@@ -7,6 +7,9 @@ namespace yaclib::detail {
 template <typename Functor, typename PrevProxy>
 class LazyProxy;
 
+template <typename Functor, typename PrevP, typename Ret>
+class ReversedLazyProxy;
+
 struct Nil {
   using FunctorT = void;
   using ReturnType = void;
@@ -22,6 +25,11 @@ struct GetProxySize<Nil> {
 
 template <typename Functor, typename PrevProxy>
 struct GetProxySize<LazyProxy<Functor, PrevProxy>> {
+  constexpr static size_t value = 1 + GetProxySize<PrevProxy>::value;
+};
+
+template <typename F, typename PrevProxy, typename Ret>
+struct GetProxySize<ReversedLazyProxy<F, PrevProxy, Ret>> {
   constexpr static size_t value = 1 + GetProxySize<PrevProxy>::value;
 };
 
