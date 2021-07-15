@@ -28,3 +28,4 @@ function(yaclib_test NAME)
 endfunction()
 
 yaclib_test(task)
+yaclib_test(thread_factory)
