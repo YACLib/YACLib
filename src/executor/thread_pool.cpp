@@ -31,7 +31,7 @@ class ThreadPool final : public IThreadPool {
   }
 
  private:
-  void Execute(ITaskPtr task) final {
+  void Execute(ITaskPtr /*task*/) final {
     // TODO(kononovk): #2 implement
   }
 
