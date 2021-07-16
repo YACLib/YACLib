@@ -11,8 +11,8 @@ jobs:
           - 'test'
           - 'include'
     steps:
-      - uses: actions/checkout@v2
       - name: Run clang-format style check for C/C++ programs.
+        uses: actions/checkout@v2
         # uses: jidicula/clang-format-action@v3.4.0
         with:
           clang-format-version: '11'
