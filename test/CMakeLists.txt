@@ -16,7 +16,11 @@ if (NOT GTEST_FOUND)
   endif ()
 endif ()
 
-add_compile_options(-Wall -Wextra -pedantic)
+if (MSVC)
+  add_compile_options(/Wall)
+else ()
+  add_compile_options(-Wall -Wextra -pedantic)
+endif ()
 
 function(yaclib_test NAME)
   add_executable(${NAME} ${NAME}.cpp)

@@ -5,7 +5,12 @@ macro(set_parent_scope)
 endmacro()
 
 # yaclib library
-add_compile_options(-Wall -Wextra -pedantic)
+if (MSVC)
+  add_compile_options(/Wall)
+else ()
+  add_compile_options(-Wall -Wextra -pedantic)
+endif ()
+
 configure_file(config.hpp.in ${CMAKE_BINARY_DIR}/config.hpp)
 
 set(${PROJECT_NAME}_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include/yaclib)
