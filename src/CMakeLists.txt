@@ -26,3 +26,6 @@ target_sources(${PROJECT_NAME}
   PUBLIC ${${PROJECT_NAME}_INCLUDES}
   PRIVATE ${${PROJECT_NAME}_HEADERS}
   )
+target_link_libraries(${PROJECT_NAME}
+  PUBLIC pthread
+  )
