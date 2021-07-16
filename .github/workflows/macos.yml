@@ -1,0 +1,26 @@
+name: macos
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ${{matrix.config.os}}
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { os: macos-10.15 }
+        build: [Debug, Release]
+
+    name: "${{matrix.config.os}}:${{matrix.build}}"
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Configure CMake
+        run: cmake -DCMAKE_BUILD_TYPE=${{matrix.build}} -DBUILD_TESTING=ON
+
+      - name: Build
+        run: cmake --build . --config ${{matrix.build}}
+
+      - name: Tests
+        run: ctest --output-on-failure -C ${{matrix.build}}
