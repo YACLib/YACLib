@@ -24,6 +24,9 @@ function(yaclib_test NAME)
     PRIVATE ${GTEST_BOTH_LIBRARIES}
     PRIVATE ${PROJECT_NAME}
     )
+  target_include_directories(${NAME}
+    PRIVATE ${CMAKE_SOURCE_DIR}/src
+    )
   add_test(NAME ${NAME} COMMAND ${NAME})
 endfunction()
 
