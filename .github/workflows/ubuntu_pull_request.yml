@@ -1,0 +1,33 @@
+name: Check pull request on Ubuntu
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        build: [ Debug ]
+        compiler:
+          - { cc: "clang-12", cxx: "clang++-12" }
+          - { cc: "gcc-10", cxx: "g++-10" }
+    name: "${{matrix.compiler.cxx}}:${{matrix.build}}"
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Configure CMake
+        run: cmake
+          -DCMAKE_BUILD_TYPE=${{ matrix.build }}
+          -DCMAKE_C_COMPILER=${{ matrix.compiler.cc }}
+          -DCMAKE_CXX_COMPILER=${{ matrix.compiler.cxx }}
+          -DBUILD_TESTING=ON
+
+      - name: Build
+        run: cmake --build . --config ${{ matrix.build }}
+
+      - name: Test
+        run: ctest --output-on-failure -C ${{ matrix.build }}
