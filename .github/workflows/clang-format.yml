@@ -1,0 +1,26 @@
+name: Check clang-format
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        path:
+          - '.'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run clang-format style check
+        uses: jidicula/clang-format-action@v3.4.0
+        with:
+          clang-format-version: '11'
+          check-path: ${{ matrix.path }}
+
