@@ -26,7 +26,7 @@ class Node {
   }
 
   T* AsItem() noexcept {
-    return reinterpret_cast<T*>(this);
+    return static_cast<T*>(this);
   }
 
   Node* _prev{this};

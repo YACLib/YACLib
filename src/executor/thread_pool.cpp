@@ -20,7 +20,7 @@ class ThreadPool final : public IThreadPool {
       Loop();
     };
     for (size_t i = 0; i != _min_threads_count; ++i) {
-      _threads.PushBack(factory->Acquire(loop_functor).release()->AsNode());
+      _threads.PushBack(factory->Acquire(loop_functor).release());
     }
   }
 

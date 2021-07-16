@@ -7,15 +7,11 @@
 
 namespace yaclib {
 
-class ITask : private container::intrusive::detail::Node<ITask> {
+class ITask : public container::intrusive::detail::Node<ITask> {
  public:
   virtual void Call() = 0;
 
   virtual ~ITask() = default;
-
-  container::intrusive::detail::Node<ITask>* AsNode() noexcept {
-    return static_cast<container::intrusive::detail::Node<ITask>*>(this);
-  }
 };
 
 using ITaskPtr = std::unique_ptr<ITask>;
