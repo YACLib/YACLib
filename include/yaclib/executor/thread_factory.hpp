@@ -8,13 +8,9 @@
 
 namespace yaclib::executor {
 
-class IThread : private container::intrusive::detail::Node<IThread> {
+class IThread : public container::intrusive::detail::Node<IThread> {
  public:
   virtual void Join() = 0;
-
-  container::intrusive::detail::Node<IThread>* AsNode() noexcept {
-    return static_cast<container::intrusive::detail::Node<IThread>*>(this);
-  }
 
   virtual ~IThread() = default;
 };
