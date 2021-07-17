@@ -16,6 +16,8 @@ class ITask : public container::intrusive::detail::Node<ITask> {
 
 using ITaskPtr = std::unique_ptr<ITask>;
 
+using Functor = std::shared_ptr<ITask>;
+
 namespace detail {
 
 template <typename Functor>
@@ -42,9 +44,15 @@ class Task final : public ITask {
 }  // namespace detail
 
 template <typename Functor>
-ITaskPtr CreateTask(Functor&& f) {
+ITaskPtr MakeTask(Functor&& f) {
   using FunctorT = std::remove_reference_t<Functor>;
   return std::make_unique<detail::Task<FunctorT>>(std::forward<Functor>(f));
+}
+
+template <typename Functor>
+yaclib::Functor MakeFunctor(Functor&& f) {
+  using FunctorT = std::remove_reference_t<Functor>;
+  return std::make_shared<detail::Task<FunctorT>>(std::forward<Functor>(f));
 }
 
 }  // namespace yaclib

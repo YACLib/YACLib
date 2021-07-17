@@ -16,9 +16,9 @@ class ThreadPool final : public IThreadPool {
              size_t max_threads_count)
       : _min_threads_count{min_threads_count},
         _max_threads_count{max_threads_count} {
-    auto loop_functor = [this] {
+    auto loop_functor = MakeFunctor([this] {
       Loop();
-    };
+    });
     for (size_t i = 0; i != _min_threads_count; ++i) {
       _threads.PushBack(factory->Acquire(loop_functor).release());
     }
@@ -88,7 +88,7 @@ class ThreadPool final : public IThreadPool {
 IThreadPoolPtr CreateThreadPool(IThreadFactoryPtr factory,
                                 size_t cached_threads_count,
                                 size_t max_threads_count) {
-  return std::make_shared<ThreadPool>(factory, cached_threads_count,
+  return std::make_shared<ThreadPool>(std::move(factory), cached_threads_count,
                                       max_threads_count);
 }
 
