@@ -22,8 +22,8 @@ using namespace yaclib;
 
 using ThreadsContainter = container::intrusive::List<executor::IThread>;
 
-constexpr auto kDoNothing = [] {
-};
+const auto kDoNothing = MakeFunc([] {
+});
 
 template <bool SingleThreaded = true>
 void MakeFactoryEmpty(executor::IThreadFactoryPtr factory,
@@ -47,7 +47,6 @@ void MakeFactoryAvailable(executor::IThreadFactoryPtr factory,
   while (release_threads != 0 && !threads.IsEmpty()) {
     auto release_thread =
         rand() % 2 == 0 ? threads.PopBack() : threads.PopFront();
-    release_thread->Join();
     factory->Release(executor::IThreadPtr{release_thread});
     --release_threads;
   }
@@ -73,23 +72,25 @@ void run_tests(size_t iter_count, executor::IThreadFactoryPtr factory,
 
 GTEST_TEST(single_threaded, simple) {
   size_t counter{0};
-  auto factory = executor::CreateThreadFactory(0, 1);
-  auto thread = factory->Acquire([&counter] {
+  auto factory = executor::MakeThreadFactory(0, 1);
+  auto thread = factory->Acquire(MakeFunc([&counter] {
     counter = 1;
-  });
-  thread->Join();
-  EXPECT_EQ(counter, 1);
+  }));
   EXPECT_EQ(factory->Acquire(kDoNothing), nullptr);
   factory->Release(std::move(thread));
+  EXPECT_EQ(counter, 1);
 }
 
 GTEST_TEST(single_threaded, complex) {
   static const size_t kMaxThreadCount =
       (kSanitizer ? 1 : 4) * std::thread::hardware_concurrency();
   static const size_t kIterCount = kSanitizer ? 10 : (100 + rand() % 100);
-  auto factory = executor::CreateThreadFactory(0, kMaxThreadCount);
+  for (size_t cached_threads :
+       {size_t{0}, kMaxThreadCount / 2, kMaxThreadCount}) {
+    auto factory = executor::MakeThreadFactory(cached_threads, kMaxThreadCount);
 
-  run_tests(kIterCount, factory, kMaxThreadCount);
+    run_tests(kIterCount, factory, kMaxThreadCount);
+  }
 }
 
 GTEST_TEST(multi_threaded, simple) {
@@ -100,33 +101,45 @@ GTEST_TEST(multi_threaded, simple) {
       kThreadsCount * std::thread::hardware_concurrency();
   static const size_t kIterCount = kSanitizer ? 10 : (100 + rand() % 100);
 
-  auto test_threads = executor::CreateThreadFactory(0, kThreadsCount);
+  for (size_t cached_threads :
+       {size_t{0}, kMaxThreadCount / 2, kMaxThreadCount}) {
+    auto test_threads = executor::MakeThreadFactory(0, kThreadsCount);
 
-  auto factory = executor::CreateThreadFactory(0, kMaxThreadCount);
+    auto factory = executor::MakeThreadFactory(cached_threads, kMaxThreadCount);
 
-  ThreadsContainter threads;
-  size_t max_threads = 0;
-  size_t remaining_threads = kMaxThreadCount;
+    ThreadsContainter threads;
+    size_t max_threads = 0;
+    size_t remaining_threads = kMaxThreadCount;
 
-  for (size_t i = 0; i != kThreadsCount; ++i) {
-    max_threads = 1 + rand() % (std::thread::hardware_concurrency() * 2);
-    auto todo_threads = kThreadsCount - (i + 1);
-    max_threads = std::min(max_threads, remaining_threads - todo_threads);
-    ASSERT_TRUE(max_threads != 0);
+    for (size_t i = 0; i != kThreadsCount; ++i) {
+      max_threads = 1 + rand() % (std::thread::hardware_concurrency() * 2);
+      auto todo_threads = kThreadsCount - (i + 1);
+      max_threads = std::min(max_threads, remaining_threads - todo_threads);
+      ASSERT_TRUE(max_threads != 0);
 
-    auto thread_func = [&factory, max_threads] {
-      run_tests<false>(kIterCount, factory, max_threads);
-    };
-    threads.PushBack(test_threads->Acquire(thread_func).release());
+      const auto thread_func = MakeFunc([&factory, max_threads] {
+        run_tests<false>(kIterCount, factory, max_threads);
+      });
+      threads.PushBack(test_threads->Acquire(thread_func).release());
 
-    remaining_threads -= max_threads;
+      remaining_threads -= max_threads;
+    }
+
+    while (!threads.IsEmpty()) {
+      auto release_thread = executor::IThreadPtr{threads.PopFront()};
+      test_threads->Release(std::move(release_thread));
+    }
   }
+}
 
-  while (!threads.IsEmpty()) {
-    auto release_thread = executor::IThreadPtr{threads.PopFront()};
-    release_thread->Join();
-    test_threads->Release(std::move(release_thread));
-  }
+GTEST_TEST(decorator, priority) {
+  // TODO(kononovk): implement test
+}
+GTEST_TEST(decorator, name) {
+  // TODO(kononovk): implement test
+}
+GTEST_TEST(decorator, callback) {
+  // TODO(kononovk): implement test
 }
 
 }  // namespace
