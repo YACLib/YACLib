@@ -7,44 +7,56 @@
 
 namespace yaclib {
 
-class ITask : public container::intrusive::detail::Node<ITask> {
+class IFunc {
  public:
   virtual void Call() = 0;
 
-  virtual ~ITask() = default;
+  virtual ~IFunc() = default;
 };
+
+using IFuncPtr = std::shared_ptr<IFunc>;
+
+class ITask : public IFunc, public container::intrusive::detail::Node {};
 
 using ITaskPtr = std::unique_ptr<ITask>;
 
 namespace detail {
 
-template <typename Functor>
-class Task final : public ITask {
+template <typename Interface, typename Functor>
+class Impl final : public Interface {
  public:
-  Task(Functor&& f) : _f{std::move(f)} {
+  Impl(Functor&& functor) : _functor{std::move(functor)} {
   }
 
-  Task(const Functor& f) : _f{f} {
+  Impl(const Functor& functor) : _functor{functor} {
   }
 
  private:
   void Call() noexcept final {
     try {
-      _f();
+      _functor();
     } catch (...) {
       // TODO(MBkkt): create issue
     }
   }
 
-  Functor _f;
+  Functor _functor;
 };
 
 }  // namespace detail
 
 template <typename Functor>
-ITaskPtr CreateTask(Functor&& f) {
-  using FunctorT = std::remove_reference_t<Functor>;
-  return std::make_unique<detail::Task<FunctorT>>(std::forward<Functor>(f));
+ITaskPtr MakeTask(Functor&& functor) {
+  return std::make_unique<
+      detail::Impl<ITask, std::remove_reference_t<Functor>>>(
+      std::forward<Functor>(functor));
+}
+
+template <typename Functor>
+IFuncPtr MakeFunc(Functor&& functor) {
+  return std::make_shared<
+      detail::Impl<IFunc, std::remove_reference_t<Functor>>>(
+      std::forward<Functor>(functor));
 }
 
 }  // namespace yaclib
