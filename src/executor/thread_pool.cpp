@@ -5,34 +5,49 @@
 
 #include <condition_variable>
 #include <mutex>
+#include <thread>
 
 namespace yaclib::executor {
 
 namespace {
 
+thread_local IThreadPool* tlCurrentThreadPool;
+
 class ThreadPool final : public IThreadPool {
  public:
-  ThreadPool(IThreadFactoryPtr factory, size_t min_threads_count,
-             size_t max_threads_count)
-      : _min_threads_count{min_threads_count},
-        _max_threads_count{max_threads_count} {
-    auto loop_functor = [this] {
+  explicit ThreadPool(size_t threads)
+      : ThreadPool{MakeThreadFactory(), threads, threads} {
+  }
+
+  ThreadPool(IThreadFactoryPtr factory, size_t cache_threads,
+             size_t max_threads)
+      : _factory(std::move(factory)),
+        _cache_threads{cache_threads},
+        _max_threads{max_threads} {
+    auto loop_functor = MakeFunc([this] {
+      tlCurrentThreadPool = this;
       Loop();
-    };
-    for (size_t i = 0; i != _min_threads_count; ++i) {
-      _threads.PushBack(factory->Acquire(loop_functor).release());
+      tlCurrentThreadPool = nullptr;
+    });
+    for (size_t i = 0; i != _cache_threads; ++i) {
+      _threads.PushBack(_factory->Acquire(loop_functor).release());
     }
   }
 
   ~ThreadPool() final {
-    // TODO(kononovk): #2 review
     Cancel();
     Wait();
   }
 
- private:
   void Execute(ITaskPtr task) final {
-    // TODO(kononovk): #2 implement
+    {
+      std::lock_guard guard{_m};
+      if (_stopped) {
+        return;
+      }
+      _tasks.PushBack(task.release());
+    }
+    _cv.notify_one();
   }
 
   void Stop() final {
@@ -41,55 +56,76 @@ class ThreadPool final : public IThreadPool {
   }
 
   void Close() final {
-    // TODO(kononovk): #2 After call: сalling Execute() for all, does nothing
+    {
+      std::lock_guard guard{_m};
+      _stopped = true;
+    }
+    _cv.notify_all();
   }
 
   void Cancel() final {
-    // TODO(kononovk): #2 After call: сalling Execute() for all,
-    //  does nothing and remove all not
+    container::intrusive::List<ITask> tasks;
+    {
+      std::lock_guard guard{_m};
+      tasks.Append(_tasks);
+      _stopped = true;
+    }
+
+    while (!tasks.IsEmpty()) {
+      ITaskPtr{tasks.PopBack()};  // for delete
+    }
+
+    _cv.notify_all();
   }
 
   void Wait() final {
-    // TODO(kononovk): #2 After call: this ThreadPool haven't running threads
+    while (!_threads.IsEmpty()) {
+      auto thread_ptr = _threads.PopFront();
+      _factory->Release(executor::IThreadPtr{thread_ptr});
+    }
   }
 
+ private:
   void Loop() {
-    /* TODO(kononovk): #2 implement
     while (true) {
       std::unique_lock guard{_m};
       while (_tasks.IsEmpty()) {
-        if (!_running) {
+        if (_stopped) {
           return;
         }
         _cv.wait(guard);
       }
-      auto current = _tasks.PopFront();
+      auto current = ITaskPtr{_tasks.PopFront()};
       guard.unlock();
-
       current->Call();
-      delete current;
     }
-     */
   }
 
   container::intrusive::List<IThread> _threads;
   container::intrusive::List<ITask> _tasks;
-  size_t _min_threads_count;
-  size_t _max_threads_count;
+  IThreadFactoryPtr _factory;
+  size_t _cache_threads;
+  size_t _max_threads;
 
   std::condition_variable _cv;
   std::mutex _m;
-
-  bool _running{true};
+  bool _stopped{false};
 };
 
 }  // namespace
 
-IThreadPoolPtr CreateThreadPool(IThreadFactoryPtr factory,
-                                size_t cached_threads_count,
-                                size_t max_threads_count) {
-  return std::make_shared<ThreadPool>(factory, cached_threads_count,
-                                      max_threads_count);
+IThreadPool* CurrentThreadPool() {
+  return tlCurrentThreadPool;
+}
+
+IThreadPoolPtr MakeThreadPool(size_t threads) {
+  return std::make_shared<ThreadPool>(threads);
+}
+
+IThreadPoolPtr MakeThreadPool(IThreadFactoryPtr factory, size_t cache_threads,
+                              size_t max_threads) {
+  return std::make_shared<ThreadPool>(std::move(factory), cache_threads,
+                                      max_threads);
 }
 
 }  // namespace yaclib::executor

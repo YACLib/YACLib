@@ -20,8 +20,11 @@ class IThreadPool : public IExecutor {
 
 using IThreadPoolPtr = std::shared_ptr<IThreadPool>;
 
-IThreadPoolPtr CreateThreadPool(IThreadFactoryPtr factory,
-                                size_t cached_threads_count,
-                                size_t max_threads_count);
+IThreadPool* CurrentThreadPool();
+
+IThreadPoolPtr MakeThreadPool(size_t threads);
+
+IThreadPoolPtr MakeThreadPool(IThreadFactoryPtr factory, size_t cache_threads,
+                              size_t max_threads);
 
 }  // namespace yaclib::executor

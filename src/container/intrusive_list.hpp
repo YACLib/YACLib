@@ -16,15 +16,19 @@ class List final {
   List(const List&) = delete;
   List& operator=(const List&) = delete;
 
+  static T* AsItem(detail::Node* node) noexcept {
+    return static_cast<T*>(node);
+  }
+
   bool IsEmpty() const noexcept {
     return !_head.IsLinked();
   }
 
-  void PushBack(detail::Node<T>* node) noexcept {
+  void PushBack(detail::Node* node) noexcept {
     node->Link(_head._prev, &_head);
   }
 
-  void PushFront(detail::Node<T>* node) noexcept {
+  void PushFront(detail::Node* node) noexcept {
     node->Link(&_head, _head._next);
   }
 
@@ -32,8 +36,10 @@ class List final {
 
   T* PopFront() noexcept;
 
+  void Append(List& other) noexcept;
+
  private:
-  detail::Node<T> _head;  // sentinel node
+  detail::Node _head;  // sentinel node
 };
 
 }  // namespace yaclib::container::intrusive
