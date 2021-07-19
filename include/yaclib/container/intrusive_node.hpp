@@ -2,7 +2,6 @@
 
 namespace yaclib::container::intrusive::detail {
 
-template <typename T>
 class Node {
  public:
   void Link(Node* prev, Node* next) noexcept {
@@ -23,10 +22,6 @@ class Node {
     _next->_prev = _prev;
     _prev = this;
     _next = this;
-  }
-
-  T* AsItem() noexcept {
-    return static_cast<T*>(this);
   }
 
   Node* _prev{this};
