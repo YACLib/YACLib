@@ -13,6 +13,19 @@ if (NOT GTEST_FOUND)
   set(GTEST_BOTH_LIBRARIES gtest gtest_main)
 endif ()
 
+# Google Benchmark
+find_package(benchmark ${LEVEL_FIND_PACKAGE} QUIET)
+
+if (NOT BENCHMARK_FOUND)
+  set(BENCHMARK_ENABLE_TESTING NO)
+  fetchcontent_declare(
+    googlebenchmark
+    GIT_REPOSITORY https://github.com/google/benchmark.git
+    GIT_TAG v1.5.5
+  )
+  fetchcontent_makeavailable(googlebenchmark)
+endif ()
+
 if (ENABLE_LTO)
   set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
 else ()
