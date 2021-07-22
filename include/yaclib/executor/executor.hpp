@@ -10,10 +10,10 @@ class IExecutor {
  public:
   template <typename Functor>
   void Execute(Functor&& functor) {
-    Execute(MakeTask(std::forward<Functor>(functor)));
+    Execute(*detail::MakeFunctorTask(std::forward<Functor>(functor)));
   }
 
-  virtual void Execute(ITaskPtr task) = 0;
+  virtual void Execute(ITask& task) = 0;
 
   virtual ~IExecutor() = default;
 };
