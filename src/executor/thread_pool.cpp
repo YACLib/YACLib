@@ -3,129 +3,122 @@
 #include <yaclib/executor/executor.hpp>
 #include <yaclib/executor/thread_pool.hpp>
 
+#include <atomic>
 #include <condition_variable>
 #include <mutex>
 #include <thread>
 
 namespace yaclib::executor {
-
 namespace {
 
 thread_local IThreadPool* tlCurrentThreadPool;
 
 class ThreadPool final : public IThreadPool {
  public:
-  explicit ThreadPool(size_t threads)
-      : ThreadPool{MakeThreadFactory(), threads, threads} {
-  }
-
-  ThreadPool(IThreadFactoryPtr factory, size_t cache_threads,
-             size_t max_threads)
-      : _factory(std::move(factory)),
-        _cache_threads{cache_threads},
-        _max_threads{max_threads} {
-    auto loop_functor = MakeFunc([this] {
+  ThreadPool(IThreadFactoryPtr factory, size_t threads)
+      : _factory{std::move(factory)}, _threads_count{threads} {
+    auto loop = MakeFunc([this] {
       tlCurrentThreadPool = this;
       Loop();
       tlCurrentThreadPool = nullptr;
     });
-    for (size_t i = 0; i != _cache_threads; ++i) {
-      _threads.PushBack(_factory->Acquire(loop_functor).release());
+    for (size_t i = 0; i != _threads_count; ++i) {
+      _threads.PushBack(_factory->Acquire(loop).release());
     }
   }
 
   ~ThreadPool() final {
-    Cancel();
+    HardStop();
     Wait();
   }
 
-  void Execute(ITaskPtr task) final {
+  void Execute(ITask& task) final {
+    _refs_flag.fetch_add(2, std::memory_order_relaxed);
     {
       std::lock_guard guard{_m};
-      if (_stopped) {
+      if (_stop) {
         return;
       }
-      _tasks.PushBack(task.release());
+      task.Acquire();
+      _tasks.PushBack(&task);
     }
     _cv.notify_one();
   }
 
-  void Stop() final {
-    // TODO(kononovk): #2 After call: сalling Execute() for all,
-    //  expect this ThreadPool tasks, does nothing
+  void SoftStop() final {
+    if (_refs_flag.fetch_add(1, std::memory_order_acq_rel) == 0) {
+      Stop();
+    }
   }
 
-  void Close() final {
+  void Stop() final {
     {
       std::lock_guard guard{_m};
-      _stopped = true;
+      _stop = true;
     }
     _cv.notify_all();
   }
 
-  void Cancel() final {
+  void HardStop() final {
     container::intrusive::List<ITask> tasks;
     {
       std::lock_guard guard{_m};
       tasks.Append(_tasks);
-      _stopped = true;
+      _stop = true;
     }
-
-    while (!tasks.IsEmpty()) {
-      ITaskPtr{tasks.PopBack()};  // for delete
-    }
-
     _cv.notify_all();
+
+    while (auto task = tasks.PopBack()) {
+      task->Release();
+    }
   }
 
   void Wait() final {
-    while (!_threads.IsEmpty()) {
-      auto thread_ptr = _threads.PopFront();
-      _factory->Release(executor::IThreadPtr{thread_ptr});
+    while (auto thread = _threads.PopFront()) {
+      _factory->Release(executor::IThreadPtr{thread});
     }
   }
 
  private:
-  void Loop() {
+  void Loop() noexcept {
+    std::unique_lock guard{_m};
     while (true) {
-      std::unique_lock guard{_m};
-      while (_tasks.IsEmpty()) {
-        if (_stopped) {
+      while (auto task = _tasks.PopFront()) {
+        guard.unlock();
+        task->Call();
+        task->Release();
+        if (_refs_flag.fetch_sub(2, std::memory_order_release) == 3) {
+          std::atomic_thread_fence(std::memory_order_acquire);
+          Stop();
           return;
         }
-        _cv.wait(guard);
+        guard.lock();
       }
-      auto current = ITaskPtr{_tasks.PopFront()};
-      guard.unlock();
-      current->Call();
+      if (_stop) {
+        return;
+      }
+      _cv.wait(guard);
     }
   }
 
+  alignas(64) std::atomic_size_t _refs_flag{0};
+  std::mutex _m;
+  std::condition_variable _cv;
+  IThreadFactoryPtr _factory;
   container::intrusive::List<IThread> _threads;
   container::intrusive::List<ITask> _tasks;
-  IThreadFactoryPtr _factory;
-  size_t _cache_threads;
-  size_t _max_threads;
-
-  std::condition_variable _cv;
-  std::mutex _m;
-  bool _stopped{false};
+  const size_t _threads_count;
+  bool _stop{false};
 };
 
 }  // namespace
 
-IThreadPool* CurrentThreadPool() {
+IThreadPool* CurrentThreadPool() noexcept {
   return tlCurrentThreadPool;
 }
 
-IThreadPoolPtr MakeThreadPool(size_t threads) {
-  return std::make_shared<ThreadPool>(threads);
-}
-
-IThreadPoolPtr MakeThreadPool(IThreadFactoryPtr factory, size_t cache_threads,
-                              size_t max_threads) {
-  return std::make_shared<ThreadPool>(std::move(factory), cache_threads,
-                                      max_threads);
+IThreadPoolPtr MakeThreadPool(size_t threads, IThreadFactoryPtr factory) {
+  return std::make_shared<ThreadPool>(std::move(factory), threads);
 }
 
 }  // namespace yaclib::executor
