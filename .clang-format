@@ -20,7 +20,7 @@ IncludeCategories:
     Priority: 30
   - Regex: '^<[[:alpha:]_\/]+>$' # STL
     Priority: 40
-  - Regex: '^<.*.hpp>$'          # our library private includes
+  - Regex: '^<.*\.hpp>$'         # our library private includes
     Priority: 20
   - Regex: '.*'                  # other libraries (system headers in our case)
     Priority: 50
