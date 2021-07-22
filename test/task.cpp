@@ -38,14 +38,14 @@ struct Idle {
 
 GTEST_TEST(function_ptr, function_ptr) {
   counter = 0;
-  ITaskPtr task = MakeTask(&AddOne);
+  IFuncPtr task = MakeFunc(&AddOne);
   EXPECT_EQ(counter, 0);
   task->Call();
   EXPECT_EQ(counter, 1);
   task->Call();
   EXPECT_EQ(counter, 2);
 
-  task = MakeTask(&AddOne);
+  task = MakeFunc(&AddOne);
   EXPECT_EQ(counter, 2);
   task->Call();
   EXPECT_EQ(counter, 3);
@@ -56,14 +56,14 @@ GTEST_TEST(lambda, lvalue) {
   auto lambda = [&] {
     ++value;
   };
-  ITaskPtr task = MakeTask(lambda);
+  IFuncPtr task = MakeFunc(lambda);
   EXPECT_EQ(value, 0);
   task->Call();
   EXPECT_EQ(value, 1);
   task->Call();
   EXPECT_EQ(value, 2);
 
-  task = MakeTask([&] {
+  task = MakeFunc([&] {
     ++value;
   });
   EXPECT_EQ(value, 2);
@@ -73,7 +73,7 @@ GTEST_TEST(lambda, lvalue) {
 
 GTEST_TEST(lambda, rvalue) {
   size_t value = 0;
-  ITaskPtr task = MakeTask([&] {
+  IFuncPtr task = MakeFunc([&] {
     ++value;
   });
   EXPECT_EQ(value, 0);
@@ -88,7 +88,7 @@ GTEST_TEST(std_function, lvalue) {
   const std::function<void()> fun1{[&] {
     ++value;
   }};
-  auto task = MakeTask(fun1);
+  auto task = MakeFunc(fun1);
   EXPECT_EQ(value, 0);
   task->Call();
   EXPECT_EQ(value, 1);
@@ -98,7 +98,7 @@ GTEST_TEST(std_function, lvalue) {
   std::function<void()> fun2 = [&] {
     --value;
   };
-  task = MakeTask(fun2);
+  task = MakeFunc(fun2);
   EXPECT_EQ(value, 2);
   task->Call();
   EXPECT_EQ(value, 1);
@@ -106,7 +106,7 @@ GTEST_TEST(std_function, lvalue) {
 
 GTEST_TEST(std_function, rvalue) {
   int value = 0;
-  auto task = MakeTask(std::function<void()>([&] {
+  auto task = MakeFunc(std::function<void()>([&] {
     ++value;
   }));
   EXPECT_EQ(value, 0);
@@ -118,7 +118,7 @@ GTEST_TEST(std_function, rvalue) {
   std::function<void()> fun = [&] {
     --value;
   };
-  task = MakeTask(std::move(fun));
+  task = MakeFunc(std::move(fun));
   EXPECT_EQ(value, 2);
   task->Call();
   EXPECT_EQ(value, 1);
@@ -126,14 +126,14 @@ GTEST_TEST(std_function, rvalue) {
 
 GTEST_TEST(member_function, mut_obj_mut_method) {
   Idle idle;
-  auto task = MakeTask([&idle] {
+  auto task = MakeFunc([&idle] {
     idle.DoNothingForceMut();
   });
   task->Call();
   EXPECT_EQ(idle._force_mut_method_called, true);
 
   idle = Idle{};
-  task = MakeTask([&idle] {
+  task = MakeFunc([&idle] {
     idle.DoNothing();
   });
   task->Call();
@@ -142,7 +142,7 @@ GTEST_TEST(member_function, mut_obj_mut_method) {
 
 GTEST_TEST(member_function, mut_obj_const_method) {
   Idle idle;
-  auto task = MakeTask([&idle] {
+  auto task = MakeFunc([&idle] {
     idle.DoNothingForceConst();
   });
   task->Call();
@@ -151,7 +151,7 @@ GTEST_TEST(member_function, mut_obj_const_method) {
 
 GTEST_TEST(member_function, const_obj_const_method) {
   const Idle const_idle;
-  auto task = MakeTask([&const_idle] {
+  auto task = MakeFunc([&const_idle] {
     const_idle.DoNothing();
   });
   task->Call();
