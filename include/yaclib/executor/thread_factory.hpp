@@ -18,7 +18,7 @@ using IThreadPtr = std::unique_ptr<IThread>;
 
 class IThreadFactory {
  public:
-  virtual IThreadPtr Acquire(IFuncPtr functor) = 0;
+  virtual IThreadPtr Acquire(IFuncPtr func) = 0;
 
   virtual void Release(IThreadPtr thread) = 0;
 
@@ -27,9 +27,7 @@ class IThreadFactory {
 
 using IThreadFactoryPtr = std::shared_ptr<IThreadFactory>;
 
-IThreadFactoryPtr MakeThreadFactory();
-
-IThreadFactoryPtr MakeThreadFactory(size_t cache_threads, size_t max_threads);
+IThreadFactoryPtr MakeThreadFactory(size_t cache_threads = 0);
 
 IThreadFactoryPtr MakeThreadFactory(IThreadFactoryPtr base, std::string name);
 
