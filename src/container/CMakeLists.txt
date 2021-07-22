@@ -1,11 +1,15 @@
-list(APPEND ${PROJECT_NAME}_INCLUDES
-  ${${PROJECT_NAME}_INCLUDE_DIR}/container/intrusive_node.hpp
-  )
-list(APPEND ${PROJECT_NAME}_HEADERS
+list(
+  APPEND YACLIB_INCLUDES
+  ${YACLIB_INCLUDE_DIR}/container/intrusive_node.hpp
+)
+list(
+  APPEND YACLIB_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/intrusive_list.hpp
-  )
-list(APPEND ${PROJECT_NAME}_SOURCES
+)
+list(
+  APPEND YACLIB_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/intrusive_list.cpp
-  )
+  ${CMAKE_CURRENT_SOURCE_DIR}/mpsc_stack.hpp
+)
 
-set_parent_scope()
+add_files()

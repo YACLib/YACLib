@@ -1,9 +1,7 @@
 #include <container/intrusive_list.hpp>
 
-#include <yaclib/container/intrusive_node.hpp>
 #include <yaclib/executor/thread_factory.hpp>
 
-#include <atomic>
 #include <cassert>
 #include <condition_variable>
 #include <mutex>
@@ -58,7 +56,8 @@ class HeavyThread final : public IThread {
            IFuncPtr acquire, IFuncPtr release) {
     {
       std::lock_guard guard{_m};
-      assert(!_stopped);
+      assert(_state == State::Idle);
+      _state = State::Run;
       _priority = priority;
       _name = name;
       _func = std::move(func);
@@ -68,10 +67,17 @@ class HeavyThread final : public IThread {
     _cv.notify_all();
   }
 
+  void Wait() {
+    std::unique_lock guard{_m};
+    while (_state == State::Run) {
+      _cv.wait(guard);
+    }
+  }
+
   void Join() {
     {
       std::lock_guard guard{_m};
-      _stopped = true;
+      _state = State::Stop;
     }
     _cv.notify_all();
     if (_thread.joinable()) {
@@ -83,28 +89,35 @@ class HeavyThread final : public IThread {
   void Loop() {
     std::unique_lock guard{_m};
     while (true) {
-      while (!_func) {
-        if (_stopped) {
-          return;
-        }
-        _cv.wait(guard);
+      while (_func) {
+        auto priority = std::exchange(_priority, 0);
+        auto name = std::exchange(_name, "");
+        auto func = std::exchange(_func, nullptr);
+        auto acquire = std::exchange(_acquire, nullptr);
+        auto release = std::exchange(_release, nullptr);
+
+        guard.unlock();
+        CallFunc(priority, name, *func, acquire.get(), release.get());
+        guard.lock();
       }
-
-      auto priority = std::exchange(_priority, 0);
-      auto name = std::exchange(_name, "");
-      auto func = std::exchange(_func, nullptr);
-      auto acquire = std::exchange(_acquire, nullptr);
-      auto release = std::exchange(_release, nullptr);
-
-      guard.unlock();
-      CallFunc(priority, name, *func, acquire.get(), release.get());
-      guard.lock();
+      if (_state == State::Stop) {
+        return;
+      } else {
+        _state = State::Idle;
+        _cv.notify_one();
+      }
+      _cv.wait(guard);
     }
   }
 
   std::mutex _m;
   std::condition_variable _cv;
-  bool _stopped{false};
+  enum class State {
+    Idle,
+    Run,
+    Stop,
+  };
+  State _state{State::Idle};
 
   size_t _priority{0};
   std::string_view _name;
@@ -128,26 +141,16 @@ class BaseFactory : public IThreadFactory {
 
 class ThreadFactory : public BaseFactory {
  public:
-  explicit ThreadFactory() {
-  }
+  explicit ThreadFactory() = default;
 
   virtual IThreadPtr Acquire(IFuncPtr func, size_t priority,
                              std::string_view name, IFuncPtr acquire,
-                             IFuncPtr release) {
-    return std::make_unique<LightThread>(priority, name, std::move(func),
-                                         std::move(acquire),
-                                         std::move(release));
-  }
+                             IFuncPtr release) = 0;
 
  private:
-  IThreadPtr Acquire(IFuncPtr func) override {
+  IThreadPtr Acquire(IFuncPtr func) final {
     return Acquire(std::move(func), GetPriority(), GetName(), GetAcquire(),
                    GetRelease());
-  }
-
-  void Release(IThreadPtr thread) override {
-    static_cast<LightThread&>(*thread).Join();
-    thread.reset();
   }
 
   ThreadFactory& GetThreadFactory() final {
@@ -169,39 +172,26 @@ class ThreadFactory : public BaseFactory {
 
 class LightThreadFactory final : public ThreadFactory {
  public:
-  explicit LightThreadFactory(size_t max_threads) : _max_threads(max_threads) {
-  }
+  LightThreadFactory() = default;
 
  private:
   IThreadPtr Acquire(IFuncPtr func, size_t priority, std::string_view name,
                      IFuncPtr acquire, IFuncPtr release) final {
-    if (_threads.fetch_add(1, std::memory_order_acq_rel) < _max_threads) {
-      return std::make_unique<LightThread>(priority, name, std::move(func),
-                                           std::move(acquire),
-                                           std::move(release));
-    }
-    // It's fast and ensures that we never create more than _max_threads
-    // std::thread, but it doesn't guarantee that we won't get nullptr back
-    // when std::thread count < _max_threads.
-    _threads.fetch_sub(1, std::memory_order_relaxed);
-    return nullptr;
+    return std::make_unique<LightThread>(priority, name, std::move(func),
+                                         std::move(acquire),
+                                         std::move(release));
   }
 
   void Release(IThreadPtr thread) final {
     static_cast<LightThread&>(*thread).Join();
     thread.reset();
-    _threads.fetch_sub(1, std::memory_order_release);
   }
-
-  const size_t _max_threads;
-
-  std::atomic_size_t _threads{0};
 };
 
 class HeavyThreadFactory final : public ThreadFactory {
  public:
-  HeavyThreadFactory(size_t cache_threads, size_t max_threads)
-      : _cache_threads{cache_threads}, _max_threads(max_threads) {
+  explicit HeavyThreadFactory(size_t cache_threads)
+      : _cache_threads{cache_threads} {
   }
 
  private:
@@ -210,9 +200,6 @@ class HeavyThreadFactory final : public ThreadFactory {
     std::unique_lock guard{_m};
     IThreadPtr thread{_threads.PopBack()};
     if (thread == nullptr) {
-      if (_threads_count == _max_threads) {
-        return nullptr;
-      }
       thread = std::make_unique<HeavyThread>();
       ++_threads_count;
     }
@@ -227,6 +214,7 @@ class HeavyThreadFactory final : public ThreadFactory {
   void Release(IThreadPtr thread) final {
     std::unique_lock guard{_m};
     if (_threads_count <= _cache_threads) {
+      static_cast<HeavyThread&>(*thread).Wait();
       _threads.PushBack(thread.release());
     } else {
       static_cast<HeavyThread&>(*thread).Join();
@@ -236,7 +224,6 @@ class HeavyThreadFactory final : public ThreadFactory {
   }
 
   const size_t _cache_threads;
-  const size_t _max_threads;
 
   std::mutex _m;
   size_t _threads_count{0};
@@ -360,16 +347,12 @@ class CallbackThreadFactory final : public DecoratorThreadFactory {
 
 }  // namespace
 
-IThreadFactoryPtr MakeThreadFactory() {
-  static auto factory = std::make_shared<ThreadFactory>();
-  return factory;
-}
-
-IThreadFactoryPtr MakeThreadFactory(size_t cache_threads, size_t max_threads) {
+IThreadFactoryPtr MakeThreadFactory(size_t cache_threads) {
   if (cache_threads == 0) {
-    return std::make_shared<LightThreadFactory>(max_threads);
+    static auto factory = std::make_shared<LightThreadFactory>();
+    return factory;
   }
-  return std::make_shared<HeavyThreadFactory>(cache_threads, max_threads);
+  return std::make_shared<HeavyThreadFactory>(cache_threads);
 }
 
 IThreadFactoryPtr MakeThreadFactory(IThreadFactoryPtr base, size_t priority) {

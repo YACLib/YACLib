@@ -1,34 +1,32 @@
 #pragma once
 
+#include "ref.hpp"
+
 #include <yaclib/container/intrusive_node.hpp>
 
-#include <functional>
 #include <memory>
+#include <utility>
 
 namespace yaclib {
 
-class IFunc {
+class IFunc : public IRef {
  public:
   virtual void Call() = 0;
-
-  virtual ~IFunc() = default;
 };
 
 using IFuncPtr = std::shared_ptr<IFunc>;
 
 class ITask : public IFunc, public container::intrusive::detail::Node {};
 
-using ITaskPtr = std::unique_ptr<ITask>;
-
 namespace detail {
 
 template <typename Interface, typename Functor>
-class Impl final : public Interface {
+class CallImpl : public Interface {
  public:
-  Impl(Functor&& functor) : _functor{std::move(functor)} {
+  explicit CallImpl(Functor&& functor) : _functor{std::move(functor)} {
   }
 
-  Impl(const Functor& functor) : _functor{functor} {
+  explicit CallImpl(const Functor& functor) : _functor{functor} {
   }
 
  private:
@@ -43,19 +41,45 @@ class Impl final : public Interface {
   Functor _functor;
 };
 
+template <typename Functor>
+class FunctorFunc final : public CallImpl<IFunc, Functor> {
+ public:
+  using CallImpl<IFunc, Functor>::CallImpl;
+
+ private:
+  void Acquire() noexcept final {
+  }
+
+  void Release() noexcept final {
+  }
+};
+
+template <typename Functor>
+class FunctorTask final : public CallImpl<ITask, Functor> {
+ public:
+  using CallImpl<ITask, Functor>::CallImpl;
+
+ private:
+  void Acquire() noexcept final {
+  }
+
+  void Release() noexcept final {
+    delete this;
+  }
+};
+
+template <typename Functor>
+ITask* MakeFunctorTask(Functor&& functor) {
+  using FunctorType = std::remove_reference_t<Functor>;
+  return new FunctorTask<FunctorType>{std::forward<Functor>(functor)};
+}
+
 }  // namespace detail
 
 template <typename Functor>
-ITaskPtr MakeTask(Functor&& functor) {
-  return std::make_unique<
-      detail::Impl<ITask, std::remove_reference_t<Functor>>>(
-      std::forward<Functor>(functor));
-}
-
-template <typename Functor>
 IFuncPtr MakeFunc(Functor&& functor) {
-  return std::make_shared<
-      detail::Impl<IFunc, std::remove_reference_t<Functor>>>(
+  using FunctorType = std::remove_reference_t<Functor>;
+  return std::make_shared<detail::FunctorFunc<FunctorType>>(
       std::forward<Functor>(functor));
 }
 

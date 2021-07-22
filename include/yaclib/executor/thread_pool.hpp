@@ -4,27 +4,27 @@
 #include <yaclib/executor/thread_factory.hpp>
 
 #include <memory>
+#include <thread>
 
 namespace yaclib::executor {
 
 class IThreadPool : public IExecutor {
  public:
+  virtual void SoftStop() = 0;
+
   virtual void Stop() = 0;
 
-  virtual void Close() = 0;
-
-  virtual void Cancel() = 0;
+  virtual void HardStop() = 0;
 
   virtual void Wait() = 0;
 };
 
 using IThreadPoolPtr = std::shared_ptr<IThreadPool>;
 
-IThreadPool* CurrentThreadPool();
+IThreadPool* CurrentThreadPool() noexcept;
 
-IThreadPoolPtr MakeThreadPool(size_t threads);
-
-IThreadPoolPtr MakeThreadPool(IThreadFactoryPtr factory, size_t cache_threads,
-                              size_t max_threads);
+IThreadPoolPtr MakeThreadPool(
+    size_t threads = std::thread::hardware_concurrency(),
+    IThreadFactoryPtr factory = MakeThreadFactory());
 
 }  // namespace yaclib::executor

@@ -14,18 +14,14 @@ namespace {
 using namespace yaclib;
 using namespace std::chrono_literals;
 
-executor::IThreadPoolPtr MakeTestPool() {
-  return executor::MakeThreadPool(std::thread::hardware_concurrency());
-}
-
 GTEST_TEST(single_threaded, just_works) {
-  auto tp = MakeTestPool();
+  auto tp = executor::MakeThreadPool();
 
   bool ready{false};
   tp->Execute([&ready] {
     ready = true;
   });
-  tp->Close();
+  tp->Stop();
   tp->Wait();
   EXPECT_TRUE(ready);
 }
@@ -38,7 +34,7 @@ GTEST_TEST(single_threaded, exception) {
     ready = true;
     throw std::runtime_error("task failed");
   });
-  tp->Close();
+  tp->Stop();
   tp->Wait();
   EXPECT_TRUE(ready);
 }
@@ -53,8 +49,7 @@ GTEST_TEST(single_threaded, many_tasks) {
       ++tasks;
     });
   }
-
-  tp->Close();
+  tp->Stop();
   tp->Wait();
 
   EXPECT_EQ(tasks.load(), kTasks);
@@ -78,32 +73,32 @@ GTEST_TEST(multithreaded, simple) {
 
   ASSERT_EQ(tasks.load(), 1);
 
-  tp->Close();
+  tp->Stop();
   tp->Wait();
 
   ASSERT_EQ(tasks.load(), 2);
 }
 
 GTEST_TEST(two_pools, simple) {
-  auto factory = executor::MakeThreadFactory(0, 4);
-  auto pool1 = executor::MakeThreadPool(factory, 2, 2);
-  auto pool2 = executor::MakeThreadPool(factory, 2, 2);
+  auto factory = executor::MakeThreadFactory(4);
+  auto pool1 = executor::MakeThreadPool(2, factory);
+  auto pool2 = executor::MakeThreadPool(2, factory);
 
   std::atomic<size_t> tasks{0};
   util::StopWatch stop_watch;
 
   pool1->Execute([&] {
     std::this_thread::sleep_for(1s);
-    ++tasks;
+    tasks.fetch_add(1, std::memory_order_relaxed);
   });
 
   pool2->Execute([&] {
     std::this_thread::sleep_for(1s);
-    ++tasks;
+    tasks.fetch_add(1, std::memory_order_relaxed);
   });
 
-  pool1->Close();
-  pool2->Close();
+  pool1->Stop();
+  pool2->Stop();
   pool1->Wait();
   pool2->Wait();
 
@@ -128,7 +123,7 @@ GTEST_TEST(stop, simple) {
     });
   }
   std::this_thread::sleep_for(250ms);
-  pool->Close();
+  pool->Stop();
   EXPECT_LE(stop_watch.Elapsed(), 1s);
 }
 
@@ -146,7 +141,7 @@ GTEST_TEST(simple, dont_burn_cpu) {
 
   std::this_thread::sleep_for(1s);
 
-  pool->Close();
+  pool->Stop();
   pool->Wait();
 
   EXPECT_TRUE(cpu_timer.Elapsed() < 100ms);
@@ -161,7 +156,7 @@ GTEST_TEST(simple, current) {
     EXPECT_EQ(executor::CurrentThreadPool(), tp.get());
   });
 
-  tp->Close();
+  tp->Stop();
   tp->Wait();
 }
 
@@ -178,7 +173,7 @@ GTEST_TEST(simple, execute_after_join) {
       done = true;
     });
 
-    tp->Close();
+    tp->Stop();
   });
 
   tp->Wait();
@@ -199,9 +194,9 @@ GTEST_TEST(simple, execute_after_cancel) {
     });
   });
 
-  tp->Cancel();
+  tp->HardStop();
   tp->Wait();
-  ASSERT_FALSE(done);
+  EXPECT_FALSE(done);
 }
 
 GTEST_TEST(simple, racy) {
@@ -219,7 +214,7 @@ GTEST_TEST(simple, racy) {
     });
   }
 
-  tp->Close();
+  tp->Stop();
   tp->Wait();
 
   std::cout << "Racy counter value: " << shared_counter << std::endl;
@@ -261,7 +256,7 @@ GTEST_TEST(simple, test_lifetime) {
   }
   std::this_thread::sleep_for(500ms);
   EXPECT_EQ(dead.load(), 4);
-  tp->Close();
+  tp->Stop();
   tp->Wait();
 }
 
@@ -279,7 +274,7 @@ GTEST_TEST(simple, use_threads) {
     });
   }
 
-  pool->Close();
+  pool->Stop();
   pool->Wait();
 
   EXPECT_EQ(tasks.load(), 4);

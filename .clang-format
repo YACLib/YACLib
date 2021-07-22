@@ -9,7 +9,7 @@ AllowShortLambdasOnASingleLine: None
 AllowShortFunctionsOnASingleLine: None
 AllowShortBlocksOnASingleLine: Never
 AllowShortCaseLabelsOnASingleLine: false
-AllowShortEnumsOnASingleLine: false
+AllowShortEnumsOnASingleLine: true # if false then enums would be formatted as Allman braces style
 AllowShortIfStatementsOnASingleLine: Never
 AllowShortLoopsOnASingleLine: false
 
