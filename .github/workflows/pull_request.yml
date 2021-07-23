@@ -8,7 +8,7 @@ on:
 jobs:
   main:
     runs-on: ${{ matrix.config.os }}
-    name: "${{matrix.config.os}} | ${{matrix.config.cxx}} | ${{matrix.build_type}}"
+    name: "${{matrix.config.os}} / ${{matrix.config.cxx}} / ${{matrix.build_type}}"
     strategy:
       fail-fast: false
       matrix:
@@ -21,6 +21,10 @@ jobs:
           - {
             os: ubuntu-latest,
             cc: "clang-12", cxx: "clang++-12"
+          }
+          - {
+            os: windows-latest,
+            cc: "cl", cxx: "cl",
           }
     steps:
       - uses: actions/checkout@v2
