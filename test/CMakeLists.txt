@@ -9,6 +9,8 @@ if (NOT GTEST_FOUND)
     GIT_REPOSITORY https://github.com/google/googletest.git
     GIT_TAG release-1.11.0
   )
+  # For Windows: Prevent overriding the parent project's compiler/linker settings
+  set(gtest_force_shared_crt ON CACHE BOOL "Always use msvcrt.dll")
   fetchcontent_makeavailable(googletest)
   set(GTEST_BOTH_LIBRARIES gtest gtest_main)
 endif ()
@@ -32,7 +34,11 @@ else ()
   set(CMAKE_INTERPROCEDURAL_OPTIMIZATION OFF)
 endif ()
 
-add_compile_options(-Wall -Wextra -pedantic)
+if (MSVC)
+  add_compile_options(/W3 /Wall)
+else ()
+  add_compile_options(-Wall -Wextra -pedantic)
+endif ()
 
 set(UTIL_HEADERS
   util/cpu_time.hpp

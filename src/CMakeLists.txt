@@ -5,7 +5,12 @@ macro(add_files)
 endmacro()
 
 # yaclib library
-add_compile_options(-Wall -Wextra -pedantic)
+if (MSVC)
+  add_compile_options(/Wall)
+else ()
+  add_compile_options(-Wall -Wextra -pedantic)
+endif ()
+
 configure_file(config.hpp.in ${CMAKE_BINARY_DIR}/include/yaclib/config.hpp)
 
 set(YACLIB_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include/yaclib)
@@ -30,10 +35,13 @@ target_sources(
   PUBLIC ${YACLIB_INCLUDES}
   PRIVATE ${YACLIB_HEADERS}
 )
+
+find_package(Threads REQUIRED)
 target_link_libraries(
   ${PROJECT_NAME}
-  PUBLIC pthread
+  PUBLIC Threads::Threads
 )
+
 target_include_directories(
   ${PROJECT_NAME}
   PUBLIC ${CMAKE_SOURCE_DIR}/include

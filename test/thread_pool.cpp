@@ -127,6 +127,11 @@ GTEST_TEST(stop, simple) {
   EXPECT_LE(stop_watch.Elapsed(), 1s);
 }
 
+/* TODO(Ri7ay): Dont work on windows, check this:
+ *   -
+ * https://stackoverflow.com/questions/12606033/computing-cpu-time-in-c-on-windows
+ */
+#if __linux
 GTEST_TEST(simple, dont_burn_cpu) {
   auto pool = executor::MakeThreadPool(4);
 
@@ -146,6 +151,7 @@ GTEST_TEST(simple, dont_burn_cpu) {
 
   EXPECT_TRUE(cpu_timer.Elapsed() < 100ms);
 }
+#endif
 
 GTEST_TEST(simple, current) {
   auto tp = executor::MakeThreadPool(4);

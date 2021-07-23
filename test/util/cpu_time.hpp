@@ -6,6 +6,8 @@
 
 namespace util {
 
+/* TODO(Ri7ay): dont work on windows, check thread_pool tests */
+#if __linux
 class ProcessCPUTimer {
  public:
   ProcessCPUTimer() {
@@ -63,5 +65,6 @@ class ThreadCPUTimer {
  private:
   struct timespec start_;
 };
+#endif  // linux
 
 }  // namespace util
