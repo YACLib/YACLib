@@ -1,7 +1,7 @@
 unset(CMAKE_INTERPROCEDURAL_OPTIMIZATION)
 
 # GTest
-find_package(GTest ${LEVEL_FIND_PACKAGE})
+find_package(GTest QUIET)
 
 if (NOT GTEST_FOUND)
   fetchcontent_declare(
@@ -12,20 +12,20 @@ if (NOT GTEST_FOUND)
   # For Windows: Prevent overriding the parent project's compiler/linker settings
   set(gtest_force_shared_crt ON CACHE BOOL "Always use msvcrt.dll")
   fetchcontent_makeavailable(googletest)
-  set(GTEST_BOTH_LIBRARIES gtest gtest_main)
+  set(GTEST_BOTH_LIBRARIES GTest::gtest GTest::gtest_main)
 endif ()
 
 # Google Benchmark
-find_package(benchmark ${LEVEL_FIND_PACKAGE} QUIET)
+find_package(benchmark QUIET)
 
 if (NOT BENCHMARK_FOUND)
   set(BENCHMARK_ENABLE_TESTING NO)
   fetchcontent_declare(
-    googlebenchmark
+    benchmark
     GIT_REPOSITORY https://github.com/google/benchmark.git
     GIT_TAG v1.5.5
   )
-  fetchcontent_makeavailable(googlebenchmark)
+  fetchcontent_makeavailable(benchmark)
 endif ()
 
 if (ENABLE_LTO)
@@ -34,32 +34,34 @@ else ()
   set(CMAKE_INTERPROCEDURAL_OPTIMIZATION OFF)
 endif ()
 
-if (MSVC)
-  add_compile_options(/W3 /Wall)
-else ()
-  add_compile_options(-Wall -Wextra -pedantic)
-endif ()
+add_compile_options(${YACLIB_COMPILE_OPTIONS})
+add_link_options(${YACLIB_LINK_OPTIONS})
 
-set(UTIL_HEADERS
+set(
+  TEST_UTIL_HEADERS
   util/cpu_time.hpp
   util/time.hpp
-  )
+)
 
 function(yaclib_test NAME)
-  add_executable(${NAME}
+  add_executable(
+    ${NAME}
     ${NAME}.cpp
-    )
-  target_sources(${NAME}
+  )
+  target_sources(
+    ${NAME}
     PRIVATE ${UTIL_HEADERS}
-    )
-  target_link_libraries(${NAME}
+  )
+  target_link_libraries(
+    ${NAME}
     PRIVATE ${GTEST_BOTH_LIBRARIES}
     PRIVATE benchmark::benchmark
     PRIVATE ${PROJECT_NAME}
-    )
-  target_include_directories(${NAME}
+  )
+  target_include_directories(
+    ${NAME}
     PRIVATE ${CMAKE_SOURCE_DIR}/src
-    )
+  )
   add_test(NAME ${NAME} COMMAND ${NAME})
 endfunction()
 
