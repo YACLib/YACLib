@@ -30,11 +30,11 @@ class LightThread final : public IThread {
               IFuncPtr acquire, IFuncPtr release)
       : _thread{[priority, name, func = std::move(func),
                  acquire = std::move(acquire), release = std::move(release)] {
-          CallFunc(priority, name, *func, acquire.get(), release.get());
+          CallFunc(priority, name, *func, acquire.Get(), release.Get());
         }} {
   }
 
-  void Join() {
+  ~LightThread() final {
     if (_thread.joinable()) {
       _thread.join();
     }
@@ -74,13 +74,13 @@ class HeavyThread final : public IThread {
     }
   }
 
-  void Join() {
-    {
-      std::lock_guard guard{_m};
-      _state = State::Stop;
-    }
-    _cv.notify_all();
+  ~HeavyThread() final {
     if (_thread.joinable()) {
+      {
+        std::lock_guard guard{_m};
+        _state = State::Stop;
+      }
+      _cv.notify_all();
       _thread.join();
     }
   }
@@ -97,7 +97,7 @@ class HeavyThread final : public IThread {
         auto release = std::exchange(_release, nullptr);
 
         guard.unlock();
-        CallFunc(priority, name, *func, acquire.get(), release.get());
+        CallFunc(priority, name, *func, acquire.Get(), release.Get());
         guard.lock();
       }
       if (_state == State::Stop) {
@@ -171,9 +171,6 @@ class ThreadFactory : public BaseFactory {
 };
 
 class LightThreadFactory final : public ThreadFactory {
- public:
-  LightThreadFactory() = default;
-
  private:
   IThreadPtr Acquire(IFuncPtr func, size_t priority, std::string_view name,
                      IFuncPtr acquire, IFuncPtr release) final {
@@ -183,15 +180,25 @@ class LightThreadFactory final : public ThreadFactory {
   }
 
   void Release(IThreadPtr thread) final {
-    static_cast<LightThread&>(*thread).Join();
     thread.reset();
+  }
+
+  void IncRef() noexcept final {
+  }
+  void DecRef() noexcept final {
   }
 };
 
-class HeavyThreadFactory final : public ThreadFactory {
+class HeavyThreadFactory : public ThreadFactory {
  public:
   explicit HeavyThreadFactory(size_t cache_threads)
       : _cache_threads{cache_threads} {
+  }
+
+  ~HeavyThreadFactory() {
+    while (auto thread = _threads.PopFront()) {
+      delete thread;
+    }
   }
 
  private:
@@ -217,7 +224,6 @@ class HeavyThreadFactory final : public ThreadFactory {
       static_cast<HeavyThread&>(*thread).Wait();
       _threads.PushBack(thread.release());
     } else {
-      static_cast<HeavyThread&>(*thread).Join();
       thread.reset();
       --_threads_count;
     }
@@ -268,7 +274,7 @@ class DecoratorThreadFactory : public BaseFactory {
   IThreadFactoryPtr _base;
 };
 
-class PriorityThreadFactory final : public DecoratorThreadFactory {
+class PriorityThreadFactory : public DecoratorThreadFactory {
  public:
   PriorityThreadFactory(IThreadFactoryPtr base, size_t priority)
       : DecoratorThreadFactory{std::move(base)}, _priority{priority} {
@@ -282,7 +288,7 @@ class PriorityThreadFactory final : public DecoratorThreadFactory {
   size_t _priority;
 };
 
-class NamedThreadFactory final : public DecoratorThreadFactory {
+class NamedThreadFactory : public DecoratorThreadFactory {
  public:
   NamedThreadFactory(IThreadFactoryPtr base, std::string name)
       : DecoratorThreadFactory{std::move(base)}, _name{std::move(name)} {
@@ -296,7 +302,7 @@ class NamedThreadFactory final : public DecoratorThreadFactory {
   std::string _name;
 };
 
-class AcquireThreadFactory final : public DecoratorThreadFactory {
+class AcquireThreadFactory : public DecoratorThreadFactory {
  public:
   AcquireThreadFactory(IThreadFactoryPtr base, IFuncPtr acquire)
       : DecoratorThreadFactory{std::move(base)}, _acquire{std::move(acquire)} {
@@ -310,7 +316,7 @@ class AcquireThreadFactory final : public DecoratorThreadFactory {
   IFuncPtr _acquire;
 };
 
-class ReleaseThreadFactory final : public DecoratorThreadFactory {
+class ReleaseThreadFactory : public DecoratorThreadFactory {
  public:
   ReleaseThreadFactory(IThreadFactoryPtr base, IFuncPtr release)
       : DecoratorThreadFactory{std::move(base)}, _release{std::move(release)} {
@@ -324,7 +330,7 @@ class ReleaseThreadFactory final : public DecoratorThreadFactory {
   IFuncPtr _release;
 };
 
-class CallbackThreadFactory final : public DecoratorThreadFactory {
+class CallbackThreadFactory : public DecoratorThreadFactory {
  public:
   CallbackThreadFactory(IThreadFactoryPtr base, IFuncPtr acquire,
                         IFuncPtr release)
@@ -349,33 +355,36 @@ class CallbackThreadFactory final : public DecoratorThreadFactory {
 
 IThreadFactoryPtr MakeThreadFactory(size_t cache_threads) {
   if (cache_threads == 0) {
-    static auto factory = std::make_shared<LightThreadFactory>();
-    return factory;
+    static LightThreadFactory sFactory;
+    return IThreadFactoryPtr{&sFactory};
   }
-  return std::make_shared<HeavyThreadFactory>(cache_threads);
+  return new container::Counter<HeavyThreadFactory>{cache_threads};
 }
 
 IThreadFactoryPtr MakeThreadFactory(IThreadFactoryPtr base, size_t priority) {
-  return std::make_shared<PriorityThreadFactory>(std::move(base), priority);
+  return new container::Counter<PriorityThreadFactory>(std::move(base),
+                                                       priority);
 }
 
 IThreadFactoryPtr MakeThreadFactory(IThreadFactoryPtr base, std::string name) {
-  return std::make_shared<NamedThreadFactory>(std::move(base), std::move(name));
+  return new container::Counter<NamedThreadFactory>(std::move(base),
+                                                    std::move(name));
 }
 
 IThreadFactoryPtr MakeThreadFactory(IThreadFactoryPtr base, IFuncPtr acquire,
                                     IFuncPtr release) {
   if (acquire && release) {
-    return std::make_shared<CallbackThreadFactory>(
+    return new container::Counter<CallbackThreadFactory>(
         std::move(base), std::move(acquire), std::move(release));
   } else if (acquire) {
-    return std::make_shared<AcquireThreadFactory>(std::move(base),
-                                                  std::move(release));
+    return new container::Counter<AcquireThreadFactory>(std::move(base),
+                                                        std::move(release));
   } else if (release) {
-    return std::make_shared<ReleaseThreadFactory>(std::move(base),
-                                                  std::move(release));
+    return new container::Counter<ReleaseThreadFactory>(std::move(base),
+                                                        std::move(release));
   }
-  return base;
+  return std::move(base);  // std::move necessary because
+                           // copy elision doesn't work for function arguments.
 }
 
 }  // namespace yaclib::executor

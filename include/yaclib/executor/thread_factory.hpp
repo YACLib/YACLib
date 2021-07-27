@@ -16,16 +16,14 @@ class IThread : public container::intrusive::detail::Node {
 
 using IThreadPtr = std::unique_ptr<IThread>;
 
-class IThreadFactory {
+class IThreadFactory : public IRef {
  public:
   virtual IThreadPtr Acquire(IFuncPtr func) = 0;
 
   virtual void Release(IThreadPtr thread) = 0;
-
-  virtual ~IThreadFactory() = default;
 };
 
-using IThreadFactoryPtr = std::shared_ptr<IThreadFactory>;
+using IThreadFactoryPtr = container::intrusive::Ptr<IThreadFactory>;
 
 IThreadFactoryPtr MakeThreadFactory(size_t cache_threads = 0);
 
