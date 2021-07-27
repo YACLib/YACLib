@@ -73,7 +73,7 @@ GTEST_TEST(fifo, simple) {
 
 class Counter {
  public:
-  Counter(executor::IExecutorPtr e) : strand_(executor::MakeAsyncMutex(e)) {
+  Counter(executor::IExecutorPtr e) : strand_{executor::MakeAsyncMutex(e)} {
   }
 
   void Increment() {
