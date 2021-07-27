@@ -1,6 +1,7 @@
 list(
   APPEND YACLIB_INCLUDES
   ${YACLIB_INCLUDE_DIR}/container/intrusive_node.hpp
+  ${YACLIB_INCLUDE_DIR}/container/intrusive_ptr.hpp
 )
 list(
   APPEND YACLIB_HEADERS
