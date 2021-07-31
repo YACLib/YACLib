@@ -13,9 +13,9 @@ namespace {
 
 thread_local IThreadPool* tlCurrentThreadPool;
 
-class ThreadPool final : public IThreadPool {
+class ThreadPool : public IThreadPool {
  public:
-  ThreadPool(IThreadFactoryPtr factory, size_t threads)
+  explicit ThreadPool(IThreadFactoryPtr factory, size_t threads)
       : _factory{std::move(factory)}, _threads_count{threads} {
     auto loop = MakeFunc([this] {
       tlCurrentThreadPool = this;
@@ -27,7 +27,7 @@ class ThreadPool final : public IThreadPool {
     }
   }
 
-  ~ThreadPool() final {
+  ~ThreadPool() override {
     HardStop();
     Wait();
   }
@@ -39,7 +39,7 @@ class ThreadPool final : public IThreadPool {
       if (_stop) {
         return;
       }
-      task.Acquire();
+      task.IncRef();
       _tasks.PushBack(&task);
     }
     _cv.notify_one();
@@ -69,7 +69,7 @@ class ThreadPool final : public IThreadPool {
     _cv.notify_all();
 
     while (auto task = tasks.PopBack()) {
-      task->Release();
+      task->DecRef();
     }
   }
 
@@ -86,7 +86,7 @@ class ThreadPool final : public IThreadPool {
       while (auto task = _tasks.PopFront()) {
         guard.unlock();
         task->Call();
-        task->Release();
+        task->DecRef();
         if (_refs_flag.fetch_sub(2, std::memory_order_release) == 3) {
           std::atomic_thread_fence(std::memory_order_acquire);
           Stop();
@@ -118,7 +118,7 @@ IThreadPool* CurrentThreadPool() noexcept {
 }
 
 IThreadPoolPtr MakeThreadPool(size_t threads, IThreadFactoryPtr factory) {
-  return std::make_shared<ThreadPool>(std::move(factory), threads);
+  return new container::Counter<ThreadPool>{std::move(factory), threads};
 }
 
 }  // namespace yaclib::executor

@@ -19,7 +19,7 @@ class IThreadPool : public IExecutor {
   virtual void Wait() = 0;
 };
 
-using IThreadPoolPtr = std::shared_ptr<IThreadPool>;
+using IThreadPoolPtr = container::intrusive::Ptr<IThreadPool>;
 
 IThreadPool* CurrentThreadPool() noexcept;
 

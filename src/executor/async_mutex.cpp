@@ -1,44 +1,42 @@
 #include <container/mpsc_stack.hpp>
 
+#include <yaclib/config.hpp>
 #include <yaclib/executor/executor.hpp>
 
 #include <atomic>
-#include <cassert>
 #include <utility>
 
 namespace yaclib::executor {
 namespace {
 
-class AsyncMutex final : public executor::IExecutor,
-                         public std::enable_shared_from_this<AsyncMutex> {
+class AsyncMutex : public IExecutor, public ITask {
+  // Inheritance from two IRef's, but that's okay, because they are pure virtual
  public:
-  explicit AsyncMutex(IExecutorPtr executor) : executor_{std::move(executor)} {
+  explicit AsyncMutex(IExecutorPtr executor) : _executor{std::move(executor)} {
   }
 
-  ~AsyncMutex() final {
+  ~AsyncMutex() override {
     auto nodes{_tasks.TakeAllLIFO()};
     auto task = static_cast<ITask*>(nodes);
     while (task != nullptr) {
       auto next = static_cast<ITask*>(task->_next);
       task->Call();
-      task->Release();
+      task->DecRef();
       task = next;
     }
   }
 
+ private:
   void Execute(ITask& task) final {
-    task.Acquire();
+    task.IncRef();
     _tasks.Put(&task);
 
     if (_work_counter.fetch_add(1, std::memory_order_acq_rel) == 0) {
-      executor_->Execute([self = shared_from_this()] {
-        self->ExecuteTasks();
-      });
+      _executor->Execute(*this);
     }
   }
 
- private:
-  void ExecuteTasks() {
+  void Call() noexcept final {
     auto nodes{_tasks.TakeAllFIFO()};
     size_t size = 0;
 
@@ -46,28 +44,26 @@ class AsyncMutex final : public executor::IExecutor,
     while (task != nullptr) {
       auto next = static_cast<ITask*>(task->_next);
       task->Call();
-      task->Release();
+      task->DecRef();
       task = next;
       ++size;
     }
 
     if (_work_counter.fetch_sub(size, std::memory_order_acq_rel) > size) {
-      executor_->Execute([self = shared_from_this()] {
-        self->ExecuteTasks();
-      });
+      _executor->Execute(*this);
     }
   }
 
-  IExecutorPtr executor_;
+  IExecutorPtr _executor;
   container::intrusive::MPSCStack _tasks;
-  alignas(64) std::atomic<size_t> _work_counter{0};
   // TODO remove _work_counter, make active/inactive like libunifex
+  alignas(kCacheLineSize) std::atomic<size_t> _work_counter{0};
 };
 
 }  // namespace
 
 IExecutorPtr MakeAsyncMutex(IExecutorPtr executor) {
-  return std::make_shared<AsyncMutex>(std::move(executor));
+  return new container::Counter<AsyncMutex>{std::move(executor)};
 }
 
 }  // namespace yaclib::executor

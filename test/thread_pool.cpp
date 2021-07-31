@@ -159,7 +159,7 @@ GTEST_TEST(simple, current) {
   EXPECT_EQ(executor::CurrentThreadPool(), nullptr);
 
   tp->Execute([&] {
-    EXPECT_EQ(executor::CurrentThreadPool(), tp.get());
+    EXPECT_EQ(executor::CurrentThreadPool(), tp);
   });
 
   tp->Stop();

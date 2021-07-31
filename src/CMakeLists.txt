@@ -1,15 +1,12 @@
 macro(add_files)
   set(YACLIB_INCLUDES ${YACLIB_INCLUDES} PARENT_SCOPE)
-  set(YACLIB_HEADERS ${YACLIB_HEADERS} PARENT_SCOPE)
-  set(YACLIB_SOURCES ${YACLIB_SOURCES} PARENT_SCOPE)
+  set(YACLIB_HEADERS  ${YACLIB_HEADERS}  PARENT_SCOPE)
+  set(YACLIB_SOURCES  ${YACLIB_SOURCES}  PARENT_SCOPE)
 endmacro()
 
 # yaclib library
-if (MSVC)
-  add_compile_options(/Wall)
-else ()
-  add_compile_options(-Wall -Wextra -pedantic)
-endif ()
+add_compile_options(${YACLIB_COMPILE_OPTIONS})
+add_link_options(${YACLIB_LINK_OPTIONS})
 
 configure_file(config.hpp.in ${CMAKE_BINARY_DIR}/include/yaclib/config.hpp)
 

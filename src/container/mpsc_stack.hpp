@@ -1,5 +1,6 @@
 #pragma once
 
+#include <yaclib/config.hpp>
 #include <yaclib/container/intrusive_node.hpp>
 
 #include <atomic>
@@ -37,7 +38,7 @@ class MPSCStack final {
     return prev;
   }
 
-  alignas(64) std::atomic<detail::Node*> head_{nullptr};
+  alignas(kCacheLineSize) std::atomic<detail::Node*> head_{nullptr};
 };
 
 }  // namespace yaclib::container::intrusive

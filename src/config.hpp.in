@@ -1,1 +1,16 @@
 #pragma once
+
+#include <cstddef>
+
+// clang-format off
+
+// ASAN, TSAN, UBSAN, MEMSAN
+#define YACLIB_${SANITIZER}
+
+// clang-format on
+
+namespace yaclib {
+
+constexpr size_t kCacheLineSize = 64;
+
+}  // namespace yaclib

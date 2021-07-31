@@ -2,7 +2,9 @@
 
 #include "ref.hpp"
 
+#include <yaclib/container/counter.hpp>
 #include <yaclib/container/intrusive_node.hpp>
+#include <yaclib/container/intrusive_ptr.hpp>
 
 #include <memory>
 #include <utility>
@@ -11,10 +13,10 @@ namespace yaclib {
 
 class IFunc : public IRef {
  public:
-  virtual void Call() = 0;
+  virtual void Call() noexcept = 0;
 };
 
-using IFuncPtr = std::shared_ptr<IFunc>;
+using IFuncPtr = container::intrusive::Ptr<IFunc>;
 
 class ITask : public IFunc, public container::intrusive::detail::Node {};
 
@@ -42,45 +44,31 @@ class CallImpl : public Interface {
 };
 
 template <typename Functor>
-class FunctorFunc final : public CallImpl<IFunc, Functor> {
- public:
-  using CallImpl<IFunc, Functor>::CallImpl;
-
- private:
-  void Acquire() noexcept final {
-  }
-
-  void Release() noexcept final {
-  }
-};
-
-template <typename Functor>
-class FunctorTask final : public CallImpl<ITask, Functor> {
+class UniqueTask final : public CallImpl<ITask, Functor> {
  public:
   using CallImpl<ITask, Functor>::CallImpl;
 
  private:
-  void Acquire() noexcept final {
+  void IncRef() noexcept final {
   }
 
-  void Release() noexcept final {
+  void DecRef() noexcept final {
     delete this;
   }
 };
 
 template <typename Functor>
-ITask* MakeFunctorTask(Functor&& functor) {
+ITask* MakeUniqueTask(Functor&& functor) {
   using FunctorType = std::remove_reference_t<Functor>;
-  return new FunctorTask<FunctorType>{std::forward<Functor>(functor)};
+  return new UniqueTask<FunctorType>{std::forward<Functor>(functor)};
 }
 
 }  // namespace detail
 
 template <typename Functor>
 IFuncPtr MakeFunc(Functor&& functor) {
-  using FunctorType = std::remove_reference_t<Functor>;
-  return std::make_shared<detail::FunctorFunc<FunctorType>>(
-      std::forward<Functor>(functor));
+  using Base = detail::CallImpl<IFunc, std::decay_t<Functor>>;
+  return new container::Counter<Base>{std::forward<Functor>(functor)};
 }
 
 }  // namespace yaclib
