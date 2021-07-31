@@ -338,7 +338,7 @@ GTEST_TEST(simple, then_executor) {
 }
 
 GTEST_TEST(simple, pipeline) {
-  auto tp = executor::MakeThreadPool(4);
+  auto tp = executor::MakeThreadPool(1);
 
   // Pipeline stages:
 

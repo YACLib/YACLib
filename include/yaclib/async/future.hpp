@@ -55,6 +55,7 @@ class Future final {
       shared_state->SetPrev(_state);
     }
     _state->SetCallback(*shared_state);
+    _state = nullptr;
     return Future<U>{shared_state};
   }
 
@@ -65,39 +66,41 @@ class Future final {
   }
 
   ~Future() {
-    //_state->Cancel();
+    std::move(*this).Cancel();
+  }
+
+  void Cancel() && {
+    if (_state) {
+      _state->Cancel();
+      _state = nullptr;
+      std::cout << "Cancel()" << std::endl;
+    }
   }
 
   T Get() && {
     std::mutex m;
     bool is_ready = false;
     std::condition_variable cv;
-    if constexpr (std::is_void_v<T>) {
-      auto future = std::move(*this).Then([&m, &is_ready, &cv]() {
+    auto get_res = [&] {
         std::unique_lock guard{m};
         is_ready = true;
         cv.notify_all();
-        return 0;
-      });
+    };
 
-      std::unique_lock guard{m};
-      while (!is_ready) {
-        cv.wait(guard);
-      }
+    using CoreType = Core<void, std::decay_t<decltype(get_res)>, void>;
+    auto shared_state = container::NothingCounter<CoreType>{std::move(get_res)};
+    shared_state.SetExecutor(_state->GetExecutor());
+    _state->SetCallback(shared_state);
+    std::unique_lock guard{m};
+    while (!is_ready) {
+      cv.wait(guard);
+    }
+    if constexpr (!std::is_void_v<T>) {
+      auto result = _state->GetResult();
+      _state = nullptr;
+      return result;
     } else {
-      std::aligned_storage_t<sizeof(T), alignof(T)> res;
-      auto future = std::move(*this).Then([&m, &is_ready, &cv, &res](T arg) {
-        new (&res) T{std::move(arg)};
-        std::unique_lock guard{m};
-        is_ready = true;
-        cv.notify_all();
-      });
-
-      std::unique_lock guard{m};
-      while (!is_ready) {
-        cv.wait(guard);
-      }
-      return std::move(*reinterpret_cast<T*>(&res));
+      _state = nullptr;
     }
   }
 

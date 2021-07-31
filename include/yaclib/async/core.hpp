@@ -8,6 +8,7 @@
 #include <atomic>
 #include <iostream>
 #include <type_traits>
+#include <cassert>
 
 namespace yaclib::async {
 
@@ -18,36 +19,32 @@ class BaseCore : public ITask {
   }
 
   void SetCallback(ITask& callback) {
-    callback.IncRef();
     _callback = &callback;
     auto state = _state.exchange(State::HasCallback, std::memory_order_acq_rel);
     if (state == State::HasResult) {
       Execute();
     }
   }
-  /*virtual BaseCore* GetPrev(){
-    re
-  }*/
-  void ResetCallback() {
-    if (_callback) {
-      _callback->DecRef();
-      _callback = nullptr;
-    }
-  }
 
   void Cancel() noexcept {
+    assert(_callback == nullptr);
     _state.store(State::Canceled, std::memory_order_release);
+    ResetPrev();
   }
 
-  void SetExecutor(executor::IExecutorPtr executor) {
-    _executor = executor;
+  void SetExecutor(executor::IExecutorPtr executor) noexcept {
+    _executor = std::move(executor);
   }
 
-  executor::IExecutorPtr GetExecutor() const {
+  executor::IExecutorPtr GetExecutor() const noexcept {
     return _executor;
   }
-  ~BaseCore() override {
-    ResetCallback();
+
+  void SetResult() {
+    auto state = _state.exchange(State::HasResult, std::memory_order_acq_rel);
+    if (state == State::HasCallback) {
+      Execute();
+    }
   }
 
  protected:
@@ -58,15 +55,17 @@ class BaseCore : public ITask {
     Canceled,
   };
 
+  std::atomic<State> _state{State::None};
+  container::intrusive::Ptr<ITask> _callback;
+  executor::IExecutorPtr _executor{executor::MakeInlineExecutor()};
+
+ private:
   void Execute() {
     _executor->Execute(*_callback);
-    _callback->DecRef();
     _callback = nullptr;
   }
 
-  std::atomic<State> _state{State::None};
-  ITask* _callback;
-  executor::IExecutorPtr _executor{executor::MakeInlineExecutor()};
+  virtual void ResetPrev() {}
 };
 
 template <typename Result>
@@ -76,23 +75,17 @@ class ResultCore : public BaseCore {
     return std::move(*reinterpret_cast<Result*>(&_result));
   }
 
-  void SetResult(Result&& res) {
-    new (&_result) Result{std::move(res)};
-    auto state = _state.exchange(State::HasResult, std::memory_order_acq_rel);
-    if (state == State::HasCallback) {
-      Execute();
-    }
+  void SetResult(Result&& result) {
+    new (&_result) Result{std::move(result)};
+    BaseCore::SetResult();
   }
 
-  void SetResult(const Result& res) {
-    new (&_result) Result{res};
-    auto state = _state.exchange(State::HasResult, std::memory_order_acq_rel);
-    if (state == State::HasCallback) {
-      Execute();
-    }
+  void SetResult(const Result& result) {
+    new (&_result) Result{result};
+    BaseCore::SetResult();
   }
 
- protected:
+ private:
   std::aligned_storage_t<sizeof(Result), alignof(Result)> _result;
 };
 
@@ -102,35 +95,37 @@ class ResultCore<void> : public BaseCore {};
 template <typename Result, typename Functor, typename Arg>
 class Core : public ResultCore<Result> {
   using Base = ResultCore<Result>;
-  using Base::_executor;
-  using Base::_state;
 
  public:
   Core(Functor&& functor) : ResultCore<Result>{}, _functor{std::move(functor)} {
   }
-
   Core(const Functor& functor) : _functor(functor) {
   }
-
-  void Call() noexcept final {
-    auto arg = _prev->GetResult();
-    _prev = nullptr;
-
-    if constexpr (!std::is_void_v<Result>) {
-      Base::SetResult(_functor(std::move(arg)));
-    } else {
-      _functor(std::move(arg));
-    }
-
-    auto state =
-        _state.exchange(Base::State::HasResult, std::memory_order_acq_rel);
-    if (state == Base::State::HasCallback) {
-      Base::Execute();
-    }
+/*
+  ~Core() override {
+    ResetPrev();
   }
+*/
 
   void SetPrev(container::intrusive::Ptr<ResultCore<Arg>> prev_state) {
     _prev = std::move(prev_state);
+  }
+
+  void ResetPrev() final {
+    _prev = nullptr;
+  }
+
+ private:
+  void Call() noexcept final {
+    auto arg = _prev->GetResult();
+    ResetPrev();
+
+    if constexpr (std::is_void_v<Result>) {
+      _functor(std::move(arg));
+      Base::SetResult();
+    } else {
+      Base::SetResult(_functor(std::move(arg)));
+    }
   }
 
  private:
@@ -141,8 +136,6 @@ class Core : public ResultCore<Result> {
 template <typename Result, typename Functor>
 class Core<Result, Functor, void> : public ResultCore<Result> {
   using Base = ResultCore<Result>;
-  using Base::_executor;
-  using Base::_state;
 
  public:
   Core(Functor&& functor) : _functor{std::move(functor)} {
@@ -150,32 +143,23 @@ class Core<Result, Functor, void> : public ResultCore<Result> {
   Core(const Functor& functor) : _functor(functor) {
   }
 
+ private:
   void Call() noexcept final {
-    if constexpr (!std::is_void_v<Result>) {
-      Base::SetResult(_functor());
-    } else {
+    if constexpr (std::is_void_v<Result>) {
       _functor();
-    }
-
-    auto state =
-        _state.exchange(Base::State::HasResult, std::memory_order_acq_rel);
-    if (state == Base::State::HasCallback) {
-      Base::Execute();
+      Base::SetResult();
+    } else {
+      Base::SetResult(_functor());
     }
   }
 
- private:
   Functor _functor;
 };
 
 template <typename Result>
 class Core<Result, void, void> : public ResultCore<Result> {
-  using Base = ResultCore<Result>;
-  using Base::_executor;
-  using Base::_state;
-
- public:
   void Call() noexcept final {
+    assert(false);
   }
 };
 

@@ -36,4 +36,16 @@ class Counter final : public Base {
   std::atomic_size_t _impl{0};
 };
 
+template <typename Base>
+class NothingCounter final : public Base {
+ public:
+  using Base::Base;
+
+  void IncRef() noexcept final {
+  }
+
+  void DecRef() noexcept final {
+  }
+};
+
 }  // namespace yaclib::container
