@@ -101,11 +101,6 @@ class Core : public ResultCore<Result> {
   }
   Core(const Functor& functor) : _functor(functor) {
   }
-/*
-  ~Core() override {
-    ResetPrev();
-  }
-*/
 
   void SetPrev(container::intrusive::Ptr<ResultCore<Arg>> prev_state) {
     _prev = std::move(prev_state);

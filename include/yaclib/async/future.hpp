@@ -78,22 +78,13 @@ class Future final {
   }
 
   T Get() && {
-    std::mutex m;
-    bool is_ready = false;
-    std::condition_variable cv;
-    auto get_res = [&] {
-        std::unique_lock guard{m};
-        is_ready = true;
-        cv.notify_all();
-    };
-
-    using CoreType = Core<void, std::decay_t<decltype(get_res)>, void>;
-    auto shared_state = container::NothingCounter<CoreType>{std::move(get_res)};
-    shared_state.SetExecutor(_state->GetExecutor());
-    _state->SetCallback(shared_state);
-    std::unique_lock guard{m};
-    while (!is_ready) {
-      cv.wait(guard);
+    if (!_state->HasResult()) {
+      container::Counter<Getter, GetterDeleter> getter;
+      _state->SetCallback(getter);
+      std::unique_lock guard{getter.m};
+      while (!getter.is_ready) {
+        getter.cv.wait(guard);
+      }
     }
     if constexpr (!std::is_void_v<T>) {
       auto result = _state->GetResult();
@@ -113,6 +104,24 @@ class Future final {
   }
 
  private:
+  struct Getter : ITask {
+    void Call() noexcept final {
+    }
+  };
+
+  struct GetterDeleter {
+    template <typename Type>
+    void Delete(void*) {
+      std::lock_guard guard{m};
+      is_ready = true;
+      cv.notify_all();
+    }
+
+    bool is_ready{false};
+    std::mutex m;
+    std::condition_variable cv;
+  };
+
   FutureCorePtr<T> _state;
 };
 

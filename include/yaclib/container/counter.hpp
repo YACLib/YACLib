@@ -5,9 +5,19 @@
 #include <atomic>
 
 namespace yaclib::container {
+namespace detail {
 
-template <typename Base>
-class Counter final : public Base {
+struct DefaultDeleter {
+  template <typename Type>
+  void Delete(void* p) {
+    delete static_cast<Type>(p);
+  }
+};
+
+}  // namespace detail
+
+template <typename Base, typename Deleter = detail::DefaultDeleter>
+class Counter final : public Base, public Deleter {
  public:
   using Base::Base;
 
@@ -24,7 +34,7 @@ class Counter final : public Base {
     if (_impl.fetch_sub(1, std::memory_order_release) == 1) {
       std::atomic_thread_fence(std::memory_order_acquire);
 #endif
-      delete this;
+      Deleter::template Delete<decltype(this)>(this);
     }
   }
 
