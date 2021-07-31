@@ -10,7 +10,7 @@
 
 namespace {
 
-constexpr bool kSanitizer{false};
+constexpr bool kSanitizer{true};
 
 // TODO(kononovk): usage better random
 static auto init_rand = [] {

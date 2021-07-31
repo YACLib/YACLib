@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstddef>
+
 namespace yaclib {
 
 class IRef {
@@ -11,6 +13,9 @@ class IRef {
   // IExecutor make this after use ITask
   // IThreadFactory make this after use IFunc
   virtual void DecRef() noexcept = 0;
+  virtual size_t GetRef() const noexcept {
+    return 0;
+  }
 
   virtual ~IRef() = default;
 };

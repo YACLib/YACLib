@@ -16,6 +16,10 @@ set(
   YACLIB_INCLUDES
   ${YACLIB_INCLUDE_DIR}/ref.hpp
   ${YACLIB_INCLUDE_DIR}/task.hpp
+  ${YACLIB_INCLUDE_DIR}/async/core.hpp
+  ${YACLIB_INCLUDE_DIR}/async/future.hpp
+  ${YACLIB_INCLUDE_DIR}/async/promise.hpp
+  ${YACLIB_INCLUDE_DIR}/async/async.hpp
 )
 set(YACLIB_HEADERS)
 set(YACLIB_SOURCES)
