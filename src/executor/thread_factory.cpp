@@ -383,8 +383,8 @@ IThreadFactoryPtr MakeThreadFactory(IThreadFactoryPtr base, IFuncPtr acquire,
     return new container::Counter<ReleaseThreadFactory>(std::move(base),
                                                         std::move(release));
   }
-  return std::move(base);  // std::move necessary because
-                           // copy elision doesn't work for function arguments.
+  return base;  // copy elision doesn't work for function arguments
+                // but implicit move compiler optimisation is used
 }
 
 }  // namespace yaclib::executor
