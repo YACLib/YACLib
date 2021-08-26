@@ -35,9 +35,7 @@ class LightThread final : public IThread {
   }
 
   ~LightThread() final {
-    if (_thread.joinable()) {
-      _thread.join();
-    }
+    _thread.join();
   }
 
  private:
@@ -75,14 +73,12 @@ class HeavyThread final : public IThread {
   }
 
   ~HeavyThread() final {
-    if (_thread.joinable()) {
-      {
-        std::lock_guard guard{_m};
-        _state = State::Stop;
-      }
-      _cv.notify_all();
-      _thread.join();
+    {
+      std::lock_guard guard{_m};
+      _state = State::Stop;
     }
+    _cv.notify_all();
+    _thread.join();
   }
 
  private:
@@ -383,8 +379,7 @@ IThreadFactoryPtr MakeThreadFactory(IThreadFactoryPtr base, IFuncPtr acquire,
     return new container::Counter<ReleaseThreadFactory>(std::move(base),
                                                         std::move(release));
   }
-  return std::move(base);  // std::move necessary because
-                           // copy elision doesn't work for function arguments.
+  return base;  // Copy elision doesn't work for function arguments, but implicit move guaranteed by standard
 }
 
 }  // namespace yaclib::executor
