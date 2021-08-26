@@ -1,0 +1,37 @@
+name: YACLib CI
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    name: "${{matrix.cxx}} ${{matrix.cmake_args}} / ${{matrix.build_type}}"
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: [ Debug, Release ]
+        cc: [ clang-12 ]
+        cxx: [ clang++-12 ]
+        cmake_args: [ -DSANITIZER=ASAN, -DSANITIZER=TSAN, -DSANITIZER=UBSAN ]
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Configure CMake
+        run: cmake
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+          -DCMAKE_C_COMPILER=${{ matrix.cc }}
+          -DCMAKE_CXX_COMPILER=${{ matrix.cxx }}
+          -DBUILD_TESTING=ON
+          ${{ matrix.cmake_args }}
+
+      - name: Build
+        run: cmake --build . --config ${{ matrix.build_type }}
+
+      - name: Test
+        run: ctest --output-on-failure -C ${{ matrix.build_type }} -V
