@@ -148,8 +148,7 @@ GTEST_TEST(batching, simple) {
 GTEST_TEST(strand_over_strand, simple) {
   auto tp = executor::MakeThreadPool(4);
 
-  auto strand = executor::MakeAsyncMutex(
-      executor::MakeAsyncMutex(executor::MakeAsyncMutex(tp)));
+  auto strand = executor::MakeAsyncMutex(executor::MakeAsyncMutex(executor::MakeAsyncMutex(tp)));
 
   bool done = false;
   strand->Execute([&done] {

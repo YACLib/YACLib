@@ -31,7 +31,6 @@ IThreadFactoryPtr MakeThreadFactory(IThreadFactoryPtr base, std::string name);
 
 IThreadFactoryPtr MakeThreadFactory(IThreadFactoryPtr base, size_t priority);
 
-IThreadFactoryPtr MakeThreadFactory(IThreadFactoryPtr base, IFuncPtr acquire,
-                                    IFuncPtr release);
+IThreadFactoryPtr MakeThreadFactory(IThreadFactoryPtr base, IFuncPtr acquire, IFuncPtr release);
 
 }  // namespace yaclib::executor

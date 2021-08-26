@@ -10,7 +10,7 @@
 
 namespace {
 
-constexpr bool kSanitizer{false};
+constexpr bool kSanitizer{true};
 
 // TODO(kononovk): usage better random
 static auto init_rand = [] {
@@ -25,8 +25,7 @@ using ThreadsContainter = container::intrusive::List<executor::IThread>;
 const auto kDoNothing = MakeFunc([] {
 });
 
-void MakeFactoryEmpty(executor::IThreadFactoryPtr factory,
-                      size_t acquire_threads, ThreadsContainter& threads) {
+void MakeFactoryEmpty(executor::IThreadFactoryPtr factory, size_t acquire_threads, ThreadsContainter& threads) {
   for (size_t i = 0; i != acquire_threads; ++i) {
     auto thread_ptr = factory->Acquire(kDoNothing).release();
     EXPECT_NE(thread_ptr, nullptr);
@@ -38,19 +37,16 @@ void MakeFactoryEmpty(executor::IThreadFactoryPtr factory,
   }
 }
 
-void MakeFactoryAvailable(executor::IThreadFactoryPtr factory,
-                          size_t release_threads, ThreadsContainter& threads) {
+void MakeFactoryAvailable(executor::IThreadFactoryPtr factory, size_t release_threads, ThreadsContainter& threads) {
   while (release_threads != 0 && !threads.IsEmpty()) {
-    auto release_thread =
-        rand() % 2 == 0 ? threads.PopBack() : threads.PopFront();
+    auto release_thread = rand() % 2 == 0 ? threads.PopBack() : threads.PopFront();
     factory->Release(executor::IThreadPtr{release_thread});
     --release_threads;
   }
   EXPECT_EQ(release_threads, 0);
 }
 
-void run_tests(size_t iter_count, executor::IThreadFactoryPtr factory,
-               size_t max_thread_count) {
+void run_tests(size_t iter_count, executor::IThreadFactoryPtr factory, size_t max_thread_count) {
   ThreadsContainter threads;
   size_t acquire_counter = max_thread_count;
   size_t release_counter = 0;
@@ -76,11 +72,9 @@ GTEST_TEST(single_threaded, simple) {
 }
 
 GTEST_TEST(single_threaded, complex) {
-  static const size_t kMaxThreadCount =
-      (kSanitizer ? 1 : 4) * std::thread::hardware_concurrency();
+  static const size_t kMaxThreadCount = (kSanitizer ? 1 : 4) * std::thread::hardware_concurrency();
   static const size_t kIterCount = kSanitizer ? 10 : (100 + rand() % 100);
-  for (size_t cached_threads :
-       {size_t{0}, kMaxThreadCount / 2, kMaxThreadCount}) {
+  for (size_t cached_threads : {size_t{0}, kMaxThreadCount / 2, kMaxThreadCount}) {
     auto factory = executor::MakeThreadFactory(cached_threads);
 
     run_tests(kIterCount, factory, kMaxThreadCount);
@@ -89,14 +83,11 @@ GTEST_TEST(single_threaded, complex) {
 
 GTEST_TEST(multi_threaded, simple) {
   EXPECT_GE(std::thread::hardware_concurrency(), 2);
-  static const size_t kThreadsCount =
-      kSanitizer ? 2 : (2 + rand() % (std::thread::hardware_concurrency() - 1));
-  static const size_t kMaxThreadCount =
-      kThreadsCount * std::thread::hardware_concurrency();
+  static const size_t kThreadsCount = kSanitizer ? 2 : (2 + rand() % (std::thread::hardware_concurrency() - 1));
+  static const size_t kMaxThreadCount = kThreadsCount * std::thread::hardware_concurrency();
   static const size_t kIterCount = kSanitizer ? 10 : (100 + rand() % 100);
 
-  for (size_t cached_threads :
-       {size_t{0}, kMaxThreadCount / 2, kMaxThreadCount}) {
+  for (size_t cached_threads : {size_t{0}, kMaxThreadCount / 2, kMaxThreadCount}) {
     auto test_threads = executor::MakeThreadFactory(kThreadsCount);
 
     auto factory = executor::MakeThreadFactory(cached_threads);
