@@ -23,7 +23,7 @@ class MPSCStack final {
   }
 
   detail::Node* TakeAllLIFO() {
-    return head_.exchange(nullptr, std::memory_order_consume);
+    return head_.exchange(nullptr, std::memory_order_acquire);
   }
 
  private:
