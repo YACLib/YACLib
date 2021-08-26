@@ -1,5 +1,5 @@
-#include <yaclib/container/counter.hpp>
 #include <yaclib/container/intrusive_ptr.hpp>
+#include <yaclib/util/counters.hpp>
 
 #include <gtest/gtest.h>
 
