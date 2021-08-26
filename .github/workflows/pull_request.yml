@@ -40,4 +40,4 @@ jobs:
         run: cmake --build . --config ${{ matrix.build_type }}
 
       - name: Test
-        run: ctest --output-on-failure -C ${{ matrix.build_type }}
+        run: ctest --output-on-failure -C ${{ matrix.build_type }} -V
