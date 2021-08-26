@@ -23,8 +23,7 @@ using IThreadPoolPtr = container::intrusive::Ptr<IThreadPool>;
 
 IThreadPool* CurrentThreadPool() noexcept;
 
-IThreadPoolPtr MakeThreadPool(
-    size_t threads = std::thread::hardware_concurrency(),
-    IThreadFactoryPtr factory = MakeThreadFactory());
+IThreadPoolPtr MakeThreadPool(size_t threads = std::thread::hardware_concurrency(),
+                              IThreadFactoryPtr factory = MakeThreadFactory());
 
 }  // namespace yaclib::executor
