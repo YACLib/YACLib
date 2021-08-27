@@ -2,6 +2,7 @@
 
 #include <yaclib/ref.hpp>
 
+#include <algorithm>
 #include <functional>
 #include <type_traits>
 #include <utility>
@@ -10,8 +11,7 @@ namespace yaclib::container::intrusive {
 
 template <typename T>
 class Ptr {
-  static_assert(std::is_base_of_v<IRef, T>,
-                "T must be derived class of yaclib::IRef");
+  static_assert(std::is_base_of_v<IRef, T>, "T must be derived class of yaclib::IRef");
 
  public:
   constexpr Ptr() noexcept : _ptr{nullptr} {
@@ -58,7 +58,7 @@ class Ptr {
   }
   template <typename U>
   Ptr& operator=(Ptr<U>&& other) noexcept {
-    Swap(other);
+    Ptr{std::move(other)}.Swap(*this);
     return *this;
   }
 
@@ -92,7 +92,7 @@ class Ptr {
 
  private:
   inline void Swap(Ptr& other) noexcept {
-    _ptr = std::exchange(other._ptr, _ptr);
+    std::swap(_ptr, other._ptr);
   }
 
   T* _ptr;

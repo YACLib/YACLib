@@ -36,16 +36,29 @@ if (MSVC)
 else ()
   list(APPEND YACLIB_COMPILE_OPTIONS -Wall -Wextra -pedantic)
   if (SANITIZER STREQUAL ASAN)
-    set(SANITIZE -fsanitize=address)
+    set(SANITIZER_ENABLE_OPTION -fsanitize=address)
+    set(SANITIZER_COMPILE_OPTIONS
+      # -fsanitize-address-use-after-return=runtime
+      -fsanitize-recover=address
+      -fsanitize-address-use-after-scope
+      )
   elseif (SANITIZER STREQUAL TSAN)
-    set(SANITIZE -fsanitize=thread)
+    set(SANITIZER_ENABLE_OPTION -fsanitize=thread)
+    set(SANITIZER_COMPILE_OPTIONS
+      # -fsanitize-address-use-after-return=runtime
+      -gcolumn-info
+      )
   elseif (SANITIZER STREQUAL UBSAN)
-    set(SANITIZE -fsanitize=undefined)
+    set(SANITIZER_ENABLE_OPTION -fsanitize=undefined)
   elseif (SANITIZER STREQUAL MEMSAN) # Memory Santizer doesn't work with GTest (https://github.com/google/sanitizers/issues/648)
-    set(SANITIZE -fsanitize=memory)
+    set(SANITIZER_ENABLE_OPTION -fsanitize=memory)
   endif ()
-  list(APPEND YACLIB_COMPILE_OPTIONS ${SANITIZE})
-  list(APPEND YACLIB_LINK_OPTIONS ${SANITIZE})
+  list(APPEND YACLIB_COMPILE_OPTIONS
+    -fno-omit-frame-pointer
+    ${SANITIZER_ENABLE_OPTION}
+    ${SANITIZER_COMPILE_OPTIONS}
+    )
+  list(APPEND YACLIB_LINK_OPTIONS ${SANITIZER_ENABLE_OPTION})
 endif ()
 message("Build options: ${YACLIB_COMPILE_OPTIONS}")
 message("Link  options: ${YACLIB_LINK_OPTIONS}")

@@ -23,4 +23,3 @@ jobs:
         with:
           clang-format-version: '11'
           check-path: ${{ matrix.path }}
-

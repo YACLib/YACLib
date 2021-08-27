@@ -8,7 +8,7 @@ on:
 jobs:
   main:
     runs-on: ${{ matrix.config.os }}
-    name: "${{matrix.config.os}} / ${{matrix.config.cxx}} / ${{matrix.build_type}}"
+    name: "${{ matrix.config.os }} / ${{ matrix.config.cxx }} / ${{ matrix.build_type }}"
     strategy:
       fail-fast: false
       matrix:
@@ -40,4 +40,4 @@ jobs:
         run: cmake --build . --config ${{ matrix.build_type }}
 
       - name: Test
-        run: ctest --output-on-failure -C ${{ matrix.build_type }}
+        run: ctest --output-on-failure -C ${{ matrix.build_type }} -V
