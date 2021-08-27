@@ -60,6 +60,14 @@ else ()
     )
   list(APPEND YACLIB_LINK_OPTIONS ${SANITIZER_ENABLE_OPTION})
 endif ()
+if (COVERAGE AND CMAKE_SYSTEM_NAME STREQUAL Linux)
+  list(APPEND YACLIB_COMPILE_OPTIONS
+    --coverage
+    )
+  list(APPEND YACLIB_LINK_OPTIONS
+    --coverage
+    )
+endif ()
 message("Build options: ${YACLIB_COMPILE_OPTIONS}")
 message("Link  options: ${YACLIB_LINK_OPTIONS}")
 
