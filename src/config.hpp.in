@@ -9,6 +9,24 @@
 
 // clang-format on
 
+// Maybe we should increase some of this
+#if defined(YACLIB_ASAN)
+#  define YACLIB_SLOWDOWN 2
+#  define YACLIB_MEMORY_OVERHEAD 3
+#elif defined(YACLIB_TSAN)
+#  define YACLIB_SLOWDOWN 2
+#  define YACLIB_MEMORY_OVERHEAD 3
+#elif defined(YACLIB_UBSAN)
+#  define YACLIB_SLOWDOWN 1
+#  define YACLIB_MEMORY_OVERHEAD 1
+#elif defined(YACLIB_MEMSAN)
+#  define YACLIB_SLOWDOWN 1
+#  define YACLIB_MEMORY_OVERHEAD 1
+#else
+#  define YACLIB_SLOWDOWN 1
+#  define YACLIB_MEMORY_OVERHEAD 1
+#endif
+
 namespace yaclib {
 
 constexpr size_t kCacheLineSize = 64;
