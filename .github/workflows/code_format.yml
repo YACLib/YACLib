@@ -1,4 +1,4 @@
-name: Check clang-format
+name: Check code format
 
 on:
   push:
@@ -21,5 +21,5 @@ jobs:
       - name: Run clang-format style check
         uses: jidicula/clang-format-action@v3.4.0
         with:
-          clang-format-version: '11'
+          clang-format-version: 11
           check-path: ${{ matrix.path }}
