@@ -1,4 +1,4 @@
-name: YACLib CI
+name: Test coverage
 
 on:
   push:
@@ -10,43 +10,48 @@ on:
 
 jobs:
   main:
-    name: Test coverage
-    runs-on: ${{ matrix.config.os }}
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: true
       matrix:
+        os: [ ubuntu-latest ]
+        cc: [ gcc-10 ]
+        cxx: [ g++-10 ]
         build_type: [ Debug ]
-        config:
-          - {
-            os: ubuntu-latest,
-            cc: "gcc-10", cxx: "g++-10"
-          }
+
     steps:
       - uses: actions/checkout@v2
 
       - name: Install lcov
-        run: sudo apt install lcov
+        run:
+          sudo apt install lcov
 
       - name: Configure CMake
-        run: mkdir build && cd build && cmake
-          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-          -DCMAKE_C_COMPILER=${{ matrix.config.cc }}
-          -DCMAKE_CXX_COMPILER=${{ matrix.config.cxx }}
+        run:
+          mkdir build &&
+          cd build &&
+          cmake ..
           -DBUILD_TESTING=ON
-          -DCOVERAGE=ON ..
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+          -DCMAKE_C_COMPILER=${{ matrix.cc }}
+          -DCMAKE_CXX_COMPILER=${{ matrix.cxx }}
+          -DCOVERAGE=ON
 
       - name: Build
-        run: cmake --build build --config ${{ matrix.build_type }}
+        run:
+          cmake --build build --config ${{ matrix.build_type }}
 
       - name: Test
-        run: cd build && ctest --output-on-failure -C ${{ matrix.build_type }} -V
+        run:
+          cd build &&
+          ctest --output-on-failure -C ${{ matrix.build_type }} -V
 
-      - name: Collect lcov
-        run: |
-          cd build
-          lcov -d ./src -c -o lcov.info
-          lcov -r lcov.info '/usr/*' -o lcov.info
-          lcov -r lcov.info '*/build/*' -o lcov.info
+      - name: Collect lcov info
+        run:
+          cd build &&
+          lcov -d ./src -c -o lcov.info &&
+          lcov -r lcov.info '/usr/*' -o lcov.info &&
+          lcov -r lcov.info '*/build/*' -o lcov.info &&
           lcov --list lcov.info
 
       - name: codecov
