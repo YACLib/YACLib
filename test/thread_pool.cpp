@@ -276,14 +276,14 @@ void TwoThreadPool(executor::IThreadPoolPtr& tp1, executor::IThreadPoolPtr& tp2)
     tp2->Execute([&] {
       done1 = true;
     });
-    std::this_thread::sleep_for(100ms);
+    std::this_thread::sleep_for(200ms);
   });
 
   tp2->Execute([&] {
     tp1->Execute([&] {
       done2 = true;
     });
-    std::this_thread::sleep_for(100ms);
+    std::this_thread::sleep_for(200ms);
   });
 
   tp1->SoftStop();
@@ -292,7 +292,7 @@ void TwoThreadPool(executor::IThreadPoolPtr& tp1, executor::IThreadPoolPtr& tp2)
   tp2->Wait();
   EXPECT_TRUE(done1);
   EXPECT_TRUE(done2);
-  EXPECT_LT(stop_watch.Elapsed(), 150ms);
+  EXPECT_LT(stop_watch.Elapsed(), 350ms);
 }
 
 TEST_F(SingleLightThread, TwoThreadPool) {
@@ -467,7 +467,7 @@ void UseAllThreads(executor::IThreadPoolPtr& tp, StopType stop_type) {
   std::atomic_size_t counter{0};
 
   auto sleeper = [&counter] {
-    std::this_thread::sleep_for(80ms);
+    std::this_thread::sleep_for(200ms);
     counter.fetch_add(1, std::memory_order_relaxed);
   };
 
@@ -492,8 +492,8 @@ void UseAllThreads(executor::IThreadPoolPtr& tp, StopType stop_type) {
   auto elapsed = stop_watch.Elapsed();
 
   EXPECT_EQ(counter, 2);
-  EXPECT_GE(elapsed, 80ms);
-  EXPECT_LE(elapsed, 140ms);
+  EXPECT_GE(elapsed, 200ms);
+  EXPECT_LE(elapsed, 350ms);
 }
 
 TEST_F(MultiLightThread, UseAllThreads) {
@@ -516,7 +516,7 @@ void NotSequentialAndParallel(executor::IThreadPoolPtr& tp, StopType stop_type) 
   std::atomic_int counter{0};
 
   tp->Execute([&] {
-    std::this_thread::sleep_for(100ms);
+    std::this_thread::sleep_for(300ms);
     counter.store(2, std::memory_order_release);
   });
 
@@ -524,7 +524,7 @@ void NotSequentialAndParallel(executor::IThreadPoolPtr& tp, StopType stop_type) 
     counter.store(1, std::memory_order_release);
   });
 
-  std::this_thread::sleep_for(10ms);
+  std::this_thread::sleep_for(100ms);
 
   EXPECT_EQ(counter.load(std::memory_order_acquire), 1);
 
@@ -614,7 +614,7 @@ void Lifetime(executor::IThreadPoolPtr& tp, size_t threads) {
     }
 
     void operator()() {
-      std::this_thread::sleep_for(10ms);
+      std::this_thread::sleep_for(100ms);
       _done = true;
     }
 
@@ -629,7 +629,7 @@ void Lifetime(executor::IThreadPoolPtr& tp, size_t threads) {
     tp->Execute(Task(dead));
   }
 
-  std::this_thread::sleep_for(10ms * threads / 2);
+  std::this_thread::sleep_for(100ms * threads / 2);
   EXPECT_EQ(dead.load(std::memory_order_acquire), threads);
 
   tp->Stop();
