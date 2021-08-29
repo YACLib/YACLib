@@ -10,11 +10,12 @@ namespace yaclib::executor {
 class IExecutor : public IRef {
  public:
   template <typename Functor, std::enable_if_t<!std::is_base_of_v<ITask, std::decay_t<Functor>>, int> = 0>
-  void Execute(Functor&& functor) {
-    Execute(*detail::MakeUniqueTask(std::forward<Functor>(functor)));
+  bool Execute(Functor&& functor) {
+    auto task = detail::MakeUniqueTask(std::forward<Functor>(functor));
+    return Execute(*task);
   }
 
-  virtual void Execute(ITask& task) = 0;
+  virtual bool Execute(ITask& task) = 0;
 };
 
 using IExecutorPtr = container::intrusive::Ptr<IExecutor>;

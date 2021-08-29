@@ -32,17 +32,19 @@ class ThreadPool : public IThreadPool {
     Wait();
   }
 
-  void Execute(ITask& task) final {
+  bool Execute(ITask& task) final {
     _refs_flag.fetch_add(2, std::memory_order_relaxed);
-    {
-      std::lock_guard guard{_m};
-      if (_stop) {
-        return;
-      }
-      task.IncRef();
-      _tasks.PushBack(&task);
+    task.IncRef();
+    std::unique_lock guard{_m};
+    if (_stop) {
+      guard.unlock();
+      task.DecRef();
+      return false;
     }
+    _tasks.PushBack(&task);
+    guard.unlock();
     _cv.notify_one();
+    return true;
   }
 
   void SoftStop() final {

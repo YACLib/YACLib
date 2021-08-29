@@ -27,13 +27,14 @@ class AsyncMutex : public IExecutor, public ITask {
   }
 
  private:
-  void Execute(ITask& task) final {
+  bool Execute(ITask& task) final {
     task.IncRef();
     _tasks.Put(&task);
 
     if (_work_counter.fetch_add(1, std::memory_order_acq_rel) == 0) {
       _executor->Execute(*this);
     }
+    return true;
   }
 
   void Call() noexcept final {

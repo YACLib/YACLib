@@ -6,8 +6,9 @@ namespace yaclib::executor {
 
 class Inline final : public IExecutor {
  private:
-  void Execute(ITask& task) override {
+  bool Execute(ITask& task) override {
     task.Call();
+    return true;
   }
 
   void IncRef() noexcept final {
