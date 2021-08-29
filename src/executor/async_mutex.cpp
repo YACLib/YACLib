@@ -20,25 +20,25 @@ class AsyncMutex : public IExecutor, public ITask {
     auto task = static_cast<ITask*>(nodes);
     while (task != nullptr) {
       auto next = static_cast<ITask*>(task->_next);
-      task->Call();
       task->DecRef();
       task = next;
     }
   }
 
  private:
-  void Execute(ITask& task) final {
+  bool Execute(ITask& task) final {
     task.IncRef();
     _tasks.Put(&task);
 
     if (_work_counter.fetch_add(1, std::memory_order_acq_rel) == 0) {
       _executor->Execute(*this);
     }
+    return true;
   }
 
   void Call() noexcept final {
     auto nodes{_tasks.TakeAllFIFO()};
-    size_t size = 0;
+    int32_t size{0};
 
     auto task = static_cast<ITask*>(nodes);
     while (task != nullptr) {
@@ -57,7 +57,7 @@ class AsyncMutex : public IExecutor, public ITask {
   IExecutorPtr _executor;
   container::intrusive::MPSCStack _tasks;
   // TODO remove _work_counter, make active/inactive like libunifex
-  alignas(kCacheLineSize) std::atomic<size_t> _work_counter{0};
+  alignas(kCacheLineSize) std::atomic_int32_t _work_counter{0};
 };
 
 }  // namespace

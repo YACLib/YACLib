@@ -1,41 +1,48 @@
-name: YACLib CI
+name: Test with Google sanitizer
 
 on:
-  pull_request:
+  push:
     branches:
       - main
-  push:
+  pull_request:
     branches:
       - main
 
 jobs:
   main:
-    runs-on: ubuntu-latest
-    name: "${{ matrix.cxx }} / ${{ matrix.build_type }} / ${{ matrix.sanitizer }}"
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.sanitizer }} on ${{ matrix.build_type }} ${{ matrix.cxx }} ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
+        sanitizer: [ ASAN, TSAN, UBSAN ]
+        # TODO(MBkkt): Add MEMSAN then GTest fix that issue https://github.com/google/sanitizers/issues/648
         build_type: [ RelWithDebInfo, Debug ]
         cc: [ clang-12 ]
         cxx: [ clang++-12 ]
-        sanitizer: [ ASAN, TSAN, UBSAN ] # TODO(MBkkt): Add MEMSAN then GTest fix that https://github.com/google/sanitizers/issues/648
+        os: [ ubuntu-latest ]
 
     steps:
       - uses: actions/checkout@v2
 
       - name: Configure CMake
-        run: cmake
+        run:
+          mkdir build &&
+          cd build &&
+          cmake ..
+          -DBUILD_TESTING=ON
           -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
           -DCMAKE_C_COMPILER=${{ matrix.cc }}
           -DCMAKE_CXX_COMPILER=${{ matrix.cxx }}
           -DSANITIZER=${{ matrix.sanitizer }}
-          -DBUILD_TESTING=ON
 
       - name: Build
-        run: cmake --build . --config ${{ matrix.build_type }}
+        run:
+          cmake --build build --config ${{ matrix.build_type }}
 
       - name: Test
         run:
+          cd build &&
           ASAN_OPTIONS=help=0:verbosity=0:halt_on_error=0:check_initialization_order=1:detect_stack_use_after_return=1:strict_init_order=1:strict_string_checks=1:debug=1
           TSAN_OPTIONS=help=0:verbosity=0
           ctest --output-on-failure -C ${{ matrix.build_type }} -V

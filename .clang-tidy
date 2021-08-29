@@ -1,4 +1,21 @@
-Checks: '*'
+Checks: '*,
+         -abseil-*,
+         -altera-*,
+         -android-*,
+         -boost-*,
+         -google-objc-*,
+         -linuxkernel-*,
+         -llvmlibc-*,
+         -mpi-*,
+         -objc-*,
+         -openmp-*,
+
+         -cert-err58-cpp,
+         -cppcoreguidelines-pro-type-static-cast-downcast,
+         -fuchsia-default-arguments-*,
+         -google-build-using-namespace,
+         -modernize-use-trailing-return-type'
+
 WarningsAsErrors: '*'
 
 HeaderFilterRegex: '^<.*\.hpp>$'
