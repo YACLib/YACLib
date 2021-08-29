@@ -61,7 +61,7 @@ void run_tests(size_t iter_count, executor::IThreadFactoryPtr factory, size_t ma
   MakeFactoryAvailable(factory, release_counter, threads);
 }
 
-GTEST_TEST(single_threaded, simple) {
+TEST(single_threaded, simple) {
   size_t counter{0};
   auto factory = executor::MakeThreadFactory(1);
   auto thread = factory->Acquire(MakeFunc([&counter] {
@@ -71,24 +71,30 @@ GTEST_TEST(single_threaded, simple) {
   EXPECT_EQ(counter, 1);
 }
 
-GTEST_TEST(single_threaded, complex) {
+TEST(single_threaded, complex) {
   static const size_t kMaxThreadCount = (kSanitizer ? 1 : 4) * std::thread::hardware_concurrency();
   static const size_t kIterCount = kSanitizer ? 10 : (100 + rand() % 100);
   for (size_t cached_threads : {size_t{0}, kMaxThreadCount / 2, kMaxThreadCount}) {
-    auto factory = executor::MakeThreadFactory(cached_threads);
+    auto factory = executor::MakeThreadFactory(executor::MakeThreadFactory(cached_threads), nullptr, nullptr);
 
     run_tests(kIterCount, factory, kMaxThreadCount);
   }
 }
 
-GTEST_TEST(multi_threaded, simple) {
+TEST(multi_threaded, simple) {
   EXPECT_GE(std::thread::hardware_concurrency(), 2);
   static const size_t kThreadsCount = kSanitizer ? 2 : (2 + rand() % (std::thread::hardware_concurrency() - 1));
   static const size_t kMaxThreadCount = kThreadsCount * std::thread::hardware_concurrency();
   static const size_t kIterCount = kSanitizer ? 10 : (100 + rand() % 100);
 
-  for (size_t cached_threads : {size_t{0}, kMaxThreadCount / 2, kMaxThreadCount}) {
-    auto test_threads = executor::MakeThreadFactory(kThreadsCount);
+  auto stub = MakeFunc([] {
+  });
+
+  for (size_t cached_threads : {size_t{0}, kMaxThreadCount / 3, kMaxThreadCount * 2 / 3, kMaxThreadCount}) {
+    auto test_threads = executor::MakeThreadFactory(
+        executor::MakeThreadFactory(executor::MakeThreadFactory(executor::MakeThreadFactory(kThreadsCount), 1), "stub"),
+        (cached_threads == kMaxThreadCount / 3 ? nullptr : stub),
+        (cached_threads == kMaxThreadCount * 2 / 3 ? nullptr : stub));
 
     auto factory = executor::MakeThreadFactory(cached_threads);
 
@@ -117,13 +123,13 @@ GTEST_TEST(multi_threaded, simple) {
   }
 }
 
-GTEST_TEST(decorator, priority) {
+TEST(decorator, priority) {
   // TODO(kononovk): implement test
 }
-GTEST_TEST(decorator, name) {
+TEST(decorator, name) {
   // TODO(kononovk): implement test
 }
-GTEST_TEST(decorator, callback) {
+TEST(decorator, callback) {
   // TODO(kononovk): implement test
 }
 
