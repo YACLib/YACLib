@@ -24,6 +24,10 @@ jobs:
             os: windows-latest,
             cc: cl, cxx: cl,
           }
+          - {
+            os: macos-latest,
+            cc: clang, cxx: clang++
+          }
         build_type: [ Debug ]
 
     steps:
