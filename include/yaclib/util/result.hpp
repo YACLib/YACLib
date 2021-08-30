@@ -37,7 +37,7 @@ enum class ResultState {
 
 class ResultError : public std::exception {
  public:
-  ResultError(std::error_code error) : _error(error) {
+  ResultError(std::error_code error) : _error{error} {
   }
   std::error_code Get() const {
     return _error;
