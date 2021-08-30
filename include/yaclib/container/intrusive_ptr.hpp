@@ -3,7 +3,6 @@
 #include <yaclib/ref.hpp>
 
 #include <algorithm>
-#include <functional>
 #include <type_traits>
 #include <utility>
 
@@ -90,11 +89,11 @@ class Ptr {
     return _ptr != nullptr;
   }
 
- private:
   inline void Swap(Ptr& other) noexcept {
     std::swap(_ptr, other._ptr);
   }
 
+ private:
   T* _ptr;
 
   template <typename U>
