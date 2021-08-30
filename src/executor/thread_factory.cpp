@@ -32,6 +32,7 @@ class LightThread final : public IThread {
   }
 
   ~LightThread() final {
+    assert(_thread.get_id() != std::this_thread::get_id());
     _thread.join();
   }
 
@@ -74,6 +75,7 @@ class HeavyThread final : public IThread {
       _state = State::Stop;
     }
     _cv.notify_all();
+    assert(_thread.get_id() != std::this_thread::get_id());
     _thread.join();
   }
 

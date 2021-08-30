@@ -1,5 +1,6 @@
 #include <container/intrusive_list.hpp>
 
+#include <yaclib/config.hpp>
 #include <yaclib/executor/thread_factory.hpp>
 
 #include <atomic>
@@ -10,7 +11,7 @@
 
 namespace {
 
-constexpr bool kSanitizer{true};
+constexpr bool kSanitizer{YACLIB_SLOWDOWN != 1};
 
 // TODO(kononovk): usage better random
 static auto init_rand = [] {

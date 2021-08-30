@@ -292,7 +292,7 @@ void TwoThreadPool(executor::IThreadPoolPtr& tp1, executor::IThreadPoolPtr& tp2)
   tp2->Wait();
   EXPECT_TRUE(done1);
   EXPECT_TRUE(done2);
-  EXPECT_LT(stop_watch.Elapsed(), 350ms);
+  EXPECT_LT(stop_watch.Elapsed(), 400ms);
 }
 
 TEST_F(SingleLightThread, TwoThreadPool) {

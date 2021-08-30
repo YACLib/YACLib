@@ -1,7 +1,7 @@
 macro(add_files)
   set(YACLIB_INCLUDES ${YACLIB_INCLUDES} PARENT_SCOPE)
-  set(YACLIB_HEADERS  ${YACLIB_HEADERS}  PARENT_SCOPE)
-  set(YACLIB_SOURCES  ${YACLIB_SOURCES}  PARENT_SCOPE)
+  set(YACLIB_HEADERS ${YACLIB_HEADERS} PARENT_SCOPE)
+  set(YACLIB_SOURCES ${YACLIB_SOURCES} PARENT_SCOPE)
 endmacro()
 
 # yaclib library
@@ -16,8 +16,20 @@ set(
   YACLIB_INCLUDES
   ${YACLIB_INCLUDE_DIR}/ref.hpp
   ${YACLIB_INCLUDE_DIR}/task.hpp
+  ${YACLIB_INCLUDE_DIR}/async/run.hpp
+  ${YACLIB_INCLUDE_DIR}/util/counters.hpp
+  ${YACLIB_INCLUDE_DIR}/util/result.hpp
+  ${YACLIB_INCLUDE_DIR}/util/type_traits.hpp
 )
-set(YACLIB_HEADERS)
+set(
+  YACLIB_HEADERS
+  ${YACLIB_INCLUDE_DIR}/async/detail/core.hpp
+  ${YACLIB_INCLUDE_DIR}/async/detail/future.hpp
+  ${YACLIB_INCLUDE_DIR}/async/detail/promise.hpp
+  ${YACLIB_INCLUDE_DIR}/async/detail/future_impl.hpp
+  ${YACLIB_INCLUDE_DIR}/async/detail/promise_impl.hpp
+)
+
 set(YACLIB_SOURCES)
 
 add_subdirectory(container)
