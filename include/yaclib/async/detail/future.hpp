@@ -19,57 +19,60 @@ class Future final {
   Future(const Future&) = delete;
   Future& operator=(const Future&) = delete;
 
-  explicit Future(FutureCorePtr<T> state);
+  explicit Future(FutureCorePtr<T> core);
+
   Future(Future&& other) noexcept = default;
   Future& operator=(Future&& other) noexcept = default;
 
-  template <typename Functor>
-  auto Then(executor::IExecutorPtr executor, Functor&& functor) &&;
+  ~Future();
+
+  bool IsReady() const noexcept;
+
+  // TODO util::Result<T> Get() const &;
+
+  util::Result<T> Get() &&;
+
+  void Cancel() &&;
 
   template <typename Functor>
   auto Then(Functor&& functor) &&;
 
   template <typename Functor>
-  void Subscribe(executor::IExecutorPtr executor, Functor&& functor) &&;
+  auto Then(executor::IExecutorPtr executor, Functor&& functor) &&;
 
   template <typename Functor>
   void Subscribe(Functor&& functor) &&;
 
-  ~Future();
-
-  void Cancel() &&;
-
-  util::Result<T> Get() &&;
-
-  bool IsReady() const noexcept;
+  template <typename Functor>
+  void Subscribe(executor::IExecutorPtr executor, Functor&& functor) &&;
 
  private:
   template <typename U>
   friend class Future;
 
   template <typename U, typename Functor>
-  Future<U> ThenResult(executor::IExecutorPtr executor, Functor&& functor);
+  Future<U> ThenResult(Functor&& functor);
 
   template <typename U, typename Functor>
-  Future<U> ThenValue(executor::IExecutorPtr executor, Functor&& functor);
+  Future<U> ThenValue(Functor&& functor);
 
   template <typename Functor>
-  Future<T> ThenError(executor::IExecutorPtr executor, Functor&& functor);
+  Future<T> ThenError(Functor&& functor);
 
   template <typename Functor>
-  Future<T> ThenException(executor::IExecutorPtr executor, Functor&& functor);
+  Future<T> ThenException(Functor&& functor);
 
   template <typename U, typename Functor>
-  Future<U> AsyncThenResult(executor::IExecutorPtr executor, Functor&& functor);
+  Future<U> AsyncThenResult(Functor&& functor);
 
   template <typename U, typename Functor>
-  Future<U> AsyncThenValue(executor::IExecutorPtr executor, Functor&& functor);
+  Future<U> AsyncThenValue(Functor&& functor);
 
   template <typename Functor>
-  Future<T> AsyncThenError(executor::IExecutorPtr executor, Functor&& functor);
+  Future<T> AsyncThenError(Functor&& functor);
 
   template <typename Functor>
-  Future<T> AsyncThenException(executor::IExecutorPtr executor, Functor&& functor);
+  Future<T> AsyncThenException(Functor&& functor);
 
   FutureCorePtr<T> _core;
 };
