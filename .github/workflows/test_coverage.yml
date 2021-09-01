@@ -49,9 +49,10 @@ jobs:
       - name: Collect lcov info
         run:
           cd build &&
-          lcov -d ./src -c -o lcov.info &&
+          lcov -d . -c -o lcov.info &&
           lcov -r lcov.info '/usr/*' -o lcov.info &&
-          lcov -r lcov.info '*/build/*' -o lcov.info &&
+          lcov -r lcov.info '*/_deps/*' -o lcov.info &&
+          lcov -r lcov.info '*/test/*' -o lcov.info &&
           lcov --list lcov.info
 
       - name: codecov
