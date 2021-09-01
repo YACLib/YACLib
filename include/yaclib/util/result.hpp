@@ -28,6 +28,10 @@ using ResultValueT = typename ResultValue<T>::type;
 
 }  // namespace detail
 
+/**
+ * Result states \see Result
+ * \enum Empty, Value, Error, Exception
+ * */
 enum class ResultState {
   Empty = 0,
   Value,
@@ -35,6 +39,10 @@ enum class ResultState {
   Exception,
 };
 
+/**
+ * \class Exception for std::error_code
+ * \see Result
+ */
 class ResultError : public std::exception {
  public:
   ResultError(std::error_code error) : _error{error} {
@@ -49,6 +57,10 @@ class ResultError : public std::exception {
 
 struct ResultEmpty : std::exception {};
 
+/**
+ * \class Encapsulated return value from caller
+ * \tparam T type to store in Result
+ */
 template <typename T>
 class Result {
   struct Unit {};

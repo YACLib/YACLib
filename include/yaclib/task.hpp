@@ -11,6 +11,9 @@
 
 namespace yaclib {
 
+/**
+ * \class Shared callable interface
+ */
 class IFunc : public IRef {
  public:
   virtual void Call() noexcept = 0;
@@ -18,6 +21,9 @@ class IFunc : public IRef {
 
 using IFuncPtr = container::intrusive::Ptr<IFunc>;
 
+/**
+ * \class Callable that can be executed in an IExecutor \see IExecutor
+ * */
 class ITask : public IFunc, public container::intrusive::detail::Node {};
 
 namespace detail {
@@ -65,6 +71,10 @@ ITask* MakeUniqueTask(Functor&& functor) {
 
 }  // namespace detail
 
+/**
+ * \brief Create IFunc object from any Callable functor
+ * \param functor Callable object
+ * */
 template <typename Functor>
 IFuncPtr MakeFunc(Functor&& functor) {
   using Base = detail::CallImpl<IFunc, std::decay_t<Functor>>;
