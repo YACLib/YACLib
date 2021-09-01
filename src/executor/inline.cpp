@@ -1,7 +1,5 @@
 #include <yaclib/executor/executor.hpp>
 
-#include <memory>
-
 namespace yaclib::executor {
 
 class Inline final : public IExecutor {
