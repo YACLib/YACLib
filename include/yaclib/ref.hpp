@@ -2,14 +2,19 @@
 
 namespace yaclib {
 
+/**
+ * \class Reference counting interface
+ */
 class IRef {
  public:
-  // IExecutor make this before use ITask
-  // IThreadFactory make this before use IFunc
+  /**
+   * \brief Increments reference counter
+   */
   virtual void IncRef() noexcept = 0;
 
-  // IExecutor make this after use ITask
-  // IThreadFactory make this after use IFunc
+  /**
+   * \brief Decrements reference counter
+   */
   virtual void DecRef() noexcept = 0;
 
   virtual ~IRef() = default;
