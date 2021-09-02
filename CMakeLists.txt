@@ -1,11 +1,14 @@
 cmake_minimum_required(VERSION 3.11)
 
+project(yaclib)
+
+set(YACLIB_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+set(YACLIB_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
+
 # Include guards
-if (CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
+if (YACLIB_SOURCE_DIR STREQUAL YACLIB_BINARY_DIR)
   message(FATAL_ERROR "In-source builds not allowed. Please make a new directory (called a build directory) and run CMake from there.")
 endif ()
-
-project(yaclib)
 
 # Set variables
 set(CMAKE_CXX_STANDARD 17)

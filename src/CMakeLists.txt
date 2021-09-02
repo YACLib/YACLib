@@ -8,9 +8,9 @@ endmacro()
 add_compile_options(${YACLIB_COMPILE_OPTIONS})
 add_link_options(${YACLIB_LINK_OPTIONS})
 
-configure_file(config.hpp.in ${CMAKE_BINARY_DIR}/include/yaclib/config.hpp)
+configure_file(config.hpp.in ${YACLIB_BINARY_DIR}/include/yaclib/config.hpp)
 
-set(YACLIB_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include/yaclib)
+set(YACLIB_INCLUDE_DIR ${YACLIB_SOURCE_DIR}/include/yaclib)
 
 set(
   YACLIB_INCLUDES
@@ -53,7 +53,7 @@ target_link_libraries(
 
 target_include_directories(
   ${PROJECT_NAME}
-  PUBLIC ${CMAKE_SOURCE_DIR}/include
-  PUBLIC ${CMAKE_BINARY_DIR}/include # for config.hpp
-  PRIVATE ${CMAKE_SOURCE_DIR}/src
+  PUBLIC ${YACLIB_SOURCE_DIR}/include
+  PUBLIC ${YACLIB_BINARY_DIR}/include # for config.hpp
+  PRIVATE ${YACLIB_SOURCE_DIR}/src
 )
