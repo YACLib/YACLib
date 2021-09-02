@@ -60,7 +60,7 @@ function(yaclib_test NAME)
   )
   target_include_directories(
     ${NAME}
-    PRIVATE ${CMAKE_SOURCE_DIR}/src
+    PRIVATE ${YACLIB_SOURCE_DIR}/src
   )
   add_test(NAME ${NAME} COMMAND ${NAME})
 endfunction()
