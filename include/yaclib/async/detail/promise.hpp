@@ -33,11 +33,14 @@ class Promise {
 
  private:
   bool _future_extracted{false};
-  PromiseCorePtr<T> _core;
+  detail::PromiseCorePtr<T> _core;
 };
 
 template <typename T>
-using Contract = std::pair<Future<T>, Promise<T>>;
+struct Contract {
+  Future<T> future;
+  Promise<T> promise;
+};
 
 template <typename T>
 Contract<T> MakeContract();

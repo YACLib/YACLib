@@ -19,7 +19,8 @@ class Future final {
   Future(const Future&) = delete;
   Future& operator=(const Future&) = delete;
 
-  explicit Future(FutureCorePtr<T> core);
+  Future() = default;
+  explicit Future(detail::FutureCorePtr<T> core);
 
   Future(Future&& other) noexcept = default;
   Future& operator=(Future&& other) noexcept = default;
@@ -74,7 +75,7 @@ class Future final {
   template <typename Functor>
   Future<T> AsyncThenException(Functor&& functor);
 
-  FutureCorePtr<T> _core;
+  detail::FutureCorePtr<T> _core;
 };
 
 }  // namespace yaclib::async

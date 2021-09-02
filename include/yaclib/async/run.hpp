@@ -34,7 +34,7 @@ auto Run(executor::IExecutorPtr executor, Functor&& functor) {
       return {std::current_exception()};
     }
   };
-  using CoreType = Core<Ret, std::decay_t<decltype(wrapper)>, void>;
+  using CoreType = detail::Core<Ret, std::decay_t<decltype(wrapper)>, void>;
   container::intrusive::Ptr shared_core{new container::Counter<CoreType>{std::move(wrapper)}};
   shared_core->SetExecutor(executor);
   executor->Execute(*shared_core);

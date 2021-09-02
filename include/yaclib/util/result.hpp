@@ -45,7 +45,7 @@ enum class ResultState {
  */
 class ResultError : public std::exception {
  public:
-  ResultError(std::error_code error) : _error{error} {
+  explicit ResultError(std::error_code error) : _error{error} {
   }
   std::error_code Get() const {
     return _error;
@@ -108,7 +108,6 @@ class Result {
   }
 
   ValueT Ok() && {
-    static_assert(!std::is_void_v<T>, "Ok don't work for Result<void>");
     switch (State()) {
       case ResultState::Value: {
         return std::move(std::get<ValueT>(_result));
