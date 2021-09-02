@@ -10,17 +10,6 @@
 namespace yaclib::async {
 namespace detail {
 
-template <typename U>
-struct FutureValue;
-
-template <typename U>
-struct FutureValue<Future<U>> {
-  using type = U;
-};
-
-template <typename T>
-using FutureValueT = typename FutureValue<T>::type;
-
 struct Getter : ITask {
   void Call() noexcept final {
   }
@@ -51,7 +40,7 @@ Future<U> MakeFuture(Value val) {
 }  // namespace detail
 
 template <typename T>
-Future<T>::Future(FutureCorePtr<T> core) : _core{std::move(core)} {
+Future<T>::Future(detail::FutureCorePtr<T> core) : _core{std::move(core)} {
 }
 
 template <typename T>
@@ -62,14 +51,14 @@ auto Future<T>::Then(Functor&& functor) && {
   if constexpr (util::IsInvocableV<Functor, util::Result<T>>) {
     using Ret = util::detail::ResultValueT<util::InvokeT<Functor, util::Result<T>>>;
     if constexpr (util::IsFutureV<Ret>) {
-      return AsyncThenResult<detail::FutureValueT<Ret>>(std::forward<Functor>(functor));
+      return AsyncThenResult<util::detail::FutureValueT<Ret>>(std::forward<Functor>(functor));
     } else {
       return ThenResult<Ret>(std::forward<Functor>(functor));
     }
   } else if constexpr (util::IsInvocableV<Functor, T>) {
     using Ret = util::detail::ResultValueT<util::InvokeT<Functor, T>>;
     if constexpr (util::IsFutureV<Ret>) {
-      return AsyncThenValue<detail::FutureValueT<Ret>>(std::forward<Functor>(functor));
+      return AsyncThenValue<util::detail::FutureValueT<Ret>>(std::forward<Functor>(functor));
     } else {
       return ThenValue<Ret>(std::forward<Functor>(functor));
     }
@@ -162,7 +151,7 @@ Future<U> Future<T>::ThenResult(Functor&& f) {
       return {std::current_exception()};
     }
   };
-  using CoreType = Core<U, std::decay_t<decltype(wrapper)>, T>;
+  using CoreType = detail::Core<U, std::decay_t<decltype(wrapper)>, T>;
   container::intrusive::Ptr core{new container::Counter<CoreType>{std::move(wrapper)}};
   core->SetExecutor(_core->GetExecutor());
   core->SetCaller(_core);

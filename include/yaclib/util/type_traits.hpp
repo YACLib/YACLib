@@ -10,6 +10,20 @@ class Future;
 
 }  // namespace async
 namespace util {
+namespace detail {
+
+template <typename U>
+struct FutureValue;
+
+template <typename U>
+struct FutureValue<async::Future<U>> {
+  using type = U;
+};
+
+template <typename T>
+using FutureValueT = typename FutureValue<T>::type;
+
+}  // namespace detail
 
 template <template <typename...> class T, typename... U>
 struct IsInstantiationOf : std::false_type {};

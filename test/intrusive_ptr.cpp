@@ -144,7 +144,7 @@ GTEST_TEST(assign, copy) {
 
   {
     Ptr<X> p1;
-    { p1 = p1; }  // brackets used to avoid warning about self-assignment
+    p1 = p1;
     EXPECT_EQ(p1, p1);
     EXPECT_TRUE(p1 ? false : true);
     EXPECT_FALSE(p1);

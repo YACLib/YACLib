@@ -17,6 +17,7 @@ set(
   ${YACLIB_INCLUDE_DIR}/ref.hpp
   ${YACLIB_INCLUDE_DIR}/task.hpp
   ${YACLIB_INCLUDE_DIR}/async/run.hpp
+  ${YACLIB_INCLUDE_DIR}/async/when_all.hpp
   ${YACLIB_INCLUDE_DIR}/util/counters.hpp
   ${YACLIB_INCLUDE_DIR}/util/result.hpp
   ${YACLIB_INCLUDE_DIR}/util/type_traits.hpp

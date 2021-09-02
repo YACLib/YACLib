@@ -10,7 +10,7 @@
 #include <cassert>
 #include <type_traits>
 
-namespace yaclib::async {
+namespace yaclib::async::detail {
 
 template <typename Value>
 class BaseCore : public ITask {
@@ -28,7 +28,7 @@ class BaseCore : public ITask {
     _caller = nullptr;
   }
 
-  void Set(util::Result<Value>&& result) {
+  void SetResult(util::Result<Value>&& result) {
     _result = std::move(result);
     const auto state = _state.exchange(State::HasResult, std::memory_order_acq_rel);
     if (state == State::HasCallback) {
@@ -103,7 +103,7 @@ class Core : public BaseCore<Ret> {
     }();
 
     Base::_caller = nullptr;
-    Base::Set(_functor(std::move(ret)));
+    Base::SetResult(_functor(std::move(ret)));
   }
 
  private:
@@ -123,4 +123,4 @@ using PromiseCorePtr = container::intrusive::Ptr<Core<Value, void, void>>;
 template <typename Value>
 using FutureCorePtr = container::intrusive::Ptr<BaseCore<Value>>;
 
-}  // namespace yaclib::async
+}  // namespace yaclib::async::detail

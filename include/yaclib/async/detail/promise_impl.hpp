@@ -7,7 +7,7 @@
 namespace yaclib::async {
 
 template <typename T>
-Promise<T>::Promise() : _core{new container::Counter<Core<T, void, void>>{}} {
+Promise<T>::Promise() : _core{new container::Counter<detail::Core<T, void, void>>{}} {
 }
 
 template <typename T>
@@ -21,13 +21,13 @@ template <typename Type>
 void Promise<T>::Set(Type&& value) && {
   static_assert(!std::is_void_v<T> || std::is_same_v<std::error_code, util::DecayT<Type>> ||
                 std::is_same_v<std::exception_ptr, util::DecayT<Type>>);
-  _core->Set({std::forward<Type>(value)});
+  _core->SetResult({std::forward<Type>(value)});
 }
 
 template <typename T>
 void Promise<T>::Set() && {
   static_assert(std::is_void_v<T>);
-  _core->Set(util::Result<T>::Default());
+  _core->SetResult(util::Result<T>::Default());
 }
 
 template <typename T>
