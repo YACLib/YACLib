@@ -36,10 +36,8 @@ class AllCombinator : public AllCombinatorBase<FutureValue>, public IRef {
         }
         return {std::move(future), nullptr};
       }
-      return {std::move(future), new container::Counter<AllCombinator>{std::move(promise), size}};
     }
-    return {std::move(future),
-            container::intrusive::Ptr<AllCombinator>{new container::Counter<AllCombinator>{std::move(promise)}}};
+    return {std::move(future), new container::Counter<AllCombinator>{std::move(promise), size}};
   }
 
   void Combine(util::Result<T> result) noexcept(std::is_void_v<T> || std::is_nothrow_move_assignable_v<T>) {
