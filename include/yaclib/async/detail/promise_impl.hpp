@@ -20,7 +20,8 @@ template <typename T>
 template <typename Type>
 void Promise<T>::Set(Type&& value) && {
   static_assert(!std::is_void_v<T> || std::is_same_v<std::error_code, util::DecayT<Type>> ||
-                std::is_same_v<std::exception_ptr, util::DecayT<Type>>);
+                std::is_same_v<std::exception_ptr, util::DecayT<Type>> ||
+                std::is_same_v<util::Result<void>, util::DecayT<Type>>);
   _core->SetResult({std::forward<Type>(value)});
 }
 
