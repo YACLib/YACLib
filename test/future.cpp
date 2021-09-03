@@ -1,3 +1,5 @@
+#include <container/intrusive_list.hpp>
+
 #include <yaclib/async/run.hpp>
 #include <yaclib/executor/thread_pool.hpp>
 
@@ -531,6 +533,267 @@ TEST(Pipeline, Simple2) {
   tp1->Wait();
   tp2->Stop();
   tp2->Wait();
+}
+
+TEST(Simple, MakePromiseContract) {
+  class ManualExecutor : public executor::IExecutor {
+   private:
+    container::intrusive::List<ITask> _tasks;
+
+   public:
+    bool Execute(ITask& f) final {
+      f.IncRef();
+      _tasks.PushBack(&f);
+      return true;
+    }
+
+    void Drain() {
+      while (auto task = _tasks.PopBack()) {
+        task->Call();
+        task->DecRef();
+      }
+    }
+  };
+
+  auto e = container::NothingCounter<ManualExecutor>{};
+  auto [f, p] = async::MakeContract<int>();
+  auto g = std::move(f).Then(&e, [](int _) {
+    return _ + 1;
+  });
+  EXPECT_FALSE(g.IsReady());
+  std::move(p).Set(3);
+  EXPECT_FALSE(g.IsReady());
+  e.Drain();
+  ASSERT_TRUE(g.IsReady());
+  EXPECT_EQ(4, std::move(g).Get().Ok());
+}
+
+template <typename T>
+async::Future<T> MakeFuture(T&& x) {
+  auto [f, p] = async::MakeContract<T>();
+  std::move(p).Set(std::forward<T>(x));
+  return std::move(f);
+}
+
+TEST(PerfectForwarding, InvokeCallbackReturningValueAsRvalue) {
+  struct Foo {
+    int operator()(int x) & {
+      return x + 1;
+    }
+    int operator()(int x) const& {
+      return x + 2;
+    }
+    int operator()(int x) && {
+      return x + 3;
+    }
+  };
+
+  Foo foo;
+  Foo const cfoo;
+
+  // The continuation will be forward-constructed - copied if given as & and
+  // moved if given as && - everywhere construction is required.
+  // The continuation will be invoked with the same cvref as it is passed.
+  EXPECT_EQ(101, MakeFuture<int>(100).Then(foo).Get().Ok());
+  EXPECT_EQ(202, MakeFuture<int>(200).Then(cfoo).Get().Ok());
+  EXPECT_EQ(303, MakeFuture<int>(300).Then(Foo()).Get().Ok());
+}
+
+TEST(PerfectForwarding, InvokeCallbackReturningFutureAsRvalue) {
+  struct Foo {
+    async::Future<int> operator()(int x) & {
+      return MakeFuture<int>(x + 1);
+    }
+    async::Future<int> operator()(int x) const& {
+      return MakeFuture<int>(x + 2);
+    }
+    async::Future<int> operator()(int x) && {
+      return MakeFuture<int>(x + 3);
+    }
+  };
+
+  Foo foo;
+  Foo const cfoo;
+
+  // The continuation will be forward-constructed - copied if given as & and
+  // moved if given as && - everywhere construction is required.
+  // The continuation will be invoked with the same cvref as it is passed.
+  EXPECT_EQ(101, MakeFuture<int>(100).Then(foo).Get().Ok());
+  EXPECT_EQ(202, MakeFuture<int>(200).Then(cfoo).Get().Ok());
+  EXPECT_EQ(303, MakeFuture<int>(300).Then(Foo()).Get().Ok());
+}
+
+TEST(Exception, CallbackReturningValue) {
+  auto tp = executor::MakeThreadPool(1);
+
+  auto f = async::Run(tp,
+                      [] {
+                        return 1;
+                      })
+               .Then([](util::Result<int>) {
+                 throw std::runtime_error{""};
+               })
+               .Then([](util::Result<void> result) {
+                 EXPECT_EQ(result.State(), util::ResultState::Exception);
+                 return 0;
+               });
+  EXPECT_EQ(std::move(f).Get().Ok(), 0);
+  tp->Stop();
+  tp->Wait();
+}
+
+TEST(Exception, CallbackReturningFuture) {
+  auto tp = executor::MakeThreadPool(1);
+
+  auto f = async::Run(tp,
+                      [] {
+                        return 1;
+                      })
+               .Then([](int) -> async::Future<void> {
+                 throw std::runtime_error{""};
+               })
+               .Then([](util::Result<void> result) {
+                 EXPECT_EQ(result.State(), util::ResultState::Exception);
+                 return 0;
+               });
+  EXPECT_EQ(std::move(f).Get().Ok(), 0);
+  tp->Stop();
+  tp->Wait();
+}
+
+TEST(Simple, SetAndGetRequiresOnlyMove) {
+  struct MoveCtorOnly {
+    explicit MoveCtorOnly(int id) : id_(id) {
+    }
+    MoveCtorOnly(MoveCtorOnly&&) = default;
+    MoveCtorOnly& operator=(MoveCtorOnly&&) = default;
+    MoveCtorOnly(const MoveCtorOnly&) = delete;
+    MoveCtorOnly& operator=(MoveCtorOnly const&) = delete;
+    int id_;
+  };
+  auto f = MakeFuture<MoveCtorOnly>(MoveCtorOnly(42));
+  EXPECT_TRUE(f.IsReady());
+  auto v = std::move(f).Get().Ok();
+  EXPECT_EQ(v.id_, 42);
+}
+
+TEST(Future, special) {
+  EXPECT_FALSE(std::is_copy_constructible_v<async::Future<int>>);
+  EXPECT_FALSE(std::is_copy_assignable_v<async::Future<int>>);
+  EXPECT_TRUE(std::is_move_constructible_v<async::Future<int>>);
+  EXPECT_TRUE(std::is_move_assignable_v<async::Future<int>>);
+}
+
+TEST(Future, ThenError) {
+  bool theFlag = false;
+  auto flag = [&] {
+    theFlag = true;
+  };
+
+#define EXPECT_FLAG()     \
+  do {                    \
+    EXPECT_TRUE(theFlag); \
+    theFlag = false;      \
+  } while (0)
+
+  // By reference
+  {
+    auto f = MakeFuture<int>(1)
+                 .Then([](auto&&) {
+                   throw std::runtime_error{""};
+                 })
+                 .Then([&](auto&&) {
+                   flag();
+                 });
+    EXPECT_FLAG();
+    EXPECT_NO_THROW(std::move(f).Get().Ok());
+  }
+
+  {
+    auto f = MakeFuture<int>(5)
+                 .Then([](auto&&) {
+                   throw std::runtime_error{""};
+                 })
+                 .Then([&](auto&&) {
+                   flag();
+                   return MakeFuture<int>(6);
+                 });
+    EXPECT_FLAG();
+    EXPECT_NO_THROW(std::move(f).Get().Ok());
+  }
+
+  // By value
+  {
+    auto f = MakeFuture<int>(5)
+                 .Then([](auto&&) {
+                   throw std::runtime_error{""};
+                 })
+                 .Then([&](auto) {
+                   flag();
+                 });
+    EXPECT_FLAG();
+    EXPECT_NO_THROW(std::move(f).Get().Ok());
+  }
+
+  {
+    auto f = MakeFuture<int>(5)
+                 .Then([](auto&&) {
+                   throw std::runtime_error{""};
+                 })
+                 .Then([&](auto) {
+                   flag();
+                   return MakeFuture<int>(5);
+                 });
+    EXPECT_FLAG();
+    EXPECT_NO_THROW(std::move(f).Get().Ok());
+  }
+
+  // Mutable lambda
+  {
+    auto f = MakeFuture<int>(5)
+                 .Then([](auto&&) {
+                   throw std::runtime_error{""};
+                 })
+                 .Then([&](auto&&) mutable {
+                   flag();
+                 });
+    EXPECT_FLAG();
+    EXPECT_NO_THROW(std::move(f).Get().Ok());
+  }
+
+  {
+    auto f = MakeFuture<int>(5)
+                 .Then([](auto&&) {
+                   throw std::runtime_error{""};
+                 })
+                 .Then([&](auto&&) mutable {
+                   flag();
+                   return MakeFuture<int>(5);
+                 });
+    EXPECT_FLAG();
+    EXPECT_NO_THROW(std::move(f).Get().Ok());
+  }
+#undef EXPECT_FLAG
+}
+
+static std::string DoWorkStatic(util::Result<std::string>&& t) {
+  return std::move(t).Value() + ";static";
+}
+
+static std::string DoWorkStaticValue(std::string&& t) {
+  return t + ";value";
+}
+
+TEST(Future, thenFunction) {
+  struct Worker {
+    static std::string DoWorkStatic(util::Result<std::string>&& t) {
+      return std::move(t).Value() + ";class-static";
+    }
+  };
+
+  auto f = MakeFuture<std::string>("start").Then(DoWorkStatic).Then(Worker::DoWorkStatic).Then(DoWorkStaticValue);
+
+  EXPECT_EQ(std::move(f).Get().Value(), "start;static;class-static;value");
 }
 
 }  // namespace
