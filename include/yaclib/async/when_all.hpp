@@ -12,18 +12,24 @@ namespace detail {
 template <typename T>
 class AllCombinatorBase {
  protected:
-  T _results;
+  alignas(kCacheLineSize) std::atomic<bool> _done{false};
   alignas(kCacheLineSize) std::atomic<size_t> _ticket{0};
+  T _results;
 };
 
 template <>
-class AllCombinatorBase<void> {};
+class AllCombinatorBase<void> {
+ protected:
+  alignas(kCacheLineSize) std::atomic<bool> _done{false};
+};
 
 template <
     typename T, size_t N = std::numeric_limits<size_t>::max(), bool IsArray = (N != std::numeric_limits<size_t>::max()),
     typename FutureValue =
         std::conditional_t<std::is_void_v<T>, void, std::conditional_t<IsArray, std::array<T, N>, std::vector<T>>>>
 class AllCombinator : public AllCombinatorBase<FutureValue>, public IRef {
+  using Base = AllCombinatorBase<FutureValue>;
+
  public:
   static std::pair<Future<FutureValue>, container::intrusive::Ptr<AllCombinator>> Make(size_t size = 0) {
     auto [future, promise] = MakeContract<FutureValue>();
@@ -41,7 +47,7 @@ class AllCombinator : public AllCombinatorBase<FutureValue>, public IRef {
   }
 
   void Combine(util::Result<T> result) noexcept(std::is_void_v<T> || std::is_nothrow_move_assignable_v<T>) {
-    if (_done.load(std::memory_order_acquire)) {
+    if (Base::_done.load(std::memory_order_acquire)) {
       return;
     }
     auto state = result.State();
@@ -52,7 +58,7 @@ class AllCombinator : public AllCombinatorBase<FutureValue>, public IRef {
       }
       return;
     }
-    if (_done.exchange(true, std::memory_order_acq_rel)) {
+    if (Base::_done.exchange(true, std::memory_order_acq_rel)) {
       return;
     }
     if (state == util::ResultState::Error) {
@@ -63,7 +69,7 @@ class AllCombinator : public AllCombinatorBase<FutureValue>, public IRef {
   }
 
   ~AllCombinator() {
-    if (!_done.load(std::memory_order_acquire)) {
+    if (!Base::_done.load(std::memory_order_acquire)) {
       if constexpr (!std::is_void_v<T>) {
         std::move(_promise).Set(std::move(AllCombinatorBase<FutureValue>::_results));
       } else {
@@ -80,7 +86,6 @@ class AllCombinator : public AllCombinatorBase<FutureValue>, public IRef {
     }
   }
 
-  alignas(kCacheLineSize) std::atomic<bool> _done;
   Promise<FutureValue> _promise;
 };
 
