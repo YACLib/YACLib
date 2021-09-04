@@ -29,9 +29,10 @@ class Future final {
 
   bool IsReady() const noexcept;
 
-  // TODO util::Result<T> Get() const &;
-
+  util::Result<T> Get() const&;  // You can use this iff you want call Get multiple times
   util::Result<T> Get() &&;
+  util::Result<T> Get() const&& = delete;  // TODO maybe add as ref to 'Get() &&'
+  util::Result<T> Get() & = delete;
 
   void Cancel() &&;
 
@@ -55,25 +56,7 @@ class Future final {
   Future<U> ThenResult(Functor&& functor);
 
   template <typename U, typename Functor>
-  Future<U> ThenValue(Functor&& functor);
-
-  template <typename Functor>
-  Future<T> ThenError(Functor&& functor);
-
-  template <typename Functor>
-  Future<T> ThenException(Functor&& functor);
-
-  template <typename U, typename Functor>
   Future<U> AsyncThenResult(Functor&& functor);
-
-  template <typename U, typename Functor>
-  Future<U> AsyncThenValue(Functor&& functor);
-
-  template <typename Functor>
-  Future<T> AsyncThenError(Functor&& functor);
-
-  template <typename Functor>
-  Future<T> AsyncThenException(Functor&& functor);
 
   detail::FutureCorePtr<T> _core;
 };

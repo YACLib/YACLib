@@ -8,36 +8,63 @@
 
 #include <atomic>
 #include <cassert>
+#include <condition_variable>
+#include <mutex>
 #include <type_traits>
 
 namespace yaclib::async::detail {
 
-template <typename Value>
-class BaseCore : public ITask {
+struct CallerCore : ITask {
+  container::intrusive::Ptr<ITask> _caller;
+};
+
+class GetCore : public CallerCore {
+ public:
+  bool is_ready{false};
+  std::mutex m;
+  std::condition_variable cv;
+
+ private:
+  void Call() noexcept final {
+  }
+  void Cancel() noexcept final {
+  }
+};
+
+class GetCoreDeleter {
+ public:
+  template <typename Type>
+  void Delete(void* p) {
+    auto& self = *static_cast<GetCore*>(p);
+    self.m.lock();
+    self.is_ready = self._caller != nullptr;
+    self._caller = nullptr;
+    self.cv.notify_all();  // Notify under mutex, because cv located on stack memory of other thread
+    self.m.unlock();
+  }
+};
+
+class BaseCore : public CallerCore {
  protected:
   enum class State {
     Empty,
     HasCallback,
     HasResult,
-    Canceled,
+    Stopped,
   };
 
  public:
-  void Cancel() {
-    _state.store(State::Canceled, std::memory_order_release);
-    _caller = nullptr;
-  }
-
-  void SetResult(util::Result<Value>&& result) {
-    _result = std::move(result);
-    const auto state = _state.exchange(State::HasResult, std::memory_order_acq_rel);
-    if (state == State::HasCallback) {
-      Execute();
-    }
-  }
-
   bool IsReady() const noexcept {
     return _state.load(std::memory_order_acquire) != State::Empty;
+  }
+
+  void Stop() {
+    _state.store(State::Stopped, std::memory_order_release);
+    assert(_callback == nullptr);
+  }
+
+  void SetExecutor(executor::IExecutorPtr executor) noexcept {
+    _executor = std::move(executor);
   }
 
   void SetCallback(container::intrusive::Ptr<ITask> callback) {
@@ -48,52 +75,68 @@ class BaseCore : public ITask {
     }
   }
 
-  void SetExecutor(executor::IExecutorPtr executor) noexcept {
-    _executor = std::move(executor);
-  }
-
   executor::IExecutorPtr GetExecutor() const noexcept {
     return _executor;
+  }
+
+ protected:
+  std::atomic<State> _state{State::Empty};
+  executor::IExecutorPtr _executor{executor::MakeInline()};
+  container::intrusive::Ptr<ITask> _callback;
+
+  void Cancel() noexcept final {
+    _caller = nullptr;
+    _callback = nullptr;
+    _executor = nullptr;
+  }
+
+  void Execute() {
+    assert(_caller == nullptr);
+    static_cast<CallerCore&>(*_callback)._caller = this;
+    _executor->Execute(*_callback);
+    _callback = nullptr;
+    _executor = nullptr;
+  }
+};
+
+template <typename Value>
+class ResultCore : public BaseCore {
+ public:
+  void SetResult(util::Result<Value>&& result) {
+    _result = std::move(result);
+    const auto state = _state.exchange(State::HasResult, std::memory_order_acq_rel);
+    if (state == State::HasCallback) {
+      BaseCore::Execute();
+    } else if (state == State::Stopped) {
+      BaseCore::Cancel();
+    }
   }
 
   util::Result<Value>& Get() {
     return _result;
   }
 
- protected:
-  std::atomic<State> _state{State::Empty};
-  executor::IExecutorPtr _executor{executor::MakeInlineExecutor()};
-  container::intrusive::Ptr<ITask> _caller;
-  container::intrusive::Ptr<ITask> _callback;
-
  private:
-  void Execute() {
-    _executor->Execute(*_callback);
-    _callback = nullptr;
-    _executor = nullptr;
-  }
-
   util::Result<Value> _result;
 };
 
-template <typename Ret, typename Functor, typename Arg>
-class Core : public BaseCore<Ret> {
-  using Base = BaseCore<Ret>;
+template <typename Ret, typename InvokeType, typename Arg>
+class Core : public ResultCore<Ret> {
+  using Base = ResultCore<Ret>;
 
  public:
-  explicit Core(Functor&& functor) : _functor{std::move(functor)} {
-  }
-  explicit Core(const Functor& functor) : _functor{functor} {
-  }
-
-  void SetCaller(container::intrusive::Ptr<BaseCore<Arg>> caller) {
-    Base::_caller = std::move(caller);
+  template <typename... T>
+  explicit Core(T&&... t) : _functor{std::forward<T>(t)...} {
   }
 
  private:
   void Call() noexcept final {
+    if (Base::_state.load(std::memory_order_acquire) == Base::State::Stopped) {
+      Base::Cancel();
+      return;
+    }
     auto ret = [&] {
-      auto* caller = static_cast<BaseCore<Arg>*>(Base::_caller.Get());
+      auto* caller = static_cast<ResultCore<Arg>*>(Base::_caller.Get());
       if constexpr (std::is_void_v<Arg>) {
         if (!caller) {
           return util::Result<Arg>::Default();
@@ -101,17 +144,19 @@ class Core : public BaseCore<Ret> {
       }
       return std::move(caller->Get());
     }();
-
+    if (Base::_state.load(std::memory_order_acquire) == Base::State::Stopped) {
+      Base::Cancel();
+      return;
+    }
     Base::_caller = nullptr;
-    Base::SetResult(_functor(std::move(ret)));
+    Base::SetResult(_functor.Wrapper(std::move(ret)));
   }
 
- private:
-  Functor _functor;
+  InvokeType _functor;
 };
 
 template <typename Result>
-class Core<Result, void, void> : public BaseCore<Result> {
+class Core<Result, void, void> : public ResultCore<Result> {
   void Call() noexcept final {
     assert(false);  // this class using only via promise
   }
@@ -121,6 +166,6 @@ template <typename Value>
 using PromiseCorePtr = container::intrusive::Ptr<Core<Value, void, void>>;
 
 template <typename Value>
-using FutureCorePtr = container::intrusive::Ptr<BaseCore<Value>>;
+using FutureCorePtr = container::intrusive::Ptr<ResultCore<Value>>;
 
 }  // namespace yaclib::async::detail

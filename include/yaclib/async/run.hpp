@@ -7,10 +7,10 @@
 
 #include <type_traits>
 
-#define ASYNC_IMPL
+#define YACLIB_ASYNC_IMPL
 #include <yaclib/async/detail/future_impl.hpp>
 #include <yaclib/async/detail/promise_impl.hpp>
-#undef ASYNC_IMPL
+#undef YACLIB_ASYNC_IMPL
 
 namespace yaclib::async {
 
@@ -18,27 +18,27 @@ namespace yaclib::async {
  * Execute Callable functor via executor
  */
 template <typename Functor>
-auto Run(executor::IExecutorPtr executor, Functor&& functor) {
-  using U = std::invoke_result_t<Functor>;
-  using Ret = util::detail::ResultValueT<U>;
+auto Run(const executor::IExecutorPtr& e, Functor&& f) {
+  using Ret = detail::Return<void, Functor, 2>;
+  using U = typename Ret::Type;
+  if constexpr (Ret::kIsAsync) {
+    using InvokeT = detail::AsyncInvoke<U, decltype(std::forward<Functor>(f)), void>;
+    using CoreType = detail::Core<void, InvokeT, void>;
 
-  auto wrapper = [functor = std::forward<Functor>(functor)](util::Result<void>) mutable -> util::Result<Ret> {
-    try {
-      if constexpr (std::is_void_v<U>) {
-        functor();
-        return util::Result<U>::Default();
-      } else {
-        return {functor()};
-      }
-    } catch (...) {
-      return {std::current_exception()};
-    }
-  };
-  using CoreType = detail::Core<Ret, std::decay_t<decltype(wrapper)>, void>;
-  container::intrusive::Ptr shared_core{new container::Counter<CoreType>{std::move(wrapper)}};
-  shared_core->SetExecutor(executor);
-  executor->Execute(*shared_core);
-  return Future<Ret>{shared_core};
+    auto [future, promise] = async::MakeContract<U>();
+    future._core->SetExecutor(e);
+    container::intrusive::Ptr core{new container::Counter<CoreType>{e, std::move(promise), std::forward<Functor>(f)}};
+    core->SetExecutor(e);
+    e->Execute(*core);
+    return std::move(future);
+  } else {
+    using InvokeT = detail::Invoke<U, decltype(std::forward<Functor>(f)), void>;
+    using CoreType = detail::Core<U, InvokeT, void>;
+    container::intrusive::Ptr core{new container::Counter<CoreType>{std::forward<Functor>(f)}};
+    core->SetExecutor(e);
+    e->Execute(*core);
+    return Future<U>{core};
+  }
 }
 
 }  // namespace yaclib::async
