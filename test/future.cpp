@@ -79,14 +79,14 @@ TEST(JustWorks, Exception) {
 
 TEST(JustWorks, Run) {
   bool called = false;
-  async::Run(executor::MakeInlineExecutor(), [&] {
+  async::Run(executor::MakeInline(), [&] {
     called = true;
   });
   EXPECT_TRUE(called);
 }
 
 TEST(JustWorks, RunException) {
-  auto result = async::Run(executor::MakeInlineExecutor(),
+  auto result = async::Run(executor::MakeInline(),
                            [] {
                              throw std::runtime_error{""};
                            })
@@ -98,7 +98,7 @@ TEST(JustWorks, RunException) {
 }
 
 TEST(JustWorks, RunError) {
-  auto result = async::Run(executor::MakeInlineExecutor(),
+  auto result = async::Run(executor::MakeInline(),
                            [] {
                              return util::Result<void>{std::error_code{}};
                            })
@@ -110,7 +110,7 @@ TEST(JustWorks, RunError) {
 }
 
 TEST(JustWorks, VoidThen) {
-  auto f = async::Run(executor::MakeInlineExecutor(), [] {
+  auto f = async::Run(executor::MakeInline(), [] {
            }).Then([] {
     return util::Result<int>(1);
   });
