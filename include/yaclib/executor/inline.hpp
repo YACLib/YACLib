@@ -26,6 +26,6 @@ namespace yaclib::executor {
  * ...
  * executor->Execute(task);
  */
-IExecutorPtr MakeInlineExecutor() noexcept;
+IExecutorPtr MakeInline() noexcept;
 
 }  // namespace yaclib::executor

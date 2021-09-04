@@ -4,7 +4,7 @@ namespace yaclib::executor {
 
 class Inline final : public IExecutor {
  private:
-  bool Execute(ITask& task) override {
+  bool Execute(ITask& task) final {
     task.Call();
     return true;
   }
@@ -15,7 +15,7 @@ class Inline final : public IExecutor {
   }
 };
 
-IExecutorPtr MakeInlineExecutor() noexcept {
+IExecutorPtr MakeInline() noexcept {
   static Inline sInline;
   return &sInline;
 }
