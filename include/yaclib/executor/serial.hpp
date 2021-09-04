@@ -4,6 +4,6 @@
 
 namespace yaclib::executor {
 
-IExecutorPtr MakeAsyncMutex(IExecutorPtr executor);
+IExecutorPtr MakeSerial(IExecutorPtr executor);
 
 }  // namespace yaclib::executor

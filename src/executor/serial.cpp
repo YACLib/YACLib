@@ -9,17 +9,18 @@
 namespace yaclib::executor {
 namespace {
 
-class AsyncMutex : public IExecutor, public ITask {
+class Serial : public IExecutor, public ITask {
   // Inheritance from two IRef's, but that's okay, because they are pure virtual
  public:
-  explicit AsyncMutex(IExecutorPtr executor) : _executor{std::move(executor)} {
+  explicit Serial(IExecutorPtr executor) : _executor{std::move(executor)} {
   }
 
-  ~AsyncMutex() override {
+  ~Serial() override {
     auto nodes{_tasks.TakeAllLIFO()};
     auto task = static_cast<ITask*>(nodes);
     while (task != nullptr) {
       auto next = static_cast<ITask*>(task->_next);
+      task->Cancel();
       task->DecRef();
       task = next;
     }
@@ -54,6 +55,9 @@ class AsyncMutex : public IExecutor, public ITask {
     }
   }
 
+  void Cancel() noexcept final {
+  }
+
   IExecutorPtr _executor;
   container::intrusive::MPSCStack _tasks;
   // TODO remove _work_counter, make active/inactive like libunifex
@@ -62,8 +66,8 @@ class AsyncMutex : public IExecutor, public ITask {
 
 }  // namespace
 
-IExecutorPtr MakeAsyncMutex(IExecutorPtr executor) {
-  return new container::Counter<AsyncMutex>{std::move(executor)};
+IExecutorPtr MakeSerial(IExecutorPtr executor) {
+  return new container::Counter<Serial>{std::move(executor)};
 }
 
 }  // namespace yaclib::executor
