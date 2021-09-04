@@ -64,7 +64,6 @@ struct ResultEmpty : std::exception {};
 template <typename T>
 class Result {
   struct Unit {};
-  using ValueT = std::conditional_t<std::is_void_v<T>, Unit, T>;
 
   static_assert(!util::IsResultV<T>, "Result cannot be instantiated with Result");
   static_assert(!util::IsFutureV<T>, "Result cannot be instantiated with Future");
@@ -72,12 +71,13 @@ class Result {
                 "Result cannot be instantiated with std::error_code");
   static_assert(!std::is_same_v<util::DecayT<T>, std::exception_ptr>,
                 "Result cannot be instantiated with std::exception_ptr");
-  using VariantT = std::variant<std::monostate, std::error_code, std::exception_ptr, ValueT>;
+  using VariantT =
+      std::variant<std::monostate, std::error_code, std::exception_ptr, std::conditional_t<std::is_void_v<T>, Unit, T>>;
 
  public:
   static Result Default() {
-    static_assert(std::is_void_v<T>, "");
-    return {ValueT{}};
+    static_assert(std::is_void_v<T>, "Only for void");
+    return {Unit{}};
   }
 
   Result() : _result{std::monostate{}} {
@@ -107,10 +107,14 @@ class Result {
     return State() == ResultState::Value;
   }
 
-  ValueT Ok() && {
+  T Ok() && {
     switch (State()) {
       case ResultState::Value: {
-        return std::move(std::get<ValueT>(_result));
+        if constexpr (std::is_void_v<T>) {
+          return;
+        } else {
+          return std::move(std::get<T>(_result));
+        }
       }
       case ResultState::Exception: {
         std::rethrow_exception(std::get<std::exception_ptr>(_result));
@@ -124,7 +128,7 @@ class Result {
     }
   }
 
-  ResultState State() const noexcept {
+  [[nodiscard]] ResultState State() const noexcept {
     if (std::holds_alternative<std::monostate>(_result)) {
       return ResultState::Empty;
     } else if (std::holds_alternative<std::error_code>(_result)) {
@@ -136,8 +140,10 @@ class Result {
     }
   }
 
-  ValueT Value() && noexcept {
-    return std::move(std::get<ValueT>(_result));
+  T Value() && noexcept {
+    if constexpr (!std::is_void_v<T>) {
+      return std::move(std::get<T>(_result));
+    }
   }
 
   std::error_code Error() && noexcept {

@@ -38,6 +38,7 @@ class ThreadPool : public IThreadPool {
     std::unique_lock guard{_m};
     if (_stop) {
       guard.unlock();
+      task.Cancel();
       task.DecRef();
       return false;
     }
@@ -71,6 +72,7 @@ class ThreadPool : public IThreadPool {
     _cv.notify_all();
 
     while (auto task = tasks.PopBack()) {
+      task->Cancel();
       task->DecRef();
     }
   }
@@ -103,7 +105,7 @@ class ThreadPool : public IThreadPool {
     }
   }
 
-  alignas(64) std::atomic_size_t _refs_flag{0};
+  alignas(kCacheLineSize) std::atomic_size_t _refs_flag{0};
   std::mutex _m;
   std::condition_variable _cv;
   IThreadFactoryPtr _factory;

@@ -1,6 +1,6 @@
 #pragma once
 
-#ifndef ASYNC_IMPL
+#ifndef YACLIB_ASYNC_IMPL
 #error "You can not include this header directly, use yaclib/async/async.hpp"
 #endif
 
@@ -19,8 +19,9 @@ Future<T> Promise<T>::MakeFuture() {
 template <typename T>
 template <typename Type>
 void Promise<T>::Set(Type&& value) && {
-  static_assert(!std::is_void_v<T> || std::is_same_v<std::error_code, util::DecayT<Type>> ||
-                std::is_same_v<std::exception_ptr, util::DecayT<Type>>);
+  static_assert(!std::is_void_v<T> || std::is_same_v<std::error_code, std::decay_t<Type>> ||
+                std::is_same_v<std::exception_ptr, std::decay_t<Type>> ||
+                std::is_same_v<util::Result<void>, std::decay_t<Type>>);
   _core->SetResult({std::forward<Type>(value)});
 }
 

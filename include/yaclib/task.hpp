@@ -24,7 +24,10 @@ using IFuncPtr = container::intrusive::Ptr<IFunc>;
 /**
  * \class Callable that can be executed in an IExecutor \see IExecutor
  * */
-class ITask : public IFunc, public container::intrusive::detail::Node {};
+class ITask : public IFunc, public container::intrusive::detail::Node {
+ public:
+  virtual void Cancel() noexcept = 0;
+};
 
 namespace detail {
 
@@ -55,6 +58,9 @@ class UniqueTask final : public CallImpl<ITask, Functor> {
   using CallImpl<ITask, Functor>::CallImpl;
 
  private:
+  void Cancel() noexcept final {
+  }
+
   void IncRef() noexcept final {
   }
 
@@ -65,8 +71,7 @@ class UniqueTask final : public CallImpl<ITask, Functor> {
 
 template <typename Functor>
 ITask* MakeUniqueTask(Functor&& functor) {
-  using FunctorType = std::remove_reference_t<Functor>;
-  return new UniqueTask<FunctorType>{std::forward<Functor>(functor)};
+  return new UniqueTask<std::decay_t<Functor>>{std::forward<Functor>(functor)};
 }
 
 }  // namespace detail

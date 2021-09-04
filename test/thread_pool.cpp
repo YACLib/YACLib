@@ -200,7 +200,9 @@ void AfterStopImpl(executor::IThreadPoolPtr& tp, StopType stop_type, bool need_w
         std::this_thread::sleep_for(1ms);
       }
     });
-    std::this_thread::sleep_for(1ms);
+    if (need_wait && stop_type == StopType::HardStop) {
+      std::this_thread::sleep_for(10ms);
+    }
   }
 
   switch (stop_type) {
@@ -223,6 +225,10 @@ void AfterStopImpl(executor::IThreadPoolPtr& tp, StopType stop_type, bool need_w
   tp->Execute([] {
     FAIL();
   });
+
+  if (!need_wait) {
+    tp->Wait();
+  }
 }
 
 TEST_F(SingleLightThread, AfterStop) {
