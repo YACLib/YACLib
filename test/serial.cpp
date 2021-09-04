@@ -1,6 +1,6 @@
 #include "util/time.hpp"
 
-#include <yaclib/executor/async_mutex.hpp>
+#include <yaclib/executor/serial.hpp>
 #include <yaclib/executor/thread_pool.hpp>
 
 #include <atomic>
@@ -18,7 +18,7 @@ using namespace std::chrono_literals;
 
 GTEST_TEST(execute_task, simple) {
   auto tp = executor::MakeThreadPool(4);
-  auto strand = executor::MakeAsyncMutex(tp);
+  auto strand = executor::MakeSerial(tp);
 
   bool done{false};
 
@@ -34,7 +34,7 @@ GTEST_TEST(execute_task, simple) {
 
 GTEST_TEST(counter, simple) {
   auto tp = executor::MakeThreadPool(13);
-  auto strand = executor::MakeAsyncMutex(tp);
+  auto strand = executor::MakeSerial(tp);
 
   size_t counter = 0;
   static const size_t kIncrements = 65536;
@@ -53,7 +53,7 @@ GTEST_TEST(counter, simple) {
 
 GTEST_TEST(fifo, simple) {
   auto tp = executor::MakeThreadPool(13);
-  auto strand = executor::MakeAsyncMutex(tp);
+  auto strand = executor::MakeSerial(tp);
 
   size_t next_ticket = 0;
   static const size_t kTickets = 123456;
@@ -73,7 +73,7 @@ GTEST_TEST(fifo, simple) {
 
 class Counter {
  public:
-  Counter(executor::IExecutorPtr e) : strand_{executor::MakeAsyncMutex(e)} {
+  Counter(executor::IExecutorPtr e) : strand_{executor::MakeSerial(e)} {
   }
 
   void Increment() {
@@ -128,7 +128,7 @@ GTEST_TEST(batching, simple) {
     std::this_thread::sleep_for(1s);
   });
 
-  auto strand = executor::MakeAsyncMutex(tp);
+  auto strand = executor::MakeSerial(tp);
 
   static const size_t kStrandTasks = 100;
 
@@ -148,7 +148,7 @@ GTEST_TEST(batching, simple) {
 GTEST_TEST(strand_over_strand, simple) {
   auto tp = executor::MakeThreadPool(4);
 
-  auto strand = executor::MakeAsyncMutex(executor::MakeAsyncMutex(executor::MakeAsyncMutex(tp)));
+  auto strand = executor::MakeSerial(executor::MakeSerial(executor::MakeSerial(tp)));
 
   bool done = false;
   strand->Execute([&done] {
@@ -182,7 +182,7 @@ GTEST_TEST(strand_over_strand, simple) {
 //
 // GTEST_TEST(stack, cimple) {
 //  auto lifo = std::make_shared<LifoManualExecutor>();
-//  auto strand = executor::MakeAsyncMutex(lifo);
+//  auto strand = executor::MakeSerial(lifo);
 //
 //  int steps = 0;
 //
@@ -209,7 +209,7 @@ GTEST_TEST(keep_strong_ref, simple) {
   });
 
   bool done = false;
-  executor::MakeAsyncMutex(tp)->Execute([&done] {
+  executor::MakeSerial(tp)->Execute([&done] {
     done = true;
   });
 
@@ -221,7 +221,7 @@ GTEST_TEST(keep_strong_ref, simple) {
 GTEST_TEST(do_not_occupy_thread, simple) {
   auto tp = executor::MakeThreadPool(1);
 
-  auto strand = executor::MakeAsyncMutex(tp);
+  auto strand = executor::MakeSerial(tp);
 
   tp->Execute([] {
     // bubble
@@ -249,13 +249,13 @@ GTEST_TEST(do_not_occupy_thread, simple) {
     std::this_thread::sleep_for(kStepPause);
   }
 
-  tp->SoftStop();
+  tp->HardStop();
   tp->Wait();
 }
 
 GTEST_TEST(exceptions, simple) {
   auto tp = executor::MakeThreadPool(1);
-  auto strand = executor::MakeAsyncMutex(tp);
+  auto strand = executor::MakeSerial(tp);
 
   tp->Execute([] {
     std::this_thread::sleep_for(1s);
@@ -277,7 +277,7 @@ GTEST_TEST(exceptions, simple) {
 
 GTEST_TEST(non_blocking_execute, simple) {
   auto tp = executor::MakeThreadPool(1);
-  auto strand = executor::MakeAsyncMutex(tp);
+  auto strand = executor::MakeSerial(tp);
 
   strand->Execute([] {
     std::this_thread::sleep_for(2s);
@@ -296,7 +296,7 @@ GTEST_TEST(non_blocking_execute, simple) {
 
 GTEST_TEST(do_not_block_thread_pool, simple) {
   auto tp = executor::MakeThreadPool(2);
-  auto strand = executor::MakeAsyncMutex(tp);
+  auto strand = executor::MakeSerial(tp);
 
   strand->Execute([] {
     std::this_thread::sleep_for(1s);
@@ -317,13 +317,13 @@ GTEST_TEST(do_not_block_thread_pool, simple) {
   std::this_thread::sleep_for(200ms);
   EXPECT_TRUE(done.load());
 
-  tp->SoftStop();
+  tp->HardStop();
   tp->Wait();
 }
 
 GTEST_TEST(memory_leak, simple) {
   auto tp = executor::MakeThreadPool(1);
-  auto strand = executor::MakeAsyncMutex(tp);
+  auto strand = executor::MakeSerial(tp);
 
   tp->Execute([] {
     std::this_thread::sleep_for(1s);
