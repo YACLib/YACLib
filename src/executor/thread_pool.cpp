@@ -143,6 +143,7 @@ class SingleThread : public IThreadPool {
     task.IncRef();
     const auto state = _state.load(std::memory_order_acquire);
     if (state == kStop || state == kHardStop) {
+      task.Cancel();
       task.DecRef();
       return false;
     }
@@ -160,6 +161,9 @@ class SingleThread : public IThreadPool {
     {
       std::lock_guard guard{_m};
       _state.store(kSoftStop, std::memory_order_release);
+      if (_work_counter.load(std::memory_order_acquire) <= 0) {
+        _state.store(kStop, std::memory_order_release);
+      }
     }
     _cv.notify_one();
   }
@@ -180,8 +184,10 @@ class SingleThread : public IThreadPool {
     _cv.notify_one();
   }
 
-  void Wait() {
-    _factory->Release(std::move(_thread));
+  void Wait() final {
+    if (_thread) {
+      _factory->Release(std::move(_thread));
+    }
   }
 
  private:
@@ -227,6 +233,7 @@ class SingleThread : public IThreadPool {
   static void KillTasks(ITask* head) {
     while (head != nullptr) {
       auto next = static_cast<ITask*>(head->_next);
+      head->Cancel();
       head->DecRef();
       head = next;
     }
