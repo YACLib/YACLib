@@ -18,6 +18,7 @@ class IExecutor : public IRef {
     ThreadPool,
     Serial,
     Inline,
+    SingleThread,
   };
 
   /**
