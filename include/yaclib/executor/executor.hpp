@@ -10,6 +10,22 @@ namespace yaclib::executor {
 class IExecutor : public IRef {
  public:
   /**
+   * Executor tag
+   * \enum SingleThread, ThreadPool, AsyncMutex, Inline
+   * */
+  enum class Type {
+    Custom = 0,
+    ThreadPool,
+    Serial,
+    Inline,
+  };
+
+  /**
+   * \return type of this executor
+   */
+  virtual Type Tag() const = 0;
+
+  /**
    * \brief Execute given functor for details \see Execute
    * This method creates ITask with one allocation and call Execute(ITask)
    * \param functor task to execute
