@@ -30,11 +30,11 @@ jobs:
           mkdir build &&
           cd build &&
           cmake ..
-          -DBUILD_TESTING=ON
           -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
           -DCMAKE_C_COMPILER=${{ matrix.cc }}
           -DCMAKE_CXX_COMPILER=${{ matrix.cxx }}
-          -DSANITIZER=${{ matrix.sanitizer }}
+          -DYACLIB_BUILD_TESTING=ON
+          -DYACLIB_SANITIZER=${{ matrix.sanitizer }}
 
       - name: Build
         run:

@@ -5,26 +5,41 @@
 // clang-format off
 
 // ASAN, TSAN, UBSAN, MEMSAN
-#define YACLIB_${SANITIZER}
+#define YACLIB_${YACLIB_SANITIZER}
 
 // clang-format on
 
 // Maybe we should increase some of this
-#if defined(YACLIB_ASAN)
-#  define YACLIB_SLOWDOWN 2
-#  define YACLIB_MEMORY_OVERHEAD 3
-#elif defined(YACLIB_TSAN)
-#  define YACLIB_SLOWDOWN 2
-#  define YACLIB_MEMORY_OVERHEAD 3
-#elif defined(YACLIB_UBSAN)
-#  define YACLIB_SLOWDOWN 1
-#  define YACLIB_MEMORY_OVERHEAD 1
-#elif defined(YACLIB_MEMSAN)
-#  define YACLIB_SLOWDOWN 1
-#  define YACLIB_MEMORY_OVERHEAD 1
-#else
-#  define YACLIB_SLOWDOWN 1
-#  define YACLIB_MEMORY_OVERHEAD 1
+#ifndef YACLIB_SLOWDOWN
+#  if defined(YACLIB_ASAN)
+#    define YACLIB_SLOWDOWN 2
+#  elif defined(YACLIB_TSAN)
+#    define YACLIB_SLOWDOWN 2
+#  elif defined(YACLIB_UBSAN)
+#    define YACLIB_SLOWDOWN 1
+#  elif defined(YACLIB_MEMSAN)
+#    define YACLIB_SLOWDOWN 1
+#  else
+#    define YACLIB_SLOWDOWN 1
+#  endif
+#endif
+
+#ifndef YACLIB_MEMORY_OVERHEAD
+#  if defined(YACLIB_ASAN)
+#    define YACLIB_MEMORY_OVERHEAD 3
+#  elif defined(YACLIB_TSAN)
+#    define YACLIB_MEMORY_OVERHEAD 3
+#  elif defined(YACLIB_UBSAN)
+#    define YACLIB_MEMORY_OVERHEAD 1
+#  elif defined(YACLIB_MEMSAN)
+#    define YACLIB_MEMORY_OVERHEAD 1
+#  else
+#    define YACLIB_MEMORY_OVERHEAD 1
+#  endif
+#endif
+
+#ifndef YACLIB_CI_SLOWDOWN
+#  define YACLIB_CI_SLOWDOWN 1
 #endif
 
 namespace yaclib {

@@ -38,7 +38,7 @@ void JustWorks() {
     }
   }();
 
-  EXPECT_FALSE(all.IsReady());
+  EXPECT_FALSE(all.Ready());
 
   if constexpr (is_void) {
     std::move(promises[2]).Set();
@@ -49,7 +49,7 @@ void JustWorks() {
   }
 
   // Still not completed
-  EXPECT_FALSE(all.IsReady());
+  EXPECT_FALSE(all.Ready());
 
   if constexpr (is_void) {
     std::move(promises[1]).Set();
@@ -57,7 +57,7 @@ void JustWorks() {
     std::move(promises[1]).Set(5);
   }
 
-  EXPECT_TRUE(all.IsReady());
+  EXPECT_TRUE(all.Ready());
 
   auto expected = [] {
     if constexpr (suite == TestSuite::Vector) {
@@ -108,11 +108,11 @@ void AllFails() {
     }
   }();
 
-  EXPECT_FALSE(all.IsReady());
+  EXPECT_FALSE(all.Ready());
 
   std::move(promises[1]).Set(std::make_exception_ptr(std::runtime_error{""}));
 
-  EXPECT_TRUE(all.IsReady());
+  EXPECT_TRUE(all.Ready());
 
   // Second error
   std::move(promises[0]).Set(std::error_code{});
@@ -141,7 +141,7 @@ void EmptyInput() {
   auto empty = std::vector<async::Future<T>>{};
   auto all = async::WhenAll(empty.begin(), empty.end());
 
-  EXPECT_TRUE(all.IsReady());
+  EXPECT_TRUE(all.Ready());
   EXPECT_NO_THROW(std::move(all).Get().Ok());
 }
 
