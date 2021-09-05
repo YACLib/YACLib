@@ -24,7 +24,7 @@ class IExecutor : public IRef {
   /**
    * \return type of this executor
    */
-  virtual Type Tag() const = 0;
+  [[nodiscard]] virtual Type Tag() const = 0;
 
   /**
    * \brief Execute given functor for details \see Execute

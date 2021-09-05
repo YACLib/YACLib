@@ -123,12 +123,11 @@ class ThreadPool : public IThreadPool {
 class SingleThread : public IThreadPool {
  public:
   explicit SingleThread(IThreadFactoryPtr factory) : _factory{std::move(factory)} {
-    auto loop = MakeFunc([this] {
+    _thread = _factory->Acquire(MakeFunc([this] {
       tlCurrentThreadPool = this;
       Loop();
       tlCurrentThreadPool = nullptr;
-    });
-    _thread = _factory->Acquire(loop);
+    }));
   }
 
   ~SingleThread() override {
