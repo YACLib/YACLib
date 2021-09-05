@@ -32,6 +32,11 @@ class ThreadPool : public IThreadPool {
     Wait();
   }
 
+ private:
+  Type Tag() const final {
+    return Type::ThreadPool;
+  }
+
   bool Execute(ITask& task) final {
     _refs_flag.fetch_add(2, std::memory_order_relaxed);
     task.IncRef();
@@ -66,7 +71,7 @@ class ThreadPool : public IThreadPool {
     container::intrusive::List<ITask> tasks;
     {
       std::lock_guard guard{_m};
-      tasks.Append(_tasks);
+      tasks.Append(_tasks);  // TODO(MBkkt) replace Append with Swap
       _stop = true;
     }
     _cv.notify_all();
@@ -83,7 +88,6 @@ class ThreadPool : public IThreadPool {
     }
   }
 
- private:
   void Loop() noexcept {
     std::unique_lock guard{_m};
     while (true) {

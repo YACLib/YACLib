@@ -542,6 +542,10 @@ TEST(Simple, MakePromiseContract) {
     container::intrusive::List<ITask> _tasks;
 
    public:
+    Type Tag() const final {
+      return Type::Custom;
+    }
+
     bool Execute(ITask& f) final {
       f.IncRef();
       _tasks.PushBack(&f);
