@@ -46,7 +46,7 @@ class AllCombinator : public AllCombinatorBase<FutureValue>, public IRef {
     return {std::move(future), new container::Counter<AllCombinator>{std::move(promise), size}};
   }
 
-  void Combine(util::Result<T> result) noexcept(std::is_void_v<T> || std::is_nothrow_move_assignable_v<T>) {
+  void Combine(util::Result<T>&& result) noexcept(std::is_void_v<T> || std::is_nothrow_move_assignable_v<T>) {
     if (Base::_done.load(std::memory_order_acquire)) {
       return;
     }
@@ -91,7 +91,7 @@ class AllCombinator : public AllCombinatorBase<FutureValue>, public IRef {
 
 template <size_t N, typename T, typename... Fs>
 void WhenAllImpl(container::intrusive::Ptr<AllCombinator<T, N>>& combinator, Future<T>&& head, Fs&&... tail) {
-  std::move(head).Subscribe([c = combinator](util::Result<T> result) mutable {
+  std::move(head).Subscribe([c = combinator](util::Result<T>&& result) mutable {
     c->Combine(std::move(result));
   });
   if constexpr (sizeof...(tail) != 0) {
@@ -102,12 +102,13 @@ void WhenAllImpl(container::intrusive::Ptr<AllCombinator<T, N>>& combinator, Fut
 }  // namespace detail
 
 template <typename It, typename T = util::detail::FutureValueT<typename std::iterator_traits<It>::value_type>>
-auto WhenAll(It begin, It end, size_t size) {
+auto WhenAll(It begin, size_t size) {
   auto [future, combinator] = detail::AllCombinator<T>::Make(size);
-  for (; begin != end; ++begin) {
-    std::move(*begin).Subscribe([c = combinator](util::Result<T> result) mutable {
+  for (size_t i = 0; i != size; ++i) {
+    std::move(*begin).Subscribe([c = combinator](util::Result<T>&& result) mutable {
       c->Combine(std::move(result));
     });
+    ++begin;
   }
   return std::move(future);
 }
@@ -115,7 +116,7 @@ auto WhenAll(It begin, It end, size_t size) {
 template <typename It>
 auto WhenAll(It begin, It end) {
   static_assert(util::IsFutureV<typename std::iterator_traits<It>::value_type>);
-  return WhenAll(begin, end, std::distance(begin, end));
+  return WhenAll(begin, std::distance(begin, end));
 }
 
 template <typename T, typename... Fs>
