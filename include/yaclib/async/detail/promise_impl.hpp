@@ -19,9 +19,7 @@ Future<T> Promise<T>::MakeFuture() {
 template <typename T>
 template <typename Type>
 void Promise<T>::Set(Type&& value) && {
-  static_assert(!std::is_void_v<T> || std::is_same_v<std::error_code, std::decay_t<Type>> ||
-                std::is_same_v<std::exception_ptr, std::decay_t<Type>> ||
-                std::is_same_v<util::Result<void>, std::decay_t<Type>>);
+  static_assert(std::is_constructible_v<util::Result<T>, Type>, "TODO(MBkkt): Add message");
   _core->SetResult({std::forward<Type>(value)});
 }
 
