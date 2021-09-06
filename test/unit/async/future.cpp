@@ -136,6 +136,7 @@ TEST(JustWorks, AsyncGetResult) {
 
 TEST(JustWorks, AsyncRun) {
   auto tp = executor::MakeThreadPool(3);
+  EXPECT_EQ(tp->Tag(), executor::IExecutor::Type::ThreadPool);
 
   {
     auto good = [&] {
@@ -561,6 +562,7 @@ TEST(Simple, MakePromiseContract) {
   };
 
   auto e = container::NothingCounter<ManualExecutor>{};
+  EXPECT_EQ(e.Tag(), executor::IExecutor::Type::Custom);
   auto [f, p] = async::MakeContract<int>();
   auto g = std::move(f).Then(&e, [](int _) {
     return _ + 1;

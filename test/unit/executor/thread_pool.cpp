@@ -1,6 +1,7 @@
 #include <util/cpu_time.hpp>
 #include <util/time.hpp>
 
+#include <yaclib/executor/inline.hpp>
 #include <yaclib/executor/thread_pool.hpp>
 
 #include <atomic>
@@ -143,6 +144,7 @@ void JustWork(executor::IThreadPoolPtr& tp) {
 }
 
 TEST_F(SingleLightThread, JustWork) {
+  EXPECT_EQ(executor::MakeInline()->Tag(), executor::IExecutor::Type::Inline);
   JustWork(_tps[0]);
 }
 TEST_F(SingleHeavyThread, JustWork) {

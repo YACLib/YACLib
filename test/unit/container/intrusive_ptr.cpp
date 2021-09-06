@@ -33,14 +33,14 @@ class Y : public X {};
 using CounterX = container::Counter<X>;
 using CounterY = container::Counter<Y>;
 
-GTEST_TEST(ctor, default) {
+TEST(ctor, default) {
   Ptr<Core> px;
   EXPECT_EQ(px.Get(), nullptr);
   EXPECT_EQ(px, nullptr);
   EXPECT_EQ(nullptr, px);
 }
 
-GTEST_TEST(ctor, pointer) {
+TEST(ctor, pointer) {
   EXPECT_EQ(Core::sInstances, 0);
   {
     Ptr<Core> px{nullptr};
@@ -84,7 +84,7 @@ GTEST_TEST(ctor, pointer) {
   EXPECT_EQ(Core::sInstances, 0);
 }
 
-GTEST_TEST(ctor, copy) {
+TEST(ctor, copy) {
   EXPECT_EQ(Core::sInstances, 0);
   {
     Ptr<CounterX> pc1;
@@ -114,7 +114,7 @@ GTEST_TEST(ctor, copy) {
   EXPECT_EQ(Core::sInstances, 0);
 }
 
-GTEST_TEST(dtor, simple) {
+TEST(dtor, simple) {
   EXPECT_EQ(Core::sInstances, 0);
   {
     Ptr<CounterX> pc1;
@@ -139,7 +139,7 @@ GTEST_TEST(dtor, simple) {
   EXPECT_EQ(Core::sInstances, 0);
 }
 
-GTEST_TEST(assign, copy) {
+TEST(assign, copy) {
   EXPECT_EQ(Core::sInstances, 0);
 
   {
@@ -195,7 +195,7 @@ GTEST_TEST(assign, copy) {
   }
 }
 
-GTEST_TEST(assign, conversation) {
+TEST(assign, conversation) {
   EXPECT_EQ(Core::sInstances, 0);
   {
     Ptr<X> p1;
@@ -241,7 +241,7 @@ GTEST_TEST(assign, conversation) {
   }
 }
 
-GTEST_TEST(assign, pointer) {
+TEST(assign, pointer) {
   EXPECT_EQ(Core::sInstances, 0);
   {
     Ptr<X> p1;
@@ -340,7 +340,7 @@ GTEST_TEST(assign, pointer) {
   }
 }
 //
-// GTEST_TEST(reset, simple) {
+// TEST(reset, simple) {
 //  BOOST_TEST(N::base::instances == 0);
 //
 //  {
@@ -496,7 +496,7 @@ GTEST_TEST(assign, pointer) {
 //  BOOST_TEST(N::base::instances == 0);
 //}
 //
-// GTEST_TEST(access, simple) {
+// TEST(access, simple) {
 //  {
 //    boost::intrusive_ptr<X> px;
 //    BOOST_TEST(px ? false : true);
@@ -548,7 +548,7 @@ GTEST_TEST(assign, pointer) {
 //  }
 //}
 
-// GTEST_TEST(swap, simple) {
+// TEST(swap, simple) {
 //   {
 //     boost::intrusive_ptr<X> px;
 //     boost::intrusive_ptr<X> px2;
