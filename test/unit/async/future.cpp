@@ -17,9 +17,9 @@ template <typename FutureType, typename ErrorType>
 void ErrorsCheck(ErrorType expected) {
   static_assert(std::is_same_v<ErrorType, std::exception_ptr> || std::is_same_v<ErrorType, std::error_code>);
   auto [f, p] = async::MakeContract<FutureType>();
-  EXPECT_FALSE(f.IsReady());
+  EXPECT_FALSE(f.Ready());
   std::move(p).Set(expected);
-  EXPECT_TRUE(f.IsReady());
+  EXPECT_TRUE(f.Ready());
   auto result = std::move(f).Get();
   if constexpr (std::is_same_v<ErrorType, std::exception_ptr>) {
     EXPECT_EQ(result.State(), util::ResultState::Exception);
@@ -34,13 +34,13 @@ void ErrorsCheck(ErrorType expected) {
 template <typename FutureType>
 void ValueCheck() {
   auto [f, p] = async::MakeContract<FutureType>();
-  EXPECT_FALSE(f.IsReady());
+  EXPECT_FALSE(f.Ready());
   if constexpr (std::is_void_v<FutureType>) {
     std::move(p).Set();
   } else {
     std::move(p).Set(FutureType{});
   }
-  EXPECT_TRUE(f.IsReady());
+  EXPECT_TRUE(f.Ready());
   auto result = std::move(f).Get();
   EXPECT_EQ(result.State(), util::ResultState::Value);
   if constexpr (!std::is_void_v<FutureType>) {
@@ -156,6 +156,7 @@ TEST(JustWorks, AsyncRun) {
   }
 
   tp->Stop();
+  tp->Wait();
 }
 
 TEST(JustWorks, Promise) {
@@ -167,7 +168,7 @@ TEST(JustWorks, Promise) {
     i = 1;
   });
   std::move(p).Set();
-  std::move(g).Get();
+  g.Wait();
   EXPECT_EQ(i, 1);
   tp->Stop();
   tp->Wait();
@@ -560,11 +561,11 @@ TEST(Simple, MakePromiseContract) {
   auto g = std::move(f).Then(&e, [](int _) {
     return _ + 1;
   });
-  EXPECT_FALSE(g.IsReady());
+  EXPECT_FALSE(g.Ready());
   std::move(p).Set(3);
-  EXPECT_FALSE(g.IsReady());
+  EXPECT_FALSE(g.Ready());
   e.Drain();
-  ASSERT_TRUE(g.IsReady());
+  ASSERT_TRUE(g.Ready());
   EXPECT_EQ(4, std::move(g).Get().Ok());
 }
 
@@ -755,7 +756,7 @@ TEST(Simple, SetAndGetRequiresOnlyMove) {
     int id_;
   };
   auto f = MakeFuture<MoveCtorOnly>(MoveCtorOnly(42));
-  EXPECT_TRUE(f.IsReady());
+  EXPECT_TRUE(f.Ready());
   auto v = std::move(f).Get().Ok();
   EXPECT_EQ(v.id_, 42);
 }

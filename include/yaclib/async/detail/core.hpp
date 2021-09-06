@@ -18,32 +18,6 @@ struct CallerCore : ITask {
   container::intrusive::Ptr<ITask> _caller;
 };
 
-class GetCore : public CallerCore {
- public:
-  bool is_ready{false};
-  std::mutex m;
-  std::condition_variable cv;
-
- private:
-  void Call() noexcept final {
-  }
-  void Cancel() noexcept final {
-  }
-};
-
-class GetCoreDeleter {
- public:
-  template <typename Type>
-  void Delete(void* p) {
-    auto& self = *static_cast<GetCore*>(p);
-    self.m.lock();
-    self.is_ready = self._caller != nullptr;
-    self._caller = nullptr;
-    self.cv.notify_all();  // Notify under mutex, because cv located on stack memory of other thread
-    self.m.unlock();
-  }
-};
-
 class BaseCore : public CallerCore {
  protected:
   enum class State {
@@ -54,8 +28,8 @@ class BaseCore : public CallerCore {
   };
 
  public:
-  bool IsReady() const noexcept {
-    return _state.load(std::memory_order_acquire) != State::Empty;
+  bool Ready() const noexcept {
+    return _state.load(std::memory_order_acquire) == State::HasResult;
   }
 
   void Stop() {
@@ -79,6 +53,33 @@ class BaseCore : public CallerCore {
     return _executor;
   }
 
+  bool SetWaitCallback(container::intrusive::Ptr<ITask> callback) {
+    _callback = std::move(callback);
+    const auto state = _state.exchange(State::HasCallback, std::memory_order_acq_rel);
+    const bool ready = state == State::HasResult;  // this is mean we have result
+    if (ready) {
+      _callback = nullptr;
+      _state.store(State::HasResult, std::memory_order_release);
+    }
+    return ready;
+  }
+
+  /**
+   * Maybe called then we know we have done callback and valid Result
+   */
+  void ResetToReady() {
+    _state.store(State::HasResult, std::memory_order_release);
+  }
+
+  bool ResetToEmpty() {
+    const auto state = _state.exchange(State::Empty, std::memory_order_acq_rel);
+    const bool was_callback = state == State::HasCallback;  // this is mean we doesn't have executed callback
+    if (was_callback) {
+      _callback = nullptr;
+    }
+    return was_callback;
+  }
+
  protected:
   std::atomic<State> _state{State::Empty};
   executor::IExecutorPtr _executor{executor::MakeInline()};
@@ -86,16 +87,18 @@ class BaseCore : public CallerCore {
 
   void Cancel() noexcept final {
     _caller = nullptr;
-    _callback = nullptr;
+    // order is matter
     _executor = nullptr;
+    _callback = nullptr;
   }
 
   void Execute() {
     assert(_caller == nullptr);
     static_cast<CallerCore&>(*_callback)._caller = this;
     _executor->Execute(*_callback);
-    _callback = nullptr;
+    // order is matter
     _executor = nullptr;
+    _callback = nullptr;
   }
 };
 
@@ -159,6 +162,31 @@ template <typename Result>
 class Core<Result, void, void> : public ResultCore<Result> {
   void Call() noexcept final {
     assert(false);  // this class using only via promise
+  }
+};
+
+class WaitCore : public CallerCore {
+ public:
+  bool is_ready{false};
+  std::mutex m;
+  std::condition_variable cv;
+
+ private:
+  void Call() noexcept final {
+  }
+  void Cancel() noexcept final {
+  }
+};
+
+class WaitCoreDeleter {
+ public:
+  template <typename Type>
+  void Delete(void* p) {
+    auto& self = *static_cast<WaitCore*>(p);
+    std::lock_guard guard{self.m};
+    self.is_ready = self._caller != nullptr;
+    self._caller = nullptr;
+    self.cv.notify_all();  // Notify under mutex, because cv located on stack memory of other thread
   }
 };
 

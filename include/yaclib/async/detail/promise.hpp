@@ -18,22 +18,22 @@ class Promise {
                 "Promise cannot be instantiated with std::exception_ptr");
 
  public:
+  Promise(const Promise& other) = delete;
+  Promise& operator=(const Promise& other) = delete;
+
   Promise();
   Promise(Promise&& other) noexcept = default;
   Promise& operator=(Promise&& other) noexcept = default;
-  Promise(const Promise& other) = delete;
-  Promise& operator=(const Promise& other) = delete;
 
   Future<T> MakeFuture();
 
   template <typename Type>
   void Set(Type&& value) &&;
-
   void Set() &&;
 
  private:
-  bool _future_extracted{false};
   detail::PromiseCorePtr<T> _core;
+  bool _future_extracted{false};  // TODO should be in _core bit
 };
 
 template <typename T>

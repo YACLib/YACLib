@@ -4,6 +4,8 @@
 #error "You can not include this header directly, use yaclib/async/async.hpp"
 #endif
 
+#include <yaclib/util/defer.hpp>
+
 namespace yaclib::async {
 namespace detail {
 
@@ -200,10 +202,144 @@ class AsyncInvoke {
   FunctorStoreT _f;
 };
 
+template <typename U, typename T, typename Functor>
+Future<U> Then(FutureCorePtr<T> caller, Functor&& f) {
+  using InvokeT = detail::Invoke<U, decltype(std::forward<Functor>(f)), T>;
+  using CoreType = detail::Core<U, InvokeT, T>;
+  container::intrusive::Ptr callback{new container::Counter<CoreType>{std::forward<Functor>(f)}};
+  callback->SetExecutor(caller->GetExecutor());
+  caller->SetCallback(callback);
+  return Future<U>{std::move(callback)};
+}
+
+template <typename U, typename T, typename Functor>
+Future<U> AsyncThen(FutureCorePtr<T> caller, Functor&& f) {
+  auto [future, promise] = async::MakeContract<U>();
+  future.Via(caller->GetExecutor());
+  using InvokeT = detail::AsyncInvoke<U, decltype(std::forward<Functor>(f)), T>;
+  using CoreType = detail::Core<void, InvokeT, T>;
+  container::intrusive::Ptr callback{
+      new container::Counter<CoreType>{caller->GetExecutor(), std::move(promise), std::forward<Functor>(f)}};
+  callback->SetExecutor(caller->GetExecutor());
+  caller->SetCallback(callback);
+  return std::move(future);
+}
+
+enum class WaitPolicy {
+  Endless,
+  For,
+  Until,
+};
+
+template <WaitPolicy kPolicy, typename T, typename Time>
+bool Wait(detail::FutureCorePtr<T>& core, const Time& time) {
+  if (core->Ready()) {
+    return true;
+  }
+
+  auto defer = util::defer([&core, old_executor = core->GetExecutor()] {
+    core->SetExecutor(std::move(old_executor));
+  });
+  core->SetExecutor(executor::MakeInline());
+
+  container::Counter<detail::WaitCore, detail::WaitCoreDeleter> callback;
+  if (core->SetWaitCallback(&callback)) {
+    return true;
+  }
+  std::unique_lock guard{callback.m};
+  if constexpr (kPolicy != WaitPolicy::Endless) {
+    const bool ready = [&] {
+      if constexpr (kPolicy == WaitPolicy::For) {
+        return callback.cv.wait_for(guard, time, [&] {
+          return callback.is_ready;
+        });
+      } else if constexpr (kPolicy == WaitPolicy::Until) {
+        return callback.cv.wait_until(guard, time, [&] {
+          return callback.is_ready;
+        });
+      }
+    }();
+    if (ready) {
+      core->ResetToReady();
+      return true;
+    }
+    if (core->ResetToEmpty()) {
+      return false;
+    }
+    // We know we have Result, but we must wait until callback was not used by executor
+  }
+  while (!callback.is_ready) {
+    callback.cv.wait(guard);
+  }
+  core->ResetToReady();
+  return true;
+}
+
 }  // namespace detail
 
 template <typename T>
-Future<T>::Future(detail::FutureCorePtr<T> core) : _core{std::move(core)} {
+Future<T>::~Future() {
+  std::move(*this).Stop();
+}
+
+template <typename T>
+bool Future<T>::Valid() const& noexcept {
+  return _core != nullptr;
+}
+
+template <typename T>
+bool Future<T>::Ready() const& noexcept {
+  return _core->Ready();
+}
+
+template <typename T>
+void Future<T>::Wait() & {
+  detail::Wait<detail::WaitPolicy::Endless>(_core, /* stub value */ false);
+}
+
+template <typename T>
+template <typename Clock, typename Duration>
+bool Future<T>::WaitUntil(const std::chrono::time_point<Clock, Duration>& timeout_time) & {
+  return detail::Wait<detail::WaitPolicy::Until>(_core, timeout_time);
+}
+
+template <typename T>
+template <typename Rep, typename Period>
+bool Future<T>::WaitFor(const std::chrono::duration<Rep, Period>& timeout_duration) & {
+  return detail::Wait<detail::WaitPolicy::For>(_core, timeout_duration);
+}
+
+template <typename T>
+util::Result<T> Future<T>::Get() const& {
+  if (_core->Ready()) {
+    return _core->Get();
+  }
+  return {};
+}
+
+template <typename T>
+util::Result<T> Future<T>::Get() && {
+  Wait();
+  auto core = std::exchange(_core, nullptr);
+  return std::move(core->Get());
+}
+
+template <typename T>
+void Future<T>::Stop() && {
+  if (auto core = std::exchange(_core, nullptr)) {
+    core->Stop();
+  }
+}
+
+template <typename T>
+void Future<T>::Detach() && {
+  _core = nullptr;
+}
+
+template <typename T>
+Future<T>& Future<T>::Via(executor::IExecutorPtr executor) & {
+  _core->SetExecutor(std::move(executor));
+  return *this;
 }
 
 template <typename T>
@@ -213,9 +349,11 @@ auto Future<T>::Then(Functor&& functor) && {
   //  when T is constructable from Result
   using Ret = detail::Return<T, Functor>;
   if constexpr (Ret::kIsAsync) {
-    return AsyncThenResult<util::detail::FutureValueT<typename Ret::Type>>(std::forward<Functor>(functor));
+    return detail::AsyncThen<util::detail::FutureValueT<typename Ret::Type>>(std::exchange(_core, nullptr),
+                                                                             std::forward<Functor>(functor));
   } else {
-    return ThenResult<util::detail::ResultValueT<typename Ret::Type>>(std::forward<Functor>(functor));
+    return detail::Then<util::detail::ResultValueT<typename Ret::Type>>(std::exchange(_core, nullptr),
+                                                                        std::forward<Functor>(functor));
   }
 }
 
@@ -227,11 +365,9 @@ auto Future<T>::Then(executor::IExecutorPtr executor, Functor&& functor) && {
 }
 
 template <typename T>
-/* Functor must return void type */
 template <typename Functor>
 void Future<T>::Subscribe(Functor&& functor) && {
-  auto future = std::move(*this).Then(std::forward<Functor>(functor));
-  future._core = nullptr;  // Detach future to avoid Cancel() in dtor
+  std::move(*this).Then(std::forward<Functor>(functor)).Detach();  // Detach Future to avoid call Stop in dtor
 }
 
 template <typename T>
@@ -242,68 +378,7 @@ void Future<T>::Subscribe(executor::IExecutorPtr executor, Functor&& functor) &&
 }
 
 template <typename T>
-Future<T>::~Future() {
-  std::move(*this).Cancel();
-}
-
-template <typename T>
-void Future<T>::Cancel() && {
-  auto core = std::exchange(_core, nullptr);
-  if (core) {
-    core->Stop();
-  }
-}
-
-template <typename T>
-util::Result<T> Future<T>::Get() const& {
-  assert(false);  // TODO not implemented yet
-  return {};
-}
-
-template <typename T>
-util::Result<T> Future<T>::Get() && {
-  auto core = std::exchange(_core, nullptr);
-  if (!core->IsReady()) {
-    container::Counter<detail::GetCore, detail::GetCoreDeleter> getter;
-    core->SetCallback(&getter);
-    std::unique_lock guard{getter.m};
-    while (!getter.is_ready) {
-      getter.cv.wait(guard);
-    }
-  }
-  return std::move(core->Get());
-}
-
-template <typename T>
-bool Future<T>::IsReady() const noexcept {
-  return _core->IsReady();
-}
-
-template <typename T>
-template <typename U, typename Functor>
-Future<U> Future<T>::ThenResult(Functor&& f) {
-  using InvokeT = detail::Invoke<U, decltype(std::forward<Functor>(f)), T>;
-  using CoreType = detail::Core<U, InvokeT, T>;
-  container::intrusive::Ptr core{new container::Counter<CoreType>{std::forward<Functor>(f)}};
-  core->SetExecutor(_core->GetExecutor());
-  _core->SetCallback(core);
-  _core = nullptr;
-  return Future<U>{std::move(core)};
-}
-
-template <typename T>
-template <typename U, typename Functor>
-Future<U> Future<T>::AsyncThenResult(Functor&& f) {
-  auto [future, promise] = async::MakeContract<U>();
-  future._core->SetExecutor(_core->GetExecutor());
-  using InvokeT = detail::AsyncInvoke<U, decltype(std::forward<Functor>(f)), T>;
-  using CoreType = detail::Core<void, InvokeT, T>;
-  container::intrusive::Ptr core{
-      new container::Counter<CoreType>{_core->GetExecutor(), std::move(promise), std::forward<Functor>(f)}};
-  core->SetExecutor(_core->GetExecutor());
-  _core->SetCallback(core);
-  _core = nullptr;
-  return std::move(future);
+Future<T>::Future(detail::FutureCorePtr<T> core) : _core{std::move(core)} {
 }
 
 }  // namespace yaclib::async

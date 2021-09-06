@@ -31,11 +31,11 @@ jobs:
           mkdir build &&
           cd build &&
           cmake ..
-          -DBUILD_TESTING=ON
           -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
           -DCMAKE_C_COMPILER=${{ matrix.cc }}
           -DCMAKE_CXX_COMPILER=${{ matrix.cxx }}
-          -DCOVERAGE=ON
+          -DYACLIB_BUILD_TESTING=ON
+          -DYACLIB_COVERAGE=ON
 
       - name: Build
         run:
@@ -49,10 +49,10 @@ jobs:
       - name: Collect lcov info
         run:
           cd build &&
-          lcov -d . -c -o lcov.info &&
-          lcov -r lcov.info '/usr/*' -o lcov.info &&
+          lcov -d . -c                  -o lcov.info &&
+          lcov -r lcov.info '/usr/*'    -o lcov.info &&
           lcov -r lcov.info '*/_deps/*' -o lcov.info &&
-          lcov -r lcov.info '*/test/*' -o lcov.info &&
+          lcov -r lcov.info '*/test/*'  -o lcov.info &&
           lcov --list lcov.info
 
       - name: codecov

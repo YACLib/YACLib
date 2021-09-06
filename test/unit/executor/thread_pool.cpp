@@ -1,5 +1,5 @@
-#include "util/cpu_time.hpp"
-#include "util/time.hpp"
+#include <util/cpu_time.hpp>
+#include <util/time.hpp>
 
 #include <yaclib/executor/thread_pool.hpp>
 
@@ -473,7 +473,7 @@ void UseAllThreads(executor::IThreadPoolPtr& tp, StopType stop_type) {
   std::atomic_size_t counter{0};
 
   auto sleeper = [&counter] {
-    std::this_thread::sleep_for(200ms);
+    std::this_thread::sleep_for(50ms * YACLIB_CI_SLOWDOWN);
     counter.fetch_add(1, std::memory_order_relaxed);
   };
 
@@ -498,8 +498,8 @@ void UseAllThreads(executor::IThreadPoolPtr& tp, StopType stop_type) {
   auto elapsed = stop_watch.Elapsed();
 
   EXPECT_EQ(counter, 2);
-  EXPECT_GE(elapsed, 200ms);
-  EXPECT_LE(elapsed, 350ms);
+  EXPECT_GE(elapsed, 50ms * YACLIB_CI_SLOWDOWN);
+  EXPECT_LT(elapsed, 100ms * YACLIB_CI_SLOWDOWN);
 }
 
 TEST_F(MultiLightThread, UseAllThreads) {
@@ -620,7 +620,7 @@ void Lifetime(executor::IThreadPoolPtr& tp, size_t threads) {
     }
 
     void operator()() {
-      std::this_thread::sleep_for(100ms);
+      std::this_thread::sleep_for(50ms * YACLIB_CI_SLOWDOWN);
       _done = true;
     }
 
@@ -635,7 +635,7 @@ void Lifetime(executor::IThreadPoolPtr& tp, size_t threads) {
     tp->Execute(Task(dead));
   }
 
-  std::this_thread::sleep_for(100ms * threads / 2);
+  std::this_thread::sleep_for(50ms * YACLIB_CI_SLOWDOWN * threads / 2);
   EXPECT_EQ(dead.load(std::memory_order_acquire), threads);
 
   tp->Stop();

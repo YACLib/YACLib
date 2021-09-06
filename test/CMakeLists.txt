@@ -37,39 +37,37 @@ endif ()
 add_compile_options(${YACLIB_COMPILE_OPTIONS})
 add_link_options(${YACLIB_LINK_OPTIONS})
 
-set(
-  TEST_UTIL_HEADERS
+set(TEST_UTIL_INCLUDES
   util/cpu_time.hpp
   util/time.hpp
-)
+  )
 
-function(yaclib_test NAME)
-  add_executable(
-    ${NAME}
-    ${NAME}.cpp
+#TODO(MBkkt) Add options which shuffle tests list
+set(YACLIB_TESTS
+  unit/task
+  unit/executor/thread_factory
+  unit/container/intrusive_ptr
+  unit/async/future
+  unit/util/result
+  unit/async/when_all
+  unit/executor/thread_pool
+  unit/executor/serial
   )
-  target_sources(
-    ${NAME}
-    PRIVATE ${UTIL_HEADERS}
-  )
-  target_link_libraries(
-    ${NAME}
+
+foreach (TEST_SOURCE ${YACLIB_TESTS})
+  string(REPLACE "/" "_" TEST_NAME ${TEST_SOURCE})
+  add_executable(${TEST_NAME} ${TEST_SOURCE}.cpp)
+  target_sources(${TEST_NAME}
+    PRIVATE ${TEST_UTIL_INCLUDES}
+    )
+  target_link_libraries(${TEST_NAME}
     PRIVATE ${GTEST_BOTH_LIBRARIES}
     PRIVATE benchmark::benchmark
     PRIVATE ${PROJECT_NAME}
-  )
-  target_include_directories(
-    ${NAME}
+    )
+  target_include_directories(${TEST_NAME}
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
     PRIVATE ${YACLIB_SOURCE_DIR}/src
-  )
-  add_test(NAME ${NAME} COMMAND ${NAME})
-endfunction()
-
-yaclib_test(task)
-yaclib_test(thread_factory)
-yaclib_test(intrusive_ptr)
-yaclib_test(future)
-yaclib_test(result)
-yaclib_test(when_all)
-yaclib_test(thread_pool)
-yaclib_test(serial)
+    )
+  add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
+endforeach ()

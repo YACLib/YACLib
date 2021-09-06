@@ -24,7 +24,6 @@ auto Run(const executor::IExecutorPtr& e, Functor&& f) {
   if constexpr (Ret::kIsAsync) {
     using InvokeT = detail::AsyncInvoke<U, decltype(std::forward<Functor>(f)), void>;
     using CoreType = detail::Core<void, InvokeT, void>;
-
     auto [future, promise] = async::MakeContract<U>();
     future._core->SetExecutor(e);
     container::intrusive::Ptr core{new container::Counter<CoreType>{e, std::move(promise), std::forward<Functor>(f)}};

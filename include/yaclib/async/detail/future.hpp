@@ -16,48 +16,132 @@ class Future final {
   static_assert(!std::is_same_v<util::DecayT<T>, std::exception_ptr>,
                 "Future cannot be instantiated with std::exception_ptr");
 
-  Future(const Future&) = delete;
-  Future& operator=(const Future&) = delete;
-
-  Future() = default;
-  explicit Future(detail::FutureCorePtr<T> core);
-
   Future(Future&& other) noexcept = default;
   Future& operator=(Future&& other) noexcept = default;
 
+  Future(const Future&) = delete;
+  Future& operator=(const Future&) = delete;
+
+  /**
+   * \brief The default constructor creates not \ref Valid Future, needed only for usability
+   */
+  Future() = default;
+
+  /**
+   * \brief if Future \ref Valid then call \ref Stop
+   */
   ~Future();
 
-  bool IsReady() const noexcept;
+  /**
+   * \brief Checks if the this \ref Future has \ref Promise
+   * \return false if this \ref Future default-constructed or moved to, otherwise true
+   */
+  [[nodiscard]] bool Valid() const& noexcept;
 
-  util::Result<T> Get() const&;  // You can use this iff you want call Get multiple times
-  util::Result<T> Get() &&;
-  util::Result<T> Get() const&& = delete;  // TODO maybe add as ref to 'Get() &&'
+  /**
+   * \brief Checks if the this \ref Future has not Empty \ref util::Result<T>
+   * \return false if this \ref Future \ref util::Result<T> not computed yet, otherwise true
+   */
+  [[nodiscard]] bool Ready() const& noexcept;
+
+  /**
+   * \brief Blocks until \ref Ready becomes true
+   */
+  void Wait() &;
+
+  /**
+   *
+   * \tparam Rep
+   * \tparam Period
+   * \param timeout_duration
+   * \return
+   */
+  template <typename Rep, typename Period>
+  bool WaitFor(const std::chrono::duration<Rep, Period>& timeout_duration) &;
+
+  /**
+   *
+   * \tparam Clock
+   * \tparam Duration
+   * \param timeout_time
+   * \return
+   */
+  template <typename Clock, typename Duration>
+  bool WaitUntil(const std::chrono::time_point<Clock, Duration>& timeout_time) &;
+
+  /**
+   * \brief  You can use this iff you want call Get multiple times
+   * \return
+   */
+  [[nodiscard]] util::Result<T> Get() const&;
+
+  /**
+   *
+   * \return
+   */
+  [[nodiscard]] util::Result<T> Get() &&;
+
+  util::Result<T> Get() const&& = delete;
   util::Result<T> Get() & = delete;
 
-  void Cancel() &&;
+  /**
+   * \brief Stop pipeline before current step if possible
+   */
+  void Stop() &&;
 
+  /**
+   * \brief
+   */
+  void Detach() &&;
+
+  /**
+   * \brief
+   */
+  Future& Via(executor::IExecutorPtr executor) &;
+
+  /**
+   * \brief Make new future callback for this
+   * \tparam Functor
+   * \param functor
+   * \return
+   */
   template <typename Functor>
-  auto Then(Functor&& functor) &&;
+  [[nodiscard]] auto Then(Functor&& functor) &&;
 
+  /**
+   *
+   * \tparam Functor
+   * \param executor
+   * \param functor
+   * \return
+   */
   template <typename Functor>
-  auto Then(executor::IExecutorPtr executor, Functor&& functor) &&;
+  [[nodiscard]] auto Then(executor::IExecutorPtr executor, Functor&& functor) &&;
 
+  /**
+   * Functor must return void type
+   * \tparam Functor
+   * \param functor
+   */
   template <typename Functor>
   void Subscribe(Functor&& functor) &&;
 
+  /**
+   *
+   * \tparam Functor
+   * \param executor
+   * \param functor
+   */
   template <typename Functor>
   void Subscribe(executor::IExecutorPtr executor, Functor&& functor) &&;
 
+  /**
+   * \brief Detail constructor
+   * @param core
+   */
+  explicit Future(detail::FutureCorePtr<T> core);
+
  private:
-  template <typename U>
-  friend class Future;
-
-  template <typename U, typename Functor>
-  Future<U> ThenResult(Functor&& functor);
-
-  template <typename U, typename Functor>
-  Future<U> AsyncThenResult(Functor&& functor);
-
   detail::FutureCorePtr<T> _core;
 };
 
