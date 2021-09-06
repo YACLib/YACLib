@@ -45,8 +45,8 @@ Future в нашем интерфейсе имеет две перегрузки
 2. Future/Promise abstraction
 3. Combinators:
     - WhenAll
-    - ThreadFactory
-    - Documentation, Tests, CI
+4. ThreadFactory
+5. Documentation, Tests, CI
 
 - ### Inline Executor:
 Zero cost абстракция, для того, чтобы избежать лишний проверок `executor` на `nullptr`. Дефолтный `executor` для других классов.
