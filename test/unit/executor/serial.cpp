@@ -16,9 +16,10 @@ using namespace std::chrono_literals;
 
 // TODO(kononovk): add expect threads, current_executes
 
-GTEST_TEST(execute_task, simple) {
+TEST(execute_task, simple) {
   auto tp = executor::MakeThreadPool(4);
   auto strand = executor::MakeSerial(tp);
+  EXPECT_EQ(strand->Tag(), executor::IExecutor::Type::Serial);
 
   bool done{false};
 
@@ -32,7 +33,7 @@ GTEST_TEST(execute_task, simple) {
   EXPECT_TRUE(done);
 }
 
-GTEST_TEST(counter, simple) {
+TEST(counter, simple) {
   auto tp = executor::MakeThreadPool(13);
   auto strand = executor::MakeSerial(tp);
 
@@ -51,7 +52,7 @@ GTEST_TEST(counter, simple) {
   EXPECT_EQ(counter, kIncrements);
 }
 
-GTEST_TEST(fifo, simple) {
+TEST(fifo, simple) {
   auto tp = executor::MakeThreadPool(13);
   auto strand = executor::MakeSerial(tp);
 
@@ -91,7 +92,7 @@ class Counter {
   executor::IExecutorPtr strand_;
 };
 
-GTEST_TEST(concurrent_strands, simple) {
+TEST(concurrent_strands, simple) {
   auto tp = executor::MakeThreadPool(16);
 
   static const size_t kStrands = 50;
@@ -120,9 +121,9 @@ GTEST_TEST(concurrent_strands, simple) {
   }
 }
 
-GTEST_TEST(batching, simple) {
+TEST(batching, simple) {
   auto tp = executor::MakeThreadPool(1);
-
+  EXPECT_EQ(tp->Tag(), executor::IExecutor::Type::SingleThread);
   tp->Execute([] {
     // bubble
     std::this_thread::sleep_for(1s);
@@ -145,7 +146,7 @@ GTEST_TEST(batching, simple) {
   EXPECT_EQ(completed, kStrandTasks);
 }
 
-GTEST_TEST(strand_over_strand, simple) {
+TEST(strand_over_strand, simple) {
   auto tp = executor::MakeThreadPool(4);
 
   auto strand = executor::MakeSerial(executor::MakeSerial(executor::MakeSerial(tp)));
@@ -180,7 +181,7 @@ GTEST_TEST(strand_over_strand, simple) {
 //  std::stack<yaclib::ITaskPtr> tasks_;
 //};
 //
-// GTEST_TEST(stack, cimple) {
+// TEST(stack, cimple) {
 //  auto lifo = std::make_shared<LifoManualExecutor>();
 //  auto strand = executor::MakeSerial(lifo);
 //
@@ -200,7 +201,7 @@ GTEST_TEST(strand_over_strand, simple) {
 //  EXPECT_EQ(steps, 2);
 //}
 
-GTEST_TEST(keep_strong_ref, simple) {
+TEST(keep_strong_ref, simple) {
   auto tp = executor::MakeThreadPool(1);
 
   tp->Execute([] {
@@ -218,7 +219,7 @@ GTEST_TEST(keep_strong_ref, simple) {
   EXPECT_TRUE(done);
 }
 
-GTEST_TEST(do_not_occupy_thread, simple) {
+TEST(do_not_occupy_thread, simple) {
   auto tp = executor::MakeThreadPool(1);
 
   auto strand = executor::MakeSerial(tp);
@@ -253,7 +254,7 @@ GTEST_TEST(do_not_occupy_thread, simple) {
   tp->Wait();
 }
 
-GTEST_TEST(exceptions, simple) {
+TEST(exceptions, simple) {
   auto tp = executor::MakeThreadPool(1);
   auto strand = executor::MakeSerial(tp);
 
@@ -275,7 +276,7 @@ GTEST_TEST(exceptions, simple) {
   EXPECT_TRUE(done);
 }
 
-GTEST_TEST(non_blocking_execute, simple) {
+TEST(non_blocking_execute, simple) {
   auto tp = executor::MakeThreadPool(1);
   auto strand = executor::MakeSerial(tp);
 
@@ -294,7 +295,7 @@ GTEST_TEST(non_blocking_execute, simple) {
   tp->Wait();
 }
 
-GTEST_TEST(do_not_block_thread_pool, simple) {
+TEST(do_not_block_thread_pool, simple) {
   auto tp = executor::MakeThreadPool(2);
   auto strand = executor::MakeSerial(tp);
 
@@ -321,7 +322,7 @@ GTEST_TEST(do_not_block_thread_pool, simple) {
   tp->Wait();
 }
 
-GTEST_TEST(memory_leak, simple) {
+TEST(memory_leak, simple) {
   auto tp = executor::MakeThreadPool(1);
   auto strand = executor::MakeSerial(tp);
 

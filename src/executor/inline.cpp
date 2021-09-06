@@ -4,6 +4,10 @@ namespace yaclib::executor {
 
 class Inline final : public IExecutor {
  private:
+  Type Tag() const final {
+    return Type::Inline;
+  }
+
   bool Execute(ITask& task) final {
     task.Call();
     return true;

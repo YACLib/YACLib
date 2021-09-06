@@ -1,4 +1,5 @@
 #include <container/intrusive_list.hpp>
+#include <container/mpsc_stack.hpp>
 
 #include <yaclib/executor/executor.hpp>
 #include <yaclib/executor/thread_pool.hpp>
@@ -30,6 +31,11 @@ class ThreadPool : public IThreadPool {
   ~ThreadPool() override {
     HardStop();
     Wait();
+  }
+
+ private:
+  Type Tag() const final {
+    return Type::ThreadPool;
   }
 
   bool Execute(ITask& task) final {
@@ -66,7 +72,7 @@ class ThreadPool : public IThreadPool {
     container::intrusive::List<ITask> tasks;
     {
       std::lock_guard guard{_m};
-      tasks.Append(_tasks);
+      tasks.Append(_tasks);  // TODO(MBkkt) replace Append with Swap
       _stop = true;
     }
     _cv.notify_all();
@@ -83,7 +89,6 @@ class ThreadPool : public IThreadPool {
     }
   }
 
- private:
   void Loop() noexcept {
     std::unique_lock guard{_m};
     while (true) {
@@ -115,6 +120,141 @@ class ThreadPool : public IThreadPool {
   bool _stop{false};
 };
 
+class SingleThread : public IThreadPool {
+ public:
+  explicit SingleThread(IThreadFactoryPtr factory) : _factory{std::move(factory)} {
+    _thread = _factory->Acquire(MakeFunc([this] {
+      tlCurrentThreadPool = this;
+      Loop();
+      tlCurrentThreadPool = nullptr;
+    }));
+  }
+
+  ~SingleThread() override {
+    HardStop();
+    Wait();
+  }
+
+ private:
+  Type Tag() const final {
+    return Type::SingleThread;
+  }
+
+  bool Execute(ITask& task) final {
+    task.IncRef();
+    const auto state = _state.load(std::memory_order_acquire);
+    if (state == kStop || state == kHardStop) {
+      task.Cancel();
+      task.DecRef();
+      return false;
+    }
+    _tasks.Put(&task);
+
+    if (_work_counter.fetch_add(1, std::memory_order_acq_rel) == 0) {
+      _m.lock();
+      _m.unlock();
+      _cv.notify_one();
+    }
+    return true;
+  }
+
+  void SoftStop() final {
+    {
+      std::lock_guard guard{_m};
+      _state.store(kSoftStop, std::memory_order_release);
+      if (_work_counter.load(std::memory_order_acquire) <= 0) {
+        _state.store(kStop, std::memory_order_release);
+      }
+    }
+    _cv.notify_one();
+  }
+
+  void Stop() final {
+    {
+      std::lock_guard guard{_m};
+      _state.store(kStop, std::memory_order_release);
+    }
+    _cv.notify_one();
+  }
+
+  void HardStop() final {
+    {
+      std::lock_guard guard{_m};
+      _state.store(kHardStop, std::memory_order_release);
+    }
+    _cv.notify_one();
+  }
+
+  void Wait() final {
+    if (_thread) {
+      _factory->Release(std::move(_thread));
+    }
+  }
+
+  void Loop() noexcept {
+    while (true) {
+      int32_t size = 0;
+      do {
+        size = 0;
+
+        auto state = _state.load(std::memory_order_acquire);
+        auto nodes{_tasks.TakeAllFIFO()};
+        if ((state == kHardStop || state == kStop) && nodes == nullptr) {
+          return;
+        }
+        state = _state.load(std::memory_order_acquire);
+        if (state == kSoftStop && nodes == nullptr) {
+          Stop();
+        }
+
+        auto task = static_cast<ITask*>(nodes);
+        while (task != nullptr) {
+          state = _state.load(std::memory_order_acquire);
+          if (state == kHardStop) {
+            KillTasks(task);
+            KillTasks(static_cast<ITask*>(_tasks.TakeAllLIFO()));
+            return;
+          }
+          auto next = static_cast<ITask*>(task->_next);
+          task->Call();
+          task->DecRef();
+          task = next;
+          ++size;
+        }
+
+      } while (_work_counter.fetch_sub(size, std::memory_order_acq_rel) > size);
+      std::unique_lock guard{_m};
+      if (_work_counter.load(std::memory_order_acquire) <= 0 && _state.load(std::memory_order_acquire) == kRun) {
+        _cv.wait(guard);
+      }
+    }
+  }
+
+  static void KillTasks(ITask* head) {
+    while (head != nullptr) {
+      auto next = static_cast<ITask*>(head->_next);
+      head->Cancel();
+      head->DecRef();
+      head = next;
+    }
+  }
+
+  enum State {
+    kRun = 0,
+    kStop,
+    kSoftStop,
+    kHardStop,
+  };
+
+  IThreadFactoryPtr _factory;
+  IThreadPtr _thread;
+  container::intrusive::MPSCStack _tasks;
+  std::atomic<State> _state{kRun};
+  std::mutex _m;
+  std::condition_variable _cv;
+  alignas(kCacheLineSize) std::atomic_int32_t _work_counter{0};
+};
+
 }  // namespace
 
 IThreadPool* CurrentThreadPool() noexcept {
@@ -122,6 +262,9 @@ IThreadPool* CurrentThreadPool() noexcept {
 }
 
 IThreadPoolPtr MakeThreadPool(size_t threads, IThreadFactoryPtr factory) {
+  if (threads == 1) {
+    return new container::Counter<SingleThread>{std::move(factory)};
+  }
   return new container::Counter<ThreadPool>{std::move(factory), threads};
 }
 

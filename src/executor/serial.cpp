@@ -27,6 +27,10 @@ class Serial : public IExecutor, public ITask {
   }
 
  private:
+  Type Tag() const final {
+    return Type::Serial;
+  }
+
   bool Execute(ITask& task) final {
     task.IncRef();
     _tasks.Put(&task);
