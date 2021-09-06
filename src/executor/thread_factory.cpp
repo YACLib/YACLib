@@ -98,7 +98,7 @@ class HeavyThread final : public IThread {
         return;
       } else {
         _state = State::Idle;
-        _cv.notify_one();
+        _cv.notify_all();
       }
       _cv.wait(guard);
     }
