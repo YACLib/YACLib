@@ -17,6 +17,7 @@ set(YACLIB_INCLUDES
   ${YACLIB_INCLUDE_DIR}/task.hpp
   ${YACLIB_INCLUDE_DIR}/async/run.hpp
   ${YACLIB_INCLUDE_DIR}/async/when_all.hpp
+  ${YACLIB_INCLUDE_DIR}/async/when_any.hpp
   ${YACLIB_INCLUDE_DIR}/util/counters.hpp
   ${YACLIB_INCLUDE_DIR}/util/defer.hpp
   ${YACLIB_INCLUDE_DIR}/util/result.hpp

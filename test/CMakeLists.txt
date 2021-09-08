@@ -50,6 +50,7 @@ set(YACLIB_TESTS
   unit/async/future
   unit/util/result
   unit/async/when_all
+  unit/async/when_any
   unit/executor/thread_pool
   unit/executor/serial
   )
