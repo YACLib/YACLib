@@ -15,7 +15,11 @@
 namespace yaclib::async {
 
 /**
- * Execute Callable functor via executor
+ * \brief Execute Callable functor via executor
+ *
+ * \param e executor to be used to execute f and saved as callback executor for return \ref Future
+ * \param f functor to execute
+ * \return \ref Future corresponding f return value
  */
 template <typename Functor>
 auto Run(const executor::IExecutorPtr& e, Functor&& f) {

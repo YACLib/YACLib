@@ -867,7 +867,7 @@ static std::string DoWorkStaticValue(std::string&& t) {
   return t + ";value";
 }
 
-TEST(Future, thenFunction) {
+TEST(Future, ThenFunction) {
   struct Worker {
     static std::string DoWorkStatic(util::Result<std::string>&& t) {
       return std::move(t).Value() + ";class-static";
@@ -877,6 +877,12 @@ TEST(Future, thenFunction) {
   auto f = MakeFuture<std::string>("start").Then(DoWorkStatic).Then(Worker::DoWorkStatic).Then(DoWorkStaticValue);
 
   EXPECT_EQ(std::move(f).Get().Value(), "start;static;class-static;value");
+}
+
+TEST(Future, CheckReferenceWrapper) {
+  int x = 5;
+  auto [f, p] = async::MakeContract<std::reference_wrapper<int>>();
+  std::move(p).Set(std::ref(x));
 }
 
 }  // namespace

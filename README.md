@@ -1,4 +1,4 @@
-# YACLib
+# [YACLib](https://github.com/YACLib/YACLib)
 
 [![GitHub license](
 https://img.shields.io/badge/license-MIT-blue.svg)](
@@ -26,8 +26,10 @@ https://www.codacy.com/gh/YACLib/YACLib/dashboard?utm_source=github.com&amp;utm_
 
 YACLib (_Yet Another Concurrency Library_) is a C++ library for concurrent tasks execution.
 
-## Documentation
+## Useful links
 
+* [Documentation](https://yaclib.github.io/YACLib)
+* [Examples](test/examples)
 * [Install guide](doc/INSTALL.md)
 * [About dependencies](doc/DEPENDENCIES.md)
 * [Targets description](doc/TARGETS.md)
