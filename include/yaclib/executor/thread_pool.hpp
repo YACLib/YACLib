@@ -3,7 +3,6 @@
 #include <yaclib/executor/executor.hpp>
 #include <yaclib/executor/thread_factory.hpp>
 
-#include <memory>
 #include <thread>
 
 namespace yaclib::executor {
@@ -14,8 +13,7 @@ namespace yaclib::executor {
 class IThreadPool : public IExecutor {
  public:
   /**
-   * \brief Wait until task counter is zero and call Stop()
-   * \see Stop() for details
+   * \brief Wait until task counter is zero and call Stop(). Check \ref Stop for details
    */
   virtual void SoftStop() = 0;
 
@@ -31,6 +29,7 @@ class IThreadPool : public IExecutor {
 
   /**
    * \brief Wait until all threads join.
+   *
    * \note This method is blocking.
    * Note that in order for an IThreadPool to join all the threads, one Stop methods must be called.
    * \see SoftStop, Stop, HardStop

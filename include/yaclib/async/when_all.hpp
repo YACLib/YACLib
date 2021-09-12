@@ -93,37 +93,62 @@ template <size_t N, typename T, typename... Fs>
 void WhenAllImpl(container::intrusive::Ptr<AllCombinator<T, N>>& combinator, Future<T>&& head, Fs&&... tail) {
   std::move(head).Subscribe([c = combinator](util::Result<T>&& result) mutable {
     c->Combine(std::move(result));
+    c = nullptr;
   });
   if constexpr (sizeof...(tail) != 0) {
-    WhenAllImpl(combinator, std::move(tail)...);
+    WhenAllImpl(combinator, std::forward<Fs>(tail)...);
   }
 }
 
 }  // namespace detail
 
+/**
+ * \brief Create \ref Future which will be ready when all futures are ready
+ *
+ * \tparam It type of passed iterator
+ * \tparam T type of all passed futures
+ * \param begin, size the range of futures to combine
+ * \return Future<vector<T>>
+ */
 template <typename It, typename T = util::detail::FutureValueT<typename std::iterator_traits<It>::value_type>>
 auto WhenAll(It begin, size_t size) {
   auto [future, combinator] = detail::AllCombinator<T>::Make(size);
   for (size_t i = 0; i != size; ++i) {
     std::move(*begin).Subscribe([c = combinator](util::Result<T>&& result) mutable {
       c->Combine(std::move(result));
+      c = nullptr;
     });
     ++begin;
   }
   return std::move(future);
 }
 
+/**
+ * \brief Create \ref Future which will be ready when all futures are ready
+ *
+ * \tparam It type of passed iterator
+ * \tparam T type of all passed futures
+ * \param begin, end the range of futures to combine
+ * \return Future<vector<T>>
+ */
 template <typename It>
 auto WhenAll(It begin, It end) {
   static_assert(util::IsFutureV<typename std::iterator_traits<It>::value_type>);
   return WhenAll(begin, std::distance(begin, end));
 }
 
+/**
+ * \brief Create \ref Future which will be ready when all futures are ready
+ *
+ * \tparam T type of all passed futures
+ * \param head, tail one or more futures to combine
+ * \return Future<array<T>>
+ */
 template <typename T, typename... Fs>
 auto WhenAll(Future<T>&& head, Fs&&... tail) {
   static_assert((... && util::IsFutureV<Fs>));  // TODO(kononovk): Add static assert that FutureValue<Fs> = T
   auto [future, combinator] = detail::AllCombinator<T, sizeof...(Fs) + 1>::Make();
-  detail::WhenAllImpl<sizeof...(Fs) + 1>(combinator, std::move(head), std::move(tail)...);
+  detail::WhenAllImpl<sizeof...(Fs) + 1>(combinator, std::move(head), std::forward<Fs>(tail)...);
   return std::move(future);
 }
 

@@ -3,7 +3,7 @@
 namespace yaclib {
 
 /**
- * \class Reference counting interface
+ * \brief Reference counting interface
  */
 class IRef {
  public:

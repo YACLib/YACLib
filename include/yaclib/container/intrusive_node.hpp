@@ -2,6 +2,9 @@
 
 namespace yaclib::container::intrusive::detail {
 
+/**
+ * \brief Intrusive node class
+ */
 class Node {
  public:
   void Link(Node* prev, Node* next) noexcept {
@@ -11,12 +14,18 @@ class Node {
     next->_prev = this;
   }
 
-  // Is this node linked in a circular list?
+  /**
+   * \brief is node linked in circular list?
+   *
+   * \return true if node is linked in a circular list, false otherwise
+   */
   bool IsLinked() const noexcept {
     return _next != this;
   }
 
-  // Unlink this node from current list
+  /**
+   * \brief Unlink this node from current list
+   */
   void Unlink() noexcept {
     _prev->_next = _next;
     _next->_prev = _prev;

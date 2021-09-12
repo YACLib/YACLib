@@ -10,9 +10,9 @@ namespace yaclib::executor {
 class IExecutor : public IRef {
  public:
   /**
-   * Executor tag
+   * \brief Executor tag
    * \enum Custom, ThreadPool, Serial, Inline, SingleThread
-   * */
+   */
   enum class Type {
     Custom = 0,
     ThreadPool,
@@ -22,12 +22,13 @@ class IExecutor : public IRef {
   };
 
   /**
-   * \return type of this executor
+   * \brief Return type of this executor
    */
   [[nodiscard]] virtual Type Tag() const = 0;
 
   /**
    * \brief Execute given functor for details \see Execute
+   *
    * This method creates ITask with one allocation and call Execute(ITask)
    * \param functor task to execute
    * \return true if the task is accepted and scheduled for execution, false if the task is rejected
@@ -39,9 +40,8 @@ class IExecutor : public IRef {
   }
 
   /**
-   * \brief
-   * Execute given task. This method may either accept or reject the task.
-   * \details
+   * \brief Execute given task. This method may either accept or reject the task.
+   *
    * This method always increments reference counter for the given task,
    * even if it rejects the task after that.
    * If the task is rejected, the reference counter is decremented back,

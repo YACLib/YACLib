@@ -12,7 +12,7 @@
 namespace yaclib {
 
 /**
- * \class Shared callable interface
+ * \brief Shared callable interface
  */
 class IFunc : public IRef {
  public:
@@ -22,7 +22,7 @@ class IFunc : public IRef {
 using IFuncPtr = container::intrusive::Ptr<IFunc>;
 
 /**
- * \class Callable that can be executed in an IExecutor \see IExecutor
+ * \brief Callable that can be executed in an IExecutor \see IExecutor
  * */
 class ITask : public IFunc, public container::intrusive::detail::Node {
  public:

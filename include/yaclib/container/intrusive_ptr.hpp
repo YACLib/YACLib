@@ -8,6 +8,10 @@
 
 namespace yaclib::container::intrusive {
 
+/**
+ * \brief A pointer to objects with an embedded reference count;
+ * https://www.boost.org/doc/libs/1_77_0/libs/smart_ptr/doc/html/smart_ptr.html#intrusive_ptr
+ */
 template <typename T>
 class Ptr {
   static_assert(std::is_base_of_v<IRef, T>, "T must be derived class of yaclib::IRef");
