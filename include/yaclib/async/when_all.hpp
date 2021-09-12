@@ -3,7 +3,9 @@
 #include <yaclib/async/run.hpp>
 
 #include <array>
+#include <iterator>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 namespace yaclib::async {
@@ -95,7 +97,7 @@ void WhenAllImpl(container::intrusive::Ptr<AllCombinator<T, N>>& combinator, Fut
     c->Combine(std::move(result));
   });
   if constexpr (sizeof...(tail) != 0) {
-    WhenAllImpl(combinator, std::move(tail)...);
+    WhenAllImpl(combinator, std::forward<Fs>(tail)...);
   }
 }
 
@@ -123,7 +125,7 @@ template <typename T, typename... Fs>
 auto WhenAll(Future<T>&& head, Fs&&... tail) {
   static_assert((... && util::IsFutureV<Fs>));  // TODO(kononovk): Add static assert that FutureValue<Fs> = T
   auto [future, combinator] = detail::AllCombinator<T, sizeof...(Fs) + 1>::Make();
-  detail::WhenAllImpl<sizeof...(Fs) + 1>(combinator, std::move(head), std::move(tail)...);
+  detail::WhenAllImpl<sizeof...(Fs) + 1>(combinator, std::move(head), std::forward<Fs>(tail)...);
   return std::move(future);
 }
 

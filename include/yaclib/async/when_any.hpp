@@ -2,72 +2,142 @@
 
 #include <yaclib/async/run.hpp>
 
-#include <array>
-#include <iostream>
+#include <iterator>
 #include <type_traits>
-#include <vector>
+#include <utility>
 
 namespace yaclib::async {
+
+enum class PolicyWhenAny { FirstError, LastError };
+
 namespace detail {
 
-template <typename T, size_t N = std::numeric_limits<size_t>::max(),
-          typename FutureValue = std::conditional_t<std::is_void_v<T>, void, T>>
+template <typename T, PolicyWhenAny P>
 class AnyCombinator : public IRef {
  public:
-  static std::pair<Future<FutureValue>, container::intrusive::Ptr<AnyCombinator>> Make(size_t size = 0) {
+  static std::pair<Future<T>, container::intrusive::Ptr<AnyCombinator>> Make(bool empty = true) {
     auto [future, promise] = MakeContract<T>();
-    if (size == 0) {
-      if constexpr (std::is_void_v<T>) {
-        std::move(promise).Set();
-      } else {
-        // TODO: what should be return value?
-        std::move(promise).Set(util::Result<T>{});
-      }
+    if (empty) {
+      std::move(promise).Set(util::Result<T>{});
       return {std::move(future), nullptr};
     }
-    return {std::move(future), new container::Counter<AnyCombinator<T>>{std::move(promise)}};
+    return {std::move(future), new container::Counter<AnyCombinator<T, P>>{std::move(promise)}};
   }
 
-  void Combine(util::Result<T> result) {
+  void Combine(util::Result<T>&& result) {
     if (_done.load(std::memory_order_acquire)) {
       return;
     }
 
-    if (_done.exchange(true, std::memory_order_acq_rel)) {
-      return;
+    if (result) {
+      if (!_done.exchange(true, std::memory_order_acq_rel)) {
+        std::move(_promise).Set(std::move(result));
+      }
+    } else if (!_ex_er.load(std::memory_order_acquire) && !_ex_er.exchange(true, std::memory_order_acq_rel)) {
+      _except_error = std::move(result);
     }
-    std::move(_promise).Set(std::move(result));
   }
 
-  AnyCombinator(Promise<T> promise) : _done{false}, _promise{std::move(promise)} {
+  explicit AnyCombinator(Promise<T> promise) : _promise{std::move(promise)} {
+  }
+
+  ~AnyCombinator() override {
+    if (!_done.load(std::memory_order_acquire)) {
+      std::move(_promise).Set(std::move(_except_error));
+    }
   }
 
  private:
-  alignas(kCacheLineSize) std::atomic<bool> _done;
+  alignas(kCacheLineSize) std::atomic<bool> _done{false};
+  alignas(kCacheLineSize) std::atomic<bool> _ex_er{false};
+  util::Result<T> _except_error;
   Promise<T> _promise;
 };
 
 template <typename T>
-using AnyCombinatorPtr = container::intrusive::Ptr<AnyCombinator<T>>;
+class AnyCombinator<T, PolicyWhenAny::LastError> : public IRef {
+ public:
+  static std::pair<Future<T>, container::intrusive::Ptr<AnyCombinator>> Make(size_t size = 0) {
+    auto [future, promise] = MakeContract<T>();
+    if (size == 0) {
+      std::move(promise).Set(util::Result<T>{});
+      return {std::move(future), nullptr};
+    }
+    return {std::move(future),
+            new container::Counter<AnyCombinator<T, PolicyWhenAny::LastError>>{std::move(promise), size}};
+  }
 
-template <typename T, typename... Fs>
-void WhenAnyImpl(detail::AnyCombinatorPtr<T>& combinator, Future<T>&& head, Fs&&... tail) {
-  std::move(head).Subscribe([c = combinator](util::Result<T> result) mutable {
+  void Combine(util::Result<T>&& result) {
+    if (_done.load(std::memory_order_acquire)) {
+      return;
+    }
+
+    if (result) {
+      if (!_done.exchange(true, std::memory_order_acq_rel)) {
+        std::move(_promise).Set(std::move(result));
+      }
+    } else if (_size.fetch_sub(1, std::memory_order_acq_rel) <= 1U) {
+      std::move(_promise).Set(std::move(result));
+    }
+  }
+
+  explicit AnyCombinator(Promise<T> promise, size_t size = 0) : _size{size}, _promise{std::move(promise)} {
+  }
+
+ private:
+  alignas(kCacheLineSize) std::atomic<bool> _done{false};
+  alignas(kCacheLineSize) std::atomic<size_t> _size;
+  Promise<T> _promise;
+};
+
+template <typename T, PolicyWhenAny P>
+using AnyCombinatorPtr = container::intrusive::Ptr<AnyCombinator<T, P>>;
+
+template <PolicyWhenAny P, typename T, typename... Fs>
+void WhenAnyImpl(detail::AnyCombinatorPtr<T, P>& combinator, Future<T>&& head, Fs&&... tail) {
+  std::move(head).Subscribe([c = combinator](util::Result<T>&& result) mutable {
     c->Combine(std::move(result));
     c = nullptr;
   });
   if constexpr (sizeof...(tail) != 0) {
-    WhenAnyImpl(combinator, std::move(tail)...);
+    WhenAnyImpl(combinator, std::forward<Fs>(tail)...);
   }
 }
 
 }  // namespace detail
 
-template <typename It, typename T = util::detail::FutureValueT<typename std::iterator_traits<It>::value_type>>
-Future<T> WhenAny(It begin, It end) {
-  auto [future, combinator] = detail::AnyCombinator<T>::Make(std::distance(begin, end));
+template <PolicyWhenAny P, typename It,
+          typename T = util::detail::FutureValueT<typename std::iterator_traits<It>::value_type>>
+auto WhenAny(It begin, size_t size) {
+  auto [future, combinator] = [&size] {
+    if constexpr (P == PolicyWhenAny::FirstError) {
+      return detail::AnyCombinator<T, P>::Make(size == 0);
+    } else {
+      return detail::AnyCombinator<T, P>::Make(size);
+    }
+  }();
+  for (size_t i = 0; i != size; ++i) {
+    std::move(*begin).Subscribe([c = combinator](util::Result<T>&& result) mutable {
+      c->Combine(std::move(result));
+      c = nullptr;
+    });
+    ++begin;
+  }
+  return std::move(future);
+}
+
+template <PolicyWhenAny P, typename It,
+          typename T = util::detail::FutureValueT<typename std::iterator_traits<It>::value_type>>
+auto WhenAny(It begin, It end) {
+  auto [future, combinator] = [&begin, &end] {
+    if constexpr (P == PolicyWhenAny::FirstError) {
+      return detail::AnyCombinator<T, P>::Make(begin == end);
+    } else {
+      return detail::AnyCombinator<T, P>::Make(std::distance(begin, end));
+    }
+  }();
   for (; begin != end; ++begin) {
-    std::move(*begin).Subscribe([c = combinator](util::Result<T> result) mutable {
+    std::move(*begin).Subscribe([c = combinator](util::Result<T>&& result) mutable {
       c->Combine(std::move(result));
       c = nullptr;
     });
@@ -75,11 +145,17 @@ Future<T> WhenAny(It begin, It end) {
   return std::move(future);
 }
 
-template <typename T, typename... Fs>
-Future<T> WhenAny(Future<T>&& head, Fs&&... tail) {
+template <PolicyWhenAny P, typename T, typename... Fs>
+auto WhenAny(Future<T>&& head, Fs&&... tail) {
   static_assert((... && util::IsFutureV<Fs>));
-  auto [future, combinator] = detail::AnyCombinator<T>::Make(1);
-  detail::WhenAnyImpl(combinator, std::move(head), std::move(tail)...);
+  auto [future, combinator] = [] {
+    if constexpr (P == PolicyWhenAny::FirstError) {
+      return detail::AnyCombinator<T, P>::Make(false);
+    } else {
+      return detail::AnyCombinator<T, P>::Make(sizeof...(Fs) + 1);
+    }
+  }();
+  detail::WhenAnyImpl<P>(combinator, std::move(head), std::forward<Fs>(tail)...);
   return std::move(future);
 }
 
