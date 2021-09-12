@@ -41,9 +41,11 @@ set(TEST_UTIL_INCLUDES
   util/cpu_time.hpp
   util/time.hpp
   )
+set(YACLIB_EXAMPLE_SOURCES)
+set(YACLIB_EXAMPLE_INCLUDES)
 
 #TODO(MBkkt) Add options which shuffle tests list
-set(YACLIB_TESTS
+set(YACLIB_UNITS
   unit/task
   unit/executor/thread_factory
   unit/container/intrusive_ptr
@@ -54,7 +56,17 @@ set(YACLIB_TESTS
   unit/executor/serial
   )
 
-foreach (TEST_SOURCE ${YACLIB_TESTS})
+if (YACLIB_BUILD_EXAMPLES)
+  set(YACLIB_EXAMPLES
+    example/executor/thread_pool
+    example/executor/serial
+    example/async/simple
+    example/async/when_all
+    )
+endif()
+
+set(YACLIB_TEST_SOURCES ${YACLIB_UNITS} ${YACLIB_EXAMPLES})
+foreach (TEST_SOURCE ${YACLIB_TEST_SOURCES})
   string(REPLACE "/" "_" TEST_NAME ${TEST_SOURCE})
   add_executable(${TEST_NAME} ${TEST_SOURCE}.cpp)
   target_sources(${TEST_NAME}
