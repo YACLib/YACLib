@@ -1,4 +1,4 @@
-# YACLib
+# Design doc Russian
 - [github](https://github.com/YACLib/YACLib)
 - [documentation](https://yaclib.github.io/YACLib/)
 
@@ -149,7 +149,7 @@ future.Then(task1).Then(task2).Then(task3)
 ~~~
 - Добавить `lazy::Run`, создание незапущенной Future без аллокации
 - Реализация ленивых `Future Combinators` как для `lazy::Future`, так и для `async::Future`
-## Разные реализации `ThreadPool` и их бенчмарки
+## Разные реализации ThreadPool и их бенчмарки
 Основной смысл задачи в написании правильный бенчмарков и различных реализаций `ThreadPool` для того, чтобы определить для каких типов задач какой `ThreadPool` наиболее оптимальный.
 
 ### План реализации:

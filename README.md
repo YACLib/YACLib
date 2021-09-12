@@ -1,4 +1,4 @@
-# YACLib
+# [YACLib](https://github.com/YACLib/YACLib)
 
 [![GitHub license](
 https://img.shields.io/badge/license-MIT-blue.svg)](

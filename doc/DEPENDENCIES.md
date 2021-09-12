@@ -1,6 +1,6 @@
 # Dependencies
 
-<h2>[Google Test](https://github.com\/google\/googletest)</h2>
+## [Google Test](https://github.com\/google\/googletest)
 
 
 ### Version
@@ -12,7 +12,7 @@
 Because it's the most popular and well-supported unit testing library and mocking framework for C++.
 At the moment, competitors don't have any advantages for us.
 
-<h2>[Google Benchmark](https://github.com\/google\/benchmark)</h2>
+## [Google Benchmark](https://github.com/google/benchmark)
 
 ### Version
 

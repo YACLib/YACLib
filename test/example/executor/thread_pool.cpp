@@ -16,7 +16,7 @@ TEST(Example, ThreadPool) {
 
   std::atomic<size_t> counter{0};
 
-  static const size_t kIncrements = 100500;
+  static constexpr size_t kIncrements = 100500;
 
   for (size_t i = 0; i < kIncrements; ++i) {
     tp->Execute([&counter] {

@@ -21,8 +21,8 @@ TEST(Example, Serial) {
 
   size_t counter = 0;
 
-  static const size_t kThreads = 5;
-  static const size_t kIncrementsPerThread = 12345;
+  static constexpr size_t kThreads = 5;
+  static constexpr size_t kIncrementsPerThread = 12345;
 
   std::vector<std::thread> threads;
 
