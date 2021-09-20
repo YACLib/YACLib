@@ -14,8 +14,10 @@ Only additions here (see .clang-format). See .clang-tidy for naming convention.
 
 Only additions here (see .clang-tidy).
 
-* Write `final` for methods and classes if possible.
-* Write `noexcept` for methods if possible.
-* Don't use relative include `#include "..."`, use `#include <...>` instead of this.
-* Don't use `#include guards`, use `#pracma once`.
-* Surround function definitions and declarations with one or more blank lines.
+* Write `final` for classes if possible
+* Write `noexcept` for methods if possible
+* Write `final` for virtual methods, if not `override`
+* Don't write any combination of `virtual`, `override`, `final` at the same time
+* Don't use relative include `#include "..."`, use `#include <...>` instead of this
+* Don't use `#include guard`, use `#pragma once`
+* Write `=` for constructor if possible, if not try `{}`, if not `()`
