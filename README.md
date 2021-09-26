@@ -28,13 +28,20 @@ YACLib (_Yet Another Concurrency Library_) is a C++ library for concurrent tasks
 
 ## Useful links
 
+### For user
+
 * [Documentation](https://yaclib.github.io/YACLib)
-* [Examples](test/examples)
-* [Install guide](doc/INSTALL.md)
-* [About dependencies](doc/DEPENDENCIES.md)
-* [Targets description](doc/TARGETS.md)
-* [Style guide](doc/STYLEGUIDE.md)
-* [Pull Request guide](TODO(MBkkt))
+* [Examples](test/example)
+* [Install guide](doc/install.md)
+* [Benchmarks](TODO(MBkkt))
+
+### For developer
+
+* [Specification](https://yaclib.github.io/YACLib)
+* [Targets description](doc/target.md)
+* [About dependencies](doc/dependency.md)
+* [Pull request guide](doc/pr_guide.md)
+* [Style guide](doc/style_guide.md)
 
 ## License
 
