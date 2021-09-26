@@ -109,6 +109,15 @@ void WhenAnyImpl(detail::AnyCombinatorPtr<T, P>& combinator, Future<T>&& head, F
 
 }  // namespace detail
 
+/**
+ * \brief Create \ref Future that is ready when any of futures is ready
+ *
+ * \tparam P policy WhenAny errors
+ * \tparam It type of passed iterator
+ * \tparam T type of all passed futures
+ * \param begin, size the range of futures to combine
+ * \return Future<T>
+ */
 template <PolicyWhenAny P = PolicyWhenAny::FirstError, typename It,
           typename T = util::detail::FutureValueT<typename std::iterator_traits<It>::value_type>>
 auto WhenAny(It begin, size_t size) {
@@ -129,6 +138,15 @@ auto WhenAny(It begin, size_t size) {
   return std::move(future);
 }
 
+/**
+ * \brief Create \ref Future that is ready when any of futures is ready
+ *
+ * \tparam P policy WhenAny errors
+ * \tparam It type of passed iterator
+ * \tparam T type of all passed futures
+ * \param begin, end the range of futures to combine
+ * \return Future<T>
+ */
 template <PolicyWhenAny P = PolicyWhenAny::FirstError, typename It,
           typename T = util::detail::FutureValueT<typename std::iterator_traits<It>::value_type>>
 auto WhenAny(It begin, It end) {
@@ -148,6 +166,14 @@ auto WhenAny(It begin, It end) {
   return std::move(future);
 }
 
+/**
+ * \brief Create \ref Future that is ready when any of futures is ready
+ *
+ * \tparam P policy WhenAny errors
+ * \tparam T type of all passed futures
+ * \param head, tail one or more futures to combine
+ * \return Future<T>
+ */
 template <PolicyWhenAny P = PolicyWhenAny::FirstError, typename T, typename... Fs>
 auto WhenAny(Future<T>&& head, Fs&&... tail) {
   static_assert((... && util::IsFutureV<Fs>));
