@@ -1,10 +1,10 @@
 #pragma once
 
-#include <yaclib/container/intrusive_node.hpp>
+#include <yaclib/util/intrusive_node.hpp>
 
 #include <cstddef>
 
-namespace yaclib::container::intrusive {
+namespace yaclib::util {
 
 template <typename T>
 class List final {
@@ -42,4 +42,4 @@ class List final {
   detail::Node _head;  // sentinel node
 };
 
-}  // namespace yaclib::container::intrusive
+}  // namespace yaclib::util

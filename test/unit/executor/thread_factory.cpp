@@ -1,4 +1,4 @@
-#include <container/intrusive_list.hpp>
+#include <util/intrusive_list.hpp>
 
 #include <yaclib/config.hpp>
 #include <yaclib/executor/thread_factory.hpp>
@@ -21,14 +21,14 @@ static auto init_rand = [] {
 
 using namespace yaclib;
 
-using ThreadsContainter = container::intrusive::List<executor::IThread>;
+using ThreadsContainter = util::List<executor::IThread>;
 
-const auto kDoNothing = MakeFunc([] {
+const auto kDoNothing = util::MakeFunc([] {
 });
 
 void MakeFactoryEmpty(executor::IThreadFactoryPtr factory, size_t acquire_threads, ThreadsContainter& threads) {
   for (size_t i = 0; i != acquire_threads; ++i) {
-    auto thread_ptr = factory->Acquire(kDoNothing).release();
+    auto thread_ptr = factory->Acquire(kDoNothing);
     EXPECT_NE(thread_ptr, nullptr);
     if (rand() % 2 == 0) {
       threads.PushBack(thread_ptr);
@@ -65,7 +65,7 @@ void run_tests(size_t iter_count, executor::IThreadFactoryPtr factory, size_t ma
 TEST(single_threaded, simple) {
   size_t counter{0};
   auto factory = executor::MakeThreadFactory(1);
-  auto thread = factory->Acquire(MakeFunc([&counter] {
+  auto thread = factory->Acquire(util::MakeFunc([&counter] {
     counter = 1;
   }));
   factory->Release(std::move(thread));
@@ -88,7 +88,7 @@ TEST(multi_threaded, simple) {
   static const size_t kMaxThreadCount = kThreadsCount * std::thread::hardware_concurrency();
   static const size_t kIterCount = kSanitizer ? 10 : (100 + rand() % 100);
 
-  auto stub = MakeFunc([] {
+  auto stub = util::MakeFunc([] {
   });
 
   for (size_t cached_threads : {size_t{0}, kMaxThreadCount / 3, kMaxThreadCount * 2 / 3, kMaxThreadCount}) {
@@ -109,10 +109,10 @@ TEST(multi_threaded, simple) {
       max_threads = std::min(max_threads, remaining_threads - todo_threads);
       ASSERT_TRUE(max_threads != 0);
 
-      const auto thread_func = MakeFunc([&factory, max_threads] {
+      const auto thread_func = util::MakeFunc([&factory, max_threads] {
         run_tests(kIterCount, factory, max_threads);
       });
-      threads.PushBack(test_threads->Acquire(thread_func).release());
+      threads.PushBack(test_threads->Acquire(thread_func));
 
       remaining_threads -= max_threads;
     }

@@ -1,12 +1,13 @@
 #pragma once
 
-#include <yaclib/async/run.hpp>
+#include <yaclib/async/future.hpp>
+#include <yaclib/async/promise.hpp>
 
 #include <iterator>
 #include <type_traits>
 #include <utility>
 
-namespace yaclib::async {
+namespace yaclib::algo {
 
 enum class PolicyWhenAny {
   FirstError,
@@ -16,15 +17,15 @@ enum class PolicyWhenAny {
 namespace detail {
 
 template <typename T, PolicyWhenAny P>
-class AnyCombinator : public IRef {
+class AnyCombinator : public util::IRef {
  public:
-  static std::pair<Future<T>, container::intrusive::Ptr<AnyCombinator>> Make(bool empty = true) {
-    auto [future, promise] = MakeContract<T>();
+  static std::pair<async::Future<T>, util::Ptr<AnyCombinator>> Make(bool empty = true) {
+    auto [future, promise] = async::MakeContract<T>();
     if (empty) {
       std::move(promise).Set(util::Result<T>{});
       return {std::move(future), nullptr};
     }
-    return {std::move(future), new container::Counter<AnyCombinator<T, P>>{std::move(promise)}};
+    return {std::move(future), new util::Counter<AnyCombinator<T, P>>{std::move(promise)}};
   }
 
   void Combine(util::Result<T>&& result) {
@@ -48,26 +49,25 @@ class AnyCombinator : public IRef {
   }
 
  private:
-  explicit AnyCombinator(Promise<T> promise) : _promise{std::move(promise)} {
+  explicit AnyCombinator(async::Promise<T> promise) : _promise{std::move(promise)} {
   }
 
   alignas(kCacheLineSize) std::atomic<bool> _done{false};
   alignas(kCacheLineSize) std::atomic<bool> _error{false};
   util::Result<T> _except_error;
-  Promise<T> _promise;
+  async::Promise<T> _promise;
 };
 
 template <typename T>
-class AnyCombinator<T, PolicyWhenAny::LastError> : public IRef {
+class AnyCombinator<T, PolicyWhenAny::LastError> : public util::IRef {
  public:
-  static std::pair<Future<T>, container::intrusive::Ptr<AnyCombinator>> Make(size_t size = 0) {
-    auto [future, promise] = MakeContract<T>();
+  static std::pair<async::Future<T>, util::Ptr<AnyCombinator>> Make(size_t size = 0) {
+    auto [future, promise] = async::MakeContract<T>();
     if (size == 0) {
       std::move(promise).Set(util::Result<T>{});
       return {std::move(future), nullptr};
     }
-    return {std::move(future),
-            new container::Counter<AnyCombinator<T, PolicyWhenAny::LastError>>{std::move(promise), size}};
+    return {std::move(future), new util::Counter<AnyCombinator<T, PolicyWhenAny::LastError>>{std::move(promise), size}};
   }
 
   void Combine(util::Result<T>&& result) {
@@ -85,19 +85,19 @@ class AnyCombinator<T, PolicyWhenAny::LastError> : public IRef {
   }
 
  private:
-  explicit AnyCombinator(Promise<T> promise, size_t size = 0) : _size{size}, _promise{std::move(promise)} {
+  explicit AnyCombinator(async::Promise<T> promise, size_t size = 0) : _size{size}, _promise{std::move(promise)} {
   }
 
   alignas(kCacheLineSize) std::atomic<bool> _done{false};
   alignas(kCacheLineSize) std::atomic<size_t> _size;
-  Promise<T> _promise;
+  async::Promise<T> _promise;
 };
 
 template <typename T, PolicyWhenAny P>
-using AnyCombinatorPtr = container::intrusive::Ptr<AnyCombinator<T, P>>;
+using AnyCombinatorPtr = util::Ptr<AnyCombinator<T, P>>;
 
 template <PolicyWhenAny P = PolicyWhenAny::FirstError, typename T, typename... Fs>
-void WhenAnyImpl(detail::AnyCombinatorPtr<T, P>& combinator, Future<T>&& head, Fs&&... tail) {
+void WhenAnyImpl(detail::AnyCombinatorPtr<T, P>& combinator, async::Future<T>&& head, Fs&&... tail) {
   std::move(head).Subscribe([c = combinator](util::Result<T>&& result) mutable {
     c->Combine(std::move(result));
     c = nullptr;
@@ -175,7 +175,7 @@ auto WhenAny(It begin, It end) {
  * \return Future<T>
  */
 template <PolicyWhenAny P = PolicyWhenAny::FirstError, typename T, typename... Fs>
-auto WhenAny(Future<T>&& head, Fs&&... tail) {
+auto WhenAny(async::Future<T>&& head, Fs&&... tail) {
   static_assert((... && util::IsFutureV<Fs>));
   auto [future, combinator] = [] {
     if constexpr (P == PolicyWhenAny::FirstError) {
@@ -188,4 +188,4 @@ auto WhenAny(Future<T>&& head, Fs&&... tail) {
   return std::move(future);
 }
 
-}  // namespace yaclib::async
+}  // namespace yaclib::algo

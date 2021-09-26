@@ -1,4 +1,4 @@
-#include <yaclib/task.hpp>
+#include <yaclib/executor/task.hpp>
 
 #include <functional>
 
@@ -38,14 +38,14 @@ struct Idle {
 
 TEST(function_ptr, function_ptr) {
   counter = 0;
-  IFuncPtr task = MakeFunc(&AddOne);
+  auto task = util::MakeFunc(&AddOne);
   EXPECT_EQ(counter, 0);
   task->Call();
   EXPECT_EQ(counter, 1);
   task->Call();
   EXPECT_EQ(counter, 2);
 
-  task = MakeFunc(&AddOne);
+  task = util::MakeFunc(&AddOne);
   EXPECT_EQ(counter, 2);
   task->Call();
   EXPECT_EQ(counter, 3);
@@ -56,14 +56,14 @@ TEST(lambda, lvalue) {
   auto lambda = [&] {
     ++value;
   };
-  IFuncPtr task = MakeFunc(lambda);
+  auto task = util::MakeFunc(lambda);
   EXPECT_EQ(value, 0);
   task->Call();
   EXPECT_EQ(value, 1);
   task->Call();
   EXPECT_EQ(value, 2);
 
-  task = MakeFunc([&] {
+  task = util::MakeFunc([&] {
     ++value;
   });
   EXPECT_EQ(value, 2);
@@ -73,7 +73,7 @@ TEST(lambda, lvalue) {
 
 TEST(lambda, rvalue) {
   size_t value = 0;
-  IFuncPtr task = MakeFunc([&] {
+  auto task = util::MakeFunc([&] {
     ++value;
   });
   EXPECT_EQ(value, 0);
@@ -88,7 +88,7 @@ TEST(std_function, lvalue) {
   const std::function<void()> fun1{[&] {
     ++value;
   }};
-  auto task = MakeFunc(fun1);
+  auto task = util::MakeFunc(fun1);
   EXPECT_EQ(value, 0);
   task->Call();
   EXPECT_EQ(value, 1);
@@ -98,7 +98,7 @@ TEST(std_function, lvalue) {
   std::function<void()> fun2 = [&] {
     --value;
   };
-  task = MakeFunc(fun2);
+  task = util::MakeFunc(fun2);
   EXPECT_EQ(value, 2);
   task->Call();
   EXPECT_EQ(value, 1);
@@ -106,7 +106,7 @@ TEST(std_function, lvalue) {
 
 TEST(std_function, rvalue) {
   int value = 0;
-  auto task = MakeFunc(std::function<void()>([&] {
+  auto task = util::MakeFunc(std::function<void()>([&] {
     ++value;
   }));
   EXPECT_EQ(value, 0);
@@ -118,7 +118,7 @@ TEST(std_function, rvalue) {
   std::function<void()> fun = [&] {
     --value;
   };
-  task = MakeFunc(std::move(fun));
+  task = util::MakeFunc(std::move(fun));
   EXPECT_EQ(value, 2);
   task->Call();
   EXPECT_EQ(value, 1);
@@ -126,14 +126,14 @@ TEST(std_function, rvalue) {
 
 TEST(member_function, mut_obj_mut_method) {
   Idle idle;
-  auto task = MakeFunc([&idle] {
+  auto task = util::MakeFunc([&idle] {
     idle.DoNothingForceMut();
   });
   task->Call();
   EXPECT_EQ(idle._force_mut_method_called, true);
 
   idle = Idle{};
-  task = MakeFunc([&idle] {
+  task = util::MakeFunc([&idle] {
     idle.DoNothing();
   });
   task->Call();
@@ -142,7 +142,7 @@ TEST(member_function, mut_obj_mut_method) {
 
 TEST(member_function, mut_obj_const_method) {
   Idle idle;
-  auto task = MakeFunc([&idle] {
+  auto task = util::MakeFunc([&idle] {
     idle.DoNothingForceConst();
   });
   task->Call();
@@ -151,7 +151,7 @@ TEST(member_function, mut_obj_const_method) {
 
 TEST(member_function, const_obj_const_method) {
   const Idle const_idle;
-  auto task = MakeFunc([&const_idle] {
+  auto task = util::MakeFunc([&const_idle] {
     const_idle.DoNothing();
   });
   task->Call();

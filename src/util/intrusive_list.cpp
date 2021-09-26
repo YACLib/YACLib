@@ -1,9 +1,9 @@
-#include "intrusive_list.hpp"
+#include <util/intrusive_list.hpp>
 
+#include <yaclib/executor/task.hpp>
 #include <yaclib/executor/thread_factory.hpp>
-#include <yaclib/task.hpp>
 
-namespace yaclib::container::intrusive {
+namespace yaclib::util {
 
 template <typename T>
 T* List<T>::PopBack() noexcept {
@@ -45,7 +45,7 @@ void List<T>::Append(List& other) noexcept {
   other._head._prev = &other._head;
 }
 
-template class List<ITask>;
+template class List<executor::ITask>;
 template class List<executor::IThread>;
 
-}  // namespace yaclib::container::intrusive
+}  // namespace yaclib::util

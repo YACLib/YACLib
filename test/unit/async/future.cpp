@@ -1,4 +1,4 @@
-#include <container/intrusive_list.hpp>
+#include <util/intrusive_list.hpp>
 
 #include <yaclib/async/run.hpp>
 #include <yaclib/executor/thread_pool.hpp>
@@ -540,14 +540,14 @@ TEST(Pipeline, Simple2) {
 TEST(Simple, MakePromiseContract) {
   class ManualExecutor : public executor::IExecutor {
    private:
-    container::intrusive::List<ITask> _tasks;
+    util::List<executor::ITask> _tasks;
 
    public:
     Type Tag() const final {
       return Type::Custom;
     }
 
-    bool Execute(ITask& f) final {
+    bool Execute(executor::ITask& f) final {
       f.IncRef();
       _tasks.PushBack(&f);
       return true;
@@ -561,7 +561,7 @@ TEST(Simple, MakePromiseContract) {
     }
   };
 
-  auto e = container::NothingCounter<ManualExecutor>{};
+  util::NothingCounter<ManualExecutor> e{};
   EXPECT_EQ(e.Tag(), executor::IExecutor::Type::Custom);
   auto [f, p] = async::MakeContract<int>();
   auto g = std::move(f).Then(&e, [](int _) {

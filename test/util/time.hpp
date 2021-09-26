@@ -1,7 +1,7 @@
 #pragma once
 #include <chrono>
 
-namespace util {
+namespace test::util {
 
 using Duration = std::chrono::nanoseconds;
 
@@ -33,4 +33,4 @@ class StopWatch {
   TimePoint start_;
 };
 
-}  // namespace util
+}  // namespace test::util

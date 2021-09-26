@@ -1,5 +1,5 @@
-#include <container/intrusive_list.hpp>
-#include <container/mpsc_stack.hpp>
+#include <util/intrusive_list.hpp>
+#include <util/mpsc_stack.hpp>
 
 #include <yaclib/executor/executor.hpp>
 #include <yaclib/executor/thread_pool.hpp>
@@ -18,13 +18,13 @@ class ThreadPool : public IThreadPool {
  public:
   explicit ThreadPool(IThreadFactoryPtr factory, size_t threads)
       : _factory{std::move(factory)}, _threads_count{threads} {
-    auto loop = MakeFunc([this] {
+    auto loop = util::MakeFunc([this] {
       tlCurrentThreadPool = this;
       Loop();
       tlCurrentThreadPool = nullptr;
     });
     for (size_t i = 0; i != _threads_count; ++i) {
-      _threads.PushBack(_factory->Acquire(loop).release());
+      _threads.PushBack(_factory->Acquire(loop));
     }
   }
 
@@ -69,7 +69,7 @@ class ThreadPool : public IThreadPool {
   }
 
   void HardStop() final {
-    container::intrusive::List<ITask> tasks;
+    util::List<ITask> tasks;
     {
       std::lock_guard guard{_m};
       tasks.Append(_tasks);  // TODO(MBkkt) replace Append with Swap
@@ -114,8 +114,8 @@ class ThreadPool : public IThreadPool {
   std::mutex _m;
   std::condition_variable _cv;
   IThreadFactoryPtr _factory;
-  container::intrusive::List<IThread> _threads;
-  container::intrusive::List<ITask> _tasks;
+  util::List<IThread> _threads;
+  util::List<ITask> _tasks;
   const size_t _threads_count;
   bool _stop{false};
 };
@@ -123,7 +123,7 @@ class ThreadPool : public IThreadPool {
 class SingleThread : public IThreadPool {
  public:
   explicit SingleThread(IThreadFactoryPtr factory) : _factory{std::move(factory)} {
-    _thread = _factory->Acquire(MakeFunc([this] {
+    _thread = _factory->Acquire(util::MakeFunc([this] {
       tlCurrentThreadPool = this;
       Loop();
       tlCurrentThreadPool = nullptr;
@@ -187,7 +187,8 @@ class SingleThread : public IThreadPool {
 
   void Wait() final {
     if (_thread) {
-      _factory->Release(std::move(_thread));
+      _factory->Release(_thread);
+      _thread = nullptr;
     }
   }
 
@@ -248,7 +249,7 @@ class SingleThread : public IThreadPool {
 
   IThreadFactoryPtr _factory;
   IThreadPtr _thread;
-  container::intrusive::MPSCStack _tasks;
+  util::MPSCStack _tasks;
   std::atomic<State> _state{kRun};
   std::mutex _m;
   std::condition_variable _cv;
@@ -261,11 +262,11 @@ IThreadPool* CurrentThreadPool() noexcept {
   return tlCurrentThreadPool;
 }
 
-IThreadPoolPtr MakeThreadPool(size_t threads, IThreadFactoryPtr factory) {
+IThreadPoolPtr MakeThreadPool(size_t threads, IThreadFactoryPtr tf) {
   if (threads == 1) {
-    return new container::Counter<SingleThread>{std::move(factory)};
+    return new util::Counter<SingleThread>{std::move(tf)};
   }
-  return new container::Counter<ThreadPool>{std::move(factory), threads};
+  return new util::Counter<ThreadPool>{std::move(tf), threads};
 }
 
 }  // namespace yaclib::executor

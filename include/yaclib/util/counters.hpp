@@ -4,7 +4,7 @@
 
 #include <atomic>
 
-namespace yaclib::container {
+namespace yaclib::util {
 namespace detail {
 
 struct DefaultDeleter {
@@ -38,7 +38,7 @@ class Counter final : public CounterBase, public Deleter {
     }
   }
 
-  size_t GetRef() const noexcept {  // Only for tests
+  [[nodiscard]] size_t GetRef() const noexcept {  // Only for tests
     return _impl.load(std::memory_order_relaxed);
   }
 
@@ -58,4 +58,4 @@ class NothingCounter final : public CounterBase {
   }
 };
 
-}  // namespace yaclib::container
+}  // namespace yaclib::util

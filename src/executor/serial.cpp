@@ -1,4 +1,4 @@
-#include <container/mpsc_stack.hpp>
+#include <util/mpsc_stack.hpp>
 
 #include <yaclib/config.hpp>
 #include <yaclib/executor/executor.hpp>
@@ -63,7 +63,7 @@ class Serial : public IExecutor, public ITask {
   }
 
   IExecutorPtr _executor;
-  container::intrusive::MPSCStack _tasks;
+  util::MPSCStack _tasks;
   // TODO remove _work_counter, make active/inactive like libunifex
   alignas(kCacheLineSize) std::atomic_int32_t _work_counter{0};
 };
@@ -71,7 +71,7 @@ class Serial : public IExecutor, public ITask {
 }  // namespace
 
 IExecutorPtr MakeSerial(IExecutorPtr executor) {
-  return new container::Counter<Serial>{std::move(executor)};
+  return new util::Counter<Serial>{std::move(executor)};
 }
 
 }  // namespace yaclib::executor

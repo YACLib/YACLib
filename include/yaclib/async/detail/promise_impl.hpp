@@ -7,7 +7,7 @@
 namespace yaclib::async {
 
 template <typename T>
-Promise<T>::Promise() : _core{new container::Counter<detail::Core<T, void, void>>{}} {
+Promise<T>::Promise() : _core{new util::Counter<detail::Core<T, void, void>>{}} {
 }
 
 template <typename T>

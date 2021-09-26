@@ -31,7 +31,7 @@ using ResultValueT = typename ResultValue<T>::type;
 /**
  * Result states \see Result
  * \enum Empty, Value, Error, Exception
- * */
+ */
 enum class ResultState {
   Empty = 0,
   Value,
@@ -58,14 +58,12 @@ class ResultError : public std::exception {
 struct ResultEmpty : std::exception {};
 
 /**
- * \brief Encapsulated return value from caller
+ * Encapsulated return value from caller
  *
  * \tparam T type to store in Result
  */
 template <typename T>
 class Result {
-  struct Unit {};
-
   static_assert(!std::is_reference_v<T>,
                 "Result cannot be instantiated with reference, "
                 "you can use std::reference_wrapper or pointer");
@@ -75,6 +73,8 @@ class Result {
   static_assert(!util::IsFutureV<T>, "Result cannot be instantiated with Future");
   static_assert(!std::is_same_v<T, std::error_code>, "Result cannot be instantiated with std::error_code");
   static_assert(!std::is_same_v<T, std::exception_ptr>, "Result cannot be instantiated with std::exception_ptr");
+
+  struct Unit {};
   using VariantT =
       std::variant<std::monostate, std::error_code, std::exception_ptr, std::conditional_t<std::is_void_v<T>, Unit, T>>;
 

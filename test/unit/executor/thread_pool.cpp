@@ -278,7 +278,7 @@ void TwoThreadPool(executor::IThreadPoolPtr& tp1, executor::IThreadPoolPtr& tp2)
   bool done1{false};
   bool done2{false};
 
-  util::StopWatch stop_watch;
+  test::util::StopWatch stop_watch;
 
   tp1->Execute([&] {
     tp2->Execute([&] {
@@ -479,7 +479,7 @@ void UseAllThreads(executor::IThreadPoolPtr& tp, StopType stop_type) {
     counter.fetch_add(1, std::memory_order_relaxed);
   };
 
-  util::StopWatch stop_watch;
+  test::util::StopWatch stop_watch;
 
   tp->Execute(sleeper);
   tp->Execute(sleeper);
@@ -701,7 +701,7 @@ void NotBurnCPU(executor::IThreadPoolPtr& tp, size_t threads) {
     });
   }
 
-  util::ProcessCPUTimer cpu_timer;
+  test::util::ProcessCPUTimer cpu_timer;
 
   tp->Stop();
   tp->Wait();

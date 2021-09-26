@@ -1,9 +1,9 @@
 #pragma once
 
-namespace yaclib::container::intrusive::detail {
+namespace yaclib::util::detail {
 
 /**
- * \brief Intrusive node class
+ * Intrusive node class.
  */
 class Node {
  public:
@@ -15,7 +15,7 @@ class Node {
   }
 
   /**
-   * \brief is node linked in circular list?
+   * Is node linked in circular list?
    *
    * \return true if node is linked in a circular list, false otherwise
    */
@@ -24,7 +24,7 @@ class Node {
   }
 
   /**
-   * \brief Unlink this node from current list
+   * Unlink this node from current list
    */
   void Unlink() noexcept {
     _prev->_next = _next;
@@ -37,4 +37,4 @@ class Node {
   Node* _next{this};
 };
 
-}  // namespace yaclib::container::intrusive::detail
+}  // namespace yaclib::util::detail
