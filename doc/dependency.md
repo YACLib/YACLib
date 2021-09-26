@@ -1,7 +1,6 @@
-# Dependencies
+# Dependency
 
-## [Google Test](https://github.com\/google\/googletest)
-
+## [Google Test](https://github.com/google/googletest)
 
 ### Version
 
