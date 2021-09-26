@@ -1,6 +1,6 @@
 # Targets
 
-For prerequisites and CMake/build options see [INSTALL](INSTALL.md).
+For prerequisites and CMake/build options see [install](install.md).
 
 ## yaclib
 
