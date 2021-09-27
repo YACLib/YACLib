@@ -34,6 +34,7 @@ jobs:
           -DCMAKE_C_COMPILER=${{ matrix.cc }}
           -DCMAKE_CXX_COMPILER=${{ matrix.cxx }}
           -DYACLIB_BUILD_TESTING=ON
+          -DYACLIB_BUILD_EXAMPLES=ON
           -DYACLIB_SANITIZER=${{ matrix.sanitizer }}
 
       - name: Build

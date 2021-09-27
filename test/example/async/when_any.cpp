@@ -2,8 +2,8 @@
  * \example when_any.cpp
  * Simple WhenAny examples
  */
+#include <yaclib/algo/when_any.hpp>
 #include <yaclib/async/run.hpp>
-#include <yaclib/async/when_any.hpp>
 #include <yaclib/executor/thread_pool.hpp>
 
 #include <chrono>
@@ -32,7 +32,7 @@ TEST(Example, WhenAny) {
   // Parallel composition
   // Any combinator: std::vector<Future<T>> -> Future<T>
   // Non-blocking!
-  yaclib::async::Future<int> any = yaclib::async::WhenAny(futs.begin(), futs.size());
+  yaclib::async::Future<int> any = yaclib::algo::WhenAny(futs.begin(), futs.size());
 
   // First value
   std::cout << "Any value: " << std::move(any).Get().Ok() << std::endl;
