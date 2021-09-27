@@ -1,13 +1,15 @@
 #pragma once
 
 #include <yaclib/config.hpp>
-#include <yaclib/container/intrusive_node.hpp>
+#include <yaclib/util/intrusive_node.hpp>
 
 #include <atomic>
 
-namespace yaclib::container::intrusive {
+namespace yaclib::util {
 
-/** Lock free multi-producer/single-consumer stack */
+/**
+ * Lock free multi-producer/single-consumer stack
+ */
 class MPSCStack final {
  public:
   void Put(detail::Node* node) {
@@ -28,7 +30,7 @@ class MPSCStack final {
   static detail::Node* Reverse(detail::Node* node) {
     detail::Node* prev{};
     while (node != nullptr) {
-      auto next{node->_next};
+      auto* next{node->_next};
       node->_next = prev;
       prev = node;
       node = next;
@@ -39,4 +41,4 @@ class MPSCStack final {
   alignas(kCacheLineSize) std::atomic<detail::Node*> head_{nullptr};
 };
 
-}  // namespace yaclib::container::intrusive
+}  // namespace yaclib::util

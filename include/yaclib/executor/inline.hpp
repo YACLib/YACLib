@@ -5,7 +5,8 @@
 namespace yaclib::executor {
 
 /**
- * \brief Get Inline executor singleton object.
+ * Get Inline executor singleton object.
+ *
  * This executor immediately executes given Callable object in the same OS thread without any overhead.
  * \note This object is useful as safe default executor value. See example.
  *

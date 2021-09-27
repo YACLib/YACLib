@@ -9,7 +9,7 @@ template <typename T>
 class Future;
 
 template <typename T>
-class Promise {
+class Promise final {
   static_assert(!std::is_reference_v<T>,
                 "Promise cannot be instantiated with reference, "
                 "you can use std::reference_wrapper or pointer");
@@ -29,24 +29,24 @@ class Promise {
   Promise& operator=(Promise&& other) noexcept = default;
 
   /**
-   * \brief Create and return \ref Future associated with this promise
+   * Create and return \ref Future associated with this promise
    *
-   * \note You cat extract \ref Future only once
+   * \note You cat extract \ref Future only once.
    * \return New \ref Future object associated with *this
    */
   Future<T> MakeFuture();
 
   /**
-   * \brief Set \ref Promise result.
+   * Set \ref Promise result
    *
-   * \tparam Type \ref Result<T> should be constructible from this type.
+   * \tparam Type \ref Result<T> should be constructable from this type
    * @param value
    */
   template <typename Type>
   void Set(Type&& value) &&;
 
   /**
-   * \brief Set \ref Promise result.
+   * Set \ref Promise result
    */
   void Set() &&;
 
@@ -56,7 +56,7 @@ class Promise {
 };
 
 /**
- * \brief Describes channel with future and promise.
+ * Describes channel with future and promise
  */
 template <typename T>
 struct Contract {
@@ -65,7 +65,7 @@ struct Contract {
 };
 
 /**
- * \brief Creates related future and promise
+ * Creates related future and promise
  *
  * \return \see Contract object with new future and promise
  */
@@ -73,3 +73,16 @@ template <typename T>
 Contract<T> MakeContract();
 
 }  // namespace yaclib::async
+
+#ifndef YACLIB_ASYNC_DECL
+
+#define YACLIB_ASYNC_DECL
+#include <yaclib/async/future.hpp>
+#undef YACLIB_ASYNC_DECL
+
+#define YACLIB_ASYNC_IMPL
+#include <yaclib/async/detail/future_impl.hpp>
+#include <yaclib/async/detail/promise_impl.hpp>
+#undef YACLIB_ASYNC_IMPL
+
+#endif

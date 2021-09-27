@@ -1,15 +1,16 @@
 #pragma once
 
-#include <yaclib/ref.hpp>
+#include <yaclib/util/ref.hpp>
 
 #include <algorithm>
 #include <type_traits>
 #include <utility>
 
-namespace yaclib::container::intrusive {
+namespace yaclib::util {
 
 /**
- * \brief A pointer to objects with an embedded reference count;
+ * A intrusive pointer to objects with an embedded reference count
+ *
  * https://www.boost.org/doc/libs/1_77_0/libs/smart_ptr/doc/html/smart_ptr.html#intrusive_ptr
  */
 template <typename T>
@@ -162,4 +163,4 @@ inline void swap(const Ptr<T>& lhs, const Ptr<T>& rhs) noexcept {
   lhs.Swap(rhs);
 }
 
-}  // namespace yaclib::container::intrusive
+}  // namespace yaclib::util

@@ -2,8 +2,8 @@
  * \example when_all.cpp
  * Simple WhenAll examples
  */
+#include <yaclib/algo/when_all.hpp>
 #include <yaclib/async/run.hpp>
-#include <yaclib/async/when_all.hpp>
 #include <yaclib/executor/thread_pool.hpp>
 
 #include <chrono>
@@ -32,7 +32,7 @@ TEST(Example, WhenAll) {
   // Parallel composition
   // All combinator: std::vector<Future<T>> -> Future<std::vector<T>>
   // Non-blocking!
-  yaclib::async::Future<std::vector<int>> all = yaclib::async::WhenAll(futs.begin(), futs.size());
+  yaclib::async::Future<std::vector<int>> all = yaclib::algo::WhenAll(futs.begin(), futs.size());
 
   // Blocks
   std::vector<int> ints = std::move(all).Get().Ok();

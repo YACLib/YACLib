@@ -286,7 +286,7 @@ TEST(non_blocking_execute, simple) {
 
   std::this_thread::sleep_for(500ms);
 
-  util::StopWatch stop_watch;
+  test::util::StopWatch stop_watch;
   strand->Execute([] {
   });
   EXPECT_LE(stop_watch.Elapsed(), 100ms);

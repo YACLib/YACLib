@@ -6,7 +6,9 @@
 namespace yaclib::util {
 namespace detail {
 
-// final_action allows you to ensure something gets run at the end of a scope
+/**
+ * DeferAction allows you to ensure something gets run at the end of a scope
+ */
 template <typename F>
 class DeferAction {
  public:
@@ -36,7 +38,9 @@ class DeferAction {
 
 }  // namespace detail
 
-// defer() - convenience function to generate a final_action
+/**
+ * defer() - convenience function to generate a DeferAction
+ */
 template <typename F>
 [[nodiscard]] detail::DeferAction<typename std::remove_cv<typename std::remove_reference<F>::type>::type> defer(
     F&& f) noexcept {

@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <ctime>
 
-namespace util {
+namespace test::util {
 
 /* TODO(Ri7ay): dont work on windows, check thread_pool tests */
 #if __linux
@@ -67,4 +67,4 @@ class ThreadCPUTimer {
 };
 #endif  // linux
 
-}  // namespace util
+}  // namespace test::util

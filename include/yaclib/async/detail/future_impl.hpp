@@ -206,7 +206,7 @@ template <typename U, typename T, typename Functor>
 Future<U> Then(FutureCorePtr<T> caller, Functor&& f) {
   using InvokeT = detail::Invoke<U, decltype(std::forward<Functor>(f)), T>;
   using CoreType = detail::Core<U, InvokeT, T>;
-  container::intrusive::Ptr callback{new container::Counter<CoreType>{std::forward<Functor>(f)}};
+  util::Ptr callback{new util::Counter<CoreType>{std::forward<Functor>(f)}};
   callback->SetExecutor(caller->GetExecutor());
   caller->SetCallback(callback);
   return Future<U>{std::move(callback)};
@@ -218,8 +218,7 @@ Future<U> AsyncThen(FutureCorePtr<T> caller, Functor&& f) {
   future.Via(caller->GetExecutor());
   using InvokeT = detail::AsyncInvoke<U, decltype(std::forward<Functor>(f)), T>;
   using CoreType = detail::Core<void, InvokeT, T>;
-  container::intrusive::Ptr callback{
-      new container::Counter<CoreType>{caller->GetExecutor(), std::move(promise), std::forward<Functor>(f)}};
+  util::Ptr callback{new util::Counter<CoreType>{caller->GetExecutor(), std::move(promise), std::forward<Functor>(f)}};
   callback->SetExecutor(caller->GetExecutor());
   caller->SetCallback(callback);
   return std::move(future);
@@ -242,7 +241,7 @@ bool Wait(detail::FutureCorePtr<T>& core, const Time& time) {
   });
   core->SetExecutor(executor::MakeInline());
 
-  container::Counter<detail::WaitCore, detail::WaitCoreDeleter> callback;
+  util::Counter<detail::WaitCore, detail::WaitCoreDeleter> callback;
   if (core->SetWaitCallback(&callback)) {
     return true;
   }

@@ -28,7 +28,7 @@ if (NOT BENCHMARK_FOUND)
   fetchcontent_makeavailable(benchmark)
 endif ()
 
-if (ENABLE_LTO)
+if (YACLIB_ENABLE_LTO)
   set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
 else ()
   set(CMAKE_INTERPROCEDURAL_OPTIMIZATION OFF)
@@ -46,26 +46,26 @@ set(YACLIB_EXAMPLE_INCLUDES)
 
 #TODO(MBkkt) Add options which shuffle tests list
 set(YACLIB_UNITS
-  unit/task
-  unit/executor/thread_factory
-  unit/container/intrusive_ptr
-  unit/async/future
+  unit/util/intrusive_ptr
   unit/util/result
-  unit/async/when_all
-  unit/async/when_any
+  unit/executor/task
+  unit/async/future
+  unit/algo/when_all
+  unit/algo/when_any
+  unit/executor/thread_factory
   unit/executor/thread_pool
   unit/executor/serial
   )
 
 if (YACLIB_BUILD_EXAMPLES)
   set(YACLIB_EXAMPLES
+    example/async/simple
     example/executor/thread_pool
     example/executor/serial
-    example/async/simple
     example/async/when_all
     example/async/when_any
     )
-endif()
+endif ()
 
 set(YACLIB_TEST_SOURCES ${YACLIB_UNITS} ${YACLIB_EXAMPLES})
 foreach (TEST_SOURCE ${YACLIB_TEST_SOURCES})

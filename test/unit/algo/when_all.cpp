@@ -1,5 +1,5 @@
+#include <yaclib/algo/when_all.hpp>
 #include <yaclib/async/run.hpp>
-#include <yaclib/async/when_all.hpp>
 #include <yaclib/executor/thread_pool.hpp>
 
 #include <iostream>
@@ -32,9 +32,9 @@ void JustWorks() {
 
   auto all = [&futures] {
     if constexpr (suite == TestSuite::Array) {
-      return async::WhenAll(std::move(futures[0]), std::move(futures[1]), std::move(futures[2]));
+      return algo::WhenAll(std::move(futures[0]), std::move(futures[1]), std::move(futures[2]));
     } else {
-      return async::WhenAll(futures.begin(), futures.end());
+      return algo::WhenAll(futures.begin(), futures.end());
     }
   }();
 
@@ -102,9 +102,9 @@ void AllFails() {
 
   auto all = [&futures] {
     if constexpr (suite == TestSuite::Array) {
-      return async::WhenAll(std::move(futures[0]), std::move(futures[1]), std::move(futures[2]));
+      return algo::WhenAll(std::move(futures[0]), std::move(futures[1]), std::move(futures[2]));
     } else {
-      return async::WhenAll(futures.begin(), futures.end());
+      return algo::WhenAll(futures.begin(), futures.end());
     }
   }();
 
@@ -139,7 +139,7 @@ TEST(VoidArray, AllFails) {
 template <typename T = int>
 void EmptyInput() {
   auto empty = std::vector<async::Future<T>>{};
-  auto all = async::WhenAll(empty.begin(), empty.end());
+  auto all = algo::WhenAll(empty.begin(), empty.end());
 
   EXPECT_TRUE(all.Ready());
   EXPECT_NO_THROW(std::move(all).Get().Ok());
@@ -180,10 +180,10 @@ void MultiThreaded() {
   auto ints =
       [&fs] {
         if constexpr (suite == TestSuite::Vector) {
-          return async::WhenAll(fs.begin(), fs.end());
+          return algo::WhenAll(fs.begin(), fs.end());
         } else {
-          return async::WhenAll(std::move(fs[0]), std::move(fs[1]), std::move(fs[2]), std::move(fs[3]),
-                                std::move(fs[4]), std::move(fs[5]));
+          return algo::WhenAll(std::move(fs[0]), std::move(fs[1]), std::move(fs[2]), std::move(fs[3]), std::move(fs[4]),
+                               std::move(fs[5]));
         }
       }()
           .Get();

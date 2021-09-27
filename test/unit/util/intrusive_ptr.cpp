@@ -1,13 +1,11 @@
-#include <yaclib/container/intrusive_ptr.hpp>
 #include <yaclib/util/counters.hpp>
+#include <yaclib/util/intrusive_ptr.hpp>
 
 #include <gtest/gtest.h>
 
 namespace {
 
-using namespace yaclib;
-
-using container::intrusive::Ptr;
+using namespace yaclib::util;
 
 class Core : public IRef {
  public:
@@ -30,8 +28,8 @@ size_t Core::sInstances = 0;
 class X : public Core {};
 class Y : public X {};
 
-using CounterX = container::Counter<X>;
-using CounterY = container::Counter<Y>;
+using CounterX = Counter<X>;
+using CounterY = Counter<Y>;
 
 TEST(ctor, default) {
   Ptr<Core> px;

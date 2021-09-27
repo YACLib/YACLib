@@ -1,9 +1,9 @@
 #pragma once
 
-#include <yaclib/container/intrusive_ptr.hpp>
 #include <yaclib/executor/executor.hpp>
 #include <yaclib/executor/inline.hpp>
-#include <yaclib/task.hpp>
+#include <yaclib/executor/task.hpp>
+#include <yaclib/util/intrusive_ptr.hpp>
 #include <yaclib/util/result.hpp>
 
 #include <atomic>
@@ -14,8 +14,8 @@
 
 namespace yaclib::async::detail {
 
-struct CallerCore : ITask {
-  container::intrusive::Ptr<ITask> _caller;
+struct CallerCore : executor::ITask {
+  util::Ptr<executor::ITask> _caller;
 };
 
 class BaseCore : public CallerCore {
@@ -41,7 +41,7 @@ class BaseCore : public CallerCore {
     _executor = std::move(executor);
   }
 
-  void SetCallback(container::intrusive::Ptr<ITask> callback) {
+  void SetCallback(util::Ptr<ITask> callback) {
     _callback = std::move(callback);
     const auto state = _state.exchange(State::HasCallback, std::memory_order_acq_rel);
     if (state == State::HasResult) {
@@ -53,7 +53,7 @@ class BaseCore : public CallerCore {
     return _executor;
   }
 
-  bool SetWaitCallback(container::intrusive::Ptr<ITask> callback) {
+  bool SetWaitCallback(util::Ptr<ITask> callback) {
     _callback = std::move(callback);
     const auto state = _state.exchange(State::HasCallback, std::memory_order_acq_rel);
     const bool ready = state == State::HasResult;  // this is mean we have result
@@ -83,7 +83,7 @@ class BaseCore : public CallerCore {
  protected:
   std::atomic<State> _state{State::Empty};
   executor::IExecutorPtr _executor{executor::MakeInline()};
-  container::intrusive::Ptr<ITask> _callback;
+  util::Ptr<ITask> _callback;
 
   void Cancel() noexcept final {
     _caller = nullptr;
@@ -191,9 +191,9 @@ class WaitCoreDeleter {
 };
 
 template <typename Value>
-using PromiseCorePtr = container::intrusive::Ptr<Core<Value, void, void>>;
+using PromiseCorePtr = util::Ptr<Core<Value, void, void>>;
 
 template <typename Value>
-using FutureCorePtr = container::intrusive::Ptr<ResultCore<Value>>;
+using FutureCorePtr = util::Ptr<ResultCore<Value>>;
 
 }  // namespace yaclib::async::detail
