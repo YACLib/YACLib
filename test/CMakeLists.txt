@@ -63,6 +63,7 @@ if (YACLIB_BUILD_EXAMPLES)
     example/executor/serial
     example/async/simple
     example/async/when_all
+    example/async/when_any
     )
 endif()
 
