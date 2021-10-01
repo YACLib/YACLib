@@ -8,8 +8,8 @@ https://app.fossa.com/api/projects/git%2Bgithub.com%2FYACLib%2FYACLib.svg?type=s
 https://app.fossa.com/projects/git%2Bgithub.com%2FYACLib%2FYACLib)
 
 [![Test](
-https://github.com/YACLib/YACLib/actions/workflows/push.yml/badge.svg?branch=main)](
-https://github.com/YACLib/YACLib/actions/workflows/push.yml)
+https://github.com/YACLib/YACLib/actions/workflows/test.yml/badge.svg?branch=main)](
+https://github.com/YACLib/YACLib/actions/workflows/test.yml)
 [![Test with Google sanitizer](
 https://github.com/YACLib/YACLib/actions/workflows/google_sanitizer.yml/badge.svg?branch=main)](
 https://github.com/YACLib/YACLib/actions/workflows/google_sanitizer.yml)
