@@ -14,27 +14,23 @@
 
 namespace yaclib::async::detail {
 
-struct CallerCore : executor::ITask {
-  util::Ptr<executor::ITask> _caller;
-};
-
-class BaseCore : public CallerCore {
+class BaseCore : public executor::ITask {
  protected:
   enum class State {
     Empty,
-    HasCallback,
     HasResult,
+    HasCallback,
+    HasInlineCallback,
+    HasWaitCallback,
     Stopped,
   };
 
  public:
-  bool Ready() const noexcept {
-    return _state.load(std::memory_order_acquire) == State::HasResult;
+  [[nodiscard]] executor::IExecutorPtr GetExecutor() const noexcept {
+    return _executor;
   }
-
-  void Stop() {
-    _state.store(State::Stopped, std::memory_order_release);
-    assert(_callback == nullptr);
+  [[nodiscard]] bool Ready() const noexcept {
+    return _state.load(std::memory_order_acquire) == State::HasResult;
   }
 
   void SetExecutor(executor::IExecutorPtr executor) noexcept {
@@ -48,32 +44,24 @@ class BaseCore : public CallerCore {
       Execute();
     }
   }
-
-  executor::IExecutorPtr GetExecutor() const noexcept {
-    return _executor;
+  void Stop() noexcept {
+    _state.store(State::Stopped, std::memory_order_release);
+    assert(_callback == nullptr);
   }
 
-  bool SetWaitCallback(util::Ptr<ITask> callback) {
+  bool SetWaitCallback(util::Ptr<ITask> callback) noexcept {
     _callback = std::move(callback);
-    const auto state = _state.exchange(State::HasCallback, std::memory_order_acq_rel);
-    const bool ready = state == State::HasResult;  // this is mean we have result
+    const auto state = _state.exchange(State::HasWaitCallback, std::memory_order_acq_rel);
+    const bool ready = state == State::HasResult;  // This is mean we have Result
     if (ready) {
-      _callback = nullptr;
       _state.store(State::HasResult, std::memory_order_release);
+      _callback = nullptr;
     }
     return ready;
   }
-
-  /**
-   * Maybe called then we know we have done callback and valid Result
-   */
-  void ResetToReady() {
-    _state.store(State::HasResult, std::memory_order_release);
-  }
-
-  bool ResetToEmpty() {
+  bool ResetAfterTimeout() noexcept {
     const auto state = _state.exchange(State::Empty, std::memory_order_acq_rel);
-    const bool was_callback = state == State::HasCallback;  // this is mean we doesn't have executed callback
+    const bool was_callback = state == State::HasWaitCallback;  // This is mean we don't have executed callback
     if (was_callback) {
       _callback = nullptr;
     }
@@ -82,20 +70,20 @@ class BaseCore : public CallerCore {
 
  protected:
   std::atomic<State> _state{State::Empty};
+  util::Ptr<ITask> _caller;
   executor::IExecutorPtr _executor{executor::MakeInline()};
   util::Ptr<ITask> _callback;
 
-  void Cancel() noexcept final {
-    _caller = nullptr;
-    // order is matter
+  void Execute() {
+    static_cast<BaseCore&>(*_callback)._caller = this;
+    _executor->Execute(*_callback);
+    // order is matter TODO(MBkkt) Why?
     _executor = nullptr;
     _callback = nullptr;
   }
 
-  void Execute() {
-    assert(_caller == nullptr);
-    static_cast<CallerCore&>(*_callback)._caller = this;
-    _executor->Execute(*_callback);
+  void Cancel() noexcept final {  // Opposite for Call with SetResult
+    _caller = nullptr;
     // order is matter
     _executor = nullptr;
     _callback = nullptr;
@@ -110,6 +98,11 @@ class ResultCore : public BaseCore {
     const auto state = _state.exchange(State::HasResult, std::memory_order_acq_rel);
     if (state == State::HasCallback) {
       BaseCore::Execute();
+    } else if (state == State::HasInlineCallback) {
+      _executor = executor::MakeInline();
+      BaseCore::Execute();
+    } else if (state == State::HasWaitCallback) {
+      _callback = nullptr;
     } else if (state == State::Stopped) {
       BaseCore::Cancel();
     }
@@ -147,10 +140,6 @@ class Core : public ResultCore<Ret> {
       }
       return std::move(caller->Get());
     }();
-    if (Base::_state.load(std::memory_order_acquire) == Base::State::Stopped) {
-      Base::Cancel();
-      return;
-    }
     Base::_caller = nullptr;
     Base::SetResult(_functor.Wrapper(std::move(ret)));
   }
@@ -165,7 +154,7 @@ class Core<Result, void, void> : public ResultCore<Result> {
   }
 };
 
-class WaitCore : public CallerCore {
+class WaitCore : public executor::ITask {
  public:
   bool is_ready{false};
   std::mutex m;
@@ -184,8 +173,7 @@ class WaitCoreDeleter {
   void Delete(void* p) {
     auto& self = *static_cast<WaitCore*>(p);
     std::lock_guard guard{self.m};
-    self.is_ready = self._caller != nullptr;
-    self._caller = nullptr;
+    self.is_ready = true;
     self.cv.notify_all();  // Notify under mutex, because cv located on stack memory of other thread
   }
 };
