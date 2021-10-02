@@ -207,8 +207,10 @@ Future<U> Then(FutureCorePtr<T> caller, Functor&& f) {
   using InvokeT = detail::Invoke<U, decltype(std::forward<Functor>(f)), T>;
   using CoreType = detail::Core<U, InvokeT, T>;
   util::Ptr callback{new util::Counter<CoreType>{std::forward<Functor>(f)}};
+
   callback->SetExecutor(caller->GetExecutor());
   caller->SetCallback(callback);
+
   return Future<U>{std::move(callback)};
 }
 
@@ -216,11 +218,14 @@ template <typename U, typename T, typename Functor>
 Future<U> AsyncThen(FutureCorePtr<T> caller, Functor&& f) {
   auto [future, promise] = async::MakeContract<U>();
   future.Via(caller->GetExecutor());
+
   using InvokeT = detail::AsyncInvoke<U, decltype(std::forward<Functor>(f)), T>;
   using CoreType = detail::Core<void, InvokeT, T>;
   util::Ptr callback{new util::Counter<CoreType>{caller->GetExecutor(), std::move(promise), std::forward<Functor>(f)}};
+
   callback->SetExecutor(caller->GetExecutor());
   caller->SetCallback(callback);
+
   return std::move(future);
 }
 
@@ -235,12 +240,6 @@ bool Wait(detail::FutureCorePtr<T>& core, const Time& time) {
   if (core->Ready()) {
     return true;
   }
-
-  auto defer = util::defer([&core, old_executor = core->GetExecutor()] {
-    core->SetExecutor(std::move(old_executor));
-  });
-  core->SetExecutor(executor::MakeInline());
-
   util::Counter<detail::WaitCore, detail::WaitCoreDeleter> callback;
   if (core->SetWaitCallback(&callback)) {
     return true;
@@ -259,10 +258,9 @@ bool Wait(detail::FutureCorePtr<T>& core, const Time& time) {
       }
     }();
     if (ready) {
-      core->ResetToReady();
       return true;
     }
-    if (core->ResetToEmpty()) {
+    if (core->ResetAfterTimeout()) {
       return false;
     }
     // We know we have Result, but we must wait until callback was not used by executor
@@ -270,7 +268,6 @@ bool Wait(detail::FutureCorePtr<T>& core, const Time& time) {
   while (!callback.is_ready) {
     callback.cv.wait(guard);
   }
-  core->ResetToReady();
   return true;
 }
 
