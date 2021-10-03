@@ -169,7 +169,7 @@ TEST(JustWorks, Promise) {
     i = 1;
   });
   std::move(p).Set();
-  g.Wait();
+  algo::Wait(g);
   EXPECT_EQ(i, 1);
   tp->Stop();
   tp->Wait();

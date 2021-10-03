@@ -59,11 +59,12 @@ class BaseCore : public executor::ITask {
     }
     return ready;
   }
+
   bool ResetAfterTimeout() noexcept {
     const auto state = _state.exchange(State::Empty, std::memory_order_acq_rel);
     const bool was_callback = state == State::HasWaitCallback;  // This is mean we don't have executed callback
     if (was_callback) {
-      _callback = nullptr;
+      _callback.Release();
     }
     return was_callback;
   }

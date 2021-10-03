@@ -76,7 +76,7 @@ Contract<T> MakeContract();
 
 #ifndef YACLIB_ASYNC_DECL
 
-#define YACLIB_ASYNC_DECL
+11 #define YACLIB_ASYNC_DECL
 #include <yaclib/async/future.hpp>
 #undef YACLIB_ASYNC_DECL
 

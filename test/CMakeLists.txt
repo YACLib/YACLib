@@ -51,6 +51,7 @@ set(YACLIB_UNITS
   unit/executor/task
   unit/async/future
   unit/algo/when_all
+  unit/algo/wait_group
   unit/algo/when_any
   unit/executor/thread_factory
   unit/executor/thread_pool
@@ -64,6 +65,7 @@ if (YACLIB_BUILD_EXAMPLES)
     example/executor/serial
     example/async/when_all
     example/async/when_any
+    example/async/wait_group
     )
 endif ()
 

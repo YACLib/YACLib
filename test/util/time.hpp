@@ -24,7 +24,6 @@ class StopWatch {
     return elapsed;
   }
 
- private:
   static TimePoint Now() {
     return Clock::now();
   }
