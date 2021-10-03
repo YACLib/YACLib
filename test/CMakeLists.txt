@@ -43,8 +43,7 @@ set(TEST_UTIL_INCLUDES
 set(YACLIB_EXAMPLE_SOURCES)
 set(YACLIB_EXAMPLE_INCLUDES)
 
-#TODO(MBkkt) Add options which shuffle tests list
-set(YACLIB_UNITS
+set(YACLIB_UNIT_SOURCES
   unit/util/intrusive_ptr
   unit/util/result
   unit/executor/task
@@ -61,7 +60,7 @@ set(YACLIB_UNITS
   )
 
 if (YACLIB_BUILD_EXAMPLES)
-  set(YACLIB_EXAMPLES
+  set(YACLIB_EXAMPLE_SOURCES
     example/async/simple
     example/executor/thread_pool
     example/executor/serial
@@ -70,7 +69,9 @@ if (YACLIB_BUILD_EXAMPLES)
     )
 endif ()
 
-set(YACLIB_TEST_SOURCES ${YACLIB_UNITS} ${YACLIB_EXAMPLES})
+#TODO(MBkkt) Add options which shuffle tests list
+set(YACLIB_TEST_SOURCES ${YACLIB_UNIT_SOURCES} ${YACLIB_EXAMPLE_SOURCES})
+
 foreach (TEST_SOURCE ${YACLIB_TEST_SOURCES})
   string(REPLACE "/" "_" TEST_NAME ${TEST_SOURCE})
   add_executable(${TEST_NAME} ${TEST_SOURCE}.cpp)
@@ -79,7 +80,7 @@ foreach (TEST_SOURCE ${YACLIB_TEST_SOURCES})
     )
   target_link_libraries(${TEST_NAME}
     PRIVATE ${GTEST_BOTH_LIBRARIES}
-    PRIVATE benchmark::benchmark
+    PRIVATE benchmark::benchmark benchmark::benchmark_main
     PRIVATE ${PROJECT_NAME}
     )
   target_include_directories(${TEST_NAME}
