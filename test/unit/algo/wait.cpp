@@ -158,7 +158,7 @@ TEST(WaitFor, Diff) {
     });
   }
   test::util::StopWatch timer;
-  bool ready = yaclib::WaitFor(100ms * YACLIB_CI_SLOWDOWN, f[0], f[1], f[2], f[3]);
+  bool ready = yaclib::WaitFor(100ms * YACLIB_CI_SLOWDOWN, std::begin(f), std::end(f));
   EXPECT_FALSE(ready);
   EXPECT_LE(timer.Elapsed(), 150ms * YACLIB_CI_SLOWDOWN);
 
