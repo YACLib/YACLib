@@ -54,22 +54,21 @@ class BaseCore : public executor::ITask {
       return true;
     }
     _callback = &callback;
-    const auto state = _state.exchange(State::HasWaitCallback, std::memory_order_acq_rel);
-    const bool ready = state == State::HasResult;  // This is mean we have Result
-    if (ready) {
-      _state.store(State::HasResult, std::memory_order_release);
-      _callback.Release()->DecRefRelease();
+    auto expected = State::Empty;
+    if (!_state.compare_exchange_strong(expected, State::HasWaitCallback, std::memory_order_acq_rel)) {
+      _callback.Release()->DecRefRelease();  // This is mean we have Result
+      return true;
     }
-    return ready;
+    return false;
   }
 
   bool ResetAfterTimeout() noexcept {
-    const auto state = _state.exchange(State::Empty, std::memory_order_acq_rel);
-    const bool was_callback = state == State::HasWaitCallback;  // This is mean we don't have executed callback
-    if (was_callback) {
-      _callback.Release()->DecRefRelease();
+    auto expected = State::HasWaitCallback;
+    if (_state.compare_exchange_strong(expected, State::Empty, std::memory_order_acq_rel)) {
+      _callback.Release()->DecRefRelease();  // This is mean we don't have executed callback
+      return true;
     }
-    return was_callback;
+    return false;
   }
 
  protected:

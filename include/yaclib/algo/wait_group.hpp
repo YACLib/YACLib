@@ -25,9 +25,10 @@ bool Wait(const Time& time, Fs&&... futures) {
   if ((... & futures._core->SetWaitCallback(callback))) {
     return true;
   }
+  bool ready{true};
   std::unique_lock guard{callback.m};
   if constexpr (kPolicy != WaitPolicy::Endless) {
-    const bool ready = [&] {
+    ready = [&] {
       if constexpr (kPolicy == WaitPolicy::For) {
         return callback.cv.wait_for(guard, time, [&] {
           return callback.is_ready;
@@ -41,7 +42,7 @@ bool Wait(const Time& time, Fs&&... futures) {
     if (ready) {
       return true;
     }
-    if ((... | futures._core->ResetAfterTimeout())) {
+    if ((... & futures._core->ResetAfterTimeout())) {
       return false;
     }
     // We know we have Result, but we must wait until callback was not used by executor
@@ -49,7 +50,7 @@ bool Wait(const Time& time, Fs&&... futures) {
   while (!callback.is_ready) {
     callback.cv.wait(guard);
   }
-  return true;
+  return ready;
 }
 
 }  // namespace detail
