@@ -66,6 +66,10 @@ class Counter final : public CounterBase, public Deleter {
     }
   }
 
+  void DecRefRelease() noexcept final {
+    _impl.fetch_sub(1, std::memory_order_release);
+  }
+
   [[nodiscard]] size_t GetRef() const noexcept {  // Only for tests
     return _impl.load(std::memory_order_relaxed);
   }

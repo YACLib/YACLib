@@ -21,15 +21,10 @@ template <WaitPolicy kPolicy, typename Time, typename... Fs>
 bool Wait(const Time& time, Fs&&... futures) {
   static_assert(sizeof...(futures) > 0, "Number of futures must be more than zero");
   static_assert((... && util::IsFutureV<std::decay_t<Fs>>), "Fs must be futures in Wait function");
-  if ((... && futures.Ready())) {
+  util::Counter<async::detail::WaitCore, async::detail::WaitCoreDeleter> callback;
+  if ((... & futures._core->SetWaitCallback(callback))) {
     return true;
   }
-
-  util::DecRefCounter<async::detail::WaitCore, async::detail::WaitCoreDeleter> callback{sizeof...(Fs)};
-  if ((... & futures._core->SetWaitCallback(&callback))) {
-    return true;
-  }
-
   std::unique_lock guard{callback.m};
   if constexpr (kPolicy != WaitPolicy::Endless) {
     const bool ready = [&] {
@@ -43,7 +38,6 @@ bool Wait(const Time& time, Fs&&... futures) {
         });
       }
     }();
-
     if (ready) {
       return true;
     }
@@ -52,7 +46,6 @@ bool Wait(const Time& time, Fs&&... futures) {
     }
     // We know we have Result, but we must wait until callback was not used by executor
   }
-
   while (!callback.is_ready) {
     callback.cv.wait(guard);
   }

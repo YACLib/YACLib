@@ -17,6 +17,11 @@ class IRef {
    */
   virtual void DecRef() noexcept = 0;
 
+  /**
+   * Decrements reference counter without dtor
+   */
+  virtual void DecRefRelease() noexcept {};
+
   virtual ~IRef() = default;
 };
 

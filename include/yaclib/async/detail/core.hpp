@@ -49,13 +49,16 @@ class BaseCore : public executor::ITask {
     assert(_callback == nullptr);
   }
 
-  bool SetWaitCallback(util::Ptr<ITask> callback) noexcept {
-    _callback = std::move(callback);
+  bool SetWaitCallback(ITask& callback) noexcept {
+    if (_state.load(std::memory_order_acquire) == State::HasResult) {
+      return true;
+    }
+    _callback = &callback;
     const auto state = _state.exchange(State::HasWaitCallback, std::memory_order_acq_rel);
     const bool ready = state == State::HasResult;  // This is mean we have Result
     if (ready) {
       _state.store(State::HasResult, std::memory_order_release);
-      _callback = nullptr;
+      _callback.Release()->DecRefRelease();
     }
     return ready;
   }
@@ -64,7 +67,7 @@ class BaseCore : public executor::ITask {
     const auto state = _state.exchange(State::Empty, std::memory_order_acq_rel);
     const bool was_callback = state == State::HasWaitCallback;  // This is mean we don't have executed callback
     if (was_callback) {
-      _callback.Release();
+      _callback.Release()->DecRefRelease();
     }
     return was_callback;
   }
