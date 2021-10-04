@@ -18,12 +18,12 @@ TEST(Wait, JustWorks) {
   test::util::StopWatch timer;
 
   tp->Execute([p = std::move(p)]() mutable {
-    std::this_thread::sleep_for(150ms);
+    std::this_thread::sleep_for(150ms * YACLIB_SLOWDOWN);
     std::move(p).Set();
   });
   algo::Wait(f);
   EXPECT_TRUE(f.Ready());
-  EXPECT_LE(timer.Elapsed(), 200ms);
+  EXPECT_LE(timer.Elapsed(), 200ms * YACLIB_SLOWDOWN);
   tp->Stop();
   tp->Wait();
 }
@@ -35,12 +35,12 @@ TEST(WaitFor, JustWorks) {
   test::util::StopWatch timer;
 
   tp->Execute([p = std::move(p)]() mutable {
-    std::this_thread::sleep_for(150ms);
+    std::this_thread::sleep_for(150ms * YACLIB_SLOWDOWN);
     std::move(p).Set();
   });
-  algo::WaitFor(50ms, f);
+  algo::WaitFor(50ms * YACLIB_SLOWDOWN, f);
   EXPECT_TRUE(!f.Ready());
-  EXPECT_LE(timer.Elapsed(), 100ms);
+  EXPECT_LE(timer.Elapsed(), 100ms * YACLIB_SLOWDOWN);
   tp->Stop();
   tp->Wait();
 }
@@ -51,12 +51,12 @@ TEST(WaitUntil, JustWorks) {
 
   test::util::StopWatch timer;
   tp->Execute([p = std::move(p)]() mutable {
-    std::this_thread::sleep_for(150ms);
+    std::this_thread::sleep_for(150ms * YACLIB_SLOWDOWN);
     std::move(p).Set();
   });
-  algo::WaitUntil(timer.Now() + 50ms, f);
+  algo::WaitUntil(timer.Now() + 50ms * YACLIB_SLOWDOWN, f);
   EXPECT_TRUE(!f.Ready());
-  EXPECT_LE(timer.Elapsed(), 100ms);
+  EXPECT_LE(timer.Elapsed(), 100ms * YACLIB_SLOWDOWN);
   tp->Stop();
   tp->Wait();
 }
@@ -67,13 +67,13 @@ TEST(Wait, Multithreaded) {
   async::Future<int> f[kThreads];
   for (int i = 0; i < kThreads; ++i) {
     f[i] = async::Run(tp, [i] {
-      std::this_thread::sleep_for(50ms);
+      std::this_thread::sleep_for(50ms * YACLIB_SLOWDOWN);
       return i;
     });
   }
   test::util::StopWatch timer;
   algo::Wait(f[0], f[1], f[2], f[3]);
-  EXPECT_LE(timer.Elapsed(), 100ms);
+  EXPECT_LE(timer.Elapsed(), 100ms * YACLIB_SLOWDOWN);
   EXPECT_TRUE(std::all_of(std::begin(f), std::end(f), [](auto& f) {
     return f.Ready();
   }));

@@ -22,16 +22,13 @@ bool Wait(const Time& time, Fs&&... futures) {
   static_assert(sizeof...(futures) > 0, "Number of futures must be more than zero");
   static_assert((... && util::IsFutureV<std::decay_t<Fs>>), "Fs must be futures in Wait function");
   if ((... && futures.Ready())) {
-    std::cout << "------------------------GGGGGGGGGGGGGGGG" << std::endl;
     return true;
   }
 
-  util::Counter<async::detail::WaitCore, async::detail::WaitCoreDeleter> callback;
-  /*if ((... & futures._core->SetWaitCallback(&callback))) {
-    std::cout << "------------------------LLLLLLLLLLLLL" << std::endl;
+  util::DecRefCounter<async::detail::WaitCore, async::detail::WaitCoreDeleter> callback{sizeof...(Fs)};
+  if ((... & futures._core->SetWaitCallback(&callback))) {
     return true;
-  }*/
-  (..., futures._core->SetWaitCallback(&callback));
+  }
 
   std::unique_lock guard{callback.m};
   if constexpr (kPolicy != WaitPolicy::Endless) {
@@ -57,11 +54,8 @@ bool Wait(const Time& time, Fs&&... futures) {
   }
 
   while (!callback.is_ready) {
-    std::cout << "------------------------AAAAAAAAAAAAAAAAAA" << std::endl;
     callback.cv.wait(guard);
   }
-  std::cout << "------------------------fffffffffffffffffff" << std::endl;
-
   return true;
 }
 
