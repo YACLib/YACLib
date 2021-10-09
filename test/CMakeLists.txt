@@ -51,6 +51,7 @@ set(YACLIB_UNITS
   unit/executor/task
   unit/async/future
   unit/algo/when_all
+  unit/algo/wait
   unit/algo/when_any
   unit/executor/thread_factory
   unit/executor/thread_pool
