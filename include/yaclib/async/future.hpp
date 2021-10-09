@@ -1,5 +1,8 @@
 #pragma once
 
+#include <yaclib/algo/wait.hpp>
+#include <yaclib/algo/wait_for.hpp>
+#include <yaclib/algo/wait_until.hpp>
 #include <yaclib/async/detail/core.hpp>
 #include <yaclib/executor/executor.hpp>
 #include <yaclib/util/type_traits.hpp>
@@ -56,34 +59,6 @@ class Future final {
    * \return false if the \Result of this \ref Future is not computed yet, otherwise true
    */
   [[nodiscard]] bool Ready() const& noexcept;
-
-  /**
-   * Wait until \ref Ready becomes true
-   */
-  void Wait() &;
-
-  /**
-   * Wait until the specified timeout duration has elapsed or \ref Ready becomes true
-   *
-   * \note The behavior is undefined if \ref Valid is false before the call to this function.
-   *       This function may block for longer than timeout_duration due to scheduling or resource contention delays.
-   * \param timeout_duration maximum duration to block for
-   * \return The result of \ref Ready upon exiting
-   */
-  template <typename Rep, typename Period>
-  bool WaitFor(const std::chrono::duration<Rep, Period>& timeout_duration) &;
-
-  /**
-   * Wait until specified time has been reached or \ref Ready becomes true
-   *
-   * \note The behavior is undefined if \ref Valid is false before the call to this function.
-   *       This function may block for longer than until after timeout_time has been reached
-   *       due to scheduling or resource contention delays.
-   * \param timeout_time maximum time point to block until
-   * \return The result of \ref Ready upon exiting
-   */
-  template <typename Clock, typename Duration>
-  bool WaitUntil(const std::chrono::time_point<Clock, Duration>& timeout_time) &;
 
   /**
    * Return copy of \ref Result from \ref Future
@@ -168,6 +143,15 @@ class Future final {
   Future& Via(executor::IExecutorPtr executor) &;
 
  private:
+  template <typename... Fs>
+  friend void algo::Wait(Fs&&... futures);
+
+  template <typename Rep, typename Period, typename... Fs>
+  friend bool algo::WaitFor(const std::chrono::duration<Rep, Period>& timeout_duration, Fs&&... fs);
+
+  template <typename Clock, typename Duration, typename... Fs>
+  friend bool algo::WaitUntil(const std::chrono::time_point<Clock, Duration>& timeout_time, Fs&&... fs);
+
   detail::FutureCorePtr<T> _core;
 };
 

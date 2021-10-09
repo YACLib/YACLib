@@ -138,23 +138,23 @@ TEST(JustWorks, AsyncRun) {
   auto tp = executor::MakeThreadPool(3);
   EXPECT_EQ(tp->Tag(), executor::IExecutor::Type::ThreadPool);
 
-  {
-    auto good = [&] {
-      EXPECT_EQ(executor::CurrentThreadPool(), tp);
-      return std::string{"Hello!"};
-    };
-    EXPECT_EQ(async::Run(tp, good).Get().Ok(), "Hello!");
-  }
+  auto good = [&] {
+    EXPECT_EQ(executor::CurrentThreadPool(), tp);
+    return std::string{"Hello!"};
+  };
 
-  {
-    auto bad = [&] {
-      EXPECT_EQ(executor::CurrentThreadPool(), tp);
-      throw std::logic_error("test");
-      return int{};
-    };
-
-    EXPECT_THROW(async::Run(tp, bad).Get().Ok(), std::logic_error);
-  }
+  auto bad = [&] {
+    EXPECT_EQ(executor::CurrentThreadPool(), tp);
+    throw std::logic_error("test");
+    return int{};
+  };
+  auto f1 = async::Run(tp, good);
+  auto f2 = async::Run(tp, bad);
+  algo::Wait(f1, f2);
+  EXPECT_TRUE(f1.Ready());
+  EXPECT_TRUE(f2.Ready());
+  EXPECT_EQ(std::move(f1).Get().Ok(), "Hello!");
+  EXPECT_THROW(std::move(f2).Get().Ok(), std::logic_error);
 
   tp->Stop();
   tp->Wait();
@@ -169,7 +169,7 @@ TEST(JustWorks, Promise) {
     i = 1;
   });
   std::move(p).Set();
-  g.Wait();
+  algo::Wait(g);
   EXPECT_EQ(i, 1);
   tp->Stop();
   tp->Wait();

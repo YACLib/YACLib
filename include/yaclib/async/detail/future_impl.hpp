@@ -4,6 +4,7 @@
 #error "You can not include this header directly, use yaclib/async/async.hpp"
 #endif
 
+#include <yaclib/algo/wait.hpp>
 #include <yaclib/util/defer.hpp>
 
 namespace yaclib::async {
@@ -229,48 +230,6 @@ Future<U> AsyncThen(FutureCorePtr<T> caller, Functor&& f) {
   return std::move(future);
 }
 
-enum class WaitPolicy {
-  Endless,
-  For,
-  Until,
-};
-
-template <WaitPolicy kPolicy, typename T, typename Time>
-bool Wait(detail::FutureCorePtr<T>& core, const Time& time) {
-  if (core->Ready()) {
-    return true;
-  }
-  util::Counter<detail::WaitCore, detail::WaitCoreDeleter> callback;
-  if (core->SetWaitCallback(&callback)) {
-    return true;
-  }
-  std::unique_lock guard{callback.m};
-  if constexpr (kPolicy != WaitPolicy::Endless) {
-    const bool ready = [&] {
-      if constexpr (kPolicy == WaitPolicy::For) {
-        return callback.cv.wait_for(guard, time, [&] {
-          return callback.is_ready;
-        });
-      } else if constexpr (kPolicy == WaitPolicy::Until) {
-        return callback.cv.wait_until(guard, time, [&] {
-          return callback.is_ready;
-        });
-      }
-    }();
-    if (ready) {
-      return true;
-    }
-    if (core->ResetAfterTimeout()) {
-      return false;
-    }
-    // We know we have Result, but we must wait until callback was not used by executor
-  }
-  while (!callback.is_ready) {
-    callback.cv.wait(guard);
-  }
-  return true;
-}
-
 }  // namespace detail
 
 template <typename T>
@@ -289,23 +248,6 @@ bool Future<T>::Ready() const& noexcept {
 }
 
 template <typename T>
-void Future<T>::Wait() & {
-  detail::Wait<detail::WaitPolicy::Endless>(_core, /* stub value */ false);
-}
-
-template <typename T>
-template <typename Clock, typename Duration>
-bool Future<T>::WaitUntil(const std::chrono::time_point<Clock, Duration>& timeout_time) & {
-  return detail::Wait<detail::WaitPolicy::Until>(_core, timeout_time);
-}
-
-template <typename T>
-template <typename Rep, typename Period>
-bool Future<T>::WaitFor(const std::chrono::duration<Rep, Period>& timeout_duration) & {
-  return detail::Wait<detail::WaitPolicy::For>(_core, timeout_duration);
-}
-
-template <typename T>
 util::Result<T> Future<T>::Get() const& {
   if (_core->Ready()) {
     return _core->Get();
@@ -315,7 +257,9 @@ util::Result<T> Future<T>::Get() const& {
 
 template <typename T>
 util::Result<T> Future<T>::Get() && {
-  Wait();
+  if (!Ready()) {
+    algo::Wait(*this);
+  }
   auto core = std::exchange(_core, nullptr);
   return std::move(core->Get());
 }
