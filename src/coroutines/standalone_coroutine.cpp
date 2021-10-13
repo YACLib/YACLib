@@ -1,5 +1,4 @@
-#include <yaclib/coroutines/standalone_coroutine.h>
-
+#include <yaclib/coroutines/standalone_coroutine.hpp>
 #include <yaclib/util/defer.hpp>
 
 static thread_local StandaloneCoroutine* current = nullptr;

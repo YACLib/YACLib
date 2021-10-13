@@ -1,6 +1,6 @@
 #pragma once
 
-#include "setup_stack.h"
+#include "setup_stack.hpp"
 
 struct StackSavedMachineContext {
   // Layout of the StackSavedMachineContext matches the layout of the stack

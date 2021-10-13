@@ -1,4 +1,4 @@
-#include <yaclib/coroutines/coroutine.h>
+#include <yaclib/coroutines/coroutine.hpp>
 
 void Coroutine::operator()() {
   Resume();
