@@ -14,6 +14,9 @@ list(APPEND YACLIB_HEADERS
         ${CMAKE_CURRENT_SOURCE_DIR}/context/stack_builder.h
         ${CMAKE_CURRENT_SOURCE_DIR}/context/setup_stack/setup_stack.h
         )
+
+SET(CMAKE_ASM_FLAGS "${CFLAGS} -x assembler-with-cpp")
+
 list(APPEND YACLIB_SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/coroutine.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/standalone_coroutine.cpp
@@ -21,13 +24,9 @@ list(APPEND YACLIB_SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/context/machine_context.cpp
         # todo: pick based on a system
         ${CMAKE_CURRENT_SOURCE_DIR}/context/setup_stack/setup_stack_x64.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/context/asm/switch_context_x64_mac.S
+
         ${CMAKE_CURRENT_SOURCE_DIR}/context/default_allocator.cpp
-        )
-
-enable_language(ASM)
-
-set(ASM_SOURCES
-        context/asm/switch_context_x64_mac.S
         )
 
 add_files()
