@@ -3,23 +3,37 @@
 
 #include <gtest/gtest.h>
 
+template <class T>
 class MyTask : public yaclib::util::IFunc {
+ public:
+  explicit MyTask(T func) : _func(std::move(func)) {
+  }
+
   void Call() noexcept override {
-    std::cout << "kek";
-    StandaloneCoroutine::Yield();
-    std::cout << "kek2";
+    _func();
   }
   void IncRef() noexcept override {
   }
   void DecRef() noexcept override {
   }
+ private:
+  T _func;
 };
 
 TEST(coriutine, basic) {
-  auto kek = MyTask();
+  std::string test;
+  auto kek = MyTask([&] {
+    for (int i = 0; i < 10; i++) {
+      test.append(std::to_string(i));
+      StandaloneCoroutine::Yield();
+    }
+  });
   auto& kek2 = dynamic_cast<yaclib::util::IFunc&>(kek);
   auto allocator = DefaultAllocator();
+  allocator.SetMinStackSize(64 * 1024);
   auto coroutine = StandaloneCoroutine(allocator, yaclib::util::Ptr<yaclib::util::IFunc>(&kek, false));
-  coroutine();
-  coroutine();
+  while(!coroutine.IsCompleted()) {
+    coroutine();
+  }
+  EXPECT_EQ(test, "0123456789");
 }

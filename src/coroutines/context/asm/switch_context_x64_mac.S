@@ -1,29 +1,26 @@
 .text
 .globl _SwitchMachineContext
-.align 8
 _SwitchMachineContext:
-    leaq  -0x38(%rsp), %rsp /* prepare stack */
+    pushq %r15
+    pushq %r14
+    pushq %r13
+    pushq %r12
 
-    movq  %r12, 0x8(%rsp)  /* save R12 */
-    movq  %r13, 0x10(%rsp)  /* save R13 */
-    movq  %r14, 0x18(%rsp)  /* save R14 */
-    movq  %r15, 0x20(%rsp)  /* save R15 */
-    movq  %rbx, 0x28(%rsp)  /* save RBX */
-    movq  %rbp, 0x30(%rsp)  /* save RBP */
+    pushq %rbx
+    pushq %rbp
 
     /* Save current stack pointer to 'from' MachineContext */
-    movq  %rsp, %rdi
+    movq %rsp, (%rdi)
 
     /* Set stack pointer to target stack */
-    movq  %rsi, %rsp
+    movq (%rsi), %rsp
 
-    movq  0x8(%rsp), %r12  /* restore R12 */
-    movq  0x10(%rsp), %r13  /* restore R13 */
-    movq  0x18(%rsp), %r14  /* restore R14 */
-    movq  0x20(%rsp), %r15  /* restore R15 */
-    movq  0x28(%rsp), %rbx  /* restore RBX */
-    movq  0x30(%rsp), %rbp  /* restore RBP */
+    popq %rbp
+    popq %rbx
 
-    /* leaq  0x40(%rsp), %rsp /* prepare stack */
+    popq %r12
+    popq %r13
+    popq %r14
+    popq %r15
 
     retq
