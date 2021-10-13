@@ -1,8 +1,8 @@
 #pragma once
-#include "coroutines/context/execution_context.h"
-#include "coroutines/context/stack.h"
-#include "coroutines/context/stack_allocator.h"
-#include "yaclib/util/func.hpp"
+#include <yaclib/coroutines/context/execution_context.h>
+#include <yaclib/coroutines/context/stack_view.h>
+
+#include <yaclib/util/func.hpp>
 
 #include <utility>
 
