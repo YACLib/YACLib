@@ -1,7 +1,8 @@
 #pragma once
 
-#include "machine_context.h"
-#include "stack_view.h"
+#include "machine_context.hpp"
+#include "stack_view.hpp"
+
 #include <algorithm>
 
 class ExecutionContext {

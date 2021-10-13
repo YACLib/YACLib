@@ -1,7 +1,6 @@
 #pragma once
-#include <yaclib/coroutines/context/execution_context.h>
-#include <yaclib/coroutines/context/stack_view.h>
-
+#include <yaclib/coroutines/context/execution_context.hpp>
+#include <yaclib/coroutines/context/stack_view.hpp>
 #include <yaclib/util/func.hpp>
 
 #include <utility>

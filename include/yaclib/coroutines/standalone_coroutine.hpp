@@ -1,8 +1,8 @@
 #pragma once
-#include "coroutine.h"
-#include "yaclib/coroutines/context/stack.h"
+#include "coroutine.hpp"
+#include "yaclib/coroutines/context/stack.hpp"
 
-#include <yaclib/coroutines/context/stack_allocator.h>
+#include <yaclib/coroutines/context/stack_allocator.hpp>
 
 class StandaloneCoroutine {
  public:

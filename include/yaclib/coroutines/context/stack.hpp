@@ -1,6 +1,7 @@
 #pragma once
-#include "stack_allocator.h"
-#include "stack_view.h"
+#include "stack_allocator.hpp"
+#include "stack_view.hpp"
+
 #include <cstddef>
 
 class Stack {
