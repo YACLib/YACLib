@@ -5,6 +5,7 @@
 
 // probably won't work for win
 class DefaultAllocator : public StackAllocator {
+ public:
   [[nodiscard]] Allocation Allocate() const override;
   void Release(Allocation allocation) override;
   void SetMinStackSize(size_t bytes) override;
