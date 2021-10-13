@@ -1,7 +1,7 @@
 #pragma once
 
-#include "machine_context.hpp"
-#include "stack_view.hpp"
+#include <yaclib/coroutines/context/machine_context.hpp>
+#include <yaclib/coroutines/context/stack_view.hpp>
 
 #include <algorithm>
 

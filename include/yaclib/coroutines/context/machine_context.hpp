@@ -1,5 +1,5 @@
 #pragma once
-#include "stack_view.hpp"
+#include <yaclib/coroutines/context/stack_view.hpp>
 
 using Trampoline = void (*)(void* arg);
 

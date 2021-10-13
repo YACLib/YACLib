@@ -1,6 +1,6 @@
-#include "yaclib/coroutines/context/machine_context.h"
+#include "yaclib/coroutines/context/machine_context.hpp"
 
-#include "setup_stack/setup_stack.h"
+#include "coroutines/context/setup_stack/setup_stack.hpp"
 
 extern "C" void SwitchMachineContext(void* from_rsp, void* to_rsp);
 

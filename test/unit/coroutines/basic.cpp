@@ -1,5 +1,5 @@
-#include <yaclib/coroutines/context/default_allocator.h>
-#include <yaclib/coroutines/standalone_coroutine.h>
+#include <yaclib/coroutines/context/default_allocator.hpp>
+#include <yaclib/coroutines/standalone_coroutine.hpp>
 
 #include <gtest/gtest.h>
 
@@ -28,9 +28,8 @@ TEST(coriutine, basic) {
       StandaloneCoroutine::Yield();
     }
   });
-  auto& i_func_typed_task = dynamic_cast<yaclib::util::IFunc&>(test_task);
   auto allocator = DefaultAllocator();
-  allocator.SetMinStackSize(64 * 1024);
+  allocator.SetMinStackSize(1024);
   auto coroutine = StandaloneCoroutine(allocator, yaclib::util::Ptr<yaclib::util::IFunc>(&test_task, false));
   while(!coroutine.IsCompleted()) {
     coroutine();

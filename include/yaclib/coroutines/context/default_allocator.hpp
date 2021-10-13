@@ -1,5 +1,5 @@
 #pragma once
-#include "stack_allocator.hpp"
+#include <yaclib/coroutines/context/stack_allocator.hpp>
 
 #include <vector>
 

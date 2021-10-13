@@ -1,5 +1,5 @@
 #pragma once
-#include "coroutine.hpp"
+#include <yaclib/coroutines/coroutine.hpp>
 #include "yaclib/coroutines/context/stack.hpp"
 
 #include <yaclib/coroutines/context/stack_allocator.hpp>
