@@ -1,9 +1,9 @@
 #pragma once
 
 #include "machine_context.h"
-#include "stack.h"
-
+#include "stack_view.h"
 #include <algorithm>
+
 class ExecutionContext {
  public:
   ExecutionContext() = default;

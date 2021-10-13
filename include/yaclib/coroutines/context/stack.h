@@ -1,11 +1,11 @@
 #pragma once
 #include "stack_allocator.h"
 #include "stack_view.h"
-
 #include <cstddef>
+
 class Stack {
  public:
-  Stack(Allocation allocation, const StackAllocator& allocator) : _allocation(allocation), _allocator(allocator) {
+  Stack(Allocation allocation, StackAllocator& allocator) : _allocation(allocation), _allocator(allocator) {
   }
 
   Stack(Stack&& that) = default;
@@ -24,5 +24,5 @@ class Stack {
 
  private:
   Allocation _allocation;
-  const StackAllocator& _allocator;
+  StackAllocator& _allocator;
 };
