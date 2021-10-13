@@ -22,16 +22,16 @@ class MyTask : public yaclib::util::IFunc {
 
 TEST(coriutine, basic) {
   std::string test;
-  auto kek = MyTask([&] {
+  auto test_task = MyTask([&] {
     for (int i = 0; i < 10; i++) {
       test.append(std::to_string(i));
       StandaloneCoroutine::Yield();
     }
   });
-  auto& kek2 = dynamic_cast<yaclib::util::IFunc&>(kek);
+  auto& i_func_typed_task = dynamic_cast<yaclib::util::IFunc&>(test_task);
   auto allocator = DefaultAllocator();
   allocator.SetMinStackSize(64 * 1024);
-  auto coroutine = StandaloneCoroutine(allocator, yaclib::util::Ptr<yaclib::util::IFunc>(&kek, false));
+  auto coroutine = StandaloneCoroutine(allocator, yaclib::util::Ptr<yaclib::util::IFunc>(&test_task, false));
   while(!coroutine.IsCompleted()) {
     coroutine();
   }

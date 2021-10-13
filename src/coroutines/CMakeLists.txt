@@ -24,9 +24,20 @@ list(APPEND YACLIB_SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/context/machine_context.cpp
         # todo: pick based on a system
         ${CMAKE_CURRENT_SOURCE_DIR}/context/setup_stack/setup_stack_x64.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/context/asm/switch_context_x64_mac.S
 
         ${CMAKE_CURRENT_SOURCE_DIR}/context/default_allocator.cpp
         )
+
+if(WIN32)
+    # do nothing
+elseif(APPLE)
+    list(APPEND YACLIB_SOURCES
+            ${CMAKE_CURRENT_SOURCE_DIR}/context/asm/switch_context_x64_mac.S
+            )
+else()
+    list(APPEND YACLIB_SOURCES
+            ${CMAKE_CURRENT_SOURCE_DIR}/context/asm/switch_context_x64_linux.S
+            )
+endif()
 
 add_files()
