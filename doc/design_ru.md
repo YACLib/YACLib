@@ -104,8 +104,8 @@ Zero cost абстракция, для того, чтобы избежать л�
 Абстракция для составления пайплайнов исполнения задач.
 
 ~~~{.cpp}
-auto thread_pool = executor::MakeThreadPool(4);
-auto future = async::Run(thread_pool, task1)
+auto thread_pool = MakeThreadPool(4);
+auto future = Run(thread_pool, task1)
               .Then(task2)
               .Then(task3)
 ~~~
@@ -122,7 +122,7 @@ auto future = async::Run(thread_pool, task1)
 Пример:
 
 ~~~{.cpp}
-auto future = async::Run(executor::MakeInline(), []{
+auto future = Run(MakeInline(), []{
     return MakeFuture<int>(5); // Returns Future<int>
 });
 
@@ -135,7 +135,7 @@ auto future = async::Run(executor::MakeInline(), []{
 Пример:
 
 ~~~{.cpp}
-auto future = async::Run(executor::MakeInline(), []{
+auto future = Run(MakeInline(), []{
     throw std::runtime_error{"bad exception"};
 }).Then([](std::exception_ptr e) { // recover error
     return 1;
@@ -153,10 +153,10 @@ assert(std::move(future).Get().Value() == 1);
 Пример:
 
 ~~~{.cpp}
-auto [future1, promise1] = async::MakeContract<int>();
-auto [future2, promise2] = async::MakeContract<int>();
-auto [future3, promise3] = async::MakeContract<int>();
-auto AllFuture = async::WhenAll(future1, future2, future3);
+auto [future1, promise1] = MakeContract<int>();
+auto [future2, promise2] = MakeContract<int>();
+auto [future3, promise3] = MakeContract<int>();
+auto AllFuture = WhenAll(future1, future2, future3);
 // decltype(AllFuture) == Future<std::array<int, 3>>;
 assert(AllFuture.Ready() == false);
 promise1.Set(5);
@@ -200,7 +200,7 @@ future.Then(task1).Then(task2).Then(task3)
 ~~~
 
 * Добавить `lazy::Run`, создание незапущенной Future без аллокации
-* Реализация ленивых `Future Combinators` как для `lazy::Future`, так и для `async::Future`
+* Реализация ленивых `Future Combinators` как для `lazy::Future`, так и для `Future`
 
 ## Разные реализации ThreadPool и их бенчмарки
 
@@ -230,7 +230,7 @@ future.Then(task1).Then(task2).Then(task3)
 * Реализовать `Fibers`, по сути являющиеся исполнениями coroutine.
 * Реализовать `Futex` для `Fibers`, не использующий системных вызовов.
 * Реализовать различные примитивы синхронизации для `Fibers`: `Mutex`, `ConditionVariable`, `etc`.
-* Реализовать lock-free `AsyncMutex`, по сути переосмысление `executor::Serial`.
+* Реализовать lock-free `AsyncMutex`, по сути переосмысление `Serial`.
 * Реализовать каналы для передачи данных между `Fibers`: `Bounded/Unbounded SPSC/MPSC/SPMC/MPMC`, стоит попытаться
   реализовать `lock-free` алгоритмы.
 * Реализовать `select` для каналов.
@@ -244,11 +244,11 @@ future.Then(task1).Then(task2).Then(task3)
 
 - `Shared Future`
 
-Аналог `async::Future`, у которой не константные методы - `thread-safe`
+Аналог `Future`, у которой не константные методы - `thread-safe`
 
 - `Shared Promise`
 
-Аналог `async::Promise`, у которого не константные методы - `thread-safe`
+Аналог `Promise`, у которого не константные методы - `thread-safe`
 
 - `WhenAny combinator`
 

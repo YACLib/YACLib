@@ -21,8 +21,8 @@ enum class WaitPolicy {
 
 template <WaitPolicy policy>
 void TestJustWorks() {
-  auto tp = executor::MakeThreadPool(1);
-  auto [f, p] = async::MakeContract<void>();
+  auto tp = MakeThreadPool(1);
+  auto [f, p] = MakeContract<void>();
 
   test::util::StopWatch timer;
 
@@ -31,15 +31,15 @@ void TestJustWorks() {
     std::move(p).Set();
   });
   if constexpr (policy == WaitPolicy::Endless) {
-    algo::Wait(f);
+    Wait(f);
     EXPECT_TRUE(f.Ready());
     EXPECT_LE(timer.Elapsed(), 200ms * YACLIB_CI_SLOWDOWN);
   } else if constexpr (policy == WaitPolicy::For) {
-    algo::WaitFor(50ms * YACLIB_CI_SLOWDOWN, f);
+    WaitFor(50ms * YACLIB_CI_SLOWDOWN, f);
     EXPECT_TRUE(!f.Ready());
     EXPECT_LE(timer.Elapsed(), 100ms * YACLIB_CI_SLOWDOWN);
   } else if constexpr (policy == WaitPolicy::Until) {
-    algo::WaitUntil(timer.Now() + 50ms * YACLIB_CI_SLOWDOWN, f);
+    WaitUntil(timer.Now() + 50ms * YACLIB_CI_SLOWDOWN, f);
     EXPECT_TRUE(!f.Ready());
     EXPECT_LE(timer.Elapsed(), 100ms * YACLIB_CI_SLOWDOWN);
   }
@@ -63,24 +63,24 @@ TEST(WaitUntil, JustWorks) {
 template <WaitPolicy kPolicy>
 void TestMultithreaded() {
   static constexpr int kThreads = 4;
-  auto tp = executor::MakeThreadPool(kThreads);
-  async::Future<int> f[kThreads];
+  auto tp = MakeThreadPool(kThreads);
+  Future<int> f[kThreads];
 
   for (int i = 0; i < kThreads; ++i) {
-    f[i] = async::Run(tp, [i] {
+    f[i] = Run(tp, [i] {
       std::this_thread::sleep_for(50ms * YACLIB_CI_SLOWDOWN);
       return i;
     });
   }
   test::util::StopWatch timer;
   if constexpr (kPolicy == WaitPolicy::Endless) {
-    algo::Wait(f[0], f[1], f[2], f[3]);
+    Wait(f[0], f[1], f[2], f[3]);
     EXPECT_LE(timer.Elapsed(), 100ms * YACLIB_CI_SLOWDOWN);
   } else if constexpr (kPolicy == WaitPolicy::For) {
-    bool ready = yaclib::algo::WaitFor(100ms * YACLIB_CI_SLOWDOWN, f[0], f[1], f[2], f[3]);
+    bool ready = yaclib::WaitFor(100ms * YACLIB_CI_SLOWDOWN, f[0], f[1], f[2], f[3]);
     EXPECT_TRUE(ready);
   } else if constexpr (kPolicy == WaitPolicy::Until) {
-    bool ready = yaclib::algo::WaitUntil(timer.Now() + 100ms * YACLIB_CI_SLOWDOWN, f[0], f[1], f[2], f[3]);
+    bool ready = yaclib::WaitUntil(timer.Now() + 100ms * YACLIB_CI_SLOWDOWN, f[0], f[1], f[2], f[3]);
     EXPECT_TRUE(ready);
   }
   EXPECT_LE(timer.Elapsed(), 150ms * YACLIB_CI_SLOWDOWN);

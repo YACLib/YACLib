@@ -1,6 +1,6 @@
 #include <yaclib/executor/executor.hpp>
 
-namespace yaclib::executor {
+namespace yaclib {
 
 class Inline final : public IExecutor {
  private:
@@ -24,4 +24,4 @@ IExecutorPtr MakeInline() noexcept {
   return &sInline;
 }
 
-}  // namespace yaclib::executor
+}  // namespace yaclib

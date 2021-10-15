@@ -17,9 +17,9 @@ using namespace std::chrono_literals;
 // TODO(kononovk): add expect threads, current_executes
 
 TEST(execute_task, simple) {
-  auto tp = executor::MakeThreadPool(4);
-  auto strand = executor::MakeSerial(tp);
-  EXPECT_EQ(strand->Tag(), executor::IExecutor::Type::Serial);
+  auto tp = MakeThreadPool(4);
+  auto strand = MakeSerial(tp);
+  EXPECT_EQ(strand->Tag(), yaclib::IExecutor::Type::Serial);
 
   bool done{false};
 
@@ -34,8 +34,8 @@ TEST(execute_task, simple) {
 }
 
 TEST(counter, simple) {
-  auto tp = executor::MakeThreadPool(13);
-  auto strand = executor::MakeSerial(tp);
+  auto tp = MakeThreadPool(13);
+  auto strand = MakeSerial(tp);
 
   size_t counter = 0;
   static const size_t kIncrements = 65536;
@@ -53,8 +53,8 @@ TEST(counter, simple) {
 }
 
 TEST(fifo, simple) {
-  auto tp = executor::MakeThreadPool(13);
-  auto strand = executor::MakeSerial(tp);
+  auto tp = MakeThreadPool(13);
+  auto strand = MakeSerial(tp);
 
   size_t next_ticket = 0;
   static const size_t kTickets = 123456;
@@ -74,7 +74,7 @@ TEST(fifo, simple) {
 
 class Counter {
  public:
-  Counter(executor::IExecutorPtr e) : strand_{executor::MakeSerial(e)} {
+  Counter(IExecutorPtr e) : strand_{MakeSerial(e)} {
   }
 
   void Increment() {
@@ -89,11 +89,11 @@ class Counter {
 
  private:
   size_t value_{0};
-  executor::IExecutorPtr strand_;
+  IExecutorPtr strand_;
 };
 
 TEST(concurrent_strands, simple) {
-  auto tp = executor::MakeThreadPool(16);
+  auto tp = MakeThreadPool(16);
 
   static const size_t kStrands = 50;
 
@@ -122,14 +122,14 @@ TEST(concurrent_strands, simple) {
 }
 
 TEST(batching, simple) {
-  auto tp = executor::MakeThreadPool(1);
-  EXPECT_EQ(tp->Tag(), executor::IExecutor::Type::SingleThread);
+  auto tp = MakeThreadPool(1);
+  EXPECT_EQ(tp->Tag(), yaclib::IExecutor::Type::SingleThread);
   tp->Execute([] {
     // bubble
     std::this_thread::sleep_for(1s);
   });
 
-  auto strand = executor::MakeSerial(tp);
+  auto strand = MakeSerial(tp);
 
   static const size_t kStrandTasks = 100;
 
@@ -147,9 +147,9 @@ TEST(batching, simple) {
 }
 
 TEST(strand_over_strand, simple) {
-  auto tp = executor::MakeThreadPool(4);
+  auto tp = MakeThreadPool(4);
 
-  auto strand = executor::MakeSerial(executor::MakeSerial(executor::MakeSerial(tp)));
+  auto strand = MakeSerial(MakeSerial(MakeSerial(tp)));
 
   bool done = false;
   strand->Execute([&done] {
@@ -163,7 +163,7 @@ TEST(strand_over_strand, simple) {
 }
 
 // TODO(kononovk)
-// class LifoManualExecutor final : public executor::IExecutor {
+// class LifoManualExecutor final : public IExecutor {
 // public:
 //  void Execute(yaclib::ITaskPtr task) final {
 //    tasks_.push(std::move(task));
@@ -183,7 +183,7 @@ TEST(strand_over_strand, simple) {
 //
 // TEST(stack, cimple) {
 //  auto lifo = std::make_shared<LifoManualExecutor>();
-//  auto strand = executor::MakeSerial(lifo);
+//  auto strand = MakeSerial(lifo);
 //
 //  int steps = 0;
 //
@@ -202,7 +202,7 @@ TEST(strand_over_strand, simple) {
 //}
 
 TEST(keep_strong_ref, simple) {
-  auto tp = executor::MakeThreadPool(1);
+  auto tp = MakeThreadPool(1);
 
   tp->Execute([] {
     // bubble
@@ -210,7 +210,7 @@ TEST(keep_strong_ref, simple) {
   });
 
   bool done = false;
-  executor::MakeSerial(tp)->Execute([&done] {
+  MakeSerial(tp)->Execute([&done] {
     done = true;
   });
 
@@ -220,9 +220,9 @@ TEST(keep_strong_ref, simple) {
 }
 
 TEST(do_not_occupy_thread, simple) {
-  auto tp = executor::MakeThreadPool(1);
+  auto tp = MakeThreadPool(1);
 
-  auto strand = executor::MakeSerial(tp);
+  auto strand = MakeSerial(tp);
 
   tp->Execute([] {
     // bubble
@@ -255,8 +255,8 @@ TEST(do_not_occupy_thread, simple) {
 }
 
 TEST(exceptions, simple) {
-  auto tp = executor::MakeThreadPool(1);
-  auto strand = executor::MakeSerial(tp);
+  auto tp = MakeThreadPool(1);
+  auto strand = MakeSerial(tp);
 
   tp->Execute([] {
     std::this_thread::sleep_for(1s);
@@ -277,8 +277,8 @@ TEST(exceptions, simple) {
 }
 
 TEST(non_blocking_execute, simple) {
-  auto tp = executor::MakeThreadPool(1);
-  auto strand = executor::MakeSerial(tp);
+  auto tp = MakeThreadPool(1);
+  auto strand = MakeSerial(tp);
 
   strand->Execute([] {
     std::this_thread::sleep_for(2s);
@@ -296,8 +296,8 @@ TEST(non_blocking_execute, simple) {
 }
 
 TEST(do_not_block_thread_pool, simple) {
-  auto tp = executor::MakeThreadPool(2);
-  auto strand = executor::MakeSerial(tp);
+  auto tp = MakeThreadPool(2);
+  auto strand = MakeSerial(tp);
 
   strand->Execute([] {
     std::this_thread::sleep_for(1s);
@@ -323,8 +323,8 @@ TEST(do_not_block_thread_pool, simple) {
 }
 
 TEST(memory_leak, simple) {
-  auto tp = executor::MakeThreadPool(1);
-  auto strand = executor::MakeSerial(tp);
+  auto tp = MakeThreadPool(1);
+  auto strand = MakeSerial(tp);
 
   tp->Execute([] {
     std::this_thread::sleep_for(1s);

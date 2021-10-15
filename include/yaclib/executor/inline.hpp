@@ -2,7 +2,7 @@
 
 #include <yaclib/executor/executor.hpp>
 
-namespace yaclib::executor {
+namespace yaclib {
 
 /**
  * Get Inline executor singleton object.
@@ -31,4 +31,4 @@ namespace yaclib::executor {
  */
 IExecutorPtr MakeInline() noexcept;
 
-}  // namespace yaclib::executor
+}  // namespace yaclib

@@ -22,19 +22,19 @@ void JustWorks() {
   constexpr int kSize = 3;
   static constexpr bool is_void = std::is_void_v<T>;
 
-  std::array<async::Promise<T>, kSize> promises;
-  std::array<async::Future<T>, kSize> futures;
+  std::array<Promise<T>, kSize> promises;
+  std::array<Future<T>, kSize> futures;
   for (int i = 0; i < kSize; ++i) {
-    auto [f, p] = async::MakeContract<T>();
+    auto [f, p] = MakeContract<T>();
     futures[i] = std::move(f);
     promises[i] = std::move(p);
   }
 
   auto all = [&futures] {
     if constexpr (suite == TestSuite::Array) {
-      return algo::WhenAll(std::move(futures[0]), std::move(futures[1]), std::move(futures[2]));
+      return WhenAll(std::move(futures[0]), std::move(futures[1]), std::move(futures[2]));
     } else {
-      return algo::WhenAll(futures.begin(), futures.end());
+      return WhenAll(futures.begin(), futures.end());
     }
   }();
 
@@ -92,19 +92,19 @@ TEST(VoidArray, JustWorks) {
 template <TestSuite suite, typename T = void>
 void AllFails() {
   constexpr int kSize = 3;
-  std::array<async::Promise<T>, kSize> promises;
-  std::array<async::Future<T>, kSize> futures;
+  std::array<Promise<T>, kSize> promises;
+  std::array<Future<T>, kSize> futures;
   for (int i = 0; i < kSize; ++i) {
-    auto [f, p] = async::MakeContract<T>();
+    auto [f, p] = MakeContract<T>();
     futures[i] = std::move(f);
     promises[i] = std::move(p);
   }
 
   auto all = [&futures] {
     if constexpr (suite == TestSuite::Array) {
-      return algo::WhenAll(std::move(futures[0]), std::move(futures[1]), std::move(futures[2]));
+      return WhenAll(std::move(futures[0]), std::move(futures[1]), std::move(futures[2]));
     } else {
-      return algo::WhenAll(futures.begin(), futures.end());
+      return WhenAll(futures.begin(), futures.end());
     }
   }();
 
@@ -138,8 +138,8 @@ TEST(VoidArray, AllFails) {
 
 template <typename T = int>
 void EmptyInput() {
-  auto empty = std::vector<async::Future<T>>{};
-  auto all = algo::WhenAll(empty.begin(), empty.end());
+  auto empty = std::vector<Future<T>>{};
+  auto all = WhenAll(empty.begin(), empty.end());
 
   EXPECT_TRUE(all.Ready());
   EXPECT_NO_THROW(std::move(all).Get().Ok());
@@ -157,10 +157,10 @@ template <TestSuite suite, typename T = int>
 void MultiThreaded() {
   static constexpr bool is_void = std::is_void_v<T>;
 
-  auto tp = executor::MakeThreadPool(4);
+  auto tp = MakeThreadPool(4);
 
   auto async_value = [tp](int value) {
-    return async::Run(tp, [value] {
+    return Run(tp, [value] {
       std::this_thread::sleep_for(10ms);
       if constexpr (!is_void) {
         return value;
@@ -172,7 +172,7 @@ void MultiThreaded() {
 
   static const int kValues = 6;
 
-  std::array<async::Future<T>, 6> fs;
+  std::array<Future<T>, 6> fs;
   for (int i = 0; i < kValues; ++i) {
     fs[i] = async_value(i);
   }
@@ -180,10 +180,10 @@ void MultiThreaded() {
   auto ints =
       [&fs] {
         if constexpr (suite == TestSuite::Vector) {
-          return algo::WhenAll(fs.begin(), fs.end());
+          return WhenAll(fs.begin(), fs.end());
         } else {
-          return algo::WhenAll(std::move(fs[0]), std::move(fs[1]), std::move(fs[2]), std::move(fs[3]), std::move(fs[4]),
-                               std::move(fs[5]));
+          return WhenAll(std::move(fs[0]), std::move(fs[1]), std::move(fs[2]), std::move(fs[3]), std::move(fs[4]),
+                         std::move(fs[5]));
         }
       }()
           .Get();

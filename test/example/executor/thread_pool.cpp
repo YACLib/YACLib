@@ -12,7 +12,7 @@
 TEST(Example, ThreadPool) {
   std::cout << "ThreadPool" << std::endl;
 
-  auto tp = yaclib::executor::MakeThreadPool(4);
+  auto tp = yaclib::MakeThreadPool(4);
 
   std::atomic<size_t> counter{0};
 

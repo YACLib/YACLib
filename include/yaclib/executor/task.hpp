@@ -3,7 +3,7 @@
 #include <yaclib/util/func.hpp>
 #include <yaclib/util/intrusive_node.hpp>
 
-namespace yaclib::executor {
+namespace yaclib {
 
 /**
  * Callable that can be executed in an IExecutor \see IExecutor
@@ -38,4 +38,4 @@ ITask* MakeUniqueTask(Functor&& functor) {
 }
 
 }  // namespace detail
-}  // namespace yaclib::executor
+}  // namespace yaclib

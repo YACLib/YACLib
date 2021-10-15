@@ -9,7 +9,7 @@
 #include <mutex>
 #include <thread>
 
-namespace yaclib::executor {
+namespace yaclib {
 namespace {
 
 thread_local IThreadPool* tlCurrentThreadPool;
@@ -85,7 +85,7 @@ class ThreadPool : public IThreadPool {
 
   void Wait() final {
     while (auto thread = _threads.PopFront()) {
-      _factory->Release(executor::IThreadPtr{thread});
+      _factory->Release(IThreadPtr{thread});
     }
   }
 
@@ -269,4 +269,4 @@ IThreadPoolPtr MakeThreadPool(size_t threads, IThreadFactoryPtr tf) {
   return new util::Counter<ThreadPool>{std::move(tf), threads};
 }
 
-}  // namespace yaclib::executor
+}  // namespace yaclib

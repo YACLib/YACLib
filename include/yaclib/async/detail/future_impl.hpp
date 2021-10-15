@@ -7,7 +7,7 @@
 #include <yaclib/algo/wait.hpp>
 #include <yaclib/util/defer.hpp>
 
-namespace yaclib::async {
+namespace yaclib {
 namespace detail {
 
 template <typename T, typename Functor>
@@ -137,12 +137,12 @@ class AsyncInvoke {
       std::conditional_t<std::is_function_v<std::remove_reference_t<FunctorT>>, FunctorStoreT, FunctorT>;
 
  public:
-  explicit AsyncInvoke(executor::IExecutorPtr executor, Promise<U> promise,
+  explicit AsyncInvoke(IExecutorPtr executor, Promise<U> promise,
                        FunctorStoreT&& f) noexcept(std::is_nothrow_move_constructible_v<FunctorStoreT>)
       : _executor{std::move(executor)}, _promise{std::move(promise)}, _f{std::move(f)} {
   }
 
-  explicit AsyncInvoke(executor::IExecutorPtr executor, Promise<U> promise,
+  explicit AsyncInvoke(IExecutorPtr executor, Promise<U> promise,
                        const FunctorStoreT& f) noexcept(std::is_nothrow_copy_constructible_v<FunctorStoreT>)
       : _executor{std::move(executor)}, _promise{std::move(promise)}, _f{f} {
   }
@@ -198,7 +198,7 @@ class AsyncInvoke {
     }
   }
 
-  executor::IExecutorPtr _executor;
+  IExecutorPtr _executor;
   Promise<U> _promise;
   FunctorStoreT _f;
 };
@@ -217,7 +217,7 @@ Future<U> Then(FutureCorePtr<T> caller, Functor&& f) {
 
 template <typename U, typename T, typename Functor>
 Future<U> AsyncThen(FutureCorePtr<T> caller, Functor&& f) {
-  auto [future, promise] = async::MakeContract<U>();
+  auto [future, promise] = MakeContract<U>();
   future.Via(caller->GetExecutor());
 
   using InvokeT = detail::AsyncInvoke<U, decltype(std::forward<Functor>(f)), T>;
@@ -258,7 +258,7 @@ util::Result<T> Future<T>::Get() const& {
 template <typename T>
 util::Result<T> Future<T>::Get() && {
   if (!Ready()) {
-    algo::Wait(*this);
+    Wait(*this);
   }
   auto core = std::exchange(_core, nullptr);
   return std::move(core->Get());
@@ -277,7 +277,7 @@ void Future<T>::Detach() && {
 }
 
 template <typename T>
-Future<T>& Future<T>::Via(executor::IExecutorPtr executor) & {
+Future<T>& Future<T>::Via(IExecutorPtr executor) & {
   _core->SetExecutor(std::move(executor));
   return *this;
 }
@@ -299,7 +299,7 @@ auto Future<T>::Then(Functor&& functor) && {
 
 template <typename T>
 template <typename Functor>
-auto Future<T>::Then(executor::IExecutorPtr executor, Functor&& functor) && {
+auto Future<T>::Then(IExecutorPtr executor, Functor&& functor) && {
   _core->SetExecutor(std::move(executor));
   return std::move(*this).Then(std::forward<Functor>(functor));
 }
@@ -312,7 +312,7 @@ void Future<T>::Subscribe(Functor&& functor) && {
 
 template <typename T>
 template <typename Functor>
-void Future<T>::Subscribe(executor::IExecutorPtr executor, Functor&& functor) && {
+void Future<T>::Subscribe(IExecutorPtr executor, Functor&& functor) && {
   _core->SetExecutor(std::move(executor));
   std::move(*this).Subscribe(std::forward<Functor>(functor));
 }
@@ -321,4 +321,4 @@ template <typename T>
 Future<T>::Future(detail::FutureCorePtr<T> core) : _core{std::move(core)} {
 }
 
-}  // namespace yaclib::async
+}  // namespace yaclib

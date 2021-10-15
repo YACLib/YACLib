@@ -34,7 +34,7 @@ enum class ThreadPoolTag {
 class SingleLightThread : public ::testing::Test {
  protected:
   void SetUp() override {
-    _factory = executor::MakeThreadFactory();
+    _factory = MakeThreadFactory();
     PushTP();
   }
 
@@ -43,15 +43,15 @@ class SingleLightThread : public ::testing::Test {
   }
 
   void PushTP() {
-    _tps.push_back(executor::MakeThreadPool(1, _factory));
+    _tps.push_back(MakeThreadPool(1, _factory));
   }
 
   void PopTP() {
     _tps.pop_back();
   }
 
-  std::vector<executor::IThreadPoolPtr> _tps;
-  executor::IThreadFactoryPtr _factory;
+  std::vector<IThreadPoolPtr> _tps;
+  IThreadFactoryPtr _factory;
   FactoryTag _factory_tag{FactoryTag::Light};
   FactoryTag _tp_tag{ThreadPoolTag::Single};
 };
@@ -59,7 +59,7 @@ class SingleLightThread : public ::testing::Test {
 class SingleHeavyThread : public ::testing::Test {
  protected:
   void SetUp() override {
-    _factory = executor::MakeThreadFactory(1);
+    _factory = MakeThreadFactory(1);
     PushTP();
   }
 
@@ -68,15 +68,15 @@ class SingleHeavyThread : public ::testing::Test {
   }
 
   void PushTP() {
-    _tps.push_back(executor::MakeThreadPool(1, _factory));
+    _tps.push_back(MakeThreadPool(1, _factory));
   }
 
   void PopTP() {
     _tps.pop_back();
   }
 
-  std::vector<executor::IThreadPoolPtr> _tps;
-  executor::IThreadFactoryPtr _factory;
+  std::vector<IThreadPoolPtr> _tps;
+  IThreadFactoryPtr _factory;
   FactoryTag _factory_tag{FactoryTag::Heavy};
   FactoryTag _tp_tag{ThreadPoolTag::Single};
 };
@@ -84,7 +84,7 @@ class SingleHeavyThread : public ::testing::Test {
 class MultiLightThread : public ::testing::Test {
  protected:
   void SetUp() override {
-    _factory = executor::MakeThreadFactory();
+    _factory = MakeThreadFactory();
     PushTP();
   }
 
@@ -93,15 +93,15 @@ class MultiLightThread : public ::testing::Test {
   }
 
   void PushTP() {
-    _tps.push_back(executor::MakeThreadPool(kCoresCount, _factory));
+    _tps.push_back(MakeThreadPool(kCoresCount, _factory));
   }
 
   void PopTP() {
     _tps.pop_back();
   }
 
-  std::vector<executor::IThreadPoolPtr> _tps;
-  executor::IThreadFactoryPtr _factory;
+  std::vector<IThreadPoolPtr> _tps;
+  IThreadFactoryPtr _factory;
   FactoryTag _factory_tag{FactoryTag::Heavy};
   FactoryTag _tp_tag{ThreadPoolTag::Multi};
 };
@@ -109,7 +109,7 @@ class MultiLightThread : public ::testing::Test {
 class MultiHeavyThread : public ::testing::Test {
  protected:
   void SetUp() override {
-    _factory = executor::MakeThreadFactory(kCoresCount);
+    _factory = MakeThreadFactory(kCoresCount);
     PushTP();
   }
 
@@ -118,20 +118,20 @@ class MultiHeavyThread : public ::testing::Test {
   }
 
   void PushTP() {
-    _tps.push_back(executor::MakeThreadPool(kCoresCount, _factory));
+    _tps.push_back(MakeThreadPool(kCoresCount, _factory));
   }
 
   void PopTP() {
     _tps.pop_back();
   }
 
-  std::vector<executor::IThreadPoolPtr> _tps;
-  executor::IThreadFactoryPtr _factory;
+  std::vector<IThreadPoolPtr> _tps;
+  IThreadFactoryPtr _factory;
   FactoryTag _factory_tag{FactoryTag::Heavy};
   FactoryTag _tp_tag{ThreadPoolTag::Single};
 };
 
-void JustWork(executor::IThreadPoolPtr& tp) {
+void JustWork(IThreadPoolPtr& tp) {
   bool ready{false};
   tp->Execute([&] {
     ready = true;
@@ -144,7 +144,7 @@ void JustWork(executor::IThreadPoolPtr& tp) {
 }
 
 TEST_F(SingleLightThread, JustWork) {
-  EXPECT_EQ(executor::MakeInline()->Tag(), executor::IExecutor::Type::Inline);
+  EXPECT_EQ(MakeInline()->Tag(), yaclib::IExecutor::Type::Inline);
   JustWork(_tps[0]);
 }
 TEST_F(SingleHeavyThread, JustWork) {
@@ -157,10 +157,10 @@ TEST_F(MultiHeavyThread, JustWork) {
   JustWork(_tps[0]);
 }
 
-void ExecuteFrom(executor::IThreadPoolPtr& tp) {
+void ExecuteFrom(IThreadPoolPtr& tp) {
   bool done{false};
   auto task = [&] {
-    executor::CurrentThreadPool()->Execute([&] {
+    CurrentThreadPool()->Execute([&] {
       done = true;
     });
   };
@@ -192,7 +192,7 @@ enum class StopType {
   HardStop,
 };
 
-void AfterStopImpl(executor::IThreadPoolPtr& tp, StopType stop_type, bool need_wait) {
+void AfterStopImpl(IThreadPoolPtr& tp, StopType stop_type, bool need_wait) {
   bool ready{false};
 
   if (need_wait || stop_type != StopType::SoftStop) {
@@ -274,7 +274,7 @@ TEST_F(MultiHeavyThread, AfterStop) {
   }
 }
 
-void TwoThreadPool(executor::IThreadPoolPtr& tp1, executor::IThreadPoolPtr& tp2) {
+void TwoThreadPool(IThreadPoolPtr& tp1, IThreadPoolPtr& tp2) {
   bool done1{false};
   bool done2{false};
 
@@ -320,7 +320,7 @@ TEST_F(MultiHeavyThread, TwoThreadPool) {
   TwoThreadPool(_tps[0], _tps[1]);
 }
 
-void FIFO(executor::IThreadPoolPtr& tp, StopType stop_type) {
+void FIFO(IThreadPoolPtr& tp, StopType stop_type) {
   size_t next_task{0};
 
   constexpr size_t kTasks{256};
@@ -363,7 +363,7 @@ TEST_F(SingleHeavyThread, FIFO) {
   }
 }
 
-void Exception(executor::IThreadPoolPtr& tp, StopType stop_type) {
+void Exception(IThreadPoolPtr& tp, StopType stop_type) {
   int flag{0};
   tp->Execute([&] {
     flag += 1;
@@ -416,7 +416,7 @@ TEST_F(SingleHeavyThread, Exception) {
   }
 }
 
-void ManyTask(executor::IThreadPoolPtr& tp, StopType stop_type, size_t threads_count) {
+void ManyTask(IThreadPoolPtr& tp, StopType stop_type, size_t threads_count) {
   const size_t tasks{1024 * threads_count / 3};
 
   std::atomic_size_t completed{0};
@@ -471,7 +471,7 @@ TEST_F(MultiHeavyThread, ManyTask) {
   }
 }
 
-void UseAllThreads(executor::IThreadPoolPtr& tp, StopType stop_type) {
+void UseAllThreads(IThreadPoolPtr& tp, StopType stop_type) {
   std::atomic_size_t counter{0};
 
   auto sleeper = [&counter] {
@@ -507,19 +507,19 @@ void UseAllThreads(executor::IThreadPoolPtr& tp, StopType stop_type) {
 TEST_F(MultiLightThread, UseAllThreads) {
   for (auto stop_type : {StopType::SoftStop, StopType::Stop}) {
     _tps[0] = nullptr;  // Release threads
-    _tps[0] = executor::MakeThreadPool(2);
+    _tps[0] = MakeThreadPool(2);
     UseAllThreads(_tps[0], stop_type);
   }
 }
 TEST_F(MultiHeavyThread, UseAllThreads) {
   for (auto stop_type : {StopType::SoftStop, StopType::Stop}) {
     _tps[0] = nullptr;  // Release threads
-    _tps[0] = executor::MakeThreadPool(2);
+    _tps[0] = MakeThreadPool(2);
     UseAllThreads(_tps[0], stop_type);
   }
 }
 
-void NotSequentialAndParallel(executor::IThreadPoolPtr& tp, StopType stop_type) {
+void NotSequentialAndParallel(IThreadPoolPtr& tp, StopType stop_type) {
   // Not sequential start and parallel running
   std::atomic_int counter{0};
 
@@ -555,40 +555,40 @@ void NotSequentialAndParallel(executor::IThreadPoolPtr& tp, StopType stop_type) 
 TEST_F(MultiLightThread, NotSequentialAndParallel) {
   for (auto stop_type : {StopType::SoftStop, StopType::Stop}) {
     _tps[0] = nullptr;  // Release threads
-    _tps[0] = executor::MakeThreadPool(2);
+    _tps[0] = MakeThreadPool(2);
     NotSequentialAndParallel(_tps[0], stop_type);
   }
 }
 TEST_F(MultiHeavyThread, NotSequentialAndParallel) {
   for (auto stop_type : {StopType::SoftStop, StopType::Stop}) {
     _tps[0] = nullptr;  // Release threads
-    _tps[0] = executor::MakeThreadPool(2);
+    _tps[0] = MakeThreadPool(2);
     NotSequentialAndParallel(_tps[0], stop_type);
   }
 }
 
-void Current(executor::IThreadPoolPtr& tp) {
-  EXPECT_EQ(executor::CurrentThreadPool(), nullptr);
+void Current(IThreadPoolPtr& tp) {
+  EXPECT_EQ(CurrentThreadPool(), nullptr);
 
   tp->Execute([&] {
-    EXPECT_EQ(executor::CurrentThreadPool(), tp);
+    EXPECT_EQ(CurrentThreadPool(), tp);
     std::this_thread::sleep_for(10ms);
-    EXPECT_EQ(executor::CurrentThreadPool(), tp);
+    EXPECT_EQ(CurrentThreadPool(), tp);
   });
 
-  EXPECT_EQ(executor::CurrentThreadPool(), nullptr);
+  EXPECT_EQ(CurrentThreadPool(), nullptr);
 
   std::this_thread::sleep_for(1ms);
 
-  EXPECT_EQ(executor::CurrentThreadPool(), nullptr);
+  EXPECT_EQ(CurrentThreadPool(), nullptr);
 
   tp->Stop();
 
-  EXPECT_EQ(executor::CurrentThreadPool(), nullptr);
+  EXPECT_EQ(CurrentThreadPool(), nullptr);
 
   tp->Wait();
 
-  EXPECT_EQ(executor::CurrentThreadPool(), nullptr);
+  EXPECT_EQ(CurrentThreadPool(), nullptr);
 }
 
 TEST_F(SingleLightThread, Current) {
@@ -604,7 +604,7 @@ TEST_F(MultiHeavyThread, Current) {
   Current(_tps[0]);
 }
 
-void Lifetime(executor::IThreadPoolPtr& tp, size_t threads) {
+void Lifetime(IThreadPoolPtr& tp, size_t threads) {
   class Task final {
    public:
     Task(Task&&) = default;
@@ -648,17 +648,17 @@ void Lifetime(executor::IThreadPoolPtr& tp, size_t threads) {
 
 TEST_F(MultiLightThread, Lifetime) {
   _tps[0] = nullptr;  // Release threads
-  _tps[0] = executor::MakeThreadPool(4);
+  _tps[0] = MakeThreadPool(4);
   Lifetime(_tps[0], 4);
 }
 TEST_F(MultiHeavyThread, Lifetime) {
   _tps[0] = nullptr;  // Release threads
-  _tps[0] = executor::MakeThreadPool(4);
+  _tps[0] = MakeThreadPool(4);
   Lifetime(_tps[0], 4);
 }
 
-void RacyCounter(executor::IThreadFactoryPtr& factory) {
-  auto tp = executor::MakeThreadPool(2 * kCoresCount, factory);
+void RacyCounter(IThreadFactoryPtr& factory) {
+  auto tp = MakeThreadPool(2 * kCoresCount, factory);
 
   std::atomic<size_t> counter1{0};
   std::atomic<size_t> counter2{0};
@@ -693,7 +693,7 @@ TEST_F(MultiHeavyThread, RacyCounter) {
 ///  https://stackoverflow.com/questions/12606033/computing-cpu-time-in-c-on-windows
 #if defined(__linux)
 
-void NotBurnCPU(executor::IThreadPoolPtr& tp, size_t threads) {
+void NotBurnCPU(IThreadPoolPtr& tp, size_t threads) {
   // Warmup
   for (size_t i = 0; i != threads; ++i) {
     tp->Execute([&] {
