@@ -6,7 +6,7 @@
 #include <atomic>
 #include <utility>
 
-namespace yaclib::executor {
+namespace yaclib {
 namespace {
 
 class Serial : public IExecutor, public ITask {
@@ -74,4 +74,4 @@ IExecutorPtr MakeSerial(IExecutorPtr executor) {
   return new util::Counter<Serial>{std::move(executor)};
 }
 
-}  // namespace yaclib::executor
+}  // namespace yaclib

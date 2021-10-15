@@ -12,9 +12,9 @@
 #include <mutex>
 #include <type_traits>
 
-namespace yaclib::async::detail {
+namespace yaclib::detail {
 
-class BaseCore : public executor::ITask {
+class BaseCore : public ITask {
  protected:
   enum class State {
     Empty,
@@ -26,14 +26,14 @@ class BaseCore : public executor::ITask {
   };
 
  public:
-  [[nodiscard]] executor::IExecutorPtr GetExecutor() const noexcept {
+  [[nodiscard]] IExecutorPtr GetExecutor() const noexcept {
     return _executor;
   }
   [[nodiscard]] bool Ready() const noexcept {
     return _state.load(std::memory_order_acquire) == State::HasResult;
   }
 
-  void SetExecutor(executor::IExecutorPtr executor) noexcept {
+  void SetExecutor(IExecutorPtr executor) noexcept {
     _executor = std::move(executor);
   }
 
@@ -74,7 +74,7 @@ class BaseCore : public executor::ITask {
  protected:
   std::atomic<State> _state{State::Empty};
   util::Ptr<ITask> _caller;
-  executor::IExecutorPtr _executor{executor::MakeInline()};
+  IExecutorPtr _executor{MakeInline()};
   util::Ptr<ITask> _callback;
 
   void Execute() {
@@ -102,7 +102,7 @@ class ResultCore : public BaseCore {
     if (state == State::HasCallback) {
       BaseCore::Execute();
     } else if (state == State::HasInlineCallback) {
-      _executor = executor::MakeInline();
+      _executor = MakeInline();
       BaseCore::Execute();
     } else if (state == State::HasWaitCallback) {
       _callback = nullptr;
@@ -157,7 +157,7 @@ class Core<Result, void, void> : public ResultCore<Result> {
   }
 };
 
-class WaitCore : public executor::ITask {
+class WaitCore : public ITask {
  public:
   bool is_ready{false};
   std::mutex m;
@@ -187,4 +187,4 @@ using PromiseCorePtr = util::Ptr<Core<Value, void, void>>;
 template <typename Value>
 using FutureCorePtr = util::Ptr<ResultCore<Value>>;
 
-}  // namespace yaclib::async::detail
+}  // namespace yaclib::detail

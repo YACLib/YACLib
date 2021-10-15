@@ -5,7 +5,7 @@
 
 #include <memory>
 
-namespace yaclib::executor {
+namespace yaclib {
 
 class IExecutor : public util::IRef {
  public:
@@ -54,4 +54,4 @@ class IExecutor : public util::IRef {
 
 using IExecutorPtr = util::Ptr<IExecutor>;
 
-}  // namespace yaclib::executor
+}  // namespace yaclib

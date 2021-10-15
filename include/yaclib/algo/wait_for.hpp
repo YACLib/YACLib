@@ -2,7 +2,7 @@
 
 #include <yaclib/algo/detail/wait.hpp>
 
-namespace yaclib::algo {
+namespace yaclib {
 
 /**
  * Wait until the specified timeout duration has elapsed or \ref Ready becomes true
@@ -15,7 +15,7 @@ namespace yaclib::algo {
  */
 template <typename Rep, typename Period, typename... Futures>
 bool WaitFor(const std::chrono::duration<Rep, Period>& timeout_duration, Futures&&... fs) {
-  return detail::Wait<detail::WaitPolicy::For>(timeout_duration, static_cast<async::detail::BaseCore&>(*fs._core)...);
+  return detail::Wait<detail::WaitPolicy::For>(timeout_duration, static_cast<detail::BaseCore&>(*fs._core)...);
 }
 
-}  // namespace yaclib::algo
+}  // namespace yaclib

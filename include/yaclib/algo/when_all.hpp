@@ -9,7 +9,7 @@
 #include <utility>
 #include <vector>
 
-namespace yaclib::algo {
+namespace yaclib {
 namespace detail {
 
 template <typename T>
@@ -34,8 +34,8 @@ class AllCombinator : public AllCombinatorBase<FutureValue>, public util::IRef {
   using Base = AllCombinatorBase<FutureValue>;
 
  public:
-  static std::pair<async::Future<FutureValue>, util::Ptr<AllCombinator>> Make(size_t size = 0) {
-    auto [future, promise] = async::MakeContract<FutureValue>();
+  static std::pair<Future<FutureValue>, util::Ptr<AllCombinator>> Make(size_t size = 0) {
+    auto [future, promise] = MakeContract<FutureValue>();
     if constexpr (!IsArray) {
       if (size == 0) {
         if constexpr (std::is_void_v<T>) {
@@ -82,18 +82,18 @@ class AllCombinator : public AllCombinatorBase<FutureValue>, public util::IRef {
   }
 
  private:
-  explicit AllCombinator(async::Promise<FutureValue> promise, [[maybe_unused]] size_t size = 0)
+  explicit AllCombinator(Promise<FutureValue> promise, [[maybe_unused]] size_t size = 0)
       : _promise{std::move(promise)} {
     if constexpr (!std::is_void_v<T> && !IsArray) {
       AllCombinatorBase<FutureValue>::_results.resize(size);
     }
   }
 
-  async::Promise<FutureValue> _promise;
+  Promise<FutureValue> _promise;
 };
 
 template <size_t N, typename T, typename... Fs>
-void WhenAllImpl(util::Ptr<AllCombinator<T, N>>& combinator, async::Future<T>&& head, Fs&&... tail) {
+void WhenAllImpl(util::Ptr<AllCombinator<T, N>>& combinator, Future<T>&& head, Fs&&... tail) {
   std::move(head).Subscribe([c = combinator](util::Result<T>&& result) mutable {
     c->Combine(std::move(result));
     c = nullptr;
@@ -148,11 +148,11 @@ auto WhenAll(It begin, It end) {
  * \return Future<array<T>>
  */
 template <typename T, typename... Fs>
-auto WhenAll(async::Future<T>&& head, Fs&&... tail) {
+auto WhenAll(Future<T>&& head, Fs&&... tail) {
   static_assert((... && util::IsFutureV<Fs>));  // TODO(kononovk): Add static assert that FutureValue<Fs> = T
   auto [future, combinator] = detail::AllCombinator<T, sizeof...(Fs) + 1>::Make();
   detail::WhenAllImpl<sizeof...(Fs) + 1>(combinator, std::move(head), std::forward<Fs>(tail)...);
   return std::move(future);
 }
 
-}  // namespace yaclib::algo
+}  // namespace yaclib

@@ -21,12 +21,12 @@ static auto init_rand = [] {
 
 using namespace yaclib;
 
-using ThreadsContainter = util::List<executor::IThread>;
+using ThreadsContainter = util::List<IThread>;
 
 const auto kDoNothing = util::MakeFunc([] {
 });
 
-void MakeFactoryEmpty(executor::IThreadFactoryPtr factory, size_t acquire_threads, ThreadsContainter& threads) {
+void MakeFactoryEmpty(IThreadFactoryPtr factory, size_t acquire_threads, ThreadsContainter& threads) {
   for (size_t i = 0; i != acquire_threads; ++i) {
     auto thread_ptr = factory->Acquire(kDoNothing);
     EXPECT_NE(thread_ptr, nullptr);
@@ -38,16 +38,16 @@ void MakeFactoryEmpty(executor::IThreadFactoryPtr factory, size_t acquire_thread
   }
 }
 
-void MakeFactoryAvailable(executor::IThreadFactoryPtr factory, size_t release_threads, ThreadsContainter& threads) {
+void MakeFactoryAvailable(IThreadFactoryPtr factory, size_t release_threads, ThreadsContainter& threads) {
   while (release_threads != 0 && !threads.IsEmpty()) {
     auto release_thread = rand() % 2 == 0 ? threads.PopBack() : threads.PopFront();
-    factory->Release(executor::IThreadPtr{release_thread});
+    factory->Release(IThreadPtr{release_thread});
     --release_threads;
   }
   EXPECT_EQ(release_threads, 0);
 }
 
-void run_tests(size_t iter_count, executor::IThreadFactoryPtr factory, size_t max_thread_count) {
+void run_tests(size_t iter_count, IThreadFactoryPtr factory, size_t max_thread_count) {
   ThreadsContainter threads;
   size_t acquire_counter = max_thread_count;
   size_t release_counter = 0;
@@ -64,7 +64,7 @@ void run_tests(size_t iter_count, executor::IThreadFactoryPtr factory, size_t ma
 
 TEST(single_threaded, simple) {
   size_t counter{0};
-  auto factory = executor::MakeThreadFactory(1);
+  auto factory = MakeThreadFactory(1);
   auto thread = factory->Acquire(util::MakeFunc([&counter] {
     counter = 1;
   }));
@@ -76,7 +76,7 @@ TEST(single_threaded, complex) {
   static const size_t kMaxThreadCount = (kSanitizer ? 1 : 4) * std::thread::hardware_concurrency();
   static const size_t kIterCount = kSanitizer ? 10 : (100 + rand() % 100);
   for (size_t cached_threads : {size_t{0}, kMaxThreadCount / 2, kMaxThreadCount}) {
-    auto factory = executor::MakeThreadFactory(executor::MakeThreadFactory(cached_threads), nullptr, nullptr);
+    auto factory = MakeThreadFactory(MakeThreadFactory(cached_threads), nullptr, nullptr);
 
     run_tests(kIterCount, factory, kMaxThreadCount);
   }
@@ -92,12 +92,12 @@ TEST(multi_threaded, simple) {
   });
 
   for (size_t cached_threads : {size_t{0}, kMaxThreadCount / 3, kMaxThreadCount * 2 / 3, kMaxThreadCount}) {
-    auto test_threads = executor::MakeThreadFactory(
-        executor::MakeThreadFactory(executor::MakeThreadFactory(executor::MakeThreadFactory(kThreadsCount), 1), "stub"),
-        (cached_threads == kMaxThreadCount / 3 ? nullptr : stub),
-        (cached_threads == kMaxThreadCount * 2 / 3 ? nullptr : stub));
+    auto test_threads =
+        MakeThreadFactory(MakeThreadFactory(MakeThreadFactory(MakeThreadFactory(kThreadsCount), 1), "stub"),
+                          (cached_threads == kMaxThreadCount / 3 ? nullptr : stub),
+                          (cached_threads == kMaxThreadCount * 2 / 3 ? nullptr : stub));
 
-    auto factory = executor::MakeThreadFactory(cached_threads);
+    auto factory = MakeThreadFactory(cached_threads);
 
     ThreadsContainter threads;
     size_t max_threads = 0;
@@ -118,7 +118,7 @@ TEST(multi_threaded, simple) {
     }
 
     while (!threads.IsEmpty()) {
-      auto release_thread = executor::IThreadPtr{threads.PopFront()};
+      auto release_thread = IThreadPtr{threads.PopFront()};
       test_threads->Release(std::move(release_thread));
     }
   }

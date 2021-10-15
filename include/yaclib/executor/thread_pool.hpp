@@ -5,7 +5,7 @@
 
 #include <thread>
 
-namespace yaclib::executor {
+namespace yaclib {
 
 /**
  * Interface for thread-pool-like executors
@@ -55,4 +55,4 @@ IThreadPool* CurrentThreadPool() noexcept;
 IThreadPoolPtr MakeThreadPool(size_t threads = std::thread::hardware_concurrency(),
                               IThreadFactoryPtr tf = MakeThreadFactory());
 
-}  // namespace yaclib::executor
+}  // namespace yaclib

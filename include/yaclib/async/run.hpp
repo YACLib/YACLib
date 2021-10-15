@@ -6,7 +6,7 @@
 
 #include <type_traits>
 
-namespace yaclib::async {
+namespace yaclib {
 
 /**
  * Execute Callable functor via executor
@@ -16,13 +16,13 @@ namespace yaclib::async {
  * \return \ref Future corresponding f return value
  */
 template <typename Functor>
-auto Run(const executor::IExecutorPtr& e, Functor&& f) {
+auto Run(const IExecutorPtr& e, Functor&& f) {
   using Ret = detail::Return<void, Functor, 2>;
   using U = typename Ret::Type;
   if constexpr (Ret::kIsAsync) {
     using InvokeT = detail::AsyncInvoke<U, decltype(std::forward<Functor>(f)), void>;
     using CoreType = detail::Core<void, InvokeT, void>;
-    auto [future, promise] = async::MakeContract<U>();
+    auto [future, promise] = MakeContract<U>();
     future._core->SetExecutor(e);
     util::Ptr core{new util::Counter<CoreType>{e, std::move(promise), std::forward<Functor>(f)}};
     core->SetExecutor(e);
@@ -38,4 +38,4 @@ auto Run(const executor::IExecutorPtr& e, Functor&& f) {
   }
 }
 
-}  // namespace yaclib::async
+}  // namespace yaclib

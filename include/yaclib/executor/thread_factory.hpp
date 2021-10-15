@@ -7,7 +7,7 @@
 #include <functional>
 #include <memory>
 
-namespace yaclib::executor {
+namespace yaclib {
 
 class IThread : public util::detail::Node {
  public:
@@ -33,4 +33,4 @@ IThreadFactoryPtr MakeThreadFactory(IThreadFactoryPtr base, size_t priority);
 
 IThreadFactoryPtr MakeThreadFactory(IThreadFactoryPtr base, util::IFuncPtr acquire, util::IFuncPtr release);
 
-}  // namespace yaclib::executor
+}  // namespace yaclib

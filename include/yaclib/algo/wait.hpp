@@ -2,7 +2,7 @@
 
 #include <yaclib/algo/detail/wait.hpp>
 
-namespace yaclib::algo {
+namespace yaclib {
 
 /**
  * Wait until \ref Ready becomes true
@@ -11,8 +11,7 @@ namespace yaclib::algo {
  */
 template <typename... Fs>
 void Wait(Fs&&... futures) {
-  detail::Wait<detail::WaitPolicy::Endless>(/* stub value */ false,
-                                            static_cast<async::detail::BaseCore&>(*futures._core)...);
+  detail::Wait<detail::WaitPolicy::Endless>(/* stub value */ false, static_cast<detail::BaseCore&>(*futures._core)...);
 }
 
-}  // namespace yaclib::algo
+}  // namespace yaclib

@@ -7,7 +7,7 @@
 #include <yaclib/executor/executor.hpp>
 #include <yaclib/util/type_traits.hpp>
 
-namespace yaclib::async {
+namespace yaclib {
 
 /**
  * Provides a mechanism to access the result of async operations
@@ -110,7 +110,7 @@ class Future final {
    * \return New \ref Future object associated with the functor result
    */
   template <typename Functor>
-  [[nodiscard]] auto Then(executor::IExecutorPtr executor, Functor&& functor) &&;
+  [[nodiscard]] auto Then(IExecutorPtr executor, Functor&& functor) &&;
 
   /**
    * Attach the final continuation functor to *this
@@ -130,7 +130,7 @@ class Future final {
    * \param functor A continuation to be attached
    */
   template <typename Functor>
-  void Subscribe(executor::IExecutorPtr executor, Functor&& functor) &&;
+  void Subscribe(IExecutorPtr executor, Functor&& functor) &&;
 
   /**
    * Detail constructor
@@ -140,22 +140,22 @@ class Future final {
   /**
    * Detail method
    */
-  Future& Via(executor::IExecutorPtr executor) &;
+  Future& Via(IExecutorPtr executor) &;
 
  private:
   template <typename... Fs>
-  friend void algo::Wait(Fs&&... futures);
+  friend void Wait(Fs&&... futures);
 
   template <typename Rep, typename Period, typename... Fs>
-  friend bool algo::WaitFor(const std::chrono::duration<Rep, Period>& timeout_duration, Fs&&... fs);
+  friend bool WaitFor(const std::chrono::duration<Rep, Period>& timeout_duration, Fs&&... fs);
 
   template <typename Clock, typename Duration, typename... Fs>
-  friend bool algo::WaitUntil(const std::chrono::time_point<Clock, Duration>& timeout_time, Fs&&... fs);
+  friend bool WaitUntil(const std::chrono::time_point<Clock, Duration>& timeout_time, Fs&&... fs);
 
   detail::FutureCorePtr<T> _core;
 };
 
-}  // namespace yaclib::async
+}  // namespace yaclib
 
 #ifndef YACLIB_ASYNC_DECL
 

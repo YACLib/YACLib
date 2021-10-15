@@ -17,14 +17,14 @@ using namespace std::chrono_literals;
 // std::vector<Future<T>> -> Future<std::vector<T>>
 
 TEST(Example, WhenAll) {
-  auto tp = yaclib::executor::MakeThreadPool(4);
+  auto tp = yaclib::MakeThreadPool(4);
 
-  std::vector<yaclib::async::Future<int>> futs;
+  std::vector<yaclib::Future<int>> futs;
 
   // Run sync computations in parallel
 
   for (size_t i = 0; i < 5; ++i) {
-    futs.push_back(yaclib::async::Run(tp, [i]() -> int {
+    futs.push_back(yaclib::Run(tp, [i]() -> int {
       return i;
     }));
   }
@@ -32,7 +32,7 @@ TEST(Example, WhenAll) {
   // Parallel composition
   // All combinator: std::vector<Future<T>> -> Future<std::vector<T>>
   // Non-blocking!
-  yaclib::async::Future<std::vector<int>> all = yaclib::algo::WhenAll(futs.begin(), futs.size());
+  yaclib::Future<std::vector<int>> all = yaclib::WhenAll(futs.begin(), futs.size());
 
   // Blocks
   std::vector<int> ints = std::move(all).Get().Ok();

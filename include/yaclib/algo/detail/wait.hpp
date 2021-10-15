@@ -4,7 +4,7 @@
 #include <yaclib/util/counters.hpp>
 #include <yaclib/util/type_traits.hpp>
 
-namespace yaclib::algo::detail {
+namespace yaclib::detail {
 
 enum class WaitPolicy {
   Endless,
@@ -15,8 +15,8 @@ enum class WaitPolicy {
 template <WaitPolicy kPolicy, typename Time, typename... Cores>
 bool Wait(const Time& time, Cores&... cores) {
   static_assert(sizeof...(cores) > 0, "Number of futures must be more than zero");
-  static_assert((... && std::is_same_v<async::detail::BaseCore, Cores>), "Fs must be futures in Wait function");
-  util::Counter<async::detail::WaitCore, async::detail::WaitCoreDeleter> callback;
+  static_assert((... && std::is_same_v<detail::BaseCore, Cores>), "Fs must be futures in Wait function");
+  util::Counter<detail::WaitCore, detail::WaitCoreDeleter> callback;
   callback.IncRef();  // Optimization: we don't want to notify when return true immediately
   if ((... & cores.SetWaitCallback(callback))) {
     return true;
@@ -54,4 +54,4 @@ bool Wait(const Time& time, Cores&... cores) {
   return ready;
 }
 
-}  // namespace yaclib::algo::detail
+}  // namespace yaclib::detail

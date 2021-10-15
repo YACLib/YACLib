@@ -3,7 +3,7 @@
 
 #include <utility>
 
-namespace yaclib::async {
+namespace yaclib {
 
 template <typename T>
 class Future;
@@ -72,7 +72,7 @@ struct Contract {
 template <typename T>
 Contract<T> MakeContract();
 
-}  // namespace yaclib::async
+}  // namespace yaclib
 
 #ifndef YACLIB_ASYNC_DECL
 

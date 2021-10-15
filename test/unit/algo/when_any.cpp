@@ -14,22 +14,22 @@ using namespace std::chrono_literals;
 
 enum class TestSuite { Vector, Array };
 
-template <TestSuite suite, typename T = int, algo::PolicyWhenAny P = algo::PolicyWhenAny::FirstError>
+template <TestSuite suite, typename T = int, PolicyWhenAny P = PolicyWhenAny::FirstError>
 void JustWorks() {
   constexpr int kSize = 3;
 
-  std::array<async::Promise<T>, kSize> promises;
-  std::array<async::Future<T>, kSize> futures;
+  std::array<Promise<T>, kSize> promises;
+  std::array<Future<T>, kSize> futures;
   for (int i = 0; i < kSize; ++i) {
-    auto [f, p] = async::MakeContract<T>();
+    auto [f, p] = MakeContract<T>();
     futures[i] = std::move(f);
     promises[i] = std::move(p);
   }
   auto any = [&futures] {
     if constexpr (suite == TestSuite::Array) {
-      return algo::WhenAny<P>(std::move(futures[0]), std::move(futures[1]), std::move(futures[2]));
+      return WhenAny<P>(std::move(futures[0]), std::move(futures[1]), std::move(futures[2]));
     } else {
-      return algo::WhenAny<P>(futures.begin(), futures.end());
+      return WhenAny<P>(futures.begin(), futures.end());
     }
   }();
 
@@ -54,7 +54,7 @@ TEST(VectorFirstError, JustWorks) {
 }
 
 TEST(VectorLastError, JustWorks) {
-  JustWorks<TestSuite::Vector, int, algo::PolicyWhenAny::LastError>();
+  JustWorks<TestSuite::Vector, int, PolicyWhenAny::LastError>();
 }
 
 TEST(VoidVectorFirstError, JustWorks) {
@@ -62,7 +62,7 @@ TEST(VoidVectorFirstError, JustWorks) {
 }
 
 TEST(VoidVectorLastError, JustWorks) {
-  JustWorks<TestSuite::Vector, void, algo::PolicyWhenAny::LastError>();
+  JustWorks<TestSuite::Vector, void, PolicyWhenAny::LastError>();
 }
 
 TEST(ArrayFirstError, JustWorks) {
@@ -70,7 +70,7 @@ TEST(ArrayFirstError, JustWorks) {
 }
 
 TEST(ArrayLastError, JustWorks) {
-  JustWorks<TestSuite::Array, int, algo::PolicyWhenAny::LastError>();
+  JustWorks<TestSuite::Array, int, PolicyWhenAny::LastError>();
 }
 
 TEST(VoidArrayFirstError, JustWorks) {
@@ -78,25 +78,25 @@ TEST(VoidArrayFirstError, JustWorks) {
 }
 
 TEST(VoidArrayLastError, JustWorks) {
-  JustWorks<TestSuite::Array, void, algo::PolicyWhenAny::LastError>();
+  JustWorks<TestSuite::Array, void, PolicyWhenAny::LastError>();
 }
 
-template <TestSuite suite, typename T = void, algo::PolicyWhenAny P = algo::PolicyWhenAny::FirstError>
+template <TestSuite suite, typename T = void, PolicyWhenAny P = PolicyWhenAny::FirstError>
 void AllFails() {
   constexpr int kSize = 3;
-  std::array<async::Promise<T>, kSize> promises;
-  std::array<async::Future<T>, kSize> futures;
+  std::array<Promise<T>, kSize> promises;
+  std::array<Future<T>, kSize> futures;
   for (int i = 0; i < kSize; ++i) {
-    auto [f, p] = async::MakeContract<T>();
+    auto [f, p] = MakeContract<T>();
     futures[i] = std::move(f);
     promises[i] = std::move(p);
   }
 
   auto any = [&futures] {
     if constexpr (suite == TestSuite::Array) {
-      return algo::WhenAny<P>(std::move(futures[0]), std::move(futures[1]), std::move(futures[2]));
+      return WhenAny<P>(std::move(futures[0]), std::move(futures[1]), std::move(futures[2]));
     } else {
-      return algo::WhenAny<P>(futures.begin(), futures.end());
+      return WhenAny<P>(futures.begin(), futures.end());
     }
   }();
 
@@ -111,7 +111,7 @@ void AllFails() {
   std::move(promises[2]).Set(std::error_code{});
 
   EXPECT_TRUE(any.Ready());
-  if constexpr (P == algo::PolicyWhenAny::FirstError) {
+  if constexpr (P == PolicyWhenAny::FirstError) {
     EXPECT_THROW(std::move(any).Get().Ok(), std::runtime_error);
   } else {
     EXPECT_THROW(std::move(any).Get().Ok(), std::exception);
@@ -123,7 +123,7 @@ TEST(VectorFirstError, AllFails) {
 }
 
 TEST(VectorLastError, AllFails) {
-  AllFails<TestSuite::Vector, int, algo::PolicyWhenAny::LastError>();
+  AllFails<TestSuite::Vector, int, PolicyWhenAny::LastError>();
 }
 
 TEST(VoidVectorFirstError, AllFails) {
@@ -131,7 +131,7 @@ TEST(VoidVectorFirstError, AllFails) {
 }
 
 TEST(VoidVectorLastError, AllFails) {
-  AllFails<TestSuite::Vector, void, algo::PolicyWhenAny::LastError>();
+  AllFails<TestSuite::Vector, void, PolicyWhenAny::LastError>();
 }
 
 TEST(ArrayFirstError, AllFails) {
@@ -139,7 +139,7 @@ TEST(ArrayFirstError, AllFails) {
 }
 
 TEST(ArrayLastError, AllFails) {
-  AllFails<TestSuite::Array, int, algo::PolicyWhenAny::LastError>();
+  AllFails<TestSuite::Array, int, PolicyWhenAny::LastError>();
 }
 
 TEST(VoidArrayFirstError, AllFails) {
@@ -147,25 +147,25 @@ TEST(VoidArrayFirstError, AllFails) {
 }
 
 TEST(VoidArrayLastError, AllFails) {
-  AllFails<TestSuite::Array, void, algo::PolicyWhenAny::LastError>();
+  AllFails<TestSuite::Array, void, PolicyWhenAny::LastError>();
 }
 
-template <TestSuite suite, typename T = int, algo::PolicyWhenAny P = algo::PolicyWhenAny::FirstError>
+template <TestSuite suite, typename T = int, PolicyWhenAny P = PolicyWhenAny::FirstError>
 void ResultWithFails() {
   constexpr int kSize = 3;
-  std::array<async::Promise<T>, kSize> promises;
-  std::array<async::Future<T>, kSize> futures;
+  std::array<Promise<T>, kSize> promises;
+  std::array<Future<T>, kSize> futures;
   for (int i = 0; i < kSize; ++i) {
-    auto [f, p] = async::MakeContract<T>();
+    auto [f, p] = MakeContract<T>();
     futures[i] = std::move(f);
     promises[i] = std::move(p);
   }
 
   auto any = [&futures] {
     if constexpr (suite == TestSuite::Array) {
-      return algo::WhenAny<P>(std::move(futures[0]), std::move(futures[1]), std::move(futures[2]));
+      return WhenAny<P>(std::move(futures[0]), std::move(futures[1]), std::move(futures[2]));
     } else {
-      return algo::WhenAny<P>(futures.begin(), futures.end());
+      return WhenAny<P>(futures.begin(), futures.end());
     }
   }();
 
@@ -193,7 +193,7 @@ TEST(VectorFirstError, ResultWithFails) {
 }
 
 TEST(VectorLastError, ResultWithFails) {
-  ResultWithFails<TestSuite::Vector, int, algo::PolicyWhenAny::LastError>();
+  ResultWithFails<TestSuite::Vector, int, PolicyWhenAny::LastError>();
 }
 
 TEST(VoidVectorFirstError, ResultWithFails) {
@@ -201,7 +201,7 @@ TEST(VoidVectorFirstError, ResultWithFails) {
 }
 
 TEST(VoidVectorLastError, ResultWithFails) {
-  ResultWithFails<TestSuite::Vector, void, algo::PolicyWhenAny::LastError>();
+  ResultWithFails<TestSuite::Vector, void, PolicyWhenAny::LastError>();
 }
 
 TEST(ArrayFirstError, ResultWithFails) {
@@ -209,7 +209,7 @@ TEST(ArrayFirstError, ResultWithFails) {
 }
 
 TEST(ArrayLastError, ResultWithFails) {
-  ResultWithFails<TestSuite::Array, int, algo::PolicyWhenAny::LastError>();
+  ResultWithFails<TestSuite::Array, int, PolicyWhenAny::LastError>();
 }
 
 TEST(VoidArrayFirstError, ResultWithFails) {
@@ -217,14 +217,14 @@ TEST(VoidArrayFirstError, ResultWithFails) {
 }
 
 TEST(VoidArrayLastError, ResultWithFails) {
-  ResultWithFails<TestSuite::Array, void, algo::PolicyWhenAny::LastError>();
+  ResultWithFails<TestSuite::Array, void, PolicyWhenAny::LastError>();
 }
 
-template <typename T = int, algo::PolicyWhenAny P = algo::PolicyWhenAny::FirstError>
+template <typename T = int, PolicyWhenAny P = PolicyWhenAny::FirstError>
 void EmptyInput() {
   util::Result<T> res{};
-  auto empty = std::vector<async::Future<T>>{};
-  auto any = algo::WhenAny<P>(empty.begin(), empty.end());
+  auto empty = std::vector<Future<T>>{};
+  auto any = WhenAny<P>(empty.begin(), empty.end());
 
   EXPECT_TRUE(any.Ready());
   EXPECT_THROW(std::move(any).Get().Ok(), std::exception);
@@ -235,7 +235,7 @@ TEST(VectorFirstError, EmptyInput) {
 }
 
 TEST(VectorLastError, EmptyInput) {
-  EmptyInput<int, algo::PolicyWhenAny::LastError>();
+  EmptyInput<int, PolicyWhenAny::LastError>();
 }
 
 TEST(VoidVectorFirstError, EmptyInput) {
@@ -243,17 +243,17 @@ TEST(VoidVectorFirstError, EmptyInput) {
 }
 
 TEST(VoidVectorLastError, EmptyInput) {
-  EmptyInput<void, algo::PolicyWhenAny::LastError>();
+  EmptyInput<void, PolicyWhenAny::LastError>();
 }
 
-template <TestSuite suite, typename T = int, algo::PolicyWhenAny P = algo::PolicyWhenAny::FirstError>
+template <TestSuite suite, typename T = int, PolicyWhenAny P = PolicyWhenAny::FirstError>
 void MultiThreaded() {
   static constexpr bool is_void = std::is_void_v<T>;
 
-  auto tp = executor::MakeThreadPool(4);
+  auto tp = MakeThreadPool(4);
 
   auto async_value = [tp](int value) {
-    return async::Run(tp, [value] {
+    return Run(tp, [value] {
       std::this_thread::sleep_for(10ms);
       if constexpr (!is_void) {
         return value;
@@ -266,7 +266,7 @@ void MultiThreaded() {
   static const int kValues = 6;
   static const std::set<int> kOuts = {0, 1, 2, 3, 4, 5};
 
-  std::array<async::Future<T>, 6> fs;
+  std::array<Future<T>, 6> fs;
   for (int i = 0; i < kValues; ++i) {
     fs[i] = async_value(i);
   }
@@ -274,10 +274,10 @@ void MultiThreaded() {
   auto ints =
       [&fs] {
         if constexpr (suite == TestSuite::Vector) {
-          return algo::WhenAny<P>(fs.begin(), fs.end());
+          return WhenAny<P>(fs.begin(), fs.end());
         } else {
-          return algo::WhenAny<P>(std::move(fs[0]), std::move(fs[1]), std::move(fs[2]), std::move(fs[3]),
-                                  std::move(fs[4]), std::move(fs[5]));
+          return WhenAny<P>(std::move(fs[0]), std::move(fs[1]), std::move(fs[2]), std::move(fs[3]), std::move(fs[4]),
+                            std::move(fs[5]));
         }
       }()
           .Get();
@@ -298,7 +298,7 @@ TEST(VectorFirstError, MultiThreaded) {
 }
 
 TEST(VectorLastError, MultiThreaded) {
-  MultiThreaded<TestSuite::Vector, int, algo::PolicyWhenAny::LastError>();
+  MultiThreaded<TestSuite::Vector, int, PolicyWhenAny::LastError>();
 }
 
 TEST(VoidVectorFirstError, MultiThreaded) {
@@ -306,7 +306,7 @@ TEST(VoidVectorFirstError, MultiThreaded) {
 }
 
 TEST(VoidVectorLastError, MultiThreaded) {
-  MultiThreaded<TestSuite::Vector, void, algo::PolicyWhenAny::LastError>();
+  MultiThreaded<TestSuite::Vector, void, PolicyWhenAny::LastError>();
 }
 
 TEST(ArrayFirstError, MultiThreaded) {
@@ -314,7 +314,7 @@ TEST(ArrayFirstError, MultiThreaded) {
 }
 
 TEST(ArrayLastError, MultiThreaded) {
-  MultiThreaded<TestSuite::Array, int, algo::PolicyWhenAny::LastError>();
+  MultiThreaded<TestSuite::Array, int, PolicyWhenAny::LastError>();
 }
 
 TEST(VoidArrayFirstError, MultiThreaded) {
@@ -322,18 +322,18 @@ TEST(VoidArrayFirstError, MultiThreaded) {
 }
 
 TEST(VoidArrayLastError, MultiThreaded) {
-  MultiThreaded<TestSuite::Array, void, algo::PolicyWhenAny::LastError>();
+  MultiThreaded<TestSuite::Array, void, PolicyWhenAny::LastError>();
 }
 
-template <TestSuite suite, typename T = int, algo::PolicyWhenAny P = algo::PolicyWhenAny::FirstError>
+template <TestSuite suite, typename T = int, PolicyWhenAny P = PolicyWhenAny::FirstError>
 void TimeTest() {
   using Duration = std::chrono::nanoseconds;
   static constexpr bool is_void = std::is_void_v<T>;
 
-  auto tp = executor::MakeThreadPool(4);
+  auto tp = MakeThreadPool(4);
 
   auto async_value = [tp](int value, Duration d) {
-    return async::Run(tp, [value, d] {
+    return Run(tp, [value, d] {
       std::this_thread::sleep_for(d);
       if constexpr (!is_void) {
         return value;
@@ -345,7 +345,7 @@ void TimeTest() {
 
   static const int kValues = 2;
 
-  std::array<async::Future<T>, kValues> fs;
+  std::array<Future<T>, kValues> fs;
 
   fs[0] = async_value(10, 200ms);
   fs[1] = async_value(5, 50ms);
@@ -353,9 +353,9 @@ void TimeTest() {
   auto ints =
       [&fs] {
         if constexpr (suite == TestSuite::Vector) {
-          return algo::WhenAny<P>(fs.begin(), fs.end());
+          return WhenAny<P>(fs.begin(), fs.end());
         } else {
-          return algo::WhenAny<P>(std::move(fs[0]), std::move(fs[1]));
+          return WhenAny<P>(std::move(fs[0]), std::move(fs[1]));
         }
       }()
           .Get();
@@ -376,7 +376,7 @@ TEST(VectorFirstError, TimeTest) {
 }
 
 TEST(VectorLastError, TimeTest) {
-  TimeTest<TestSuite::Vector, int, algo::PolicyWhenAny::LastError>();
+  TimeTest<TestSuite::Vector, int, PolicyWhenAny::LastError>();
 }
 
 TEST(VoidVectorFirstError, TimeTest) {
@@ -384,7 +384,7 @@ TEST(VoidVectorFirstError, TimeTest) {
 }
 
 TEST(VoidVectorLastError, TimeTest) {
-  TimeTest<TestSuite::Vector, void, algo::PolicyWhenAny::LastError>();
+  TimeTest<TestSuite::Vector, void, PolicyWhenAny::LastError>();
 }
 
 TEST(ArrayFirstError, TimeTest) {
@@ -392,7 +392,7 @@ TEST(ArrayFirstError, TimeTest) {
 }
 
 TEST(ArrayLastError, TimeTest) {
-  TimeTest<TestSuite::Array, int, algo::PolicyWhenAny::LastError>();
+  TimeTest<TestSuite::Array, int, PolicyWhenAny::LastError>();
 }
 
 TEST(VoidArrayFirstError, TimeTest) {
@@ -400,25 +400,25 @@ TEST(VoidArrayFirstError, TimeTest) {
 }
 
 TEST(VoidArrayLastError, TimeTest) {
-  TimeTest<TestSuite::Array, void, algo::PolicyWhenAny::LastError>();
+  TimeTest<TestSuite::Array, void, PolicyWhenAny::LastError>();
 }
 
 template <TestSuite suite, typename T = int>
 void DefaultPolice() {
   constexpr int kSize = 3;
 
-  std::array<async::Promise<T>, kSize> promises;
-  std::array<async::Future<T>, kSize> futures;
+  std::array<Promise<T>, kSize> promises;
+  std::array<Future<T>, kSize> futures;
   for (int i = 0; i < kSize; ++i) {
-    auto [f, p] = async::MakeContract<T>();
+    auto [f, p] = MakeContract<T>();
     futures[i] = std::move(f);
     promises[i] = std::move(p);
   }
   auto any = [&futures] {
     if constexpr (suite == TestSuite::Array) {
-      return algo::WhenAny(std::move(futures[0]), std::move(futures[1]), std::move(futures[2]));
+      return WhenAny(std::move(futures[0]), std::move(futures[1]), std::move(futures[2]));
     } else {
-      return algo::WhenAny(futures.begin(), futures.end());
+      return WhenAny(futures.begin(), futures.end());
     }
   }();
 

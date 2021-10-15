@@ -1,6 +1,6 @@
 /**
  * \example serial.cpp
- * Simple \ref executor::Serial examples
+ * Simple \ref Serial examples
  */
 
 #include <yaclib/executor/serial.hpp>
@@ -15,9 +15,9 @@ using namespace yaclib;
 TEST(Example, Serial) {
   std::cout << "Strand" << std::endl;
 
-  auto tp = executor::MakeThreadPool(4);
+  auto tp = MakeThreadPool(4);
 
-  auto strand = executor::MakeSerial(tp);
+  auto strand = MakeSerial(tp);
 
   size_t counter = 0;
 

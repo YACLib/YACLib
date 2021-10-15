@@ -45,7 +45,7 @@ void List<T>::Append(List& other) noexcept {
   other._head._prev = &other._head;
 }
 
-template class List<executor::ITask>;
-template class List<executor::IThread>;
+template class List<ITask>;
+template class List<IThread>;
 
 }  // namespace yaclib::util

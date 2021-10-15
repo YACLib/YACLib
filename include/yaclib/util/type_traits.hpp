@@ -3,12 +3,10 @@
 #include <type_traits>
 
 namespace yaclib {
-namespace async {
 
 template <typename T>
 class Future;
 
-}  // namespace async
 namespace util {
 namespace detail {
 
@@ -16,7 +14,7 @@ template <typename U>
 struct FutureValue;
 
 template <typename U>
-struct FutureValue<async::Future<U>> {
+struct FutureValue<Future<U>> {
   using type = U;
 };
 
@@ -64,7 +62,7 @@ template <typename T>
 class Result;
 
 template <typename T>
-inline constexpr bool IsFutureV = std::integral_constant<bool, IsInstantiationOf<async::Future, T>::value>::value;
+inline constexpr bool IsFutureV = std::integral_constant<bool, IsInstantiationOf<Future, T>::value>::value;
 
 template <typename T>
 inline constexpr bool IsResultV = std::integral_constant<bool, IsInstantiationOf<Result, T>::value>::value;

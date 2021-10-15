@@ -4,7 +4,7 @@
 #error "You can not include this header directly, use yaclib/async/async.hpp"
 #endif
 
-namespace yaclib::async {
+namespace yaclib {
 
 template <typename T>
 Promise<T>::Promise() : _core{new util::Counter<detail::Core<T, void, void>>{}} {
@@ -36,4 +36,4 @@ Contract<T> MakeContract() {
   return {std::move(f), std::move(p)};
 }
 
-}  // namespace yaclib::async
+}  // namespace yaclib

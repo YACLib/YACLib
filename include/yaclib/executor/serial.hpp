@@ -2,7 +2,7 @@
 
 #include <yaclib/executor/executor.hpp>
 
-namespace yaclib::executor {
+namespace yaclib {
 
 /**
  * Serial is the asynchronous analogue of a mutex
@@ -14,4 +14,4 @@ namespace yaclib::executor {
  */
 IExecutorPtr MakeSerial(IExecutorPtr e);
 
-}  // namespace yaclib::executor
+}  // namespace yaclib
