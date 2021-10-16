@@ -28,11 +28,12 @@ YACLib (_Yet Another Concurrency Library_) is a C++ library for concurrent tasks
 
 ## Table of Contents
 * [About YACLib](#about)
+* [Examples](#examples)
 * [Getting started](#quickstart)
-* Support
-* Contributing
-* License
-* Useful links
+* [Requirements](#req)
+* [Support](#support)
+* [Useful links](#links)
+* [License](#license)
 
 <a name="about"></a>
 ## About YACLib
@@ -42,8 +43,13 @@ YACLib (_Yet Another Concurrency Library_) is a C++ library for concurrent tasks
 * Zero cost abstractions
 * Good test coverage
 
+<a name="examples"></a>
+## Examples
+TODO
+
+<a name="quickstart"></a>
 ## Getting started
-For quick start just paste this code in your CMakeLists.txt
+For quick start just paste this code in your `CMakeLists.txt` file
 ```cmake
 include(FetchContent)
 FetchContent_Declare(yaclib
@@ -53,6 +59,21 @@ FetchContent_Declare(yaclib
 FetchContent_MakeAvailable(yaclib)
 link_libraries(yaclib)
 ```
+
+<a name="req"></a>
+## Requirements
+A recent C++ compilers that support C++17:
+* Gcc-9.* and later
+* Clang-11.* and later
+* Apple Clang
+* MSVC
+
+<a name="support"></a>
+## Support
+We are always open for issues and pull requests, also you can check our emails:
+* kononov.nikolay.nk1@gmail.com
+
+<a name="links"></a>
 ## Useful links
 
 ### For user
@@ -70,7 +91,10 @@ link_libraries(yaclib)
 * [Pull request guide](doc/pr_guide.md)
 * [Style guide](doc/style_guide.md)
 
+<a name="license"></a>
 ## License
+YACLib is made available under MIT License.
+See [LICENSE.txt](LICENSE.txt) for details
 
 [![FOSSA Status](
 https://app.fossa.com/api/projects/git%2Bgithub.com%2FYACLib%2FYACLib.svg?type=large)](
