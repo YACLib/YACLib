@@ -79,14 +79,16 @@ auto fourth = [](int r) { return std::to_string(r); };
 auto last = [](yaclib::util::Result<std::string> r) {
     std::cout << "Pipeline result: <" 
               << std::move(r).Ok() << ">" << std::endl;
-yaclib::Run(tp, first).Then(second)
-                      .Then(third)
-                      .Then(fourth)
-                      .Subscribe(last); // 42 * 2 + 1
+    yaclib::Run(tp, first).Then(second)
+                        .Then(third)
+                        .Then(fourth)
+                        .Subscribe(last); // 42 * 2 + 1
 };
 ```
+
 * Error recovering from callbacks
-```
+
+```C++
 auto tp = yaclib::MakeThreadPool(4);
 auto f = yaclib::Run(tp, [] { return 1; })
             .Then([](int x) { return x + 15; })
