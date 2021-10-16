@@ -192,7 +192,7 @@ auto future = yaclib::Run(tp_output, [] {
 ```
 </p></details>
 
-<details><summary>Serial Executor (strand)</summary><p>
+<details><summary>Serial Executor, Strand, Async Mutex</summary><p>
 
 ```C++
 auto tp = MakeThreadPool(4);
@@ -215,8 +215,7 @@ for (size_t i = 0; i < 5; ++i) {
 ```
 </p></details>
 
-<details><summary>Future combinators (WhenAll, WhenAny)</summary><p>
-
+<details><summary>WhenAll</summary><p>
 
 ```C++
 auto tp = yaclib::MakeThreadPool(4);
@@ -225,16 +224,18 @@ std::vector<yaclib::Future<int>> futs;
 // Run sync computations in parallel
 for (size_t i = 0; i < 5; ++i) {
   futs.push_back(yaclib::Run(tp, [i]() -> int {
-    return i;
+    return random() * i;
   }));
 }
 
 // Will be ready when all futures are ready
 yaclib::Future<std::vector<int>> all = yaclib::WhenAll(futs.begin(), futs.size());
-std::vector<int> ints = std::move(all).Get().Value();
+std::vector<int> unique_ints = std::move(all).Then([](std::vector<int> ints) {
+  ints.erase(std::unique(ints.begin(), ints.end()), ints.end());
+  return ints;
+}).Get().Ok();
 ```
 </p></details>
-
 
 <a name="req"></a>
 
