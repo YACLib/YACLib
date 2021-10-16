@@ -165,7 +165,7 @@ We are always open for issues and pull requests, also you can check our emails:
 <a name="license"></a>
 ## License
 YACLib is made available under MIT License.
-See [LICENSE.txt](LICENSE.txt) for details
+See [LICENSE](LICENSE) file for details
 
 [![FOSSA Status](
 https://app.fossa.com/api/projects/git%2Bgithub.com%2FYACLib%2FYACLib.svg?type=large)](
