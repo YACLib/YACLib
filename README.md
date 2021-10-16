@@ -1,4 +1,5 @@
 # [YACLib](https://github.com/YACLib/YACLib)
+_Yet Another Concurrency Library_
 
 [![GitHub license](
 https://img.shields.io/badge/license-MIT-blue.svg)](
@@ -24,7 +25,6 @@ https://codecov.io/gh/YACLib/YACLib)
 https://app.codacy.com/project/badge/Grade/4113686840a645a8950abdf1197611bd)](
 https://www.codacy.com/gh/YACLib/YACLib/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=YACLib/YACLib&amp;utm_campaign=Badge_Grade)
 
-YACLib (_Yet Another Concurrency Library_) is a C++ library for concurrent tasks execution.
 
 ## Table of Contents
 * [About YACLib](#about)
@@ -42,6 +42,8 @@ YACLib (_Yet Another Concurrency Library_) is a C++ library for concurrent tasks
 * Easy to build
 * Zero cost abstractions
 * Good test coverage
+
+For more details check our design [document](doc/design.md)
 
 <a name="links"></a>
 ## Useful links
@@ -63,7 +65,47 @@ YACLib (_Yet Another Concurrency Library_) is a C++ library for concurrent tasks
 
 <a name="examples"></a>
 ## Examples
-TODO
+Here are short examples of using some features from YACLib, for more details check examples in [useful links](#examples)
+
+* Asynchronous pipeline with future
+```C++
+// create thread pool with 4 threads
+auto tp = yaclib::MakeThreadPool(4);
+
+auto first = [] { return 42; };
+auto second = [](int r) { return r * 2; };
+auto third = [](int r) { return r + 1; };
+auto fourth = [](int r) { return std::to_string(r); };
+auto last = [](yaclib::util::Result<std::string> r) {
+    std::cout << "Pipeline result: <" 
+              << std::move(r).Ok() << ">" << std::endl;
+yaclib::Run(tp, first).Then(second)
+                      .Then(third)
+                      .Then(fourth)
+                      .Subscribe(last); // 42 * 2 + 1
+};
+```
+* Serial Executor (strand)
+
+```C++
+auto tp = MakeThreadPool(4);
+// decorated thread pool by serializing tasks:
+auto strand = MakeSerial(tp);
+
+size_t counter = 0;
+
+std::vector<std::thread> threads;
+
+for (size_t i = 0; i < 5; ++i) {
+    threads.emplace_back([&]() {
+        for (size_t j = 0; j < 1000; ++j) {
+            strand->Execute([&] {
+                ++counter; // no data race!
+            });
+        }
+    });
+}
+```
 
 <a name="quickstart"></a>
 ## Getting started
