@@ -1,4 +1,4 @@
-# [YACLib](https://github.com/YACLib/YACLib)
+# YACLib
 _Yet Another Concurrency Library_
 
 [![GitHub license](
@@ -28,12 +28,16 @@ https://www.codacy.com/gh/YACLib/YACLib/dashboard?utm_source=github.com&amp;utm_
 
 ## Table of Contents
 * [About YACLib](#about)
-* [Useful links](#links)
 * [Examples](#examples)
 * [Getting started](#quickstart)
 * [Requirements](#req)
+* [Contributing](#contrib)
 * [Support](#support)
 * [License](#license)
+* [Documentation](https://yaclib.github.io/YACLib)
+* [Benchmarks](TODO(MBkkt))
+
+
 
 <a name="about"></a>
 
@@ -45,25 +49,6 @@ https://www.codacy.com/gh/YACLib/YACLib/dashboard?utm_source=github.com&amp;utm_
 * Good test coverage
 
 For more details check our design [document](doc/design.md)
-
-<a name="links"></a>
-
-## Useful links
-
-### For user
-
-* [Documentation](https://yaclib.github.io/YACLib)
-* [Examples](test/example)
-* [Install guide](doc/install.md)
-* [Benchmarks](TODO(MBkkt))
-
-### For developer
-
-* [Specification](https://yaclib.github.io/YACLib)
-* [Targets description](doc/target.md)
-* [About dependencies](doc/dependency.md)
-* [Pull request guide](doc/pr_guide.md)
-* [Style guide](doc/style_guide.md)
 
 <a name="examples"></a>
 
@@ -142,32 +127,42 @@ For quick start just paste this code in your `CMakeLists.txt` file
 ```cmake
 include(FetchContent)
 FetchContent_Declare(yaclib
-        GIT_REPOSITORY https://github.com/YACLib/YACLib.git
-        GIT_TAG main
-        )
+  GIT_REPOSITORY https://github.com/YACLib/YACLib.git
+  GIT_TAG main
+  )
 FetchContent_MakeAvailable(yaclib)
 link_libraries(yaclib)
 ```
+For more details check [install guide](doc/install.md).
 
 <a name="req"></a>
 
 ## Requirements
-A recent C++ compilers that support C++17:
-* Gcc-9.* and later
-* Clang-11.* and later
+A recent C++ compilers that support C++17
+* GCC-9 and later
+* Clang-11 and later
 * Apple Clang
 * MSVC
 
 <a name="support"></a>
 
-## Support
-We are always open for issues and pull requests, also you can check our emails:
+<a name="contrib"></a>
+
+## Contributing
+We are always open for issues and pull requests. For more details you can check following links:
+* [Specification](https://yaclib.github.io/YACLib)
+* [Targets description](doc/target.md)
+* [Developer dependencies](doc/dependency.md)
+* [PR guide](doc/pr_guide.md)
+* [Style guide](doc/style_guide.md)
+
+## Contacts
+You can contact us by our emails:
+* valery.mironow@gmail.com
 * kononov.nikolay.nk1@gmail.com
 * ionin.code@gmail.com
 * zakhar.zakharov.zz16@gmail.com
 * myannyax@gmail.com
-
-<a name="license"></a>
 
 ## License
 YACLib is made available under MIT License.
