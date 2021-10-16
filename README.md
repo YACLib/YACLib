@@ -28,11 +28,11 @@ YACLib (_Yet Another Concurrency Library_) is a C++ library for concurrent tasks
 
 ## Table of Contents
 * [About YACLib](#about)
+* [Useful links](#links)
 * [Examples](#examples)
 * [Getting started](#quickstart)
 * [Requirements](#req)
 * [Support](#support)
-* [Useful links](#links)
 * [License](#license)
 
 <a name="about"></a>
@@ -42,6 +42,24 @@ YACLib (_Yet Another Concurrency Library_) is a C++ library for concurrent tasks
 * Easy to build
 * Zero cost abstractions
 * Good test coverage
+
+<a name="links"></a>
+## Useful links
+
+### For user
+
+* [Documentation](https://yaclib.github.io/YACLib)
+* [Examples](test/example)
+* [Install guide](doc/install.md)
+* [Benchmarks](TODO(MBkkt))
+
+### For developer
+
+* [Specification](https://yaclib.github.io/YACLib)
+* [Targets description](doc/target.md)
+* [About dependencies](doc/dependency.md)
+* [Pull request guide](doc/pr_guide.md)
+* [Style guide](doc/style_guide.md)
 
 <a name="examples"></a>
 ## Examples
@@ -72,24 +90,6 @@ A recent C++ compilers that support C++17:
 ## Support
 We are always open for issues and pull requests, also you can check our emails:
 * kononov.nikolay.nk1@gmail.com
-
-<a name="links"></a>
-## Useful links
-
-### For user
-
-* [Documentation](https://yaclib.github.io/YACLib)
-* [Examples](test/example)
-* [Install guide](doc/install.md)
-* [Benchmarks](TODO(MBkkt))
-
-### For developer
-
-* [Specification](https://yaclib.github.io/YACLib)
-* [Targets description](doc/target.md)
-* [About dependencies](doc/dependency.md)
-* [Pull request guide](doc/pr_guide.md)
-* [Style guide](doc/style_guide.md)
 
 <a name="license"></a>
 ## License
