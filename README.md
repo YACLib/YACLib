@@ -68,7 +68,8 @@ For more details check [install guide](doc/install.md).
 ## Examples
 Here are short examples of using some features from YACLib, for details check [documentation](https://yaclib.github.io/YACLib/examples.html).
 
-* Asynchronous pipeline
+<details><summary>Asynchronous pipeline</summary><p>
+
 ```C++
 auto tp = yaclib::MakeThreadPool(/*threads=*/4);
 yaclib::Run(tp, [] { return 42; })
@@ -80,8 +81,96 @@ yaclib::Run(tp, [] { return 42; })
   });
 };
 ```
+</p></details>
 
-* Future unwraping
+<details><summary>Exception recovering from callbacks</summary><p>
+
+```C++
+auto tp = yaclib::MakeThreadPool(/*threads=*/4);
+auto f = yaclib::Run(tp, [] { 
+    return 1; 
+  }).Then([](int y) { 
+    throw std::runtime_error{""}; 
+  }).Then([](int z) {
+    return z * 2; // Will  not run
+  }).Then([](std::exception_ptr) {
+    return 15; 
+  }); //  Recover from exception
+int x = std::move(f).Get().Value(); // 15
+```
+</p></details>
+
+<details><summary>Error recovering from callbacks</summary><p>
+
+```C++
+auto tp = yaclib::MakeThreadPool(/*threads=*/4);
+auto f = yaclib::Run(tp, [] {
+    if (random() % 2) {
+      return std::make_error_code(1);
+    }
+    return 42;
+  }).Then([](int y) {
+    if (random() % 2) {
+      return std::make_error_code(2);
+    }
+    return y + 15;
+  }).Then([](int z) {  // Will not run if we have any error
+    return z * 2;
+  }).Then([](std::error_code ec) {  // Recover from error codes
+    std::cout << ec.value() << std::endl;
+    return 10; // some default value
+  });
+int x = std::move(f).Get().Value();
+```
+</p></details>
+
+<details><summary>Error recovering from callbacks with Result </summary><p>
+
+```C++
+auto tp = yaclib::MakeThreadPool(/*threads=*/4);
+auto f = yaclib::Run(tp, [] { 
+    return 1; 
+  }).Then([](int y) {
+    if (random() % 2) {
+      return std::make_error_code(1);
+    }
+    return 10;
+  }).Then([](int z) {
+    if (random() % 2) {
+      throw std::runtime_error{""};
+    }
+    return z * 2;
+  }).Then([](yaclib::util::Result<int> res) {
+    return 15; 
+  }); //  Recover from exception
+int x = std::move(f).Get().Value(); // 15
+```
+</p></details>
+
+<details><summary>Timed wait</summary><p>
+
+```C++
+auto tp = yaclib:MakeThreadPool(/*threads=*/4);
+
+yaclib::Future<int> f1 = yaclib::Run(tp, [] { return 42; });
+yaclib::Future<double> f2 = yaclib::Run(tp, [] { return 15.0; });
+
+yaclib::WaitFor(10ms, f1, f2);
+
+if (f1.Ready()) {
+  Process(std::as_const(f1).Get());
+  yaclib::util::Result<int> res1 = std::as_const(f1).Get();
+  assert(f1.Valid());  // f1 valid here
+}
+
+if (f2.Ready()) {
+  Process(std::move(f2).Get());
+  assert(!f2.Valid());  // f2 invalid here
+}
+```
+</p></details>
+
+<details><summary>Future unwraping</summary><p>
 
 Sometimes it is necessary to return from one async function the result of the other. It would be possible with the wait on this result. But this would cause to block thread while waiting for the task to complete.
 
@@ -101,20 +190,9 @@ auto future = yaclib::Run(tp_output, [] {
   });
 });
 ```
+</p></details>
 
-* Error recovering from callbacks
-
-```C++
-auto tp = yaclib::MakeThreadPool(4);
-auto f = yaclib::Run(tp, [] { return 1; })
-            .Then([](int x) { return x + 15; })
-            .Then([](int y) { throw std::runtime_error{""}; })
-            .Then([](int z) { return z * 2; })            // Will not run
-            .Then([](std::exception_ptr) { return 15; }); // Recover from exception
-int x = std::move(f).Get().Value(); // 15
-```
-
-* Serial Executor (strand)
+<details><summary>Serial Executor (strand)</summary><p>
 
 ```C++
 auto tp = MakeThreadPool(4);
@@ -126,16 +204,19 @@ size_t counter = 0;
 std::vector<std::thread> threads;
 
 for (size_t i = 0; i < 5; ++i) {
-    threads.emplace_back([&] {
-        for (size_t j = 0; j < 1000; ++j) {
-            strand->Execute([&] {
-                ++counter; // no data race!
-            });
-        }
+  threads.emplace_back([&] {
+  for (size_t j = 0; j < 1000; ++j) {
+    strand->Execute([&] {
+      ++counter; // no data race!
     });
+  }
+  });
 }
 ```
-* Future combinators (WhenAll, WhenAny)
+</p></details>
+
+<details><summary>Future combinators (WhenAll, WhenAny)</summary><p>
+
 
 ```C++
 auto tp = yaclib::MakeThreadPool(4);
@@ -143,15 +224,17 @@ std::vector<yaclib::Future<int>> futs;
 
 // Run sync computations in parallel
 for (size_t i = 0; i < 5; ++i) {
-    futs.push_back(yaclib::Run(tp, [i]() -> int {
-        return i;
-    }));
+  futs.push_back(yaclib::Run(tp, [i]() -> int {
+    return i;
+  }));
 }
 
 // Will be ready when all futures are ready
 yaclib::Future<std::vector<int>> all = yaclib::WhenAll(futs.begin(), futs.size());
 std::vector<int> ints = std::move(all).Get().Value();
 ```
+</p></details>
+
 
 <a name="req"></a>
 
