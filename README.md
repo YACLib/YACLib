@@ -31,8 +31,8 @@ https://www.codacy.com/gh/YACLib/YACLib/dashboard?utm_source=github.com&amp;utm_
 * [Getting started](#quickstart)
 * [Examples](#examples)
 * [Requirements](#req)
+* [Releases](#releases)
 * [Contributing](#contrib)
-* [Support](#support)
 * [Contacts](#contacts)
 * [License](#license)
 
