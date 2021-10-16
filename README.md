@@ -71,18 +71,13 @@ Here are short examples of using some features from YACLib, for more details che
 ```C++
 // create thread pool with 4 threads
 auto tp = yaclib::MakeThreadPool(4);
-
-auto first = [] { return 42; };
-auto second = [](int r) { return r * 2; };
-auto third = [](int r) { return r + 1; };
-auto fourth = [](int r) { return std::to_string(r); };
-auto last = [](yaclib::util::Result<std::string> r) {
-    std::cout << "Pipeline result: <" 
-              << std::move(r).Ok() << ">" << std::endl;
-    yaclib::Run(tp, first).Then(second)
-                        .Then(third)
-                        .Then(fourth)
-                        .Subscribe(last); // 42 * 2 + 1
+yaclib::Run(tp, [] { return 42; })
+    .Then([](int r) { return r * 2; })
+    .Then([](int r) { return r + 1; })
+    .Then([](int r) { return std::to_string(r); })
+    .Subscribe( [](yaclib::util::Result<std::string> r) {
+        std::cout << "Pipeline result: <"  << std::move(r).Ok() << ">" << std::endl
+    }); // 42 * 2 + 1
 };
 ```
 
@@ -93,7 +88,8 @@ auto tp = yaclib::MakeThreadPool(4);
 auto f = yaclib::Run(tp, [] { return 1; })
             .Then([](int x) { return x + 15; })
             .Then([](int y) { throw std::runtime_error{""}; })
-            .Then([](std::exception_ptr) { return 15; });
+            .Then([](int z) { return z * 2; })            // Will not run
+            .Then([](std::exception_ptr) { return 15; }); // Recover from exception
 int x = std::move(f).Get().Value(); // 15
 ```
 
