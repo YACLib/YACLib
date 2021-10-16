@@ -28,14 +28,12 @@ https://www.codacy.com/gh/YACLib/YACLib/dashboard?utm_source=github.com&amp;utm_
 
 ## Table of Contents
 * [About YACLib](#about)
-* [Examples](#examples)
 * [Getting started](#quickstart)
-* [Requirements](#req)
+* [Examples](#examples)
+* [Benchmarks](TODO(MBkkt))
 * [Contributing](#contrib)
 * [Support](#support)
 * [License](#license)
-* [Documentation](https://yaclib.github.io/YACLib)
-* [Benchmarks](TODO(MBkkt))
 
 
 
@@ -48,25 +46,60 @@ https://www.codacy.com/gh/YACLib/YACLib/dashboard?utm_source=github.com&amp;utm_
 * Zero cost abstractions
 * Good test coverage
 
-For more details check our design [document](doc/design.md)
+For more details check our [design document](doc/design.md) and [documentation](https://yaclib.github.io/YACLib).
+
+<a name="quickstart"></a>
+
+## Getting started
+For quick start just paste this code in your `CMakeLists.txt` file
+```cmake
+include(FetchContent)
+FetchContent_Declare(yaclib
+  GIT_REPOSITORY https://github.com/YACLib/YACLib.git
+  GIT_TAG main
+  )
+FetchContent_MakeAvailable(yaclib)
+link_libraries(yaclib)
+```
+For more details check [install guide](doc/install.md).
 
 <a name="examples"></a>
 
 ## Examples
-Here are short examples of using some features from YACLib, for more details check [examples](https://yaclib.github.io/YACLib/examples.html) in documentation.
+Here are short examples of using some features from YACLib, for details check [documentation](https://yaclib.github.io/YACLib/examples.html).
 
-* Asynchronous pipeline with future
+* Asynchronous pipeline
 ```C++
-// create thread pool with 4 threads
-auto tp = yaclib::MakeThreadPool(4);
+auto tp = yaclib::MakeThreadPool(/*threads=*/4);
 yaclib::Run(tp, [] { return 42; })
-    .Then([](int r) { return r * 2; })
-    .Then([](int r) { return r + 1; })
-    .Then([](int r) { return std::to_string(r); })
-    .Subscribe( [](yaclib::util::Result<std::string> r) {
-        std::cout << "Pipeline result: <"  << std::move(r).Ok() << ">" << std::endl
-    }); // 42 * 2 + 1
+  .Then([](int r) { return r * 2; })
+  .Then([](int r) { return r + 1; })
+  .Then([](int r) { return std::to_string(r); })
+  .Subscribe([](std::string r) {
+    std::cout << "Pipeline result: <"  << r << ">" << std::endl;
+  });
 };
+```
+
+* Future unwraping
+
+Sometimes it is necessary to return from one async function the result of the other. It would be possible with the wait on this result. But this would cause to block thread while waiting for the task to complete.
+
+This problem can be solved using future unwrapping: when an async function returns a Future object, instead of setting its result to the Future object, the inner Future will "replace" the outer Future. This means that the outer Future will complete when the inner Future finishes and will acquire the result of the inner Future.
+
+```C++
+auto tp_output = yaclib::MakeThreadPool(/*threads=*/1);
+auto tp_compute = yaclib::MakeThreadPool(/*threads=CPU cores*/);
+
+auto future = yaclib::Run(tp_output, [] {
+  std::cout << "Outer task" <<   std::endl;
+  return yaclib::Run(tp_compute, [] { return 42; });
+}).Then(/*tp_compute*/ [](int result) {
+  result *= 13;
+  return yaclib::Run(tp_output, [result] { 
+    return std::cout << "Result = " << result << std::endl; 
+  });
+});
 ```
 
 * Error recovering from callbacks
@@ -120,31 +153,26 @@ yaclib::Future<std::vector<int>> all = yaclib::WhenAll(futs.begin(), futs.size()
 std::vector<int> ints = std::move(all).Get().Value();
 ```
 
-<a name="quickstart"></a>
-
-## Getting started
-For quick start just paste this code in your `CMakeLists.txt` file
-```cmake
-include(FetchContent)
-FetchContent_Declare(yaclib
-  GIT_REPOSITORY https://github.com/YACLib/YACLib.git
-  GIT_TAG main
-  )
-FetchContent_MakeAvailable(yaclib)
-link_libraries(yaclib)
-```
-For more details check [install guide](doc/install.md).
-
 <a name="req"></a>
 
 ## Requirements
+### Operating systems
+
+* Linux
+* macOS
+* Windows
+* Android
+* iOS (theoretical)
+
+### Compilers
 A recent C++ compilers that support C++17
 * GCC-9 and later
 * Clang-11 and later
 * Apple Clang
 * MSVC
 
-<a name="support"></a>
+### Build systems
+* CMake
 
 <a name="contrib"></a>
 
@@ -155,6 +183,11 @@ We are always open for issues and pull requests. For more details you can check 
 * [Developer dependencies](doc/dependency.md)
 * [PR guide](doc/pr_guide.md)
 * [Style guide](doc/style_guide.md)
+
+## Releases
+YACLib follows the
+[Abseil Live at Head philosophy](https://abseil.io/about/philosophy#upgrade-support).
+We recommend using the latest commit in the `main` branch in your projects.
 
 ## Contacts
 You can contact us by our emails:
