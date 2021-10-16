@@ -84,6 +84,23 @@ yaclib::Run(tp, [] { return 42; })
 ```
 </p></details>
 
+<details><summary>Thread Pool</summary><p>
+
+```C++
+auto tp = yaclib::MakeThreadPool(/*threads=*/4);
+tp->Execute([] {
+  // some computations...
+});
+
+tp->Execute([] {
+  // some computations...
+});
+
+tp->Stop();
+tp->Wait();
+```
+</p></details>
+
 <details><summary>Exception recovering from callbacks</summary><p>
 
 ```C++
