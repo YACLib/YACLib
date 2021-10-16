@@ -68,7 +68,7 @@ For more details check our design [document](doc/design.md)
 <a name="examples"></a>
 
 ## Examples
-Here are short examples of using some features from YACLib, for more details check examples in [useful links](#examples)
+Here are short examples of using some features from YACLib, for more details check examples in [documentation](https://yaclib.github.io/YACLib/index.html)
 
 * Asynchronous pipeline with future
 ```C++
