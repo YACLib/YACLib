@@ -85,6 +85,16 @@ yaclib::Run(tp, first).Then(second)
                       .Subscribe(last); // 42 * 2 + 1
 };
 ```
+* Error recovering from callbacks
+```
+auto tp = yaclib::MakeThreadPool(4);
+auto f = yaclib::Run(tp, [] { return 1; })
+            .Then([](int x) { return x + 15; })
+            .Then([](int y) { throw std::runtime_error{""}; })
+            .Then([](std::exception_ptr) { return 15; });
+int x = std::move(f).Get().Value(); // 15
+```
+
 * Serial Executor (strand)
 
 ```C++
@@ -97,7 +107,7 @@ size_t counter = 0;
 std::vector<std::thread> threads;
 
 for (size_t i = 0; i < 5; ++i) {
-    threads.emplace_back([&]() {
+    threads.emplace_back([&] {
         for (size_t j = 0; j < 1000; ++j) {
             strand->Execute([&] {
                 ++counter; // no data race!
@@ -105,6 +115,23 @@ for (size_t i = 0; i < 5; ++i) {
         }
     });
 }
+```
+* Future combinators (WhenAll, WhenAny)
+
+```C++
+auto tp = yaclib::MakeThreadPool(4);
+std::vector<yaclib::Future<int>> futs;
+
+// Run sync computations in parallel
+for (size_t i = 0; i < 5; ++i) {
+    futs.push_back(yaclib::Run(tp, [i]() -> int {
+        return i;
+    }));
+}
+
+// Will be ready when all futures are ready
+yaclib::Future<std::vector<int>> all = yaclib::WhenAll(futs.begin(), futs.size());
+std::vector<int> ints = std::move(all).Get().Value();
 ```
 
 <a name="quickstart"></a>
