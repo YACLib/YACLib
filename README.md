@@ -33,6 +33,7 @@ https://www.codacy.com/gh/YACLib/YACLib/dashboard?utm_source=github.com&amp;utm_
 * [Requirements](#req)
 * [Contributing](#contrib)
 * [Support](#support)
+* [Contacts](#contacts)
 * [License](#license)
 
 
@@ -258,6 +259,13 @@ A recent C++ compilers that support C++17
 ### Build systems
 * CMake
 
+<a name="releases"></a>
+
+## Releases
+YACLib follows the
+[Abseil Live at Head philosophy](https://abseil.io/about/philosophy#upgrade-support).
+We recommend using the latest commit in the `main` branch in your projects.
+
 <a name="contrib"></a>
 
 ## Contributing
@@ -268,10 +276,7 @@ We are always open for issues and pull requests. For more details you can check 
 * [PR guide](doc/pr_guide.md)
 * [Style guide](doc/style_guide.md)
 
-## Releases
-YACLib follows the
-[Abseil Live at Head philosophy](https://abseil.io/about/philosophy#upgrade-support).
-We recommend using the latest commit in the `main` branch in your projects.
+<a name="contacts"></a>
 
 ## Contacts
 You can contact us by our emails:
@@ -280,6 +285,8 @@ You can contact us by our emails:
 * ionin.code@gmail.com
 * zakhar.zakharov.zz16@gmail.com
 * myannyax@gmail.com
+
+<a name="license"></a>
 
 ## License
 YACLib is made available under MIT License.
