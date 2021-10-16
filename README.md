@@ -26,6 +26,33 @@ https://www.codacy.com/gh/YACLib/YACLib/dashboard?utm_source=github.com&amp;utm_
 
 YACLib (_Yet Another Concurrency Library_) is a C++ library for concurrent tasks execution.
 
+## Table of Contents
+* [About YACLib](#about)
+* [Getting started](#quickstart)
+* Support
+* Contributing
+* License
+* Useful links
+
+<a name="about"></a>
+## About YACLib
+**YACLib** is a lightweight C++ library for concurrent and parallel task execution, that is striving to satisfy the following properties:
+* Easy to use
+* Easy to build
+* Zero cost abstractions
+* Good test coverage
+
+## Getting started
+For quick start just paste this code in your CMakeLists.txt
+```cmake
+include(FetchContent)
+FetchContent_Declare(yaclib
+        GIT_REPOSITORY https://github.com/YACLib/YACLib.git
+        GIT_TAG main
+        )
+FetchContent_MakeAvailable(yaclib)
+link_libraries(yaclib)
+```
 ## Useful links
 
 ### For user
