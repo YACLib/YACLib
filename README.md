@@ -36,6 +36,7 @@ https://www.codacy.com/gh/YACLib/YACLib/dashboard?utm_source=github.com&amp;utm_
 * [License](#license)
 
 <a name="about"></a>
+
 ## About YACLib
 **YACLib** is a lightweight C++ library for concurrent and parallel task execution, that is striving to satisfy the following properties:
 * Easy to use
@@ -46,6 +47,7 @@ https://www.codacy.com/gh/YACLib/YACLib/dashboard?utm_source=github.com&amp;utm_
 For more details check our design [document](doc/design.md)
 
 <a name="links"></a>
+
 ## Useful links
 
 ### For user
@@ -64,6 +66,7 @@ For more details check our design [document](doc/design.md)
 * [Style guide](doc/style_guide.md)
 
 <a name="examples"></a>
+
 ## Examples
 Here are short examples of using some features from YACLib, for more details check examples in [useful links](#examples)
 
@@ -133,6 +136,7 @@ std::vector<int> ints = std::move(all).Get().Value();
 ```
 
 <a name="quickstart"></a>
+
 ## Getting started
 For quick start just paste this code in your `CMakeLists.txt` file
 ```cmake
@@ -146,6 +150,7 @@ link_libraries(yaclib)
 ```
 
 <a name="req"></a>
+
 ## Requirements
 A recent C++ compilers that support C++17:
 * Gcc-9.* and later
@@ -154,11 +159,16 @@ A recent C++ compilers that support C++17:
 * MSVC
 
 <a name="support"></a>
+
 ## Support
 We are always open for issues and pull requests, also you can check our emails:
 * kononov.nikolay.nk1@gmail.com
+* ionin.code@gmail.com
+* zakhar.zakharov.zz16@gmail.com
+* myannyax@gmail.com
 
 <a name="license"></a>
+
 ## License
 YACLib is made available under MIT License.
 See [LICENSE](LICENSE) file for details
