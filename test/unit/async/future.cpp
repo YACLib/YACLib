@@ -884,4 +884,23 @@ TEST(Future, CheckReferenceWrapper) {
   std::move(p).Set(std::ref(x));
 }
 
+TEST(Future, InlineCallback) {
+  auto [f, p] = yaclib::MakeContract<void>();
+  auto f1 = std::move(f).Then(yaclib::MakeInline(), [] {
+  });
+  std::move(std::move(p)).Set();
+  EXPECT_TRUE(f1.Ready());
+}
+
+TEST(Future, Stopped) {
+  auto [f, p] = yaclib::MakeContract<void>();
+  bool ready = false;
+  auto f1 = std::move(f).Then(yaclib::MakeInline(), [&] {
+    ready = true;
+  });
+  std::move(f1).Stop();
+  std::move(p).Set();
+  EXPECT_FALSE(ready);
+}
+
 }  // namespace
