@@ -101,7 +101,7 @@ TEST(Example, Pipeline) {
 
 class CalculatorService {
  public:
-  CalculatorService(yaclib::IExecutorPtr e) : e_(e) {
+  explicit CalculatorService(yaclib::IExecutorPtr e) : e_(e) {
   }
 
   yaclib::Future<int> Increment(int value) {
