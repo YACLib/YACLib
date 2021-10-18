@@ -29,14 +29,6 @@ class StackView {
     return End() - 1;
   }
 
-  [[nodiscard]] bool HasSpace() const noexcept {
-    return _size > 0;
-  }
-
-  [[nodiscard]] bool IsValid() const noexcept {
-    return _sp != nullptr;
-  }
-
   void operator+=(size_t offset) noexcept {
     _sp += offset;
     _size -= offset;

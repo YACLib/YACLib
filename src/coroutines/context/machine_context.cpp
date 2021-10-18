@@ -1,13 +1,11 @@
-#include "yaclib/coroutines/context/machine_context.hpp"
+#include <yaclib/coroutines/context/machine_context.hpp>
 
-#include "coroutines/context/setup_stack/setup_stack.hpp"
-
-extern "C" void SwitchMachineContext(void* from_rsp, void* to_rsp);
+extern "C" void __yclib_switch_context(void* from_context, void* to_context);
 
 void MachineContext::Setup(StackView stack, Trampoline trampoline, void* arg) {
-  _rsp = SetupStack(stack, trampoline, arg);
+  SetupStack(stack, trampoline, arg, _context);
 }
 
 void MachineContext::SwitchTo(MachineContext& target) {
-  SwitchMachineContext(&_rsp, &target._rsp);
+  __yclib_switch_context(&_context, &target._context);
 }
