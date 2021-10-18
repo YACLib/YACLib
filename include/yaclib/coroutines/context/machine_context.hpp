@@ -1,5 +1,7 @@
 #pragma once
 #include <yaclib/coroutines/context/stack_view.hpp>
+//TODO if
+#include "coroutines/context/setup_stack/setup_stack_x64.hpp"
 
 using Trampoline = void (*)(void* arg);
 
@@ -15,5 +17,5 @@ class MachineContext {
   void SwitchTo(MachineContext& target);
 
  private:
-  void* _rsp;
+  YaclibFiberMachineContext _context;
 };

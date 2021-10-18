@@ -1,45 +1,20 @@
-#pragma once
+#include <cstdint>
+#include "setup_stack_x64.hpp"
 
-#include "setup_stack.hpp"
-
-struct StackSavedMachineContext {
-  // Layout of the StackSavedMachineContext matches the layout of the stack
-  // in machine_context.S at the 'Switch stacks' comment
-
-  // Callee-saved registers
-  // Saved manually in SwitchMachineContext
-  void* rbp;
-  void* rbx;
-
-  void* r12;
-  void* r13;
-  void* r14;
-  void* r15;
-
-  // Saved automatically by 'call' instruction
-  void* rip;
-};
-
-static void MachineContextTrampoline(void*, void*, void*, void*, void*, void*, void* arg1, void* arg2) {
+static void MachineContextTrampoline(void* arg1, void* arg2) {
   auto trampoline = (Trampoline)arg1;
   trampoline(arg2);
 }
 
-void* SetupStack(StackView stack, Trampoline trampoline, void* arg) {
-  StackBuilder builder(stack.Back());
+static const int kAlignment = 16;
 
-  builder.Allocate(sizeof(uintptr_t) * 3);
+void SetupStack(StackView stack, Trampoline trampoline, void* arg, YaclibFiberMachineContext& context) {
+  size_t shift = (size_t)(stack.Back() - (sizeof(uintptr_t))) % kAlignment;
+  char* top = stack.Back() - shift;
 
-  builder.AlignNextPush(16);
+  context.RSP = top;
+  context.RDI = (void*)trampoline;
+  context.RSI = arg;
 
-  ArgumentsListBuilder args(builder.Top());
-  args.Push((void*)trampoline);
-  args.Push(arg);
-
-  builder.Allocate(sizeof(StackSavedMachineContext));
-
-  auto* stack_saved_context = (StackSavedMachineContext*)builder.Top();
-  stack_saved_context->rip = (void*)MachineContextTrampoline;
-
-  return stack_saved_context;
+  context.RIP = (void*)MachineContextTrampoline;
 }
