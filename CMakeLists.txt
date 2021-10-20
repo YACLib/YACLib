@@ -56,7 +56,6 @@ else ()
     set(SANITIZER_ENABLE_OPTION -fsanitize=memory)
   endif ()
   list(APPEND YACLIB_COMPILE_OPTIONS
-    -fno-omit-frame-pointer
     ${SANITIZER_ENABLE_OPTION}
     ${SANITIZER_COMPILE_OPTIONS}
     )
