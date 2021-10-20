@@ -25,14 +25,14 @@ auto Run(const IExecutorPtr& e, Functor&& f) {
     auto callback = util::MakeIntrusive<detail::ResultCore<Ret>>();
     callback->SetExecutor(e);
     using InvokeT = detail::AsyncInvoke<Ret, decltype(std::forward<Functor>(f)), void>;
-    using CoreT = detail::Core<void, InvokeT, void>;
-    auto core = util::MakeIntrusive<CoreT>(callback, std::forward<Functor>(f));
+    using CoreT = detail::Core<void, InvokeT, void, true>;
+    util::Ptr core{new util::Counter<CoreT>{callback, std::forward<Functor>(f)}};
     core->SetExecutor(e);
     e->Execute(*core);
-    return Future<Ret>{callback};
+    return Future<Ret>{std::move(callback)};
   } else {
     using InvokeT = detail::SyncInvoke<Ret, decltype(std::forward<Functor>(f)), void>;
-    using CoreT = detail::Core<Ret, InvokeT, void>;
+    using CoreT = detail::Core<Ret, InvokeT, void, true>;
     auto core = util::MakeIntrusive<CoreT>(std::forward<Functor>(f));
     core->SetExecutor(e);
     e->Execute(*core);

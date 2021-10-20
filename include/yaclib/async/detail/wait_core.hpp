@@ -24,7 +24,7 @@ class WaitCore : public util::IRef {
 
   template <typename Clock, typename Duration>
   bool Wait(std::unique_lock<std::mutex>& guard, const std::chrono::time_point<Clock, Duration>& timeout_time) {
-    return cv.wait_until(guard, timeout_time, [&] {
+    return cv.wait_until(guard, timeout_time, [this] {
       return is_ready;
     });
   }
