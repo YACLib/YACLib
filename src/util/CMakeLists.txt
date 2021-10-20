@@ -14,6 +14,7 @@ list(APPEND YACLIB_HEADERS
   )
 list(APPEND YACLIB_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/intrusive_list.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/mpsc_stack.cpp
   )
 
 add_files()

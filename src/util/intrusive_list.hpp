@@ -20,7 +20,7 @@ class List final {
     return static_cast<T*>(node);
   }
 
-  bool IsEmpty() const noexcept {
+  [[nodiscard]] bool IsEmpty() const noexcept {
     return !_head.IsLinked();
   }
 
@@ -32,9 +32,9 @@ class List final {
     node->Link(&_head, _head._next);
   }
 
-  T* PopBack() noexcept;
+  [[nodiscard]] T* PopBack() noexcept;
 
-  T* PopFront() noexcept;
+  [[nodiscard]] T* PopFront() noexcept;
 
   void Append(List& other) noexcept;
 

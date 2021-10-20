@@ -1,123 +1,10 @@
 #pragma once
 
-#include <yaclib/executor/executor.hpp>
-#include <yaclib/executor/inline.hpp>
-#include <yaclib/executor/task.hpp>
-#include <yaclib/util/intrusive_ptr.hpp>
-#include <yaclib/util/result.hpp>
+#include <yaclib/async/detail/result_core.hpp>
 
-#include <atomic>
 #include <cassert>
-#include <condition_variable>
-#include <mutex>
-#include <type_traits>
 
 namespace yaclib::detail {
-
-class BaseCore : public ITask {
- protected:
-  enum class State {
-    Empty,
-    HasResult,
-    HasCallback,
-    HasInlineCallback,
-    HasWaitCallback,
-    Stopped,
-  };
-
- public:
-  [[nodiscard]] IExecutorPtr GetExecutor() const noexcept {
-    return _executor;
-  }
-  [[nodiscard]] bool Ready() const noexcept {
-    return _state.load(std::memory_order_acquire) == State::HasResult;
-  }
-
-  void SetExecutor(IExecutorPtr executor) noexcept {
-    _executor = std::move(executor);
-  }
-
-  void SetCallback(util::Ptr<ITask> callback) {
-    _callback = std::move(callback);
-    const auto state = _state.exchange(State::HasCallback, std::memory_order_acq_rel);
-    if (state == State::HasResult) {
-      Execute();
-    }
-  }
-  void Stop() noexcept {
-    _state.store(State::Stopped, std::memory_order_release);
-    assert(_callback == nullptr);
-  }
-
-  bool SetWaitCallback(ITask& callback) noexcept {
-    if (_state.load(std::memory_order_acquire) == State::HasResult) {
-      return true;
-    }
-    _callback = &callback;
-    auto expected = State::Empty;
-    if (!_state.compare_exchange_strong(expected, State::HasWaitCallback, std::memory_order_acq_rel)) {
-      _callback = nullptr;  // This is mean we have Result
-      return true;
-    }
-    return false;
-  }
-
-  bool ResetAfterTimeout() noexcept {
-    auto expected = State::HasWaitCallback;
-    if (_state.compare_exchange_strong(expected, State::Empty, std::memory_order_acq_rel)) {
-      _callback = nullptr;  // This is mean we don't have executed callback
-      return true;
-    }
-    return false;
-  }
-
- protected:
-  std::atomic<State> _state{State::Empty};
-  util::Ptr<ITask> _caller;
-  IExecutorPtr _executor{MakeInline()};
-  util::Ptr<ITask> _callback;
-
-  void Execute() {
-    static_cast<BaseCore&>(*_callback)._caller = this;
-    _executor->Execute(*_callback);
-    // order is matter TODO(MBkkt) Why?
-    _executor = nullptr;
-    _callback = nullptr;
-  }
-
-  void Cancel() noexcept final {  // Opposite for Call with SetResult
-    _caller = nullptr;
-    // order is matter
-    _executor = nullptr;
-    _callback = nullptr;
-  }
-};
-
-template <typename Value>
-class ResultCore : public BaseCore {
- public:
-  void SetResult(util::Result<Value>&& result) {
-    _result = std::move(result);
-    const auto state = _state.exchange(State::HasResult, std::memory_order_acq_rel);
-    if (state == State::HasCallback) {
-      BaseCore::Execute();
-    } else if (state == State::HasInlineCallback) {
-      _executor = MakeInline();
-      BaseCore::Execute();
-    } else if (state == State::HasWaitCallback) {
-      _callback = nullptr;
-    } else if (state == State::Stopped) {
-      BaseCore::Cancel();
-    }
-  }
-
-  util::Result<Value>& Get() {
-    return _result;
-  }
-
- private:
-  util::Result<Value> _result;
-};
 
 template <typename Ret, typename InvokeType, typename Arg>
 class Core : public ResultCore<Ret> {
@@ -153,38 +40,10 @@ class Core : public ResultCore<Ret> {
 template <typename Result>
 class Core<Result, void, void> : public ResultCore<Result> {
   void Call() noexcept final {
-    assert(false);  // this class using only via promise
+    assert(false);  // This class using only via promise
   }
 };
 
-class WaitCore : public ITask {
- public:
-  bool is_ready{false};
-  std::mutex m;
-  std::condition_variable cv;
-
- private:
-  void Call() noexcept final {
-  }
-  void Cancel() noexcept final {
-  }
-};
-
-class WaitCoreDeleter {
- public:
-  template <typename Type>
-  void Delete(void* p) {
-    auto& self = *static_cast<WaitCore*>(p);
-    std::lock_guard guard{self.m};
-    self.is_ready = true;
-    self.cv.notify_all();  // Notify under mutex, because cv located on stack memory of other thread
-  }
-};
-
-template <typename Value>
-using PromiseCorePtr = util::Ptr<Core<Value, void, void>>;
-
-template <typename Value>
-using FutureCorePtr = util::Ptr<ResultCore<Value>>;
+extern template class Core<void, void, void>;
 
 }  // namespace yaclib::detail

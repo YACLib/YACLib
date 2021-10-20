@@ -1,9 +1,16 @@
 #pragma once
-#include <yaclib/async/detail/core.hpp>
+
+#include <yaclib/async/detail/result_core.hpp>
 
 #include <utility>
 
 namespace yaclib {
+namespace detail {
+
+template <typename Value>
+using PromiseCorePtr = util::Ptr<ResultCore<Value>>;
+
+}  // namespace detail
 
 template <typename T>
 class Future;
@@ -54,6 +61,8 @@ class Promise final {
   detail::PromiseCorePtr<T> _core;
   bool _future_extracted{false};  // TODO should be in _core bit
 };
+
+extern template class Promise<void>;
 
 /**
  * Describes channel with future and promise

@@ -7,11 +7,11 @@ namespace yaclib {
 /**
  * Wait until \ref Ready becomes true
  *
- * \param futures one or more futures to wait
+ * \param fs one or more futures to wait
  */
-template <typename... Fs>
-void Wait(Fs&&... futures) {
-  detail::Wait<detail::WaitPolicy::Endless>(/* stub value */ false, static_cast<detail::BaseCore&>(*futures._core)...);
+template <typename... Futures>
+void Wait(Futures&&... fs) {
+  detail::Wait(detail::NoTimeoutTag{}, static_cast<detail::BaseCore&>(*fs._core)...);
 }
 
 }  // namespace yaclib
