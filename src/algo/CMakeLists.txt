@@ -6,10 +6,10 @@ list(APPEND YACLIB_INCLUDES
   ${YACLIB_INCLUDE_DIR}/algo/when_any.hpp
   )
 list(APPEND YACLIB_HEADERS
-  ${YACLIB_INCLUDE_DIR}/algo/detail/wait.hpp
+  ${YACLIB_INCLUDE_DIR}/algo/detail/wait_impl.hpp
   )
 list(APPEND YACLIB_SOURCES
-  ${CMAKE_CURRENT_SOURCE_DIR}/wait.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/wait_impl.cpp
   )
 
 add_files()
