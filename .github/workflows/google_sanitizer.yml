@@ -11,19 +11,31 @@ on:
 jobs:
   main:
     runs-on: ${{ matrix.os }}
-    name: ${{ matrix.sanitizer }} on ${{ matrix.build_type }} ${{ matrix.cxx }} ${{ matrix.os }}
+    name: ${{ matrix.sanitizer }} on ${{ matrix.build_type }} ${{ matrix.config.cxx }} ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        sanitizer: [ ASAN, TSAN, UBSAN ]
+        sanitizer: [ UBSAN, ASAN, TSAN ]
         # TODO(MBkkt): Add MEMSAN then GTest fix that issue https://github.com/google/sanitizers/issues/648
         build_type: [ RelWithDebInfo, Debug ]
-        cc: [ clang-12 ]
-        cxx: [ clang++-12 ]
+        cxx_standard: [ 20 ]
         os: [ ubuntu-latest ]
+        config:
+          - {
+            cc: clang-12, cxx: clang++-12,
+            deps: 'clang-12',
+          }
+          - {
+            cc: gcc-11, cxx: g++-11,
+            deps: 'gcc-11 g++-11',
+          }
 
     steps:
       - uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run:
+          sudo apt install ${{ matrix.config.deps }}
 
       - name: Configure CMake
         run:
@@ -31,11 +43,12 @@ jobs:
           cd build &&
           cmake ..
           -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-          -DCMAKE_C_COMPILER=${{ matrix.cc }}
-          -DCMAKE_CXX_COMPILER=${{ matrix.cxx }}
+          -DCMAKE_C_COMPILER=${{ matrix.config.cc }}
+          -DCMAKE_CXX_COMPILER=${{ matrix.config.cxx }}
           -DYACLIB_BUILD_TESTING=ON
           -DYACLIB_BUILD_EXAMPLES=ON
           -DYACLIB_SANITIZER=${{ matrix.sanitizer }}
+          -DYACLIB_CXX_STANDARD=${{ matrix.cxx_standard }}
 
       - name: Build
         run:

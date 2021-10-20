@@ -315,12 +315,23 @@ int x = std::move(f).Get().Value();
 
 ### Compilers
 
-A recent C++ compilers that support C++17
+C++ compiler that supports standard 17 or higher.
 
-* GCC-9 and later
-* Clang-11 and later
+If the library doesn't compile on some compiler satisfying this condition, please create an issue.
+
+These compilers are tested in CI:
+
+* Clang-7, Clang-8, Clang-9, Clang-10, Clang-11, Clang-12
+* GCC-8, GCC-9, GCC-10, GCC-11
 * Apple Clang
 * MSVC
+
+### C++ standard
+
+We support 17 and 20 C++ standards, we also probably support newer standards (if not, please create an issue).
+
+We can also try support older standards. If you are interested in it, see
+this [discussion](https://github.com/YACLib/YACLib/discussions/102).
 
 ### Build systems
 

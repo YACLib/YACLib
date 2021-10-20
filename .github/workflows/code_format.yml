@@ -16,10 +16,11 @@ jobs:
       matrix:
         path:
           - '.'
+
     steps:
       - uses: actions/checkout@v2
       - name: Run clang-format style check
-        uses: jidicula/clang-format-action@v3.4.0
+        uses: jidicula/clang-format-action@v4.2.0
         with:
-          clang-format-version: 11
+          clang-format-version: 13
           check-path: ${{ matrix.path }}

@@ -18,13 +18,14 @@ jobs:
         cc: [ gcc-10 ]
         cxx: [ g++-10 ]
         build_type: [ Debug ]
+        cxx_standard: [ 17 ]
 
     steps:
       - uses: actions/checkout@v2
 
-      - name: Install lcov
+      - name: Install dependencies
         run:
-          sudo apt install lcov
+          sudo apt install ${{ matrix.cc }} ${{ matrix.cxx }} lcov
 
       - name: Configure CMake
         run:
@@ -37,6 +38,7 @@ jobs:
           -DYACLIB_BUILD_TESTING=ON
           -DYACLIB_BUILD_EXAMPLES=ON
           -DYACLIB_COVERAGE=ON
+          -DYACLIB_CXX_STANDARD=${{ matrix.cxx_standard }}
 
       - name: Build
         run:

@@ -14,41 +14,169 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        build_type: [ RelWithDebInfo, Debug ]
         config:
           - {
             os: ubuntu-latest,
-            cc: gcc-9, cxx: g++-9,
-            cmake_args: "",
-          }
-          - {
-            os: ubuntu-latest,
-            cc: gcc-10, cxx: g++-10,
-            cmake_args: "",
-          }
-          - {
-            os: ubuntu-latest,
-            cc: clang-11, cxx: clang++-11,
-            cmake_args: "",
+            cc: clang-12, cxx: clang++-12,
+            deps: 'clang-12',
+            cxx_standard: 20,
+            cmake_args: '',
           }
           - {
             os: ubuntu-latest,
             cc: clang-12, cxx: clang++-12,
-            cmake_args: "",
+            deps: 'clang-12',
+            cxx_standard: 17,
+            cmake_args: '',
+          }
+          - {
+            os: ubuntu-latest,
+            cc: clang-11, cxx: clang++-11,
+            deps: 'clang-11',
+            cxx_standard: 20,
+            cmake_args: '',
+          }
+          - {
+            os: ubuntu-latest,
+            cc: clang-11, cxx: clang++-11,
+            deps: 'clang-11',
+            cxx_standard: 17,
+            cmake_args: '',
+          }
+          - {
+            os: ubuntu-latest,
+            cc: clang-10, cxx: clang++-10,
+            deps: 'clang-10',
+            cxx_standard: 20,
+            cmake_args: '',
+          }
+          - {
+            os: ubuntu-latest,
+            cc: clang-10, cxx: clang++-10,
+            deps: 'clang-10',
+            cxx_standard: 17,
+            cmake_args: '',
+          }
+          - {
+            os: ubuntu-latest,
+            cc: clang-9, cxx: clang++-9,
+            deps: 'clang-9',
+            cxx_standard: 20,
+            cmake_args: '',
+          }
+          - {
+            os: ubuntu-latest,
+            cc: clang-9, cxx: clang++-9,
+            deps: 'clang-9',
+            cxx_standard: 17,
+            cmake_args: '',
+          }
+          - {
+            os: ubuntu-latest,
+            cc: clang-8, cxx: clang++-8,
+            deps: 'clang-8',
+            cxx_standard: 17,
+            cmake_args: '',
+          }
+          - {
+            os: ubuntu-latest,
+            cc: clang-7, cxx: clang++-7,
+            deps: 'clang-7',
+            cxx_standard: 17,
+            cmake_args: '',
+          }
+
+          - {
+            os: ubuntu-latest,
+            cc: gcc-11, cxx: g++-11,
+            deps: 'gcc-11 g++-11',
+            cxx_standard: 20,
+            cmake_args: '',
+          }
+          - {
+            os: ubuntu-latest,
+            cc: gcc-11, cxx: g++-11,
+            deps: 'gcc-11 g++-11',
+            cxx_standard: 17,
+            cmake_args: '',
+          }
+          - {
+            os: ubuntu-latest,
+            cc: gcc-10, cxx: g++-10,
+            deps: 'gcc-10 g++-10',
+            cxx_standard: 20,
+            cmake_args: '',
+          }
+          - {
+            os: ubuntu-latest,
+            cc: gcc-10, cxx: g++-10,
+            deps: 'gcc-10 g++-10',
+            cxx_standard: 17,
+            cmake_args: '',
+          }
+          - {
+            os: ubuntu-latest,
+            cc: gcc-9, cxx: g++-9,
+            deps: 'gcc-9 g++-9',
+            cxx_standard: 20,
+            cmake_args: '',
+          }
+          - {
+            os: ubuntu-latest,
+            cc: gcc-9, cxx: g++-9,
+            deps: 'gcc-9 g++-9',
+            cxx_standard: 17,
+            cmake_args: '',
+          }
+          - {
+            os: ubuntu-latest,
+            cc: gcc-8, cxx: g++-8,
+            deps: 'gcc-8 g++-8',
+            cxx_standard: 20,
+            cmake_args: '',
+          }
+          - {
+            os: ubuntu-latest,
+            cc: gcc-8, cxx: g++-8,
+            deps: 'gcc-8 g++-8',
+            cxx_standard: 17,
+            cmake_args: '',
+          }
+
+          - {
+            os: macos-latest,
+            cc: clang, cxx: clang++,
+            cxx_standard: 20,
+            cmake_args: '-DYACLIB_DEFINITIONS=/DYACLIB_CI_SLOWDOWN=10',
           }
           - {
             os: macos-latest,
             cc: clang, cxx: clang++,
-            cmake_args: "-DYACLIB_DEFINITIONS=/DYACLIB_CI_SLOWDOWN=10",
+            cxx_standard: 17,
+            cmake_args: '-DYACLIB_DEFINITIONS=/DYACLIB_CI_SLOWDOWN=10',
+          }
+
+          - {
+            os: windows-latest,
+            cc: cl, cxx: cl,
+            cxx_standard: 20,
+            cmake_args: '',
           }
           - {
             os: windows-latest,
             cc: cl, cxx: cl,
-            cmake_args: "",
+            cxx_standard: 17,
+            cmake_args: '',
           }
-        build_type: [ RelWithDebInfo, Debug ]
 
     steps:
       - uses: actions/checkout@v2
+
+      - name: Install dependencies
+        if: ${{ matrix.config.os == 'ubuntu-latest' }}
+        run:
+          sudo apt install ${{ matrix.config.deps }}
 
       - name: Configure CMake
         run:
@@ -60,6 +188,7 @@ jobs:
           -DCMAKE_CXX_COMPILER=${{ matrix.config.cxx }}
           -DYACLIB_BUILD_TESTING=ON
           -DYACLIB_BUILD_EXAMPLES=ON
+          -DYACLIB_CXX_STANDARD=${{ matrix.config.cxx_standard }}
           ${{ matrix.config.cmake_args }}
 
       - name: Build
