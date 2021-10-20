@@ -42,7 +42,7 @@ class ResultCore : public BaseCore {
   }
 
  private:
-  void CallInline(void* caller) noexcept override {
+  void CallInline(InlineCore* caller) noexcept override {
     if (BaseCore::GetState() == BaseCore::State::HasStop) {
       // Don't need to call Cancel, because we call Clean after CallInline and our _caller is nullptr
       return;

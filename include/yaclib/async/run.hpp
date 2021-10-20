@@ -25,14 +25,14 @@ auto Run(const IExecutorPtr& e, Functor&& f) {
     util::Ptr callback{new util::Counter<detail::ResultCore<Ret>>{}};
     callback->SetExecutor(e);
     using InvokeT = detail::AsyncInvoke<Ret, decltype(std::forward<Functor>(f)), void>;
-    using CoreT = detail::Core<void, InvokeT, void>;
+    using CoreT = detail::Core<void, InvokeT, void, true>;
     util::Ptr core{new util::Counter<CoreT>{callback, std::forward<Functor>(f)}};
     core->SetExecutor(e);
     e->Execute(*core);
     return Future<Ret>{callback};
   } else {
     using InvokeT = detail::SyncInvoke<Ret, decltype(std::forward<Functor>(f)), void>;
-    using CoreT = detail::Core<Ret, InvokeT, void>;
+    using CoreT = detail::Core<Ret, InvokeT, void, true>;
     util::Ptr core{new util::Counter<CoreT>{std::forward<Functor>(f)}};
     core->SetExecutor(e);
     e->Execute(*core);
