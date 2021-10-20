@@ -83,6 +83,7 @@ link_libraries(yaclib)
 For more details check [install guide](doc/install.md).
 
 ## Examples
+
 <details open><summary> 
 Here are short examples of using some features from YACLib, for details
 check <a href="https://yaclib.github.io/YACLib/examples.html">documentation</a>.
@@ -105,7 +106,6 @@ yaclib::Run(tp, [] {
   });
 };
 ```
-
 
 #### Thread Pool
 
@@ -328,7 +328,10 @@ A recent C++ compilers that support C++17
 
 ## Releases
 
-YACLib follows the [Abseil Live at Head philosophy](https://abseil.io/about/philosophy#upgrade-support) (update to the latest commit from the main branch as often as possible). So we recommend using the latest commit in the main branch in your projects.
+YACLib follows the [Abseil Live at Head philosophy](https://abseil.io/about/philosophy#upgrade-support)
+(update to the latest commit from the main branch as often as possible).
+
+So we recommend using the latest commit in the main branch in your projects.
 
 However, we realize this philosophy doesn't work for every project, so we also provide Releases.
 
@@ -343,6 +346,7 @@ We are always open for issues and pull requests. For more details you can check 
 * [Dev dependencies](doc/dependency.md)
 * [PR guide](doc/pr_guide.md)
 * [Style guide](doc/style_guide.md)
+* [How to use sanitizers](doc/sanitizer.md)
 
 ## Contacts
 
