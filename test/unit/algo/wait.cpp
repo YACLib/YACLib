@@ -38,7 +38,7 @@ void TestJustWorks() {
     EXPECT_TRUE(!f.Ready());
     EXPECT_LE(timer.Elapsed(), 100ms * YACLIB_CI_SLOWDOWN);
   } else if constexpr (policy == WaitPolicy::Until) {
-    yaclib::WaitUntil(timer.Now() + 50ms * YACLIB_CI_SLOWDOWN, f);
+    yaclib::WaitUntil(std::chrono::system_clock::now() + 50ms * YACLIB_CI_SLOWDOWN, f);
     EXPECT_TRUE(!f.Ready());
     EXPECT_LE(timer.Elapsed(), 100ms * YACLIB_CI_SLOWDOWN);
   }
@@ -51,16 +51,18 @@ TEST(Wait, JustWorks) {
   TestJustWorks<WaitPolicy::Endless>();
 }
 
+#if !defined(YACLIB_TSAN) || !defined(__GNUC__)  // https://github.com/google/sanitizers/issues/1259
 TEST(WaitFor, JustWorks) {
   TestJustWorks<WaitPolicy::For>();
 }
+#endif
 
 TEST(WaitUntil, JustWorks) {
   TestJustWorks<WaitPolicy::Until>();
 }
 
 template <WaitPolicy kPolicy>
-void TestMultithreaded() {
+void TestMultiThreaded() {
   static constexpr int kThreads = 4;
   auto tp = yaclib::MakeThreadPool(kThreads);
   yaclib::Future<int> f[kThreads];
@@ -79,7 +81,8 @@ void TestMultithreaded() {
     bool ready = yaclib::WaitFor(100ms * YACLIB_CI_SLOWDOWN, f[0], f[1], f[2], f[3]);
     EXPECT_TRUE(ready);
   } else if constexpr (kPolicy == WaitPolicy::Until) {
-    bool ready = yaclib::WaitUntil(timer.Now() + 100ms * YACLIB_CI_SLOWDOWN, f[0], f[1], f[2], f[3]);
+    bool ready =
+        yaclib::WaitUntil(std::chrono::system_clock::now() + 100ms * YACLIB_CI_SLOWDOWN, f[0], f[1], f[2], f[3]);
     EXPECT_TRUE(ready);
   }
   EXPECT_LE(timer.Elapsed(), 150ms * YACLIB_CI_SLOWDOWN);
@@ -96,15 +99,17 @@ void TestMultithreaded() {
 }
 
 TEST(Wait, Multithreaded) {
-  TestMultithreaded<WaitPolicy::Endless>();
+  TestMultiThreaded<WaitPolicy::Endless>();
 }
 
+#if !defined(YACLIB_TSAN) || !defined(__GNUC__)  // https://github.com/google/sanitizers/issues/1259
 TEST(WaitFor, Multithreaded) {
-  TestMultithreaded<WaitPolicy::For>();
+  TestMultiThreaded<WaitPolicy::For>();
 }
+#endif
 
 TEST(WaitUntil, Multithreaded) {
-  TestMultithreaded<WaitPolicy::Until>();
+  TestMultiThreaded<WaitPolicy::Until>();
 }
 
 template <WaitPolicy kPolicy>
@@ -116,15 +121,15 @@ void TestHaveResults() {
     std::move(p1).Set();
     std::move(p2).Set();
   });
-  test::util::StopWatch timer;
-  std::this_thread::sleep_for(100ms * YACLIB_CI_SLOWDOWN);
+  std::this_thread::sleep_for(10ms * YACLIB_CI_SLOWDOWN);
   if constexpr (kPolicy == WaitPolicy::Endless) {
     yaclib::Wait(f1, f2);
   } else if constexpr (kPolicy == WaitPolicy::Until) {
-    yaclib::WaitUntil(timer.Now() + 10ms, f1, f2);
+    EXPECT_TRUE(yaclib::WaitUntil(std::chrono::steady_clock::now(), f1, f2));
   } else {
-    yaclib::WaitFor(10ms, f1, f2);
+    EXPECT_TRUE(yaclib::WaitFor(0ns, f1, f2));
   }
+
   EXPECT_TRUE(f1.Ready());
   EXPECT_TRUE(f2.Ready());
 }
