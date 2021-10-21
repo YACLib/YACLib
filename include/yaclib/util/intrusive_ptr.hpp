@@ -155,12 +155,7 @@ inline bool operator!=(std::nullptr_t, const Ptr<T>& rhs) noexcept {
 
 template <typename T>
 inline bool operator<(const Ptr<T>& lhs, const Ptr<T>& rhs) noexcept {
-  return std::less<T*>{}(lhs.Get(), rhs.Get());
-}
-
-template <typename T>
-inline void swap(const Ptr<T>& lhs, const Ptr<T>& rhs) noexcept {
-  lhs.Swap(rhs);
+  return lhs.Get() < rhs.Get();
 }
 
 }  // namespace yaclib::util
