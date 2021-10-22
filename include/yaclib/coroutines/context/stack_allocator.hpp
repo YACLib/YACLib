@@ -1,6 +1,8 @@
 #pragma once
 #include <cstddef>
 
+namespace yaclib::coroutines {
+
 struct Allocation {
   char* start;
   size_t size;
@@ -16,3 +18,5 @@ class StackAllocator {
   virtual void SetMinStackSize(size_t bytes) = 0;
   virtual ~StackAllocator() = default;
 };
+
+}  // namespace yaclib::coroutines

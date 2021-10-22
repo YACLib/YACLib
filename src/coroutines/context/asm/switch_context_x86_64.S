@@ -1,8 +1,8 @@
 #include "switch_context_x86_64.hpp"
 
 .text
-.globl YACLIB_FUNC_NAME(__yclib_switch_context)
-YACLIB_FUNC_NAME(__yclib_switch_context):
+.globl YACLIB_FUNC_NAME(__yaclib_switch_context)
+YACLIB_FUNC_NAME(__yaclib_switch_context):
     // rdi = from
     // rsi = to
 

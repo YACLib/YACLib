@@ -16,4 +16,3 @@
 #define YACLIB_RSI_INDEX 7
 #define YACLIB_RSP_INDEX 8
 #define YACLIB_RIP_INDEX 9
-

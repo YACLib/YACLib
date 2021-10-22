@@ -1,5 +1,7 @@
 #include <yaclib/coroutines/standalone_coroutine.hpp>
 
+namespace yaclib::coroutines {
+
 static thread_local StandaloneCoroutine* current = nullptr;
 
 void StandaloneCoroutine::operator()() {
@@ -19,3 +21,5 @@ void StandaloneCoroutine::Yield() {
 bool StandaloneCoroutine::IsCompleted() const {
   return _impl.IsCompleted();
 }
+
+}  // namespace yaclib::coroutines

@@ -2,6 +2,8 @@
 
 #include <yaclib/coroutines/context/stack_view.hpp>
 
+namespace yaclib::coroutines {
+
 using Trampoline = void (*)(void* arg);
 
 struct YaclibFiberMachineContext {
@@ -12,12 +14,13 @@ struct YaclibFiberMachineContext {
   void* R14;
   void* R15;
 
-  void* RDI; //from
-  void* RSI; //to
+  void* RDI;  // from
+  void* RSI;  // to
 
   void* RSP;
   void* RIP;
 };
 
-void SetupStack(StackView stack, Trampoline trampoline, void* arg,
-                                      YaclibFiberMachineContext& context);
+void SetupStack(StackView stack, Trampoline trampoline, void* arg, YaclibFiberMachineContext& context);
+
+}  // namespace yaclib::coroutines

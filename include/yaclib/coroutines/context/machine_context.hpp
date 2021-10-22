@@ -1,9 +1,9 @@
 #pragma once
 #include <yaclib/coroutines/context/stack_view.hpp>
-//TODO if
+// TODO if
 #include "coroutines/context/setup_stack/setup_stack_x64.hpp"
 
-using Trampoline = void (*)(void* arg);
+namespace yaclib::coroutines {
 
 /***
  * registers and stack switch
@@ -19,3 +19,5 @@ class MachineContext {
  private:
   YaclibFiberMachineContext _context;
 };
+
+}  // namespace yaclib::coroutines

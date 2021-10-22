@@ -2,7 +2,9 @@
 
 #include <sys/mman.h>
 
-//TODO change to getting actual page size
+namespace yaclib::coroutines {
+
+// TODO change to getting actual page size
 static const size_t kPageSize = 4096;
 
 static size_t PagesToBytes(size_t count) {
@@ -13,7 +15,7 @@ static void ProtectPages(char* start, size_t offset, size_t count) {
   mprotect(/*addr=*/(void*)(start + PagesToBytes(offset)),
            /*len=*/PagesToBytes(count),
            /*prot=*/PROT_NONE);
-  //todo check returns not -1
+  // todo check returns not -1
 }
 
 Allocation DefaultAllocator::Allocate() const {
@@ -39,7 +41,7 @@ void DefaultAllocator::Release(Allocation allocation) {
     }
 
     munmap((void*)allocation.start, allocation.size);
-    //todo check returns not -1
+    // todo check returns not -1
   }
 }
 
@@ -55,3 +57,5 @@ void DefaultAllocator::SetMinStackSize(size_t bytes) {
     _stack_size_pages = pages + 1;
   }
 }
+
+}  // namespace yaclib::coroutines
