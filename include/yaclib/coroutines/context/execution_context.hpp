@@ -5,6 +5,8 @@
 
 #include <algorithm>
 
+namespace yaclib::coroutines {
+
 class ExecutionContext {
  public:
   ExecutionContext() = default;
@@ -22,3 +24,5 @@ class ExecutionContext {
  private:
   MachineContext _machine_context;
 };
+
+}  // namespace yaclib::coroutines

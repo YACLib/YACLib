@@ -3,6 +3,8 @@
 
 #include <vector>
 
+namespace yaclib::coroutines {
+
 // probably won't work for win
 class DefaultAllocator : public StackAllocator {
  public:
@@ -14,3 +16,5 @@ class DefaultAllocator : public StackAllocator {
   size_t _stack_size_pages;
   std::vector<Allocation> _pool;
 };
+
+}  // namespace yaclib::coroutines

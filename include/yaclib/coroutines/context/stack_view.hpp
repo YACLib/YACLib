@@ -1,6 +1,8 @@
 #pragma once
 #include <cstddef>
 
+namespace yaclib::coroutines {
+
 class StackView {
  public:
   StackView(char* start, size_t size) : _sp(start), _size(size) {
@@ -38,3 +40,5 @@ class StackView {
   char* _sp;
   size_t _size;
 };
+
+}  // namespace yaclib::coroutines

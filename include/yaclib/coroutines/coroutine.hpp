@@ -5,6 +5,8 @@
 
 #include <utility>
 
+namespace yaclib::coroutines {
+
 // TODO some smart c++ stuff for zero cost abstraction
 using Routine = yaclib::util::IFuncPtr;
 
@@ -31,3 +33,5 @@ class Coroutine {
   bool _completed = false;
   std::exception_ptr _exception;
 };
+
+}  // namespace yaclib::coroutines

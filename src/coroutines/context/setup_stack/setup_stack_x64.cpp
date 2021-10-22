@@ -1,5 +1,8 @@
-#include <cstdint>
 #include "setup_stack_x64.hpp"
+
+#include <cstdint>
+
+namespace yaclib::coroutines {
 
 static void MachineContextTrampoline(void* arg1, void* arg2) {
   auto trampoline = (Trampoline)arg1;
@@ -18,3 +21,5 @@ void SetupStack(StackView stack, Trampoline trampoline, void* arg, YaclibFiberMa
 
   context.RIP = (void*)MachineContextTrampoline;
 }
+
+}  // namespace yaclib::coroutines

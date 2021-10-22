@@ -4,6 +4,8 @@
 
 #include <cstddef>
 
+namespace yaclib::coroutines {
+
 class Stack {
  public:
   Stack(Allocation allocation, StackAllocator& allocator) : _allocation(allocation), _allocator(allocator) {
@@ -27,3 +29,5 @@ class Stack {
   Allocation _allocation;
   StackAllocator& _allocator;
 };
+
+}  // namespace yaclib::coroutines
