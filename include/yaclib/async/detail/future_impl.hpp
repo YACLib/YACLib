@@ -324,4 +324,9 @@ template <typename T>
 Future<T>::Future(detail::FutureCorePtr<T> core) : _core{std::move(core)} {
 }
 
+template <typename T>
+Future<T> MakeFuture(T&& x) {
+  return Future<T>{new util::Counter<detail::ResultCore<T>>{std::forward<T>(x)}};
+}
+
 }  // namespace yaclib

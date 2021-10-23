@@ -7,7 +7,7 @@
 namespace yaclib {
 
 template <typename T>
-Promise<T>::Promise() : _core{new util::Counter<detail::Core<T, void, void>>{}} {
+Promise<T>::Promise() : _core{new util::Counter<detail::ResultCore<T>>{}} {
 }
 
 template <typename T>

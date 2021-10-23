@@ -72,11 +72,11 @@ For quick start just paste this code in your `CMakeLists.txt` file.
 
 ```CMake
 include(FetchContent)
-FetchContent_declare(yaclib
+FetchContent_Declare(yaclib
   GIT_REPOSITORY https://github.com/YACLib/YACLib.git
   GIT_TAG main
   )
-FetchContent_makeAvailable(yaclib)
+FetchContent_MakeAvailable(yaclib)
 link_libraries(yaclib)
 ```
 

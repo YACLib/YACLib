@@ -8,6 +8,13 @@ namespace yaclib::detail {
 template <typename Value>
 class ResultCore : public BaseCore {
  public:
+  ResultCore() noexcept : BaseCore{State::Empty} {
+  }
+
+  template <typename T>
+  explicit ResultCore(T&& value) : BaseCore{State::HasResult}, _result{std::forward<T>(value)} {
+  }
+
   void SetResult(util::Result<Value>&& result) {
     _result = std::move(result);
     const auto state = _state.exchange(State::HasResult, std::memory_order_acq_rel);

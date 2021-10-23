@@ -19,6 +19,7 @@ class BaseCore : public ITask {
     HasWaitCallback,
     Stopped,
   };
+  explicit BaseCore(State state);
 
  public:
   [[nodiscard]] bool Ready() const noexcept;
@@ -36,7 +37,7 @@ class BaseCore : public ITask {
   bool ResetAfterTimeout() noexcept;
 
  protected:
-  std::atomic<State> _state{State::Empty};
+  std::atomic<State> _state;
   util::Ptr<ITask> _caller;
   IExecutorPtr _executor{MakeInline()};
   util::Ptr<IRef> _callback;
@@ -44,6 +45,7 @@ class BaseCore : public ITask {
   void Execute();
   void Execute(IExecutor& e);
 
+  void Call() noexcept override;
   void Cancel() noexcept final;
 
   void Clean() noexcept;

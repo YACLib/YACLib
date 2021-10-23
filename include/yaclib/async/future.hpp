@@ -83,9 +83,6 @@ class Future final {
    */
   [[nodiscard]] util::Result<T> Get() &&;
 
-  util::Result<T> Get() const&& = delete;
-  util::Result<T> Get() & = delete;
-
   /**
    * Stop pipeline before current step, if possible. Used in destructor
    */
@@ -162,6 +159,9 @@ class Future final {
 };
 
 extern template class Future<void>;
+
+template <typename T>
+yaclib::Future<T> MakeFuture(T&& x);
 
 }  // namespace yaclib
 

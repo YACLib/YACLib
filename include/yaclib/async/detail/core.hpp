@@ -37,13 +37,4 @@ class Core : public ResultCore<Ret> {
   InvokeType _functor;
 };
 
-template <typename Result>
-class Core<Result, void, void> : public ResultCore<Result> {
-  void Call() noexcept final {
-    assert(false);  // This class using only via promise
-  }
-};
-
-extern template class Core<void, void, void>;
-
 }  // namespace yaclib::detail

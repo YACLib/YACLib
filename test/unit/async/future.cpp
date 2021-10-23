@@ -574,13 +574,6 @@ TEST(Simple, MakePromiseContract) {
   EXPECT_EQ(4, std::move(g).Get().Ok());
 }
 
-template <typename T>
-yaclib::Future<T> MakeFuture(T&& x) {
-  auto [f, p] = yaclib::MakeContract<T>();
-  std::move(p).Set(std::forward<T>(x));
-  return std::move(f);
-}
-
 static int default_ctor{0};
 static int copy_ctor{0};
 static int move_ctor{0};
@@ -637,16 +630,16 @@ struct Foo : Counter {
 
 struct AsyncFoo : Counter {
   yaclib::Future<int> operator()(int x) & {
-    return MakeFuture<int>(x + 1);
+    return yaclib::MakeFuture<int>(x + 1);
   }
   yaclib::Future<int> operator()(int x) const& {
-    return MakeFuture<int>(x + 2);
+    return yaclib::MakeFuture<int>(x + 2);
   }
   yaclib::Future<int> operator()(int x) && {
-    return MakeFuture<int>(x + 3);
+    return yaclib::MakeFuture<int>(x + 3);
   }
   yaclib::Future<int> operator()(int x) const&& {
-    return MakeFuture<int>(x + 4);
+    return yaclib::MakeFuture<int>(x + 4);
   }
 };
 
@@ -659,7 +652,7 @@ void HelpPerfectForwarding() {
   // moved if given as && - everywhere construction is required.
   // The continuation will be invoked with the same cvref as it is passed.
   Type::Init();
-  EXPECT_EQ(101, MakeFuture<int>(100).Then(foo).Get().Ok());
+  EXPECT_EQ(101, yaclib::MakeFuture<int>(100).Then(foo).Get().Ok());
   EXPECT_EQ(default_ctor, 0);
   EXPECT_EQ(copy_ctor, 1);
   EXPECT_EQ(move_ctor, 0);
@@ -668,7 +661,7 @@ void HelpPerfectForwarding() {
   EXPECT_EQ(dtor, 1);
 
   Type::Init();
-  EXPECT_EQ(303, MakeFuture<int>(300).Then(std::move(foo)).Get().Ok());
+  EXPECT_EQ(303, yaclib::MakeFuture<int>(300).Then(std::move(foo)).Get().Ok());
   EXPECT_EQ(default_ctor, 0);
   EXPECT_EQ(copy_ctor, 0);
   EXPECT_EQ(move_ctor, 1);
@@ -677,7 +670,7 @@ void HelpPerfectForwarding() {
   EXPECT_EQ(dtor, 1);
 
   Type::Init();
-  EXPECT_EQ(202, MakeFuture<int>(200).Then(cfoo).Get().Ok());
+  EXPECT_EQ(202, yaclib::MakeFuture<int>(200).Then(cfoo).Get().Ok());
   EXPECT_EQ(default_ctor, 0);
   EXPECT_EQ(copy_ctor, 1);
   EXPECT_EQ(move_ctor, 0);
@@ -686,7 +679,7 @@ void HelpPerfectForwarding() {
   EXPECT_EQ(dtor, 1);
 
   Type::Init();
-  EXPECT_EQ(404, MakeFuture<int>(400).Then(std::move(cfoo)).Get().Ok());
+  EXPECT_EQ(404, yaclib::MakeFuture<int>(400).Then(std::move(cfoo)).Get().Ok());
   EXPECT_EQ(default_ctor, 0);
   EXPECT_EQ(copy_ctor, 1);
   EXPECT_EQ(move_ctor, 0);
@@ -695,7 +688,7 @@ void HelpPerfectForwarding() {
   EXPECT_EQ(dtor, 1);
 
   Type::Init();
-  EXPECT_EQ(303, MakeFuture<int>(300).Then(AsyncFoo()).Get().Ok());
+  EXPECT_EQ(303, yaclib::MakeFuture<int>(300).Then(AsyncFoo()).Get().Ok());
   EXPECT_EQ(default_ctor, 1);
   EXPECT_EQ(copy_ctor, 0);
   EXPECT_EQ(move_ctor, 1);
@@ -760,7 +753,7 @@ TEST(Simple, SetAndGetRequiresOnlyMove) {
     MoveCtorOnly& operator=(MoveCtorOnly const&) = delete;
     int id_;
   };
-  auto f = MakeFuture<MoveCtorOnly>(MoveCtorOnly(42));
+  auto f = yaclib::MakeFuture<MoveCtorOnly>(MoveCtorOnly(42));
   EXPECT_TRUE(f.Ready());
   auto v = std::move(f).Get().Ok();
   EXPECT_EQ(v.id_, 42);
@@ -781,7 +774,7 @@ TEST(Future, ThenError) {
 
   // By reference
   {
-    auto f = MakeFuture<int>(1)
+    auto f = yaclib::MakeFuture<int>(1)
                  .Then([](auto&&) {
                    throw std::runtime_error{""};
                  })
@@ -793,13 +786,13 @@ TEST(Future, ThenError) {
   }
 
   {
-    auto f = MakeFuture<int>(5)
+    auto f = yaclib::MakeFuture<int>(5)
                  .Then([](auto&&) {
                    throw std::runtime_error{""};
                  })
                  .Then([&](auto&&) {
                    flag();
-                   return MakeFuture<int>(6);
+                   return yaclib::MakeFuture<int>(6);
                  });
     EXPECT_TRUE(std::exchange(theFlag, false));
     EXPECT_NO_THROW(std::move(f).Get().Ok());
@@ -807,7 +800,7 @@ TEST(Future, ThenError) {
 
   // By value
   {
-    auto f = MakeFuture<int>(5)
+    auto f = yaclib::MakeFuture<int>(5)
                  .Then([](auto&&) {
                    throw std::runtime_error{""};
                  })
@@ -819,13 +812,13 @@ TEST(Future, ThenError) {
   }
 
   {
-    auto f = MakeFuture<int>(5)
+    auto f = yaclib::MakeFuture<int>(5)
                  .Then([](auto&&) {
                    throw std::runtime_error{""};
                  })
                  .Then([&](auto) {
                    flag();
-                   return MakeFuture<int>(5);
+                   return yaclib::MakeFuture<int>(5);
                  });
     EXPECT_TRUE(std::exchange(theFlag, false));
     EXPECT_NO_THROW(std::move(f).Get().Ok());
@@ -833,7 +826,7 @@ TEST(Future, ThenError) {
 
   // Mutable lambda
   {
-    auto f = MakeFuture<int>(5)
+    auto f = yaclib::MakeFuture<int>(5)
                  .Then([](auto&&) {
                    throw std::runtime_error{""};
                  })
@@ -845,13 +838,13 @@ TEST(Future, ThenError) {
   }
 
   {
-    auto f = MakeFuture<int>(5)
+    auto f = yaclib::MakeFuture<int>(5)
                  .Then([](auto&&) {
                    throw std::runtime_error{""};
                  })
                  .Then([&](auto&&) mutable {
                    flag();
-                   return MakeFuture<int>(5);
+                   return yaclib::MakeFuture<int>(5);
                  });
     EXPECT_TRUE(std::exchange(theFlag, false));
     EXPECT_NO_THROW(std::move(f).Get().Ok());
@@ -873,7 +866,8 @@ TEST(Future, ThenFunction) {
     }
   };
 
-  auto f = MakeFuture<std::string>("start").Then(DoWorkStatic).Then(Worker::DoWorkStatic).Then(DoWorkStaticValue);
+  auto f =
+      yaclib::MakeFuture<std::string>("start").Then(DoWorkStatic).Then(Worker::DoWorkStatic).Then(DoWorkStaticValue);
 
   EXPECT_EQ(std::move(f).Get().Value(), "start;static;class-static;value");
 }

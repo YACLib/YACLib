@@ -4,6 +4,9 @@
 
 namespace yaclib::detail {
 
+BaseCore::BaseCore(State state) : _state{state} {
+}
+
 IExecutorPtr BaseCore::GetExecutor() const noexcept {
   return _executor;
 }
@@ -58,6 +61,9 @@ void BaseCore::Execute() {
 void BaseCore::Execute(IExecutor& e) {
   e.Execute(static_cast<ITask&>(*_callback));
   Clean();
+}
+
+void BaseCore::Call() noexcept {
 }
 
 void BaseCore::Cancel() noexcept {  // Opposite for Call with SetResult
