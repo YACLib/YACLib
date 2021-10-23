@@ -10,8 +10,12 @@ if (YACLIB_SOURCE_DIR STREQUAL YACLIB_BINARY_DIR)
   message(FATAL_ERROR "In-source builds not allowed. Please make a new directory (called a build directory) and run CMake from there.")
 endif ()
 
+if (NOT YACLIB_CXX_STANDARD)
+  set(YACLIB_CXX_STANDARD 17)
+endif ()
+
 # Set variables
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD ${YACLIB_CXX_STANDARD})
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
@@ -56,7 +60,6 @@ else ()
     set(SANITIZER_ENABLE_OPTION -fsanitize=memory)
   endif ()
   list(APPEND YACLIB_COMPILE_OPTIONS
-    -fno-omit-frame-pointer
     ${SANITIZER_ENABLE_OPTION}
     ${SANITIZER_COMPILE_OPTIONS}
     )

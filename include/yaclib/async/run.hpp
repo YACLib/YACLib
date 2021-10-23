@@ -34,7 +34,7 @@ auto Run(const IExecutorPtr& e, Functor&& f) {
     util::Ptr core{new util::Counter<CoreType>{std::forward<Functor>(f)}};
     core->SetExecutor(e);
     e->Execute(*core);
-    return Future<U>{core};
+    return Future<U>{std::move(core)};
   }
 }
 

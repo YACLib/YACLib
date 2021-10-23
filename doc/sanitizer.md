@@ -1,5 +1,11 @@
 # Sanitizers
 
+### Tips
+
+1. To get nicer stack traces in error messages add `-fno-omit-frame-pointer`.
+2. To get perfect stack traces you may need to disable inlining (just use `-O1`)
+   and tail call elimination (`-fno-optimize-sibling-calls`).
+
 ### Useful links
 
 1. https://github.com/google/sanitizers/wiki
@@ -21,7 +27,7 @@ https://github.com/google/sanitizers/wiki/ThreadSanitizerFlags)
     * If set, coverage information will be dumped at program shutdown
     * 0 by default
 4. help=1
-    * Print the flag ptions
+    * Print the flag options
     * 0 by default
 
 ## Address Sanitizer

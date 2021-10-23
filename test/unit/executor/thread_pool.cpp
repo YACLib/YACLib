@@ -53,7 +53,7 @@ class SingleLightThread : public ::testing::Test {
   std::vector<IThreadPoolPtr> _tps;
   IThreadFactoryPtr _factory;
   FactoryTag _factory_tag{FactoryTag::Light};
-  FactoryTag _tp_tag{ThreadPoolTag::Single};
+  ThreadPoolTag _tp_tag{ThreadPoolTag::Single};
 };
 
 class SingleHeavyThread : public ::testing::Test {
@@ -78,7 +78,7 @@ class SingleHeavyThread : public ::testing::Test {
   std::vector<IThreadPoolPtr> _tps;
   IThreadFactoryPtr _factory;
   FactoryTag _factory_tag{FactoryTag::Heavy};
-  FactoryTag _tp_tag{ThreadPoolTag::Single};
+  ThreadPoolTag _tp_tag{ThreadPoolTag::Single};
 };
 
 class MultiLightThread : public ::testing::Test {
@@ -103,7 +103,7 @@ class MultiLightThread : public ::testing::Test {
   std::vector<IThreadPoolPtr> _tps;
   IThreadFactoryPtr _factory;
   FactoryTag _factory_tag{FactoryTag::Heavy};
-  FactoryTag _tp_tag{ThreadPoolTag::Multi};
+  ThreadPoolTag _tp_tag{ThreadPoolTag::Multi};
 };
 
 class MultiHeavyThread : public ::testing::Test {
@@ -128,7 +128,7 @@ class MultiHeavyThread : public ::testing::Test {
   std::vector<IThreadPoolPtr> _tps;
   IThreadFactoryPtr _factory;
   FactoryTag _factory_tag{FactoryTag::Heavy};
-  FactoryTag _tp_tag{ThreadPoolTag::Single};
+  ThreadPoolTag _tp_tag{ThreadPoolTag::Single};
 };
 
 void JustWork(IThreadPoolPtr& tp) {

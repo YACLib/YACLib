@@ -1,6 +1,6 @@
 #pragma once
 
-#include <yaclib/algo/detail/wait.hpp>
+#include <yaclib/algo/detail/wait_impl.hpp>
 
 namespace yaclib {
 
@@ -15,7 +15,7 @@ namespace yaclib {
  */
 template <typename Rep, typename Period, typename... Futures>
 bool WaitFor(const std::chrono::duration<Rep, Period>& timeout_duration, Futures&&... fs) {
-  return detail::Wait<detail::WaitPolicy::For>(timeout_duration, static_cast<detail::BaseCore&>(*fs._core)...);
+  return detail::Wait(timeout_duration, static_cast<detail::BaseCore&>(*fs._core)...);
 }
 
 }  // namespace yaclib

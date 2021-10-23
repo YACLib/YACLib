@@ -3,11 +3,17 @@
 #include <yaclib/algo/wait.hpp>
 #include <yaclib/algo/wait_for.hpp>
 #include <yaclib/algo/wait_until.hpp>
-#include <yaclib/async/detail/core.hpp>
+#include <yaclib/async/detail/result_core.hpp>
 #include <yaclib/executor/executor.hpp>
 #include <yaclib/util/type_traits.hpp>
 
 namespace yaclib {
+namespace detail {
+
+template <typename Value>
+using FutureCorePtr = util::Ptr<ResultCore<Value>>;
+
+}  // namespace detail
 
 /**
  * Provides a mechanism to access the result of async operations
@@ -67,7 +73,7 @@ class Future final {
    * \note The behavior is undefined if \ref Valid is false before the call to this function.
    * \return \ref Result stored in the shared state
    */
-  [[nodiscard]] util::Result<T> Get() const&;
+  [[nodiscard]] const util::Result<T>* Get() const&;
 
   /**
    * Wait until \def Ready is true and move \ref Result from Future
@@ -154,6 +160,8 @@ class Future final {
 
   detail::FutureCorePtr<T> _core;
 };
+
+extern template class Future<void>;
 
 }  // namespace yaclib
 

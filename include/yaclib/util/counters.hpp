@@ -9,7 +9,7 @@ namespace detail {
 
 struct DefaultDeleter {
   template <typename Type>
-  void Delete(void* p) {
+  static void Delete(void* p) {
     delete static_cast<Type>(p);
   }
 };

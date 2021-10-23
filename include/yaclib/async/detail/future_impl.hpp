@@ -5,7 +5,10 @@
 #endif
 
 #include <yaclib/algo/wait.hpp>
+#include <yaclib/async/detail/core.hpp>
 #include <yaclib/util/defer.hpp>
+
+#include <cassert>
 
 namespace yaclib {
 namespace detail {
@@ -248,11 +251,11 @@ bool Future<T>::Ready() const& noexcept {
 }
 
 template <typename T>
-util::Result<T> Future<T>::Get() const& {
+const util::Result<T>* Future<T>::Get() const& {
   if (_core->Ready()) {
-    return _core->Get();
+    return &_core->Get();
   }
-  return {};
+  return nullptr;
 }
 
 template <typename T>

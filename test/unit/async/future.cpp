@@ -884,6 +884,17 @@ TEST(Future, CheckReferenceWrapper) {
   std::move(p).Set(std::ref(x));
 }
 
+TEST(Future, CheckConstGet) {
+  auto [f, p] = yaclib::MakeContract<int>();
+  auto ptr = std::as_const(f).Get();
+  EXPECT_FALSE(f.Ready());
+  EXPECT_EQ(ptr, nullptr);
+  std::move(p).Set(5);
+  ptr = std::as_const(f).Get();
+  EXPECT_TRUE(f.Ready());
+  EXPECT_NE(ptr, nullptr);
+}
+
 TEST(Future, InlineCallback) {
   auto [f, p] = yaclib::MakeContract<void>();
   auto f1 = std::move(f).Then(yaclib::MakeInline(), [] {
