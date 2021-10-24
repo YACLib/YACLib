@@ -35,6 +35,14 @@ void BaseCore::SetInlineCallback(util::Ptr<ITask> callback) {
   }
 }
 
+void BaseCore::SetLastInlineCallback(util::Ptr<ITask> callback) {
+  _callback = std::move(callback);
+  const auto state = _state.exchange(State::HasLastInlineCallback, std::memory_order_acq_rel);
+  if (state == State::HasResult) {
+    LastInlineExecute();
+  }
+}
+
 void BaseCore::Stop() noexcept {
   _state.store(State::Stopped, std::memory_order_release);
 }
@@ -61,12 +69,6 @@ bool BaseCore::ResetAfterTimeout() noexcept {
   return false;
 }
 
-void BaseCore::InlineExecute() {
-  auto& callback = static_cast<BaseCore&>(*_callback);
-  callback.InlineCall(this);
-  Clean();
-}
-
 void BaseCore::Execute() {
   auto& callback = static_cast<BaseCore&>(*_callback);
   callback._caller = this;
@@ -74,7 +76,20 @@ void BaseCore::Execute() {
   Clean();
 }
 
+void BaseCore::InlineExecute() {
+  static_cast<BaseCore&>(*_callback).InlineCall(this);
+  Clean();
+}
+
+void BaseCore::LastInlineExecute() {
+  static_cast<BaseCore&>(*_callback).LastInlineCall(this);
+  Clean();
+}
+
 void BaseCore::InlineCall(void* /*context*/) {
+}
+
+void BaseCore::LastInlineCall(void* /*context*/) {
 }
 
 void BaseCore::Call() noexcept {

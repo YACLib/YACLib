@@ -30,7 +30,7 @@ template <
     typename T, size_t N = std::numeric_limits<size_t>::max(), bool IsArray = (N != std::numeric_limits<size_t>::max()),
     typename FutureValue =
         std::conditional_t<std::is_void_v<T>, void, std::conditional_t<IsArray, std::array<T, N>, std::vector<T>>>>
-class AllCombinator : public AllCombinatorBase<FutureValue>, public util::IRef {
+class AllCombinator : public BaseCore, public AllCombinatorBase<FutureValue> {
   using Base = AllCombinatorBase<FutureValue>;
 
  public:
@@ -47,6 +47,14 @@ class AllCombinator : public AllCombinatorBase<FutureValue>, public util::IRef {
       }
     }
     return {std::move(future), new util::Counter<AllCombinator>{std::move(promise), size}};
+  }
+
+  void LastInlineCall(void* context) noexcept final {
+    if (BaseCore::_state.load(std::memory_order_acquire) == BaseCore::State::Stopped) {
+      return;
+    }
+    auto* caller = static_cast<ResultCore<T>*>(context);
+    Combine(std::move(caller->Get()));
   }
 
   void Combine(util::Result<T>&& result) noexcept(std::is_void_v<T> || std::is_nothrow_move_assignable_v<T>) {
@@ -83,7 +91,7 @@ class AllCombinator : public AllCombinatorBase<FutureValue>, public util::IRef {
 
  private:
   explicit AllCombinator(Promise<FutureValue> promise, [[maybe_unused]] size_t size = 0)
-      : _promise{std::move(promise)} {
+      : BaseCore{BaseCore::State::Empty}, _promise{std::move(promise)} {
     if constexpr (!std::is_void_v<T> && !IsArray) {
       AllCombinatorBase<FutureValue>::_results.resize(size);
     }
@@ -94,10 +102,7 @@ class AllCombinator : public AllCombinatorBase<FutureValue>, public util::IRef {
 
 template <size_t N, typename T, typename... Fs>
 void WhenAllImpl(util::Ptr<AllCombinator<T, N>>& combinator, Future<T>&& head, Fs&&... tail) {
-  std::move(head).Subscribe([c = combinator](util::Result<T>&& result) mutable {
-    c->Combine(std::move(result));
-    c = nullptr;
-  });
+  std::move(head).LastInline(combinator);
   if constexpr (sizeof...(tail) != 0) {
     WhenAllImpl(combinator, std::forward<Fs>(tail)...);
   }
@@ -117,10 +122,7 @@ template <typename It, typename T = util::detail::FutureValueT<typename std::ite
 auto WhenAll(It begin, size_t size) {
   auto [future, combinator] = detail::AllCombinator<T>::Make(size);
   for (size_t i = 0; i != size; ++i) {
-    std::move(*begin).Subscribe([c = combinator](util::Result<T>&& result) mutable {
-      c->Combine(std::move(result));
-      c = nullptr;
-    });
+    std::move(*begin).LastInline(combinator);
     ++begin;
   }
   return std::move(future);

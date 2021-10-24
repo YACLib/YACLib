@@ -148,6 +148,11 @@ class Future final {
    */
   Future& Via(IExecutorPtr executor) &;
 
+  void LastInline(util::Ptr<ITask> callback) && {
+    auto core = std::exchange(_core, nullptr);
+    core->SetLastInlineCallback(std::move(callback));
+  }
+
  private:
   template <typename... Fs>
   friend void Wait(Fs&&... futures);

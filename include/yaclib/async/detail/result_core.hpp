@@ -18,14 +18,24 @@ class ResultCore : public BaseCore {
   void SetResult(util::Result<Value>&& result) {
     _result = std::move(result);
     const auto state = _state.exchange(State::HasResult, std::memory_order_acq_rel);
-    if (state == State::HasCallback) {
-      BaseCore::Execute();
-    } else if (state == State::HasInlineCallback) {
-      BaseCore::InlineExecute();
-    } else if (state == State::HasWaitCallback) {
-      _callback = nullptr;
-    } else if (state == State::Stopped) {
-      BaseCore::Cancel();
+    switch (state) {
+      case State::HasCallback:
+        BaseCore::Execute();
+        break;
+      case State::HasInlineCallback:
+        BaseCore::InlineExecute();
+        break;
+      case State::HasLastInlineCallback:
+        BaseCore::LastInlineExecute();
+        break;
+      case State::HasWaitCallback:
+        _callback = nullptr;
+        break;
+      case State::Stopped:
+        BaseCore::Cancel();
+        break;
+      default:
+        break;
     }
   }
 
