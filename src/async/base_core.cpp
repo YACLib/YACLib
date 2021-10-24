@@ -27,12 +27,20 @@ void BaseCore::SetCallback(util::Ptr<ITask> callback) {
   }
 }
 
+void BaseCore::SetInlineCallback(util::Ptr<ITask> callback) {
+  _callback = std::move(callback);
+  const auto state = _state.exchange(State::HasInlineCallback, std::memory_order_acq_rel);
+  if (state == State::HasResult) {
+    InlineExecute();
+  }
+}
+
 void BaseCore::Stop() noexcept {
   _state.store(State::Stopped, std::memory_order_release);
 }
 
 bool BaseCore::SetWaitCallback(util::IRef& callback) noexcept {
-  if (_state.load(std::memory_order_acquire) == State::HasResult) {
+  if (Ready()) {
     return true;
   }
   _callback = &callback;
@@ -53,14 +61,20 @@ bool BaseCore::ResetAfterTimeout() noexcept {
   return false;
 }
 
-void BaseCore::Execute() {
-  static_cast<BaseCore&>(*_callback)._caller = this;
-  Execute(*_executor);
+void BaseCore::InlineExecute() {
+  auto& callback = static_cast<BaseCore&>(*_callback);
+  callback.InlineCall(this);
+  Clean();
 }
 
-void BaseCore::Execute(IExecutor& e) {
-  e.Execute(static_cast<ITask&>(*_callback));
+void BaseCore::Execute() {
+  auto& callback = static_cast<BaseCore&>(*_callback);
+  callback._caller = this;
+  _executor->Execute(callback);
   Clean();
+}
+
+void BaseCore::InlineCall(void* /*context*/) {
 }
 
 void BaseCore::Call() noexcept {

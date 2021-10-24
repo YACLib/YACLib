@@ -21,7 +21,7 @@ class ResultCore : public BaseCore {
     if (state == State::HasCallback) {
       BaseCore::Execute();
     } else if (state == State::HasInlineCallback) {
-      BaseCore::Execute(*MakeInline());
+      BaseCore::InlineExecute();
     } else if (state == State::HasWaitCallback) {
       _callback = nullptr;
     } else if (state == State::Stopped) {

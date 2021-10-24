@@ -32,6 +32,8 @@ class BaseCore : public ITask {
 
   void SetCallback(util::Ptr<ITask> callback);
 
+  void SetInlineCallback(util::Ptr<ITask> callback);
+
   bool SetWaitCallback(util::IRef& callback) noexcept;
 
   bool ResetAfterTimeout() noexcept;
@@ -42,9 +44,11 @@ class BaseCore : public ITask {
   IExecutorPtr _executor{MakeInline()};
   util::Ptr<IRef> _callback;
 
+  void InlineExecute();
   void Execute();
-  void Execute(IExecutor& e);
 
+  using GetArg = void* (*)(void*);
+  virtual void InlineCall(void* context);
   void Call() noexcept override;
   void Cancel() noexcept final;
 

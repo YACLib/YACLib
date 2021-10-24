@@ -206,19 +206,23 @@ class AsyncInvoke {
   FunctorStoreT _f;
 };
 
-template <typename U, typename T, typename Functor>
+template <typename Tag, typename U, typename T, typename Functor>
 Future<U> Then(FutureCorePtr<T> caller, Functor&& f) {
   using InvokeT = detail::Invoke<U, decltype(std::forward<Functor>(f)), T>;
   using CoreType = detail::Core<U, InvokeT, T>;
   util::Ptr callback{new util::Counter<CoreType>{std::forward<Functor>(f)}};
 
   callback->SetExecutor(caller->GetExecutor());
-  caller->SetCallback(callback);
+  if constexpr (std::is_same_v<Tag, InlineTag>) {
+    caller->SetInlineCallback(callback);
+  } else {
+    caller->SetCallback(callback);
+  }
 
   return Future<U>{std::move(callback)};
 }
 
-template <typename U, typename T, typename Functor>
+template <typename Tag, typename U, typename T, typename Functor>
 Future<U> AsyncThen(FutureCorePtr<T> caller, Functor&& f) {
   auto [future, promise] = MakeContract<U>();
   future.Via(caller->GetExecutor());
@@ -228,7 +232,11 @@ Future<U> AsyncThen(FutureCorePtr<T> caller, Functor&& f) {
   util::Ptr callback{new util::Counter<CoreType>{caller->GetExecutor(), std::move(promise), std::forward<Functor>(f)}};
 
   callback->SetExecutor(caller->GetExecutor());
-  caller->SetCallback(callback);
+  if constexpr (std::is_same_v<Tag, InlineTag>) {
+    caller->SetInlineCallback(callback);
+  } else {
+    caller->SetCallback(callback);
+  }
 
   return std::move(future);
 }
@@ -286,23 +294,26 @@ Future<T>& Future<T>::Via(IExecutorPtr executor) & {
 }
 
 template <typename T>
-template <typename Functor>
+template <typename Tag, typename Functor>
 auto Future<T>::Then(Functor&& functor) && {
   // TODO(kononovk/MBkkt): think about how to distinguish first and second overloads,
   //  when T is constructable from Result
   using Ret = detail::Return<T, Functor>;
   if constexpr (Ret::kIsAsync) {
-    return detail::AsyncThen<util::detail::FutureValueT<typename Ret::Type>>(std::exchange(_core, nullptr),
-                                                                             std::forward<Functor>(functor));
+    return detail::AsyncThen<Tag, util::detail::FutureValueT<typename Ret::Type>>(std::exchange(_core, nullptr),
+                                                                                  std::forward<Functor>(functor));
   } else {
-    return detail::Then<util::detail::ResultValueT<typename Ret::Type>>(std::exchange(_core, nullptr),
-                                                                        std::forward<Functor>(functor));
+    return detail::Then<Tag, util::detail::ResultValueT<typename Ret::Type>>(std::exchange(_core, nullptr),
+                                                                             std::forward<Functor>(functor));
   }
 }
 
 template <typename T>
 template <typename Functor>
 auto Future<T>::Then(IExecutorPtr executor, Functor&& functor) && {
+  if (executor->Tag() == IExecutor::Type::Inline) {
+    return std::move(*this).template Then<detail::InlineTag>(std::forward<Functor>(functor));
+  }
   _core->SetExecutor(std::move(executor));
   return std::move(*this).Then(std::forward<Functor>(functor));
 }
@@ -316,8 +327,7 @@ void Future<T>::Subscribe(Functor&& functor) && {
 template <typename T>
 template <typename Functor>
 void Future<T>::Subscribe(IExecutorPtr executor, Functor&& functor) && {
-  _core->SetExecutor(std::move(executor));
-  std::move(*this).Subscribe(std::forward<Functor>(functor));
+  std::move(*this).Then(std::move(executor), std::forward<Functor>(functor)).Detach();
 }
 
 template <typename T>

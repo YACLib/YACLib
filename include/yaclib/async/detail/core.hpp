@@ -16,12 +16,21 @@ class Core : public ResultCore<Ret> {
   }
 
  private:
+  void InlineCall(void* context) noexcept final {
+    if (Base::_state.load(std::memory_order_acquire) == Base::State::Stopped) {
+      Base::Cancel();
+      return;
+    }
+    auto* caller = static_cast<ResultCore<Arg>*>(context);
+    Base::SetResult(_functor.Wrapper(std::move(caller->Get())));
+  }
+
   void Call() noexcept final {
     if (Base::_state.load(std::memory_order_acquire) == Base::State::Stopped) {
       Base::Cancel();
       return;
     }
-    auto ret = [&] {
+    auto arg = [&] {
       auto* caller = static_cast<ResultCore<Arg>*>(Base::_caller.Get());
       if constexpr (std::is_void_v<Arg>) {
         if (!caller) {
@@ -31,7 +40,7 @@ class Core : public ResultCore<Ret> {
       return std::move(caller->Get());
     }();
     Base::_caller = nullptr;
-    Base::SetResult(_functor.Wrapper(std::move(ret)));
+    Base::SetResult(_functor.Wrapper(std::move(arg)));
   }
 
   InvokeType _functor;

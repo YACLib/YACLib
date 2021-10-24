@@ -13,6 +13,9 @@ namespace detail {
 template <typename Value>
 using FutureCorePtr = util::Ptr<ResultCore<Value>>;
 
+struct ExecutorTag {};
+struct InlineTag {};
+
 }  // namespace detail
 
 /**
@@ -100,7 +103,7 @@ class Future final {
    * \param functor A continuation to be attached
    * \return New \ref Future object associated with the functor result
    */
-  template <typename Functor>
+  template <typename Tag = detail::ExecutorTag, typename Functor>
   [[nodiscard]] auto Then(Functor&& functor) &&;
 
   /**
