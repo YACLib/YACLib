@@ -4,8 +4,8 @@
 namespace yaclib::coroutines {
 
 struct Allocation {
-  char* start;
-  size_t size;
+  char* start = nullptr;
+  size_t size = 0;
 };
 
 /***
@@ -14,8 +14,13 @@ struct Allocation {
 class StackAllocator {
  public:
   [[nodiscard]] virtual Allocation Allocate() const = 0;
+
   virtual void Release(Allocation) = 0;
+
   virtual void SetMinStackSize(size_t bytes) = 0;
+
+  virtual size_t GetMinStackSize() = 0;
+
   virtual ~StackAllocator() = default;
 };
 

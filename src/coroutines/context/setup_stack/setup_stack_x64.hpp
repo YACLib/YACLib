@@ -7,18 +7,18 @@ namespace yaclib::coroutines {
 using Trampoline = void (*)(void* arg);
 
 struct YaclibFiberMachineContext {
-  void* RBX;
-  void* RBP;
-  void* R12;
-  void* R13;
-  void* R14;
-  void* R15;
+  [[maybe_unused]] void* RBX;
+  [[maybe_unused]] void* RBP;
+  [[maybe_unused]] void* R12;
+  [[maybe_unused]] void* R13;
+  [[maybe_unused]] void* R14;
+  [[maybe_unused]] void* R15;
 
-  void* RDI;  // from
-  void* RSI;  // to
+  [[maybe_unused]] void* RDI;  // from
+  [[maybe_unused]] void* RSI;  // to
 
-  void* RSP;
-  void* RIP;
+  [[maybe_unused]] void* RSP;
+  [[maybe_unused]] void* RIP;
 };
 
 void SetupStack(StackView stack, Trampoline trampoline, void* arg, YaclibFiberMachineContext& context);
