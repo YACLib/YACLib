@@ -1,4 +1,3 @@
-#include <yaclib/coroutines/context/default_allocator.hpp>
 #include <yaclib/coroutines/standalone_coroutine.hpp>
 
 #include <thread>
@@ -29,20 +28,17 @@ TEST(coroutine, basic) {
   std::string test;
   auto test_task = MyTask([&] {
     for (int i = 0; i < 10; i++) {
-      int k = i;
-      k = i * 8;
+      int k = i * 8;
       test.append(std::to_string(k));
       yaclib::coroutines::StandaloneCoroutine::Yield();
     }
   });
-  auto allocator = yaclib::coroutines::DefaultAllocator();
-  allocator.SetMinStackSize(1024);
-  auto coroutine =
-      yaclib::coroutines::StandaloneCoroutine(allocator, yaclib::util::Ptr<yaclib::util::IFunc>(&test_task, false));
+  auto coroutine = yaclib::coroutines::StandaloneCoroutine(yaclib::util::Ptr<yaclib::util::IFunc>(&test_task, false));
   while (!coroutine.IsCompleted()) {
     test.append("!");
     coroutine();
   }
+  EXPECT_EQ(yaclib::coroutines::default_allocator_instance.GetMinStackSize(), 4096);
   EXPECT_EQ(test, "!0!8!16!24!32!40!48!56!64!72!");
 }
 
@@ -60,13 +56,8 @@ TEST(coroutine, basic2) {
     test.append("4");
   });
 
-  auto allocator = yaclib::coroutines::DefaultAllocator();
-  allocator.SetMinStackSize(1024);
-
-  auto coroutine1 =
-      yaclib::coroutines::StandaloneCoroutine(allocator, yaclib::util::Ptr<yaclib::util::IFunc>(&test_task1, false));
-  auto coroutine2 =
-      yaclib::coroutines::StandaloneCoroutine(allocator, yaclib::util::Ptr<yaclib::util::IFunc>(&test_task2, false));
+  auto coroutine1 = yaclib::coroutines::StandaloneCoroutine(yaclib::util::Ptr<yaclib::util::IFunc>(&test_task1, false));
+  auto coroutine2 = yaclib::coroutines::StandaloneCoroutine(yaclib::util::Ptr<yaclib::util::IFunc>(&test_task2, false));
 
   coroutine1();
   coroutine2();
@@ -89,11 +80,7 @@ TEST(coroutine, basic3) {
     test.append("4");
   });
 
-  auto allocator = yaclib::coroutines::DefaultAllocator();
-  allocator.SetMinStackSize(1024);
-
-  auto coroutine =
-      yaclib::coroutines::StandaloneCoroutine(allocator, yaclib::util::Ptr<yaclib::util::IFunc>(&test_task, false));
+  auto coroutine = yaclib::coroutines::StandaloneCoroutine(yaclib::util::Ptr<yaclib::util::IFunc>(&test_task, false));
 
   for (size_t i = 0; i < 4; ++i) {
     std::thread t([&]() {
@@ -106,16 +93,14 @@ TEST(coroutine, basic3) {
   EXPECT_EQ(coroutine.IsCompleted(), true);
 }
 
-int _test(int* a, int* b) {
+static int TestFunctionWith2Args(const int* rsi, const int* rdi) {
   auto test_task = MyTask([&] {
     for (int i = 0; i < 10; i++) {
       yaclib::coroutines::StandaloneCoroutine::Yield();
     }
   });
-  auto allocator = yaclib::coroutines::DefaultAllocator();
-  allocator.SetMinStackSize(1024);
-  auto coroutine =
-      yaclib::coroutines::StandaloneCoroutine(allocator, yaclib::util::Ptr<yaclib::util::IFunc>(&test_task, false));
+
+  auto coroutine = yaclib::coroutines::StandaloneCoroutine(yaclib::util::Ptr<yaclib::util::IFunc>(&test_task, false));
 
   int iter_count = 0;
   while (!coroutine.IsCompleted()) {
@@ -123,13 +108,13 @@ int _test(int* a, int* b) {
     coroutine();
   }
   EXPECT_EQ(iter_count, 11);
-  return *a + *b;
+  return *rsi + *rdi;
 }
 
 TEST(coroutine, basic4) {
-  int a = 1;
-  int b = 2;
-  int sum = _test(&a, &b);
+  int rsi = 1;
+  int rdi = 2;
+  int sum = TestFunctionWith2Args(&rsi, &rdi);
 
   EXPECT_EQ(sum, 3);
 }

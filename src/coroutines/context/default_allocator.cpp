@@ -12,7 +12,7 @@ static size_t PagesToBytes(size_t count) {
 }
 
 static void ProtectPages(char* start, size_t offset, size_t count) {
-  mprotect(/*addr=*/(void*)(start + PagesToBytes(offset)),
+  mprotect(/*addr=*/static_cast<void*>(start + PagesToBytes(offset)),
            /*len=*/PagesToBytes(count),
            /*prot=*/PROT_NONE);
   // todo check returns not -1
@@ -40,7 +40,7 @@ void DefaultAllocator::Release(Allocation allocation) {
       return;
     }
 
-    munmap((void*)allocation.start, allocation.size);
+    munmap(static_cast<void*>(allocation.start), allocation.size);
     // todo check returns not -1
   }
 }
@@ -57,5 +57,11 @@ void DefaultAllocator::SetMinStackSize(size_t bytes) {
     _stack_size_pages = pages + 1;
   }
 }
+
+size_t DefaultAllocator::GetMinStackSize() {
+  return (_stack_size_pages - 1) * kPageSize;
+}
+
+DefaultAllocator default_allocator_instance;
 
 }  // namespace yaclib::coroutines

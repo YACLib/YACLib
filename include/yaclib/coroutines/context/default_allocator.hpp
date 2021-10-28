@@ -9,12 +9,19 @@ namespace yaclib::coroutines {
 class DefaultAllocator : public StackAllocator {
  public:
   [[nodiscard]] Allocation Allocate() const override;
+
   void Release(Allocation allocation) override;
+
   void SetMinStackSize(size_t bytes) override;
 
+  size_t GetMinStackSize() override;
+
  private:
-  size_t _stack_size_pages;
+  size_t _stack_size_pages = 2;
   std::vector<Allocation> _pool;
 };
+
+
+extern DefaultAllocator default_allocator_instance;
 
 }  // namespace yaclib::coroutines

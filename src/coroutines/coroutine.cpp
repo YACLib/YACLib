@@ -30,7 +30,7 @@ void Coroutine::Complete() {
 }
 
 void Coroutine::Trampoline(void* arg) {
-  auto* coroutine = (Coroutine*)arg;
+  auto* coroutine = reinterpret_cast<Coroutine*>(arg);
 
   try {
     coroutine->_routine->Call();

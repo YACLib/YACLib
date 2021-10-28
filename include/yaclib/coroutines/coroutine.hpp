@@ -18,17 +18,22 @@ class Coroutine {
   Coroutine(const StackView& stack_view, Routine routine) : _routine(std::move(routine)) {
     _context.Setup(stack_view, Trampoline, this);
   }
+
   void operator()();
+
   void Resume();
+
   void Yield();
-  bool IsCompleted() const;
+
+  [[nodiscard]] bool IsCompleted() const;
 
  private:
   [[noreturn]] static void Trampoline(void* arg);
+
   void Complete();
 
-  ExecutionContext _context;
-  ExecutionContext _caller_context;
+  ExecutionContext _context{};
+  ExecutionContext _caller_context{};
   Routine _routine;
   bool _completed = false;
   std::exception_ptr _exception;

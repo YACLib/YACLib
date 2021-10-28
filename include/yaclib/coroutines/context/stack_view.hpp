@@ -31,11 +31,6 @@ class StackView {
     return End() - 1;
   }
 
-  void operator+=(size_t offset) noexcept {
-    _sp += offset;
-    _size -= offset;
-  }
-
  private:
   char* _sp;
   size_t _size;
