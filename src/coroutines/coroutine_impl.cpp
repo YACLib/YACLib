@@ -1,11 +1,11 @@
-#include <yaclib/coroutines/coroutine.hpp>
+#include "coroutine_impl.hpp"
 
 namespace yaclib::coroutines {
 
-void Coroutine::operator()() {
+void CoroutineImpl::operator()() {
   Resume();
 }
-void Coroutine::Resume() {
+void CoroutineImpl::Resume() {
   if (IsCompleted()) {
     return;
   }
@@ -16,21 +16,21 @@ void Coroutine::Resume() {
     rethrow_exception(_exception);
   }
 }
-void Coroutine::Yield() {
+void CoroutineImpl::Yield() {
   _context.SwitchTo(_caller_context);
 }
 
-bool Coroutine::IsCompleted() const {
+bool CoroutineImpl::IsCompleted() const {
   return _completed;
 }
 
-void Coroutine::Complete() {
+void CoroutineImpl::Complete() {
   _completed = true;
   _context.SwitchTo(_caller_context);
 }
 
-void Coroutine::Trampoline(void* arg) {
-  auto* coroutine = reinterpret_cast<Coroutine*>(arg);
+void CoroutineImpl::Trampoline(void* arg) {
+  auto* coroutine = reinterpret_cast<CoroutineImpl*>(arg);
 
   try {
     coroutine->_routine->Call();

@@ -1,30 +1,43 @@
 #pragma once
-#include <yaclib/coroutines/context/stack.hpp>
 #include <yaclib/coroutines/context/stack_allocator.hpp>
-#include <yaclib/coroutines/coroutine.hpp>
-#include "yaclib/coroutines/context/default_allocator.hpp"
+#include <yaclib/util/func.hpp>
+#include <yaclib/util/intrusive_ptr.hpp>
 
 namespace yaclib::coroutines {
 
-class StandaloneCoroutine {
+// TODO some smart c++ stuff for zero cost abstraction
+using Routine = yaclib::util::IFuncPtr;
+
+class IStandaloneCoroutine : public util::IRef {
  public:
-  StandaloneCoroutine(StackAllocator& allocator, Routine routine)
-      : _stack(allocator.Allocate(), allocator), _impl(_stack.View(), std::move(routine)) {
-  }
+  virtual void operator()() = 0;
 
-  explicit StandaloneCoroutine(Routine routine) : StandaloneCoroutine(yaclib::coroutines::default_allocator_instance, std::move(routine)){}
-
-  void operator()();
-
-  void Resume();
+  virtual void Resume() = 0;
 
   static void Yield();
 
-  [[nodiscard]] bool IsCompleted() const;
+  [[nodiscard]] virtual bool IsCompleted() const = 0;
 
- private:
-  Stack _stack;
-  Coroutine _impl;
+  virtual ~IStandaloneCoroutine() = default;
 };
+
+using IStandaloneCoroutinePtr = util::Ptr<IStandaloneCoroutine>;
+
+class IStandaloneCoroutineFactory : public util::IRef {
+ public:
+  virtual IStandaloneCoroutinePtr New(StackAllocator& allocator, Routine routine) = 0;
+
+  virtual IStandaloneCoroutinePtr New(Routine routine) {
+    return New(GetAllocator(), std::move(routine));
+  }
+
+  virtual StackAllocator& GetAllocator() = 0;
+
+  virtual ~IStandaloneCoroutineFactory() = default;
+};
+
+using IStandaloneCoroutineFactoryPtr = util::Ptr<IStandaloneCoroutineFactory>;
+
+IStandaloneCoroutineFactoryPtr MakeStandaloneCoroutineFactory(StackAllocator& allocator);
 
 }  // namespace yaclib::coroutines
