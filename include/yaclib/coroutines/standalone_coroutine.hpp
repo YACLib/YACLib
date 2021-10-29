@@ -3,7 +3,7 @@
 #include <yaclib/util/func.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 
-namespace yaclib::coroutines {
+namespace yaclib {
 
 // TODO some smart c++ stuff for zero cost abstraction
 using Routine = yaclib::util::IFuncPtr;
@@ -40,4 +40,4 @@ using IStandaloneCoroutineFactoryPtr = util::Ptr<IStandaloneCoroutineFactory>;
 
 IStandaloneCoroutineFactoryPtr MakeStandaloneCoroutineFactory(StackAllocator& allocator);
 
-}  // namespace yaclib::coroutines
+}  // namespace yaclib

@@ -1,7 +1,7 @@
 #pragma once
 #include <cstddef>
 
-namespace yaclib::coroutines {
+namespace yaclib {
 
 class StackView {
  public:
@@ -36,4 +36,4 @@ class StackView {
   size_t _size;
 };
 
-}  // namespace yaclib::coroutines
+}  // namespace yaclib

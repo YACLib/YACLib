@@ -1,7 +1,7 @@
 #pragma once
 #include <yaclib/coroutines/standalone_coroutine.hpp>
 
-namespace yaclib::coroutines {
+namespace yaclib {
 
 class StandaloneCoroutineFactory : public IStandaloneCoroutineFactory {
  public:
@@ -23,4 +23,4 @@ class StandaloneCoroutineFactory : public IStandaloneCoroutineFactory {
   StackAllocator& _allocator;
 };
 
-}  // namespace yaclib::coroutines
+}  // namespace yaclib

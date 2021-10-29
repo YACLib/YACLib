@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-namespace yaclib::coroutines {
+namespace yaclib {
 
 static void MachineContextTrampoline(void* arg1, void* arg2) {
   auto trampoline = (Trampoline)arg1;
@@ -22,4 +22,4 @@ void SetupStack(StackView stack, Trampoline trampoline, void* arg, YaclibFiberMa
   context.RIP = (void*)MachineContextTrampoline;
 }
 
-}  // namespace yaclib::coroutines
+}  // namespace yaclib

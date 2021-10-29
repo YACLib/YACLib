@@ -1,7 +1,7 @@
 #pragma once
 #include <cstddef>
 
-namespace yaclib::coroutines {
+namespace yaclib {
 
 struct Allocation {
   char* start = nullptr;
@@ -24,4 +24,4 @@ class StackAllocator {
   virtual ~StackAllocator() = default;
 };
 
-}  // namespace yaclib::coroutines
+}  // namespace yaclib

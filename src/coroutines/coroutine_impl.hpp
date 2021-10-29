@@ -6,7 +6,7 @@
 
 #include <utility>
 
-namespace yaclib::coroutines {
+namespace yaclib {
 /***
  * base coroutine class
  */
@@ -36,4 +36,4 @@ class CoroutineImpl {
   std::exception_ptr _exception;
 };
 
-}  // namespace yaclib::coroutines
+}  // namespace yaclib

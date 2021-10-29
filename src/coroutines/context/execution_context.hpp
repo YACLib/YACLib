@@ -4,7 +4,7 @@
 
 #include <algorithm>
 
-namespace yaclib::coroutines {
+namespace yaclib {
 
 class ExecutionContext {
  public:
@@ -24,4 +24,4 @@ class ExecutionContext {
   MachineContext _machine_context;
 };
 
-}  // namespace yaclib::coroutines
+}  // namespace yaclib

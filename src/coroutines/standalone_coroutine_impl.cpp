@@ -1,6 +1,6 @@
 #include "standalone_coroutine_impl.hpp"
 
-namespace yaclib::coroutines {
+namespace yaclib {
 
 static thread_local StandaloneCoroutineImpl* current = nullptr;
 
@@ -33,4 +33,4 @@ void StandaloneCoroutineImpl::IncRef() noexcept {
 void StandaloneCoroutineImpl::DecRef() noexcept {
 }
 
-}  // namespace yaclib::coroutines
+}  // namespace yaclib

@@ -3,7 +3,7 @@
 // TODO if
 #include "coroutines/context/setup_stack/setup_stack_x64.hpp"
 
-namespace yaclib::coroutines {
+namespace yaclib {
 
 /***
  * registers and stack switch
@@ -20,4 +20,4 @@ class MachineContext {
   YaclibFiberMachineContext _context;
 };
 
-}  // namespace yaclib::coroutines
+}  // namespace yaclib

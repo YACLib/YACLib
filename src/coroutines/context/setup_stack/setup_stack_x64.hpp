@@ -2,7 +2,7 @@
 
 #include <yaclib/coroutines/context/stack_view.hpp>
 
-namespace yaclib::coroutines {
+namespace yaclib {
 
 using Trampoline = void (*)(void* arg);
 
@@ -23,4 +23,4 @@ struct YaclibFiberMachineContext {
 
 void SetupStack(StackView stack, Trampoline trampoline, void* arg, YaclibFiberMachineContext& context);
 
-}  // namespace yaclib::coroutines
+}  // namespace yaclib

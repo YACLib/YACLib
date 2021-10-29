@@ -2,7 +2,7 @@
 
 #include <sys/mman.h>
 
-namespace yaclib::coroutines {
+namespace yaclib {
 
 // TODO change to getting actual page size
 static const size_t kPageSize = 4096;
@@ -64,4 +64,4 @@ size_t DefaultAllocator::GetMinStackSize() {
 
 DefaultAllocator default_allocator_instance;
 
-}  // namespace yaclib::coroutines
+}  // namespace yaclib

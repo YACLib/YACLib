@@ -1,6 +1,6 @@
 #include "coroutine_impl.hpp"
 
-namespace yaclib::coroutines {
+namespace yaclib {
 
 void CoroutineImpl::operator()() {
   Resume();
@@ -41,4 +41,4 @@ void CoroutineImpl::Trampoline(void* arg) {
   coroutine->Complete();
 }
 
-}  // namespace yaclib::coroutines
+}  // namespace yaclib
