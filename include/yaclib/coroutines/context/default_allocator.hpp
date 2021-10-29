@@ -3,7 +3,7 @@
 
 #include <vector>
 
-namespace yaclib::coroutines {
+namespace yaclib {
 
 // probably won't work for win
 class DefaultAllocator : public StackAllocator {
@@ -23,4 +23,4 @@ class DefaultAllocator : public StackAllocator {
 
 extern DefaultAllocator default_allocator_instance;
 
-}  // namespace yaclib::coroutines
+}  // namespace yaclib

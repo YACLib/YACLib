@@ -24,7 +24,7 @@ class MyTask : public yaclib::util::IFunc {
   T _func;
 };
 
-static auto factory = yaclib::coroutines::MakeStandaloneCoroutineFactory(yaclib::coroutines::default_allocator_instance);
+static auto factory = yaclib::MakeStandaloneCoroutineFactory(yaclib::default_allocator_instance);
 
 TEST(coroutine, basic) {
   std::string test;
@@ -32,7 +32,7 @@ TEST(coroutine, basic) {
     for (int i = 0; i < 10; i++) {
       int k = i * 8;
       test.append(std::to_string(k));
-      yaclib::coroutines::StandaloneCoroutineImpl::Yield();
+      yaclib::StandaloneCoroutineImpl::Yield();
     }
   });
   auto coroutine = factory->New(yaclib::util::Ptr<yaclib::util::IFunc>(&test_task, false));
@@ -40,7 +40,7 @@ TEST(coroutine, basic) {
     test.append("!");
     coroutine->Resume();
   }
-  EXPECT_EQ(yaclib::coroutines::default_allocator_instance.GetMinStackSize(), 4096);
+  EXPECT_EQ(yaclib::default_allocator_instance.GetMinStackSize(), 4096);
   EXPECT_EQ(test, "!0!8!16!24!32!40!48!56!64!72!");
 }
 
@@ -48,13 +48,13 @@ TEST(coroutine, basic2) {
   std::string test;
   auto test_task1 = MyTask([&] {
     test.append("1");
-    yaclib::coroutines::StandaloneCoroutineImpl::Yield();
+    yaclib::StandaloneCoroutineImpl::Yield();
     test.append("3");
   });
 
   auto test_task2 = MyTask([&] {
     test.append("2");
-    yaclib::coroutines::StandaloneCoroutineImpl::Yield();
+    yaclib::StandaloneCoroutineImpl::Yield();
     test.append("4");
   });
 
@@ -74,11 +74,11 @@ TEST(coroutine, basic3) {
   std::string test;
   auto test_task = MyTask([&test]() {
     test.append("1");
-    yaclib::coroutines::StandaloneCoroutineImpl::Yield();
+    yaclib::StandaloneCoroutineImpl::Yield();
     test.append("2");
-    yaclib::coroutines::StandaloneCoroutineImpl::Yield();
+    yaclib::StandaloneCoroutineImpl::Yield();
     test.append("3");
-    yaclib::coroutines::StandaloneCoroutineImpl::Yield();
+    yaclib::StandaloneCoroutineImpl::Yield();
     test.append("4");
   });
 
@@ -98,7 +98,7 @@ TEST(coroutine, basic3) {
 static int TestFunctionWith2Args(const int* rsi, const int* rdi) {
   auto test_task = MyTask([&] {
     for (int i = 0; i < 10; i++) {
-      yaclib::coroutines::StandaloneCoroutineImpl::Yield();
+      yaclib::StandaloneCoroutineImpl::Yield();
     }
   });
 

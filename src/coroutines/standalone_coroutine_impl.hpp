@@ -6,7 +6,7 @@
 #include <yaclib/coroutines/context/stack_allocator.hpp>
 #include <yaclib/coroutines/standalone_coroutine.hpp>
 
-namespace yaclib::coroutines {
+namespace yaclib {
 
 class StandaloneCoroutineImpl : public IStandaloneCoroutine {
  public:
@@ -31,4 +31,4 @@ class StandaloneCoroutineImpl : public IStandaloneCoroutine {
   CoroutineImpl _impl;
 };
 
-}  // namespace yaclib::coroutines
+}  // namespace yaclib
