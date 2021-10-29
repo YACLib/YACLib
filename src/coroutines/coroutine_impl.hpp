@@ -1,21 +1,18 @@
 #pragma once
-#include <yaclib/coroutines/context/execution_context.hpp>
+#include "coroutines/context/execution_context.hpp"
+
 #include <yaclib/coroutines/context/stack_view.hpp>
-#include <yaclib/util/func.hpp>
+#include <yaclib/coroutines/standalone_coroutine.hpp>
 
 #include <utility>
 
 namespace yaclib::coroutines {
-
-// TODO some smart c++ stuff for zero cost abstraction
-using Routine = yaclib::util::IFuncPtr;
-
 /***
  * base coroutine class
  */
-class Coroutine {
+class CoroutineImpl {
  public:
-  Coroutine(const StackView& stack_view, Routine routine) : _routine(std::move(routine)) {
+  CoroutineImpl(const StackView& stack_view, Routine routine) : _routine(std::move(routine)) {
     _context.Setup(stack_view, Trampoline, this);
   }
 

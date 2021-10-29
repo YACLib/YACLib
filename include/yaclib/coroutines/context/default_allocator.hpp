@@ -21,7 +21,6 @@ class DefaultAllocator : public StackAllocator {
   std::vector<Allocation> _pool;
 };
 
-
 extern DefaultAllocator default_allocator_instance;
 
 }  // namespace yaclib::coroutines
