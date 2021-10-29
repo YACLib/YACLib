@@ -24,7 +24,10 @@ add_subdirectory(algo)
 add_subdirectory(async)
 add_subdirectory(executor)
 add_subdirectory(util)
-add_subdirectory(coroutines)
+
+if (YACLIB_FIBER)
+  add_subdirectory(coroutines)
+endif ()
 
 add_library(
   ${PROJECT_NAME} STATIC
