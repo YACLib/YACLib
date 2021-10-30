@@ -1,6 +1,11 @@
 #include "switch_context_x86_64.hpp"
 
 // clang-format off
+
+// TODO(MBkkt/myannyax)
+//  Check how the order of the registers affects the performance.
+//  And also which register is better to use for the temporary value.
+//  Also check how best to change the stack.
 .text
 .globl YACLIB_FUNC_NAME(yaclib_switch_context)
 YACLIB_FUNC_NAME(yaclib_switch_context):
@@ -33,7 +38,7 @@ YACLIB_FUNC_NAME(yaclib_switch_context):
 
   jmp  *%rax
 
-
+// TODO(MBkkt) Maybe it could be done better
 .globl YACLIB_FUNC_NAME(yaclib_trampoline)
 YACLIB_FUNC_NAME(yaclib_trampoline):
   pushq %rbp
