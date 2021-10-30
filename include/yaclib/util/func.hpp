@@ -21,25 +21,25 @@ using IFuncPtr = Ptr<IFunc>;
 
 namespace detail {
 
-template <typename Interface, typename Functor>
+template <typename Interface, typename Func>
 class CallImpl : public Interface {
  public:
-  explicit CallImpl(Functor&& functor) : _functor{std::move(functor)} {
+  explicit CallImpl(Func&& f) : _func{std::move(f)} {
   }
 
-  explicit CallImpl(const Functor& functor) : _functor{functor} {
+  explicit CallImpl(const Func& f) : _func{f} {
   }
 
  private:
   void Call() noexcept final {
     try {
-      _functor();
+      _func();
     } catch (...) {
       // TODO(MBkkt): create issue
     }
   }
 
-  Functor _functor;
+  Func _func;
 };
 
 }  // namespace detail
@@ -49,9 +49,9 @@ class CallImpl : public Interface {
  *
  * \param f Callable object
  */
-template <typename Functor>
-IFuncPtr MakeFunc(Functor&& f) {
-  return new util::Counter<detail::CallImpl<IFunc, std::decay_t<Functor>>>{std::forward<Functor>(f)};
+template <typename Func>
+IFuncPtr MakeFunc(Func&& f) {
+  return new util::Counter<detail::CallImpl<IFunc, std::decay_t<Func>>>{std::forward<Func>(f)};
 }
 
 }  // namespace yaclib::util
