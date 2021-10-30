@@ -17,7 +17,7 @@ class MachineContext {
   void SwitchTo(MachineContext& target);
 
  private:
-  YaclibFiberMachineContext _context;
+  AsmContext _context;
 };
 
 }  // namespace yaclib

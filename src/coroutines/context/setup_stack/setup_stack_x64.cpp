@@ -1,25 +1,25 @@
 #include "setup_stack_x64.hpp"
 
 #include <cstdint>
+#include <cstdio>
+
+extern "C" void yaclib_trampoline();
 
 namespace yaclib {
 
-static void MachineContextTrampoline(void* arg1, void* arg2) {
-  auto trampoline = (Trampoline)arg1;
-  trampoline(arg2);
-}
-
 static const int kAlignment = 16;
 
-void SetupStack(StackView stack, Trampoline trampoline, void* arg, YaclibFiberMachineContext& context) {
+void SetupStack(StackView stack, Trampoline trampoline, void* arg, AsmContext& context) {
   size_t shift = (size_t)(stack.Back() - (sizeof(uintptr_t))) % kAlignment;
   char* top = stack.Back() - shift;
 
-  context.RSP = top;
-  context.RDI = (void*)trampoline;
-  context.RSI = arg;
+  top -= sizeof(void*);
+  *(void**)top = (void*)(trampoline);
+  top -= sizeof(void*);
+  *(void**)top = arg;
 
-  context.RIP = (void*)MachineContextTrampoline;
+  context.RSP = top;
+  context.RIP = (void*)(yaclib_trampoline);
 }
 
 }  // namespace yaclib

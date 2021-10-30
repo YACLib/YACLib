@@ -120,3 +120,21 @@ TEST(coroutine, basic4) {
 
   EXPECT_EQ(sum, 3);
 }
+
+TEST(coroutine, kek) {
+  bool done{false};
+  auto test_task = MyTask([&]() {
+    while (!done) {
+      yaclib::StandaloneCoroutineImpl::Yield();
+    }
+  });
+
+  auto coroutine = factory->New(yaclib::util::Ptr<yaclib::util::IFunc>(&test_task, false));
+
+  for (size_t i = 0; i != 100'000'000; ++i) {
+    coroutine->Resume();
+  }
+  done = true;
+  coroutine->Resume();
+  EXPECT_EQ(coroutine->IsCompleted(), true);
+}
