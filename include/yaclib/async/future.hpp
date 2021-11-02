@@ -2,6 +2,7 @@
 
 #include <yaclib/algo/wait.hpp>
 #include <yaclib/algo/wait_for.hpp>
+#include <yaclib/algo/wait_group.hpp>
 #include <yaclib/algo/wait_until.hpp>
 #include <yaclib/async/detail/result_core.hpp>
 #include <yaclib/executor/executor.hpp>
@@ -157,6 +158,8 @@ class Future final {
 
   template <typename Clock, typename Duration, typename... Fs>
   friend bool WaitUntil(const std::chrono::time_point<Clock, Duration>& timeout_time, Fs&&... fs);
+
+  friend class WaitGroup;
 
   detail::FutureCorePtr<T> _core;
 };
