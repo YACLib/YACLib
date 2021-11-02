@@ -9,6 +9,7 @@ list(APPEND YACLIB_INCLUDES
   )
 list(APPEND YACLIB_HEADERS
   ${YACLIB_INCLUDE_DIR}/algo/detail/wait_impl.hpp
+  ${YACLIB_INCLUDE_DIR}/algo/detail/when_all_impl.hpp
   ${YACLIB_INCLUDE_DIR}/algo/detail/when_any_impl.hpp
   )
 list(APPEND YACLIB_SOURCES

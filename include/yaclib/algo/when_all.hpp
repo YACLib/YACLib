@@ -1,113 +1,8 @@
 #pragma once
 
-#include <yaclib/async/future.hpp>
-#include <yaclib/async/promise.hpp>
-
-#include <array>
-#include <iterator>
-#include <type_traits>
-#include <utility>
-#include <vector>
+#include <yaclib/algo/detail/when_all_impl.hpp>
 
 namespace yaclib {
-namespace detail {
-
-template <typename T>
-class AllCombinatorBase {
- protected:
-  std::atomic<bool> _done{false};
-  std::atomic<size_t> _ticket{0};
-  T _results;
-};
-
-template <>
-class AllCombinatorBase<void> {
- protected:
-  std::atomic<bool> _done{false};
-};
-
-template <
-    typename T, size_t N = std::numeric_limits<size_t>::max(), bool IsArray = (N != std::numeric_limits<size_t>::max()),
-    typename FutureValue =
-        std::conditional_t<std::is_void_v<T>, void, std::conditional_t<IsArray, std::array<T, N>, std::vector<T>>>>
-class AllCombinator : public BaseCore, public AllCombinatorBase<FutureValue> {
-  using Base = AllCombinatorBase<FutureValue>;
-
- public:
-  static std::pair<Future<FutureValue>, util::Ptr<AllCombinator>> Make(size_t size = 0) {
-    auto [future, promise] = MakeContract<FutureValue>();
-    if constexpr (!IsArray) {
-      if (size == 0) {
-        if constexpr (std::is_void_v<T>) {
-          std::move(promise).Set();
-        } else {
-          std::move(promise).Set(std::vector<T>{});
-        }
-        return {std::move(future), nullptr};
-      }
-    }
-    return {std::move(future), new util::Counter<AllCombinator>{std::move(promise), size}};
-  }
-
-  void CallInline(void* context) noexcept final {
-    if (BaseCore::GetState() != BaseCore::State::HasStop) {
-      Combine(std::move(static_cast<ResultCore<T>*>(context)->Get()));
-    }
-  }
-
-  void Combine(util::Result<T>&& result) noexcept(std::is_void_v<T> || std::is_nothrow_move_assignable_v<T>) {
-    if (Base::_done.load(std::memory_order_acquire)) {
-      return;
-    }
-    auto state = result.State();
-    if (state == util::ResultState::Value) {
-      if constexpr (!std::is_void_v<T>) {
-        const auto ticket = AllCombinatorBase<FutureValue>::_ticket.fetch_add(1, std::memory_order_acq_rel);
-        AllCombinatorBase<FutureValue>::_results[ticket] = std::move(result).Value();
-      }
-      return;
-    }
-    if (Base::_done.exchange(true, std::memory_order_acq_rel)) {
-      return;
-    }
-    if (state == util::ResultState::Error) {
-      std::move(_promise).Set(std::move(result).Error());
-    } else {
-      std::move(_promise).Set(std::move(result).Exception());
-    }
-  }
-
-  ~AllCombinator() override {
-    if (!Base::_done.load(std::memory_order_acquire)) {
-      if constexpr (!std::is_void_v<T>) {
-        std::move(_promise).Set(std::move(AllCombinatorBase<FutureValue>::_results));
-      } else {
-        std::move(_promise).Set();
-      }
-    }
-  }
-
- private:
-  explicit AllCombinator(Promise<FutureValue> promise, [[maybe_unused]] size_t size = 0)
-      : BaseCore{BaseCore::State::Empty}, _promise{std::move(promise)} {
-    if constexpr (!std::is_void_v<T> && !IsArray) {
-      AllCombinatorBase<FutureValue>::_results.resize(size);
-    }
-  }
-
-  Promise<FutureValue> _promise;
-};
-
-template <size_t N, typename T, typename... Fs>
-void WhenAllImpl(util::Ptr<AllCombinator<T, N>>& combinator, Future<T>&& head, Fs&&... tail) {
-  head.GetCore()->SetCallbackInline(combinator);
-  std::move(head).Detach();
-  if constexpr (sizeof...(tail) != 0) {
-    WhenAllImpl(combinator, std::forward<Fs>(tail)...);
-  }
-}
-
-}  // namespace detail
 
 /**
  * Create \ref Future which will be ready when all futures are ready
@@ -115,9 +10,10 @@ void WhenAllImpl(util::Ptr<AllCombinator<T, N>>& combinator, Future<T>&& head, F
  * \tparam It type of passed iterator
  * \tparam T type of all passed futures
  * \param begin, size the range of futures to combine
- * \return Future<vector<T>>
+ * \return Future<std::vector<T>>
  */
-template <typename It, typename T = util::detail::FutureValueT<typename std::iterator_traits<It>::value_type>>
+template <WhenPolicy P = WhenPolicy::FirstFail, typename It,
+          typename T = util::detail::FutureValueT<typename std::iterator_traits<It>::value_type>>
 auto WhenAll(It begin, size_t size) {
   auto [future, combinator] = detail::AllCombinator<T>::Make(size);
   for (size_t i = 0; i != size; ++i) {
@@ -134,11 +30,12 @@ auto WhenAll(It begin, size_t size) {
  * \tparam It type of passed iterator
  * \tparam T type of all passed futures
  * \param begin, end the range of futures to combine
- * \return Future<vector<T>>
+ * \return Future<std::vector<T>>
  */
-template <typename It>
+template <WhenPolicy P = WhenPolicy::FirstFail, typename It>
 auto WhenAll(It begin, It end) {
-  static_assert(util::IsFutureV<typename std::iterator_traits<It>::value_type>);
+  static_assert(util::IsFutureV<typename std::iterator_traits<It>::value_type>,
+                "When function Iterator must be point to some Future");
   return WhenAll(begin, std::distance(begin, end));
 }
 
@@ -147,13 +44,14 @@ auto WhenAll(It begin, It end) {
  *
  * \tparam T type of all passed futures
  * \param head, tail one or more futures to combine
- * \return Future<array<T>>
+ * \return Future<std::array<T>>
  */
-template <typename T, typename... Fs>
-auto WhenAll(Future<T>&& head, Fs&&... tail) {
-  static_assert((... && util::IsFutureV<Fs>));  // TODO(kononovk): Add static assert that FutureValue<Fs> = T
-  auto [future, combinator] = detail::AllCombinator<T, sizeof...(Fs) + 1>::Make();
-  detail::WhenAllImpl<sizeof...(Fs) + 1>(combinator, std::move(head), std::forward<Fs>(tail)...);
+template <WhenPolicy P = WhenPolicy::FirstFail, typename T, typename... Ts>
+auto WhenAll(Future<T>&& head, Future<Ts>&&... tail) {
+  constexpr size_t kSize = 1 + sizeof...(Ts);
+  static_assert(kSize >= 2, "WhenAll wants at least two futures");
+  auto [future, combinator] = detail::AllCombinator<T, kSize>::Make();
+  detail::WhenAllImpl<kSize>(combinator, std::move(head), std::move(tail)...);
   return std::move(future);
 }
 
