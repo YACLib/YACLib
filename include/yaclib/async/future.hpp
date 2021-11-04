@@ -22,8 +22,7 @@ template <typename T>
 class Future final {
  public:
   static_assert(!std::is_reference_v<T>,
-                "Future cannot be instantiated with reference, "
-                "you can use std::reference_wrapper or pointer");
+                "Future cannot be instantiated with reference, you can use std::reference_wrapper or pointer");
   static_assert(!std::is_volatile_v<T> && !std::is_const_v<T>,
                 "Future cannot be instantiated with cv qualifiers, because it's unnecessary");
   static_assert(!util::IsFutureV<T>, "Future cannot be instantiated with Future");
