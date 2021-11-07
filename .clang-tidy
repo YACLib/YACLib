@@ -25,6 +25,7 @@ Checks: '*,
          -hicpp-explicit-conversions,
          -llvm-header-guard,
          -cppcoreguidelines-owning-memory'
+         -cppcoreguidelines-pro-bounds-pointer-arithmetic'
 
 WarningsAsErrors: '*'
 

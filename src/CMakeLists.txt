@@ -38,6 +38,10 @@ endif()
 
 add_library(${PROJECT_NAME} STATIC ${YACLIB_SOURCES})
 
+if (YACLIB_FIBER)
+  add_subdirectory(fiber)
+endif ()
+
 set(YACLIB_IDE ON)
 
 if (YACLIB_IDE)
