@@ -14,7 +14,9 @@ Checks: '*,
          -cppcoreguidelines-pro-type-static-cast-downcast,
          -fuchsia-default-arguments-*,
          -google-build-using-namespace,
-         -modernize-use-trailing-return-type'
+         -modernize-use-trailing-return-type,
+         
+         -cppcoreguidelines-pro-bounds-pointer-arithmetic'
 
 WarningsAsErrors: '*'
 

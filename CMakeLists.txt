@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.11)
 
-project(yaclib)
+project(yaclib
+        LANGUAGES C CXX ASM)
 
 set(YACLIB_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(YACLIB_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})

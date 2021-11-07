@@ -25,6 +25,10 @@ add_subdirectory(async)
 add_subdirectory(executor)
 add_subdirectory(util)
 
+if (YACLIB_FIBER)
+  add_subdirectory(fiber)
+endif ()
+
 add_library(
   ${PROJECT_NAME} STATIC
   ${YACLIB_SOURCES}
