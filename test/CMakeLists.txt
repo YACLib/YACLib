@@ -67,6 +67,7 @@ set(YACLIB_UNIT_SOURCES
   unit/executor/thread_pool
   unit/async/stress
   unit/executor/strand
+  unit/fiber/basic
   )
 
 #TODO(MBkkt) Add options which shuffle tests list, maybe just use gtest options?
