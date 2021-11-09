@@ -28,7 +28,7 @@ https://www.codacy.com/gh/YACLib/YACLib/dashboard?utm_source=github.com&amp;utm_
 
 [![Discord](
 https://discordapp.com/api/guilds/898966884471423026/widget.png)](
-https://discord.gg/cbrCWTX9)
+https://discord.gg/xy2fDKj8VZ)
 
 ## Table of Contents
 
@@ -369,7 +369,7 @@ You can contact us by our emails:
 * zakhar.zakharov.zz16@gmail.com
 * myannyax@gmail.com
 
-Or join our [Discord Server](https://discord.gg/cbrCWTX9)
+Or join our [Discord Server](https://discord.gg/xy2fDKj8VZ)
 
 ## License
 
