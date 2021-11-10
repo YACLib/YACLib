@@ -17,3 +17,5 @@ Only additions here (see .clang-tidy).
 * Write `final` for methods and classes if possible.
 * Write `noexcept` for methods if possible.
 * Don't use relative include `#include "..."`, use `#include <...>` instead of this.
+* Don't use `#include guards`, use `#pracma once`.
+* Surround function definitions and declarations with one or more blank lines.
