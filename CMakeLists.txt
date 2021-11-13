@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.11)
+cmake_minimum_required(VERSION 3.11) # TODO(MBkkt) We can support older version here
 
 project(yaclib)
 
@@ -76,8 +76,6 @@ endif ()
 message("YACLIB_COMPILE_OPTIONS: ${YACLIB_COMPILE_OPTIONS}")
 message("YACLIB_LINK_OPTIONS   : ${YACLIB_LINK_OPTIONS}")
 add_definitions(${YACLIB_DEFINITIONS})
-
-include(FetchContent)
 
 # Create static library
 add_subdirectory(src)
