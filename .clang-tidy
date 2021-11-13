@@ -14,7 +14,9 @@ Checks: '*,
          -cppcoreguidelines-pro-type-static-cast-downcast,
          -fuchsia-default-arguments-*,
          -google-build-using-namespace,
-         -modernize-use-trailing-return-type'
+         -modernize-use-trailing-return-type,
+         -readability-identifier-length,
+         -fuchsia-overloaded-operator'
 
 WarningsAsErrors: '*'
 
@@ -56,6 +58,8 @@ CheckOptions: # TODO(Ri7ay): Setup all options
   - key: readability-identifier-naming.TypeTemplateParameterCase
     value: CamelCase
   - key: readability-simplify-boolean-expr.ChainedConditionalReturn
-    value: true
+    value: 1
   - key: readability-simplify-boolean-expr.ChainedConditionalAssignment
-    value: true
+    value: 1
+  - key: misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic
+    value: 1
