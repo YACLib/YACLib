@@ -31,19 +31,10 @@ enum class ThreadPoolTag {
   Multi,
 };
 
-class SingleLightThread : public ::testing::Test {
+class Thread : public ::testing::Test {
  protected:
-  void SetUp() override {
-    _factory = MakeThreadFactory();
-    PushTP();
-  }
-
   void TearDown() override {
     _tps.clear();
-  }
-
-  void PushTP() {
-    _tps.push_back(MakeThreadPool(1, _factory));
   }
 
   void PopTP() {
@@ -52,83 +43,62 @@ class SingleLightThread : public ::testing::Test {
 
   std::vector<IThreadPoolPtr> _tps;
   IThreadFactoryPtr _factory;
-  FactoryTag _factory_tag{FactoryTag::Light};
-  ThreadPoolTag _tp_tag{ThreadPoolTag::Single};
+  FactoryTag _factory_tag{};
+  ThreadPoolTag _tp_tag{};
 };
 
-class SingleHeavyThread : public ::testing::Test {
+class SingleThread : public Thread {
+ protected:
+  void PushTP() {
+    _tps.push_back(MakeThreadPool(1, _factory));
+  }
+};
+
+class MultiThread : public Thread {
+ protected:
+  void PushTP() {
+    _tps.push_back(MakeThreadPool(kCoresCount, _factory));
+  }
+};
+
+class SingleLightThread : public SingleThread {
  protected:
   void SetUp() override {
+    _factory_tag = FactoryTag::Light;
+    _tp_tag = ThreadPoolTag::Single;
+    _factory = MakeThreadFactory();
+    PushTP();
+  }
+};
+
+class SingleHeavyThread : public SingleThread {
+ protected:
+  void SetUp() override {
+    _factory_tag = FactoryTag::Heavy;
+    _tp_tag = ThreadPoolTag::Single;
     _factory = MakeThreadFactory(1);
     PushTP();
   }
-
-  void TearDown() override {
-    _tps.clear();
-  }
-
-  void PushTP() {
-    _tps.push_back(MakeThreadPool(1, _factory));
-  }
-
-  void PopTP() {
-    _tps.pop_back();
-  }
-
-  std::vector<IThreadPoolPtr> _tps;
-  IThreadFactoryPtr _factory;
-  FactoryTag _factory_tag{FactoryTag::Heavy};
-  ThreadPoolTag _tp_tag{ThreadPoolTag::Single};
 };
 
-class MultiLightThread : public ::testing::Test {
+class MultiLightThread : public MultiThread {
  protected:
   void SetUp() override {
+    _factory_tag = FactoryTag::Light;
+    _tp_tag = ThreadPoolTag::Multi;
     _factory = MakeThreadFactory();
     PushTP();
   }
-
-  void TearDown() override {
-    _tps.clear();
-  }
-
-  void PushTP() {
-    _tps.push_back(MakeThreadPool(kCoresCount, _factory));
-  }
-
-  void PopTP() {
-    _tps.pop_back();
-  }
-
-  std::vector<IThreadPoolPtr> _tps;
-  IThreadFactoryPtr _factory;
-  FactoryTag _factory_tag{FactoryTag::Heavy};
-  ThreadPoolTag _tp_tag{ThreadPoolTag::Multi};
 };
 
-class MultiHeavyThread : public ::testing::Test {
+class MultiHeavyThread : public MultiThread {
  protected:
   void SetUp() override {
+    _factory_tag = FactoryTag::Heavy;
+    _tp_tag = ThreadPoolTag::Multi;
     _factory = MakeThreadFactory(kCoresCount);
     PushTP();
   }
-
-  void TearDown() override {
-    _tps.clear();
-  }
-
-  void PushTP() {
-    _tps.push_back(MakeThreadPool(kCoresCount, _factory));
-  }
-
-  void PopTP() {
-    _tps.pop_back();
-  }
-
-  std::vector<IThreadPoolPtr> _tps;
-  IThreadFactoryPtr _factory;
-  FactoryTag _factory_tag{FactoryTag::Heavy};
-  ThreadPoolTag _tp_tag{ThreadPoolTag::Single};
 };
 
 void JustWork(IThreadPoolPtr& tp) {
@@ -320,17 +290,7 @@ TEST_F(MultiHeavyThread, TwoThreadPool) {
   TwoThreadPool(_tps[0], _tps[1]);
 }
 
-void FIFO(IThreadPoolPtr& tp, StopType stop_type) {
-  size_t next_task{0};
-
-  constexpr size_t kTasks{256};
-  for (size_t i = 0; i != kTasks; ++i) {
-    tp->Execute([i, &next_task] {
-      EXPECT_EQ(next_task, i);
-      ++next_task;
-    });
-  }
-
+void Join(IThreadPoolPtr& tp, StopType stop_type) {
   switch (stop_type) {
     case StopType::SoftStop:
       tp->SoftStop();
@@ -343,7 +303,19 @@ void FIFO(IThreadPoolPtr& tp, StopType stop_type) {
       break;
   }
   tp->Wait();
+}
 
+void FIFO(IThreadPoolPtr& tp, StopType stop_type) {
+  size_t next_task{0};
+
+  constexpr size_t kTasks{256};
+  for (size_t i = 0; i != kTasks; ++i) {
+    tp->Execute([i, &next_task] {
+      EXPECT_EQ(next_task, i);
+      ++next_task;
+    });
+  }
+  Join(tp, stop_type);
   EXPECT_EQ(next_task, kTasks);
 }
 
@@ -426,18 +398,7 @@ void ManyTask(IThreadPoolPtr& tp, StopType stop_type, size_t threads_count) {
     });
   }
 
-  switch (stop_type) {
-    case StopType::SoftStop:
-      tp->SoftStop();
-      break;
-    case StopType::Stop:
-      tp->Stop();
-      break;
-    case StopType::HardStop:
-      EXPECT_NE(stop_type, StopType::HardStop);
-      break;
-  }
-  tp->Wait();
+  Join(tp, stop_type);
 
   EXPECT_EQ(completed, tasks);
 }
@@ -484,18 +445,7 @@ void UseAllThreads(IThreadPoolPtr& tp, StopType stop_type) {
   tp->Execute(sleeper);
   tp->Execute(sleeper);
 
-  switch (stop_type) {
-    case StopType::SoftStop:
-      tp->SoftStop();
-      break;
-    case StopType::Stop:
-      tp->Stop();
-      break;
-    case StopType::HardStop:
-      EXPECT_NE(stop_type, StopType::HardStop);
-      break;
-  }
-  tp->Wait();
+  Join(tp, stop_type);
 
   auto elapsed = stop_watch.Elapsed();
 
@@ -536,18 +486,7 @@ void NotSequentialAndParallel(IThreadPoolPtr& tp, StopType stop_type) {
 
   EXPECT_EQ(counter.load(std::memory_order_acquire), 1);
 
-  switch (stop_type) {
-    case StopType::SoftStop:
-      tp->SoftStop();
-      break;
-    case StopType::Stop:
-      tp->Stop();
-      break;
-    case StopType::HardStop:
-      EXPECT_NE(stop_type, StopType::HardStop);
-      break;
-  }
-  tp->Wait();
+  Join(tp, stop_type);
 
   EXPECT_EQ(counter.load(std::memory_order_acquire), 2);
 }
