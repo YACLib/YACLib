@@ -1,6 +1,5 @@
 list(APPEND YACLIB_INCLUDES
   ${YACLIB_INCLUDE_DIR}/util/counters.hpp
-  ${YACLIB_INCLUDE_DIR}/util/defer.hpp
   ${YACLIB_INCLUDE_DIR}/util/func.hpp
   ${YACLIB_INCLUDE_DIR}/util/intrusive_node.hpp
   ${YACLIB_INCLUDE_DIR}/util/intrusive_ptr.hpp

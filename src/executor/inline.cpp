@@ -1,14 +1,14 @@
-#include <yaclib/executor/executor.hpp>
+#include <yaclib/executor/inline.hpp>
 
 namespace yaclib {
 
 class Inline final : public IExecutor {
  private:
-  Type Tag() const final {
+  [[nodiscard]] Type Tag() const final {
     return Type::Inline;
   }
 
-  bool Execute(ITask& task) final {
+  bool Execute(ITask& task) noexcept final {
     task.Call();
     return true;
   }

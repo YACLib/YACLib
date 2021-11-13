@@ -3,8 +3,6 @@
 #include <yaclib/executor/task.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 
-#include <memory>
-
 namespace yaclib {
 
 class IExecutor : public util::IRef {
@@ -49,7 +47,7 @@ class IExecutor : public util::IRef {
    * \param task task to execute
    * \return true if the task is accepted and scheduled for execution, false if the task is rejected
    */
-  virtual bool Execute(ITask& task) = 0;
+  virtual bool Execute(ITask& task) noexcept = 0;
 };
 
 using IExecutorPtr = util::Ptr<IExecutor>;

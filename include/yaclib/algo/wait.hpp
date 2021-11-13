@@ -11,7 +11,7 @@ namespace yaclib {
  */
 template <typename... Futures>
 void Wait(Futures&&... fs) {
-  detail::Wait(detail::NoTimeoutTag{}, static_cast<detail::BaseCore&>(*fs._core)...);
+  detail::Wait(detail::NoTimeoutTag{}, static_cast<detail::BaseCore&>(*fs.GetCore())...);
 }
 
 }  // namespace yaclib

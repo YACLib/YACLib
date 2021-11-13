@@ -1,8 +1,7 @@
 #pragma once
 
 #include <yaclib/async/detail/result_core.hpp>
-
-#include <utility>
+#include <yaclib/util/type_traits.hpp>
 
 namespace yaclib {
 namespace detail {
@@ -34,6 +33,7 @@ class Promise final {
   Promise();
   Promise(Promise&& other) noexcept = default;
   Promise& operator=(Promise&& other) noexcept = default;
+  ~Promise() = default;  // TODO(MBkkt) Maybe we want set cancel?
 
   /**
    * Create and return \ref Future associated with this promise
@@ -53,13 +53,16 @@ class Promise final {
   void Set(Type&& value) &&;
 
   /**
-   * Set \ref Promise result
+   * Set \ref Promise<void> result
    */
   void Set() &&;
 
+  /// DETAIL
+  explicit Promise(detail::PromiseCorePtr<T> core);
+  /// DETAIL
+
  private:
   detail::PromiseCorePtr<T> _core;
-  bool _future_extracted{false};  // TODO should be in _core bit
 };
 
 extern template class Promise<void>;

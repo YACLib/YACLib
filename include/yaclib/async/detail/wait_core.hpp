@@ -1,6 +1,6 @@
 #pragma once
 
-#include <yaclib/executor/task.hpp>
+#include <yaclib/util/ref.hpp>
 
 #include <condition_variable>
 #include <mutex>

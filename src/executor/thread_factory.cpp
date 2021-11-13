@@ -11,7 +11,8 @@
 namespace yaclib {
 namespace {
 
-void CallFunc(size_t priority, std::string_view name, util::IFunc& f, util::IFunc* acquire, util::IFunc* release) {
+void CallFunc(size_t /*priority*/, std::string_view /*name*/, util::IFunc& f, util::IFunc* acquire,
+              util::IFunc* release) {
   if (acquire != nullptr) {
     acquire->Call();
   }

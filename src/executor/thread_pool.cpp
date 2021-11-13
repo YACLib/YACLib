@@ -38,7 +38,7 @@ class ThreadPool : public IThreadPool {
     return Type::ThreadPool;
   }
 
-  bool Execute(ITask& task) final {
+  bool Execute(ITask& task) noexcept final {
     _refs_flag.fetch_add(2, std::memory_order_relaxed);
     task.IncRef();
     std::unique_lock guard{_m};
@@ -77,14 +77,14 @@ class ThreadPool : public IThreadPool {
     }
     _cv.notify_all();
 
-    while (auto task = tasks.PopBack()) {
+    while (auto* task = tasks.PopBack()) {
       task->Cancel();
       task->DecRef();
     }
   }
 
   void Wait() final {
-    while (auto thread = _threads.PopFront()) {
+    while (auto* thread = _threads.PopFront()) {
       _factory->Release(IThreadPtr{thread});
     }
   }
@@ -92,7 +92,7 @@ class ThreadPool : public IThreadPool {
   void Loop() noexcept {
     std::unique_lock guard{_m};
     while (true) {
-      while (auto task = _tasks.PopFront()) {
+      while (auto* task = _tasks.PopFront()) {
         guard.unlock();
         task->Call();
         task->DecRef();
@@ -136,11 +136,11 @@ class SingleThread : public IThreadPool {
   }
 
  private:
-  Type Tag() const final {
+  [[nodiscard]] Type Tag() const final {
     return Type::SingleThread;
   }
 
-  bool Execute(ITask& task) final {
+  bool Execute(ITask& task) noexcept final {
     task.IncRef();
     const auto state = _state.load(std::memory_order_acquire);
     if (state == kStop || state == kHardStop) {

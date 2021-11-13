@@ -19,7 +19,7 @@ class MPSCStack final {
   [[nodiscard]] detail::Node* TakeAllFIFO();
 
  private:
-  alignas(kCacheLineSize) std::atomic<detail::Node*> head_{nullptr};
+  alignas(kCacheLineSize) std::atomic<detail::Node*> _head{nullptr};
 };
 
 }  // namespace yaclib::util

@@ -1,9 +1,5 @@
 #pragma once
 
-#include <yaclib/algo/wait.hpp>
-#include <yaclib/algo/wait_for.hpp>
-#include <yaclib/algo/wait_group.hpp>
-#include <yaclib/algo/wait_until.hpp>
 #include <yaclib/async/detail/result_core.hpp>
 #include <yaclib/executor/executor.hpp>
 #include <yaclib/util/type_traits.hpp>
@@ -35,9 +31,6 @@ class Future final {
   static_assert(!std::is_same_v<T, std::error_code>, "Future cannot be instantiated with std::error_code");
   static_assert(!std::is_same_v<T, std::exception_ptr>, "Future cannot be instantiated with std::exception_ptr");
 
-  Future(Future&& other) noexcept = default;
-  Future& operator=(Future&& other) noexcept = default;
-
   Future(const Future&) = delete;
   Future& operator=(const Future&) = delete;
 
@@ -47,6 +40,8 @@ class Future final {
    * Needed only for usability, e.g. instead of std::optional<util::Future<T>> in containers.
    */
   Future() = default;
+  Future(Future&& other) noexcept = default;
+  Future& operator=(Future&& other) noexcept = default;
 
   /**
    * If Future is \ref Valid then call \ref Stop
@@ -67,6 +62,9 @@ class Future final {
    */
   [[nodiscard]] bool Ready() const& noexcept;
 
+  void Get() & = delete;
+  void Get() const&& = delete;
+
   /**
    * Return copy of \ref Result from \ref Future
    *
@@ -74,7 +72,7 @@ class Future final {
    * \note The behavior is undefined if \ref Valid is false before the call to this function.
    * \return \ref Result stored in the shared state
    */
-  [[nodiscard]] const util::Result<T>* Get() const&;
+  [[nodiscard]] const util::Result<T>* Get() const& noexcept;
 
   /**
    * Wait until \def Ready is true and move \ref Result from Future
@@ -82,13 +80,10 @@ class Future final {
    * \note The behavior is undefined if \ref Valid is false before the call to this function.
    * \return The \ref Result that Future received
    */
-  [[nodiscard]] util::Result<T> Get() &&;
-
-  util::Result<T> Get() const&& = delete;
-  util::Result<T> Get() & = delete;
+  [[nodiscard]] util::Result<T> Get() && noexcept;
 
   /**
-   * Stop pipeline before current step, if possible. Used in destructor
+   * Stop pipeline before current step, if possible.
    */
   void Stop() &&;
 
@@ -98,73 +93,96 @@ class Future final {
   void Detach() &&;
 
   /**
+   * Specify executor for continuation.
+   */
+  Future& Via(IExecutorPtr executor) &;
+  Future&& Via(IExecutorPtr executor) &&;
+
+  /**
    * Attach the continuation functor to *this
    *
    * \note The behavior is undefined if \ref Valid is false before the call to this function.
-   * \param functor A continuation to be attached
+   * \param f A continuation to be attached
    * \return New \ref Future object associated with the functor result
    */
   template <typename Functor>
-  [[nodiscard]] auto Then(Functor&& functor) &&;
+  [[nodiscard]] auto Then(Functor&& f) &&;
+
+  /**
+   * Attach the continuation functor to *this
+   *
+   * The functor will be executed via \ref Inline executor.
+   * \note The behavior is undefined if \ref Valid is false before the call to this function.
+   * \param f A continuation to be attached
+   * \return New \ref Future object associated with the functor result
+   */
+  template <typename Functor>
+  [[nodiscard]] auto ThenInline(Functor&& f) &&;
 
   /**
    * Attach the continuation functor to *this
    *
    * The functor will be executed via the specified executor.
    * \note The behavior is undefined if \ref Valid is false before the call to this function.
-   * \param executor Executor which will \ref Execute the continuation
-   * \param functor A continuation to be attached
+   * \param e Executor which will \ref Execute the continuation
+   * \param f A continuation to be attached
    * \return New \ref Future object associated with the functor result
    */
   template <typename Functor>
-  [[nodiscard]] auto Then(IExecutorPtr executor, Functor&& functor) &&;
+  [[nodiscard]] auto Then(IExecutorPtr e, Functor&& f) &&;
 
   /**
    * Attach the final continuation functor to *this
    *
    * \note Functor must return void type.
-   * \param functor A continuation to be attached
+   * \param f A continuation to be attached
    */
   template <typename Functor>
   void Subscribe(Functor&& functor) &&;
 
   /**
-   * Attach the final functor to *this
+   * Attach the final continuation functor to *this
+   *
+   * The functor will be executed via \ref Inline executor.
+   * \note The behavior is undefined if \ref Valid is false before the call to this function.
+   * \param f A continuation to be attached
+   */
+  template <typename Functor>
+  void SubscribeInline(Functor&& f) &&;
+
+  /**
+   * Attach the final continuation functor to *this
    *
    * The functor will be executed via the specified executor.
    * \note The behavior is undefined if \ref Valid is false before the call to this function.
-   * \param executor Executor which will \ref Execute the continuation
-   * \param functor A continuation to be attached
+   * \param e Executor which will \ref Execute the continuation
+   * \param f A continuation to be attached
    */
   template <typename Functor>
-  void Subscribe(IExecutorPtr executor, Functor&& functor) &&;
+  void Subscribe(IExecutorPtr e, Functor&& f) &&;
 
-  /**
-   * Detail constructor
-   */
+  /// DETAIL
   explicit Future(detail::FutureCorePtr<T> core);
-
-  /**
-   * Detail method
-   */
-  Future& Via(IExecutorPtr executor) &;
+  [[nodiscard]] const detail::FutureCorePtr<T>& GetCore() const;
+  /// DETAIL
 
  private:
-  template <typename... Fs>
-  friend void Wait(Fs&&... futures);
-
-  template <typename Rep, typename Period, typename... Fs>
-  friend bool WaitFor(const std::chrono::duration<Rep, Period>& timeout_duration, Fs&&... fs);
-
-  template <typename Clock, typename Duration, typename... Fs>
-  friend bool WaitUntil(const std::chrono::time_point<Clock, Duration>& timeout_time, Fs&&... fs);
-
-  friend class WaitGroup;
-
   detail::FutureCorePtr<T> _core;
 };
 
 extern template class Future<void>;
+
+Future<void> MakeFuture();
+
+template <typename V, typename T = std::remove_reference_t<V>>
+Future<T> MakeFuture(V&& value) {
+  return Future<T>{new util::Counter<detail::ResultCore<T>>{std::forward<V>(value)}};
+}
+
+template <typename T, typename V>
+std::enable_if_t<!std::is_same_v<T, std::remove_reference_t<V>>, Future<T>> MakeFuture(V&& value) {
+  return Future<T>{new util::Counter<detail::ResultCore<T>>{std::forward<V>(value)}};
+}
 
 }  // namespace yaclib
 
