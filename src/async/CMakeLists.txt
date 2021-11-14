@@ -13,7 +13,6 @@ list(APPEND YACLIB_HEADERS
   )
 list(APPEND YACLIB_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/base_core.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/core.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/future_impl.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/promise_impl.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/result_core.cpp

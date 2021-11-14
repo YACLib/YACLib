@@ -1,37 +1,36 @@
-unset(CMAKE_INTERPROCEDURAL_OPTIMIZATION)
-
-# GTest
 find_package(GTest QUIET)
-
-if (NOT GTEST_FOUND)
-  fetchcontent_declare(
-    googletest
-    GIT_REPOSITORY https://github.com/google/googletest.git
-    GIT_TAG release-1.11.0
-  )
-  # For Windows: Prevent overriding the parent project's compiler/linker settings
-  set(gtest_force_shared_crt ON CACHE BOOL "Always use msvcrt.dll")
-  fetchcontent_makeavailable(googletest)
-  set(GTEST_BOTH_LIBRARIES GTest::gtest GTest::gtest_main)
-endif ()
-
-# Google Benchmark
 find_package(benchmark QUIET)
 
-if (NOT BENCHMARK_FOUND)
-  set(BENCHMARK_ENABLE_TESTING NO)
-  fetchcontent_declare(
-    benchmark
-    GIT_REPOSITORY https://github.com/google/benchmark.git
-    GIT_TAG v1.5.5
-  )
-  fetchcontent_makeavailable(benchmark)
-endif ()
+if (NOT GTEST_FOUND OR NOT BENCHMARK_FOUND)
+  if (YACLIB_ENABLE_LTO)
+    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION OFF)
+  endif ()
 
-if (YACLIB_ENABLE_LTO)
-  set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
-else ()
-  set(CMAKE_INTERPROCEDURAL_OPTIMIZATION OFF)
+  include(FetchContent)
+  if (NOT GTEST_FOUND)
+    FetchContent_Declare(
+      googletest
+      GIT_REPOSITORY https://github.com/google/googletest.git
+      GIT_TAG release-1.11.0
+    )
+    # For Windows: Prevent overriding the parent project's compiler/linker settings
+    set(gtest_force_shared_crt ON CACHE BOOL "Always use msvcrt.dll")
+    FetchContent_MakeAvailable(googletest)
+    set(GTEST_BOTH_LIBRARIES GTest::gtest GTest::gtest_main)
+  endif ()
+  if (NOT BENCHMARK_FOUND)
+    set(BENCHMARK_ENABLE_TESTING NO)
+    FetchContent_Declare(
+      benchmark
+      GIT_REPOSITORY https://github.com/google/benchmark.git
+      GIT_TAG v1.5.5
+    )
+    FetchContent_MakeAvailable(benchmark)
+  endif ()
+
+  if (YACLIB_ENABLE_LTO)
+    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
+  endif ()
 endif ()
 
 add_compile_options(${YACLIB_COMPILE_OPTIONS})
@@ -49,13 +48,15 @@ set(YACLIB_UNITS
   unit/util/intrusive_ptr
   unit/util/result
   unit/executor/task
+  unit/async/get
   unit/async/future
   unit/algo/when_all
   unit/algo/wait
-  unit/algo/wait_group
-  unit/algo/when_any
   unit/executor/thread_factory
+  unit/algo/when_any
+  unit/algo/wait_group
   unit/executor/thread_pool
+  unit/async/stress
   unit/executor/serial
   )
 

@@ -121,7 +121,7 @@ void TestHaveResults() {
     std::move(p1).Set();
     std::move(p2).Set();
   });
-  std::this_thread::sleep_for(10ms * YACLIB_CI_SLOWDOWN);
+  std::this_thread::sleep_for(50ms * YACLIB_CI_SLOWDOWN);
   if constexpr (kPolicy == WaitPolicy::Endless) {
     yaclib::Wait(f1, f2);
   } else if constexpr (kPolicy == WaitPolicy::Until) {
@@ -144,4 +144,35 @@ TEST(WaitFor, HaveResults) {
 
 TEST(WaitUntil, HaveResults) {
   TestHaveResults<WaitPolicy::Until>();
+}
+
+TEST(WaitFor, Diff) {
+  static constexpr int kThreads = 4;
+  auto tp = yaclib::MakeThreadPool(kThreads);
+  yaclib::Future<int> f[kThreads];
+
+  for (int i = 0; i < kThreads; ++i) {
+    f[i] = yaclib::Run(tp, [i] {
+      std::this_thread::sleep_for(i * 50ms * YACLIB_CI_SLOWDOWN);
+      return i;
+    });
+  }
+  test::util::StopWatch timer;
+  bool ready = yaclib::WaitFor(100ms * YACLIB_CI_SLOWDOWN, f[0], f[1], f[2], f[3]);
+  EXPECT_FALSE(ready);
+  EXPECT_LE(timer.Elapsed(), 150ms * YACLIB_CI_SLOWDOWN);
+
+  EXPECT_TRUE(std::any_of(std::begin(f), std::end(f), [](auto& f) {
+    return f.Ready();
+  }));
+
+  EXPECT_FALSE(std::all_of(std::begin(f), std::end(f), [](auto& f) {
+    return f.Ready();
+  }));
+
+  for (int i = 0; i < kThreads; ++i) {
+    EXPECT_EQ(std::move(f[i]).Get().Value(), i);
+  }
+  tp->Stop();
+  tp->Wait();
 }

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cassert>
+#include <exception>
 #include <type_traits>
 
 namespace yaclib {
@@ -11,7 +13,9 @@ namespace util {
 namespace detail {
 
 template <typename U>
-struct FutureValue;
+struct FutureValue {
+  using type = U;
+};
 
 template <typename U>
 struct FutureValue<Future<U>> {
@@ -68,4 +72,10 @@ template <typename T>
 inline constexpr bool IsResultV = std::integral_constant<bool, IsInstantiationOf<Result, T>::value>::value;
 
 }  // namespace util
+
+[[noreturn]] inline void Unreachable() {  // TODO(MBkkt) Make it better
+  assert(false);
+  std::terminate();
+}
+
 }  // namespace yaclib

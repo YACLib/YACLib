@@ -10,43 +10,43 @@
 namespace yaclib::detail {
 
 class BaseCore : public ITask {
- protected:
+ public:
   enum class State {
     Empty,
     HasResult,
     HasCallback,
-    HasInlineCallback,
-    HasWaitCallback,
-    Stopped,
+    HasCallbackInline,
+    HasWait,
+    HasStop,
   };
 
- public:
-  [[nodiscard]] bool Ready() const noexcept;
+  explicit BaseCore(State s) noexcept;
 
-  void Stop() noexcept;
+  [[nodiscard]] State GetState() const noexcept;
+  void SetState(State s) noexcept;
 
   [[nodiscard]] IExecutorPtr GetExecutor() const noexcept;
-
   void SetExecutor(IExecutorPtr executor) noexcept;
 
   void SetCallback(util::Ptr<ITask> callback);
-
-  bool SetWaitCallback(util::IRef& callback) noexcept;
-
-  bool ResetAfterTimeout() noexcept;
+  void SetCallbackInline(util::Ptr<ITask> callback);
+  bool SetWait(util::IRef& callback) noexcept;
+  bool ResetWait() noexcept;
 
  protected:
-  std::atomic<State> _state{State::Empty};
+  std::atomic<State> _state;
   util::Ptr<ITask> _caller;
   IExecutorPtr _executor{MakeInline()};
   util::Ptr<IRef> _callback;
 
-  void Execute();
-  void Execute(IExecutor& e);
-
-  void Cancel() noexcept final;
+  void Execute() noexcept;
+  void ExecuteInline() noexcept;
 
   void Clean() noexcept;
+
+  void Call() noexcept override;
+  virtual void CallInline(void* caller) noexcept;
+  void Cancel() noexcept final;
 };
 
 }  // namespace yaclib::detail

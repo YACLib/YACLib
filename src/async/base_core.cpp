@@ -1,19 +1,22 @@
 #include <yaclib/async/detail/base_core.hpp>
 
-#include <cassert>
-
 namespace yaclib::detail {
+
+BaseCore::BaseCore(State state) noexcept : _state{state} {
+}
 
 IExecutorPtr BaseCore::GetExecutor() const noexcept {
   return _executor;
 }
-
 void BaseCore::SetExecutor(IExecutorPtr executor) noexcept {
   _executor = std::move(executor);
 }
 
-bool BaseCore::Ready() const noexcept {
-  return _state.load(std::memory_order_acquire) == State::HasResult;
+BaseCore::State BaseCore::GetState() const noexcept {
+  return _state.load(std::memory_order_acquire);
+}
+void BaseCore::SetState(State s) noexcept {
+  _state.store(s, std::memory_order_release);
 }
 
 void BaseCore::SetCallback(util::Ptr<ITask> callback) {
@@ -23,26 +26,27 @@ void BaseCore::SetCallback(util::Ptr<ITask> callback) {
     Execute();
   }
 }
-
-void BaseCore::Stop() noexcept {
-  _state.store(State::Stopped, std::memory_order_release);
+void BaseCore::SetCallbackInline(util::Ptr<ITask> callback) {
+  _callback = std::move(callback);
+  const auto state = _state.exchange(State::HasCallbackInline, std::memory_order_acq_rel);
+  if (state == State::HasResult) {
+    ExecuteInline();
+  }
 }
-
-bool BaseCore::SetWaitCallback(util::IRef& callback) noexcept {
-  if (_state.load(std::memory_order_acquire) == State::HasResult) {
+bool BaseCore::SetWait(util::IRef& callback) noexcept {
+  if (GetState() == State::HasResult) {
     return true;
   }
   _callback = &callback;
   auto expected = State::Empty;
-  if (!_state.compare_exchange_strong(expected, State::HasWaitCallback, std::memory_order_acq_rel)) {
+  if (!_state.compare_exchange_strong(expected, State::HasWait, std::memory_order_acq_rel)) {
     _callback = nullptr;  // This is mean we have Result
     return true;
   }
   return false;
 }
-
-bool BaseCore::ResetAfterTimeout() noexcept {
-  auto expected = State::HasWaitCallback;
+bool BaseCore::ResetWait() noexcept {
+  auto expected = State::HasWait;
   if (_state.compare_exchange_strong(expected, State::Empty, std::memory_order_acq_rel)) {
     _callback = nullptr;  // This is mean we don't have executed callback
     return true;
@@ -50,14 +54,21 @@ bool BaseCore::ResetAfterTimeout() noexcept {
   return false;
 }
 
-void BaseCore::Execute() {
-  static_cast<BaseCore&>(*_callback)._caller = this;
-  Execute(*_executor);
+void BaseCore::Execute() noexcept {
+  auto& callback = static_cast<BaseCore&>(*_callback);
+  callback._caller = this;
+  _executor->Execute(callback);
+  Clean();
 }
 
-void BaseCore::Execute(IExecutor& e) {
-  e.Execute(static_cast<ITask&>(*_callback));
+void BaseCore::ExecuteInline() noexcept {
+  static_cast<BaseCore&>(*_callback).CallInline(this);
   Clean();
+}
+
+void BaseCore::Call() noexcept {
+}
+void BaseCore::CallInline(void* /*caller*/) noexcept {
 }
 
 void BaseCore::Cancel() noexcept {  // Opposite for Call with SetResult

@@ -16,10 +16,10 @@ class Serial : public IExecutor, public ITask {
   }
 
   ~Serial() override {
-    auto nodes{_tasks.TakeAllLIFO()};
-    auto task = static_cast<ITask*>(nodes);
+    auto* nodes{_tasks.TakeAllLIFO()};
+    auto* task = static_cast<ITask*>(nodes);
     while (task != nullptr) {
-      auto next = static_cast<ITask*>(task->_next);
+      auto* next = static_cast<ITask*>(task->_next);
       task->Cancel();
       task->DecRef();
       task = next;
@@ -27,11 +27,11 @@ class Serial : public IExecutor, public ITask {
   }
 
  private:
-  Type Tag() const final {
+  [[nodiscard]] Type Tag() const final {
     return Type::Serial;
   }
 
-  bool Execute(ITask& task) final {
+  bool Execute(ITask& task) noexcept final {
     task.IncRef();
     _tasks.Put(&task);
 

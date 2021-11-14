@@ -3,6 +3,7 @@
 #include <yaclib/executor/executor.hpp>
 #include <yaclib/executor/thread_factory.hpp>
 
+#include <cstddef>
 #include <thread>
 
 namespace yaclib {

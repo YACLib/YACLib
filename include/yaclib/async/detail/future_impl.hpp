@@ -1,12 +1,11 @@
 #pragma once
 
 #ifndef YACLIB_ASYNC_IMPL
-#error "You can not include this header directly, use yaclib/async/async.hpp"
+#error "You can not include this header directly, use yaclib/async/future.hpp"
 #endif
 
 #include <yaclib/algo/wait.hpp>
 #include <yaclib/async/detail/core.hpp>
-#include <yaclib/util/defer.hpp>
 
 #include <cassert>
 
@@ -33,39 +32,36 @@ struct Return;
 
 template <typename T, typename Functor>
 struct Return<T, Functor, 1> {
-  using Type = util::detail::ResultValueT<util::InvokeT<Functor, util::Result<T>>>;
-  static constexpr bool kIsAsync = util::IsFutureV<Type>;
+  using Type = util::InvokeT<Functor, util::Result<T>>;
 };
 
 template <typename T, typename Functor>
 struct Return<T, Functor, 2> {
-  using Type = util::detail::ResultValueT<util::InvokeT<Functor, T>>;
-  static constexpr bool kIsAsync = util::IsFutureV<Type>;
+  using Type = util::InvokeT<Functor, T>;
 };
 
 template <typename T, typename Functor>
 struct Return<T, Functor, 4> {
-  using Type = util::detail::ResultValueT<util::InvokeT<Functor, std::error_code>>;
-  static constexpr bool kIsAsync = util::IsFutureV<Type>;
+  using Type = util::InvokeT<Functor, std::error_code>;
 };
 
 template <typename T, typename Functor>
 struct Return<T, Functor, 8> {
-  using Type = util::detail::ResultValueT<util::InvokeT<Functor, std::exception_ptr>>;
-  static constexpr bool kIsAsync = util::IsFutureV<Type>;
+  using Type = util::InvokeT<Functor, std::exception_ptr>;
 };
 
 template <typename U, typename FunctorT, typename T>
-class Invoke {
+class SyncInvoke {
   using FunctorStoreT = std::decay_t<FunctorT>;
   using FunctorInvokeT =
       std::conditional_t<std::is_function_v<std::remove_reference_t<FunctorT>>, FunctorStoreT, FunctorT>;
 
  public:
-  explicit Invoke(FunctorStoreT&& f) noexcept(std::is_nothrow_move_constructible_v<FunctorStoreT>) : _f{std::move(f)} {
+  explicit SyncInvoke(FunctorStoreT&& f) noexcept(std::is_nothrow_move_constructible_v<FunctorStoreT>)
+      : _f{std::move(f)} {
   }
 
-  explicit Invoke(const FunctorStoreT& f) noexcept(std::is_nothrow_copy_constructible_v<FunctorStoreT>) : _f{f} {
+  explicit SyncInvoke(const FunctorStoreT& f) noexcept(std::is_nothrow_copy_constructible_v<FunctorStoreT>) : _f{f} {
   }
 
   util::Result<U> Wrapper(util::Result<T>&& r) noexcept {
@@ -107,26 +103,21 @@ class Invoke {
           return {std::forward<FunctorInvokeT>(_f)(std::move(r).Value())};
         }
       }
+      if (state == util::ResultState::Error) {
+        return {std::move(r).Error()};
+      }
+      assert(state == util::ResultState::Exception);
+      return {std::move(r).Exception()};
     } else if constexpr (util::IsInvocableV<FunctorInvokeT, std::error_code>) {
       if (state == util::ResultState::Error) {
         return {std::forward<FunctorInvokeT>(_f)(std::move(r).Error())};
       }
+      return std::move(r);
     } else if constexpr (util::IsInvocableV<FunctorInvokeT, std::exception_ptr>) {
       if (state == util::ResultState::Exception) {
         return {std::forward<FunctorInvokeT>(_f)(std::move(r).Exception())};
       }
-    }
-    if constexpr (std::is_same_v<T, U>) {
       return std::move(r);
-    } else {
-      switch (state) {
-        case util::ResultState::Error:
-          return {std::move(r).Error()};
-        case util::ResultState::Exception:
-          return {std::move(r).Exception()};
-        default:
-          assert(false);
-      }
     }
   }
 
@@ -140,14 +131,14 @@ class AsyncInvoke {
       std::conditional_t<std::is_function_v<std::remove_reference_t<FunctorT>>, FunctorStoreT, FunctorT>;
 
  public:
-  explicit AsyncInvoke(IExecutorPtr executor, Promise<U> promise,
+  explicit AsyncInvoke(detail::PromiseCorePtr<U> promise,
                        FunctorStoreT&& f) noexcept(std::is_nothrow_move_constructible_v<FunctorStoreT>)
-      : _executor{std::move(executor)}, _promise{std::move(promise)}, _f{std::move(f)} {
+      : _promise{std::move(promise)}, _f{std::move(f)} {
   }
 
-  explicit AsyncInvoke(IExecutorPtr executor, Promise<U> promise,
+  explicit AsyncInvoke(detail::PromiseCorePtr<U> promise,
                        const FunctorStoreT& f) noexcept(std::is_nothrow_copy_constructible_v<FunctorStoreT>)
-      : _executor{std::move(executor)}, _promise{std::move(promise)}, _f{f} {
+      : _promise{std::move(promise)}, _f{f} {
   }
 
   util::Result<void> Wrapper(util::Result<T>&& r) noexcept {
@@ -166,8 +157,8 @@ class AsyncInvoke {
  private:
   template <typename Arg>
   void WrapperSubscribe(Arg&& a) {
-    std::forward<FunctorInvokeT>(_f)(std::move(a))
-        .Subscribe(std::move(_executor), [promise = std::move(_promise)](util::Result<U>&& r) mutable {
+    std::forward<FunctorInvokeT>(_f)(std::forward<Arg>(a))
+        .SubscribeInline([promise = std::move(_promise)](util::Result<U>&& r) mutable {
           std::move(promise).Set(std::move(r));
         });
   }
@@ -178,66 +169,97 @@ class AsyncInvoke {
       if (state == util::ResultState::Value) {
         return WrapperSubscribe(std::move(r).Value());
       }
+      if (state == util::ResultState::Error) {
+        return std::move(_promise).Set(std::move(r).Error());
+      }
+      assert(state == util::ResultState::Exception);
+      return std::move(_promise).Set(std::move(r).Exception());
+      /** We can't use this strategy for other FunctorInvokeT,
+       *  because in that case user will not have compiled error for that case:
+       *  yaclib::MakeFuture(32) // state == util::ResultState::Value
+       *    .ThenInline([](std::exception_ptr/std::error_code) -> yaclib::Future<double> {
+       *      throw std::runtime_error{""};
+       *    })
+       *    .ThenInline([](yaclib::util::Result<double>) { // need double Value
+       *      return 1;
+       *    });
+       */
     } else if constexpr (util::IsInvocableV<FunctorInvokeT, std::error_code>) {
       if (state == util::ResultState::Error) {
         return WrapperSubscribe(std::move(r).Error());
       }
+      return std::move(_promise).Set(std::move(r));
     } else if constexpr (util::IsInvocableV<FunctorInvokeT, std::exception_ptr>) {
       if (state == util::ResultState::Exception) {
         return WrapperSubscribe(std::move(r).Exception());
       }
-    }
-    if constexpr (std::is_same_v<T, U>) {
       return std::move(_promise).Set(std::move(r));
-    } else {
-      switch (state) {
-        case util::ResultState::Error:
-          return std::move(_promise).Set(std::move(r).Error());
-        case util::ResultState::Exception:
-          return std::move(_promise).Set(std::move(r).Exception());
-        default:
-          assert(false);
-      }
     }
   }
 
-  IExecutorPtr _executor;
   Promise<U> _promise;
   FunctorStoreT _f;
 };
 
-template <typename U, typename T, typename Functor>
-Future<U> Then(FutureCorePtr<T> caller, Functor&& f) {
-  using InvokeT = detail::Invoke<U, decltype(std::forward<Functor>(f)), T>;
-  using CoreType = detail::Core<U, InvokeT, T>;
-  util::Ptr callback{new util::Counter<CoreType>{std::forward<Functor>(f)}};
-
+template <bool Inline, typename Ret, typename Arg, typename Functor>
+auto SetSyncCallback(FutureCorePtr<Arg> caller, Functor&& f) {
+  using InvokeT = detail::SyncInvoke<Ret, decltype(std::forward<Functor>(f)), Arg>;
+  using CoreT = detail::Core<Ret, InvokeT, Arg>;
+  util::Ptr callback{new util::Counter<CoreT>{std::forward<Functor>(f)}};
   callback->SetExecutor(caller->GetExecutor());
-  caller->SetCallback(callback);
-
-  return Future<U>{std::move(callback)};
+  if constexpr (Inline) {
+    caller->SetCallbackInline(callback);
+  } else {
+    caller->SetCallback(callback);
+  }
+  return callback;
 }
 
-template <typename U, typename T, typename Functor>
-Future<U> AsyncThen(FutureCorePtr<T> caller, Functor&& f) {
-  auto [future, promise] = MakeContract<U>();
-  future.Via(caller->GetExecutor());
+template <bool Inline, typename Ret, typename Arg, typename Functor>
+auto SetAsyncCallback(FutureCorePtr<Arg> caller, Functor&& f) {
+  util::Ptr next_callback{new util::Counter<detail::ResultCore<Ret>>{}};
+  next_callback->SetExecutor(caller->GetExecutor());
+  using InvokeT = detail::AsyncInvoke<Ret, decltype(std::forward<Functor>(f)), Arg>;
+  using CoreT = detail::Core<void, InvokeT, Arg>;
+  util::Ptr prev_callback{new util::Counter<CoreT>{next_callback, std::forward<Functor>(f)}};
+  prev_callback->SetExecutor(caller->GetExecutor());
+  if constexpr (Inline) {
+    caller->SetCallbackInline(prev_callback);
+  } else {
+    caller->SetCallback(prev_callback);
+  }
+  return next_callback;
+}
 
-  using InvokeT = detail::AsyncInvoke<U, decltype(std::forward<Functor>(f)), T>;
-  using CoreType = detail::Core<void, InvokeT, T>;
-  util::Ptr callback{new util::Counter<CoreType>{caller->GetExecutor(), std::move(promise), std::forward<Functor>(f)}};
-
-  callback->SetExecutor(caller->GetExecutor());
-  caller->SetCallback(callback);
-
-  return std::move(future);
+template <bool Subscribe, bool Inline, typename Arg, typename Functor>
+auto SetCallback(FutureCorePtr<Arg> caller, Functor&& f) {
+  // TODO(kononovk/MBkkt): think about how to distinguish first and second overloads,
+  //  when T is constructable from Result
+  using AsyncRet = util::detail::ResultValueT<typename detail::Return<Arg, Functor>::Type>;
+  constexpr bool kAsync = util::IsFutureV<AsyncRet>;
+  using Ret = util::detail::ResultValueT<util::detail::FutureValueT<AsyncRet>>;
+  if constexpr (Subscribe) {
+    if constexpr (kAsync) {
+      SetAsyncCallback<Inline, Ret>(std::move(caller), std::forward<Functor>(f));
+    } else {
+      SetSyncCallback<Inline, Ret>(std::move(caller), std::forward<Functor>(f));
+    }
+  } else {
+    if constexpr (kAsync) {
+      return Future<Ret>{SetAsyncCallback<Inline, Ret>(std::move(caller), std::forward<Functor>(f))};
+    } else {
+      return Future<Ret>{SetSyncCallback<Inline, Ret>(std::move(caller), std::forward<Functor>(f))};
+    }
+  }
 }
 
 }  // namespace detail
 
 template <typename T>
 Future<T>::~Future() {
-  std::move(*this).Stop();
+  if (_core) {
+    _core->SetState(detail::BaseCore::State::HasStop);
+  }
 }
 
 template <typename T>
@@ -247,19 +269,19 @@ bool Future<T>::Valid() const& noexcept {
 
 template <typename T>
 bool Future<T>::Ready() const& noexcept {
-  return _core->Ready();
+  return _core->GetState() == detail::BaseCore::State::HasResult;
 }
 
 template <typename T>
-const util::Result<T>* Future<T>::Get() const& {
-  if (_core->Ready()) {
+const util::Result<T>* Future<T>::Get() const& noexcept {
+  if (/*TODO(MBkkt): Maybe we want likely*/ Ready()) {
     return &_core->Get();
   }
   return nullptr;
 }
 
 template <typename T>
-util::Result<T> Future<T>::Get() && {
+util::Result<T> Future<T>::Get() && noexcept {
   if (!Ready()) {
     Wait(*this);
   }
@@ -269,9 +291,8 @@ util::Result<T> Future<T>::Get() && {
 
 template <typename T>
 void Future<T>::Stop() && {
-  if (auto core = std::exchange(_core, nullptr)) {
-    core->Stop();
-  }
+  _core->SetState(detail::BaseCore::State::HasStop);
+  _core = nullptr;
 }
 
 template <typename T>
@@ -280,48 +301,66 @@ void Future<T>::Detach() && {
 }
 
 template <typename T>
-Future<T>& Future<T>::Via(IExecutorPtr executor) & {
-  _core->SetExecutor(std::move(executor));
+Future<T>& Future<T>::Via(IExecutorPtr e) & {
+  assert(e);
+  _core->SetExecutor(std::move(e));
   return *this;
 }
 
 template <typename T>
-template <typename Functor>
-auto Future<T>::Then(Functor&& functor) && {
-  // TODO(kononovk/MBkkt): think about how to distinguish first and second overloads,
-  //  when T is constructable from Result
-  using Ret = detail::Return<T, Functor>;
-  if constexpr (Ret::kIsAsync) {
-    return detail::AsyncThen<util::detail::FutureValueT<typename Ret::Type>>(std::exchange(_core, nullptr),
-                                                                             std::forward<Functor>(functor));
-  } else {
-    return detail::Then<util::detail::ResultValueT<typename Ret::Type>>(std::exchange(_core, nullptr),
-                                                                        std::forward<Functor>(functor));
-  }
+Future<T>&& Future<T>::Via(IExecutorPtr e) && {
+  return std::move(Via(e));
 }
 
 template <typename T>
 template <typename Functor>
-auto Future<T>::Then(IExecutorPtr executor, Functor&& functor) && {
-  _core->SetExecutor(std::move(executor));
-  return std::move(*this).Then(std::forward<Functor>(functor));
+auto Future<T>::Then(Functor&& f) && {
+  return detail::SetCallback<false, false>(std::exchange(_core, nullptr), std::forward<Functor>(f));
 }
 
 template <typename T>
 template <typename Functor>
-void Future<T>::Subscribe(Functor&& functor) && {
-  std::move(*this).Then(std::forward<Functor>(functor)).Detach();  // Detach Future to avoid call Stop in dtor
+auto Future<T>::ThenInline(Functor&& f) && {
+  return detail::SetCallback<false, true>(std::exchange(_core, nullptr), std::forward<Functor>(f));
 }
 
 template <typename T>
 template <typename Functor>
-void Future<T>::Subscribe(IExecutorPtr executor, Functor&& functor) && {
-  _core->SetExecutor(std::move(executor));
-  std::move(*this).Subscribe(std::forward<Functor>(functor));
+auto Future<T>::Then(IExecutorPtr e, Functor&& f) && {
+  assert(e);
+  assert(e->Tag() != IExecutor::Type::Inline);
+  _core->SetExecutor(std::move(e));
+  return detail::SetCallback<false, false>(std::exchange(_core, nullptr), std::forward<Functor>(f));
+}
+
+template <typename T>
+template <typename Functor>
+void Future<T>::Subscribe(Functor&& f) && {
+  detail::SetCallback<true, false>(std::exchange(_core, nullptr), std::forward<Functor>(f));
+}
+
+template <typename T>
+template <typename Functor>
+void Future<T>::SubscribeInline(Functor&& f) && {
+  detail::SetCallback<true, true>(std::exchange(_core, nullptr), std::forward<Functor>(f));
+}
+
+template <typename T>
+template <typename Functor>
+void Future<T>::Subscribe(IExecutorPtr e, Functor&& f) && {
+  assert(e);
+  assert(e->Tag() != IExecutor::Type::Inline);
+  _core->SetExecutor(std::move(e));
+  detail::SetCallback<true, false>(std::exchange(_core, nullptr), std::forward<Functor>(f));
 }
 
 template <typename T>
 Future<T>::Future(detail::FutureCorePtr<T> core) : _core{std::move(core)} {
+}
+
+template <typename T>
+const detail::FutureCorePtr<T>& Future<T>::GetCore() const {
+  return _core;
 }
 
 }  // namespace yaclib

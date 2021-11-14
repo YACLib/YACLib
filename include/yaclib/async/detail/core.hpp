@@ -2,8 +2,6 @@
 
 #include <yaclib/async/detail/result_core.hpp>
 
-#include <cassert>
-
 namespace yaclib::detail {
 
 template <typename Ret, typename InvokeType, typename Arg>
@@ -17,33 +15,29 @@ class Core : public ResultCore<Ret> {
 
  private:
   void Call() noexcept final {
-    if (Base::_state.load(std::memory_order_acquire) == Base::State::Stopped) {
+    if (Base::GetState() == BaseCore::State::HasStop) {
       Base::Cancel();
       return;
     }
-    auto ret = [&] {
-      auto* caller = static_cast<ResultCore<Arg>*>(Base::_caller.Get());
-      if constexpr (std::is_void_v<Arg>) {
-        if (!caller) {
-          return util::Result<Arg>::Default();
-        }
+    auto* caller = static_cast<ResultCore<Arg>*>(Base::_caller.Get());
+    if constexpr (std::is_void_v<Arg>) {
+      if (!caller) {
+        Base::SetResult(_functor.Wrapper(util::Result<Arg>::Default()));
+        return;
       }
-      return std::move(caller->Get());
-    }();
-    Base::_caller = nullptr;
-    Base::SetResult(_functor.Wrapper(std::move(ret)));
+    }
+    Base::SetResult(_functor.Wrapper(std::move(caller->Get())));
+  }
+
+  void CallInline(void* caller) noexcept final {
+    if (Base::GetState() == BaseCore::State::HasStop) {
+      // Don't need to call Cancel, because we call Clean after CallInline and our _caller is nullptr
+      return;
+    }
+    Base::SetResult(_functor.Wrapper(std::move(static_cast<ResultCore<Arg>*>(caller)->Get())));
   }
 
   InvokeType _functor;
 };
-
-template <typename Result>
-class Core<Result, void, void> : public ResultCore<Result> {
-  void Call() noexcept final {
-    assert(false);  // This class using only via promise
-  }
-};
-
-extern template class Core<void, void, void>;
 
 }  // namespace yaclib::detail

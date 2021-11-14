@@ -4,7 +4,7 @@
 #include <yaclib/util/intrusive_ptr.hpp>
 #include <yaclib/util/ref.hpp>
 
-#include <memory>
+#include <type_traits>
 #include <utility>
 
 namespace yaclib::util {

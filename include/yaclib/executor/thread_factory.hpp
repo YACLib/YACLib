@@ -4,8 +4,7 @@
 #include <yaclib/util/intrusive_node.hpp>
 
 #include <cstddef>
-#include <functional>
-#include <memory>
+#include <string>
 
 namespace yaclib {
 

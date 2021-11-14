@@ -18,8 +18,23 @@ class WaitGroupT : public testing::Test {
   using Type = T;
 };
 
-using MyTypes = ::testing::Types<int, void>;
-TYPED_TEST_SUITE(WaitGroupT, MyTypes);
+class TypesNames {
+ public:
+  template <typename T>
+  static std::string GetName(int i) {
+    switch (i) {
+      case 0:
+        return "void";
+      case 1:
+        return "int";
+      default:
+        return "unknown";
+    }
+  }
+};
+
+using MyTypes = ::testing::Types<void, int>;
+TYPED_TEST_SUITE(WaitGroupT, MyTypes, TypesNames);
 
 void TestJustWorks() {
   auto tp = MakeThreadPool(1);
@@ -34,7 +49,7 @@ void TestJustWorks() {
   });
 
   wg.Add(f);
-  EXPECT_FALSE(f.Ready());
+  EXPECT_FALSE(f.Ready());  // TODO() We shouldn't touch the future until Wait
   wg.Wait();
   EXPECT_TRUE(f.Ready());
 
@@ -127,7 +142,7 @@ void TestGetWorks() {
   });
 
   wg.Add(f);
-  EXPECT_FALSE(f.Ready());
+  EXPECT_FALSE(f.Ready());  // TODO() We shouldn't touch the future until Wait
   wg.Wait();
   EXPECT_TRUE(f.Ready());
 
@@ -163,7 +178,7 @@ void TestCallbackWorks() {
   });
 
   wg.Add(f);
-  EXPECT_FALSE(f.Ready());
+  EXPECT_FALSE(f.Ready());  // TODO() We shouldn't touch the future until Wait
   wg.Wait();
   EXPECT_TRUE(f.Ready());
 
@@ -226,4 +241,9 @@ void TestMultithreaded() {
 
 TEST(WaitGroup, Multithreaded) {
   TestMultithreaded();
+}
+
+TEST(WaitGroup, Empty) {
+  yaclib::WaitGroup wg;
+  wg.Wait();
 }

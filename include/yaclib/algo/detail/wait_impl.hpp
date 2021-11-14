@@ -15,7 +15,7 @@ bool Wait(const Timeout& t, Cores&... cs) {
   static_assert((... && std::is_same_v<detail::BaseCore, Cores>), "Futures must be Future in Wait function");
   util::Counter<detail::WaitCore, detail::WaitCoreDeleter> wait_core;
   wait_core.IncRef();  // Optimization: we don't want to notify when return true immediately
-  if ((... & cs.SetWaitCallback(wait_core))) {
+  if ((... & cs.SetWait(wait_core))) {
     return true;
   }
   wait_core.DecRef();
@@ -29,10 +29,10 @@ bool Wait(const Timeout& t, Cores&... cs) {
       return true;
     }
     guard.unlock();
-    if ((... & cs.ResetAfterTimeout())) {
+    if ((... & cs.ResetWait())) {
       return false;
     }
-    // We know we have Result, but we must wait until callback was not used by executor
+    // We know we have Result, but we must wait until wait_core was not used by cs
     guard.lock();
   }
   wait_core.Wait(guard);
