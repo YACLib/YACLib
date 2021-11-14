@@ -17,7 +17,7 @@ namespace yaclib {
 template <typename Functor>
 auto Run(const IExecutorPtr& e, Functor&& f) {
   assert(e);
-  assert(e->Tag() != IExecutor::Type::Inline);
+  // assert(e->Tag() != IExecutor::Type::Inline);
   using AsyncRet = util::detail::ResultValueT<typename detail::Return<void, Functor, 2>::Type>;
   constexpr bool kIsAsync = util::IsFutureV<AsyncRet>;
   using Ret = util::detail::ResultValueT<util::detail::FutureValueT<AsyncRet>>;

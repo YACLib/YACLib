@@ -58,6 +58,7 @@ set(YACLIB_UNITS
   unit/executor/thread_pool
   unit/async/stress
   unit/executor/serial
+  unit/lazy/future
   )
 
 if (YACLIB_BUILD_EXAMPLES)
