@@ -45,7 +45,7 @@ class BaseCore : public ITask {
   void Clean() noexcept;
 
   void Call() noexcept override;
-  virtual void CallInline(void* caller) noexcept;
+  virtual void CallInline(void* caller) noexcept = 0;
   void Cancel() noexcept final;
 };
 

@@ -59,6 +59,7 @@ class Promise final {
 
   /// DETAIL
   explicit Promise(detail::PromiseCorePtr<T> core);
+  [[nodiscard]] const detail::PromiseCorePtr<T>& GetCore() const;
   /// DETAIL
 
  private:

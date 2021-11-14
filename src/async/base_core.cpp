@@ -68,8 +68,6 @@ void BaseCore::ExecuteInline() noexcept {
 
 void BaseCore::Call() noexcept {
 }
-void BaseCore::CallInline(void* /*caller*/) noexcept {
-}
 
 void BaseCore::Cancel() noexcept {  // Opposite for Call with SetResult
   _caller = nullptr;
