@@ -157,10 +157,9 @@ class AsyncInvoke {
  private:
   template <typename Arg>
   void WrapperSubscribe(Arg&& a) {
-    std::forward<FunctorInvokeT>(_f)(std::forward<Arg>(a))
-        .SubscribeInline([promise = std::move(_promise)](util::Result<U>&& r) mutable {
-          std::move(promise).Set(std::move(r));
-        });
+    auto future = std::forward<FunctorInvokeT>(_f)(std::forward<Arg>(a));
+    future.GetCore()->SetCallbackInline(_promise.GetCore());
+    std::move(future).Detach();
   }
 
   void WrapperOther(util::Result<T>&& r) {

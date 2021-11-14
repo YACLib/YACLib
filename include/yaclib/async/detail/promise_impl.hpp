@@ -31,6 +31,10 @@ void Promise<T>::Set() && {
 template <typename T>
 Promise<T>::Promise(detail::PromiseCorePtr<T> core) : _core{std::move(core)} {
 }
+template <typename T>
+const detail::PromiseCorePtr<T>& Promise<T>::GetCore() const {
+  return _core;
+}
 
 template <typename T>
 Contract<T> MakeContract() {
