@@ -130,7 +130,6 @@ class Result {
         throw ResultEmpty{};
       }
     }
-    Unreachable();
   }
 
   [[nodiscard]] ResultState State() const noexcept {

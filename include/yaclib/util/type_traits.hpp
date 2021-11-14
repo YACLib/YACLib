@@ -72,10 +72,4 @@ template <typename T>
 inline constexpr bool IsResultV = std::integral_constant<bool, IsInstantiationOf<Result, T>::value>::value;
 
 }  // namespace util
-
-[[noreturn]] inline void Unreachable() {  // TODO(MBkkt) Make it better
-  assert(false);
-  std::terminate();
-}
-
 }  // namespace yaclib
