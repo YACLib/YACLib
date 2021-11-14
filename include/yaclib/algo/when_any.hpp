@@ -17,7 +17,7 @@ enum class PolicyWhenAny {
 namespace detail {
 
 template <typename T, PolicyWhenAny P>
-class AnyCombinator : public util::IRef {
+class AnyCombinator : public BaseCore {
  public:
   static std::pair<Future<T>, util::Ptr<AnyCombinator>> Make(bool empty = true) {
     auto [future, promise] = MakeContract<T>();
@@ -26,6 +26,14 @@ class AnyCombinator : public util::IRef {
       return {std::move(future), nullptr};
     }
     return {std::move(future), new util::Counter<AnyCombinator<T, P>>{std::move(promise)}};
+  }
+
+  void LastInlineCall(void* context) noexcept final {
+    if (BaseCore::_state.load(std::memory_order_acquire) == BaseCore::State::Stopped) {
+      return;
+    }
+    auto* caller = static_cast<ResultCore<T>*>(context);
+    Combine(std::move(caller->Get()));
   }
 
   void Combine(util::Result<T>&& result) {
@@ -49,7 +57,7 @@ class AnyCombinator : public util::IRef {
   }
 
  private:
-  explicit AnyCombinator(Promise<T> promise) : _promise{std::move(promise)} {
+  explicit AnyCombinator(Promise<T> promise) : BaseCore{BaseCore::State::Empty}, _promise{std::move(promise)} {
   }
 
   alignas(kCacheLineSize) std::atomic<bool> _done{false};
@@ -59,7 +67,7 @@ class AnyCombinator : public util::IRef {
 };
 
 template <typename T>
-class AnyCombinator<T, PolicyWhenAny::LastError> : public util::IRef {
+class AnyCombinator<T, PolicyWhenAny::LastError> : public BaseCore {
  public:
   static std::pair<Future<T>, util::Ptr<AnyCombinator>> Make(size_t size = 0) {
     auto [future, promise] = MakeContract<T>();
@@ -68,6 +76,14 @@ class AnyCombinator<T, PolicyWhenAny::LastError> : public util::IRef {
       return {std::move(future), nullptr};
     }
     return {std::move(future), new util::Counter<AnyCombinator<T, PolicyWhenAny::LastError>>{std::move(promise), size}};
+  }
+
+  void LastInlineCall(void* context) noexcept final {
+    if (BaseCore::_state.load(std::memory_order_acquire) == BaseCore::State::Stopped) {
+      return;
+    }
+    auto* caller = static_cast<ResultCore<T>*>(context);
+    Combine(std::move(caller->Get()));
   }
 
   void Combine(util::Result<T>&& result) {
@@ -85,7 +101,8 @@ class AnyCombinator<T, PolicyWhenAny::LastError> : public util::IRef {
   }
 
  private:
-  explicit AnyCombinator(Promise<T> promise, size_t size = 0) : _size{size}, _promise{std::move(promise)} {
+  explicit AnyCombinator(Promise<T> promise, size_t size = 0)
+      : BaseCore{BaseCore::State::Empty}, _size{size}, _promise{std::move(promise)} {
   }
 
   alignas(kCacheLineSize) std::atomic<bool> _done{false};
@@ -98,10 +115,7 @@ using AnyCombinatorPtr = util::Ptr<AnyCombinator<T, P>>;
 
 template <PolicyWhenAny P = PolicyWhenAny::FirstError, typename T, typename... Fs>
 void WhenAnyImpl(detail::AnyCombinatorPtr<T, P>& combinator, Future<T>&& head, Fs&&... tail) {
-  std::move(head).Subscribe([c = combinator](util::Result<T>&& result) mutable {
-    c->Combine(std::move(result));
-    c = nullptr;
-  });
+  std::move(head).LastInline(combinator);
   if constexpr (sizeof...(tail) != 0) {
     WhenAnyImpl(combinator, std::forward<Fs>(tail)...);
   }
@@ -129,10 +143,7 @@ auto WhenAny(It begin, size_t size) {
     }
   }();
   for (size_t i = 0; i != size; ++i) {
-    std::move(*begin).Subscribe([c = combinator](util::Result<T>&& result) mutable {
-      c->Combine(std::move(result));
-      c = nullptr;
-    });
+    std::move(*begin).LastInline(combinator);
     ++begin;
   }
   return std::move(future);
@@ -158,10 +169,7 @@ auto WhenAny(It begin, It end) {
     }
   }();
   for (; begin != end; ++begin) {
-    std::move(*begin).Subscribe([c = combinator](util::Result<T>&& result) mutable {
-      c->Combine(std::move(result));
-      c = nullptr;
-    });
+    std::move(*begin).LastInline(combinator);
   }
   return std::move(future);
 }

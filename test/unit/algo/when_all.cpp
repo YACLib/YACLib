@@ -17,6 +17,16 @@ enum class TestSuite {
   Array,
 };
 
+template <typename T>
+class WaitAllT : public testing::Test {
+ public:
+  using Type = T;
+};
+
+using MyTypes = ::testing::Types<int, void>;
+
+TYPED_TEST_SUITE(WaitAllT, MyTypes);
+
 template <TestSuite suite, typename T = int>
 void JustWorks() {
   constexpr int kSize = 3;
@@ -73,20 +83,12 @@ void JustWorks() {
   }
 }
 
-TEST(Vector, JustWorks) {
-  JustWorks<TestSuite::Vector>();
+TYPED_TEST(WaitAllT, VectorJustWorks) {
+  JustWorks<TestSuite::Vector, typename TestFixture::Type>();
 }
 
-TEST(VoidVector, JustWorks) {
-  JustWorks<TestSuite::Vector, void>();
-}
-
-TEST(Array, JustWorks) {
-  JustWorks<TestSuite::Array>();
-}
-
-TEST(VoidArray, JustWorks) {
-  JustWorks<TestSuite::Array, void>();
+TYPED_TEST(WaitAllT, ArrayJustWorks) {
+  JustWorks<TestSuite::Array, typename TestFixture::Type>();
 }
 
 template <TestSuite suite, typename T = void>
@@ -120,20 +122,12 @@ void AllFails() {
   EXPECT_THROW(std::move(all).Get().Ok(), std::runtime_error);
 }
 
-TEST(Vector, AllFails) {
-  AllFails<TestSuite::Vector>();
+TYPED_TEST(WaitAllT, VectorAllFails) {
+  AllFails<TestSuite::Vector, typename TestFixture::Type>();
 }
 
-TEST(Array, AllFails) {
-  AllFails<TestSuite::Array>();
-}
-
-TEST(VoidVector, AllFails) {
-  AllFails<TestSuite::Vector, void>();
-}
-
-TEST(VoidArray, AllFails) {
-  AllFails<TestSuite::Array, void>();
+TYPED_TEST(WaitAllT, ArrayAllFails) {
+  AllFails<TestSuite::Array, typename TestFixture::Type>();
 }
 
 template <typename T = int>
@@ -203,20 +197,12 @@ void MultiThreaded() {
   tp->Wait();
 }
 
-TEST(Vector, MultiThreaded) {
-  MultiThreaded<TestSuite::Vector>();
+TYPED_TEST(WaitAllT, VectorMultiThreaded) {
+  MultiThreaded<TestSuite::Vector, typename TestFixture::Type>();
 }
 
-TEST(VoidVector, MultiThreaded) {
-  MultiThreaded<TestSuite::Vector, void>();
-}
-
-TEST(Array, MultiThreaded) {
-  MultiThreaded<TestSuite::Array>();
-}
-
-TEST(VoidArray, MultiThreaded) {
-  MultiThreaded<TestSuite::Array, void>();
+TYPED_TEST(WaitAllT, ArrayMultiThreaded) {
+  MultiThreaded<TestSuite::Array, typename TestFixture::Type>();
 }
 
 }  // namespace
