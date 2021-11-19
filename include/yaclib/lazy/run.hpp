@@ -5,18 +5,12 @@
 #include <yaclib/async/run.hpp>
 #include <yaclib/executor/executor.hpp>
 
+#include <condition_variable>
 #include <iostream>
 #include <optional>
 #include <type_traits>
 
 namespace yaclib::detail {
-
-class Callable : public ITask {
- public:
-  void operator()() {
-    std::cout << "Callable" << std::endl;
-  }
-};
 
 template <typename Functor, typename PrevProxy>
 class Proxy;
@@ -26,9 +20,6 @@ struct Nil {
   using FunctorT = void;
   using ReturnType = void;
 };
-
-template <typename T, typename Proxy>
-class LazyCore;
 
 template <typename P>
 struct GetProxySize;
@@ -43,53 +34,50 @@ struct GetProxySize<Proxy<Functor, PrevProxy>> {
   constexpr static size_t value = 1 + GetProxySize<PrevProxy>::value;
 };
 
-template <typename T, typename F, typename PP>
-class LazyCore<T, Proxy<F, PP>> : public ResultCore<T> {
- public:
-  using ProxyT = Proxy<F, PP>;
-  static constexpr size_t kProxySize = GetProxySize<ProxyT>::value;
-
-  LazyCore(ProxyT&& proxy) : _proxy(std::move(proxy)) {
-  }
-
-  void Call() noexcept final {
-    std::cout << "Here" << std::endl;
-    /*auto e = _proxy.Call(_state);
-    _state++;
-    e->Execute(*this);*/
-  }
-
- private:
-  ProxyT _proxy;
-  size_t _state{0};
-};
+template <typename T, typename Proxy>
+class LazyCore : ITask {};
 
 template <typename Functor, typename PrevProxy = Nil>
-class Proxy {
-  // TODO: static_assert that PrevProxy == Nil or PrevProxy == Proxy<T>
-  // TODO: add overloading for const lvalue ref, etc.
+class Proxy : public ITask {
  public:
   using ReturnType = util::InvokeT<Functor, typename PrevProxy::ReturnType>;
   using PrevP = PrevProxy;
   using FunctorStoreT = std::decay_t<Functor>;
 
   Proxy(FunctorStoreT&& f, IExecutorPtr e, PrevProxy&& prev)
-      : _f(std::move(f)), _e(std::move(e)), _next(std::move(prev)) {
+      : _f(std::move(f)), _e(std::move(e)), _prev(std::move(prev)) {
   }
 
-  Proxy(const FunctorStoreT& f, IExecutorPtr e, const PrevProxy& prev) : _f(f), _e(std::move(e)), _next(prev) {
+  Proxy(const FunctorStoreT& f, IExecutorPtr e, const PrevProxy& prev) : _f(f), _e(std::move(e)), _prev(prev) {
   }
 
   // Constructor for base proxy object only
-  Proxy(FunctorStoreT&& f, IExecutorPtr e) : _f(std::move(f)), _e(std::move(e)), _next(Nil{}) {
+  Proxy(FunctorStoreT&& f, IExecutorPtr e) : _f(std::move(f)), _e(std::move(e)), _prev(Nil{}) {
     static_assert(std::is_same_v<PrevProxy, Nil>);
   }
 
-  IExecutorPtr Call(int) {
-    return _e;
-    // iterate to i
-    // variant[i + 1] = _f(variant[i]);
-    // return executor[i +1];
+  void Execute() {
+    if (GetProxySize<Proxy>::value == _index) {
+      _index++;
+      _e->Execute(*this);
+    } else {
+      _prev.Execute();
+    }
+  }
+
+  void AnotherMethod(int index) {
+    if (GetProxySize<Proxy>::value == index) {
+      _f();
+    } else {
+      _prev.AnotherMethod(index);
+    }
+  }
+
+  void Call() noexcept final {
+    AnotherMethod(_index);
+    if (_index != GetProxySize<Proxy>::value) {
+      Execute();
+    }
   }
 
   template <typename F>
@@ -103,6 +91,28 @@ class Proxy {
   }
 
   ReturnType Get() && {
+    ReturnType result;
+    std::condition_variable cv;
+    std::mutex m;
+    bool ready{false};
+
+    auto final = std::move(*this).Then([&](ReturnType r) {
+      result = std::move(r);
+      {
+        std::lock_guard guard{m};
+        ready = true;
+      }
+      cv.notify_one();
+    });
+    LazyCore<ReturnType, Proxy> core{final};
+    _e->Execute(core);
+
+    std::unique_lock guard{m};
+    while (!ready) {
+      cv.wait(guard);
+    }
+    guard.unlock();
+    return result;
   }
 
   Future<ReturnType> Make() && {
@@ -116,7 +126,8 @@ class Proxy {
  private:
   FunctorStoreT _f;
   IExecutorPtr _e;
-  PrevProxy _next{};
+  PrevProxy _prev{};
+  size_t _index{0};
 };
 
 template <class Functor>
