@@ -9,7 +9,7 @@
 #include <optional>
 #include <type_traits>
 
-namespace yaclib {
+namespace yaclib::detail {
 
 class Callable : public ITask {
  public:
@@ -26,8 +26,6 @@ struct Nil {
   using FunctorT = void;
   using ReturnType = void;
 };
-
-namespace detail {
 
 template <typename T, typename Proxy>
 class LazyCore;
@@ -54,10 +52,11 @@ class LazyCore<T, Proxy<F, PP>> : public ResultCore<T> {
   LazyCore(ProxyT&& proxy) : _proxy(std::move(proxy)) {
   }
 
-  void Call() {
-    auto e = _proxy.Call(_state);
+  void Call() noexcept final {
+    std::cout << "Here" << std::endl;
+    /*auto e = _proxy.Call(_state);
     _state++;
-    e->Execute(*this);
+    e->Execute(*this);*/
   }
 
  private:
@@ -65,16 +64,14 @@ class LazyCore<T, Proxy<F, PP>> : public ResultCore<T> {
   size_t _state{0};
 };
 
-}  // namespace detail
-
 template <typename Functor, typename PrevProxy = Nil>
 class Proxy {
+  // TODO: static_assert that PrevProxy == Nil or PrevProxy == Proxy<T>
+  // TODO: add overloading for const lvalue ref, etc.
  public:
   using ReturnType = util::InvokeT<Functor, typename PrevProxy::ReturnType>;
   using PrevP = PrevProxy;
   using FunctorStoreT = std::decay_t<Functor>;
-  // TODO: static_assert that PrevProxy == Nil or PrevProxy == Proxy<T>
-  // TODO: add overloading for const lvalue ref, etc.
 
   Proxy(FunctorStoreT&& f, IExecutorPtr e, PrevProxy&& prev)
       : _f(std::move(f)), _e(std::move(e)), _next(std::move(prev)) {
@@ -83,6 +80,7 @@ class Proxy {
   Proxy(const FunctorStoreT& f, IExecutorPtr e, const PrevProxy& prev) : _f(f), _e(std::move(e)), _next(prev) {
   }
 
+  // Constructor for base proxy object only
   Proxy(FunctorStoreT&& f, IExecutorPtr e) : _f(std::move(f)), _e(std::move(e)), _next(Nil{}) {
     static_assert(std::is_same_v<PrevProxy, Nil>);
   }
@@ -107,14 +105,12 @@ class Proxy {
   ReturnType Get() && {
   }
 
-  auto Finalize() && {
-    std::cout << detail::GetProxySize<Proxy>::value << std::endl;
-    /*using CoreT = detail::LazyCore<ReturnType, Proxy>;
+  Future<ReturnType> Make() && {
+    using CoreT = detail::LazyCore<ReturnType, Proxy>;
     IExecutorPtr e = _e;
     util::Ptr core{new util::Counter<CoreT>{std::move(*this)}};
     e->Execute(*core);
-    return Future<ReturnType>{std::move(core)};*/
-    return 0;
+    return Future<ReturnType>{std::move(core)};
   }
 
  private:
@@ -126,16 +122,13 @@ class Proxy {
 template <class Functor>
 Proxy(Functor&&, IExecutorPtr) -> Proxy<std::decay_t<Functor>, Nil>;
 
-/**
- * Execute Callable functor via executor
- *
- * \param e executor to be used to execute f and saved as callback executor for return \ref Future
- * \param f functor to execute
- * \return \ref Future corresponding f return value
- */
+}  // namespace yaclib::detail
+
+namespace yaclib {
+
 template <typename Functor>
 auto LazyRun(IExecutorPtr e, Functor&& f) {
-  return Proxy{std::forward<Functor>(f), std::move(e)};
+  return detail::Proxy{std::forward<Functor>(f), std::move(e)};
 }
 
 }  // namespace yaclib

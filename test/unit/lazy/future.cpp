@@ -20,7 +20,7 @@ TEST(Simple, Simple) {
       .Then([] {
         std::cout << "4" << std::endl;
       })
-      .Finalize();
+      .Make();
 }
 
 }  // namespace
