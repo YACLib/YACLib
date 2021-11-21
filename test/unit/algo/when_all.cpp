@@ -17,6 +17,16 @@ enum class TestSuite {
   Array,
 };
 
+template <typename T>
+class WaitAllT : public testing::Test {
+ public:
+  using Type = T;
+};
+
+using MyTypes = ::testing::Types<int, void>;
+
+TYPED_TEST_SUITE(WaitAllT, MyTypes);
+
 template <TestSuite suite, typename T = int>
 void JustWorks() {
   constexpr int kSize = 3;
@@ -73,20 +83,12 @@ void JustWorks() {
   }
 }
 
-TEST(Vector, JustWorks) {
-  JustWorks<TestSuite::Vector>();
+TYPED_TEST(WaitAllT, VectorJustWorks) {
+  JustWorks<TestSuite::Vector, typename TestFixture::Type>();
 }
 
-TEST(VoidVector, JustWorks) {
-  JustWorks<TestSuite::Vector, void>();
-}
-
-TEST(Array, JustWorks) {
-  JustWorks<TestSuite::Array>();
-}
-
-TEST(VoidArray, JustWorks) {
-  JustWorks<TestSuite::Array, void>();
+TYPED_TEST(WaitAllT, ArrayJustWorks) {
+  JustWorks<TestSuite::Array, typename TestFixture::Type>();
 }
 
 template <TestSuite suite, typename T = void>
@@ -120,20 +122,49 @@ void AllFails() {
   EXPECT_THROW(std::move(all).Get().Ok(), std::runtime_error);
 }
 
-TEST(Vector, AllFails) {
-  AllFails<TestSuite::Vector>();
+TYPED_TEST(WaitAllT, VectorAllFails) {
+  AllFails<TestSuite::Vector, typename TestFixture::Type>();
 }
 
-TEST(Array, AllFails) {
-  AllFails<TestSuite::Array>();
+TYPED_TEST(WaitAllT, ArrayAllFails) {
+  AllFails<TestSuite::Array, typename TestFixture::Type>();
 }
 
-TEST(VoidVector, AllFails) {
-  AllFails<TestSuite::Vector, void>();
+template <TestSuite suite, typename T = void>
+void ErrorFails() {
+  constexpr int kSize = 3;
+  std::array<Promise<T>, kSize> promises;
+  std::array<Future<T>, kSize> futures;
+  for (int i = 0; i < kSize; ++i) {
+    auto [f, p] = MakeContract<T>();
+    futures[i] = std::move(f);
+    promises[i] = std::move(p);
+  }
+
+  auto all = [&futures] {
+    if constexpr (suite == TestSuite::Array) {
+      return WhenAll(std::move(futures[0]), std::move(futures[1]), std::move(futures[2]));
+    } else {
+      return WhenAll(futures.begin(), futures.end());
+    }
+  }();
+
+  EXPECT_FALSE(all.Ready());
+
+  std::move(promises[1]).Set(std::error_code{});
+
+  EXPECT_TRUE(all.Ready());
+
+  // Second error
+  std::move(promises[1]).Set(std::error_code{});
 }
 
-TEST(VoidArray, AllFails) {
-  AllFails<TestSuite::Array, void>();
+TYPED_TEST(WaitAllT, VectorErrorFails) {
+  ErrorFails<TestSuite::Vector, typename TestFixture::Type>();
+}
+
+TYPED_TEST(WaitAllT, ArrayErrorFails) {
+  ErrorFails<TestSuite::Array, typename TestFixture::Type>();
 }
 
 template <typename T = int>
@@ -203,20 +234,12 @@ void MultiThreaded() {
   tp->Wait();
 }
 
-TEST(Vector, MultiThreaded) {
-  MultiThreaded<TestSuite::Vector>();
+TYPED_TEST(WaitAllT, VectorMultiThreaded) {
+  MultiThreaded<TestSuite::Vector, typename TestFixture::Type>();
 }
 
-TEST(VoidVector, MultiThreaded) {
-  MultiThreaded<TestSuite::Vector, void>();
-}
-
-TEST(Array, MultiThreaded) {
-  MultiThreaded<TestSuite::Array>();
-}
-
-TEST(VoidArray, MultiThreaded) {
-  MultiThreaded<TestSuite::Array, void>();
+TYPED_TEST(WaitAllT, ArrayMultiThreaded) {
+  MultiThreaded<TestSuite::Array, typename TestFixture::Type>();
 }
 
 }  // namespace
