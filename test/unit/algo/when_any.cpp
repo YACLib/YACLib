@@ -12,7 +12,37 @@ namespace {
 using namespace yaclib;
 using namespace std::chrono_literals;
 
-enum class TestSuite { Vector, Array };
+enum class TestSuite {
+  Vector,
+  Array,
+};
+
+template <typename T>
+class WaitAnyT : public testing::Test {
+ public:
+  using Type = T;
+};
+
+using MyTypes = ::testing::Types<int, void>;
+
+TYPED_TEST_SUITE(WaitAnyT, MyTypes);
+
+template <TestSuite suite, typename T = int, PolicyWhenAny P = PolicyWhenAny::FirstError, int kSize = 3>
+auto FillArrays(std::array<Promise<T>, kSize>& promises, std::array<Future<T>, kSize>& futures) {
+  for (int i = 0; i < kSize; ++i) {
+    auto [f, p] = MakeContract<T>();
+    futures[i] = std::move(f);
+    promises[i] = std::move(p);
+  }
+
+  return [&futures] {
+    if constexpr (suite == TestSuite::Array) {
+      return WhenAny<P>(std::move(futures[0]), std::move(futures[1]), std::move(futures[2]));
+    } else {
+      return WhenAny<P>(futures.begin(), futures.end());
+    }
+  }();
+}
 
 template <TestSuite suite, typename T = int, PolicyWhenAny P = PolicyWhenAny::FirstError>
 void JustWorks() {
@@ -20,18 +50,7 @@ void JustWorks() {
 
   std::array<Promise<T>, kSize> promises;
   std::array<Future<T>, kSize> futures;
-  for (int i = 0; i < kSize; ++i) {
-    auto [f, p] = MakeContract<T>();
-    futures[i] = std::move(f);
-    promises[i] = std::move(p);
-  }
-  auto any = [&futures] {
-    if constexpr (suite == TestSuite::Array) {
-      return WhenAny<P>(std::move(futures[0]), std::move(futures[1]), std::move(futures[2]));
-    } else {
-      return WhenAny<P>(futures.begin(), futures.end());
-    }
-  }();
+  auto any = FillArrays<suite, T, P, 3>(promises, futures);
 
   EXPECT_FALSE(any.Ready());
 
@@ -49,36 +68,20 @@ void JustWorks() {
   }
 }
 
-TEST(VectorFirstError, JustWorks) {
-  JustWorks<TestSuite::Vector>();
+TYPED_TEST(WaitAnyT, VectorFirstErrorJustWorks) {
+  JustWorks<TestSuite::Vector, typename TestFixture::Type>();
 }
 
-TEST(VectorLastError, JustWorks) {
-  JustWorks<TestSuite::Vector, int, PolicyWhenAny::LastError>();
+TYPED_TEST(WaitAnyT, VectorLastErrorJustWorks) {
+  JustWorks<TestSuite::Vector, typename TestFixture::Type, PolicyWhenAny::LastError>();
 }
 
-TEST(VoidVectorFirstError, JustWorks) {
-  JustWorks<TestSuite::Vector, void>();
+TYPED_TEST(WaitAnyT, ArrayFirstErrorJustWorks) {
+  JustWorks<TestSuite::Array, typename TestFixture::Type>();
 }
 
-TEST(VoidVectorLastError, JustWorks) {
-  JustWorks<TestSuite::Vector, void, PolicyWhenAny::LastError>();
-}
-
-TEST(ArrayFirstError, JustWorks) {
-  JustWorks<TestSuite::Array>();
-}
-
-TEST(ArrayLastError, JustWorks) {
-  JustWorks<TestSuite::Array, int, PolicyWhenAny::LastError>();
-}
-
-TEST(VoidArrayFirstError, JustWorks) {
-  JustWorks<TestSuite::Array, void>();
-}
-
-TEST(VoidArrayLastError, JustWorks) {
-  JustWorks<TestSuite::Array, void, PolicyWhenAny::LastError>();
+TYPED_TEST(WaitAnyT, ArrayLastErrorJustWorks) {
+  JustWorks<TestSuite::Array, typename TestFixture::Type, PolicyWhenAny::LastError>();
 }
 
 template <TestSuite suite, typename T = void, PolicyWhenAny P = PolicyWhenAny::FirstError>
@@ -86,19 +89,7 @@ void AllFails() {
   constexpr int kSize = 3;
   std::array<Promise<T>, kSize> promises;
   std::array<Future<T>, kSize> futures;
-  for (int i = 0; i < kSize; ++i) {
-    auto [f, p] = MakeContract<T>();
-    futures[i] = std::move(f);
-    promises[i] = std::move(p);
-  }
-
-  auto any = [&futures] {
-    if constexpr (suite == TestSuite::Array) {
-      return WhenAny<P>(std::move(futures[0]), std::move(futures[1]), std::move(futures[2]));
-    } else {
-      return WhenAny<P>(futures.begin(), futures.end());
-    }
-  }();
+  auto any = FillArrays<suite, T, P, 3>(promises, futures);
 
   EXPECT_FALSE(any.Ready());
 
@@ -118,36 +109,20 @@ void AllFails() {
   }
 }
 
-TEST(VectorFirstError, AllFails) {
-  AllFails<TestSuite::Vector>();
+TYPED_TEST(WaitAnyT, VectorFirstErrorAllFails) {
+  AllFails<TestSuite::Vector, typename TestFixture::Type>();
 }
 
-TEST(VectorLastError, AllFails) {
-  AllFails<TestSuite::Vector, int, PolicyWhenAny::LastError>();
+TYPED_TEST(WaitAnyT, VectorLastErrorAllFails) {
+  AllFails<TestSuite::Vector, typename TestFixture::Type, PolicyWhenAny::LastError>();
 }
 
-TEST(VoidVectorFirstError, AllFails) {
-  AllFails<TestSuite::Vector, void>();
+TYPED_TEST(WaitAnyT, ArrayFirstErrorAllFails) {
+  AllFails<TestSuite::Array, typename TestFixture::Type>();
 }
 
-TEST(VoidVectorLastError, AllFails) {
-  AllFails<TestSuite::Vector, void, PolicyWhenAny::LastError>();
-}
-
-TEST(ArrayFirstError, AllFails) {
-  AllFails<TestSuite::Array>();
-}
-
-TEST(ArrayLastError, AllFails) {
-  AllFails<TestSuite::Array, int, PolicyWhenAny::LastError>();
-}
-
-TEST(VoidArrayFirstError, AllFails) {
-  AllFails<TestSuite::Array, void>();
-}
-
-TEST(VoidArrayLastError, AllFails) {
-  AllFails<TestSuite::Array, void, PolicyWhenAny::LastError>();
+TYPED_TEST(WaitAnyT, ArrayLastErrorAllFails) {
+  AllFails<TestSuite::Array, typename TestFixture::Type, PolicyWhenAny::LastError>();
 }
 
 template <TestSuite suite, typename T = int, PolicyWhenAny P = PolicyWhenAny::FirstError>
@@ -155,19 +130,7 @@ void ResultWithFails() {
   constexpr int kSize = 3;
   std::array<Promise<T>, kSize> promises;
   std::array<Future<T>, kSize> futures;
-  for (int i = 0; i < kSize; ++i) {
-    auto [f, p] = MakeContract<T>();
-    futures[i] = std::move(f);
-    promises[i] = std::move(p);
-  }
-
-  auto any = [&futures] {
-    if constexpr (suite == TestSuite::Array) {
-      return WhenAny<P>(std::move(futures[0]), std::move(futures[1]), std::move(futures[2]));
-    } else {
-      return WhenAny<P>(futures.begin(), futures.end());
-    }
-  }();
+  auto any = FillArrays<suite, T, P, 3>(promises, futures);
 
   EXPECT_FALSE(any.Ready());
 
@@ -188,36 +151,20 @@ void ResultWithFails() {
   }
 }
 
-TEST(VectorFirstError, ResultWithFails) {
-  ResultWithFails<TestSuite::Vector>();
+TYPED_TEST(WaitAnyT, VectorFirstErrorResultWithFails) {
+  AllFails<TestSuite::Vector, typename TestFixture::Type>();
 }
 
-TEST(VectorLastError, ResultWithFails) {
-  ResultWithFails<TestSuite::Vector, int, PolicyWhenAny::LastError>();
+TYPED_TEST(WaitAnyT, VectorLastErrorResultWithFails) {
+  AllFails<TestSuite::Vector, typename TestFixture::Type, PolicyWhenAny::LastError>();
 }
 
-TEST(VoidVectorFirstError, ResultWithFails) {
-  ResultWithFails<TestSuite::Vector, void>();
+TYPED_TEST(WaitAnyT, ArrayFirstErrorResultWithFails) {
+  AllFails<TestSuite::Array, typename TestFixture::Type>();
 }
 
-TEST(VoidVectorLastError, ResultWithFails) {
-  ResultWithFails<TestSuite::Vector, void, PolicyWhenAny::LastError>();
-}
-
-TEST(ArrayFirstError, ResultWithFails) {
-  ResultWithFails<TestSuite::Array>();
-}
-
-TEST(ArrayLastError, ResultWithFails) {
-  ResultWithFails<TestSuite::Array, int, PolicyWhenAny::LastError>();
-}
-
-TEST(VoidArrayFirstError, ResultWithFails) {
-  ResultWithFails<TestSuite::Array, void>();
-}
-
-TEST(VoidArrayLastError, ResultWithFails) {
-  ResultWithFails<TestSuite::Array, void, PolicyWhenAny::LastError>();
+TYPED_TEST(WaitAnyT, ArrayLastErrorResultWithFails) {
+  AllFails<TestSuite::Array, typename TestFixture::Type, PolicyWhenAny::LastError>();
 }
 
 template <typename T = int, PolicyWhenAny P = PolicyWhenAny::FirstError>
@@ -230,20 +177,12 @@ void EmptyInput() {
   EXPECT_THROW(std::move(any).Get().Ok(), std::exception);
 }
 
-TEST(VectorFirstError, EmptyInput) {
-  EmptyInput();
+TYPED_TEST(WaitAnyT, FirstErrorEmptyInput) {
+  EmptyInput<typename TestFixture::Type>();
 }
 
-TEST(VectorLastError, EmptyInput) {
-  EmptyInput<int, PolicyWhenAny::LastError>();
-}
-
-TEST(VoidVectorFirstError, EmptyInput) {
-  EmptyInput<void>();
-}
-
-TEST(VoidVectorLastError, EmptyInput) {
-  EmptyInput<void, PolicyWhenAny::LastError>();
+TYPED_TEST(WaitAnyT, LastErrorEmptyInput) {
+  EmptyInput<typename TestFixture::Type, PolicyWhenAny::LastError>();
 }
 
 template <TestSuite suite, typename T = int, PolicyWhenAny P = PolicyWhenAny::FirstError>
@@ -293,36 +232,20 @@ void MultiThreaded() {
   tp->Wait();
 }
 
-TEST(VectorFirstError, MultiThreaded) {
-  MultiThreaded<TestSuite::Vector>();
+TYPED_TEST(WaitAnyT, VectorFirstErrorMultiThreaded) {
+  MultiThreaded<TestSuite::Vector, typename TestFixture::Type>();
 }
 
-TEST(VectorLastError, MultiThreaded) {
-  MultiThreaded<TestSuite::Vector, int, PolicyWhenAny::LastError>();
+TYPED_TEST(WaitAnyT, VectorLastErrorMultiThreaded) {
+  MultiThreaded<TestSuite::Vector, typename TestFixture::Type, PolicyWhenAny::LastError>();
 }
 
-TEST(VoidVectorFirstError, MultiThreaded) {
-  MultiThreaded<TestSuite::Vector, void>();
+TYPED_TEST(WaitAnyT, ArrayFirstErrorMultiThreaded) {
+  MultiThreaded<TestSuite::Array, typename TestFixture::Type>();
 }
 
-TEST(VoidVectorLastError, MultiThreaded) {
-  MultiThreaded<TestSuite::Vector, void, PolicyWhenAny::LastError>();
-}
-
-TEST(ArrayFirstError, MultiThreaded) {
-  MultiThreaded<TestSuite::Array>();
-}
-
-TEST(ArrayLastError, MultiThreaded) {
-  MultiThreaded<TestSuite::Array, int, PolicyWhenAny::LastError>();
-}
-
-TEST(VoidArrayFirstError, MultiThreaded) {
-  MultiThreaded<TestSuite::Array, void>();
-}
-
-TEST(VoidArrayLastError, MultiThreaded) {
-  MultiThreaded<TestSuite::Array, void, PolicyWhenAny::LastError>();
+TYPED_TEST(WaitAnyT, ArrayLastErrorMultiThreaded) {
+  MultiThreaded<TestSuite::Array, typename TestFixture::Type, PolicyWhenAny::LastError>();
 }
 
 template <TestSuite suite, typename T = int, PolicyWhenAny P = PolicyWhenAny::FirstError>
@@ -371,36 +294,20 @@ void TimeTest() {
   tp->Wait();
 }
 
-TEST(VectorFirstError, TimeTest) {
-  TimeTest<TestSuite::Vector>();
+TYPED_TEST(WaitAnyT, VectorFirstErrorTimeTest) {
+  TimeTest<TestSuite::Vector, typename TestFixture::Type>();
 }
 
-TEST(VectorLastError, TimeTest) {
-  TimeTest<TestSuite::Vector, int, PolicyWhenAny::LastError>();
+TYPED_TEST(WaitAnyT, VectorLastErrorTimeTest) {
+  TimeTest<TestSuite::Vector, typename TestFixture::Type, PolicyWhenAny::LastError>();
 }
 
-TEST(VoidVectorFirstError, TimeTest) {
-  TimeTest<TestSuite::Vector, void>();
+TYPED_TEST(WaitAnyT, ArrayFirstErrorTimeTest) {
+  TimeTest<TestSuite::Array, typename TestFixture::Type>();
 }
 
-TEST(VoidVectorLastError, TimeTest) {
-  TimeTest<TestSuite::Vector, void, PolicyWhenAny::LastError>();
-}
-
-TEST(ArrayFirstError, TimeTest) {
-  TimeTest<TestSuite::Array>();
-}
-
-TEST(ArrayLastError, TimeTest) {
-  TimeTest<TestSuite::Array, int, PolicyWhenAny::LastError>();
-}
-
-TEST(VoidArrayFirstError, TimeTest) {
-  TimeTest<TestSuite::Array, void>();
-}
-
-TEST(VoidArrayLastError, TimeTest) {
-  TimeTest<TestSuite::Array, void, PolicyWhenAny::LastError>();
+TYPED_TEST(WaitAnyT, ArrayLastErrorTimeTest) {
+  TimeTest<TestSuite::Array, typename TestFixture::Type, PolicyWhenAny::LastError>();
 }
 
 template <TestSuite suite, typename T = int>
@@ -438,20 +345,12 @@ void DefaultPolice() {
   }
 }
 
-TEST(VectorFirstError, DefaultPolice) {
-  DefaultPolice<TestSuite::Vector>();
+TYPED_TEST(WaitAnyT, VectorDefaultPolice) {
+  DefaultPolice<TestSuite::Vector, typename TestFixture::Type>();
 }
 
-TEST(VoidVectorFirstError, DefaultPolice) {
-  DefaultPolice<TestSuite::Vector, void>();
-}
-
-TEST(ArrayFirstError, DefaultPolice) {
-  DefaultPolice<TestSuite::Array>();
-}
-
-TEST(VoidArrayFirstError, DefaultPolice) {
-  DefaultPolice<TestSuite::Array, void>();
+TYPED_TEST(WaitAnyT, ArrayDefaultPolice) {
+  DefaultPolice<TestSuite::Array, typename TestFixture::Type>();
 }
 
 }  // namespace
