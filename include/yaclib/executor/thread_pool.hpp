@@ -56,4 +56,7 @@ IThreadPool* CurrentThreadPool() noexcept;
 IThreadPoolPtr MakeThreadPool(size_t threads = std::thread::hardware_concurrency(),
                               IThreadFactoryPtr tf = MakeThreadFactory());
 
+IThreadPoolPtr MakeLockFreeThreadPool(size_t threads = std::thread::hardware_concurrency(),
+                                      IThreadFactoryPtr tf = MakeThreadFactory());
+
 }  // namespace yaclib

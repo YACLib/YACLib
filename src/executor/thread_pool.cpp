@@ -1,4 +1,5 @@
 #include <util/intrusive_list.hpp>
+#include <util/michael_scott_queue.hpp>
 #include <util/mpsc_stack.hpp>
 
 #include <yaclib/executor/executor.hpp>
@@ -256,6 +257,94 @@ class SingleThread : public IThreadPool {
   alignas(kCacheLineSize) std::atomic_int32_t _work_counter{0};
 };
 
+class LockFreeThreadPool : public IThreadPool {
+ public:
+  explicit LockFreeThreadPool(IThreadFactoryPtr factory, size_t threads)
+      : _factory{std::move(factory)}, _threads_count{threads} {
+    auto loop = util::MakeFunc([this] {
+      tlCurrentThreadPool = this;
+      Loop();
+      tlCurrentThreadPool = nullptr;
+    });
+    for (size_t i = 0; i != _threads_count; ++i) {
+      _threads.PushBack(_factory->Acquire(loop));
+    }
+  }
+
+  ~LockFreeThreadPool() override {
+    HardStop();
+    Wait();
+  }
+
+ private:
+  Type Tag() const final {
+    return Type::ThreadPool;
+  }
+
+  bool Execute(ITask& task) noexcept final {
+    _refs_flag.fetch_add(2, std::memory_order_relaxed);
+    task.IncRef();
+    if (_stop.load(std::memory_order_acquire)) {
+      task.Cancel();
+      task.DecRef();
+      return false;
+    }
+    _tasks.PushBack(&task);
+    return true;
+  }
+
+  void SoftStop() final {
+    if (_refs_flag.fetch_add(1, std::memory_order_acq_rel) == 0) {
+      Stop();
+    }
+  }
+
+  void Stop() final {
+    _stop.store(true, std::memory_order_release);
+  }
+
+  void HardStop() final {
+    util::MichaelScottQueue<ITask> tasks;
+    tasks.UnsafeSwap(_tasks);
+    _stop.store(true, std::memory_order_release);
+
+    while (auto* task = tasks.PopFront()) {
+      task->Cancel();
+      task->DecRef();
+    }
+  }
+
+  void Wait() final {
+    while (auto* thread = _threads.PopFront()) {
+      _factory->Release(IThreadPtr{thread});
+    }
+  }
+
+  void Loop() noexcept {
+    while (true) {
+      while (auto* task = _tasks.PopFront()) {
+        task->Call();
+        task->DecRef();
+        if (_refs_flag.fetch_sub(2, std::memory_order_release) == 3) {
+          std::atomic_thread_fence(std::memory_order_acquire);
+          Stop();
+          return;
+        }
+      }
+      if (_stop.load(std::memory_order_acquire)) {
+        return;
+      }
+    }
+  }
+
+  alignas(kCacheLineSize) std::atomic_size_t _refs_flag{0};
+  IThreadFactoryPtr _factory;
+  util::List<IThread> _threads;
+  util::MichaelScottQueue<ITask> _tasks;
+  const size_t _threads_count;
+  std::atomic<bool> _stop{false};
+};
+
 }  // namespace
 
 IThreadPool* CurrentThreadPool() noexcept {
@@ -267,6 +356,10 @@ IThreadPoolPtr MakeThreadPool(size_t threads, IThreadFactoryPtr tf) {
     return new util::Counter<SingleThread>{std::move(tf)};
   }
   return new util::Counter<ThreadPool>{std::move(tf), threads};
+}
+
+IThreadPoolPtr MakeLockFreeThreadPool(size_t threads, IThreadFactoryPtr tf) {
+  return new util::Counter<LockFreeThreadPool>{std::move(tf), threads};
 }
 
 }  // namespace yaclib
