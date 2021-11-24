@@ -10,17 +10,17 @@ class StopWatch {
   using TimePoint = typename Clock::time_point;
 
  public:
-  StopWatch() : start_(Now()) {
+  StopWatch() : _start(Now()) {
     static_assert(Clock::is_steady, "Steady clock required");
   }
 
   Duration Elapsed() const {
-    return Now() - start_;
+    return Now() - _start;
   }
 
   Duration Restart() {
     auto elapsed = Elapsed();
-    start_ = Now();
+    _start = Now();
     return elapsed;
   }
 
@@ -29,7 +29,7 @@ class StopWatch {
   }
 
  private:
-  TimePoint start_;
+  TimePoint _start;
 };
 
 }  // namespace test::util

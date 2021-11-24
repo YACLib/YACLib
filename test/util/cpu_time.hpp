@@ -6,7 +6,7 @@
 
 namespace test::util {
 
-/* TODO(Ri7ay): dont work on windows, check thread_pool tests */
+/* TODO(Ri7ay): Does not work on Windows, check unit/executor/thread_pool.cpp tests */
 #if __linux
 class ProcessCPUTimer {
  public:
@@ -19,12 +19,12 @@ class ProcessCPUTimer {
   }
 
   void Reset() {
-    start_ts_ = std::clock();
+    _start_ts = std::clock();
   }
 
  private:
   size_t ElapsedMicros() const {
-    const size_t clocks = std::clock() - start_ts_;
+    const size_t clocks = std::clock() - _start_ts;
     return ClocksToMicros(clocks);
   }
 
@@ -33,7 +33,7 @@ class ProcessCPUTimer {
   }
 
  private:
-  std::clock_t start_ts_;
+  std::clock_t _start_ts;
 };
 
 class ThreadCPUTimer {
@@ -47,7 +47,7 @@ class ThreadCPUTimer {
   }
 
   void Reset() {
-    clock_gettime(CLOCK_THREAD_CPUTIME_ID, &start_);
+    clock_gettime(CLOCK_THREAD_CPUTIME_ID, &_start);
   }
 
  private:
@@ -55,7 +55,7 @@ class ThreadCPUTimer {
     struct timespec now;
     clock_gettime(CLOCK_THREAD_CPUTIME_ID, &now);
 
-    return ToNanos(now) - ToNanos(start_);
+    return ToNanos(now) - ToNanos(_start);
   }
 
   static uint64_t ToNanos(const struct timespec& tp) {
@@ -63,7 +63,7 @@ class ThreadCPUTimer {
   }
 
  private:
-  struct timespec start_;
+  struct timespec _start;
 };
 #endif  // linux
 
