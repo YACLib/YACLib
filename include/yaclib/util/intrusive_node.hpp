@@ -1,5 +1,7 @@
 #pragma once
 
+#include <utility>
+
 namespace yaclib::util::detail {
 
 /**
@@ -31,6 +33,11 @@ class Node {
     _next->_prev = _prev;
     _prev = this;
     _next = this;
+  }
+
+  void Swap(Node& other) noexcept {
+    std::swap(_prev, other._prev);
+    std::swap(_next, other._next);
   }
 
   Node* _prev{this};
