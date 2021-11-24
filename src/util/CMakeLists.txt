@@ -9,10 +9,12 @@ list(APPEND YACLIB_INCLUDES
   )
 list(APPEND YACLIB_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/intrusive_list.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/michael_scott_queue.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/mpsc_stack.hpp
   )
 list(APPEND YACLIB_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/intrusive_list.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/michael_scott_queue.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/mpsc_stack.cpp
   )
 
