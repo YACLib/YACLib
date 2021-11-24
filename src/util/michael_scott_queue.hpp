@@ -3,7 +3,9 @@
 #include <yaclib/util/intrusive_node.hpp>
 
 #include <atomic>
+#include <cassert>
 #include <cstddef>
+#include <utility>
 
 namespace yaclib::util {
 
@@ -23,41 +25,65 @@ class MichaelScottQueue final {
 
   [[nodiscard]] T* PopFront() noexcept {
     while (true) {
-      auto* saved_head = _head;
-      auto* saved_tail = _tail;
-      auto* saved_head_next = saved_head->_next;
-
-      if (saved_head == saved_tail) {
-        if (saved_head_next == saved_head) {
-          return nullptr;
-        }
-        std::atomic_ref{_tail}.compare_exchange_strong(saved_tail, saved_tail->_next);
-      } else {
-        auto res = AsItem(saved_head_next);
-        if (std::atomic_ref{_head}.compare_exchange_weak(saved_head, saved_head_next)) {
-          return res;
+      auto* current_head = _head.load();
+      auto* current_tail = _tail.load();
+      auto* next = std::atomic_ref{current_head->_next}.load();
+      if (current_head == _head.load()) {
+        if (current_head == current_tail) {
+          if (next == nullptr) {
+            return nullptr;
+          }
+          _tail.compare_exchange_strong(current_tail, next);
+        } else {
+          if (_head.compare_exchange_weak(current_head, next)) {
+            assert(next != nullptr);
+            assert(next != &_dummy);
+            return AsItem(next);
+          }
         }
       }
     }
   }
 
   void PushBack(detail::Node* node) noexcept {
-    while (true) {
-      auto* saved_tail = _tail;
-      auto* saved_tail_next = saved_tail->_next;
+    node->_next = nullptr;
+    node->_prev = nullptr;
 
-      if (std::atomic_ref{_tail->_next}.compare_exchange_weak(saved_tail_next, node)) {
-        std::atomic_ref{_tail}.compare_exchange_strong(saved_tail, node);
-        return;
+    while (true) {
+      auto* current_tail = _tail.load();
+      auto* next_tail = std::atomic_ref{current_tail->_next}.load();
+      if (current_tail == _tail.load()) {
+        if (next_tail != nullptr) {
+          _tail.compare_exchange_strong(current_tail, next_tail);
+        } else {
+          detail::Node* tmp = nullptr;
+          if (std::atomic_ref{current_tail->_next}.compare_exchange_weak(tmp, node)) {
+            std::atomic_ref{current_tail->_next}.compare_exchange_strong(current_tail, node);
+            return;
+          }
+        }
       }
-      std::atomic_ref{_tail}.compare_exchange_strong(saved_tail, saved_tail->_next);
     }
   }
 
+  void UnsafeSwap(MichaelScottQueue& other) noexcept {
+    auto tmp_dummy = other._dummy;
+    auto* tmp_head = other._head.load();
+    auto* tmp_tail = other._tail.load();
+
+    other._dummy = _dummy;
+    other._head.store(_head.load());
+    other._tail.store(_tail.load());
+
+    _dummy = tmp_dummy;
+    _head.store(tmp_head);
+    _tail.store(tmp_tail);
+  }
+
  private:
-  detail::Node _dummy;
-  detail::Node* _head;
-  detail::Node* _tail;
+  detail::Node _dummy{nullptr, nullptr};
+  std::atomic<detail::Node*> _head;
+  std::atomic<detail::Node*> _tail;
 };
 
 }  // namespace yaclib::util
