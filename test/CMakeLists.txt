@@ -56,6 +56,7 @@ set(YACLIB_UNITS
   unit/algo/when_any
   unit/algo/wait_group
   unit/executor/thread_pool
+  unit/executor/lock_free_thread_pool
   unit/async/stress
   unit/executor/serial
   )
