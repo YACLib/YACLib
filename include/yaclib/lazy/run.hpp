@@ -13,63 +13,69 @@
 
 namespace yaclib::detail {
 
-template <typename T, typename LazyProxy>
+template <typename LazyProxy>
 class LazyCore : public ITask {
  public:
-  LazyCore(LazyProxy&) {
+  LazyCore(LazyProxy&& lp) : _lp(std::move(lp)) {
   }
+
   void Call() noexcept final {
+    /*AnotherMethod(_index);
+    if (_index != GetLazyProxySize<LazyProxy>::value) {
+      Execute();
+    }*/
   }
+
   void Cancel() noexcept final {
   }
+
   void IncRef() noexcept final {
   }
+
   void DecRef() noexcept final {
-  }
-};
-
-template <typename Functor, typename PrevLazyProxy = Nil>
-class LazyProxy /*: public ITask*/ {
- public:
-  using ReturnType = util::InvokeT<Functor, typename PrevLazyProxy::ReturnType>;
-  using PrevP = PrevLazyProxy;
-  using FunctorStoreT = std::decay_t<Functor>;
-
-  LazyProxy(IExecutorPtr e, FunctorStoreT&& f, PrevLazyProxy&& prev)
-      : _e(std::move(e)), _f(std::move(f)), _prev(std::move(prev)) {
-  }
-
-  LazyProxy(IExecutorPtr e, const FunctorStoreT& f, const PrevLazyProxy& prev) : _f(f), _e(std::move(e)), _prev(prev) {
-  }
-
-  // Constructor for base LazyProxy object only
-  LazyProxy(IExecutorPtr e, FunctorStoreT&& f) : _e(std::move(e)), _f(std::move(f)), _prev(Nil{}) {
-    static_assert(std::is_same_v<PrevLazyProxy, Nil>);
   }
 
   void Execute() {
-    if (GetProxySize<LazyProxy>::value == _index) {
+    /*if (GetProxySize<LazyProxy>::value == _index) {
       _index++;
       _e->Execute(*this);
     } else {
       _prev.Execute();
-    }
+    }*/
   }
 
-  void AnotherMethod(int index) {
-    if (GetProxySize<LazyProxy>::value == index) {
-      _f();
-    } else {
-      _prev.AnotherMethod(index);
-    }
+  void AnotherMethod(int) {
+    /* if (GetProxySize<LazyProxy>::value == index) {
+       _f();
+     } else {
+       _prev.AnotherMethod(index);
+     }*/
   }
 
-  /*void Call() noexcept final {
-    AnotherMethod(_index);
-    if (_index != GetLazyProxySize<LazyProxy>::value) {
-      Execute();
-    }
-  }*/
+ private:
+  LazyProxy _lp;
+};
+
+template <typename Functor, typename PrevP = Nil>
+class LazyProxy /*: public ITask*/ {
+ public:
+  using PrevProxy = PrevP;
+  using ReturnType = util::InvokeT<Functor, typename PrevProxy::ReturnType>;
+  using FunctorStoreT = std::decay_t<Functor>;
+
+  template <typename T>
+  friend class LazyCore;
+
+  LazyProxy(IExecutorPtr e, FunctorStoreT&& f, PrevProxy&& prev) : _e(e), _f(std::move(f)), _prev(std::move(prev)) {
+  }
+
+  LazyProxy(IExecutorPtr e, const FunctorStoreT& f, const PrevProxy& prev) : _f(f), _e(e), _prev(prev) {
+  }
+
+  // Constructor for base LazyProxy object only
+  LazyProxy(IExecutorPtr e, FunctorStoreT&& f) : _e(std::move(e)), _f(std::move(f)), _prev(Nil{}) {
+    static_assert(std::is_same_v<PrevProxy, Nil>);
+  }
 
   template <typename F>
   auto Then(F&& f) && {
@@ -78,7 +84,17 @@ class LazyProxy /*: public ITask*/ {
 
   template <typename F>
   auto Then(IExecutorPtr e, F&& f) && {
-    return LazyProxy<F, LazyProxy>{std::forward<F>(f), e, std::move(*this)};
+    return LazyProxy<F, LazyProxy>{std::move(e), std::forward<F>(f), std::move(*this)};
+  }
+
+  template <typename T>
+  static IExecutorPtr GetFirstExecutor(T&& lazy) {
+    using U = std::decay_t<T>;
+    if constexpr (std::is_same_v<typename U::PrevProxy, Nil>) {
+      return lazy._e;
+    } else {
+      return GetFirstExecutor(lazy);
+    }
   }
 
   ReturnType Get() && {
@@ -86,6 +102,7 @@ class LazyProxy /*: public ITask*/ {
     std::condition_variable cv;
     std::mutex m;
     bool ready{false};
+    IExecutorPtr e = _e;
 
     auto final = std::move(*this).Then([&](ReturnType r) {
       result = std::move(r);
@@ -95,8 +112,8 @@ class LazyProxy /*: public ITask*/ {
       }
       cv.notify_one();
     });
-    auto core = LazyCore<ReturnType, decltype(final)>{final};
-    _e->Execute(core);
+    LazyCore<decltype(final)> core{std::move(final)};
+    GetFirstExecutor(final)->Execute(core);
 
     {
       std::unique_lock guard{m};
@@ -107,19 +124,10 @@ class LazyProxy /*: public ITask*/ {
     return result;
   }
 
-  /*Future<ReturnType> Make() && {
-    using CoreT = detail::LazyCore<ReturnType, LazyProxy>;
-    IExecutorPtr e = _e;
-    util::Ptr core{new util::Counter<CoreT>{std::move(*this)}};
-    e->Execute(*core);
-    return Future<ReturnType>{std::move(core)};
-  }*/
-
  private:
-  IExecutorPtr _e;
+  IExecutorPtr _e{MakeInline()};
   FunctorStoreT _f;
-  PrevLazyProxy _prev{};
-  size_t _index{0};
+  PrevProxy _prev{};
 };
 
 template <class Functor>
