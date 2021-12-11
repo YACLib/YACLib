@@ -4,7 +4,7 @@
 
 namespace yaclib::detail {
 
-template <typename Functor, typename PrevProxy>
+template <typename Functor, typename PrevProxy, bool, typename>
 class LazyProxy;
 
 struct Nil {
@@ -20,8 +20,8 @@ struct GetProxySize<Nil> {
   constexpr static size_t value = 0;
 };
 
-template <typename Functor, typename PrevProxy>
-struct GetProxySize<LazyProxy<Functor, PrevProxy>> {
+template <typename Functor, typename PrevProxy, bool A, typename B>
+struct GetProxySize<LazyProxy<Functor, PrevProxy, A, B>> {
   constexpr static size_t value = 1 + GetProxySize<PrevProxy>::value;
 };
 
