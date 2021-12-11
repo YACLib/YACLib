@@ -22,11 +22,27 @@ class LazyCore;
 template <class T>
 LazyCore(T&& lp) -> LazyCore<decltype(ReverseLazy(lp, Nil{}))>;
 
+template <typename Functor, typename Arg, typename Type>
+struct InvokeWrapper;
+
+template <typename Functor, typename Arg, typename Type = util::InvokeT<Functor, Arg>>
+struct InvokeWrapper {
+  using type = util::InvokeT<Functor, Arg>;
+};
+
+template <typename Functor, typename Arg>
+struct InvokeWrapper<Functor, Arg, void> {
+  using type = void;
+};
+
+template <typename Functor, typename Arg>
+using InvokeWrapperT = typename InvokeWrapper<Functor, Arg>::type;
+
 template <typename Functor, typename PrevP = Nil, bool IsReversed = false, typename Ret = void>
 class LazyProxy {
  public:
   using PrevProxy = PrevP;
-  using ReturnType = std::conditional_t<IsReversed, Ret, util::InvokeT<Functor, typename PrevProxy::ReturnType>>;
+  using ReturnType = std::conditional_t<IsReversed, Ret, InvokeWrapperT<Functor, typename PrevProxy::ReturnType>>;
   using FunctorStoreT = std::decay_t<Functor>;
 
   template <typename T>
