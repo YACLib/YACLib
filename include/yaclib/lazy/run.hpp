@@ -25,13 +25,13 @@ LazyCore(T&& lp) -> LazyCore<decltype(ReverseLazy(lp, Nil{}))>;
 template <typename Functor, typename Arg, typename Type>
 struct InvokeWrapper;
 
-template <typename Functor, typename Arg, typename Type = util::InvokeT<Functor, Arg>>
-struct InvokeWrapper {
-  using type = util::InvokeT<Functor, Arg>;
+template <typename Functor, typename Arg>
+struct InvokeWrapper<Functor, Arg, util::InvokeT<Functor, Arg>> {
+  using type = std::invoke_result_t<Functor, Arg>;
 };
 
-template <typename Functor, typename Arg>
-struct InvokeWrapper<Functor, Arg, void> {
+template <typename Functor, typename Arg, typename Type = void>
+struct InvokeWrapper {
   using type = void;
 };
 
