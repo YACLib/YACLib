@@ -147,12 +147,13 @@ auto LazyProxy<Functor, PrevP>::Get() && -> typename LazyProxy<Functor, PrevP>::
 template <typename LazyProxy>
 class LazyCore : public ITask {
  public:
-  LazyCore(LazyProxy&& lp) : _lp(std::move(lp)), _size(GetProxySize<LazyProxy>::value) {
+  static constexpr std::size_t _size{GetProxySize<LazyProxy>::value};
+  LazyCore(LazyProxy&& lp) : _lp(std::move(lp)) {
     assert(_size > 1);
   }
 
   void Call() noexcept final {
-    auto res = Execute(_index);
+    auto curr = Execute(_index);
     // _lp._e->Execute(_lp);
     /*_lp._f();
     std::cout << _size << std::endl;
@@ -194,7 +195,6 @@ class LazyCore : public ITask {
 
  private:
   LazyProxy _lp;
-  const std::size_t _size;
   std::size_t _index = 0;
 };
 
