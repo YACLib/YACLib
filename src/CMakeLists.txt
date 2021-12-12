@@ -29,6 +29,15 @@ if (YACLIB_FIBER)
   add_subdirectory(fiber)
 endif ()
 
+# TODO(myannyax) other flag name but not YACLIB_FAULTY or change YACLIB_FAULTY for smth like "test on" and make this YACLIB_FAULTY
+if (LOL_KEK)
+  add_subdirectory(fault_injection)
+endif ()
+
+if (YACLIB_FAULTY)
+  add_compile_definitions(YACLIB_FAULTY)
+endif ()
+
 add_library(
   ${PROJECT_NAME} STATIC
   ${YACLIB_SOURCES}
