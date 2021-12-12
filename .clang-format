@@ -5,6 +5,7 @@ UseTab: Never
 DerivePointerAlignment: false
 PointerAlignment: Left
 ColumnLimit: 120
+IndentWidth: 2
 
 AllowShortLambdasOnASingleLine: None
 AllowShortFunctionsOnASingleLine: None
