@@ -22,27 +22,11 @@ class LazyCore;
 template <class T>
 LazyCore(T&& lp) -> LazyCore<decltype(ReverseLazy(lp, Nil{}))>;
 
-template <typename Functor, typename Arg, typename Type>
-struct InvokeWrapper;
-
-template <typename Functor, typename Arg>
-struct InvokeWrapper<Functor, Arg, util::InvokeT<Functor, Arg>> {
-  using type = std::invoke_result_t<Functor, Arg>;
-};
-
-template <typename Functor, typename Arg, typename Type = void>
-struct InvokeWrapper {
-  using type = void;
-};
-
-template <typename Functor, typename Arg>
-using InvokeWrapperT = typename InvokeWrapper<Functor, Arg>::type;
-
-template <typename Functor, typename PrevP = Nil, bool IsReversed = false, typename Ret = void>
+template <typename Functor, typename PrevP = Nil>
 class LazyProxy {
  public:
   using PrevProxy = PrevP;
-  using ReturnType = std::conditional_t<IsReversed, Ret, InvokeWrapperT<Functor, typename PrevProxy::ReturnType>>;
+  using ReturnType = util::InvokeT<Functor, typename PrevProxy::ReturnType>;
   using FunctorStoreT = std::decay_t<Functor>;
 
   template <typename T>
@@ -83,6 +67,7 @@ class LazyProxy {
       }
       cv.notify_one();
     });
+
     LazyCore<decltype(ReverseLazy(final, Nil{}))> core{std::move(final)};
     core.GetExecutor()->Execute(core);
 
@@ -101,14 +86,59 @@ class LazyProxy {
   PrevProxy _prev{};
 };
 
+template <typename Functor, typename PrevP = Nil, typename Ret = void>
+class ReversedLazyProxy : public ITask {
+ public:
+  using PrevProxy = PrevP;
+  using ReturnType = Ret;
+  using FunctorStoreT = std::decay_t<Functor>;
+
+  template <typename T>
+  friend class LazyCore;
+
+  void Call() noexcept final {
+    _e->Execute([&]() {
+      auto res = _f();
+      _prev._e->Execute(_prev);
+    });
+  }
+
+  void Cancel() noexcept final {
+  }
+
+  void IncRef() noexcept final {
+  }
+
+  void DecRef() noexcept final {
+  }
+
+  ReversedLazyProxy(IExecutorPtr e, FunctorStoreT&& f, PrevProxy&& prev)
+      : _e(e), _f(std::move(f)), _prev(std::move(prev)) {
+  }
+
+  ReversedLazyProxy(IExecutorPtr e, const FunctorStoreT& f, const PrevProxy& prev) : _f(f), _e(e), _prev(prev) {
+  }
+
+  // Constructor for base LazyProxy object only
+  ReversedLazyProxy(IExecutorPtr e, FunctorStoreT&& f) : _e(std::move(e)), _f(std::move(f)), _prev(Nil{}) {
+    static_assert(std::is_same_v<PrevProxy, Nil>);
+  }
+
+ public:
+  IExecutorPtr _e{MakeInline()};
+  FunctorStoreT _f;
+  PrevProxy _prev{};
+};
+
 template <class Functor>
 LazyProxy(IExecutorPtr, Functor&&) -> LazyProxy<std::decay_t<Functor>, Nil>;
 
 template <typename Lazy, typename Res>
 auto ReverseLazy(Lazy& l, Res res) {
   if constexpr (!std::is_same_v<Lazy, Nil>) {
-    return ReverseLazy(l._prev, LazyProxy<typename Lazy::FunctorStoreT, decltype(res), true, typename Lazy::ReturnType>{
-                                    std::move(l._e), std::move(l._f), std::move(res)});
+    return ReverseLazy(l._prev,
+                       ReversedLazyProxy<typename Lazy::FunctorStoreT, decltype(res), typename Lazy::ReturnType>{
+                           std::move(l._e), std::move(l._f), std::move(res)});
   } else {
     return res;
   }
@@ -118,13 +148,16 @@ template <typename LazyProxy>
 class LazyCore : public ITask {
  public:
   template <typename T>
-  LazyCore(T&& lp) : _lp(ReverseLazy(lp, Nil{})) {
+  LazyCore(T&& lp) : _lp(ReverseLazy(lp, Nil{})), _size(GetProxySize<T>::value) {
+    assert(_size > 1);
   }
 
   void Call() noexcept final {
-    std::cout << "HERE!!!" << std::endl;
-    /*AnotherMethod(_index);
-    if (_index != GetLazyProxySize<LazyProxy>::value) {
+    _lp._e->Execute(_lp);
+    /*_lp._f();
+    std::cout << _size << std::endl;*/
+    /*Execute(_index);
+    if (_index != _size) {
       Execute();
     }*/
   }
@@ -147,12 +180,12 @@ class LazyCore : public ITask {
     }*/
   }
 
-  void AnotherMethod(int) {
-    /* if (GetProxySize<LazyProxy>::value == index) {
-       _f();
-     } else {
-       _prev.AnotherMethod(index);
-     }*/
+  void Execute(int) {
+    /*if (_index == _size) {
+      _lp._f();
+    } else {
+      _prev.AnotherMethod(index);
+    }*/
   }
 
   IExecutorPtr GetExecutor() {
@@ -161,6 +194,8 @@ class LazyCore : public ITask {
 
  private:
   LazyProxy _lp;
+  const std::size_t _size;
+  std::size_t _index = 0;
 };
 
 }  // namespace yaclib::detail
