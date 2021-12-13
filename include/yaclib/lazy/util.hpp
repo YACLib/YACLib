@@ -33,4 +33,20 @@ struct GetProxySize<ReversedLazyProxy<F, PrevProxy, Ret>> {
   constexpr static size_t value = 1 + GetProxySize<PrevProxy>::value;
 };
 
+template <typename Lazy, typename... R>
+struct GetLazyTypes;
+
+template <typename... R>
+struct GetLazyTypes<Nil, R...> {
+  using type = std::variant<R...>;
+};
+
+template <typename Lazy, typename... R>
+struct GetLazyTypes {
+  using type =
+      std::conditional_t<!std::is_same_v<typename Lazy::ReturnType, void>,
+                         typename GetLazyTypes<typename Lazy::PrevProxy, R..., typename Lazy::ReturnType>::type,
+                         typename GetLazyTypes<typename Lazy::PrevProxy, R..., std::monostate>::type>;
+};
+
 }  // namespace yaclib::detail

@@ -153,7 +153,7 @@ class LazyCore : public ITask {
   }
 
   void Call() noexcept final {
-    auto curr = Execute(_index);
+    // auto curr = Execute(_index);
     // _lp._e->Execute(_lp);
     /*_lp._f();
     std::cout << _size << std::endl;
@@ -172,7 +172,7 @@ class LazyCore : public ITask {
   //    }*/
   //  }
   //
-  auto Execute(std::size_t index) {
+  auto Execute(std::size_t) {
     /*if (_index == _size) {
       _lp._f();
     } else {
@@ -190,12 +190,13 @@ class LazyCore : public ITask {
   }
 
   IExecutorPtr GetExecutor() {
-    return MakeInline();
+    return _lp._e;
   }
 
  private:
   LazyProxy _lp;
   std::size_t _index = 0;
+  typename detail::GetLazyTypes<LazyProxy>::type result;
 };
 
 }  // namespace yaclib::detail
