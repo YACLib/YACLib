@@ -1,15 +1,18 @@
-#[[list(APPEND YACLIB_INCLUDES
-  ${YACLIB_INCLUDE_DIR}/fiber/coroutine.hpp
-  )]]
-
-list(APPEND YACLIB_HEADERS
+list(APPEND YACLIB_INCLUDES
   # chrono
-  ${CMAKE_CURRENT_SOURCE_DIR}/chrono/steady_clock.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/chrono/system_clock.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/chrono/other.hpp
+  ${YACLIB_INCLUDE_DIR}/fault_injection/chrono/steady_clock.hpp
+  ${YACLIB_INCLUDE_DIR}/fault_injection/chrono/system_clock.hpp
+  ${YACLIB_INCLUDE_DIR}/fault_injection/chrono/other.hpp
 
   # random
-  ${CMAKE_CURRENT_SOURCE_DIR}/random/random_device.hpp
+  ${YACLIB_INCLUDE_DIR}/fault_injection/random/random_device.hpp
+
+  # thread
+  ${YACLIB_INCLUDE_DIR}/fault_injection/thread/thread.hpp
+  ${YACLIB_INCLUDE_DIR}/fault_injection/thread/this_thread.hpp
+
+  # antagonist
+  ${YACLIB_INCLUDE_DIR}/fault_injection/antagonist/yielder.hpp
   )
 
 list(APPEND YACLIB_SOURCES
@@ -21,6 +24,13 @@ list(APPEND YACLIB_SOURCES
 
   # random
   ${CMAKE_CURRENT_SOURCE_DIR}/random/random_device.cpp
+
+  # thread
+  ${CMAKE_CURRENT_SOURCE_DIR}/thread/thread.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/thread/this_thread.cpp
+
+  # antagonist
+  ${CMAKE_CURRENT_SOURCE_DIR}/antagonist/yielder.cpp
   )
 
 add_files()

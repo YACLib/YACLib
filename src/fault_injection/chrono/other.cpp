@@ -1,4 +1,4 @@
-#include "other.hpp"
+#include <yaclib/fault_injection/chrono/other.hpp>
 
 #if defined(YACLIB_FAULTY)
 

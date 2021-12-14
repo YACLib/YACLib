@@ -1,4 +1,4 @@
-#include "steady_clock.hpp"
+#include <yaclib/fault_injection/chrono/steady_clock.hpp>
 
 namespace yaclib::std::chrono {
 
