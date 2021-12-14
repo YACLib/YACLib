@@ -17,70 +17,70 @@ jobs:
         build_type: [ RelWithDebInfo, Debug ]
         config:
           - {
-            os: ubuntu-latest,
+            os: ubuntu-20.04,
             cc: clang-12, cxx: clang++-12,
             deps: 'clang-12',
             cxx_standard: 20,
             cmake_args: '',
           }
           - {
-            os: ubuntu-latest,
+            os: ubuntu-20.04,
             cc: clang-12, cxx: clang++-12,
             deps: 'clang-12',
             cxx_standard: 17,
             cmake_args: '',
           }
           - {
-            os: ubuntu-latest,
+            os: ubuntu-20.04,
             cc: clang-11, cxx: clang++-11,
             deps: 'clang-11',
             cxx_standard: 20,
             cmake_args: '',
           }
           - {
-            os: ubuntu-latest,
+            os: ubuntu-20.04,
             cc: clang-11, cxx: clang++-11,
             deps: 'clang-11',
             cxx_standard: 17,
             cmake_args: '',
           }
           - {
-            os: ubuntu-latest,
+            os: ubuntu-20.04,
             cc: clang-10, cxx: clang++-10,
             deps: 'clang-10',
             cxx_standard: 20,
             cmake_args: '',
           }
           - {
-            os: ubuntu-latest,
+            os: ubuntu-20.04,
             cc: clang-10, cxx: clang++-10,
             deps: 'clang-10',
             cxx_standard: 17,
             cmake_args: '',
           }
           - {
-            os: ubuntu-latest,
+            os: ubuntu-20.04,
             cc: clang-9, cxx: clang++-9,
             deps: 'clang-9',
             cxx_standard: 20,
             cmake_args: '',
           }
           - {
-            os: ubuntu-latest,
+            os: ubuntu-20.04,
             cc: clang-9, cxx: clang++-9,
             deps: 'clang-9',
             cxx_standard: 17,
             cmake_args: '',
           }
           - {
-            os: ubuntu-latest,
+            os: ubuntu-20.04,
             cc: clang-8, cxx: clang++-8,
             deps: 'clang-8',
             cxx_standard: 17,
             cmake_args: '',
           }
           - {
-            os: ubuntu-latest,
+            os: ubuntu-20.04,
             cc: clang-7, cxx: clang++-7,
             deps: 'clang-7',
             cxx_standard: 17,
@@ -88,56 +88,56 @@ jobs:
           }
 
           - {
-            os: ubuntu-latest,
+            os: ubuntu-20.04,
             cc: gcc-11, cxx: g++-11,
             deps: 'gcc-11 g++-11',
             cxx_standard: 20,
             cmake_args: '',
           }
           - {
-            os: ubuntu-latest,
+            os: ubuntu-20.04,
             cc: gcc-11, cxx: g++-11,
             deps: 'gcc-11 g++-11',
             cxx_standard: 17,
             cmake_args: '',
           }
           - {
-            os: ubuntu-latest,
+            os: ubuntu-20.04,
             cc: gcc-10, cxx: g++-10,
             deps: 'gcc-10 g++-10',
             cxx_standard: 20,
             cmake_args: '',
           }
           - {
-            os: ubuntu-latest,
+            os: ubuntu-20.04,
             cc: gcc-10, cxx: g++-10,
             deps: 'gcc-10 g++-10',
             cxx_standard: 17,
             cmake_args: '',
           }
           - {
-            os: ubuntu-latest,
+            os: ubuntu-20.04,
             cc: gcc-9, cxx: g++-9,
             deps: 'gcc-9 g++-9',
             cxx_standard: 20,
             cmake_args: '',
           }
           - {
-            os: ubuntu-latest,
+            os: ubuntu-20.04,
             cc: gcc-9, cxx: g++-9,
             deps: 'gcc-9 g++-9',
             cxx_standard: 17,
             cmake_args: '',
           }
           - {
-            os: ubuntu-latest,
+            os: ubuntu-20.04,
             cc: gcc-8, cxx: g++-8,
             deps: 'gcc-8 g++-8',
             cxx_standard: 20,
             cmake_args: '',
           }
           - {
-            os: ubuntu-latest,
+            os: ubuntu-20.04,
             cc: gcc-8, cxx: g++-8,
             deps: 'gcc-8 g++-8',
             cxx_standard: 17,
@@ -145,26 +145,26 @@ jobs:
           }
 
           - {
-            os: macos-latest,
+            os: macos-11,
             cc: clang, cxx: clang++,
             cxx_standard: 20,
             cmake_args: '-DYACLIB_DEFINITIONS=/DYACLIB_CI_SLOWDOWN=10',
           }
           - {
-            os: macos-latest,
+            os: macos-11,
             cc: clang, cxx: clang++,
             cxx_standard: 17,
             cmake_args: '-DYACLIB_DEFINITIONS=/DYACLIB_CI_SLOWDOWN=10',
           }
 
           - {
-            os: windows-latest,
+            os: windows-2022,
             cc: cl, cxx: cl,
             cxx_standard: 20,
             cmake_args: '',
           }
           - {
-            os: windows-latest,
+            os: windows-2022,
             cc: cl, cxx: cl,
             cxx_standard: 17,
             cmake_args: '',
@@ -174,7 +174,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Install dependencies
-        if: ${{ matrix.config.os == 'ubuntu-latest' }}
+        if: ${{ matrix.config.os == 'ubuntu-20.04' }}
         run:
           sudo apt install ${{ matrix.config.deps }}
 
