@@ -10,6 +10,13 @@ list(APPEND YACLIB_HEADERS
 
   # random
   ${CMAKE_CURRENT_SOURCE_DIR}/random/random_device.hpp
+
+  # thread
+  ${CMAKE_CURRENT_SOURCE_DIR}/thread/thread.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/thread/this_thread.hpp
+
+  # antagonist
+  ${CMAKE_CURRENT_SOURCE_DIR}/antagonist/yielder.hpp
   )
 
 list(APPEND YACLIB_SOURCES
@@ -21,6 +28,13 @@ list(APPEND YACLIB_SOURCES
 
   # random
   ${CMAKE_CURRENT_SOURCE_DIR}/random/random_device.cpp
+
+  # thread
+  ${CMAKE_CURRENT_SOURCE_DIR}/thread/thread.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/thread/this_thread.cpp
+
+  # antagonist
+  ${CMAKE_CURRENT_SOURCE_DIR}/antagonist/yielder.cpp
   )
 
 add_files()
