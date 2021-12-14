@@ -10,6 +10,7 @@ namespace yaclib::std {
 // TODO(myannyax) stats?
 class Yielder {
  public:
+  explicit Yielder(int frequency);
   void MaybeYield();
 
  private:

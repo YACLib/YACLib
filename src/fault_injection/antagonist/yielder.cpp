@@ -2,6 +2,9 @@
 
 namespace yaclib::std {
 
+Yielder::Yielder(int frequency) : _eng(1142), _freq(frequency) {
+}
+
 void Yielder::MaybeYield() {
   if (ShouldYield()) {
     this_thread::yield();
@@ -17,7 +20,7 @@ bool Yielder::ShouldYield() {
 }
 
 void Yielder::Reset() {
-  auto step = _eng() % _freq;
+  auto step = 1 + _eng() % (_freq - 1);
   _count.exchange(step);
 }
 
