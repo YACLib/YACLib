@@ -103,12 +103,12 @@ Zero cost абстракция, для того, чтобы избежать л�
 
 Абстракция для составления пайплайнов исполнения задач.
 
-~~~{.cpp}
+```C++
 auto thread_pool = MakeThreadPool(4);
 auto future = Run(thread_pool, task1)
               .Then(task2)
               .Then(task3)
-~~~
+```
 
 Текущая имплементация удовлетворяет следующим свойствам:
 
@@ -121,20 +121,20 @@ auto future = Run(thread_pool, task1)
 
 Пример:
 
-~~~{.cpp}
+```C++
 auto future = Run(MakeInline(), []{
     return MakeFuture<int>(5); // Returns Future<int>
 });
 
 // decltype(future) == Future<int>
-~~~
+```
 
 * Поддерживаем обработку ошибок, как с помощью исключений, так и с помощью кодов возврата (std::error_code)
 * Помимо T умеем обрабатывать разные перегрузки: `util::Result<T>`, `std::exception_ptr`, `std::error_code`
 
 Пример:
 
-~~~{.cpp}
+```C++
 auto future = Run(MakeInline(), []{
     throw std::runtime_error{"bad exception"};
 }).Then([](std::exception_ptr e) { // recover error
@@ -142,7 +142,7 @@ auto future = Run(MakeInline(), []{
 });
 
 assert(std::move(future).Get().Value() == 1);
-~~~
+```
 
 ### WhenAll Combinator
 
@@ -152,7 +152,7 @@ assert(std::move(future).Get().Value() == 1);
 
 Пример:
 
-~~~{.cpp}
+```C++
 auto [future1, promise1] = MakeContract<int>();
 auto [future2, promise2] = MakeContract<int>();
 auto [future3, promise3] = MakeContract<int>();
@@ -167,7 +167,7 @@ assert(AllFuture.Ready() == true);
 
 // array{5, 3, 8}:
 auto result = std::move(AllFuture).Get().Value(); 
-~~~
+```
 
 ### ThreadFactory
 
@@ -195,9 +195,9 @@ Erich Niebler - Ranges C++20, Lewis Baker - создатель cppcoro, Gor Nish
 
 * Объединять подряд идущие `Future::Then` в одну аллокацию:
 
-~~~{.cpp}
+```C++
 future.Then(task1).Then(task2).Then(task3)
-~~~
+```
 
 * Добавить `lazy::Run`, создание незапущенной Future без аллокации
 * Реализация ленивых `Future Combinators` как для `lazy::Future`, так и для `Future`

@@ -19,7 +19,7 @@ jobs:
         # TODO(MBkkt): Add MEMSAN then GTest fix that issue https://github.com/google/sanitizers/issues/648
         build_type: [ RelWithDebInfo, Debug ]
         cxx_standard: [ 20 ]
-        os: [ ubuntu-latest ]
+        os: [ ubuntu-20.04 ]
         config:
           - {
             cc: clang-12, cxx: clang++-12,
