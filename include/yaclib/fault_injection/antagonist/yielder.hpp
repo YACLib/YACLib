@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../thread/this_thread.hpp"
+#include <yaclib/fault_injection/thread/this_thread.hpp>
 
 #include <atomic>
 #include <random>

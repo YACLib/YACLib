@@ -1,4 +1,4 @@
-#include "thread.hpp"
+#include <yaclib/fault_injection/thread/thread.hpp>
 
 namespace yaclib::std {
 

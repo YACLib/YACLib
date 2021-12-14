@@ -1,4 +1,5 @@
 #pragma once
+
 #include <thread>
 
 namespace yaclib::std {

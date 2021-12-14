@@ -1,6 +1,7 @@
 #pragma once
-#include "../chrono/steady_clock.hpp"
-#include "thread.hpp"
+
+#include <yaclib/fault_injection/chrono/steady_clock.hpp>
+#include <yaclib/fault_injection/thread/thread.hpp>
 
 namespace yaclib::std::this_thread {
 

@@ -1,5 +1,6 @@
 #pragma once
-#include "system_clock.hpp"
+
+#include <yaclib/fault_injection/chrono/system_clock.hpp>
 
 #include <ctime>
 
