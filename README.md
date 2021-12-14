@@ -59,9 +59,9 @@ https://discord.gg/xy2fDKj8VZ)
 **YACLib** is a lightweight C++ library for concurrent and parallel task execution, that is striving to satisfy the
 following properties:
 
+* Zero cost abstractions
 * Easy to use
 * Easy to build
-* Zero cost abstractions
 * Good test coverage
 
 For more details check our [design document](doc/design.md) and [documentation](https://yaclib.github.io/YACLib).
@@ -305,37 +305,26 @@ int x = std::move(f).Get().Value();
 
 ## Requirements
 
-### Operating systems
+YACLib is a static library, that uses _CMake_ as a build system and requires a compiler with C++17 or newer.
 
-* Linux
-* macOS
-* Windows
-* Android
-* iOS (theoretical)
+If the library doesn't compile on some compiler satisfying this condition, please create an issue. Pull requests with
+fixes are welcome!
 
-### Compilers
-
-C++ compiler that supports standard 17 or higher.
-
-If the library doesn't compile on some compiler satisfying this condition, please create an issue.
-
-These compilers are tested in CI:
-
-* Clang-7, Clang-8, Clang-9, Clang-10, Clang-11, Clang-12
-* GCC-8, GCC-9, GCC-10, GCC-11
-* Apple Clang
-* MSVC
-
-### C++ standard
-
-We support 17 and 20 C++ standards, we also probably support newer standards (if not, please create an issue).
-
-We can also try support older standards. If you are interested in it, see
+We can also try to support older standards. If you are interested in it, check
 this [discussion](https://github.com/YACLib/YACLib/discussions/102).
 
-### Build systems
+We test following configurations:
 
-* CMake
+✅ - CI tested
+
+👌 - manually tested
+
+OS\Compiler | Linux | Windows | macOS | Android
+----------- | :---: | :-----: | :---: | :-----:
+GCC 7.0+    | ✅    |         |       | 👌
+Clang 5.0+  | ✅    |         |       | 👌
+AppleClang  | —     | —       | ✅    | —
+MSVC        | —     | ✅      | —     | —
 
 ## Releases
 
