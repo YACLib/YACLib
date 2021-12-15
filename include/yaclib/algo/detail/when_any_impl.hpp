@@ -108,9 +108,6 @@ template <typename T, WhenPolicy P>
 class AnyCombinator : public AnyCombinatorBase<T, P>, public InlineCore {
   using Base = AnyCombinatorBase<T, P>;
 
-  explicit AnyCombinator(size_t size, PromiseCorePtr<T> core) : Base{size, std::move(core)} {
-  }
-
   void CallInline(InlineCore* context) noexcept final {
     if (Base::_core->GetState() != BaseCore::State::HasStop && !Base::Done()) {
       Base::Combine(std::move(static_cast<ResultCore<T>*>(context)->Get()));
@@ -120,9 +117,12 @@ class AnyCombinator : public AnyCombinatorBase<T, P>, public InlineCore {
  public:
   static std::pair<Future<T>, util::Ptr<AnyCombinator>> Make(size_t size) {
     assert(size >= 2);
-    util::Ptr core{new util::Counter<detail::ResultCore<T>>{}};
-    util::Ptr combinator{new util::Counter<AnyCombinator<T, P>>{size, core}};
+    auto core = util::MakeIntrusive<detail::ResultCore<T>>();
+    auto combinator = util::MakeIntrusive<AnyCombinator<T, P>>(size, core);
     return {Future<T>{std::move(core)}, std::move(combinator)};
+  }
+
+  explicit AnyCombinator(size_t size, PromiseCorePtr<T> core) : Base{size, std::move(core)} {
   }
 };
 

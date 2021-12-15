@@ -46,7 +46,14 @@ class AllCombinator : public InlineCore, public AllCombinatorBase<FutureValue> {
         return {std::move(future), nullptr};
       }
     }
-    return {std::move(future), new util::Counter<AllCombinator>{std::move(promise), size}};
+    return {std::move(future), util::MakeIntrusive<AllCombinator>(std::move(promise), size)};
+  }
+
+  explicit AllCombinator(Promise<FutureValue> promise, [[maybe_unused]] size_t size = 0)
+      : _promise{std::move(promise)} {
+    if constexpr (!std::is_void_v<T> && !IsArray) {
+      AllCombinatorBase<FutureValue>::_results.resize(size);
+    }
   }
 
   void CallInline(InlineCore* context) noexcept final {
@@ -88,13 +95,6 @@ class AllCombinator : public InlineCore, public AllCombinatorBase<FutureValue> {
   }
 
  private:
-  explicit AllCombinator(Promise<FutureValue> promise, [[maybe_unused]] size_t size = 0)
-      : _promise{std::move(promise)} {
-    if constexpr (!std::is_void_v<T> && !IsArray) {
-      AllCombinatorBase<FutureValue>::_results.resize(size);
-    }
-  }
-
   Promise<FutureValue> _promise;
 };
 
