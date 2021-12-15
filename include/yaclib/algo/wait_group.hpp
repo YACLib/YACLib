@@ -7,8 +7,6 @@ namespace yaclib {
 
 class WaitGroup {
  public:
-  WaitGroup();
-
   /**
    * Add \ref Future to WaitGroup
    *
@@ -28,7 +26,7 @@ class WaitGroup {
   void Wait();
 
  private:
-  util::Counter<detail::WaitCore, detail::WaitCoreDeleter> _callback{};
+  util::Counter<detail::WaitCore, detail::WaitCoreDeleter> _callback;
 };
 
 }  // namespace yaclib

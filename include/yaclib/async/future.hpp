@@ -176,12 +176,12 @@ Future<void> MakeFuture();
 
 template <typename V, typename T = std::remove_reference_t<V>>
 Future<T> MakeFuture(V&& value) {
-  return Future<T>{new util::Counter<detail::ResultCore<T>>{std::forward<V>(value)}};
+  return Future<T>{util::MakeIntrusive<detail::ResultCore<T>>(std::forward<V>(value))};
 }
 
 template <typename T, typename V>
 std::enable_if_t<!std::is_same_v<T, std::remove_reference_t<V>>, Future<T>> MakeFuture(V&& value) {
-  return Future<T>{new util::Counter<detail::ResultCore<T>>{std::forward<V>(value)}};
+  return Future<T>{util::MakeIntrusive<detail::ResultCore<T>>(std::forward<V>(value))};
 }
 
 }  // namespace yaclib

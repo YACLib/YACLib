@@ -60,7 +60,11 @@ class AnyCombinator : public BaseCore, public AnyCombinatorBase<T, P> {
       std::move(promise).Set(util::Result<T>{});
       return {std::move(future), nullptr};
     }
-    return {std::move(future), new util::Counter<AnyCombinator<T, P>>{std::move(promise), size}};
+    return {std::move(future), util::MakeIntrusive<AnyCombinator<T, P>>(std::move(promise), size)};
+  }
+
+  explicit AnyCombinator(Promise<T> promise, size_t size)
+      : BaseCore{BaseCore::State::Empty}, Base{std::move(promise), size} {
   }
 
   void CallInline(void* context) noexcept final {
@@ -92,10 +96,6 @@ class AnyCombinator : public BaseCore, public AnyCombinatorBase<T, P> {
   }
 
  private:
-  explicit AnyCombinator(Promise<T> promise, size_t size)
-      : BaseCore{BaseCore::State::Empty}, Base{std::move(promise), size} {
-  }
-
   std::atomic<bool> _done{false};
 };
 

@@ -204,7 +204,7 @@ template <bool Inline, typename Ret, typename Arg, typename Functor>
 auto SetSyncCallback(FutureCorePtr<Arg> caller, Functor&& f) {
   using InvokeT = detail::SyncInvoke<Ret, decltype(std::forward<Functor>(f)), Arg>;
   using CoreT = detail::Core<Ret, InvokeT, Arg>;
-  util::Ptr callback{new util::Counter<CoreT>{std::forward<Functor>(f)}};
+  auto callback = util::MakeIntrusive<CoreT>(std::forward<Functor>(f));
   callback->SetExecutor(caller->GetExecutor());
   if constexpr (Inline) {
     caller->SetCallbackInline(callback);
@@ -216,11 +216,11 @@ auto SetSyncCallback(FutureCorePtr<Arg> caller, Functor&& f) {
 
 template <bool Inline, typename Ret, typename Arg, typename Functor>
 auto SetAsyncCallback(FutureCorePtr<Arg> caller, Functor&& f) {
-  util::Ptr next_callback{new util::Counter<detail::ResultCore<Ret>>{}};
+  auto next_callback = util::MakeIntrusive<detail::ResultCore<Ret>>();
   next_callback->SetExecutor(caller->GetExecutor());
   using InvokeT = detail::AsyncInvoke<Ret, decltype(std::forward<Functor>(f)), Arg>;
   using CoreT = detail::Core<void, InvokeT, Arg>;
-  util::Ptr prev_callback{new util::Counter<CoreT>{next_callback, std::forward<Functor>(f)}};
+  auto prev_callback = util::MakeIntrusive<CoreT>(next_callback, std::forward<Functor>(f));
   prev_callback->SetExecutor(caller->GetExecutor());
   if constexpr (Inline) {
     caller->SetCallbackInline(prev_callback);

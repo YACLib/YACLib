@@ -14,7 +14,7 @@ bool Wait(const Timeout& t, Cores&... cs) {
   static_assert(sizeof...(cs) > 0, "Number of futures must be more than zero");
   static_assert((... && std::is_same_v<detail::BaseCore, Cores>), "Futures must be Future in Wait function");
   util::Counter<detail::WaitCore, detail::WaitCoreDeleter> wait_core;
-  wait_core.IncRef();  // Optimization: we don't want to notify when return true immediately
+  // wait_core ref counter = 1, it is optimization: we don't want to notify when return true immediately
   if ((... & cs.SetWait(wait_core))) {
     return true;
   }

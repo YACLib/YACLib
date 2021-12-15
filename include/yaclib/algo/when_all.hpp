@@ -34,6 +34,13 @@ class AllCombinator : public BaseCore, public AllCombinatorBase<FutureValue> {
   using Base = AllCombinatorBase<FutureValue>;
 
  public:
+  explicit AllCombinator(Promise<FutureValue> promise, [[maybe_unused]] size_t size = 0)
+      : BaseCore{BaseCore::State::Empty}, _promise{std::move(promise)} {
+    if constexpr (!std::is_void_v<T> && !IsArray) {
+      AllCombinatorBase<FutureValue>::_results.resize(size);
+    }
+  }
+
   static std::pair<Future<FutureValue>, util::Ptr<AllCombinator>> Make(size_t size = 0) {
     auto [future, promise] = MakeContract<FutureValue>();
     if constexpr (!IsArray) {
@@ -46,7 +53,7 @@ class AllCombinator : public BaseCore, public AllCombinatorBase<FutureValue> {
         return {std::move(future), nullptr};
       }
     }
-    return {std::move(future), new util::Counter<AllCombinator>{std::move(promise), size}};
+    return {std::move(future), util::MakeIntrusive<AllCombinator>(std::move(promise), size)};
   }
 
   void CallInline(void* context) noexcept final {
@@ -88,13 +95,6 @@ class AllCombinator : public BaseCore, public AllCombinatorBase<FutureValue> {
   }
 
  private:
-  explicit AllCombinator(Promise<FutureValue> promise, [[maybe_unused]] size_t size = 0)
-      : BaseCore{BaseCore::State::Empty}, _promise{std::move(promise)} {
-    if constexpr (!std::is_void_v<T> && !IsArray) {
-      AllCombinatorBase<FutureValue>::_results.resize(size);
-    }
-  }
-
   Promise<FutureValue> _promise;
 };
 

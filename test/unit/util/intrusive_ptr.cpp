@@ -46,17 +46,17 @@ TEST(ctor, pointer) {
   }
   EXPECT_EQ(Core::sInstances, 0);
   {
-    Ptr<Core> px{nullptr, false};
+    Ptr<Core> px = {nullptr, NoIncRefTag{}};
     EXPECT_EQ(px, nullptr);
   }
   EXPECT_EQ(Core::sInstances, 0);
   {
     auto* p = new CounterX;
-    EXPECT_EQ(p->GetRef(), 0);
+    EXPECT_EQ(p->GetRef(), 1);
 
     EXPECT_EQ(Core::sInstances, 1);
 
-    Ptr<Core> px{p};
+    Ptr<Core> px{p, NoIncRefTag{}};
     EXPECT_EQ(px.Get(), p);
     EXPECT_EQ(px, p);
     EXPECT_EQ(p, px);
@@ -65,15 +65,14 @@ TEST(ctor, pointer) {
   EXPECT_EQ(Core::sInstances, 0);
   {
     auto* p = new CounterX;
-    EXPECT_EQ(p->GetRef(), 0);
+    EXPECT_EQ(p->GetRef(), 1);
 
-    p->IncRef();
     p->IncRef();
     EXPECT_EQ(p->GetRef(), 2);
 
-    Ptr<Core> pb{p, false};
+    Ptr<Core> pb{p, NoIncRefTag{}};
     {
-      Ptr<CounterX> pc{p, false};
+      Ptr<CounterX> pc{p, NoIncRefTag{}};
       EXPECT_EQ(pb, pc);
       EXPECT_EQ(p->GetRef(), 2);
     }
@@ -97,14 +96,14 @@ TEST(ctor, copy) {
   }
   EXPECT_EQ(Core::sInstances, 0);
   {
-    Ptr<X> px1(new CounterX);
+    Ptr<X> px1 = MakeIntrusive<X>();
     Ptr<X> px2(px1);
     EXPECT_EQ(px1, px2);
     EXPECT_EQ(Core::sInstances, 1);
   }
   EXPECT_EQ(Core::sInstances, 0);
   {
-    Ptr<Y> py{new CounterY};
+    Ptr<Y> py = MakeIntrusive<Y>();
     Ptr<X> px(py);
     EXPECT_EQ(py, px);
     EXPECT_EQ(Core::sInstances, 1);
@@ -123,11 +122,11 @@ TEST(dtor, simple) {
 
   {
     auto x = new CounterX;
-    Ptr<X> px1(x);
+    Ptr<X> px1{x, NoIncRefTag{}};
     EXPECT_EQ(x->GetRef(), 1);
     EXPECT_EQ(Core::sInstances, 1);
     {
-      Ptr<X> px2(x);
+      Ptr<X> px2{x};
       EXPECT_EQ(x->GetRef(), 2);
       EXPECT_EQ(Core::sInstances, 1);
     }
@@ -168,7 +167,7 @@ TEST(assign, copy) {
 
     EXPECT_EQ(Core::sInstances, 0);
 
-    Ptr<X> p4(new CounterX);
+    Ptr<X> p4 = MakeIntrusive<X>();
 
     EXPECT_EQ(Core::sInstances, 1);
 
@@ -208,7 +207,7 @@ TEST(assign, conversation) {
 
     EXPECT_EQ(Core::sInstances, 0);
 
-    Ptr<Y> p4(new CounterY);
+    Ptr<Y> p4 = MakeIntrusive<Y>();
 
     EXPECT_EQ(Core::sInstances, 1);
     EXPECT_EQ(static_cast<CounterY&>(*p4).GetRef(), 1);
@@ -271,7 +270,7 @@ TEST(assign, pointer) {
 
     EXPECT_EQ(Core::sInstances, 0);
 
-    Ptr<X> p4(new CounterX);
+    Ptr<X> p4 = MakeIntrusive<X>();
 
     EXPECT_EQ(Core::sInstances, 1);
 
@@ -307,7 +306,7 @@ TEST(assign, pointer) {
 
     EXPECT_EQ(Core::sInstances, 0);
 
-    Ptr<Y> p4(new CounterY);
+    Ptr<Y> p4 = MakeIntrusive<Y>();
 
     EXPECT_EQ(Core::sInstances, 1);
     EXPECT_EQ(static_cast<CounterY&>(*p4).GetRef(), 1);
