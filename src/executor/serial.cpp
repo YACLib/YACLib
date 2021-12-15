@@ -71,7 +71,7 @@ class Serial : public IExecutor, public ITask {
 }  // namespace
 
 IExecutorPtr MakeSerial(IExecutorPtr executor) {
-  return new util::Counter<Serial>{std::move(executor)};
+  return util::MakeIntrusive<Serial, IExecutor>(std::move(executor));
 }
 
 }  // namespace yaclib

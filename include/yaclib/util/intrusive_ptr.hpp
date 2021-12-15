@@ -8,6 +8,8 @@
 
 namespace yaclib::util {
 
+struct NoIncRefTag {};
+
 /**
  * A intrusive pointer to objects with an embedded reference count
  *
@@ -21,11 +23,15 @@ class Ptr {
   constexpr Ptr() noexcept : _ptr{nullptr} {
   }
 
-  Ptr(T* other, bool acquire = true) noexcept : _ptr{other} {
-    if (_ptr && acquire) {
+  Ptr(T* other) noexcept : _ptr{other} {
+    if (_ptr) {
       _ptr->IncRef();
     }
   }
+
+  Ptr(T* other, NoIncRefTag) noexcept : _ptr{other} {
+  }
+
   Ptr(Ptr&& other) noexcept : _ptr{std::exchange(other._ptr, nullptr)} {
   }
   Ptr(const Ptr& other) noexcept : _ptr{other._ptr} {

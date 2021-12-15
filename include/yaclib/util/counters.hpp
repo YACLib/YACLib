@@ -1,6 +1,7 @@
 #pragma once
 
 #include <yaclib/config.hpp>
+#include <yaclib/util/intrusive_ptr.hpp>
 
 #include <atomic>
 
@@ -43,7 +44,7 @@ class Counter final : public CounterBase, public Deleter {
   }
 
  private:
-  std::atomic_size_t _impl{0};
+  std::atomic_size_t _impl{1};
 };
 
 template <typename CounterBase>
@@ -57,5 +58,10 @@ class NothingCounter final : public CounterBase {
   void DecRef() noexcept final {
   }
 };
+
+template <typename ObjectType, typename PtrType = ObjectType, typename... Args>
+util::Ptr<PtrType> MakeIntrusive(Args&&... args) {
+  return {new Counter<ObjectType>(std::forward<Args>(args)...), NoIncRefTag{}};
+}
 
 }  // namespace yaclib::util

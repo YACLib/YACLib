@@ -264,9 +264,9 @@ IThreadPool* CurrentThreadPool() noexcept {
 
 IThreadPoolPtr MakeThreadPool(size_t threads, IThreadFactoryPtr tf) {
   if (threads == 1) {
-    return new util::Counter<SingleThread>{std::move(tf)};
+    return util::MakeIntrusive<SingleThread, IThreadPool>(std::move(tf));
   }
-  return new util::Counter<ThreadPool>{std::move(tf), threads};
+  return util::MakeIntrusive<ThreadPool, IThreadPool>(std::move(tf), threads);
 }
 
 }  // namespace yaclib

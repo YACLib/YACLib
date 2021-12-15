@@ -51,7 +51,7 @@ class CallImpl : public Interface {
  */
 template <typename Functor>
 IFuncPtr MakeFunc(Functor&& f) {
-  return new util::Counter<detail::CallImpl<IFunc, std::decay_t<Functor>>>{std::forward<Functor>(f)};
+  return MakeIntrusive<detail::CallImpl<IFunc, std::decay_t<Functor>>, IFunc>(std::forward<Functor>(f));
 }
 
 }  // namespace yaclib::util

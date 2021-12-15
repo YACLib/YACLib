@@ -22,18 +22,18 @@ auto Run(const IExecutorPtr& e, Functor&& f) {
   constexpr bool kIsAsync = util::IsFutureV<AsyncRet>;
   using Ret = util::detail::ResultValueT<util::detail::FutureValueT<AsyncRet>>;
   if constexpr (kIsAsync) {
-    util::Ptr callback{new util::Counter<detail::ResultCore<Ret>>{}};
+    auto callback = util::MakeIntrusive<detail::ResultCore<Ret>>();
     callback->SetExecutor(e);
     using InvokeT = detail::AsyncInvoke<Ret, decltype(std::forward<Functor>(f)), void>;
     using CoreT = detail::Core<void, InvokeT, void>;
-    util::Ptr core{new util::Counter<CoreT>{callback, std::forward<Functor>(f)}};
+    auto core = util::MakeIntrusive<CoreT>(callback, std::forward<Functor>(f));
     core->SetExecutor(e);
     e->Execute(*core);
     return Future<Ret>{callback};
   } else {
     using InvokeT = detail::SyncInvoke<Ret, decltype(std::forward<Functor>(f)), void>;
     using CoreT = detail::Core<Ret, InvokeT, void>;
-    util::Ptr core{new util::Counter<CoreT>{std::forward<Functor>(f)}};
+    auto core = util::MakeIntrusive<CoreT>(std::forward<Functor>(f));
     core->SetExecutor(e);
     e->Execute(*core);
     return Future<Ret>{std::move(core)};

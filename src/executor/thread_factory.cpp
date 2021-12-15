@@ -342,24 +342,25 @@ IThreadFactoryPtr MakeThreadFactory(size_t cache_threads) {
     static LightThreadFactory sFactory;
     return IThreadFactoryPtr{&sFactory};
   }
-  return new util::Counter<HeavyThreadFactory>{cache_threads};
+  return util::MakeIntrusive<HeavyThreadFactory, IThreadFactory>(cache_threads);
 }
 
 IThreadFactoryPtr MakeThreadFactory(IThreadFactoryPtr base, size_t priority) {
-  return new util::Counter<PriorityThreadFactory>(std::move(base), priority);
+  return util::MakeIntrusive<PriorityThreadFactory, IThreadFactory>(std::move(base), priority);
 }
 
 IThreadFactoryPtr MakeThreadFactory(IThreadFactoryPtr base, std::string name) {
-  return new util::Counter<NamedThreadFactory>(std::move(base), std::move(name));
+  return util::MakeIntrusive<NamedThreadFactory, IThreadFactory>(std::move(base), std::move(name));
 }
 
 IThreadFactoryPtr MakeThreadFactory(IThreadFactoryPtr base, util::IFuncPtr acquire, util::IFuncPtr release) {
   if (acquire && release) {
-    return new util::Counter<CallbackThreadFactory>(std::move(base), std::move(acquire), std::move(release));
+    return util::MakeIntrusive<CallbackThreadFactory, IThreadFactory>(std::move(base), std::move(acquire),
+                                                                      std::move(release));
   } else if (acquire) {
-    return new util::Counter<AcquireThreadFactory>(std::move(base), std::move(release));
+    return util::MakeIntrusive<AcquireThreadFactory, IThreadFactory>(std::move(base), std::move(acquire));
   } else if (release) {
-    return new util::Counter<ReleaseThreadFactory>(std::move(base), std::move(release));
+    return util::MakeIntrusive<ReleaseThreadFactory, IThreadFactory>(std::move(base), std::move(release));
   }
   return base;  // Copy elision doesn't work for function arguments, but implicit move guaranteed by standard
 }
