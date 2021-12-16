@@ -19,27 +19,27 @@ class SharedTimedMutex {
   SharedTimedMutex(const SharedTimedMutex&) = delete;
   SharedTimedMutex& operator=(const SharedTimedMutex&) = delete;
 
-  inline void lock();
-  inline bool try_lock() noexcept;
-  inline void unlock() noexcept;
+  void lock();
+  bool try_lock() noexcept;
+  void unlock() noexcept;
 
   template <class _Rep, class _Period>
-  inline bool try_lock_for(const ::std::chrono::duration<_Rep, _Period>& duration) {
+  bool try_lock_for(const ::std::chrono::duration<_Rep, _Period>& duration) {
     return try_lock_until(chrono::steady_clock::now() + duration);
   }
   template <class _Clock, class _Duration>
-  inline bool try_lock_until(const ::std::chrono::time_point<_Clock, _Duration>& duration);
+  bool try_lock_until(const ::std::chrono::time_point<_Clock, _Duration>& duration);
 
-  inline void lock_shared();
-  inline bool try_lock_shared() noexcept;
-  inline void unlock_shared() noexcept;
+  void lock_shared();
+  bool try_lock_shared() noexcept;
+  void unlock_shared() noexcept;
 
   template <class _Rep, class _Period>
-  inline bool try_lock_shared_for(const ::std::chrono::duration<_Rep, _Period>& duration) {
+  bool try_lock_shared_for(const ::std::chrono::duration<_Rep, _Period>& duration) {
     return try_lock_until(chrono::steady_clock::now() + duration);
   }
   template <class _Clock, class _Duration>
-  inline bool try_lock_shared_until(const ::std::chrono::time_point<_Clock, _Duration>& duration);
+  bool try_lock_shared_until(const ::std::chrono::time_point<_Clock, _Duration>& duration);
 
  private:
 #if defined(YACLIB_FIBER)
@@ -62,13 +62,13 @@ class SharedMutex {
   SharedMutex(const SharedMutex&) = delete;
   SharedMutex& operator=(const SharedMutex&) = delete;
 
-  inline void lock();
-  inline bool try_lock() noexcept;
-  inline void unlock() noexcept;
+  void lock();
+  bool try_lock() noexcept;
+  void unlock() noexcept;
 
-  inline void lock_shared();
-  inline bool try_lock_shared() noexcept;
-  inline void unlock_shared() noexcept;
+  void lock_shared();
+  bool try_lock_shared() noexcept;
+  void unlock_shared() noexcept;
 
   // TODO(myannyax) no handle?
 

@@ -6,11 +6,11 @@ Thread::Thread() noexcept : _impl() {
 }
 
 Thread::Thread(Thread&& t) noexcept {
-  _impl = ::std::thread(t);
+  _impl = static_cast<::std::thread&&>(t._impl);
 }
 
 Thread& Thread::operator=(Thread&& t) noexcept {
-  _impl = ::std::thread(t);
+  _impl = static_cast<::std::thread&&>(t._impl);
   return *this;
 }
 

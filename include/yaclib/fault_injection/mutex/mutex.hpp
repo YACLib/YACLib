@@ -19,16 +19,16 @@ class TimedMutex {
   TimedMutex(const TimedMutex&) = delete;
   TimedMutex& operator=(const TimedMutex&) = delete;
 
-  inline void lock();
-  inline bool try_lock() noexcept;
-  inline void unlock() noexcept;
+  void lock();
+  bool try_lock() noexcept;
+  void unlock() noexcept;
 
   template <class _Rep, class _Period>
-  inline bool try_lock_for(const ::std::chrono::duration<_Rep, _Period>& duration) {
+  bool try_lock_for(const ::std::chrono::duration<_Rep, _Period>& duration) {
     return try_lock_until(chrono::steady_clock::now() + duration);
   }
   template <class _Clock, class _Duration>
-  inline bool try_lock_until(const ::std::chrono::time_point<_Clock, _Duration>& duration);
+  bool try_lock_until(const ::std::chrono::time_point<_Clock, _Duration>& duration);
 
  private:
 #if defined(YACLIB_FIBER)
@@ -49,9 +49,9 @@ class Mutex {
   Mutex(const Mutex&) = delete;
   Mutex& operator=(const Mutex&) = delete;
 
-  inline void lock();
-  inline bool try_lock() noexcept;
-  inline void unlock() noexcept;
+  void lock();
+  bool try_lock() noexcept;
+  void unlock() noexcept;
 
 #if defined(YACLIB_FIBER)
   // TODO(myannyax)

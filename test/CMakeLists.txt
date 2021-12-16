@@ -44,6 +44,10 @@ set(TEST_UTIL_INCLUDES
 set(YACLIB_EXAMPLE_SOURCES)
 set(YACLIB_EXAMPLE_INCLUDES)
 
+if (YACLIB_FAULTY)
+  add_compile_definitions(YACLIB_FAULTY)
+endif ()
+
 #TODO(MBkkt) Add options which shuffle tests list
 set(YACLIB_UNITS
   unit/util/intrusive_ptr
@@ -57,6 +61,7 @@ set(YACLIB_UNITS
   unit/executor/thread_pool
   unit/executor/serial
   unit/fiber/basic
+  unit/fault_injection/mutex
   )
 
 if (YACLIB_BUILD_EXAMPLES)

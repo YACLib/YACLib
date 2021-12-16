@@ -5,13 +5,13 @@
 
 namespace yaclib::std::this_thread {
 
-inline void sleep_for(const ::std::chrono::nanoseconds& time);
+void sleep_for(const ::std::chrono::nanoseconds& time);
 
 template <class Duration>
-inline void sleep_until(const ::std::chrono::time_point<yaclib::std::chrono::steady_clock, Duration>& time_point);
+void sleep_until(const ::std::chrono::time_point<yaclib::std::chrono::steady_clock, Duration>& time_point);
 
-inline void yield() noexcept;
+void yield() noexcept;
 
-inline yaclib::std::thread::id get_id() noexcept;
+yaclib::std::thread::id get_id() noexcept;
 
 }  // namespace yaclib::std::this_thread
