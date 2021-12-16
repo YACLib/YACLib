@@ -15,7 +15,7 @@ namespace yaclib {
  */
 template <typename Rep, typename Period, typename... T>
 bool WaitFor(const std::chrono::duration<Rep, Period>& timeout_duration, Future<T>&... fs) {
-  return detail::Wait(timeout_duration, static_cast<detail::BaseCore&>(*fs.GetCore())...);
+  return detail::WaitCores(timeout_duration, static_cast<detail::BaseCore&>(*fs.GetCore())...);
 }
 
 /**
@@ -31,7 +31,7 @@ bool WaitFor(const std::chrono::duration<Rep, Period>& timeout_duration, Future<
 template <typename Rep, typename Period, typename Iterator>
 std::enable_if_t<!util::IsFutureV<Iterator>, bool> WaitFor(const std::chrono::duration<Rep, Period>& timeout_duration,
                                                            Iterator begin, Iterator end) {
-  return detail::Wait(timeout_duration, begin, begin, end);
+  return detail::WaitIters(timeout_duration, begin, begin, end);
 }
 
 /**
@@ -46,7 +46,7 @@ std::enable_if_t<!util::IsFutureV<Iterator>, bool> WaitFor(const std::chrono::du
  */
 template <typename Rep, typename Period, typename Iterator>
 bool WaitFor(const std::chrono::duration<Rep, Period>& timeout_duration, Iterator begin, size_t size) {
-  return detail::Wait(timeout_duration, begin, 0, size);
+  return detail::WaitIters(timeout_duration, begin, size_t{0}, size);
 }
 
 }  // namespace yaclib

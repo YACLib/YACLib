@@ -15,6 +15,7 @@ namespace yaclib {
 template <WhenPolicy P = WhenPolicy::FirstFail, typename It,
           typename T = util::detail::FutureValueT<typename std::iterator_traits<It>::value_type>>
 auto WhenAll(It begin, size_t size) {
+  static_assert(P == WhenPolicy::FirstFail, "TODO(Ri7ay) Add other policy for WhenAll");
   auto [future, combinator] = detail::AllCombinator<T>::Make(size);
   for (size_t i = 0; i != size; ++i) {
     begin->GetCore()->SetCallbackInline(combinator);
@@ -34,6 +35,7 @@ auto WhenAll(It begin, size_t size) {
  */
 template <WhenPolicy P = WhenPolicy::FirstFail, typename It>
 auto WhenAll(It begin, It end) {
+  static_assert(P == WhenPolicy::FirstFail, "TODO(Ri7ay) Add other policy for WhenAll");
   static_assert(util::IsFutureV<typename std::iterator_traits<It>::value_type>,
                 "When function Iterator must be point to some Future");
   return WhenAll(begin, std::distance(begin, end));
@@ -48,6 +50,7 @@ auto WhenAll(It begin, It end) {
  */
 template <WhenPolicy P = WhenPolicy::FirstFail, typename T, typename... Ts>
 auto WhenAll(Future<T>&& head, Future<Ts>&&... tail) {
+  static_assert(P == WhenPolicy::FirstFail, "TODO(Ri7ay) Add other policy for WhenAll");
   constexpr size_t kSize = 1 + sizeof...(Ts);
   static_assert(kSize >= 2, "WhenAll wants at least two futures");
   auto [future, combinator] = detail::AllCombinator<T, kSize>::Make();

@@ -17,14 +17,14 @@ class WaitCore : public util::IRef {
 
   template <typename Rep, typename Period>
   bool Wait(std::unique_lock<std::mutex>& guard, const std::chrono::duration<Rep, Period>& timeout_duration) {
-    return cv.wait_for(guard, timeout_duration, [this] {
+    return cv.wait_for(guard, timeout_duration, [&] {
       return is_ready;
     });
   }
 
   template <typename Clock, typename Duration>
   bool Wait(std::unique_lock<std::mutex>& guard, const std::chrono::time_point<Clock, Duration>& timeout_time) {
-    return cv.wait_until(guard, timeout_time, [this] {
+    return cv.wait_until(guard, timeout_time, [&] {
       return is_ready;
     });
   }

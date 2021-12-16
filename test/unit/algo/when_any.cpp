@@ -119,6 +119,7 @@ void EmptyInput() {
   auto empty = std::vector<Future<V>>{};
   auto any = WhenAny<P>(empty.begin(), empty.end());
   EXPECT_FALSE(any.Valid());
+  //  Return this code if we decide to return an empty ready future
   //  EXPECT_TRUE(any.Ready());
   //  auto result = std::move(any).Get();
   //  EXPECT_EQ(result.State(), util::ResultState::Empty);
@@ -133,11 +134,11 @@ void MultiThreaded() {
 
   auto async_value = [tp](int value) {
     return Run(tp, [value] {
-      std::this_thread::sleep_for(10ms);
-      if constexpr (!kIsVoid) {
-        return value;
-      } else {
+      std::this_thread::sleep_for(20ms * YACLIB_CI_SLOWDOWN);
+      if constexpr (kIsVoid) {
         (void)value;
+      } else {
+        return value;
       }
     });
   };
@@ -161,7 +162,7 @@ void MultiThreaded() {
   auto begin = std::chrono::steady_clock::now();
   auto ints = gen_fs().Get();
   auto time = std::chrono::steady_clock::now() - begin;
-  EXPECT_LT(time, 20ms);
+  EXPECT_LT(time, 40ms * YACLIB_CI_SLOWDOWN);
 
   if constexpr (kIsVoid) {
     EXPECT_NO_THROW(std::move(ints).Ok());
@@ -183,7 +184,7 @@ void TimeTest() {
 
   auto async_value = [tp](int value, Duration d) {
     return Run(tp, [value, d] {
-      std::this_thread::sleep_for(d);
+      std::this_thread::sleep_for(d * YACLIB_CI_SLOWDOWN);
       if constexpr (!is_void) {
         return value;
       } else {
@@ -197,7 +198,7 @@ void TimeTest() {
   std::array<Future<V>, kValues> fs;
 
   fs[0] = async_value(10, 100ms);
-  fs[1] = async_value(5, 10ms);
+  fs[1] = async_value(5, 20ms);
 
   auto gen_fs = [&fs] {
     if constexpr (C == Container::Vector) {
@@ -210,7 +211,7 @@ void TimeTest() {
   auto begin = std::chrono::steady_clock::now();
   auto ints = gen_fs().Get();
   auto time = std::chrono::steady_clock::now() - begin;
-  EXPECT_LT(time, 50ms);
+  EXPECT_LT(time, 90ms * YACLIB_CI_SLOWDOWN);
 
   if constexpr (is_void) {
     EXPECT_NO_THROW(std::move(ints).Ok());
@@ -404,6 +405,14 @@ TEST_P(WhenAnyDefault, Default) {
   EXPECT_NE(r, Result::Ok);
   EXPECT_EQ(p, WhenPolicy::LastFail);
   CALL_F(Default)
+}
+
+TEST(WhenAny, LengthOne) {
+  std::array<Future<int>, 1> fs;
+  const void* old_addr = fs[0].GetCore().Get();
+  auto new_future = yaclib::WhenAny(std::begin(fs), 1);
+  const void* new_addr = new_future.GetCore().Get();
+  EXPECT_EQ(old_addr, new_addr);
 }
 
 }  // namespace

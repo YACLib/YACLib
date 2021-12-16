@@ -12,7 +12,7 @@ namespace yaclib {
  */
 template <typename... T>
 void Wait(Future<T>&... fs) {
-  detail::Wait(detail::NoTimeoutTag{}, static_cast<detail::BaseCore&>(*fs.GetCore())...);
+  detail::WaitCores(detail::NoTimeoutTag{}, static_cast<detail::BaseCore&>(*fs.GetCore())...);
 }
 
 /**
@@ -23,7 +23,7 @@ void Wait(Future<T>&... fs) {
  */
 template <typename Iterator>
 std::enable_if_t<!util::IsFutureV<Iterator>, void> Wait(Iterator begin, Iterator end) {
-  detail::Wait(detail::NoTimeoutTag{}, begin, begin, end);
+  detail::WaitIters(detail::NoTimeoutTag{}, begin, begin, end);
 }
 
 /**
@@ -34,7 +34,7 @@ std::enable_if_t<!util::IsFutureV<Iterator>, void> Wait(Iterator begin, Iterator
  */
 template <typename Iterator>
 void Wait(Iterator begin, size_t size) {
-  detail::Wait(detail::NoTimeoutTag{}, begin, 0, size);
+  detail::WaitIters(detail::NoTimeoutTag{}, begin, size_t{0}, size);
 }
 
 }  // namespace yaclib

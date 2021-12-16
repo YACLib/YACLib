@@ -20,7 +20,6 @@ class WaitGroup {
   void Add(Future<T>& f) {
     f.GetCore()->SetWait(_callback);
   }
-  void Add(Future<void>&& f);
 
   /**
    * Waiting for the execution of all futures added to WaitGroup

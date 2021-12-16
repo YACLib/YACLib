@@ -47,6 +47,19 @@ void TestJustWorks() {
   tp->Wait();
 }
 
+TEST(Wait, Empty) {
+  std::vector<yaclib::Future<int>> fs;
+
+  Wait(fs.begin(), 0);
+  Wait(fs.begin(), fs.end());
+
+  EXPECT_TRUE(WaitFor(0ns, fs.begin(), 0));
+  EXPECT_TRUE(WaitFor(0ns, fs.begin(), fs.end()));
+
+  EXPECT_TRUE(WaitUntil(std::chrono::steady_clock::now(), fs.begin(), 0));
+  EXPECT_TRUE(WaitUntil(std::chrono::steady_clock::now(), fs.begin(), fs.end()));
+}
+
 TEST(Wait, JustWorks) {
   TestJustWorks<WaitPolicy::Endless>();
 }

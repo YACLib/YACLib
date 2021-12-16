@@ -17,7 +17,7 @@ namespace yaclib {
  */
 template <typename Clock, typename Duration, typename... T>
 bool WaitUntil(const std::chrono::time_point<Clock, Duration>& timeout_time, Future<T>&... fs) {
-  return detail::Wait(timeout_time, static_cast<detail::BaseCore&>(*fs.GetCore())...);
+  return detail::WaitCores(timeout_time, static_cast<detail::BaseCore&>(*fs.GetCore())...);
 }
 
 /**
@@ -34,7 +34,7 @@ bool WaitUntil(const std::chrono::time_point<Clock, Duration>& timeout_time, Fut
 template <typename Clock, typename Duration, typename Iterator>
 std::enable_if_t<!util::IsFutureV<Iterator>, bool> WaitUntil(
     const std::chrono::time_point<Clock, Duration>& timeout_time, Iterator begin, Iterator end) {
-  return detail::Wait(timeout_time, begin, begin, end);
+  return detail::WaitIters(timeout_time, begin, begin, end);
 }
 
 /**
@@ -50,7 +50,7 @@ std::enable_if_t<!util::IsFutureV<Iterator>, bool> WaitUntil(
  */
 template <typename Clock, typename Duration, typename Iterator>
 bool WaitUntil(const std::chrono::time_point<Clock, Duration>& timeout_time, Iterator begin, size_t size) {
-  return detail::Wait(timeout_time, begin, 0, size);
+  return detail::WaitIters(timeout_time, begin, size_t{0}, size);
 }
 
 }  // namespace yaclib

@@ -10,7 +10,7 @@ namespace yaclib::detail {
 struct NoTimeoutTag {};
 
 template <typename Timeout, typename Range>
-bool Wait(const Timeout& t, Range range) {
+bool WaitRange(const Timeout& t, Range range) {
   util::Counter<detail::WaitCore, detail::WaitCoreDeleter> wait_core;
   // wait_core ref counter = 1, it is optimization: we don't want to notify when return true immediately
   if (range([&](detail::BaseCore& core) {
@@ -42,19 +42,19 @@ bool Wait(const Timeout& t, Range range) {
 }
 
 template <typename Timeout, typename... Cores>
-bool Wait(const Timeout& t, Cores&... cs) {
+bool WaitCores(const Timeout& t, Cores&... cs) {
   static_assert(sizeof...(cs) >= 1, "Number of futures must be at least one");
   static_assert((... && std::is_same_v<detail::BaseCore, Cores>), "Futures must be Future in Wait function");
   auto range = [&](auto&& functor) {
-    return (... & functor(cs));  // TODO(MBkkt) Maybe (functor(cs) & ...) is better
+    return (... & functor(cs));
   };
-  return Wait(t, range);
+  return WaitRange(t, range);
 }
 
-extern template bool Wait<NoTimeoutTag, BaseCore>(const NoTimeoutTag&, BaseCore&);
+extern template bool WaitCores<NoTimeoutTag, BaseCore>(const NoTimeoutTag&, BaseCore&);
 
 template <typename Timeout, typename ValueIt, typename RangeIt>
-bool Wait(const Timeout& t, ValueIt it, RangeIt begin, RangeIt end) {
+bool WaitIters(const Timeout& t, ValueIt it, RangeIt begin, RangeIt end) {
   static_assert(util::IsFutureV<typename std::iterator_traits<ValueIt>::value_type>,
                 "Wait function Iterator must be point to some Future");
   if (begin == end) {
@@ -71,7 +71,7 @@ bool Wait(const Timeout& t, ValueIt it, RangeIt begin, RangeIt end) {
     }
     return ok;
   };
-  return Wait(t, range);
+  return WaitRange(t, range);
 }
 
 }  // namespace yaclib::detail

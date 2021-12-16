@@ -1043,7 +1043,7 @@ TEST(BruhTestCov, BaseCoreCall) {
   yaclib::Promise<int> p;
   auto& core = static_cast<yaclib::detail::InlineCore&>(*p.GetCore());
   core.Call();
-  core.Cancel();
+  core.yaclib::detail::InlineCore::Cancel();
 }
 
 }  // namespace

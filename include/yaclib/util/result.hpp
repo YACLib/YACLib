@@ -76,8 +76,8 @@ class Result {
   static_assert(!std::is_same_v<T, std::error_code>, "Result cannot be instantiated with std::error_code");
   static_assert(!std::is_same_v<T, std::exception_ptr>, "Result cannot be instantiated with std::exception_ptr");
 
-  using VariantT = std::variant<std::monostate, std::error_code, std::exception_ptr,
-                                std::conditional_t<std::is_void_v<T>, detail::Unit, T>>;
+  using ValueT = std::conditional_t<std::is_void_v<T>, detail::Unit, T>;
+  using VariantT = std::variant<std::monostate, std::error_code, std::exception_ptr, ValueT>;
 
  public:
   static Result Default() {
@@ -130,16 +130,16 @@ class Result {
   }
 
   [[nodiscard]] ResultState State() const noexcept {
-    if (std::holds_alternative<std::monostate>(_result)) {
-      return ResultState::Empty;
-    }
-    if (std::holds_alternative<std::error_code>(_result)) {
-      return ResultState::Error;
+    if (std::holds_alternative<ValueT>(_result)) {
+      return ResultState::Value;
     }
     if (std::holds_alternative<std::exception_ptr>(_result)) {
       return ResultState::Exception;
     }
-    return ResultState::Value;
+    if (std::holds_alternative<std::error_code>(_result)) {
+      return ResultState::Error;
+    }
+    return ResultState::Empty;
   }
 
   T Value() && noexcept {
