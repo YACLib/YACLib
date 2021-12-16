@@ -7,6 +7,7 @@ namespace yaclib::std::random {
 
 #if defined(YACLIB_FAULTY)
 
+namespace detail {
 class RandomDevice {
  public:
   using result_type = ::std::mt19937::result_type;
@@ -40,8 +41,9 @@ class RandomDevice {
   static constexpr const unsigned kSeed = 1337;
   ::std::mt19937 _eng;
 };
+}  // namespace detail
 
-using random_device = RandomDevice;
+using random_device = detail::RandomDevice;
 
 #else
 

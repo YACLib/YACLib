@@ -6,6 +6,7 @@ namespace yaclib::std {
 
 #if defined(YACLIB_FAULTY)
 
+namespace detail {
 class Thread {
  public:
   Thread(const Thread&) = delete;
@@ -47,7 +48,11 @@ class Thread {
 #endif
 };
 
-using thread = Thread;
+extern const Thread::id kInvalidThreadId;
+
+}  // namespace detail
+
+using thread = detail::Thread;
 
 #else
 

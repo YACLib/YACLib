@@ -1,6 +1,6 @@
 #include <yaclib/fault_injection/thread/thread.hpp>
 
-namespace yaclib::std {
+namespace yaclib::std::detail {
 
 Thread::Thread() noexcept : _impl() {
 }
@@ -34,7 +34,7 @@ Thread::id Thread::get_id() const noexcept {
   return _impl.get_id();
 }
 
-std::Thread::native_handle_type Thread::native_handle() noexcept {
+Thread::native_handle_type Thread::native_handle() noexcept {
   return _impl.native_handle();
 }
 
@@ -46,4 +46,6 @@ Thread::Thread(::std::function<void()> routine) {
   _impl = ::std::thread(routine);
 }
 
-}  // namespace yaclib::std
+const Thread::id kInvalidThreadId = ::std::thread::id{};
+
+}  // namespace yaclib::std::detail
