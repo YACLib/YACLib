@@ -1,6 +1,13 @@
+#include "yaclib/async/detail/inline_core.hpp"
+
 #include <yaclib/async/detail/base_core.hpp>
 
 namespace yaclib::detail {
+
+void InlineCore::Call() noexcept {
+}
+void InlineCore::Cancel() noexcept {
+}
 
 BaseCore::BaseCore(State state) noexcept : _state{state} {
 }
@@ -19,14 +26,14 @@ void BaseCore::SetState(State s) noexcept {
   _state.store(s, std::memory_order_release);
 }
 
-void BaseCore::SetCallback(util::Ptr<ITask> callback) {
+void BaseCore::SetCallback(util::Ptr<BaseCore> callback) {
   _callback = std::move(callback);
   const auto state = _state.exchange(State::HasCallback, std::memory_order_acq_rel);
   if (state == State::HasResult) {
     Execute();
   }
 }
-void BaseCore::SetCallbackInline(util::Ptr<ITask> callback) {
+void BaseCore::SetCallbackInline(util::Ptr<InlineCore> callback) {
   _callback = std::move(callback);
   const auto state = _state.exchange(State::HasCallbackInline, std::memory_order_acq_rel);
   if (state == State::HasResult) {
@@ -62,11 +69,8 @@ void BaseCore::Execute() noexcept {
 }
 
 void BaseCore::ExecuteInline() noexcept {
-  static_cast<BaseCore&>(*_callback).CallInline(this);
+  static_cast<InlineCore&>(*_callback).CallInline(this);
   Clean();
-}
-
-void BaseCore::Call() noexcept {
 }
 
 void BaseCore::Cancel() noexcept {  // Opposite for Call with SetResult

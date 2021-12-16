@@ -1,6 +1,7 @@
 #pragma once
 
 #include <yaclib/async/detail/wait_core.hpp>
+#include <yaclib/async/future.hpp>
 #include <yaclib/util/counters.hpp>
 
 namespace yaclib {
@@ -15,8 +16,8 @@ class WaitGroup {
    * You also can't use future before Wait
    * \param f one futures to wait
    */
-  template <typename Future>
-  void Add(Future& f) {
+  template <typename T>
+  void Add(Future<T>& f) {
     f.GetCore()->SetWait(_callback);
   }
 
@@ -28,5 +29,7 @@ class WaitGroup {
  private:
   util::Counter<detail::WaitCore, detail::WaitCoreDeleter> _callback;
 };
+
+extern template void WaitGroup::Add<void>(Future<void>& f);
 
 }  // namespace yaclib

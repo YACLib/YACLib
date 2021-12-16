@@ -39,6 +39,7 @@ jobs:
           -DYACLIB_BUILD_EXAMPLES=ON
           -DYACLIB_COVERAGE=ON
           -DYACLIB_CXX_STANDARD=${{ matrix.cxx_standard }}
+          -DYACLIB_DEFINITIONS=/DNDEBUG
 
       - name: Build
         run:
@@ -50,13 +51,14 @@ jobs:
           ctest --output-on-failure -C ${{ matrix.build_type }} -V
 
       - name: Collect lcov info
-        run:
-          cd build &&
-          lcov -d . -c                  -o lcov.info &&
-          lcov -r lcov.info '/usr/*'    -o lcov.info &&
-          lcov -r lcov.info '*/_deps/*' -o lcov.info &&
-          lcov -r lcov.info '*/test/*'  -o lcov.info &&
-          lcov --list lcov.info
+        run: |
+          cd build
+          lcov --rc lcov_branch_coverage=1 -d . -c                       -o lcov_cond.info
+          lcov --rc lcov_branch_coverage=1 -r lcov_cond.info '/usr/*'    -o lcov_cond.info
+          lcov --rc lcov_branch_coverage=1 -r lcov_cond.info '*/_deps/*' -o lcov_cond.info
+          lcov -r lcov_cond.info '*/test/*'  -o lcov.info
+          lcov --rc lcov_branch_coverage=1 -r lcov_cond.info '*/test/*'  -o lcov_cond.info
+          lcov --rc lcov_branch_coverage=1 --list lcov_cond.info
 
       - name: codecov
         uses: codecov/codecov-action@v2.0.3

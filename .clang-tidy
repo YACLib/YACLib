@@ -16,7 +16,8 @@ Checks: '*,
          -google-build-using-namespace,
          -modernize-use-trailing-return-type,
          -readability-identifier-length,
-         -fuchsia-overloaded-operator'
+         -fuchsia-overloaded-operator,
+         -cppcoreguidelines-pro-type-union-access'
 
 WarningsAsErrors: '*'
 

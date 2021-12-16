@@ -47,6 +47,19 @@ void TestJustWorks() {
   tp->Wait();
 }
 
+TEST(Wait, Empty) {
+  std::vector<yaclib::Future<int>> fs;
+
+  Wait(fs.begin(), 0);
+  Wait(fs.begin(), fs.end());
+
+  EXPECT_TRUE(WaitFor(0ns, fs.begin(), 0));
+  EXPECT_TRUE(WaitFor(0ns, fs.begin(), fs.end()));
+
+  EXPECT_TRUE(WaitUntil(std::chrono::steady_clock::now(), fs.begin(), 0));
+  EXPECT_TRUE(WaitUntil(std::chrono::steady_clock::now(), fs.begin(), fs.end()));
+}
+
 TEST(Wait, JustWorks) {
   TestJustWorks<WaitPolicy::Endless>();
 }
@@ -158,7 +171,7 @@ TEST(WaitFor, Diff) {
     });
   }
   test::util::StopWatch timer;
-  bool ready = yaclib::WaitFor(100ms * YACLIB_CI_SLOWDOWN, f[0], f[1], f[2], f[3]);
+  bool ready = yaclib::WaitFor(100ms * YACLIB_CI_SLOWDOWN, std::begin(f), std::end(f));
   EXPECT_FALSE(ready);
   EXPECT_LE(timer.Elapsed(), 150ms * YACLIB_CI_SLOWDOWN);
 

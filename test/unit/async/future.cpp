@@ -79,9 +79,10 @@ TEST(JustWorks, Exception) {
 TEST(JustWorks, Run) {
   auto tp = yaclib::MakeThreadPool();
   bool called = false;
-  Wait(yaclib::Run(tp, [&] {
+  auto f = yaclib::Run(tp, [&] {
     called = true;
-  }));
+  });
+  Wait(f);
   EXPECT_TRUE(called);
   tp->Stop();
   tp->Wait();
@@ -1040,8 +1041,9 @@ TEST(Future, MakeFuture) {
 TEST(BruhTestCov, BaseCoreCall) {
   // This test needed only for stupid test coverage info
   yaclib::Promise<int> p;
-  auto& core = static_cast<yaclib::ITask&>(*p.GetCore());
+  auto& core = static_cast<yaclib::detail::InlineCore&>(*p.GetCore());
   core.Call();
+  core.yaclib::detail::InlineCore::Cancel();
 }
 
 }  // namespace

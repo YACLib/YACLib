@@ -78,7 +78,7 @@ class Counter {
   }
 
   void Increment() {
-    strand_->Execute([this] {
+    strand_->Execute([&] {
       ++value_;
     });
   }

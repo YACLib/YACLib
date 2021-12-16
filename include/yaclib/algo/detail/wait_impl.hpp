@@ -9,13 +9,13 @@ namespace yaclib::detail {
 
 struct NoTimeoutTag {};
 
-template <typename Timeout, typename... Cores>
-bool Wait(const Timeout& t, Cores&... cs) {
-  static_assert(sizeof...(cs) > 0, "Number of futures must be more than zero");
-  static_assert((... && std::is_same_v<detail::BaseCore, Cores>), "Futures must be Future in Wait function");
+template <typename Timeout, typename Range>
+bool WaitRange(const Timeout& t, Range range) {
   util::Counter<detail::WaitCore, detail::WaitCoreDeleter> wait_core;
   // wait_core ref counter = 1, it is optimization: we don't want to notify when return true immediately
-  if ((... & cs.SetWait(wait_core))) {
+  if (range([&](detail::BaseCore& core) {
+        return core.SetWait(wait_core);
+      })) {
     return true;
   }
   wait_core.DecRef();
@@ -29,7 +29,9 @@ bool Wait(const Timeout& t, Cores&... cs) {
       return true;
     }
     guard.unlock();
-    if ((... & cs.ResetWait())) {
+    if (range([](detail::BaseCore& core) {
+          return core.ResetWait();
+        })) {
       return false;
     }
     // We know we have Result, but we must wait until wait_core was not used by cs
@@ -39,6 +41,37 @@ bool Wait(const Timeout& t, Cores&... cs) {
   return ready;
 }
 
-extern template bool Wait<NoTimeoutTag, BaseCore>(const NoTimeoutTag&, BaseCore&);
+template <typename Timeout, typename... Cores>
+bool WaitCores(const Timeout& t, Cores&... cs) {
+  static_assert(sizeof...(cs) >= 1, "Number of futures must be at least one");
+  static_assert((... && std::is_same_v<detail::BaseCore, Cores>), "Futures must be Future in Wait function");
+  auto range = [&](auto&& functor) {
+    return (... & functor(cs));
+  };
+  return WaitRange(t, range);
+}
+
+extern template bool WaitCores<NoTimeoutTag, BaseCore>(const NoTimeoutTag&, BaseCore&);
+
+template <typename Timeout, typename ValueIt, typename RangeIt>
+bool WaitIters(const Timeout& t, ValueIt it, RangeIt begin, RangeIt end) {
+  static_assert(util::IsFutureV<typename std::iterator_traits<ValueIt>::value_type>,
+                "Wait function Iterator must be point to some Future");
+  if (begin == end) {
+    return true;
+  }
+  auto range = [&](auto&& functor) {
+    auto curr = it;
+    auto first = begin;
+    auto last = end;
+    bool ok = true;
+    for (; first != last; ++first) {
+      ok &= functor(*curr->GetCore());
+      ++curr;
+    }
+    return ok;
+  };
+  return WaitRange(t, range);
+}
 
 }  // namespace yaclib::detail

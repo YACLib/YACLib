@@ -26,13 +26,15 @@ struct ResultValue<Result<U>> {
 template <typename T>
 using ResultValueT = typename ResultValue<T>::type;
 
+struct Unit {};
+
 }  // namespace detail
 
 /**
  * Result states \see Result
  * \enum Empty, Value, Error, Exception
  */
-enum class ResultState {
+enum class ResultState : uint8_t {
   Empty = 0,
   Value,
   Error,
@@ -74,14 +76,13 @@ class Result {
   static_assert(!std::is_same_v<T, std::error_code>, "Result cannot be instantiated with std::error_code");
   static_assert(!std::is_same_v<T, std::exception_ptr>, "Result cannot be instantiated with std::exception_ptr");
 
-  struct Unit {};
-  using VariantT =
-      std::variant<std::monostate, std::error_code, std::exception_ptr, std::conditional_t<std::is_void_v<T>, Unit, T>>;
+  using ValueT = std::conditional_t<std::is_void_v<T>, detail::Unit, T>;
+  using VariantT = std::variant<std::monostate, std::error_code, std::exception_ptr, ValueT>;
 
  public:
   static Result Default() {
     static_assert(std::is_void_v<T>, "Only for void");
-    return {Unit{}};
+    return {detail::Unit{}};
   }
 
   Result() : _result{std::monostate{}} {
@@ -113,35 +114,32 @@ class Result {
 
   T Ok() && {
     switch (State()) {
-      case ResultState::Value: {
+      case ResultState::Value:
         if constexpr (std::is_void_v<T>) {
           return;
         } else {
           return std::move(std::get<T>(_result));
         }
-      }
-      case ResultState::Exception: {
+      case ResultState::Exception:
         std::rethrow_exception(std::get<std::exception_ptr>(_result));
-      }
-      case ResultState::Error: {
+      case ResultState::Error:
         throw ResultError{std::get<std::error_code>(_result)};
-      }
-      case ResultState::Empty: {
+      default:
         throw ResultEmpty{};
-      }
     }
   }
 
   [[nodiscard]] ResultState State() const noexcept {
-    if (std::holds_alternative<std::monostate>(_result)) {
-      return ResultState::Empty;
-    } else if (std::holds_alternative<std::error_code>(_result)) {
-      return ResultState::Error;
-    } else if (std::holds_alternative<std::exception_ptr>(_result)) {
-      return ResultState::Exception;
-    } else {
+    if (std::holds_alternative<ValueT>(_result)) {
       return ResultState::Value;
     }
+    if (std::holds_alternative<std::exception_ptr>(_result)) {
+      return ResultState::Exception;
+    }
+    if (std::holds_alternative<std::error_code>(_result)) {
+      return ResultState::Error;
+    }
+    return ResultState::Empty;
   }
 
   T Value() && noexcept {

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <yaclib/async/detail/inline_core.hpp>
 #include <yaclib/executor/executor.hpp>
 #include <yaclib/executor/inline.hpp>
 #include <yaclib/executor/task.hpp>
@@ -9,7 +10,7 @@
 
 namespace yaclib::detail {
 
-class BaseCore : public ITask {
+class BaseCore : public InlineCore {
  public:
   enum class State {
     Empty,
@@ -28,8 +29,8 @@ class BaseCore : public ITask {
   [[nodiscard]] IExecutorPtr GetExecutor() const noexcept;
   void SetExecutor(IExecutorPtr executor) noexcept;
 
-  void SetCallback(util::Ptr<ITask> callback);
-  void SetCallbackInline(util::Ptr<ITask> callback);
+  void SetCallback(util::Ptr<BaseCore> callback);
+  void SetCallbackInline(util::Ptr<InlineCore> callback);
   bool SetWait(util::IRef& callback) noexcept;
   bool ResetWait() noexcept;
 
@@ -43,9 +44,6 @@ class BaseCore : public ITask {
   void ExecuteInline() noexcept;
 
   void Clean() noexcept;
-
-  void Call() noexcept override;
-  virtual void CallInline(void* caller) noexcept = 0;
   void Cancel() noexcept final;
 };
 

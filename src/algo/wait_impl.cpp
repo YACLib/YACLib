@@ -2,6 +2,6 @@
 
 namespace yaclib::detail {
 
-template bool Wait<NoTimeoutTag, BaseCore>(const NoTimeoutTag&, BaseCore&);
+template bool WaitCores<NoTimeoutTag, BaseCore>(const NoTimeoutTag&, BaseCore&);
 
 }  // namespace yaclib::detail

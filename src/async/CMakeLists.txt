@@ -7,6 +7,7 @@ list(APPEND YACLIB_HEADERS
   ${YACLIB_INCLUDE_DIR}/async/detail/base_core.hpp
   ${YACLIB_INCLUDE_DIR}/async/detail/core.hpp
   ${YACLIB_INCLUDE_DIR}/async/detail/future_impl.hpp
+  ${YACLIB_INCLUDE_DIR}/async/detail/inline_core.hpp
   ${YACLIB_INCLUDE_DIR}/async/detail/promise_impl.hpp
   ${YACLIB_INCLUDE_DIR}/async/detail/result_core.hpp
   ${YACLIB_INCLUDE_DIR}/async/detail/wait_core.hpp

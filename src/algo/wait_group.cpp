@@ -2,6 +2,8 @@
 
 namespace yaclib {
 
+template void WaitGroup::Add<void>(Future<void>&);
+
 void WaitGroup::Wait() {
   _callback.DecRef();
   std::unique_lock guard{_callback.m};
