@@ -5,8 +5,7 @@
 #include <atomic>
 #include <random>
 
-namespace yaclib::std {
-
+namespace yaclib::detail {
 // TODO(myannyax) stats?
 class Yielder {
  public:
@@ -18,8 +17,8 @@ class Yielder {
   void Reset();
 
   ::std::atomic<int> _count;
-  int _freq;
+  const int _freq;
   ::std::mt19937 _eng;
 };
 
-}  // namespace yaclib::std
+}  // namespace yaclib::detail

@@ -1,10 +1,6 @@
-//
-// Created by Maria.Filipanova on 12/12/21.
-//
-
 #include <yaclib/fault_injection/random/random_device.hpp>
 
-namespace yaclib::std::random {
+namespace yaclib::std::random::detail {
 
 RandomDevice::RandomDevice() : _eng(kSeed) {
 }
@@ -30,4 +26,4 @@ void RandomDevice::reset() {
   _eng.seed(kSeed);
 }
 
-}  // namespace yaclib::std::random
+}  // namespace yaclib::std::random::detail

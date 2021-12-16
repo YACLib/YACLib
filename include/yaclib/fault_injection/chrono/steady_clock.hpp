@@ -6,6 +6,7 @@ namespace yaclib::std::chrono {
 
 #if defined(YACLIB_FAULTY)
 
+namespace detail {
 class SteadyClock {
  public:
   using rep = ::std::chrono::steady_clock::rep;
@@ -19,8 +20,9 @@ class SteadyClock {
 
  private:
 };
+}  // namespace detail
 
-using steady_clock = SteadyClock;
+using steady_clock = detail::SteadyClock;
 
 #else
 

@@ -1,13 +1,14 @@
 #include <yaclib/fault_injection/antagonist/yielder.hpp>
 
-namespace yaclib::std {
+namespace yaclib::detail {
 
+// TODO(myannyax) maybe scheduler-wide random engine?
 Yielder::Yielder(int frequency) : _eng(1142), _freq(frequency) {
 }
 
 void Yielder::MaybeYield() {
   if (ShouldYield()) {
-    this_thread::yield();
+    std::this_thread::yield();
   }
 }
 
@@ -24,4 +25,4 @@ void Yielder::Reset() {
   _count.exchange(step);
 }
 
-}  // namespace yaclib::std
+}  // namespace yaclib::detail

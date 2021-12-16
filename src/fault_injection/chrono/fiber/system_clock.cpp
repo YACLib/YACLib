@@ -1,6 +1,6 @@
-#include <yaclib/fault_injection/chrono/system_clock.hpp>
+#include "yaclib/fault_injection/chrono/system_clock.hpp"
 
-namespace yaclib::fault_injection::chrono {
+namespace yaclib::fault_injection::chrono::detail {
 
 system_clock::time_point system_clock::now() {
   // TODO(myannyax)
@@ -15,4 +15,4 @@ system_clock::time_point system_clock::from_time_t(time_t c_time_point) _NOEXCEP
   return std::chrono::system_clock::from_time_t(c_time_point);
 }
 
-}  // namespace yaclib::fault_injection::chrono
+}  // namespace yaclib::fault_injection::chrono::detail

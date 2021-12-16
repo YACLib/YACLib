@@ -6,6 +6,7 @@ namespace yaclib::std::chrono {
 
 #if defined(YACLIB_FAULTY)
 
+namespace detail {
 class SystemClock {
  public:
   using rep = ::std::chrono::system_clock::rep;
@@ -21,8 +22,9 @@ class SystemClock {
 
   static time_point from_time_t(time_t c_time_point) _NOEXCEPT;
 };
+}  // namespace detail
 
-using system_clock = SystemClock;
+using system_clock = detail::SystemClock;
 
 #else
 
