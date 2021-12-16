@@ -2,10 +2,6 @@ find_package(GTest QUIET)
 find_package(benchmark QUIET)
 
 if (NOT GTEST_FOUND OR NOT BENCHMARK_FOUND)
-  if (YACLIB_ENABLE_LTO)
-    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION OFF)
-  endif ()
-
   include(FetchContent)
   if (NOT GTEST_FOUND)
     FetchContent_Declare(
@@ -26,10 +22,6 @@ if (NOT GTEST_FOUND OR NOT BENCHMARK_FOUND)
       GIT_TAG v1.5.5
     )
     FetchContent_MakeAvailable(benchmark)
-  endif ()
-
-  if (YACLIB_ENABLE_LTO)
-    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
   endif ()
 endif ()
 

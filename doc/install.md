@@ -46,8 +46,6 @@ CMake options:
   ([more info](https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html)).
 * `-D CMAKE_CXX_COMPILER=<cxx-compiler-path>`
   Path to your C++ compiler.
-* `-D YACLIB_ENABLE_LTO=<OFF(default) or ON>`
-  If ON, then enable Link-Time Optimization.
 * `-D YACLIB_BUILD_TESTING=<OFF(default) or ON>`
   If ON, then build tests.
 * `-D YACLIB_SANITIZER=<EMPTY(default) or ASAN or TSAN or UBSAN or MEMSAN>`
