@@ -5,7 +5,7 @@
 
 #include <yaclib/async/run.hpp>
 #include <yaclib/executor/executor.hpp>
-#include <yaclib/executor/serial.hpp>
+#include <yaclib/executor/strand.hpp>
 #include <yaclib/executor/thread_pool.hpp>
 
 #include <atomic>
@@ -164,9 +164,9 @@ TEST(Example, Race) {
   tp2->Wait();
 }
 
-TEST(Example, Serial) {
+TEST(Example, Strand) {
   auto tp = yaclib::MakeThreadPool(1);
-  auto strand = yaclib::MakeSerial(tp);
+  auto strand = yaclib::MakeStrand(tp);
 
   auto first = []() {
     return 42;

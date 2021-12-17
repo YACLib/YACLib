@@ -48,14 +48,14 @@ set(YACLIB_UNIT_SOURCES
   unit/algo/wait_group
   unit/executor/thread_pool
   unit/async/stress
-  unit/executor/serial
+  unit/executor/strand
   )
 
 if (YACLIB_BUILD_EXAMPLES)
   set(YACLIB_EXAMPLE_SOURCES
     example/async/simple
     example/executor/thread_pool
-    example/executor/serial
+    example/executor/strand
     example/async/when_all
     example/async/when_any
     )

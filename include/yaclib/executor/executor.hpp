@@ -10,12 +10,12 @@ class IExecutor : public util::IRef {
   /**
    * Executor tag
    *
-   * \enum Custom, ThreadPool, Serial, Inline, SingleThread
+   * \enum Custom, ThreadPool, Strand, Inline, SingleThread
    */
   enum class Type {
     Custom = 0,
     ThreadPool,
-    Serial,
+    Strand,
     Inline,
     SingleThread,
   };

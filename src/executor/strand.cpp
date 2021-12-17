@@ -9,13 +9,13 @@
 namespace yaclib {
 namespace {
 
-class Serial : public IExecutor, public ITask {
+class Strand : public IExecutor, public ITask {
   // Inheritance from two IRef's, but that's okay, because they are pure virtual
  public:
-  explicit Serial(IExecutorPtr executor) : _executor{std::move(executor)} {
+  explicit Strand(IExecutorPtr executor) : _executor{std::move(executor)} {
   }
 
-  ~Serial() override {
+  ~Strand() override {
     auto* nodes{_tasks.TakeAllLIFO()};
     auto* task = static_cast<ITask*>(nodes);
     while (task != nullptr) {
@@ -28,7 +28,7 @@ class Serial : public IExecutor, public ITask {
 
  private:
   [[nodiscard]] Type Tag() const final {
-    return Type::Serial;
+    return Type::Strand;
   }
 
   bool Execute(ITask& task) noexcept final {
@@ -70,8 +70,8 @@ class Serial : public IExecutor, public ITask {
 
 }  // namespace
 
-IExecutorPtr MakeSerial(IExecutorPtr executor) {
-  return util::MakeIntrusive<Serial, IExecutor>(std::move(executor));
+IExecutorPtr MakeStrand(IExecutorPtr executor) {
+  return util::MakeIntrusive<Strand, IExecutor>(std::move(executor));
 }
 
 }  // namespace yaclib

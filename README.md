@@ -37,7 +37,7 @@ https://discord.gg/xy2fDKj8VZ)
 * [Examples](#examples)
     * [Asynchronous pipeline](#asynchronous-pipeline)
     * [Thread Pool](#thread-pool)
-    * [Serial Executor, Strand, AsyncMutex](#serial-executor-strand-async-mutex)
+    * [Strand, Serial Executor, AsyncMutex](#strand-serial-executor-async-mutex)
     * [WhenAll](#whenall)
     * [WhenAny](#whenany)
     * [Future Unwrapping](#future-unwrapping)
@@ -122,12 +122,12 @@ tp->Stop();
 tp->Wait();
 ```
 
-#### Serial Executor, Strand, Async Mutex
+#### Strand, Serial Executor, Async Mutex
 
 ```C++
 auto tp = yaclib::MakeThreadPool(4);
 // decorated thread pool by serializing tasks:
-auto strand = yaclib::MakeSerial(tp);
+auto strand = yaclib::MakeStrand(tp);
 
 size_t counter = 0;
 auto tp2 = yaclib::MakeThreadPool(4);

@@ -1,9 +1,9 @@
 /**
- * \example serial.cpp
- * Simple \ref Serial examples
+ * \example strand.cpp
+ * Simple \ref Strand examples
  */
 
-#include <yaclib/executor/serial.hpp>
+#include <yaclib/executor/strand.hpp>
 #include <yaclib/executor/thread_pool.hpp>
 
 #include <iostream>
@@ -12,12 +12,12 @@
 
 using namespace yaclib;
 
-TEST(Example, Serial) {
+TEST(Example, Strand) {
   std::cout << "Strand" << std::endl;
 
   auto tp = MakeThreadPool(4);
 
-  auto strand = MakeSerial(tp);
+  auto strand = MakeStrand(tp);
 
   size_t counter = 0;
 

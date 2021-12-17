@@ -1,6 +1,6 @@
 #include <util/time.hpp>
 
-#include <yaclib/executor/serial.hpp>
+#include <yaclib/executor/strand.hpp>
 #include <yaclib/executor/thread_pool.hpp>
 
 #include <atomic>
@@ -18,8 +18,8 @@ using namespace std::chrono_literals;
 
 TEST(execute_task, simple) {
   auto tp = MakeThreadPool(4);
-  auto strand = MakeSerial(tp);
-  EXPECT_EQ(strand->Tag(), yaclib::IExecutor::Type::Serial);
+  auto strand = MakeStrand(tp);
+  EXPECT_EQ(strand->Tag(), yaclib::IExecutor::Type::Strand);
 
   bool done{false};
 
@@ -35,7 +35,7 @@ TEST(execute_task, simple) {
 
 TEST(counter, simple) {
   auto tp = MakeThreadPool(13);
-  auto strand = MakeSerial(tp);
+  auto strand = MakeStrand(tp);
 
   size_t counter = 0;
   static const size_t kIncrements = 65536;
@@ -54,7 +54,7 @@ TEST(counter, simple) {
 
 TEST(fifo, simple) {
   auto tp = MakeThreadPool(13);
-  auto strand = MakeSerial(tp);
+  auto strand = MakeStrand(tp);
 
   size_t next_ticket = 0;
   static const size_t kTickets = 123456;
@@ -74,7 +74,7 @@ TEST(fifo, simple) {
 
 class Counter {
  public:
-  Counter(IExecutorPtr e) : strand_{MakeSerial(e)} {
+  Counter(IExecutorPtr e) : strand_{MakeStrand(e)} {
   }
 
   void Increment() {
@@ -129,7 +129,7 @@ TEST(batching, simple) {
     std::this_thread::sleep_for(1s);
   });
 
-  auto strand = MakeSerial(tp);
+  auto strand = MakeStrand(tp);
 
   static const size_t kStrandTasks = 100;
 
@@ -149,7 +149,7 @@ TEST(batching, simple) {
 TEST(strand_over_strand, simple) {
   auto tp = MakeThreadPool(4);
 
-  auto strand = MakeSerial(MakeSerial(MakeSerial(tp)));
+  auto strand = MakeStrand(MakeStrand(MakeStrand(tp)));
 
   bool done = false;
   strand->Execute([&done] {
@@ -183,7 +183,7 @@ TEST(strand_over_strand, simple) {
 //
 // TEST(stack, cimple) {
 //  auto lifo = std::make_shared<LifoManualExecutor>();
-//  auto strand = MakeSerial(lifo);
+//  auto strand = MakeStrand(lifo);
 //
 //  int steps = 0;
 //
@@ -210,7 +210,7 @@ TEST(keep_strong_ref, simple) {
   });
 
   bool done = false;
-  MakeSerial(tp)->Execute([&done] {
+  MakeStrand(tp)->Execute([&done] {
     done = true;
   });
 
@@ -222,7 +222,7 @@ TEST(keep_strong_ref, simple) {
 TEST(do_not_occupy_thread, simple) {
   auto tp = MakeThreadPool(1);
 
-  auto strand = MakeSerial(tp);
+  auto strand = MakeStrand(tp);
 
   tp->Execute([] {
     // bubble
@@ -256,7 +256,7 @@ TEST(do_not_occupy_thread, simple) {
 
 TEST(exceptions, simple) {
   auto tp = MakeThreadPool(1);
-  auto strand = MakeSerial(tp);
+  auto strand = MakeStrand(tp);
 
   tp->Execute([] {
     std::this_thread::sleep_for(1s);
@@ -278,7 +278,7 @@ TEST(exceptions, simple) {
 
 TEST(non_blocking_execute, simple) {
   auto tp = MakeThreadPool(1);
-  auto strand = MakeSerial(tp);
+  auto strand = MakeStrand(tp);
 
   strand->Execute([] {
     std::this_thread::sleep_for(2s);
@@ -297,7 +297,7 @@ TEST(non_blocking_execute, simple) {
 
 TEST(do_not_block_thread_pool, simple) {
   auto tp = MakeThreadPool(2);
-  auto strand = MakeSerial(tp);
+  auto strand = MakeStrand(tp);
 
   strand->Execute([] {
     std::this_thread::sleep_for(1s);
@@ -324,7 +324,7 @@ TEST(do_not_block_thread_pool, simple) {
 
 TEST(memory_leak, simple) {
   auto tp = MakeThreadPool(1);
-  auto strand = MakeSerial(tp);
+  auto strand = MakeStrand(tp);
 
   tp->Execute([] {
     std::this_thread::sleep_for(1s);
