@@ -40,7 +40,7 @@ void SharedTimedMutex::unlock() noexcept {
   yaclib::detail::InjectFault();
 }
 
-template <class _Clock, class _Duration>
+template <typename _Clock, typename _Duration>
 bool SharedTimedMutex::try_lock_until(const ::std::chrono::time_point<_Clock, _Duration>& duration) {
   auto me = yaclib::std::this_thread::get_id();
   assert(_exclusive_owner != me);
@@ -108,7 +108,7 @@ void SharedTimedMutex::unlock_shared() noexcept {
   yaclib::detail::InjectFault();
 }
 
-template <class _Clock, class _Duration>
+template <typename _Clock, typename _Duration>
 bool SharedTimedMutex::try_lock_shared_until(const ::std::chrono::time_point<_Clock, _Duration>& duration) {
   auto me = yaclib::std::this_thread::get_id();
   assert(_exclusive_owner != me);

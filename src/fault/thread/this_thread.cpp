@@ -6,7 +6,7 @@ void sleep_for(const ::std::chrono::nanoseconds& time) {
   return ::std::this_thread::sleep_for(time);
 }
 
-template <class Duration>
+template <typename Duration>
 void sleep_until(const ::std::chrono::time_point<yaclib::std::chrono::steady_clock, Duration>& time_point) {
   return ::std::this_thread::sleep_until(time_point);
 }
