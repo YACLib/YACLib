@@ -19,7 +19,7 @@ class Mutex {
   bool try_lock() noexcept;
   void unlock() noexcept;
 
-#if defined(YACLIB_FIBER)
+#ifdef YACLIB_FIBER
   // TODO(myannyax)
   using native_handle_type = kek;
 #else
@@ -29,7 +29,7 @@ class Mutex {
   inline native_handle_type native_handle();
 
  private:
-#if defined(YACLIB_FIBER)
+#ifdef YACLIB_FIBER
   kek _m;
 #else
   ::std::mutex _m;

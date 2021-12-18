@@ -10,7 +10,7 @@
 
 namespace yaclib::std {
 
-#if defined(YACLIB_FAULTY)
+#ifdef YACLIB_FAULTY
 
 using mutex = yaclib::detail::Mutex;
 using timed_mutex = yaclib::detail::TimedMutex;

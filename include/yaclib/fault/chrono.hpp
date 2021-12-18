@@ -5,7 +5,7 @@
 
 namespace yaclib::std::chrono {
 
-#if defined(YACLIB_FAULTY)
+#ifdef YACLIB_FAULTY
 
 using steady_clock = yaclib::detail::SteadyClock;
 

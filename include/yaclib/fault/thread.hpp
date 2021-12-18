@@ -7,7 +7,7 @@
 
 namespace yaclib::std {
 
-#if defined(YACLIB_FAULTY)
+#ifdef YACLIB_FAULTY
 
 using thread = detail::Thread;
 
