@@ -31,7 +31,7 @@ endif ()
 
 # TODO(myannyax) other flag name but not YACLIB_FAULTY or change YACLIB_FAULTY for smth like "test on" and make this YACLIB_FAULTY
 if (LOL_KEK)
-  add_subdirectory(fault_injection)
+  add_subdirectory(fault)
 endif ()
 
 if (YACLIB_FAULTY)

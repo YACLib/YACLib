@@ -1,7 +1,5 @@
-#include "yaclib/fault_injection/mutex/recursive_mutex.hpp"
-#include "yaclib/fault_injection/mutex/shared_mutex.hpp"
-
-#include <yaclib/fault_injection/mutex/mutex.hpp>
+#include <yaclib/fault/mutex.hpp>
+#include <yaclib/fault/shared_mutex.hpp>
 
 #include <gtest/gtest.h>
 
@@ -18,7 +16,7 @@ TEST(mutex, negative_simple) {
         yaclib::std::mutex lock;
         lock.unlock();
       },
-      "_owner != yaclib::std::detail::kInvalidThreadId");
+      "_owner != yaclib::detail::kInvalidThreadId");
 
   EXPECT_DEATH(
       {
@@ -75,7 +73,7 @@ TEST(shared_mutex, negative_simple) {
         yaclib::std::shared_mutex lock;
         lock.unlock();
       },
-      "_owner != yaclib::std::detail::kInvalidThreadId");
+      "_owner != yaclib::detail::kInvalidThreadId");
 
   EXPECT_DEATH(
       {
@@ -179,7 +177,7 @@ TEST(recursive_mutex, negative_simple) {
         yaclib::std::recursive_mutex lock;
         lock.unlock();
       },
-      "_owner != yaclib::std::detail::kInvalidThreadId");
+      "_owner != yaclib::detail::kInvalidThreadId");
 
   EXPECT_DEATH(
       {
