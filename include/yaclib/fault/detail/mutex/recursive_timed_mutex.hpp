@@ -19,11 +19,11 @@ class RecursiveTimedMutex {
   bool try_lock() noexcept;
   void unlock() noexcept;
 
-  template <class _Rep, class _Period>
+  template <typename _Rep, typename _Period>
   bool try_lock_for(const ::std::chrono::duration<_Rep, _Period>& duration) {
     return try_lock_until(yaclib::std::chrono::steady_clock::now() + duration);
   }
-  template <class _Clock, class _Duration>
+  template <typename _Clock, typename _Duration>
   bool try_lock_until(const ::std::chrono::time_point<_Clock, _Duration>& duration);
 
  private:

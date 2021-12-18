@@ -15,9 +15,9 @@ class SystemClock {
 
   static time_point now();
 
-  static time_t to_time_t(const time_point& time_point) _NOEXCEPT;
+  static time_t to_time_t(const time_point& time_point) noexcept;
 
-  static time_point from_time_t(time_t c_time_point) _NOEXCEPT;
+  static time_point from_time_t(time_t c_time_point) noexcept;
 };
 
 }  // namespace yaclib::detail

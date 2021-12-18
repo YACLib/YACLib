@@ -7,11 +7,11 @@ SystemClock::time_point SystemClock::now() {
   return SystemClock::time_point();
 }
 
-time_t SystemClock::to_time_t(const SystemClock::time_point& time_point) _NOEXCEPT {
+time_t SystemClock::to_time_t(const SystemClock::time_point& time_point) noexcept {
   return std::chrono::system_clock::to_time_t(time_point);
 }
 
-SystemClock::time_point SystemClock::from_time_t(time_t c_time_point) _NOEXCEPT {
+SystemClock::time_point SystemClock::from_time_t(time_t c_time_point) noexcept {
   return std::chrono::system_clock::from_time_t(c_time_point);
 }
 

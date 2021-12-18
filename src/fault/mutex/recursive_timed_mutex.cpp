@@ -45,7 +45,7 @@ void RecursiveTimedMutex::unlock() noexcept {
   yaclib::detail::InjectFault();
 }
 
-template <class _Clock, class _Duration>
+template <typename _Clock, typename _Duration>
 bool RecursiveTimedMutex::try_lock_until(const ::std::chrono::time_point<_Clock, _Duration>& duration) {
   unsigned new_level = _lock_level;
   if (_owner == yaclib::std::this_thread::get_id()) {

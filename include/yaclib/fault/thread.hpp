@@ -21,7 +21,7 @@ namespace this_thread {
 
 void sleep_for(const ::std::chrono::nanoseconds& time);
 
-template <class Duration>
+template <typename Duration>
 void sleep_until(const ::std::chrono::time_point<yaclib::std::chrono::steady_clock, Duration>& time_point);
 
 void yield() noexcept;
