@@ -70,7 +70,7 @@ class SharedMutex {
   bool try_lock_shared() noexcept;
   void unlock_shared() noexcept;
 
-  // TODO(myannyax) no handle?
+  // TODO(myannyax) no handle (my local header has them commented)?
 
  private:
 #if defined(YACLIB_FIBER)

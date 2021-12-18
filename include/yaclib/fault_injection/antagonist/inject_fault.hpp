@@ -1,6 +1,6 @@
 #pragma once
 
-#include "yielder.hpp"
+#include <yaclib/fault_injection/antagonist/yielder.hpp>
 
 namespace yaclib::detail {
 

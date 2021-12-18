@@ -1,7 +1,3 @@
-//
-// Created by Maria.Filipanova on 12/12/21.
-//
-
 #include <yaclib/fault_injection/random/random_device.hpp>
 
 namespace yaclib::std::random::detail {

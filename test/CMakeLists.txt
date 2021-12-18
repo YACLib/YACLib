@@ -44,6 +44,7 @@ set(TEST_UTIL_INCLUDES
 set(YACLIB_EXAMPLE_SOURCES)
 set(YACLIB_EXAMPLE_INCLUDES)
 
+#TODO(myannyax) any ways this can be avoided?
 if (YACLIB_FAULTY)
   add_compile_definitions(YACLIB_FAULTY)
 endif ()
