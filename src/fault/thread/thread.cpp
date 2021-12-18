@@ -1,4 +1,5 @@
 #include <yaclib/fault/detail/thread/thread.hpp>
+#include <yaclib/fault/thread.hpp>
 
 namespace yaclib::detail {
 
@@ -23,6 +24,7 @@ bool Thread::joinable() const noexcept {
 }
 
 void Thread::join() {
+  assert(get_id() != yaclib::std::this_thread::get_id());
   _impl.join();
 }
 
