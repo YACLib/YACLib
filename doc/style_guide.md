@@ -21,3 +21,4 @@ Only additions here (see .clang-tidy).
 * Don't use relative include `#include "..."`, use `#include <...>` instead of this
 * Don't use `#include guard`, use `#pragma once`
 * Write `=` for constructor if possible, if not try `{}`, if not `()`
+* Always use typename for templates
