@@ -39,7 +39,7 @@ class SharedTimedMutex {
   bool try_lock_shared_until(const ::std::chrono::time_point<_Clock, _Duration>& duration);
 
  private:
-#if defined(YACLIB_FIBER)
+#ifdef YACLIB_FIBER
   kek _m;
 #else
   ::std::shared_timed_mutex _m;

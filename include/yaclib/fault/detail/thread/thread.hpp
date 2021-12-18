@@ -9,7 +9,7 @@ class Thread {
   Thread(const Thread&) = delete;
   Thread& operator=(const Thread&) = delete;
 
-#if defined(YACLIB_FIBER)
+#ifdef YACLIB_FIBER
   // TODO(myannyax)
   using id = size_t;
   using native_handle_type = pthread_t;
@@ -35,10 +35,10 @@ class Thread {
 
   native_handle_type native_handle() noexcept;
 
-  static unsigned hardware_concurrency() noexcept;
+  static auto hardware_concurrency() noexcept;
 
  private:
-#if defined(YACLIB_FIBER)
+#ifdef YACLIB_FIBER
   // TODO(myannyax) _impl;
 #else
   ::std::thread _impl;

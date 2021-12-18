@@ -27,7 +27,7 @@ class RecursiveTimedMutex {
   bool try_lock_until(const ::std::chrono::time_point<_Clock, _Duration>& duration);
 
  private:
-#if defined(YACLIB_FIBER)
+#ifdef YACLIB_FIBER
   kek _m;
 #else
   ::std::recursive_timed_mutex _m;

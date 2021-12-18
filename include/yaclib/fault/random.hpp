@@ -7,7 +7,7 @@
 
 namespace yaclib::std::random {
 
-#if defined(YACLIB_FAULTY)
+#ifdef YACLIB_FAULTY
 
 using random_device = detail::RandomDevice;
 

@@ -28,7 +28,7 @@ class TimedMutex {
   bool try_lock_until(const ::std::chrono::time_point<_Clock, _Duration>& duration);
 
  private:
-#if defined(YACLIB_FIBER)
+#ifdef YACLIB_FIBER
   // TODO(myannyax)
   kek _m;
 #else

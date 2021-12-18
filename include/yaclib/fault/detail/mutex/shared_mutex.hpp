@@ -26,7 +26,7 @@ class SharedMutex {
   // TODO(myannyax) no handle (my local header has them commented)?
 
  private:
-#if defined(YACLIB_FIBER)
+#ifdef YACLIB_FIBER
   kek _m;
 #else
   ::std::shared_mutex _m;
