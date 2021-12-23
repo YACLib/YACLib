@@ -4,50 +4,51 @@
 namespace yaclib::detail {
 
 void RecursiveMutex::lock() {
-  unsigned new_level = _lock_level;
-  if (_owner == yaclib::std::this_thread::get_id()) {
-    new_level++;
-  } else {
-    new_level = 1;
-  }
   yaclib::detail::InjectFault();
   _m.lock();
-  _lock_level = new_level;
-  _owner = yaclib::std::this_thread::get_id();
   yaclib::detail::InjectFault();
+
+  UpdateOnLock();
 }
 
 bool RecursiveMutex::try_lock() noexcept {
-  unsigned new_level = _lock_level;
-  if (_owner == yaclib::std::this_thread::get_id()) {
-    new_level++;
-  } else {
-    new_level = 1;
-  }
   yaclib::detail::InjectFault();
   auto res = _m.try_lock();
-  if (res) {
-    _lock_level = new_level;
-    _owner = yaclib::std::this_thread::get_id();
-  }
   yaclib::detail::InjectFault();
+
+  if (res) {
+    UpdateOnLock();
+  }
   return res;
 }
 
 void RecursiveMutex::unlock() noexcept {
   assert(_owner != yaclib::detail::kInvalidThreadId);
   assert(_owner == yaclib::std::this_thread::get_id());
-  yaclib::detail::InjectFault();
-  _m.unlock();
+
   _lock_level--;
   if (_lock_level == 0) {
     _owner = yaclib::detail::kInvalidThreadId;
   }
+
+  yaclib::detail::InjectFault();
+  _m.unlock();
   yaclib::detail::InjectFault();
 }
 
 RecursiveMutex::native_handle_type RecursiveMutex::native_handle() {
   return _m.native_handle();
+}
+
+void RecursiveMutex::UpdateOnLock() {
+  unsigned new_level = _lock_level;
+  if (_owner == yaclib::std::this_thread::get_id()) {
+    new_level++;
+  } else {
+    new_level = 1;
+  }
+  _lock_level = new_level;
+  _owner = yaclib::std::this_thread::get_id();
 }
 
 }  // namespace yaclib::detail

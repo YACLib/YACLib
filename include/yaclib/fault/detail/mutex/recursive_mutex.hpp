@@ -36,6 +36,7 @@ class RecursiveMutex {
   // TODO(myannyax) yaclib wrapper
   ::std::atomic<yaclib::std::thread::id> _owner{yaclib::detail::kInvalidThreadId};
   ::std::atomic<unsigned> _lock_level{0};
+  void UpdateOnLock();
 };
 
 }  // namespace yaclib::detail

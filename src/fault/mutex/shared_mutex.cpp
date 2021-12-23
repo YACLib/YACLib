@@ -10,10 +10,12 @@ void SharedMutex::lock() {
     ::std::shared_lock lock(_helper_m);
     assert(_shared_owners.find(me) == _shared_owners.end());
   }
+
   yaclib::detail::InjectFault();
   _m.lock();
-  _exclusive_owner = me;
   yaclib::detail::InjectFault();
+
+  _exclusive_owner = me;
 }
 
 bool SharedMutex::try_lock() noexcept {
@@ -25,19 +27,22 @@ bool SharedMutex::try_lock() noexcept {
   }
   yaclib::detail::InjectFault();
   auto res = _m.try_lock();
+  yaclib::detail::InjectFault();
+
   if (res) {
     _exclusive_owner = yaclib::std::this_thread::get_id();
   }
-  yaclib::detail::InjectFault();
   return res;
 }
 
 void SharedMutex::unlock() noexcept {
   assert(_exclusive_owner != yaclib::detail::kInvalidThreadId);
   assert(_exclusive_owner == yaclib::std::this_thread::get_id());
+
+  _exclusive_owner = yaclib::detail::kInvalidThreadId;
+
   yaclib::detail::InjectFault();
   _m.unlock();
-  _exclusive_owner = yaclib::detail::kInvalidThreadId;
   yaclib::detail::InjectFault();
 }
 
@@ -48,13 +53,15 @@ void SharedMutex::lock_shared() {
     ::std::shared_lock lock(_helper_m);
     assert(_shared_owners.find(me) == _shared_owners.end());
   }
+
   yaclib::detail::InjectFault();
   _m.lock_shared();
+  yaclib::detail::InjectFault();
+
   {
     ::std::unique_lock lock(_helper_m);
     _shared_owners.insert(me);
   }
-  yaclib::detail::InjectFault();
 }
 
 bool SharedMutex::try_lock_shared() noexcept {
@@ -64,15 +71,17 @@ bool SharedMutex::try_lock_shared() noexcept {
     ::std::shared_lock lock(_helper_m);
     assert(_shared_owners.find(me) == _shared_owners.end());
   }
+
   yaclib::detail::InjectFault();
   auto res = _m.try_lock_shared();
+  yaclib::detail::InjectFault();
+
   if (res) {
     {
       ::std::unique_lock lock(_helper_m);
       _shared_owners.insert(me);
     }
   }
-  yaclib::detail::InjectFault();
   return res;
 }
 
@@ -82,13 +91,15 @@ void SharedMutex::unlock_shared() noexcept {
     ::std::shared_lock lock(_helper_m);
     assert(_shared_owners.find(me) != _shared_owners.end());
   }
-  yaclib::detail::InjectFault();
-  _m.unlock_shared();
+
   {
     ::std::unique_lock lock(_helper_m);
     _shared_owners.erase(me);
   }
   _exclusive_owner = yaclib::detail::kInvalidThreadId;
+
+  yaclib::detail::InjectFault();
+  _m.unlock_shared();
   yaclib::detail::InjectFault();
 }
 

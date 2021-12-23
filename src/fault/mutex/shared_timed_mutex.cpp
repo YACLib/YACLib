@@ -9,10 +9,12 @@ void SharedTimedMutex::lock() {
     ::std::shared_lock lock(_helper_m);
     assert(_shared_owners.find(me) == _shared_owners.end());
   }
+
   yaclib::detail::InjectFault();
   _m.lock();
-  _exclusive_owner = me;
   yaclib::detail::InjectFault();
+
+  _exclusive_owner = me;
 }
 
 bool SharedTimedMutex::try_lock() noexcept {
@@ -22,21 +24,25 @@ bool SharedTimedMutex::try_lock() noexcept {
     ::std::shared_lock lock(_helper_m);
     assert(_shared_owners.find(me) == _shared_owners.end());
   }
+
   yaclib::detail::InjectFault();
   auto res = _m.try_lock();
+  yaclib::detail::InjectFault();
+
   if (res) {
     _exclusive_owner = yaclib::std::this_thread::get_id();
   }
-  yaclib::detail::InjectFault();
   return res;
 }
 
 void SharedTimedMutex::unlock() noexcept {
   assert(_exclusive_owner != yaclib::detail::kInvalidThreadId);
   assert(_exclusive_owner == yaclib::std::this_thread::get_id());
+
+  _exclusive_owner = yaclib::detail::kInvalidThreadId;
+
   yaclib::detail::InjectFault();
   _m.unlock();
-  _exclusive_owner = yaclib::detail::kInvalidThreadId;
   yaclib::detail::InjectFault();
 }
 
@@ -48,12 +54,14 @@ bool SharedTimedMutex::try_lock_until(const ::std::chrono::time_point<_Clock, _D
     ::std::shared_lock lock(_helper_m);
     assert(_shared_owners.find(me) == _shared_owners.end());
   }
+
   yaclib::detail::InjectFault();
   auto res = _m.try_lock_until(duration);
+  yaclib::detail::InjectFault();
+
   if (res) {
     _exclusive_owner = yaclib::std::this_thread::get_id();
   }
-  yaclib::detail::InjectFault();
   return res;
 }
 
@@ -64,13 +72,15 @@ void SharedTimedMutex::lock_shared() {
     ::std::shared_lock lock(_helper_m);
     assert(_shared_owners.find(me) == _shared_owners.end());
   }
+
   yaclib::detail::InjectFault();
   _m.lock_shared();
+  yaclib::detail::InjectFault();
+
   {
     ::std::unique_lock lock(_helper_m);
     _shared_owners.insert(me);
   }
-  yaclib::detail::InjectFault();
 }
 
 bool SharedTimedMutex::try_lock_shared() noexcept {
@@ -80,15 +90,17 @@ bool SharedTimedMutex::try_lock_shared() noexcept {
     ::std::shared_lock lock(_helper_m);
     assert(_shared_owners.find(me) == _shared_owners.end());
   }
+
   yaclib::detail::InjectFault();
   auto res = _m.try_lock_shared();
+  yaclib::detail::InjectFault();
+
   if (res) {
     {
       ::std::unique_lock lock(_helper_m);
       _shared_owners.insert(me);
     }
   }
-  yaclib::detail::InjectFault();
   return res;
 }
 
@@ -98,13 +110,15 @@ void SharedTimedMutex::unlock_shared() noexcept {
     ::std::shared_lock lock(_helper_m);
     assert(_shared_owners.find(me) != _shared_owners.end());
   }
-  yaclib::detail::InjectFault();
-  _m.unlock_shared();
+
   {
     ::std::unique_lock lock(_helper_m);
     _shared_owners.erase(me);
   }
   _exclusive_owner = yaclib::detail::kInvalidThreadId;
+
+  yaclib::detail::InjectFault();
+  _m.unlock_shared();
   yaclib::detail::InjectFault();
 }
 
@@ -116,15 +130,17 @@ bool SharedTimedMutex::try_lock_shared_until(const ::std::chrono::time_point<_Cl
     ::std::shared_lock lock(_helper_m);
     assert(_shared_owners.find(me) == _shared_owners.end());
   }
+
   yaclib::detail::InjectFault();
   auto res = _m.try_lock_shared_until(duration);
+  yaclib::detail::InjectFault();
+
   if (res) {
     {
       ::std::unique_lock lock(_helper_m);
       _shared_owners.insert(me);
     }
   }
-  yaclib::detail::InjectFault();
   return res;
 }
 
