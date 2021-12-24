@@ -8,7 +8,7 @@ Yielder::Yielder(int frequency) : _eng(1142), _freq(frequency) {
 
 void Yielder::MaybeYield() {
   if (ShouldYield()) {
-    std::this_thread::sleep_for(::std::chrono::milliseconds(RandNumber(SLEEP_TIME)));
+    std::this_thread::sleep_for(::std::chrono::microseconds(RandNumber(SLEEP_TIME)));
   }
 }
 

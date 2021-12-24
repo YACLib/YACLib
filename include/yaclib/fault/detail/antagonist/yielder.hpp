@@ -1,7 +1,7 @@
 #pragma once
 
 // TODO(myannayx): define in cmake depending on system
-#define SLEEP_TIME 63
+#define SLEEP_TIME 500
 
 #include <yaclib/fault/thread.hpp>
 

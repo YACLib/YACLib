@@ -25,6 +25,13 @@ list(APPEND YACLIB_INCLUDES
   # antagonist
   ${YACLIB_INCLUDE_DIR}/fault/detail/antagonist/yielder.hpp
   ${YACLIB_INCLUDE_DIR}/fault/detail/antagonist/inject_fault.hpp
+
+  # atomics
+  ${YACLIB_INCLUDE_DIR}/fault/detail/atomic/atomic.hpp
+  ${YACLIB_INCLUDE_DIR}/fault/detail/atomic/atomic_base.hpp
+  ${YACLIB_INCLUDE_DIR}/fault/detail/atomic/atomic_reference.hpp
+  ${YACLIB_INCLUDE_DIR}/fault/detail/atomic/atomic_flag.hpp
+  ${YACLIB_INCLUDE_DIR}/fault/atomic.hpp
   )
 
 list(APPEND YACLIB_SOURCES
