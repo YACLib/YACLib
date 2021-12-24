@@ -9,39 +9,31 @@
 namespace yaclib::detail {
 
 // TODO(myannyax) is_always_lock_free
-template <class T, class Atomic, bool = ::std::is_integral<T>::desired && !::std::is_same<T, bool>::desired>
+template <typename T, typename Atomic, bool = std::is_integral<T>::value && !std::is_same<T, bool>::value>
 struct AtomicBase {
   [[nodiscard]] bool is_lock_free() const volatile noexcept {
-    return GetDelegate().is_lock_free();
+    return _impl.is_lock_free();
   }
 
   [[nodiscard]] bool is_lock_free() const noexcept {
-    return GetDelegate().is_lock_free();
+    return _impl.is_lock_free();
   }
 
-  void store(T desired, ::std::memory_order order = ::std::memory_order_seq_cst) volatile noexcept {
-    yaclib::detail::InjectFault();
-    GetDelegate().store(desired, order);
-    yaclib::detail::InjectFault();
+  void store(T desired, std::memory_order order = std::memory_order_seq_cst) volatile noexcept {
+    YACLIB_INJECT_FAULT(_impl.store(desired, order);)
   }
 
-  void store(T desired, ::std::memory_order order = ::std::memory_order_seq_cst) noexcept {
-    yaclib::detail::InjectFault();
-    GetDelegate().store(desired, order);
-    yaclib::detail::InjectFault();
+  void store(T desired, std::memory_order order = std::memory_order_seq_cst) noexcept {
+    YACLIB_INJECT_FAULT(_impl.store(desired, order);)
   }
 
-  T load(::std::memory_order order = ::std::memory_order_seq_cst) const volatile noexcept {
-    yaclib::detail::InjectFault();
-    auto result = GetDelegate().load(order);
-    yaclib::detail::InjectFault();
+  T load(std::memory_order order = std::memory_order_seq_cst) const volatile noexcept {
+    YACLIB_INJECT_FAULT(auto result = _impl.load(order);)
     return result;
   }
 
-  T load(::std::memory_order order = ::std::memory_order_seq_cst) const noexcept {
-    yaclib::detail::InjectFault();
-    auto result = GetDelegate().load(order);
-    yaclib::detail::InjectFault();
+  T load(std::memory_order order = std::memory_order_seq_cst) const noexcept {
+    YACLIB_INJECT_FAULT(auto result = _impl.load(order);)
     return result;
   }
 
@@ -53,172 +45,127 @@ struct AtomicBase {
     return load();
   }
 
-  T exchange(T desired, ::std::memory_order order = ::std::memory_order_seq_cst) volatile noexcept {
-    yaclib::detail::InjectFault();
-    auto result = GetDelegate().exchange(desired, order);
-    yaclib::detail::InjectFault();
+  T exchange(T desired, std::memory_order order = std::memory_order_seq_cst) volatile noexcept {
+    YACLIB_INJECT_FAULT(auto result = _impl.exchange(desired, order);)
     return result;
   }
 
-  T exchange(T desired, ::std::memory_order order = ::std::memory_order_seq_cst) noexcept {
-    yaclib::detail::InjectFault();
-    auto result = GetDelegate().exchange(desired, order);
-    yaclib::detail::InjectFault();
+  T exchange(T desired, std::memory_order order = std::memory_order_seq_cst) noexcept {
+    YACLIB_INJECT_FAULT(auto result = _impl.exchange(desired, order);)
     return result;
   }
 
-  bool compare_exchange_weak(T& expected, T desired, ::std::memory_order success,
-                             ::std::memory_order failure) volatile noexcept {
-    yaclib::detail::InjectFault();
-    auto result = GetDelegate().compare_exchange_weak(expected, desired, success, failure);
-    yaclib::detail::InjectFault();
+  bool compare_exchange_weak(T& expected, T desired, std::memory_order success,
+                             std::memory_order failure) volatile noexcept {
+    YACLIB_INJECT_FAULT(auto result = _impl.compare_exchange_weak(expected, desired, success, failure);)
     return result;
   }
 
-  bool compare_exchange_weak(T& expected, T desired, ::std::memory_order success,
-                             ::std::memory_order failure) noexcept {
-    yaclib::detail::InjectFault();
-    auto result = GetDelegate().compare_exchange_weak(expected, desired, success, failure);
-    yaclib::detail::InjectFault();
+  bool compare_exchange_weak(T& expected, T desired, std::memory_order success, std::memory_order failure) noexcept {
+    YACLIB_INJECT_FAULT(auto result = _impl.compare_exchange_weak(expected, desired, success, failure);)
     return result;
   }
 
-  bool compare_exchange_strong(T& expected, T desired, ::std::memory_order success,
-                               ::std::memory_order failure) volatile noexcept {
-    yaclib::detail::InjectFault();
-    auto result = GetDelegate().compare_exchange_strong(expected, desired, success, failure);
-    yaclib::detail::InjectFault();
+  bool compare_exchange_strong(T& expected, T desired, std::memory_order success,
+                               std::memory_order failure) volatile noexcept {
+    YACLIB_INJECT_FAULT(auto result = _impl.compare_exchange_strong(expected, desired, success, failure);)
     return result;
   }
 
-  bool compare_exchange_strong(T& expected, T desired, ::std::memory_order success,
-                               ::std::memory_order failure) noexcept {
-    yaclib::detail::InjectFault();
-    auto result = GetDelegate().compare_exchange_strong(expected, desired, success, failure);
-    yaclib::detail::InjectFault();
+  bool compare_exchange_strong(T& expected, T desired, std::memory_order success, std::memory_order failure) noexcept {
+    YACLIB_INJECT_FAULT(auto result = _impl.compare_exchange_strong(expected, desired, success, failure);)
     return result;
   }
 
   bool compare_exchange_weak(T& expected, T desired,
-                             ::std::memory_order order = ::std::memory_order_seq_cst) volatile noexcept {
-    yaclib::detail::InjectFault();
-    auto result = GetDelegate().compare_exchange_weak(expected, desired, order);
-    yaclib::detail::InjectFault();
+                             std::memory_order order = std::memory_order_seq_cst) volatile noexcept {
+    YACLIB_INJECT_FAULT(auto result = _impl.compare_exchange_weak(expected, desired, order);)
     return result;
   }
 
-  bool compare_exchange_weak(T& expected, T desired, ::std::memory_order order = ::std::memory_order_seq_cst) noexcept {
-    yaclib::detail::InjectFault();
-    auto result = GetDelegate().compare_exchange_weak(expected, desired, order);
-    yaclib::detail::InjectFault();
+  bool compare_exchange_weak(T& expected, T desired, std::memory_order order = std::memory_order_seq_cst) noexcept {
+    YACLIB_INJECT_FAULT(auto result = _impl.compare_exchange_weak(expected, desired, order);)
     return result;
   }
 
   bool compare_exchange_strong(T& expected, T desired,
-                               ::std::memory_order order = ::std::memory_order_seq_cst) volatile noexcept {
-    yaclib::detail::InjectFault();
-    auto result = GetDelegate().compare_exchange_strong(expected, desired, order);
-    yaclib::detail::InjectFault();
+                               std::memory_order order = std::memory_order_seq_cst) volatile noexcept {
+    YACLIB_INJECT_FAULT(auto result = _impl.compare_exchange_strong(expected, desired, order);)
     return result;
   }
 
-  bool compare_exchange_strong(T& expected, T desired,
-                               ::std::memory_order order = ::std::memory_order_seq_cst) noexcept {
-    yaclib::detail::InjectFault();
-    auto result = GetDelegate().compare_exchange_strong(expected, desired, order);
-    yaclib::detail::InjectFault();
+  bool compare_exchange_strong(T& expected, T desired, std::memory_order order = std::memory_order_seq_cst) noexcept {
+    YACLIB_INJECT_FAULT(auto result = _impl.compare_exchange_strong(expected, desired, order);)
     return result;
   }
 
   AtomicBase() noexcept = default;
 
-  // TODO(myannyax) check it's present in overrides
-  /*constexpr AtomicBase(T desired) noexcept {
-  }*/
+  constexpr AtomicBase(T desired) noexcept : _impl(desired) {
+  }
 
   AtomicBase(const AtomicBase&) = delete;
   AtomicBase& operator=(const AtomicBase&) = delete;
   AtomicBase& operator=(const AtomicBase&) volatile = delete;
 
  protected:
-  virtual Atomic GetDelegate() = 0;
+  Atomic _impl;
 };
 
-template <class T, class Atomic>
+template <typename T, typename Atomic>
 struct AtomicBase<T, Atomic, true> : public AtomicBase<T, Atomic, false> {
   AtomicBase() noexcept = default;
 
-  // TODO(myannyax) check it's present in overrides
-  /*constexpr AtomicBase(T __d) noexcept : __base(__d) {
-  }*/
+  constexpr AtomicBase(T desired) noexcept : AtomicBase<T, Atomic, false>(desired) {
+  }
 
-  T fetch_add(T arg, ::std::memory_order order = ::std::memory_order_seq_cst) volatile noexcept {
-    yaclib::detail::InjectFault();
-    auto result = this->GetDelegate().fetch_add(arg, order);
-    yaclib::detail::InjectFault();
+  T fetch_add(T arg, std::memory_order order = std::memory_order_seq_cst) volatile noexcept {
+    YACLIB_INJECT_FAULT(auto result = this->_impl.fetch_add(arg, order);)
     return result;
   }
 
-  T fetch_add(T arg, ::std::memory_order order = ::std::memory_order_seq_cst) noexcept {
-    yaclib::detail::InjectFault();
-    auto result = this->GetDelegate().fetch_add(arg, order);
-    yaclib::detail::InjectFault();
+  T fetch_add(T arg, std::memory_order order = std::memory_order_seq_cst) noexcept {
+    YACLIB_INJECT_FAULT(auto result = this->_impl.fetch_add(arg, order);)
     return result;
   }
 
-  T fetch_sub(T arg, ::std::memory_order order = ::std::memory_order_seq_cst) volatile noexcept {
-    yaclib::detail::InjectFault();
-    auto result = this->GetDelegate().fetch_sub(arg, order);
-    yaclib::detail::InjectFault();
+  T fetch_sub(T arg, std::memory_order order = std::memory_order_seq_cst) volatile noexcept {
+    YACLIB_INJECT_FAULT(auto result = this->_impl.fetch_sub(arg, order);)
     return result;
   }
 
-  T fetch_sub(T arg, ::std::memory_order order = ::std::memory_order_seq_cst) noexcept {
-    yaclib::detail::InjectFault();
-    auto result = this->GetDelegate().fetch_sub(arg, order);
-    yaclib::detail::InjectFault();
+  T fetch_sub(T arg, std::memory_order order = std::memory_order_seq_cst) noexcept {
+    YACLIB_INJECT_FAULT(auto result = this->_impl.fetch_sub(arg, order);)
     return result;
   }
 
-  T fetch_and(T arg, ::std::memory_order order = ::std::memory_order_seq_cst) volatile noexcept {
-    yaclib::detail::InjectFault();
-    auto result = this->GetDelegate().fetch_and(arg, order);
-    yaclib::detail::InjectFault();
+  T fetch_and(T arg, std::memory_order order = std::memory_order_seq_cst) volatile noexcept {
+    YACLIB_INJECT_FAULT(auto result = this->_impl.fetch_and(arg, order);)
     return result;
   }
 
-  T fetch_and(T arg, ::std::memory_order order = ::std::memory_order_seq_cst) noexcept {
-    yaclib::detail::InjectFault();
-    auto result = this->GetDelegate().fetch_and(arg, order);
-    yaclib::detail::InjectFault();
+  T fetch_and(T arg, std::memory_order order = std::memory_order_seq_cst) noexcept {
+    YACLIB_INJECT_FAULT(auto result = this->_impl.fetch_and(arg, order);)
     return result;
   }
 
-  T fetch_or(T arg, ::std::memory_order order = ::std::memory_order_seq_cst) volatile noexcept {
-    yaclib::detail::InjectFault();
-    auto result = this->GetDelegate().fetch_or(arg, order);
-    yaclib::detail::InjectFault();
+  T fetch_or(T arg, std::memory_order order = std::memory_order_seq_cst) volatile noexcept {
+    YACLIB_INJECT_FAULT(auto result = this->_impl.fetch_or(arg, order);)
     return result;
   }
 
-  T fetch_or(T arg, ::std::memory_order order = ::std::memory_order_seq_cst) noexcept {
-    yaclib::detail::InjectFault();
-    auto result = this->GetDelegate().fetch_or(arg, order);
-    yaclib::detail::InjectFault();
+  T fetch_or(T arg, std::memory_order order = std::memory_order_seq_cst) noexcept {
+    YACLIB_INJECT_FAULT(auto result = this->_impl.fetch_or(arg, order);)
     return result;
   }
 
-  T fetch_xor(T arg, ::std::memory_order order = ::std::memory_order_seq_cst) volatile noexcept {
-    yaclib::detail::InjectFault();
-    auto result = this->GetDelegate().fetch_xor(arg, order);
-    yaclib::detail::InjectFault();
+  T fetch_xor(T arg, std::memory_order order = std::memory_order_seq_cst) volatile noexcept {
+    YACLIB_INJECT_FAULT(auto result = this->_impl.fetch_xor(arg, order);)
     return result;
   }
 
-  T fetch_xor(T arg, ::std::memory_order order = ::std::memory_order_seq_cst) noexcept {
-    yaclib::detail::InjectFault();
-    auto result = this->GetDelegate().fetch_xor(arg, order);
-    yaclib::detail::InjectFault();
+  T fetch_xor(T arg, std::memory_order order = std::memory_order_seq_cst) noexcept {
+    YACLIB_INJECT_FAULT(auto result = this->_impl.fetch_xor(arg, order);)
     return result;
   }
 

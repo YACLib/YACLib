@@ -4,14 +4,13 @@
 
 namespace yaclib::detail {
 
-class SystemClock {
- public:
-  using rep = ::std::chrono::system_clock::rep;
-  using period = ::std::chrono::system_clock::period;
-  using duration = ::std::chrono::system_clock::duration;
-  using time_point = ::std::chrono::system_clock::time_point;
+struct SystemClock {
+  using rep = std::chrono::system_clock::rep;
+  using period = std::chrono::system_clock::period;
+  using duration = std::chrono::system_clock::duration;
+  using time_point = std::chrono::system_clock::time_point;
 
-  const bool is_steady = false;
+  static constexpr bool is_steady = false;
 
   static time_point now();
 

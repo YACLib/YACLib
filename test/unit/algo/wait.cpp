@@ -5,8 +5,7 @@
 #include <yaclib/algo/wait_until.hpp>
 #include <yaclib/async/run.hpp>
 #include <yaclib/executor/thread_pool.hpp>
-
-#include <chrono>
+#include <yaclib/fault/chrono.hpp>
 
 #include <gtest/gtest.h>
 
@@ -26,7 +25,7 @@ void TestJustWorks() {
   test::util::StopWatch timer;
 
   tp->Execute([p = std::move(p)]() mutable {
-    std::this_thread::sleep_for(150ms * YACLIB_CI_SLOWDOWN);
+    yaclib_std::this_thread::sleep_for(150ms * YACLIB_CI_SLOWDOWN);
     std::move(p).Set();
   });
   if constexpr (policy == WaitPolicy::Endless) {
@@ -38,7 +37,7 @@ void TestJustWorks() {
     EXPECT_TRUE(!f.Ready());
     EXPECT_LE(timer.Elapsed(), 100ms * YACLIB_CI_SLOWDOWN);
   } else if constexpr (policy == WaitPolicy::Until) {
-    yaclib::WaitUntil(std::chrono::system_clock::now() + 50ms * YACLIB_CI_SLOWDOWN, f);
+    yaclib::WaitUntil(yaclib_std::chrono::system_clock::now() + 50ms * YACLIB_CI_SLOWDOWN, f);
     EXPECT_TRUE(!f.Ready());
     EXPECT_LE(timer.Elapsed(), 100ms * YACLIB_CI_SLOWDOWN);
   }
@@ -56,8 +55,8 @@ TEST(Wait, Empty) {
   EXPECT_TRUE(WaitFor(0ns, fs.begin(), 0));
   EXPECT_TRUE(WaitFor(0ns, fs.begin(), fs.end()));
 
-  EXPECT_TRUE(WaitUntil(std::chrono::steady_clock::now(), fs.begin(), 0));
-  EXPECT_TRUE(WaitUntil(std::chrono::steady_clock::now(), fs.begin(), fs.end()));
+  EXPECT_TRUE(WaitUntil(yaclib_std::chrono::steady_clock::now(), fs.begin(), 0));
+  EXPECT_TRUE(WaitUntil(yaclib_std::chrono::steady_clock::now(), fs.begin(), fs.end()));
 }
 
 TEST(Wait, JustWorks) {
@@ -82,7 +81,7 @@ void TestMultiThreaded() {
 
   for (int i = 0; i < kThreads; ++i) {
     f[i] = yaclib::Run(tp, [i] {
-      std::this_thread::sleep_for(50ms * YACLIB_CI_SLOWDOWN);
+      yaclib_std::this_thread::sleep_for(50ms * YACLIB_CI_SLOWDOWN);
       return i;
     });
   }
@@ -95,7 +94,7 @@ void TestMultiThreaded() {
     EXPECT_TRUE(ready);
   } else if constexpr (kPolicy == WaitPolicy::Until) {
     bool ready =
-        yaclib::WaitUntil(std::chrono::system_clock::now() + 100ms * YACLIB_CI_SLOWDOWN, f[0], f[1], f[2], f[3]);
+        yaclib::WaitUntil(yaclib_std::chrono::system_clock::now() + 100ms * YACLIB_CI_SLOWDOWN, f[0], f[1], f[2], f[3]);
     EXPECT_TRUE(ready);
   }
   EXPECT_LE(timer.Elapsed(), 150ms * YACLIB_CI_SLOWDOWN);
@@ -134,11 +133,11 @@ void TestHaveResults() {
     std::move(p1).Set();
     std::move(p2).Set();
   });
-  std::this_thread::sleep_for(50ms * YACLIB_CI_SLOWDOWN);
+  yaclib_std::this_thread::sleep_for(50ms * YACLIB_CI_SLOWDOWN);
   if constexpr (kPolicy == WaitPolicy::Endless) {
     yaclib::Wait(f1, f2);
   } else if constexpr (kPolicy == WaitPolicy::Until) {
-    EXPECT_TRUE(yaclib::WaitUntil(std::chrono::steady_clock::now(), f1, f2));
+    EXPECT_TRUE(yaclib::WaitUntil(yaclib_std::chrono::steady_clock::now(), f1, f2));
   } else {
     EXPECT_TRUE(yaclib::WaitFor(0ns, f1, f2));
   }
@@ -166,7 +165,7 @@ TEST(WaitFor, Diff) {
 
   for (int i = 0; i < kThreads; ++i) {
     f[i] = yaclib::Run(tp, [i] {
-      std::this_thread::sleep_for(i * 50ms * YACLIB_CI_SLOWDOWN);
+      yaclib_std::this_thread::sleep_for(i * 50ms * YACLIB_CI_SLOWDOWN);
       return i;
     });
   }

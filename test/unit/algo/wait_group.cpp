@@ -3,9 +3,9 @@
 #include <yaclib/algo/wait_group.hpp>
 #include <yaclib/async/run.hpp>
 #include <yaclib/executor/thread_pool.hpp>
+#include <yaclib/fault/chrono.hpp>
 
 #include <array>
-#include <chrono>
 
 #include <gtest/gtest.h>
 
@@ -44,7 +44,7 @@ void TestJustWorks() {
   test::util::StopWatch timer;
 
   tp->Execute([p = std::move(p)]() mutable {
-    std::this_thread::sleep_for(150ms * YACLIB_CI_SLOWDOWN);
+    yaclib_std::this_thread::sleep_for(150ms * YACLIB_CI_SLOWDOWN);
     std::move(p).Set();
   });
 
@@ -81,7 +81,7 @@ void TestManyWorks() {
 
   for (int i = 0; i < kSize; ++i) {
     tp->Execute([p = std::move(promises[i])]() mutable {
-      std::this_thread::sleep_for(150ms * YACLIB_CI_SLOWDOWN);
+      yaclib_std::this_thread::sleep_for(150ms * YACLIB_CI_SLOWDOWN);
       if constexpr (std::is_void_v<T>) {
         std::move(p).Set();
       } else {
@@ -133,7 +133,7 @@ void TestGetWorks() {
   test::util::StopWatch timer;
 
   tp->Execute([p = std::move(p)]() mutable {
-    std::this_thread::sleep_for(150ms * YACLIB_CI_SLOWDOWN);
+    yaclib_std::this_thread::sleep_for(150ms * YACLIB_CI_SLOWDOWN);
     if constexpr (std::is_void_v<T>) {
       std::move(p).Set();
     } else {
@@ -169,7 +169,7 @@ void TestCallbackWorks() {
   test::util::StopWatch timer;
 
   tp->Execute([p = std::move(p)]() mutable {
-    std::this_thread::sleep_for(150ms * YACLIB_CI_SLOWDOWN);
+    yaclib_std::this_thread::sleep_for(150ms * YACLIB_CI_SLOWDOWN);
     if constexpr (std::is_void_v<T>) {
       std::move(p).Set();
     } else {
@@ -214,7 +214,7 @@ void TestMultithreaded() {
 
   for (int i = 0; i < kThreads; ++i) {
     f[i] = Run(tp, [i] {
-      std::this_thread::sleep_for(50ms * YACLIB_CI_SLOWDOWN);
+      yaclib_std::this_thread::sleep_for(50ms * YACLIB_CI_SLOWDOWN);
       return i;
     });
   }

@@ -3,51 +3,31 @@
 namespace yaclib::detail {
 
 void TimedMutex::lock() {
-  assert(_owner != yaclib::std::this_thread::get_id());
+  assert(_owner != yaclib_std::this_thread::get_id());
 
-  yaclib::detail::InjectFault();
-  _m.lock();
-  yaclib::detail::InjectFault();
+  YACLIB_INJECT_FAULT(_m.lock();)
 
-  _owner = yaclib::std::this_thread::get_id();
+  _owner = yaclib_std::this_thread::get_id();
 }
 
 bool TimedMutex::try_lock() noexcept {
-  assert(_owner != yaclib::std::this_thread::get_id());
+  assert(_owner != yaclib_std::this_thread::get_id());
 
-  yaclib::detail::InjectFault();
-  auto res = _m.try_lock();
-  yaclib::detail::InjectFault();
+  YACLIB_INJECT_FAULT(auto res = _m.try_lock();)
 
   if (res) {
-    _owner = yaclib::std::this_thread::get_id();
+    _owner = yaclib_std::this_thread::get_id();
   }
   return res;
 }
 
 void TimedMutex::unlock() noexcept {
   assert(_owner != yaclib::detail::kInvalidThreadId);
-  assert(_owner == yaclib::std::this_thread::get_id());
+  assert(_owner == yaclib_std::this_thread::get_id());
 
-  yaclib::detail::InjectFault();
-  _m.unlock();
-  yaclib::detail::InjectFault();
+  YACLIB_INJECT_FAULT(_m.unlock();)
 
   _owner = yaclib::detail::kInvalidThreadId;
-}
-
-template <typename _Clock, typename _Duration>
-bool TimedMutex::try_lock_until(const ::std::chrono::time_point<_Clock, _Duration>& duration) {
-  assert(_owner != yaclib::std::this_thread::get_id());
-
-  yaclib::detail::InjectFault();
-  auto res = _m.try_lock_until(duration);
-  yaclib::detail::InjectFault();
-
-  if (res) {
-    _owner = yaclib::std::this_thread::get_id();
-  }
-  return res;
 }
 
 }  // namespace yaclib::detail

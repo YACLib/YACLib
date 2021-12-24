@@ -7,7 +7,7 @@ namespace yaclib::detail {
 
 class RandomDevice {
  public:
-  using result_type = ::std::mt19937::result_type;
+  using result_type = std::mt19937::result_type;
 
   static constexpr const result_type kMin = 0;
   static constexpr const result_type kMax = 0xFFFFFFFFU;
@@ -15,7 +15,7 @@ class RandomDevice {
 
   RandomDevice();
 
-  explicit RandomDevice(const ::std::string& /*token*/) : RandomDevice() {
+  explicit RandomDevice(const std::string& /*token*/) : RandomDevice() {
   }
 
   result_type operator()() noexcept;
@@ -36,7 +36,7 @@ class RandomDevice {
 
  private:
   static constexpr const unsigned kSeed = 1337;
-  ::std::mt19937 _eng;
+  std::mt19937 _eng;
 };
 
 }  // namespace yaclib::detail

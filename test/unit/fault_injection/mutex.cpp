@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 
 TEST(mutex, positive_simple) {
-  yaclib::std::mutex lock;
+  yaclib_std::mutex lock;
   { std::unique_lock kek(lock); }
 
   { std::unique_lock kek(lock); }
@@ -13,34 +13,34 @@ TEST(mutex, positive_simple) {
 TEST(mutex, negative_simple) {
   EXPECT_DEATH(
       {
-        yaclib::std::mutex lock;
+        yaclib_std::mutex lock;
         lock.unlock();
       },
       "_owner != yaclib::detail::kInvalidThreadId");
 
   EXPECT_DEATH(
       {
-        yaclib::std::mutex lock;
+        yaclib_std::mutex lock;
         {
           std::unique_lock kek(lock);
           lock.lock();
         }
       },
-      "_owner != yaclib::std::this_thread::get_id()");
+      "_owner != yaclib_std::this_thread::get_id()");
 
   EXPECT_DEATH(
       {
-        yaclib::std::mutex lock;
+        yaclib_std::mutex lock;
         {
           std::unique_lock kek(lock);
           lock.try_lock();
         }
       },
-      "_owner != yaclib::std::this_thread::get_id()");
+      "_owner != yaclib_std::this_thread::get_id()");
 
   EXPECT_DEATH(
       {
-        yaclib::std::mutex lock;
+        yaclib_std::mutex lock;
         {
           std::unique_lock kek(lock);
           std::thread t([&] {
@@ -49,11 +49,11 @@ TEST(mutex, negative_simple) {
           t.join();
         }
       },
-      "_owner == yaclib::std::this_thread::get_id()");
+      "_owner == yaclib_std::this_thread::get_id()");
 }
 
 TEST(shared_mutex, positive_simple) {
-  yaclib::std::shared_mutex lock;
+  yaclib_std::shared_mutex lock;
   { std::unique_lock kek(lock); }
 
   { std::unique_lock kek(lock); }
@@ -70,14 +70,14 @@ TEST(shared_mutex, positive_simple) {
 TEST(shared_mutex, negative_simple) {
   EXPECT_DEATH(
       {
-        yaclib::std::shared_mutex lock;
+        yaclib_std::shared_mutex lock;
         lock.unlock();
       },
       "_owner != yaclib::detail::kInvalidThreadId");
 
   EXPECT_DEATH(
       {
-        yaclib::std::shared_mutex lock;
+        yaclib_std::shared_mutex lock;
         {
           std::unique_lock kek(lock);
           lock.lock();
@@ -87,7 +87,7 @@ TEST(shared_mutex, negative_simple) {
 
   EXPECT_DEATH(
       {
-        yaclib::std::shared_mutex lock;
+        yaclib_std::shared_mutex lock;
         {
           std::unique_lock kek(lock);
           lock.try_lock();
@@ -97,7 +97,7 @@ TEST(shared_mutex, negative_simple) {
 
   EXPECT_DEATH(
       {
-        yaclib::std::shared_mutex lock;
+        yaclib_std::shared_mutex lock;
         {
           std::unique_lock kek(lock);
           std::thread t([&] {
@@ -106,18 +106,18 @@ TEST(shared_mutex, negative_simple) {
           t.join();
         }
       },
-      "_exclusive_owner == yaclib::std::this_thread::get_id()");
+      "_exclusive_owner == yaclib_std::this_thread::get_id()");
 
   EXPECT_DEATH(
       {
-        yaclib::std::shared_mutex lock;
+        yaclib_std::shared_mutex lock;
         lock.unlock_shared();
       },
       "!= _shared_owners.end()");
 
   EXPECT_DEATH(
       {
-        yaclib::std::shared_mutex lock;
+        yaclib_std::shared_mutex lock;
         {
           std::unique_lock kek(lock);
           lock.lock_shared();
@@ -127,7 +127,7 @@ TEST(shared_mutex, negative_simple) {
 
   EXPECT_DEATH(
       {
-        yaclib::std::shared_mutex lock;
+        yaclib_std::shared_mutex lock;
         {
           std::shared_lock kek(lock);
           lock.try_lock();
@@ -137,7 +137,7 @@ TEST(shared_mutex, negative_simple) {
 
   EXPECT_DEATH(
       {
-        yaclib::std::shared_mutex lock;
+        yaclib_std::shared_mutex lock;
         {
           std::shared_lock kek(lock);
           lock.try_lock_shared();
@@ -147,7 +147,7 @@ TEST(shared_mutex, negative_simple) {
 
   EXPECT_DEATH(
       {
-        yaclib::std::shared_mutex lock;
+        yaclib_std::shared_mutex lock;
         {
           std::shared_lock kek(lock);
           std::thread t([&] {
@@ -160,7 +160,7 @@ TEST(shared_mutex, negative_simple) {
 }
 
 TEST(recursive_mutex, positive_simple) {
-  yaclib::std::recursive_mutex lock;
+  yaclib_std::recursive_mutex lock;
   { std::unique_lock kek(lock); }
 
   { std::unique_lock kek(lock); }
@@ -174,14 +174,14 @@ TEST(recursive_mutex, positive_simple) {
 TEST(recursive_mutex, negative_simple) {
   EXPECT_DEATH(
       {
-        yaclib::std::recursive_mutex lock;
+        yaclib_std::recursive_mutex lock;
         lock.unlock();
       },
       "_owner != yaclib::detail::kInvalidThreadId");
 
   EXPECT_DEATH(
       {
-        yaclib::std::recursive_mutex lock;
+        yaclib_std::recursive_mutex lock;
         {
           std::unique_lock kek(lock);
           std::thread t([&] {
@@ -190,5 +190,5 @@ TEST(recursive_mutex, negative_simple) {
           t.join();
         }
       },
-      "_owner == yaclib::std::this_thread::get_id()");
+      "_owner == yaclib_std::this_thread::get_id()");
 }

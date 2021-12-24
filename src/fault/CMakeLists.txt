@@ -32,6 +32,10 @@ list(APPEND YACLIB_INCLUDES
   ${YACLIB_INCLUDE_DIR}/fault/detail/atomic/atomic_reference.hpp
   ${YACLIB_INCLUDE_DIR}/fault/detail/atomic/atomic_flag.hpp
   ${YACLIB_INCLUDE_DIR}/fault/atomic.hpp
+
+  # condition
+  ${YACLIB_INCLUDE_DIR}/fault/detail/condition/condition_variable.hpp
+  ${YACLIB_INCLUDE_DIR}/fault/condition_variable.hpp
   )
 
 list(APPEND YACLIB_SOURCES
@@ -58,6 +62,9 @@ list(APPEND YACLIB_SOURCES
   # antagonist
   ${CMAKE_CURRENT_SOURCE_DIR}/antagonist/yielder.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/antagonist/inject_fault.cpp
+
+  # condition
+  ${CMAKE_CURRENT_SOURCE_DIR}/condition/condition_variable.cpp
   )
 
 add_files()

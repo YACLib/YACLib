@@ -24,14 +24,10 @@ add_subdirectory(algo)
 add_subdirectory(async)
 add_subdirectory(executor)
 add_subdirectory(util)
+add_subdirectory(fault)
 
-# TODO(myannyax) other flag name but not YACLIB_FAULTY or change YACLIB_FAULTY for smth like "test on" and make this YACLIB_FAULTY
-if (LOL_KEK)
-  add_subdirectory(fault)
-endif ()
-
-if (YACLIB_FAULTY)
-  add_compile_definitions(YACLIB_FAULTY)
+if (YACLIB_FAULT)
+  add_compile_definitions(YACLIB_FAULT)
 endif ()
 
 add_library(

@@ -2,10 +2,10 @@
 
 #include <yaclib/config.hpp>
 #include <yaclib/executor/thread_factory.hpp>
+#include <yaclib/fault/atomic.hpp>
+#include <yaclib/fault/thread.hpp>
 
-#include <atomic>
 #include <cstdlib>
-#include <thread>
 
 #include <gtest/gtest.h>
 

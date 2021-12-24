@@ -2,6 +2,7 @@
 
 #include <yaclib/fault/detail/antagonist/inject_fault.hpp>
 
+#include <cassert>
 #include <shared_mutex>
 #include <unordered_set>
 
@@ -26,16 +27,12 @@ class SharedMutex {
   // TODO(myannyax) no handle (my local header has them commented)?
 
  private:
-#ifdef YACLIB_FIBER
-  kek _m;
-#else
-  ::std::shared_mutex _m;
-  ::std::shared_mutex _helper_m;  // for _shared_owners
-#endif
+  std::shared_mutex _m;
+  std::shared_mutex _helper_m;  // for _shared_owners
   // TODO(myannyax) yaclib wrapper
-  ::std::atomic<yaclib::std::thread::id> _exclusive_owner{yaclib::detail::kInvalidThreadId};
+  std::atomic<yaclib_std::thread::id> _exclusive_owner{yaclib::detail::kInvalidThreadId};
   // TODO(myannyax) remove / change?
-  ::std::unordered_set<yaclib::std::thread::id> _shared_owners;
+  std::unordered_set<yaclib_std::thread::id> _shared_owners;
 };
 
 }  // namespace yaclib::detail

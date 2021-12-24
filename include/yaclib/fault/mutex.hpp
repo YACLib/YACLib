@@ -8,9 +8,9 @@
 #include <atomic>
 #include <mutex>
 
-namespace yaclib::std {
+namespace yaclib_std {
 
-#ifdef YACLIB_FAULTY
+#ifdef YACLIB_FAULT
 
 using mutex = yaclib::detail::Mutex;
 using timed_mutex = yaclib::detail::TimedMutex;
@@ -20,11 +20,11 @@ using recursive_mutex = yaclib::detail::RecursiveMutex;
 
 #else
 
-using mutex = ::std::mutex;
-using timed_mutex = ::std::timed_mutex;
+using mutex = std::mutex;
+using timed_mutex = std::timed_mutex;
 
-using recursive_timed_mutex = ::std::recursive_timed_mutex;
-using recursive_mutex = ::std::recursive_mutex;
+using recursive_timed_mutex = std::recursive_timed_mutex;
+using recursive_mutex = std::recursive_mutex;
 
 #endif
-}  // namespace yaclib::std
+}  // namespace yaclib_std

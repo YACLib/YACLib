@@ -3,6 +3,7 @@
 #include <yaclib/fault/chrono.hpp>
 #include <yaclib/fault/detail/antagonist/inject_fault.hpp>
 
+#include <cassert>
 #include <mutex>
 
 namespace yaclib::detail {
@@ -20,21 +21,24 @@ class RecursiveTimedMutex {
   void unlock() noexcept;
 
   template <typename _Rep, typename _Period>
-  bool try_lock_for(const ::std::chrono::duration<_Rep, _Period>& duration) {
-    return try_lock_until(yaclib::std::chrono::steady_clock::now() + duration);
+  bool try_lock_for(const std::chrono::duration<_Rep, _Period>& duration) {
+    return try_lock_until(yaclib_std::chrono::steady_clock::now() + duration);
   }
   template <typename _Clock, typename _Duration>
-  bool try_lock_until(const ::std::chrono::time_point<_Clock, _Duration>& duration);
+  bool try_lock_until(const std::chrono::time_point<_Clock, _Duration>& duration) {
+    YACLIB_INJECT_FAULT(auto res = _m.try_lock_until(duration);)
+
+    if (res) {
+      UpdateOnLock();
+    }
+    return res;
+  }
 
  private:
-#ifdef YACLIB_FIBER
-  kek _m;
-#else
-  ::std::recursive_timed_mutex _m;
-#endif
+  std::recursive_timed_mutex _m;
   // TODO(myannyax) yaclib wrapper
-  ::std::atomic<yaclib::std::thread::id> _owner{yaclib::detail::kInvalidThreadId};
-  ::std::atomic<unsigned> _lock_level{0};
+  std::atomic<yaclib_std::thread::id> _owner{yaclib::detail::kInvalidThreadId};
+  std::atomic<unsigned> _lock_level{0};
   void UpdateOnLock();
 };
 

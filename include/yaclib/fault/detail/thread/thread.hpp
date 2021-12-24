@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cassert>
 #include <functional>
 #include <thread>
 
@@ -10,17 +11,15 @@ class Thread {
   Thread(const Thread&) = delete;
   Thread& operator=(const Thread&) = delete;
 
-#ifdef YACLIB_FIBER
-  // TODO(myannyax)
-  using id = size_t;
-  using native_handle_type = pthread_t;
-#else
-  using id = ::std::thread::id;
-  using native_handle_type = ::std::thread::native_handle_type;
-#endif
+  using id = std::thread::id;
+  using native_handle_type = std::thread::native_handle_type;
 
   Thread() noexcept;
-  explicit Thread(::std::function<void()> routine);
+
+  template <class Fp, class... Args>
+  inline explicit Thread(Fp&& f, Args&&... args) : _impl(std::forward<Fp>(f), std::move(args)...) {
+  }
+
   Thread(Thread&& t) noexcept;
 
   ~Thread() = default;
@@ -36,14 +35,11 @@ class Thread {
 
   native_handle_type native_handle() noexcept;
 
+  // TODO(myannyax) don't use auto?
   static auto hardware_concurrency() noexcept;
 
  private:
-#ifdef YACLIB_FIBER
-  // TODO(myannyax) _impl;
-#else
-  ::std::thread _impl;
-#endif
+  std::thread _impl;
 };
 
 extern const Thread::id kInvalidThreadId;

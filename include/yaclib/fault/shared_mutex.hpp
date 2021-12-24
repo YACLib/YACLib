@@ -8,17 +8,17 @@
 #include <shared_mutex>
 #include <unordered_set>
 
-namespace yaclib::std {
+namespace yaclib_std {
 
-#ifdef YACLIB_FAULTY
+#ifdef YACLIB_FAULT
 
 using shared_mutex = yaclib::detail::SharedMutex;
 using shared_timed_mutex = yaclib::detail::SharedTimedMutex;
 
 #else
 
-using shared_mutex = ::std::shared_mutex;
-using shared_timed_mutex = ::std::shared_timed_mutex;
+using shared_mutex = std::shared_mutex;
+using shared_timed_mutex = std::shared_timed_mutex;
 
 #endif
-}  // namespace yaclib::std
+}  // namespace yaclib_std

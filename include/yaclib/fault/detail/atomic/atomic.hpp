@@ -5,34 +5,22 @@
 
 namespace yaclib::detail {
 
-template <class T>
-struct Atomic : public AtomicBase<T, ::std::atomic<T>> {
- protected:
-  ::std::atomic<T> GetDelegate() override {
-    return _delegate;
-  }
-
+template <typename T>
+struct Atomic : public AtomicBase<T, std::atomic<T>> {
   Atomic() noexcept = default;
 
-  constexpr Atomic(T desired) noexcept : _delegate(desired) {
+  constexpr Atomic(T desired) noexcept : AtomicBase<T, std::atomic<T>>(desired) {
   }
 
   T operator=(T desired) volatile noexcept {
-    yaclib::detail::InjectFault();
-    auto result = _delegate.operator=(desired);
-    yaclib::detail::InjectFault();
+    YACLIB_INJECT_FAULT(auto result = this->_impl.operator=(desired);)
     return result;
   }
 
   T operator=(T desired) noexcept {
-    yaclib::detail::InjectFault();
-    auto result = _delegate.operator=(desired);
-    yaclib::detail::InjectFault();
+    YACLIB_INJECT_FAULT(auto result = this->_impl.operator=(desired);)
     return result;
   }
-
- private:
-  ::std::atomic<T> _delegate;
 };
 
 }  // namespace yaclib::detail

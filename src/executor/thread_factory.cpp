@@ -1,11 +1,11 @@
 #include <util/intrusive_list.hpp>
 
 #include <yaclib/executor/thread_factory.hpp>
+#include <yaclib/fault/condition_variable.hpp>
+#include <yaclib/fault/mutex.hpp>
+#include <yaclib/fault/thread.hpp>
 
 #include <cassert>
-#include <condition_variable>
-#include <mutex>
-#include <thread>
 #include <utility>
 
 namespace yaclib {
@@ -34,12 +34,12 @@ class LightThread final : public IThread {
   }
 
   ~LightThread() final {
-    assert(_thread.get_id() != std::this_thread::get_id());
+    assert(_thread.get_id() != yaclib_std::this_thread::get_id());
     _thread.join();
   }
 
  private:
-  std::thread _thread;
+  yaclib_std::thread _thread;
 };
 
 class HeavyThread final : public IThread {
@@ -78,7 +78,7 @@ class HeavyThread final : public IThread {
       _state = State::Stop;
     }
     _cv.notify_all();
-    assert(_thread.get_id() != std::this_thread::get_id());
+    assert(_thread.get_id() != yaclib_std::this_thread::get_id());
     _thread.join();
   }
 
@@ -106,8 +106,8 @@ class HeavyThread final : public IThread {
     }
   }
 
-  std::mutex _m;
-  std::condition_variable _cv;
+  yaclib_std::mutex _m;
+  yaclib_std::condition_variable _cv;
   enum class State {
     Idle,
     Run,
@@ -121,7 +121,7 @@ class HeavyThread final : public IThread {
   util::IFuncPtr _acquire;
   util::IFuncPtr _release;
 
-  std::thread _thread;
+  yaclib_std::thread _thread;
 };
 
 class ThreadFactory;
@@ -220,7 +220,7 @@ class HeavyThreadFactory : public ThreadFactory {
 
   const size_t _cache_threads;
 
-  std::mutex _m;
+  yaclib_std::mutex _m;
   size_t _threads_count{0};
   util::List<IThread> _threads;
 };

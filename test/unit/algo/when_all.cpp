@@ -192,7 +192,7 @@ void MultiThreaded() {
 
   auto async_value = [tp](int value) {
     return Run(tp, [value] {
-      std::this_thread::sleep_for(10ms);
+      yaclib_std::this_thread::sleep_for(10ms);
       if constexpr (!is_void) {
         return value;
       } else {

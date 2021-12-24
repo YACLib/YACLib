@@ -44,6 +44,6 @@
 
 namespace yaclib {
 
-constexpr size_t kCacheLineSize = 64;
+inline constexpr size_t kCacheLineSize = 64;
 
 }  // namespace yaclib

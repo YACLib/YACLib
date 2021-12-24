@@ -1,7 +1,6 @@
 #pragma once
 
 // TODO(myannayx): define in cmake depending on system
-#define SLEEP_TIME 500
 
 #include <yaclib/fault/thread.hpp>
 
@@ -9,20 +8,21 @@
 #include <random>
 
 namespace yaclib::detail {
+
 // TODO(myannyax) stats?
 class Yielder {
  public:
-  explicit Yielder(int frequency);
+  explicit Yielder(uint32_t frequency);
   void MaybeYield();
 
  private:
   bool ShouldYield();
   void Reset();
-  unsigned RandNumber(unsigned max);
+  unsigned RandNumber(uint32_t max);
 
-  ::std::atomic<int> _count;
-  const unsigned _freq;
-  ::std::mt19937 _eng;
+  std::atomic_uint32_t _count;
+  const uint32_t _freq;
+  std::mt19937 _eng;
 };
 
 }  // namespace yaclib::detail

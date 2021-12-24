@@ -13,7 +13,7 @@ namespace yaclib::detail {
 template <typename T, WhenPolicy P /*None*/>
 class AnyCombinatorBase {
  protected:
-  std::atomic_bool _done;
+  yaclib_std::atomic_bool _done;
   PromiseCorePtr<T> _core;
 
   explicit AnyCombinatorBase(size_t /*size*/, PromiseCorePtr<T>&& core) : _done{false}, _core{std::move(core)} {
@@ -32,7 +32,7 @@ class AnyCombinatorBase {
 
 template <typename T>
 class AnyCombinatorBase<T, WhenPolicy::LastFail> {
-  std::atomic_size_t _state;
+  yaclib_std::atomic_size_t _state;
 
  protected:
   PromiseCorePtr<T> _core;
@@ -59,7 +59,7 @@ template <typename T>
 class AnyCombinatorBase<T, WhenPolicy::FirstFail> : public AnyCombinatorBase<T, WhenPolicy::None> {
   using Base = AnyCombinatorBase<T, WhenPolicy::None>;
 
-  std::atomic<util::ResultState> _state;
+  yaclib_std::atomic<util::ResultState> _state;
   union {
     util::detail::Unit _unit;
     std::error_code _error;

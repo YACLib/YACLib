@@ -36,8 +36,8 @@ set(YACLIB_EXAMPLE_SOURCES)
 set(YACLIB_EXAMPLE_INCLUDES)
 
 #TODO(myannyax) any ways this can be avoided?
-if (YACLIB_FAULTY)
-  add_compile_definitions(YACLIB_FAULTY)
+if (YACLIB_FAULT)
+  add_compile_definitions(YACLIB_FAULT)
 endif ()
 
 set(YACLIB_UNIT_SOURCES

@@ -3,6 +3,7 @@
 #include <yaclib/fault/detail/antagonist/inject_fault.hpp>
 
 #include <atomic>
+#include <cassert>
 #include <mutex>
 
 namespace yaclib::detail {
@@ -19,23 +20,14 @@ class Mutex {
   bool try_lock() noexcept;
   void unlock() noexcept;
 
-#ifdef YACLIB_FIBER
-  // TODO(myannyax)
-  using native_handle_type = kek;
-#else
-  using native_handle_type = ::std::mutex::native_handle_type;
-#endif
+  using native_handle_type = std::mutex::native_handle_type;
 
   inline native_handle_type native_handle();
 
  private:
-#ifdef YACLIB_FIBER
-  kek _m;
-#else
-  ::std::mutex _m;
-#endif
+  std::mutex _m;
   // TODO(myannyax) yaclib wrapper
-  ::std::atomic<yaclib::std::thread::id> _owner{yaclib::detail::kInvalidThreadId};
+  std::atomic<yaclib_std::thread::id> _owner{yaclib::detail::kInvalidThreadId};
 };
 
 }  // namespace yaclib::detail

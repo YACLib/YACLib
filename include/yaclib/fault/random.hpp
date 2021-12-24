@@ -5,16 +5,16 @@
 #include <random>
 #include <string>
 
-namespace yaclib::std::random {
+namespace yaclib_std::random {
 
-#ifdef YACLIB_FAULTY
+#ifdef YACLIB_FAULT
 
-using random_device = detail::RandomDevice;
+using random_device = yaclib::detail::RandomDevice;
 
 #else
 
-using random_device = ::std::random::random_device;
+using random_device = std::random::random_device;
 
 #endif
 
-}  // namespace yaclib::std::random
+}  // namespace yaclib_std::random

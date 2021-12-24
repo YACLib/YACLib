@@ -240,7 +240,7 @@ TEST(Subscribe, AsyncSimple) {
 
   auto [f, p] = yaclib::MakeContract<std::string>();
 
-  std::atomic<bool> called{false};
+  yaclib_std::atomic<bool> called{false};
 
   std::move(f).Subscribe([&](yaclib::util::Result<std::string> result) {
     EXPECT_EQ(yaclib::CurrentThreadPool(), tp);
@@ -267,7 +267,7 @@ TEST(Subscribe, SubscribeVia) {
 
   std::move(p).Set(17);
 
-  std::atomic<bool> called = false;
+  yaclib_std::atomic<bool> called = false;
 
   auto callback = [&called](yaclib::util::Result<int> result) mutable {
     EXPECT_EQ(std::move(result).Ok(), 17);
@@ -289,7 +289,7 @@ TEST(Subscribe, SubscribeVia2) {
 
   auto [f, p] = yaclib::MakeContract<int>();
 
-  std::atomic<bool> called = false;
+  yaclib_std::atomic<bool> called = false;
 
   auto callback = [&called](yaclib::util::Result<int> result) mutable {
     EXPECT_EQ(std::move(result).Ok(), 42);
@@ -608,7 +608,7 @@ TEST(Pipeline, Simple2) {
   auto almost_there = std::move(f).Then(tp1, make_stage(1, tp1)).Then(make_stage(2, tp1)).Then(tp2, make_stage(3, tp2));
 
   std::move(p).Set("start");
-  std::this_thread::sleep_for(100ms);
+  yaclib_std::this_thread::sleep_for(100ms);
 
   auto finally = std::move(almost_there).Then(make_stage(4, tp2)).Then(tp1, make_stage(5, tp1));
 
@@ -994,9 +994,9 @@ TEST(Future, Stopped) {
 TEST(Future, StopInFlight) {
   auto tp = yaclib::MakeThreadPool(1);
   auto f = yaclib::Run(tp, [] {
-    std::this_thread::sleep_for(10ms);
+    yaclib_std::this_thread::sleep_for(10ms);
   });
-  std::this_thread::sleep_for(10ms);
+  yaclib_std::this_thread::sleep_for(10ms);
   std::move(f).Stop();
   tp->Stop();
   tp->Wait();

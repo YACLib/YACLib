@@ -7,11 +7,11 @@ Thread::Thread() noexcept : _impl() {
 }
 
 Thread::Thread(Thread&& t) noexcept {
-  _impl = static_cast<::std::thread&&>(t._impl);
+  _impl = static_cast<std::thread&&>(t._impl);
 }
 
 Thread& Thread::operator=(Thread&& t) noexcept {
-  _impl = static_cast<::std::thread&&>(t._impl);
+  _impl = static_cast<std::thread&&>(t._impl);
   return *this;
 }
 
@@ -24,7 +24,7 @@ bool Thread::joinable() const noexcept {
 }
 
 void Thread::join() {
-  assert(get_id() != yaclib::std::this_thread::get_id());
+  assert(get_id() != yaclib_std::this_thread::get_id());
   _impl.join();
 }
 
@@ -41,13 +41,9 @@ Thread::native_handle_type Thread::native_handle() noexcept {
 }
 
 auto Thread::hardware_concurrency() noexcept {
-  return ::std::thread::hardware_concurrency();
+  return std::thread::hardware_concurrency();
 }
 
-Thread::Thread(::std::function<void()> routine) {
-  _impl = ::std::thread(routine);
-}
-
-const Thread::id kInvalidThreadId = ::std::thread::id{};
+const Thread::id kInvalidThreadId = std::thread::id{};
 
 }  // namespace yaclib::detail
