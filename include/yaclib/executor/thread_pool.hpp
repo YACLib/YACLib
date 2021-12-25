@@ -58,7 +58,6 @@ void SetCurrentThreadPool(IThreadPool* tp) noexcept;
 IThreadPoolPtr MakeThreadPool(size_t threads = std::thread::hardware_concurrency(),
                               IThreadFactoryPtr tf = MakeThreadFactory());
 
-IThreadPoolPtr MakeThreadPool(IExecutor::Type tag, size_t threads = std::thread::hardware_concurrency(),
-                              IThreadFactoryPtr tf = MakeThreadFactory());
+IThreadPoolPtr MakeThreadPool(IExecutor::Type tag, size_t threads, IThreadFactoryPtr tf);
 
 }  // namespace yaclib

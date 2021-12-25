@@ -166,6 +166,10 @@ class ThreadFactory : public BaseFactory {
 
 class LightThreadFactory final : public ThreadFactory {
  private:
+  [[nodiscard]] Type Tag() const final {
+    return Type::Light;
+  }
+
   IThreadPtr Acquire(util::IFuncPtr func, size_t priority, std::string_view name, util::IFuncPtr acquire,
                      util::IFuncPtr release) final {
     return new LightThread{priority, name, std::move(func), std::move(acquire), std::move(release)};
@@ -193,6 +197,10 @@ class HeavyThreadFactory : public ThreadFactory {
   }
 
  private:
+  [[nodiscard]] Type Tag() const final {
+    return Type::Heavy;
+  }
+
   IThreadPtr Acquire(util::IFuncPtr func, size_t priority, std::string_view name, util::IFuncPtr acquire,
                      util::IFuncPtr release) final {
     std::unique_lock guard{_m};
@@ -258,6 +266,10 @@ class DecoratorThreadFactory : public BaseFactory {
   }
 
  private:
+  [[nodiscard]] Type Tag() const final {
+    return _base->Tag();
+  }
+
   IThreadFactoryPtr _base;
 };
 

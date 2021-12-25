@@ -123,6 +123,7 @@ TEST(concurrent_strands, simple) {
 
 TEST(batching, simple) {
   auto tp = MakeThreadPool(1);
+  EXPECT_EQ(tp->Tag(), yaclib::IExecutor::Type::ThreadPool);
   tp->Execute([] {
     // bubble
     std::this_thread::sleep_for(1s);

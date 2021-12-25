@@ -17,6 +17,22 @@ using IThreadPtr = IThread*;
 
 class IThreadFactory : public util::IRef {
  public:
+  /**
+   * Thread factory tag
+   *
+   * \enum Custom, Light, Heavy
+   */
+  enum class Type {
+    Custom = 0,
+    Light,
+    Heavy,
+  };
+
+  /**
+   * Return type of this thread factory
+   */
+  [[nodiscard]] virtual Type Tag() const = 0;
+
   virtual IThreadPtr Acquire(util::IFuncPtr f) = 0;
 
   virtual void Release(IThreadPtr t) = 0;
