@@ -46,6 +46,8 @@ using IThreadPoolPtr = util::Ptr<IThreadPool>;
  */
 IThreadPool* CurrentThreadPool() noexcept;
 
+void SetCurrentThreadPool(IThreadPool* tp) noexcept;
+
 /**
  * Create new ThreadPool object
  *
@@ -54,6 +56,9 @@ IThreadPool* CurrentThreadPool() noexcept;
  * \return intrusive pointer to the new ThreadPool
  */
 IThreadPoolPtr MakeThreadPool(size_t threads = std::thread::hardware_concurrency(),
+                              IThreadFactoryPtr tf = MakeThreadFactory());
+
+IThreadPoolPtr MakeThreadPool(IExecutor::Type tag, size_t threads = std::thread::hardware_concurrency(),
                               IThreadFactoryPtr tf = MakeThreadFactory());
 
 }  // namespace yaclib

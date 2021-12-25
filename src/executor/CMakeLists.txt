@@ -7,6 +7,7 @@ list(APPEND YACLIB_INCLUDES
   ${YACLIB_INCLUDE_DIR}/executor/thread_pool.hpp
   )
 list(APPEND YACLIB_SOURCES
+  ${CMAKE_CURRENT_SOURCE_DIR}/common_thread_pool.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/inline.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/strand.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/thread_factory.cpp
