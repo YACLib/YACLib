@@ -26,7 +26,7 @@ TEST(mutex, negative_simple) {
           lock.lock();
         }
       },
-      "_owner != yaclib_std::this_thread::get_id()");
+      "_owner != yaclib_std::this_thread::get_id");
 
   EXPECT_DEATH(
       {
@@ -36,7 +36,7 @@ TEST(mutex, negative_simple) {
           lock.try_lock();
         }
       },
-      "_owner != yaclib_std::this_thread::get_id()");
+      "_owner != yaclib_std::this_thread::get_id");
 
   EXPECT_DEATH(
       {
@@ -49,7 +49,7 @@ TEST(mutex, negative_simple) {
           t.join();
         }
       },
-      "_owner == yaclib_std::this_thread::get_id()");
+      "_owner == yaclib_std::this_thread::get_id");
 }
 
 TEST(shared_mutex, positive_simple) {
@@ -106,7 +106,7 @@ TEST(shared_mutex, negative_simple) {
           t.join();
         }
       },
-      "_exclusive_owner == yaclib_std::this_thread::get_id()");
+      "_exclusive_owner == yaclib_std::this_thread::get_id");
 
   EXPECT_DEATH(
       {
@@ -160,5 +160,5 @@ TEST(recursive_mutex, negative_simple) {
           t.join();
         }
       },
-      "_owner == yaclib_std::this_thread::get_id()");
+      "_owner == yaclib_std::this_thread::get_id");
 }

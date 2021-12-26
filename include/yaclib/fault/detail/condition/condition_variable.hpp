@@ -8,7 +8,7 @@ namespace yaclib::detail {
 
 class ConditionVariable {
  public:
-  /*constexpr*/ ConditionVariable() noexcept = default;
+  /*constexpr*/ ConditionVariable() /*noexcept*/ = default;
 
   ~ConditionVariable() = default;
 
