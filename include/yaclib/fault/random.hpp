@@ -13,7 +13,7 @@ using random_device = yaclib::detail::RandomDevice;
 
 #else
 
-using random_device = std::random::random_device;
+using std::random_device;
 
 #endif
 
