@@ -27,12 +27,10 @@ class SharedMutex {
   // TODO(myannyax) no handle (my local header has them commented)?
 
  private:
-  std::shared_mutex _m;
-  std::shared_mutex _helper_m;  // for _shared_owners
+  std::shared_timed_mutex _m;
   // TODO(myannyax) yaclib wrapper
   std::atomic<yaclib_std::thread::id> _exclusive_owner{yaclib::detail::kInvalidThreadId};
-  // TODO(myannyax) remove / change?
-  std::unordered_set<yaclib_std::thread::id> _shared_owners;
+  std::atomic_bool _shared_mode{false};
 };
 
 }  // namespace yaclib::detail

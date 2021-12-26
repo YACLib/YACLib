@@ -111,13 +111,6 @@ TEST(shared_mutex, negative_simple) {
   EXPECT_DEATH(
       {
         yaclib_std::shared_mutex lock;
-        lock.unlock_shared();
-      },
-      "!= _shared_owners.end()");
-
-  EXPECT_DEATH(
-      {
-        yaclib_std::shared_mutex lock;
         {
           std::unique_lock kek(lock);
           lock.lock_shared();
@@ -129,34 +122,11 @@ TEST(shared_mutex, negative_simple) {
       {
         yaclib_std::shared_mutex lock;
         {
-          std::shared_lock kek(lock);
-          lock.try_lock();
+          std::unique_lock kek(lock);
+          lock.unlock_shared();
         }
       },
-      "== _shared_owners.end()");
-
-  EXPECT_DEATH(
-      {
-        yaclib_std::shared_mutex lock;
-        {
-          std::shared_lock kek(lock);
-          lock.try_lock_shared();
-        }
-      },
-      "== _shared_owners.end()");
-
-  EXPECT_DEATH(
-      {
-        yaclib_std::shared_mutex lock;
-        {
-          std::shared_lock kek(lock);
-          std::thread t([&] {
-            lock.unlock_shared();
-          });
-          t.join();
-        }
-      },
-      "!= _shared_owners.end()");
+      "_shared_mode == false");
 }
 
 TEST(recursive_mutex, positive_simple) {

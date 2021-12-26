@@ -5,28 +5,22 @@ namespace yaclib::detail {
 void SharedTimedMutex::lock() {
   auto me = yaclib_std::this_thread::get_id();
   assert(_exclusive_owner != me);
-  {
-    std::shared_lock lock(_helper_m);
-    assert(_shared_owners.find(me) == _shared_owners.end());
-  }
 
   YACLIB_INJECT_FAULT(_m.lock();)
 
   _exclusive_owner = me;
+  _shared_mode.store(false);
 }
 
 bool SharedTimedMutex::try_lock() noexcept {
   auto me = yaclib_std::this_thread::get_id();
   assert(_exclusive_owner != me);
-  {
-    std::shared_lock lock(_helper_m);
-    assert(_shared_owners.find(me) == _shared_owners.end());
-  }
 
   YACLIB_INJECT_FAULT(auto res = _m.try_lock();)
 
   if (res) {
     _exclusive_owner = yaclib_std::this_thread::get_id();
+    _shared_mode.store(false);
   }
   return res;
 }
@@ -34,6 +28,7 @@ bool SharedTimedMutex::try_lock() noexcept {
 void SharedTimedMutex::unlock() noexcept {
   assert(_exclusive_owner != yaclib::detail::kInvalidThreadId);
   assert(_exclusive_owner == yaclib_std::this_thread::get_id());
+  assert(_shared_mode == false);
 
   _exclusive_owner = yaclib::detail::kInvalidThreadId;
 
@@ -43,50 +38,27 @@ void SharedTimedMutex::unlock() noexcept {
 void SharedTimedMutex::lock_shared() {
   auto me = yaclib_std::this_thread::get_id();
   assert(_exclusive_owner != me);
-  {
-    std::shared_lock lock(_helper_m);
-    assert(_shared_owners.find(me) == _shared_owners.end());
-  }
 
   YACLIB_INJECT_FAULT(_m.lock_shared();)
 
-  {
-    std::unique_lock lock(_helper_m);
-    _shared_owners.insert(me);
-  }
+  _shared_mode.store(true);
 }
 
 bool SharedTimedMutex::try_lock_shared() noexcept {
   auto me = yaclib_std::this_thread::get_id();
   assert(_exclusive_owner != me);
-  {
-    std::shared_lock lock(_helper_m);
-    assert(_shared_owners.find(me) == _shared_owners.end());
-  }
 
   YACLIB_INJECT_FAULT(auto res = _m.try_lock_shared();)
 
   if (res) {
-    {
-      std::unique_lock lock(_helper_m);
-      _shared_owners.insert(me);
-    }
+    _shared_mode.store(true);
   }
   return res;
 }
 
 void SharedTimedMutex::unlock_shared() noexcept {
   auto me = yaclib_std::this_thread::get_id();
-  {
-    std::shared_lock lock(_helper_m);
-    assert(_shared_owners.find(me) != _shared_owners.end());
-  }
-
-  {
-    std::unique_lock lock(_helper_m);
-    _shared_owners.erase(me);
-  }
-  _exclusive_owner = yaclib::detail::kInvalidThreadId;
+  assert(_shared_mode = true);
 
   YACLIB_INJECT_FAULT(_m.unlock_shared();)
 }
