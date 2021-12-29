@@ -26,7 +26,7 @@ class RecursiveTimedMutex {
   }
   template <typename _Clock, typename _Duration>
   bool try_lock_until(const std::chrono::time_point<_Clock, _Duration>& duration) {
-    YACLIB_INJECT_FAULT(auto res = _m.try_lock_until(duration);)
+    YACLIB_INJECT_FAULT(auto res = _m.try_lock_until(duration));
 
     if (res) {
       UpdateOnLock();

@@ -29,7 +29,7 @@ class SharedTimedMutex {
     auto me = yaclib_std::this_thread::get_id();
     assert(_exclusive_owner != me);
 
-    YACLIB_INJECT_FAULT(auto res = _m.try_lock_until(duration);)
+    YACLIB_INJECT_FAULT(auto res = _m.try_lock_until(duration));
 
     if (res) {
       _exclusive_owner = yaclib_std::this_thread::get_id();
@@ -51,7 +51,7 @@ class SharedTimedMutex {
     auto me = yaclib_std::this_thread::get_id();
     assert(_exclusive_owner != me);
 
-    YACLIB_INJECT_FAULT(auto res = _m.try_lock_shared_until(duration);)
+    YACLIB_INJECT_FAULT(auto res = _m.try_lock_shared_until(duration));
 
     if (res) {
       _shared_mode.store(true);

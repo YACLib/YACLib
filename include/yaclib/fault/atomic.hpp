@@ -16,11 +16,11 @@ using atomic_flag = yaclib::detail::AtomicFlag;
 // fences
 
 inline void atomic_thread_fence(std::memory_order order) noexcept {
-  YACLIB_INJECT_FAULT(std::atomic_thread_fence(order);)
+  YACLIB_INJECT_FAULT(std::atomic_thread_fence(order));
 }
 
 inline void atomic_signal_fence(std::memory_order order) noexcept {
-  YACLIB_INJECT_FAULT(std::atomic_signal_fence(order);)
+  YACLIB_INJECT_FAULT(std::atomic_signal_fence(order));
 }
 
 #else

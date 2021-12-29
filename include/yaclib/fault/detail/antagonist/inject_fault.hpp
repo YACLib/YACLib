@@ -5,7 +5,7 @@
 #define YACLIB_INJECT_FAULT(statement) \
   yaclib::detail::InjectFault();       \
   statement;                           \
-  yaclib::detail::InjectFault();
+  yaclib::detail::InjectFault()
 
 namespace yaclib::detail {
 

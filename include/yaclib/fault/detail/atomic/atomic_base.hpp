@@ -20,20 +20,20 @@ struct AtomicBase {
   }
 
   void store(T desired, std::memory_order order = std::memory_order_seq_cst) volatile noexcept {
-    YACLIB_INJECT_FAULT(_impl.store(desired, order);)
+    YACLIB_INJECT_FAULT(_impl.store(desired, order));
   }
 
   void store(T desired, std::memory_order order = std::memory_order_seq_cst) noexcept {
-    YACLIB_INJECT_FAULT(_impl.store(desired, order);)
+    YACLIB_INJECT_FAULT(_impl.store(desired, order));
   }
 
   T load(std::memory_order order = std::memory_order_seq_cst) const volatile noexcept {
-    YACLIB_INJECT_FAULT(auto result = _impl.load(order);)
+    YACLIB_INJECT_FAULT(auto result = _impl.load(order));
     return result;
   }
 
   T load(std::memory_order order = std::memory_order_seq_cst) const noexcept {
-    YACLIB_INJECT_FAULT(auto result = _impl.load(order);)
+    YACLIB_INJECT_FAULT(auto result = _impl.load(order));
     return result;
   }
 
@@ -46,56 +46,56 @@ struct AtomicBase {
   }
 
   T exchange(T desired, std::memory_order order = std::memory_order_seq_cst) volatile noexcept {
-    YACLIB_INJECT_FAULT(auto result = _impl.exchange(desired, order);)
+    YACLIB_INJECT_FAULT(auto result = _impl.exchange(desired, order));
     return result;
   }
 
   T exchange(T desired, std::memory_order order = std::memory_order_seq_cst) noexcept {
-    YACLIB_INJECT_FAULT(auto result = _impl.exchange(desired, order);)
+    YACLIB_INJECT_FAULT(auto result = _impl.exchange(desired, order));
     return result;
   }
 
   bool compare_exchange_weak(T& expected, T desired, std::memory_order success,
                              std::memory_order failure) volatile noexcept {
-    YACLIB_INJECT_FAULT(auto result = _impl.compare_exchange_weak(expected, desired, success, failure);)
+    YACLIB_INJECT_FAULT(auto result = _impl.compare_exchange_weak(expected, desired, success, failure));
     return result;
   }
 
   bool compare_exchange_weak(T& expected, T desired, std::memory_order success, std::memory_order failure) noexcept {
-    YACLIB_INJECT_FAULT(auto result = _impl.compare_exchange_weak(expected, desired, success, failure);)
+    YACLIB_INJECT_FAULT(auto result = _impl.compare_exchange_weak(expected, desired, success, failure));
     return result;
   }
 
   bool compare_exchange_strong(T& expected, T desired, std::memory_order success,
                                std::memory_order failure) volatile noexcept {
-    YACLIB_INJECT_FAULT(auto result = _impl.compare_exchange_strong(expected, desired, success, failure);)
+    YACLIB_INJECT_FAULT(auto result = _impl.compare_exchange_strong(expected, desired, success, failure));
     return result;
   }
 
   bool compare_exchange_strong(T& expected, T desired, std::memory_order success, std::memory_order failure) noexcept {
-    YACLIB_INJECT_FAULT(auto result = _impl.compare_exchange_strong(expected, desired, success, failure);)
+    YACLIB_INJECT_FAULT(auto result = _impl.compare_exchange_strong(expected, desired, success, failure));
     return result;
   }
 
   bool compare_exchange_weak(T& expected, T desired,
                              std::memory_order order = std::memory_order_seq_cst) volatile noexcept {
-    YACLIB_INJECT_FAULT(auto result = _impl.compare_exchange_weak(expected, desired, order);)
+    YACLIB_INJECT_FAULT(auto result = _impl.compare_exchange_weak(expected, desired, order));
     return result;
   }
 
   bool compare_exchange_weak(T& expected, T desired, std::memory_order order = std::memory_order_seq_cst) noexcept {
-    YACLIB_INJECT_FAULT(auto result = _impl.compare_exchange_weak(expected, desired, order);)
+    YACLIB_INJECT_FAULT(auto result = _impl.compare_exchange_weak(expected, desired, order));
     return result;
   }
 
   bool compare_exchange_strong(T& expected, T desired,
                                std::memory_order order = std::memory_order_seq_cst) volatile noexcept {
-    YACLIB_INJECT_FAULT(auto result = _impl.compare_exchange_strong(expected, desired, order);)
+    YACLIB_INJECT_FAULT(auto result = _impl.compare_exchange_strong(expected, desired, order));
     return result;
   }
 
   bool compare_exchange_strong(T& expected, T desired, std::memory_order order = std::memory_order_seq_cst) noexcept {
-    YACLIB_INJECT_FAULT(auto result = _impl.compare_exchange_strong(expected, desired, order);)
+    YACLIB_INJECT_FAULT(auto result = _impl.compare_exchange_strong(expected, desired, order));
     return result;
   }
 
@@ -120,52 +120,52 @@ struct AtomicBase<T, Atomic, true> : public AtomicBase<T, Atomic, false> {
   }
 
   T fetch_add(T arg, std::memory_order order = std::memory_order_seq_cst) volatile noexcept {
-    YACLIB_INJECT_FAULT(auto result = this->_impl.fetch_add(arg, order);)
+    YACLIB_INJECT_FAULT(auto result = this->_impl.fetch_add(arg, order));
     return result;
   }
 
   T fetch_add(T arg, std::memory_order order = std::memory_order_seq_cst) noexcept {
-    YACLIB_INJECT_FAULT(auto result = this->_impl.fetch_add(arg, order);)
+    YACLIB_INJECT_FAULT(auto result = this->_impl.fetch_add(arg, order));
     return result;
   }
 
   T fetch_sub(T arg, std::memory_order order = std::memory_order_seq_cst) volatile noexcept {
-    YACLIB_INJECT_FAULT(auto result = this->_impl.fetch_sub(arg, order);)
+    YACLIB_INJECT_FAULT(auto result = this->_impl.fetch_sub(arg, order));
     return result;
   }
 
   T fetch_sub(T arg, std::memory_order order = std::memory_order_seq_cst) noexcept {
-    YACLIB_INJECT_FAULT(auto result = this->_impl.fetch_sub(arg, order);)
+    YACLIB_INJECT_FAULT(auto result = this->_impl.fetch_sub(arg, order));
     return result;
   }
 
   T fetch_and(T arg, std::memory_order order = std::memory_order_seq_cst) volatile noexcept {
-    YACLIB_INJECT_FAULT(auto result = this->_impl.fetch_and(arg, order);)
+    YACLIB_INJECT_FAULT(auto result = this->_impl.fetch_and(arg, order));
     return result;
   }
 
   T fetch_and(T arg, std::memory_order order = std::memory_order_seq_cst) noexcept {
-    YACLIB_INJECT_FAULT(auto result = this->_impl.fetch_and(arg, order);)
+    YACLIB_INJECT_FAULT(auto result = this->_impl.fetch_and(arg, order));
     return result;
   }
 
   T fetch_or(T arg, std::memory_order order = std::memory_order_seq_cst) volatile noexcept {
-    YACLIB_INJECT_FAULT(auto result = this->_impl.fetch_or(arg, order);)
+    YACLIB_INJECT_FAULT(auto result = this->_impl.fetch_or(arg, order));
     return result;
   }
 
   T fetch_or(T arg, std::memory_order order = std::memory_order_seq_cst) noexcept {
-    YACLIB_INJECT_FAULT(auto result = this->_impl.fetch_or(arg, order);)
+    YACLIB_INJECT_FAULT(auto result = this->_impl.fetch_or(arg, order));
     return result;
   }
 
   T fetch_xor(T arg, std::memory_order order = std::memory_order_seq_cst) volatile noexcept {
-    YACLIB_INJECT_FAULT(auto result = this->_impl.fetch_xor(arg, order);)
+    YACLIB_INJECT_FAULT(auto result = this->_impl.fetch_xor(arg, order));
     return result;
   }
 
   T fetch_xor(T arg, std::memory_order order = std::memory_order_seq_cst) noexcept {
-    YACLIB_INJECT_FAULT(auto result = this->_impl.fetch_xor(arg, order);)
+    YACLIB_INJECT_FAULT(auto result = this->_impl.fetch_xor(arg, order));
     return result;
   }
 

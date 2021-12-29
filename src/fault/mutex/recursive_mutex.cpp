@@ -4,13 +4,13 @@
 namespace yaclib::detail {
 
 void RecursiveMutex::lock() {
-  YACLIB_INJECT_FAULT(_m.lock();)
+  YACLIB_INJECT_FAULT(_m.lock());
 
   UpdateOnLock();
 }
 
 bool RecursiveMutex::try_lock() noexcept {
-  YACLIB_INJECT_FAULT(auto res = _m.try_lock();)
+  YACLIB_INJECT_FAULT(auto res = _m.try_lock());
 
   if (res) {
     UpdateOnLock();
@@ -27,7 +27,7 @@ void RecursiveMutex::unlock() noexcept {
     _owner = yaclib::detail::kInvalidThreadId;
   }
 
-  YACLIB_INJECT_FAULT(_m.unlock();)
+  YACLIB_INJECT_FAULT(_m.unlock());
 }
 
 RecursiveMutex::native_handle_type RecursiveMutex::native_handle() {

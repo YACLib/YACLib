@@ -6,7 +6,7 @@ namespace yaclib::detail {
 void Mutex::lock() {
   assert(_owner != yaclib_std::this_thread::get_id());
 
-  YACLIB_INJECT_FAULT(_m.lock();)
+  YACLIB_INJECT_FAULT(_m.lock());
 
   _owner = yaclib_std::this_thread::get_id();
 }
@@ -14,7 +14,7 @@ void Mutex::lock() {
 bool Mutex::try_lock() noexcept {
   assert(_owner != yaclib_std::this_thread::get_id());
 
-  YACLIB_INJECT_FAULT(auto res = _m.try_lock();)
+  YACLIB_INJECT_FAULT(auto res = _m.try_lock());
 
   if (res) {
     _owner = yaclib_std::this_thread::get_id();
@@ -28,7 +28,7 @@ void Mutex::unlock() noexcept {
 
   _owner = yaclib::detail::kInvalidThreadId;
 
-  YACLIB_INJECT_FAULT(_m.unlock();)
+  YACLIB_INJECT_FAULT(_m.unlock());
 }
 
 Mutex::native_handle_type Mutex::native_handle() {

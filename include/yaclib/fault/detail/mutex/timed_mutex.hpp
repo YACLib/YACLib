@@ -29,7 +29,7 @@ class TimedMutex {
   bool try_lock_until(const std::chrono::time_point<_Clock, _Duration>& duration) {
     assert(_owner != yaclib_std::this_thread::get_id());
 
-    YACLIB_INJECT_FAULT(auto res = _m.try_lock_until(duration);)
+    YACLIB_INJECT_FAULT(auto res = _m.try_lock_until(duration));
 
     if (res) {
       _owner = yaclib_std::this_thread::get_id();

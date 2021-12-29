@@ -13,12 +13,12 @@ struct Atomic : public AtomicBase<T, std::atomic<T>> {
   }
 
   T operator=(T desired) volatile noexcept {
-    YACLIB_INJECT_FAULT(auto result = this->_impl.operator=(desired);)
+    YACLIB_INJECT_FAULT(auto result = this->_impl.operator=(desired));
     return result;
   }
 
   T operator=(T desired) noexcept {
-    YACLIB_INJECT_FAULT(auto result = this->_impl.operator=(desired);)
+    YACLIB_INJECT_FAULT(auto result = this->_impl.operator=(desired));
     return result;
   }
 };
