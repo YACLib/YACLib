@@ -49,7 +49,6 @@ list(APPEND YACLIB_SOURCES
 
   # thread
   ${CMAKE_CURRENT_SOURCE_DIR}/thread/thread.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/thread/this_thread.cpp
 
   # mutex
   ${CMAKE_CURRENT_SOURCE_DIR}/mutex/mutex.cpp

@@ -19,14 +19,24 @@ using thread = std::thread;
 
 namespace this_thread {
 
-void sleep_for(const std::chrono::nanoseconds& time);
+using sleep_for_function_type = void (*)(const std::chrono::nanoseconds& time);
+
+inline constexpr sleep_for_function_type sleep_for = std::this_thread::sleep_for;
 
 template <typename Duration>
-void sleep_until(const std::chrono::time_point<yaclib_std::chrono::steady_clock, Duration>& time_point);
+using sleep_until_function_type =
+    void (*)(const std::chrono::time_point<yaclib_std::chrono::steady_clock, Duration>& time_point);
 
-void yield() noexcept;
+template <typename Duration>
+inline constexpr sleep_until_function_type<Duration> sleep_until = std::this_thread::sleep_until;
 
-yaclib_std::thread::id get_id() noexcept;
+using yield_function_type = void (*)();
+
+inline constexpr yield_function_type yield = std::this_thread::yield;
+
+using get_id_function_type = std::thread::id (*)();
+
+inline constexpr get_id_function_type get_id = std::this_thread::get_id;
 
 }  // namespace this_thread
 
