@@ -18,10 +18,10 @@ class ConditionVariable {
   void notify_one() noexcept;
   void notify_all() noexcept;
 
-  void wait(std::unique_lock<yaclib_std::mutex>& lock) noexcept;
+  void wait(std::unique_lock<yaclib::detail::Mutex>& lock) noexcept;
 
   template <typename Predicate>
-  void wait(std::unique_lock<yaclib_std::mutex>& lock, Predicate predicate) {
+  void wait(std::unique_lock<yaclib::detail::Mutex>& lock, Predicate predicate) {
     auto m = lock.release();
     auto guard = std::unique_lock<std::mutex>(m->GetImpl(), std::adopt_lock);
     m->UpdateOwner(yaclib::detail::kInvalidThreadId);
@@ -33,7 +33,7 @@ class ConditionVariable {
   }
 
   template <typename Clock, typename Duration>
-  std::cv_status wait_until(std::unique_lock<yaclib_std::mutex>& lock,
+  std::cv_status wait_until(std::unique_lock<yaclib::detail::Mutex>& lock,
                             const std::chrono::time_point<Clock, Duration>& time_point) {
     auto m = lock.release();
     auto guard = std::unique_lock<std::mutex>(m->GetImpl(), std::adopt_lock);
@@ -47,8 +47,8 @@ class ConditionVariable {
   }
 
   template <typename Clock, typename Duration, typename Predicate>
-  bool wait_until(std::unique_lock<yaclib_std::mutex>& lock, const std::chrono::time_point<Clock, Duration>& time_point,
-                  Predicate predicate) {
+  bool wait_until(std::unique_lock<yaclib::detail::Mutex>& lock,
+                  const std::chrono::time_point<Clock, Duration>& time_point, Predicate predicate) {
     auto m = lock.release();
     auto guard = std::unique_lock<std::mutex>(m->GetImpl(), std::adopt_lock);
     m->UpdateOwner(yaclib::detail::kInvalidThreadId);
@@ -61,7 +61,7 @@ class ConditionVariable {
   }
 
   template <typename Rep, typename Period>
-  std::cv_status wait_for(std::unique_lock<yaclib_std::mutex>& lock,
+  std::cv_status wait_for(std::unique_lock<yaclib::detail::Mutex>& lock,
                           const std::chrono::duration<Rep, Period>& duration) {
     auto m = lock.release();
     auto guard = std::unique_lock<std::mutex>(m->GetImpl(), std::adopt_lock);
@@ -75,7 +75,7 @@ class ConditionVariable {
   }
 
   template <typename Rep, typename Period, typename Predicate>
-  bool wait_for(std::unique_lock<yaclib_std::mutex>& lock, const std::chrono::duration<Rep, Period>& duration,
+  bool wait_for(std::unique_lock<yaclib::detail::Mutex>& lock, const std::chrono::duration<Rep, Period>& duration,
                 Predicate predicate) {
     auto m = lock.release();
     auto guard = std::unique_lock<std::mutex>(m->GetImpl(), std::adopt_lock);

@@ -10,7 +10,7 @@ void ConditionVariable::notify_all() noexcept {
   YACLIB_INJECT_FAULT(_impl.notify_all());
 }
 
-void ConditionVariable::wait(std::unique_lock<yaclib_std::mutex>& lock) noexcept {
+void ConditionVariable::wait(std::unique_lock<yaclib::detail::Mutex>& lock) noexcept {
   auto m = lock.release();
   auto guard = std::unique_lock<std::mutex>(m->GetImpl(), std::adopt_lock);
   m->UpdateOwner(yaclib::detail::kInvalidThreadId);
