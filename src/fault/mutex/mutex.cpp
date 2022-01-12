@@ -35,4 +35,12 @@ Mutex::native_handle_type Mutex::native_handle() {
   return _m.native_handle();
 }
 
+Mutex::impl_type& Mutex::GetImpl() {
+  return _m;
+}
+
+void Mutex::UpdateOwner(yaclib_std::thread::id new_owner) {
+  _owner = new_owner;
+}
+
 }  // namespace yaclib::detail

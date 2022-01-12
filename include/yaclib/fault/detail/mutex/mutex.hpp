@@ -24,6 +24,12 @@ class Mutex {
 
   inline native_handle_type native_handle();
 
+  using impl_type = std::mutex;
+
+  impl_type& GetImpl();
+
+  void UpdateOwner(yaclib_std::thread::id);
+
  private:
   std::mutex _m;
   // TODO(myannyax) yaclib wrapper
