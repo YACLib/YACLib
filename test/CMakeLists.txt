@@ -54,7 +54,6 @@ set(YACLIB_UNIT_SOURCES
   unit/executor/thread_pool
   unit/async/stress
   unit/executor/strand
-  unit/fault_injection/mutex
   )
 
 if (YACLIB_BUILD_EXAMPLES)
