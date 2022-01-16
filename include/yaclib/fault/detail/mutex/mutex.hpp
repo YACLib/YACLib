@@ -1,9 +1,9 @@
 #pragma once
 
 #include <yaclib/fault/detail/antagonist/inject_fault.hpp>
+#include <yaclib/fault/log_config.hpp>
 
 #include <atomic>
-#include <cassert>
 #include <mutex>
 
 namespace yaclib::detail {

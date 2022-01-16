@@ -36,6 +36,9 @@ list(APPEND YACLIB_INCLUDES
   # condition
   ${YACLIB_INCLUDE_DIR}/fault/detail/condition/condition_variable.hpp
   ${YACLIB_INCLUDE_DIR}/fault/condition_variable.hpp
+
+  # log
+  ${YACLIB_INCLUDE_DIR}/fault/log_config.hpp
   )
 
 list(APPEND YACLIB_SOURCES
@@ -64,6 +67,9 @@ list(APPEND YACLIB_SOURCES
 
   # condition
   ${CMAKE_CURRENT_SOURCE_DIR}/condition/condition_variable.cpp
+
+  # log
+  ${CMAKE_CURRENT_SOURCE_DIR}/log_config.cpp
   )
 
 add_files()

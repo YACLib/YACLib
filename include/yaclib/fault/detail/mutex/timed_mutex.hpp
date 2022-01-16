@@ -2,9 +2,9 @@
 
 #include <yaclib/fault/chrono.hpp>
 #include <yaclib/fault/detail/antagonist/inject_fault.hpp>
+#include <yaclib/fault/log_config.hpp>
 
 #include <atomic>
-#include <cassert>
 #include <mutex>
 
 namespace yaclib::detail {
@@ -27,7 +27,7 @@ class TimedMutex {
   }
   template <typename _Clock, typename _Duration>
   bool try_lock_until(const std::chrono::time_point<_Clock, _Duration>& duration) {
-    assert(_owner != yaclib_std::this_thread::get_id());
+    Log(_owner != yaclib_std::this_thread::get_id(), "trying to lock owned mutex with non-recursive lock");
 
     YACLIB_INJECT_FAULT(auto res = _m.try_lock_until(duration));
 

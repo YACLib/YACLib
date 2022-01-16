@@ -2,8 +2,8 @@
 
 #include <yaclib/fault/chrono.hpp>
 #include <yaclib/fault/detail/antagonist/inject_fault.hpp>
+#include <yaclib/fault/log_config.hpp>
 
-#include <cassert>
 #include <shared_mutex>
 
 namespace yaclib::detail {
@@ -27,7 +27,7 @@ class SharedTimedMutex {
   template <typename _Clock, typename _Duration>
   bool try_lock_until(const std::chrono::time_point<_Clock, _Duration>& duration) {
     auto me = yaclib_std::this_thread::get_id();
-    assert(_exclusive_owner != me);
+    Log(_exclusive_owner != me, "trying to lock owned mutex with non-recursive lock");
 
     YACLIB_INJECT_FAULT(auto res = _m.try_lock_until(duration));
 
@@ -49,7 +49,7 @@ class SharedTimedMutex {
   template <typename _Clock, typename _Duration>
   bool try_lock_shared_until(const std::chrono::time_point<_Clock, _Duration>& duration) {
     auto me = yaclib_std::this_thread::get_id();
-    assert(_exclusive_owner != me);
+    Log(_exclusive_owner != me, "trying to lock_shared mutex that is already owned in exclusive mode");
 
     YACLIB_INJECT_FAULT(auto res = _m.try_lock_shared_until(duration));
 

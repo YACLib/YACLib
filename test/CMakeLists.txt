@@ -12,7 +12,7 @@ if (NOT GTEST_FOUND OR NOT BENCHMARK_FOUND)
     # For Windows: Prevent overriding the parent project's compiler/linker settings
     set(gtest_force_shared_crt ON CACHE BOOL "Always use msvcrt.dll")
     FetchContent_MakeAvailable(googletest)
-    set(GTEST_BOTH_LIBRARIES GTest::gtest GTest::gtest_main)
+    set(GTEST_BOTH_LIBRARIES GTest::gtest)
   endif ()
   if (NOT BENCHMARK_FOUND)
     set(BENCHMARK_ENABLE_TESTING NO)
@@ -31,6 +31,7 @@ add_link_options(${YACLIB_LINK_OPTIONS})
 set(TEST_UTIL_INCLUDES
   util/cpu_time.hpp
   util/time.hpp
+  main.cpp
   )
 set(YACLIB_EXAMPLE_SOURCES)
 set(YACLIB_EXAMPLE_INCLUDES)
@@ -38,6 +39,14 @@ set(YACLIB_EXAMPLE_INCLUDES)
 #TODO(myannyax) any ways this can be avoided?
 if (YACLIB_FAULT)
   add_compile_definitions(YACLIB_FAULT)
+endif ()
+
+if (YACLIB_ASSERT_FATAL)
+  add_compile_definitions(YACLIB_ASSERT_FATAL)
+elseif (YACLIB_ASSERT_ERROR)
+  add_compile_definitions(YACLIB_ASSERT_IGNORE)
+elseif (YACLIB_ASSERT_IGNORE)
+  add_compile_definitions(YACLIB_ASSERT_IGNORE)
 endif ()
 
 set(YACLIB_UNIT_SOURCES

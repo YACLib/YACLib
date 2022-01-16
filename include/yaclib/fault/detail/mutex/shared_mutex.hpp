@@ -1,8 +1,8 @@
 #pragma once
 
 #include <yaclib/fault/detail/antagonist/inject_fault.hpp>
+#include <yaclib/fault/log_config.hpp>
 
-#include <cassert>
 #include <shared_mutex>
 #include <unordered_set>
 

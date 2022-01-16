@@ -24,7 +24,7 @@ bool Thread::joinable() const noexcept {
 }
 
 void Thread::join() {
-  assert(get_id() != yaclib_std::this_thread::get_id());
+  Log(get_id() != yaclib_std::this_thread::get_id(), "trying to join itself");
   _impl.join();
 }
 

@@ -2,8 +2,8 @@
 
 #include <yaclib/fault/chrono.hpp>
 #include <yaclib/fault/detail/antagonist/inject_fault.hpp>
+#include <yaclib/fault/log_config.hpp>
 
-#include <cassert>
 #include <mutex>
 
 namespace yaclib::detail {

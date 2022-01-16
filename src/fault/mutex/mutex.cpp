@@ -4,7 +4,7 @@
 namespace yaclib::detail {
 
 void Mutex::lock() {
-  assert(_owner != yaclib_std::this_thread::get_id());
+  Log(_owner != yaclib_std::this_thread::get_id(), "trying to lock owned mutex with non-recursive lock");
 
   YACLIB_INJECT_FAULT(_m.lock());
 
@@ -12,7 +12,7 @@ void Mutex::lock() {
 }
 
 bool Mutex::try_lock() noexcept {
-  assert(_owner != yaclib_std::this_thread::get_id());
+  Log(_owner != yaclib_std::this_thread::get_id(), "trying to lock owned mutex with non-recursive lock");
 
   YACLIB_INJECT_FAULT(auto res = _m.try_lock());
 
@@ -23,8 +23,8 @@ bool Mutex::try_lock() noexcept {
 }
 
 void Mutex::unlock() noexcept {
-  assert(_owner != yaclib::detail::kInvalidThreadId);
-  assert(_owner == yaclib_std::this_thread::get_id());
+  Log(_owner != yaclib::detail::kInvalidThreadId, "trying to unlock not locked mutex");
+  Log(_owner == yaclib_std::this_thread::get_id(), "trying to unlock mutex that's not owned by this thread");
 
   _owner = yaclib::detail::kInvalidThreadId;
 

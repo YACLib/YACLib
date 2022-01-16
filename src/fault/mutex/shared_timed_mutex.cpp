@@ -4,7 +4,7 @@ namespace yaclib::detail {
 
 void SharedTimedMutex::lock() {
   auto me = yaclib_std::this_thread::get_id();
-  assert(_exclusive_owner != me);
+  Log(_exclusive_owner != me, "trying to lock owned mutex with non-recursive lock");
 
   YACLIB_INJECT_FAULT(_m.lock());
 
@@ -14,7 +14,7 @@ void SharedTimedMutex::lock() {
 
 bool SharedTimedMutex::try_lock() noexcept {
   auto me = yaclib_std::this_thread::get_id();
-  assert(_exclusive_owner != me);
+  Log(_exclusive_owner != me, "trying to lock owned mutex with non-recursive lock");
 
   YACLIB_INJECT_FAULT(auto res = _m.try_lock());
 
@@ -26,9 +26,9 @@ bool SharedTimedMutex::try_lock() noexcept {
 }
 
 void SharedTimedMutex::unlock() noexcept {
-  assert(_exclusive_owner != yaclib::detail::kInvalidThreadId);
-  assert(_exclusive_owner == yaclib_std::this_thread::get_id());
-  assert(_shared_mode == false);
+  Log(_exclusive_owner != yaclib::detail::kInvalidThreadId, "trying to unlock not locked mutex");
+  Log(_exclusive_owner == yaclib_std::this_thread::get_id(), "trying to unlock mutex that's not owned by this thread");
+  Log(_shared_mode == false, "trying to exclusively unlock mutex in shared mode");
 
   _exclusive_owner = yaclib::detail::kInvalidThreadId;
 
@@ -37,7 +37,7 @@ void SharedTimedMutex::unlock() noexcept {
 
 void SharedTimedMutex::lock_shared() {
   auto me = yaclib_std::this_thread::get_id();
-  assert(_exclusive_owner != me);
+  Log(_exclusive_owner != me, "trying to lock_shared mutex that is already owned in exclusive mode");
 
   YACLIB_INJECT_FAULT(_m.lock_shared());
 
@@ -46,7 +46,7 @@ void SharedTimedMutex::lock_shared() {
 
 bool SharedTimedMutex::try_lock_shared() noexcept {
   auto me = yaclib_std::this_thread::get_id();
-  assert(_exclusive_owner != me);
+  Log(_exclusive_owner != me, "trying to lock_shared mutex that is already owned in exclusive mode");
 
   YACLIB_INJECT_FAULT(auto res = _m.try_lock_shared());
 
@@ -57,8 +57,7 @@ bool SharedTimedMutex::try_lock_shared() noexcept {
 }
 
 void SharedTimedMutex::unlock_shared() noexcept {
-  auto me = yaclib_std::this_thread::get_id();
-  assert(_shared_mode = true);
+  Log(_shared_mode = true, "trying to unlock_shared mutex that is not in shared mode");
 
   YACLIB_INJECT_FAULT(_m.unlock_shared());
 }

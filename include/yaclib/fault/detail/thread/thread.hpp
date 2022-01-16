@@ -1,6 +1,7 @@
 #pragma once
 
-#include <cassert>
+#include <yaclib/fault/log_config.hpp>
+
 #include <functional>
 #include <thread>
 

@@ -30,6 +30,15 @@ if (YACLIB_FAULT)
   add_compile_definitions(YACLIB_FAULT)
 endif ()
 
+if (YACLIB_ASSERT_FATAL)
+  add_compile_definitions(YACLIB_ASSERT_FATAL)
+elseif (YACLIB_ASSERT_ERROR)
+  add_compile_definitions(YACLIB_ASSERT_ERROR)
+elseif (YACLIB_ASSERT_IGNORE)
+  add_compile_definitions(YACLIB_ASSERT_IGNORE)
+endif ()
+
+
 add_library(
   ${PROJECT_NAME} STATIC
   ${YACLIB_SOURCES}
