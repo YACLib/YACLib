@@ -164,7 +164,7 @@ TEST(Example, Race) {
   tp2->Wait();
 }
 
-TEST(Example, Strand) {
+TEST(Example, StrandAsync) {
   auto tp = yaclib::MakeThreadPool(1);
   auto strand = yaclib::MakeStrand(tp);
 
