@@ -38,6 +38,7 @@ jobs:
           -DYACLIB_BUILD_TESTING=ON
           -DYACLIB_BUILD_EXAMPLES=ON
           -DYACLIB_FAULT=ON
+          -DYACLIB_ALL_TESTS_IN_ONE_EXECUTABLE=ON
           -DYACLIB_ASSERT_FATAL=ON
           -DYACLIB_COVERAGE=ON
           -DYACLIB_CXX_STANDARD=${{ matrix.cxx_standard }}

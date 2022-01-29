@@ -2,10 +2,8 @@
 
 namespace yaclib::detail {
 
-constexpr int kFreq = 16;
-
 Yielder* GetYielder() {
-  static Yielder instance(kFreq);
+  static Yielder instance;
   return &instance;
 }
 
