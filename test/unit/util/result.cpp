@@ -15,14 +15,14 @@ struct NotDefaultConstructible {
 TEST(Simple, Simple) {
   Result<int> result;
   EXPECT_EQ(result.State(), ResultState::Empty);
-  result.Set(5);
+  result = 5;
   EXPECT_EQ(result.State(), ResultState::Value);
   EXPECT_EQ(std::move(result).Ok(), 5);
 }
 
 TEST(Simple, NotDefaultConstructible) {
   Result<NotDefaultConstructible> result;
-  result.Set(NotDefaultConstructible{5});
+  result = NotDefaultConstructible{5};
 }
 
 void TestState(ResultState state) {
@@ -30,13 +30,13 @@ void TestState(ResultState state) {
   EXPECT_EQ(result.State(), ResultState::Empty);
   switch (state) {
     case ResultState::Value: {
-      std::move(result).Set(1);
+      result = 1;
     } break;
     case ResultState::Error: {
-      std::move(result).Set(std::error_code{});
+      result = std::error_code{};
     } break;
     case ResultState::Exception: {
-      std::move(result).Set(std::make_exception_ptr(std::runtime_error{""}));
+      result = std::make_exception_ptr(std::runtime_error{""});
     } break;
     case ResultState::Empty: {
     } break;
@@ -65,15 +65,15 @@ void TestOk(ResultState state) {
   EXPECT_EQ(result.State(), ResultState::Empty);
   switch (state) {
     case ResultState::Value: {
-      std::move(result).Set(1);
+      result = 1;
       EXPECT_NO_THROW(std::move(result).Ok());
     } break;
     case ResultState::Error: {
-      std::move(result).Set(std::error_code{});
+      result = std::error_code{};
       EXPECT_THROW(std::move(result).Ok(), ResultError);
     } break;
     case ResultState::Exception: {
-      std::move(result).Set(std::make_exception_ptr(std::runtime_error{""}));
+      result = std::make_exception_ptr(std::runtime_error{""});
       EXPECT_THROW(std::move(result).Ok(), std::runtime_error);
     } break;
     case ResultState::Empty: {

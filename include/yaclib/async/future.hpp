@@ -161,8 +161,8 @@ class Future final {
   void Subscribe(IExecutorPtr e, Functor&& f) &&;
 
   /// DETAIL
-  explicit Future(detail::FutureCorePtr<T> core);
-  [[nodiscard]] const detail::FutureCorePtr<T>& GetCore() const;
+  explicit Future(detail::FutureCorePtr<T> core) noexcept;
+  [[nodiscard]] detail::FutureCorePtr<T>& GetCore() noexcept;
   /// DETAIL
 
  private:

@@ -19,10 +19,9 @@ class Core : public ResultCore<Ret> {
       return Base::Cancel();
     }
     if constexpr (Run) {
-      Base::SetResult(_functor.Wrapper(util::Result<Arg>::Default()));
+      Base::Set(_functor.Wrapper(util::Result<Arg>{util::Unit{}}));
     } else {
-      auto& caller = static_cast<ResultCore<Arg>&>(*Base::_caller);
-      Base::SetResult(_functor.Wrapper(std::move(caller.Get())));
+      Base::Set(_functor.Wrapper(std::move(static_cast<ResultCore<Arg>&>(*Base::_caller).Get())));
     }
   }
 
@@ -30,7 +29,7 @@ class Core : public ResultCore<Ret> {
     if (Base::GetState() == BaseCore::State::HasStop) {
       return;  // Don't need to call Cancel, because we call Clean after CallInline and our _caller is nullptr
     }
-    Base::SetResult(_functor.Wrapper(std::move(static_cast<ResultCore<Arg>*>(caller)->Get())));
+    Base::Set(_functor.Wrapper(std::move(static_cast<ResultCore<Arg>*>(caller)->Get())));
   }
 
   InvokeType _functor;

@@ -1,0 +1,49 @@
+name: Windows
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'doc/**'
+      - '**.md'
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - 'doc/**'
+      - '**.md'
+  schedule:
+    - cron: '0 * * * *'
+
+jobs:
+  main:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ windows-2019, windows-2022 ]
+        build_type: [ Debug, RelWithDebInfo ]
+      # TODO(MBkkt) Add windows-2016
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Configure CMake
+        run:
+          cmake -S . -B build
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+          -DCMAKE_C_COMPILER=cl
+          -DCMAKE_CXX_COMPILER=cl
+          -DYACLIB_BUILD_TESTING=ON
+          -DYACLIB_BUILD_EXAMPLES=ON
+          -DYACLIB_CXX_STANDARD=17
+
+      - name: Build
+        run:
+          cmake --build build --config ${{ matrix.build_type }}
+
+      - name: Test
+        run: |
+          cd build
+          ctest --output-on-failure -C ${{ matrix.build_type }} -VV

@@ -34,22 +34,18 @@ class AllCombinator : public InlineCore, public AllCombinatorBase<FutureValue> {
   using Base = AllCombinatorBase<FutureValue>;
 
  public:
-  static std::pair<Future<FutureValue>, util::Ptr<AllCombinator>> Make(size_t size = 0) {
-    auto [future, promise] = MakeContract<FutureValue>();
+  static std::pair<Future<FutureValue>, util::Ptr<AllCombinator>> Make(size_t size) {
     if constexpr (!IsArray) {
       if (size == 0) {
-        if constexpr (std::is_void_v<T>) {
-          std::move(promise).Set();
-        } else {
-          std::move(promise).Set(std::vector<T>{});
-        }
-        return {std::move(future), nullptr};
+        return {Future<FutureValue>{}, nullptr};
       }
     }
-    return {std::move(future), util::MakeIntrusive<AllCombinator>(std::move(promise), size)};
+    auto core = util::MakeIntrusive<detail::ResultCore<FutureValue>>();
+    auto combinator = util::MakeIntrusive<AllCombinator>(core, size);
+    return {Future<FutureValue>{std::move(core)}, std::move(combinator)};
   }
 
-  explicit AllCombinator(Promise<FutureValue> promise, [[maybe_unused]] size_t size = 0)
+  explicit AllCombinator(PromiseCorePtr<FutureValue> promise, [[maybe_unused]] size_t size)
       : _promise{std::move(promise)} {
     if constexpr (!std::is_void_v<T> && !IsArray) {
       AllCombinatorBase<FutureValue>::_results.resize(size);
@@ -57,15 +53,12 @@ class AllCombinator : public InlineCore, public AllCombinatorBase<FutureValue> {
   }
 
   void CallInline(InlineCore* context) noexcept final {
-    if (_promise.GetCore()->GetState() != BaseCore::State::HasStop) {
+    if (_promise->GetState() != BaseCore::State::HasStop && !Base::_done.load(std::memory_order_acquire)) {
       Combine(std::move(static_cast<ResultCore<T>*>(context)->Get()));
     }
   }
 
-  void Combine(util::Result<T>&& result) noexcept(std::is_void_v<T> || std::is_nothrow_move_assignable_v<T>) {
-    if (Base::_done.load(std::memory_order_acquire)) {
-      return;
-    }
+  void Combine(util::Result<T>&& result) noexcept {
     auto state = result.State();
     if (state == util::ResultState::Value) {
       if constexpr (!std::is_void_v<T>) {
@@ -74,28 +67,27 @@ class AllCombinator : public InlineCore, public AllCombinatorBase<FutureValue> {
       }
       return;
     }
-    if (Base::_done.exchange(true, std::memory_order_acq_rel)) {
-      return;
-    }
-    if (state == util::ResultState::Error) {
-      std::move(_promise).Set(std::move(result).Error());
-    } else {
-      std::move(_promise).Set(std::move(result).Exception());
+    if (!Base::_done.exchange(true, std::memory_order_acq_rel)) {
+      if (state == util::ResultState::Exception) {
+        _promise->Set(std::move(result).Exception());
+      } else {
+        _promise->Set(std::move(result).Error());
+      }
     }
   }
 
   ~AllCombinator() override {
     if (!Base::_done.load(std::memory_order_acquire)) {
-      if constexpr (!std::is_void_v<T>) {
-        std::move(_promise).Set(std::move(AllCombinatorBase<FutureValue>::_results));
+      if constexpr (std::is_void_v<T>) {
+        _promise->Set(util::Unit{});
       } else {
-        std::move(_promise).Set();
+        _promise->Set(std::move(AllCombinatorBase<FutureValue>::_results));
       }
     }
   }
 
  private:
-  Promise<FutureValue> _promise;
+  detail::PromiseCorePtr<FutureValue> _promise;
 };
 
 template <size_t N, typename T, typename... Ts>
