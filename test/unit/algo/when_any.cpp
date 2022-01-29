@@ -134,7 +134,7 @@ void MultiThreaded() {
 
   auto async_value = [tp](int value) {
     return Run(tp, [value] {
-      std::this_thread::sleep_for(20ms * YACLIB_CI_SLOWDOWN);
+      yaclib_std::this_thread::sleep_for(20ms * YACLIB_CI_SLOWDOWN);
       if constexpr (kIsVoid) {
         (void)value;
       } else {
@@ -159,9 +159,9 @@ void MultiThreaded() {
     }
   };
 
-  auto begin = std::chrono::steady_clock::now();
+  auto begin = yaclib_std::chrono::steady_clock::now();
   auto ints = gen_fs().Get();
-  auto time = std::chrono::steady_clock::now() - begin;
+  auto time = yaclib_std::chrono::steady_clock::now() - begin;
   EXPECT_LT(time, 40ms * YACLIB_CI_SLOWDOWN);
 
   if constexpr (kIsVoid) {
@@ -185,7 +185,7 @@ void TimeTest() {
 
   auto async_value = [tp](int value, Duration d) {
     return Run(tp, [value, d] {
-      std::this_thread::sleep_for(d * YACLIB_CI_SLOWDOWN);
+      yaclib_std::this_thread::sleep_for(d * YACLIB_CI_SLOWDOWN);
       if constexpr (!is_void) {
         return value;
       } else {
@@ -209,9 +209,9 @@ void TimeTest() {
     }
   };
 
-  auto begin = std::chrono::steady_clock::now();
+  auto begin = yaclib_std::chrono::steady_clock::now();
   auto ints = gen_fs().Get();
-  auto time = std::chrono::steady_clock::now() - begin;
+  auto time = yaclib_std::chrono::steady_clock::now() - begin;
   EXPECT_LT(time, 90ms * YACLIB_CI_SLOWDOWN);
 
   if constexpr (is_void) {

@@ -1,11 +1,11 @@
 #pragma once
-#include <chrono>
+#include <yaclib/fault/chrono.hpp>
 
 namespace test::util {
 
 using Duration = std::chrono::nanoseconds;
 
-template <typename Clock = std::chrono::steady_clock>
+template <typename Clock = yaclib_std::chrono::steady_clock>
 class StopWatch {
   using TimePoint = typename Clock::time_point;
 

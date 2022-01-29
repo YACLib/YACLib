@@ -3,6 +3,7 @@
 #include <yaclib/algo/when_policy.hpp>
 #include <yaclib/async/future.hpp>
 #include <yaclib/async/promise.hpp>
+#include <yaclib/fault/atomic.hpp>
 
 #include <array>
 #include <iterator>
@@ -15,15 +16,15 @@ namespace yaclib::detail {
 template <typename T>
 class AllCombinatorBase {
  protected:
-  std::atomic<bool> _done{false};
-  std::atomic<size_t> _ticket{0};
+  yaclib_std::atomic<bool> _done{false};
+  yaclib_std::atomic<size_t> _ticket{0};
   T _results;
 };
 
 template <>
 class AllCombinatorBase<void> {
  protected:
-  std::atomic<bool> _done{false};
+  yaclib_std::atomic<bool> _done{false};
 };
 
 template <

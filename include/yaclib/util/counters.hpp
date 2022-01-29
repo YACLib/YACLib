@@ -1,9 +1,8 @@
 #pragma once
 
 #include <yaclib/config.hpp>
+#include <yaclib/fault/atomic.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
-
-#include <atomic>
 
 namespace yaclib::util {
 namespace detail {
@@ -33,7 +32,7 @@ class Counter final : public CounterBase, public Deleter {
     // Thread Sanitizer have false positive error with std::atomic_thread_fence
     // https://www.boost.org/doc/libs/1_76_0/doc/html/atomic/usage_examples.html#boost_atomic.usage_examples.example_reference_counters
     if (_impl.fetch_sub(1, std::memory_order_release) == 1) {
-      std::atomic_thread_fence(std::memory_order_acquire);
+      yaclib_std::atomic_thread_fence(std::memory_order_acquire);
 #endif
       Deleter::Delete(this);
     }
@@ -44,7 +43,7 @@ class Counter final : public CounterBase, public Deleter {
   }
 
  private:
-  std::atomic_size_t _impl{1};
+  yaclib_std::atomic_size_t _impl{1};
 };
 
 template <typename CounterBase>

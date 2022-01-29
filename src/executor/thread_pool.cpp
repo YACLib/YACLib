@@ -3,11 +3,10 @@
 
 #include <yaclib/executor/executor.hpp>
 #include <yaclib/executor/thread_pool.hpp>
-
-#include <atomic>
-#include <condition_variable>
-#include <mutex>
-#include <thread>
+#include <yaclib/fault/atomic.hpp>
+#include <yaclib/fault/condition_variable.hpp>
+#include <yaclib/fault/mutex.hpp>
+#include <yaclib/fault/thread.hpp>
 
 namespace yaclib {
 namespace {
@@ -97,7 +96,7 @@ class ThreadPool : public IThreadPool {
         task->Call();
         task->DecRef();
         if (_refs_flag.fetch_sub(2, std::memory_order_release) == 3) {
-          std::atomic_thread_fence(std::memory_order_acquire);
+          yaclib_std::atomic_thread_fence(std::memory_order_acquire);
           Stop();
           return;
         }
@@ -110,9 +109,9 @@ class ThreadPool : public IThreadPool {
     }
   }
 
-  alignas(kCacheLineSize) std::atomic_size_t _refs_flag{0};
-  std::mutex _m;
-  std::condition_variable _cv;
+  alignas(kCacheLineSize) yaclib_std::atomic_size_t _refs_flag{0};
+  yaclib_std::mutex _m;
+  yaclib_std::condition_variable _cv;
   IThreadFactoryPtr _factory;
   util::List<IThread> _threads;
   util::List<ITask> _tasks;
@@ -250,10 +249,10 @@ class SingleThread : public IThreadPool {
   IThreadFactoryPtr _factory;
   IThreadPtr _thread;
   util::MPSCStack _tasks;
-  std::atomic<State> _state{kRun};
-  std::mutex _m;
-  std::condition_variable _cv;
-  alignas(kCacheLineSize) std::atomic_int32_t _work_counter{0};
+  yaclib_std::atomic<State> _state{kRun};
+  yaclib_std::mutex _m;
+  yaclib_std::condition_variable _cv;
+  alignas(kCacheLineSize) yaclib_std::atomic_int32_t _work_counter{0};
 };
 
 }  // namespace
