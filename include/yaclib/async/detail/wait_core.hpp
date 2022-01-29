@@ -31,12 +31,10 @@ class WaitCore : public util::IRef {
 };
 
 struct WaitCoreDeleter {
-  template <typename Type>
-  static void Delete(void* p) {
-    auto& self = *static_cast<WaitCore*>(p);
-    std::lock_guard guard{self.m};
-    self.is_ready = true;
-    self.cv.notify_all();  // Notify under mutex, because cv located on stack memory of other thread
+  static void Delete(WaitCore* self) {
+    std::lock_guard guard{self->m};
+    self->is_ready = true;
+    self->cv.notify_all();  // Notify under mutex, because cv located on stack memory of other thread
   }
 };
 

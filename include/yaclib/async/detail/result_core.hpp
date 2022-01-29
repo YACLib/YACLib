@@ -15,9 +15,10 @@ class ResultCore : public BaseCore {
   explicit ResultCore(T&& value) : BaseCore{State::HasResult}, _result{std::forward<T>(value)} {
   }
 
-  void SetResult(util::Result<Value>&& result) noexcept {
+  template <typename T>
+  void Set(T&& value) noexcept {
     _caller = nullptr;
-    _result = std::move(result);
+    _result = std::forward<T>(value);
     const auto state = _state.exchange(State::HasResult, std::memory_order_acq_rel);
     switch (state) {
       case State::HasCallback:
@@ -26,18 +27,18 @@ class ResultCore : public BaseCore {
       case State::HasCallbackInline:
         BaseCore::ExecuteInline();
         break;
+      case State::HasStop:
+        _executor = nullptr;
+        [[fallthrough]];
       case State::HasWait:
         _callback = nullptr;
-        break;
-      case State::HasStop:
-        BaseCore::Cancel();
         break;
       default:
         break;
     }
   }
 
-  util::Result<Value>& Get() noexcept {
+  [[nodiscard]] util::Result<Value>& Get() noexcept {
     return _result;
   }
 
@@ -47,7 +48,7 @@ class ResultCore : public BaseCore {
       // Don't need to call Cancel, because we call Clean after CallInline and our _caller is nullptr
       return;
     }
-    SetResult(std::move(static_cast<ResultCore<Value>*>(caller)->Get()));
+    Set(std::move(static_cast<ResultCore<Value>*>(caller)->Get()));
   }
 
   util::Result<Value> _result;

@@ -25,7 +25,7 @@ class AnyCombinatorBase {
 
   void Combine(util::Result<T>&& result) {
     if (!_done.exchange(true, std::memory_order_acq_rel)) {
-      _core->SetResult(std::move(result));
+      _core->Set(std::move(result));
     }
   }
 };
@@ -47,10 +47,10 @@ class AnyCombinatorBase<T, WhenPolicy::LastFail> {
   void Combine(util::Result<T>&& result) {
     if (result) {
       if ((_state.exchange(1, std::memory_order_acq_rel) & 1U) == 0) {
-        _core->SetResult(std::move(result));
+        _core->Set(std::move(result));
       }
     } else if (_state.fetch_sub(2, std::memory_order_acq_rel) == 2) {
-      std::move(_core)->SetResult(std::move(result));
+      _core->Set(std::move(result));
     }
   }
 };
@@ -61,7 +61,7 @@ class AnyCombinatorBase<T, WhenPolicy::FirstFail> : public AnyCombinatorBase<T, 
 
   std::atomic<util::ResultState> _state;
   union {
-    util::detail::Unit _unit;
+    util::Unit _unit;
     std::error_code _error;
     std::exception_ptr _exception;
   };
@@ -76,12 +76,12 @@ class AnyCombinatorBase<T, WhenPolicy::FirstFail> : public AnyCombinatorBase<T, 
     auto state = _state.load(std::memory_order_acquire);
     if (state == util::ResultState::Error) {
       if (!done) {
-        Base::_core->SetResult({_error});
+        Base::_core->Set(_error);
       }
       _error.std::error_code::~error_code();
     } else if (state == util::ResultState::Exception) {
       if (!done) {
-        Base::_core->SetResult({std::move(_exception)});
+        Base::_core->Set(std::move(_exception));
       }
       _exception.std::exception_ptr::~exception_ptr();
     }
@@ -95,10 +95,11 @@ class AnyCombinatorBase<T, WhenPolicy::FirstFail> : public AnyCombinatorBase<T, 
     auto old_state = _state.load(std::memory_order_relaxed);
     if (old_state == util::ResultState::Empty &&
         _state.compare_exchange_strong(old_state, state, std::memory_order_acq_rel, std::memory_order_relaxed)) {
-      if (state == util::ResultState::Error) {
-        new (&_error) std::error_code{std::move(result).Error()};
-      } else {
+      if (state == util::ResultState::Exception) {
         new (&_exception) std::exception_ptr{std::move(result).Exception()};
+      } else {
+        assert(state == util::ResultState::Error);
+        new (&_error) std::error_code{std::move(result).Error()};
       }
     }
   }
@@ -149,8 +150,7 @@ Future<T> WhenAnyImpl(ValueIt it, RangeIt begin, RangeIt end) {
   }();
   auto [future, combinator] = AnyCombinator<T, P>::Make(combinator_size);
   for (; begin != end; ++begin) {
-    it->GetCore()->SetCallbackInline(combinator);
-    std::move(*it).Detach();
+    std::exchange(it->GetCore(), nullptr)->SetCallbackInline(combinator);
     ++it;
   }
   return std::move(future);
@@ -158,8 +158,7 @@ Future<T> WhenAnyImpl(ValueIt it, RangeIt begin, RangeIt end) {
 
 template <WhenPolicy P, typename T, typename... Ts>
 void WhenAnyImpl(AnyCombinatorPtr<T, P>& combinator, Future<T>&& head, Future<Ts>&&... tail) {
-  head.GetCore()->SetCallbackInline(combinator);
-  std::move(head).Detach();
+  std::exchange(head.GetCore(), nullptr)->SetCallbackInline(combinator);
   if constexpr (sizeof...(tail) != 0) {
     WhenAnyImpl<P>(combinator, std::move(tail)...);
   }

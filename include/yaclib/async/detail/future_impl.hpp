@@ -14,7 +14,7 @@ namespace detail {
 
 template <typename T, typename Functor>
 constexpr int Tag() {
-  int tag{0};
+  int tag = 0;
   if constexpr (util::IsInvocableV<Functor, util::Result<T>>) {
     tag += 1;
   } else if constexpr (util::IsInvocableV<Functor, T>) {
@@ -72,7 +72,7 @@ class SyncInvoke {
         return WrapperOther(std::move(r));
       }
     } catch (...) {
-      return {std::current_exception()};
+      return util::Result<U>{std::current_exception()};
     }
   }
 
@@ -80,9 +80,9 @@ class SyncInvoke {
   util::Result<U> WrapperResult(util::Result<T>&& r) {
     if constexpr (std::is_void_v<U> && !util::IsResultV<util::InvokeT<FunctorInvokeT, util::Result<T>>>) {
       std::forward<FunctorInvokeT>(_f)(std::move(r));
-      return util::Result<U>::Default();
+      return util::Result<U>{util::Unit{}};
     } else {
-      return {std::forward<FunctorInvokeT>(_f)(std::move(r))};
+      return util::Result<U>{std::forward<FunctorInvokeT>(_f)(std::move(r))};
     }
   }
 
@@ -96,26 +96,26 @@ class SyncInvoke {
           } else {
             std::forward<FunctorInvokeT>(_f)(std::move(r).Value());
           }
-          return util::Result<U>::Default();
+          return util::Result<U>{util::Unit{}};
         } else if constexpr (std::is_void_v<T>) {
-          return {std::forward<FunctorInvokeT>(_f)()};
+          return util::Result<U>{std::forward<FunctorInvokeT>(_f)()};
         } else {
-          return {std::forward<FunctorInvokeT>(_f)(std::move(r).Value())};
+          return util::Result<U>{std::forward<FunctorInvokeT>(_f)(std::move(r).Value())};
         }
       }
-      if (state == util::ResultState::Error) {
-        return {std::move(r).Error()};
+      if (state == util::ResultState::Exception) {
+        return util::Result<U>{std::move(r).Exception()};
       }
-      assert(state == util::ResultState::Exception);
-      return {std::move(r).Exception()};
-    } else if constexpr (util::IsInvocableV<FunctorInvokeT, std::error_code>) {
-      if (state == util::ResultState::Error) {
-        return {std::forward<FunctorInvokeT>(_f)(std::move(r).Error())};
-      }
-      return std::move(r);
+      assert(state == util::ResultState::Error);
+      return util::Result<U>{std::move(r).Error()};
     } else if constexpr (util::IsInvocableV<FunctorInvokeT, std::exception_ptr>) {
       if (state == util::ResultState::Exception) {
-        return {std::forward<FunctorInvokeT>(_f)(std::move(r).Exception())};
+        return util::Result<U>{std::forward<FunctorInvokeT>(_f)(std::move(r).Exception())};
+      }
+      return std::move(r);
+    } else if constexpr (util::IsInvocableV<FunctorInvokeT, std::error_code>) {
+      if (state == util::ResultState::Error) {
+        return util::Result<U>{std::forward<FunctorInvokeT>(_f)(std::move(r).Error())};
       }
       return std::move(r);
     }
@@ -149,17 +149,16 @@ class AsyncInvoke {
         WrapperOther(std::move(r));
       }
     } catch (...) {
-      std::move(_promise).Set(std::current_exception());
+      _promise->Set(std::current_exception());
     }
-    return util::Result<void>::Default();
+    return util::Result<void>{util::Unit{}};
   }
 
  private:
   template <typename Arg>
   void WrapperSubscribe(Arg&& a) {
     auto future = std::forward<FunctorInvokeT>(_f)(std::forward<Arg>(a));
-    future.GetCore()->SetCallbackInline(_promise.GetCore());
-    std::move(future).Detach();
+    std::exchange(future.GetCore(), nullptr)->SetCallbackInline(std::move(_promise));
   }
 
   void WrapperOther(util::Result<T>&& r) {
@@ -169,10 +168,10 @@ class AsyncInvoke {
         return WrapperSubscribe(std::move(r).Value());
       }
       if (state == util::ResultState::Error) {
-        return std::move(_promise).Set(std::move(r).Error());
+        return _promise->Set(std::move(r).Error());
       }
       assert(state == util::ResultState::Exception);
-      return std::move(_promise).Set(std::move(r).Exception());
+      return _promise->Set(std::move(r).Exception());
       /** We can't use this strategy for other FunctorInvokeT,
        *  because in that case user will not have compiled error for that case:
        *  yaclib::MakeFuture(32) // state == util::ResultState::Value
@@ -187,16 +186,16 @@ class AsyncInvoke {
       if (state == util::ResultState::Error) {
         return WrapperSubscribe(std::move(r).Error());
       }
-      return std::move(_promise).Set(std::move(r));
+      return _promise->Set(std::move(r));
     } else if constexpr (util::IsInvocableV<FunctorInvokeT, std::exception_ptr>) {
       if (state == util::ResultState::Exception) {
         return WrapperSubscribe(std::move(r).Exception());
       }
-      return std::move(_promise).Set(std::move(r));
+      return _promise->Set(std::move(r));
     }
   }
 
-  Promise<U> _promise;
+  PromiseCorePtr<U> _promise;
   FunctorStoreT _f;
 };
 
@@ -354,11 +353,11 @@ void Future<T>::Subscribe(IExecutorPtr e, Functor&& f) && {
 }
 
 template <typename T>
-Future<T>::Future(detail::FutureCorePtr<T> core) : _core{std::move(core)} {
+Future<T>::Future(detail::FutureCorePtr<T> core) noexcept : _core{std::move(core)} {
 }
 
 template <typename T>
-const detail::FutureCorePtr<T>& Future<T>::GetCore() const {
+detail::FutureCorePtr<T>& Future<T>::GetCore() noexcept {
   return _core;
 }
 

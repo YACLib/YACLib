@@ -1,5 +1,10 @@
-find_package(GTest QUIET)
-find_package(benchmark QUIET)
+if (YACLIB_SANITIZER STREQUAL MEMSAN)
+  add_compile_options(${YACLIB_COMPILE_OPTIONS})
+  add_link_options(${YACLIB_LINK_OPTIONS})
+else ()
+  find_package(GTest QUIET)
+  find_package(benchmark QUIET)
+endif ()
 
 if (NOT GTEST_FOUND OR NOT BENCHMARK_FOUND)
   include(FetchContent)
@@ -25,8 +30,10 @@ if (NOT GTEST_FOUND OR NOT BENCHMARK_FOUND)
   endif ()
 endif ()
 
-add_compile_options(${YACLIB_COMPILE_OPTIONS})
-add_link_options(${YACLIB_LINK_OPTIONS})
+if (NOT YACLIB_SANITIZER STREQUAL MEMSAN)
+  add_compile_options(${YACLIB_COMPILE_OPTIONS})
+  add_link_options(${YACLIB_LINK_OPTIONS})
+endif ()
 
 set(TEST_UTIL_INCLUDES
   util/cpu_time.hpp

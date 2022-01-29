@@ -10,8 +10,8 @@ namespace detail {
 
 struct DefaultDeleter {
   template <typename Type>
-  static void Delete(void* p) {
-    delete static_cast<Type>(p);
+  static void Delete(Type* self) {
+    delete self;
   }
 };
 
@@ -35,7 +35,7 @@ class Counter final : public CounterBase, public Deleter {
     if (_impl.fetch_sub(1, std::memory_order_release) == 1) {
       std::atomic_thread_fence(std::memory_order_acquire);
 #endif
-      Deleter::template Delete<decltype(this)>(this);
+      Deleter::Delete(this);
     }
   }
 
@@ -61,7 +61,7 @@ class NothingCounter final : public CounterBase {
 
 template <typename ObjectType, typename PtrType = ObjectType, typename... Args>
 util::Ptr<PtrType> MakeIntrusive(Args&&... args) {
-  return {new Counter<ObjectType>(std::forward<Args>(args)...), NoIncRefTag{}};
+  return {new Counter<ObjectType>{std::forward<Args>(args)...}, NoIncRefTag{}};
 }
 
 }  // namespace yaclib::util

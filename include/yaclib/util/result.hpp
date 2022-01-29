@@ -26,19 +26,19 @@ struct ResultValue<Result<U>> {
 template <typename T>
 using ResultValueT = typename ResultValue<T>::type;
 
-struct Unit {};
-
 }  // namespace detail
+
+struct Unit {};
 
 /**
  * Result states \see Result
  * \enum Empty, Value, Error, Exception
  */
 enum class ResultState : uint8_t {
-  Empty = 0,
-  Value,
-  Error,
-  Exception,
+  Value = 0,
+  Exception = 1,
+  Error = 2,
+  Empty = 3,
 };
 
 /**
@@ -47,9 +47,9 @@ enum class ResultState : uint8_t {
  */
 class ResultError : public std::exception {
  public:
-  explicit ResultError(std::error_code error) : _error{error} {
+  explicit ResultError(std::error_code error) noexcept : _error{error} {
   }
-  std::error_code Get() const {
+  [[nodiscard]] std::error_code Get() const noexcept {
     return _error;
   }
 
@@ -76,84 +76,60 @@ class Result {
   static_assert(!std::is_same_v<T, std::error_code>, "Result cannot be instantiated with std::error_code");
   static_assert(!std::is_same_v<T, std::exception_ptr>, "Result cannot be instantiated with std::exception_ptr");
 
-  using ValueT = std::conditional_t<std::is_void_v<T>, detail::Unit, T>;
-  using VariantT = std::variant<std::monostate, std::error_code, std::exception_ptr, ValueT>;
+  using ValueT = std::conditional_t<std::is_void_v<T>, Unit, T>;
+  using VariantT = std::variant<ValueT, std::exception_ptr, std::error_code, std::monostate>;
 
  public:
-  static Result Default() {
-    static_assert(std::is_void_v<T>, "Only for void");
-    return {detail::Unit{}};
+  Result(Result&& other) noexcept(std::is_nothrow_move_constructible_v<VariantT>) = default;
+  Result(const Result& other) noexcept(std::is_nothrow_copy_constructible_v<VariantT>) = default;
+  Result& operator=(Result&& other) noexcept(std::is_nothrow_move_assignable_v<VariantT>) = default;
+  Result& operator=(const Result& other) noexcept(std::is_nothrow_copy_assignable_v<VariantT>) = default;
+
+  constexpr Result() noexcept : _result{std::monostate{}} {
   }
 
-  Result() : _result{std::monostate{}} {
+  template <typename U>
+  constexpr explicit Result(U&& value) noexcept(std::is_nothrow_constructible_v<VariantT, U>)
+      : _result{std::forward<U>(value)} {
   }
 
-  Result(Result&& other) noexcept(std::is_nothrow_move_constructible_v<VariantT>) : _result{std::move(other._result)} {
-  }
-
-  Result& operator=(Result&& other) noexcept(std::is_nothrow_move_assignable_v<VariantT>) {
-    _result = std::move(other._result);
+  template <typename U>
+  Result& operator=(U&& value) noexcept(std::is_nothrow_assignable_v<VariantT, U>) {
+    _result = std::forward<U>(value);
     return *this;
   }
 
-  Result(const Result& other) = delete;
-  Result& operator=(const Result& other) = delete;
-
-  template <typename U>
-  Result(U&& result) : _result{std::forward<U>(result)} {
-  }
-
-  template <typename U>
-  void Set(U&& result) {
-    _result = std::forward<U>(result);
-  }
-
-  explicit operator bool() const noexcept {
+  [[nodiscard]] explicit operator bool() const noexcept {
     return State() == ResultState::Value;
   }
 
-  T Ok() && {
+  /*[[nodiscard]]*/ T Ok() && {
     switch (State()) {
       case ResultState::Value:
-        if constexpr (std::is_void_v<T>) {
-          return;
-        } else {
-          return std::move(std::get<T>(_result));
-        }
+        return std::move(*this).Value();
       case ResultState::Exception:
-        std::rethrow_exception(std::get<std::exception_ptr>(_result));
+        std::rethrow_exception(std::move(*this).Exception());
       case ResultState::Error:
-        throw ResultError{std::get<std::error_code>(_result)};
+        throw ResultError{std::move(*this).Error()};
       default:
         throw ResultEmpty{};
     }
   }
 
   [[nodiscard]] ResultState State() const noexcept {
-    if (std::holds_alternative<ValueT>(_result)) {
-      return ResultState::Value;
-    }
-    if (std::holds_alternative<std::exception_ptr>(_result)) {
-      return ResultState::Exception;
-    }
-    if (std::holds_alternative<std::error_code>(_result)) {
-      return ResultState::Error;
-    }
-    return ResultState::Empty;
+    return ResultState{static_cast<uint8_t>(_result.index())};
   }
 
-  T Value() && noexcept {
+  [[nodiscard]] T Value() && noexcept {
     if constexpr (!std::is_void_v<T>) {
-      return std::move(std::get<T>(_result));
+      return std::get<T>(std::move(_result));
     }
   }
-
-  std::error_code Error() && noexcept {
-    return std::get<std::error_code>(_result);
+  [[nodiscard]] std::error_code Error() && noexcept {
+    return std::get<std::error_code>(std::move(_result));
   }
-
-  std::exception_ptr Exception() && noexcept {
-    return std::get<std::exception_ptr>(_result);
+  [[nodiscard]] std::exception_ptr Exception() && noexcept {
+    return std::get<std::exception_ptr>(std::move(_result));
   }
 
  private:

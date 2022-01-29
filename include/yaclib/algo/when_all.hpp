@@ -53,7 +53,7 @@ auto WhenAll(Future<T>&& head, Future<Ts>&&... tail) {
   static_assert(P == WhenPolicy::FirstFail, "TODO(Ri7ay) Add other policy for WhenAll");
   constexpr size_t kSize = 1 + sizeof...(Ts);
   static_assert(kSize >= 2, "WhenAll wants at least two futures");
-  auto [future, combinator] = detail::AllCombinator<T, kSize>::Make();
+  auto [future, combinator] = detail::AllCombinator<T, kSize>::Make(1);
   detail::WhenAllImpl<kSize>(combinator, std::move(head), std::move(tail)...);
   return std::move(future);
 }

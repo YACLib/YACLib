@@ -45,9 +45,7 @@ void ValueCheck() {
   if constexpr (!std::is_void_v<FutureType>) {
     EXPECT_EQ(std::move(result).Value(), FutureType{});
   } else {
-    using ResultType = decltype(std::move(result).Value());
-    using ExpectedType = decltype(yaclib::util::Result<FutureType>::Default().Value());
-    static_assert(std::is_same_v<ResultType, ExpectedType>);
+    static_assert(std::is_void_v<decltype(yaclib::util::Result<void>{yaclib::util::Unit{}}.Value())>);
   }
 }
 
@@ -220,8 +218,7 @@ TEST(Subscribe, ResultSimple) {
 TEST(Subscribe, ExceptionSimple) {
   auto [f, p] = yaclib::MakeContract<int>();
 
-  auto result = yaclib::util::Result<int>{};
-  result.Set(std::make_exception_ptr(std::runtime_error{""}));
+  auto result = yaclib::util::Result<int>{std::make_exception_ptr(std::runtime_error{""})};
 
   std::move(p).Set(std::move(result));
 
@@ -361,10 +358,9 @@ TEST(Simple, ThenVia) {
   tp->Wait();
 }
 
-TEST(Simple, ThenExecutor) {
+TEST(Simple, Stop) {
   auto tp = yaclib::MakeThreadPool(1);
   {
-    std::cerr << " ";
     yaclib::Promise<Unit> p;
     {
       auto f{p.MakeFuture()};
@@ -372,16 +368,19 @@ TEST(Simple, ThenExecutor) {
         auto g = std::move(f).Then(tp, [](Unit) {
           return 42;
         });
-        tp->SoftStop();
-        tp->Wait();
-        std::cerr << " ";
       }
-      std::cerr << " ";
     }
-    std::cerr << " ";
   }
-  std::cerr << " ";
-  tp->Stop();
+  {
+    yaclib::Future<Unit> f;
+    {
+      auto g = yaclib::Promise<Unit>{}.MakeFuture().Then(tp, [](Unit) {
+        return 42;
+      });
+      EXPECT_ANY_THROW(std::move(g).Get().Ok());
+    }
+  }
+  tp->SoftStop();
   tp->Wait();
 }
 
@@ -480,9 +479,9 @@ TYPED_TEST(Error, Simple2) {
     if constexpr (std::is_same_v<typename TestFixture::Type, std::exception_ptr>) {
       throw std::runtime_error("first");
     } else {
-      return {std::make_error_code(std::errc::bad_address)};
+      return yaclib::util::Result<int>{std::make_error_code(std::errc::bad_address)};
     }
-    return {int{}};
+    return yaclib::util::Result<int>{int{}};
   };
 
   auto second = [](int v) {
@@ -563,11 +562,11 @@ TYPED_TEST(Error, AsyncThen) {
   f = yaclib::MakeFuture(32)
           .ThenInline([](int) -> yaclib::util::Result<int> {
             if constexpr (std::is_same_v<Type, std::error_code>) {
-              return std::make_error_code(std::errc::bad_address);
+              return yaclib::util::Result<int>{std::make_error_code(std::errc::bad_address)};
             } else {
               throw std::runtime_error{""};
             }
-            return {0};
+            return yaclib::util::Result<int>{0};
           })
           .ThenInline([](int) {
             return yaclib::MakeFuture<double>(1.0);
@@ -579,11 +578,11 @@ TYPED_TEST(Error, AsyncThen) {
   f = yaclib::MakeFuture(32)
           .ThenInline([](int) -> yaclib::util::Result<int> {
             if constexpr (std::is_same_v<Type, std::error_code>) {
-              return std::make_error_code(std::errc::bad_address);
+              return yaclib::util::Result<int>{std::make_error_code(std::errc::bad_address)};
             } else {
               throw std::runtime_error{""};
             }
-            return {0};
+            return yaclib::util::Result<int>{0};
           })
           .ThenInline([](Type) {
             return yaclib::MakeFuture<int>(2);
@@ -1039,11 +1038,18 @@ TEST(Future, MakeFuture) {
 }
 
 TEST(BruhTestCov, BaseCoreCall) {
-  // This test needed only for stupid test coverage info
-  yaclib::Promise<int> p;
-  auto& core = static_cast<yaclib::detail::InlineCore&>(*p.GetCore());
-  core.Call();
-  core.yaclib::detail::InlineCore::Cancel();
+  {  // This test needed only for stupid test coverage info
+    yaclib::Promise<int> p;
+    auto& core = static_cast<yaclib::detail::InlineCore&>(*p.GetCore());
+    core.Call();
+    core.yaclib::detail::InlineCore::Cancel();
+  }
+  auto [f, p] = yaclib::MakeContract<int>();
+  f = std::move(f).ThenInline([](int x) {
+    return yaclib::MakeFuture(x + 2);
+  });
+  std::move(f).Stop();
+  std::move(p).Set(3);
 }
 
 }  // namespace

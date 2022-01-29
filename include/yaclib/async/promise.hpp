@@ -32,15 +32,16 @@ class Promise final {
   Promise();
   Promise(Promise&& other) noexcept = default;
   Promise& operator=(Promise&& other) noexcept = default;
-  ~Promise() = default;  // TODO(MBkkt) Maybe we want set cancel?
+  ~Promise();
 
+  [[nodiscard]] bool Valid() const& noexcept;
   /**
    * Create and return \ref Future associated with this promise
    *
    * \note You cat extract \ref Future only once.
    * \return New \ref Future object associated with *this
    */
-  Future<T> MakeFuture();
+  [[nodiscard]] Future<T> MakeFuture();
 
   /**
    * Set \ref Promise result
@@ -57,8 +58,8 @@ class Promise final {
   void Set() &&;
 
   /// DETAIL
-  explicit Promise(detail::PromiseCorePtr<T> core);
-  [[nodiscard]] const detail::PromiseCorePtr<T>& GetCore() const;
+  explicit Promise(detail::PromiseCorePtr<T> core) noexcept;
+  [[nodiscard]] detail::PromiseCorePtr<T>& GetCore() noexcept;
   /// DETAIL
 
  private:
@@ -71,18 +72,21 @@ extern template class Promise<void>;
  * Describes channel with future and promise
  */
 template <typename T>
+#if !defined(__clang__) && __GNUC__ < 8
+using Contract = std::pair<Future<T>, Promise<T>>;
+#else
 struct Contract {
   Future<T> future;
   Promise<T> promise;
 };
-
+#endif
 /**
  * Creates related future and promise
  *
  * \return \see Contract object with new future and promise
  */
 template <typename T>
-Contract<T> MakeContract();
+[[nodiscard]] Contract<T> MakeContract();
 
 }  // namespace yaclib
 

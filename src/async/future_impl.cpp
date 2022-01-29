@@ -6,7 +6,7 @@ template class Future<void>;
 
 Future<void> MakeFuture() {
   // TODO(MBkkt) Do we really need this?
-  return Future<void>{util::MakeIntrusive<detail::ResultCore<void>>(util::Result<void>::Default())};
+  return Future<void>{util::MakeIntrusive<detail::ResultCore<void>>(util::Unit{})};
 }
 
 }  // namespace yaclib

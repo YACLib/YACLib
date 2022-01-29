@@ -18,14 +18,14 @@ enum class TestSuite {
 };
 
 template <typename T>
-class WaitAllT : public testing::Test {
+class WhenAllT : public testing::Test {
  public:
   using Type = T;
 };
 
 using MyTypes = ::testing::Types<int, void>;
 
-TYPED_TEST_SUITE(WaitAllT, MyTypes);
+TYPED_TEST_SUITE(WhenAllT, MyTypes);
 
 template <TestSuite suite, typename T = int>
 void JustWorks() {
@@ -35,9 +35,7 @@ void JustWorks() {
   std::array<Promise<T>, kSize> promises;
   std::array<Future<T>, kSize> futures;
   for (int i = 0; i < kSize; ++i) {
-    auto [f, p] = MakeContract<T>();
-    futures[i] = std::move(f);
-    promises[i] = std::move(p);
+    futures[i] = promises[i].MakeFuture();
   }
 
   auto all = [&futures] {
@@ -83,11 +81,11 @@ void JustWorks() {
   }
 }
 
-TYPED_TEST(WaitAllT, VectorJustWorks) {
+TYPED_TEST(WhenAllT, VectorJustWorks) {
   JustWorks<TestSuite::Vector, typename TestFixture::Type>();
 }
 
-TYPED_TEST(WaitAllT, ArrayJustWorks) {
+TYPED_TEST(WhenAllT, ArrayJustWorks) {
   JustWorks<TestSuite::Array, typename TestFixture::Type>();
 }
 
@@ -122,11 +120,11 @@ void AllFails() {
   EXPECT_THROW(std::move(all).Get().Ok(), std::runtime_error);
 }
 
-TYPED_TEST(WaitAllT, VectorAllFails) {
+TYPED_TEST(WhenAllT, VectorAllFails) {
   AllFails<TestSuite::Vector, typename TestFixture::Type>();
 }
 
-TYPED_TEST(WaitAllT, ArrayAllFails) {
+TYPED_TEST(WhenAllT, ArrayAllFails) {
   AllFails<TestSuite::Array, typename TestFixture::Type>();
 }
 
@@ -136,9 +134,7 @@ void ErrorFails() {
   std::array<Promise<T>, kSize> promises;
   std::array<Future<T>, kSize> futures;
   for (int i = 0; i < kSize; ++i) {
-    auto [f, p] = MakeContract<T>();
-    futures[i] = std::move(f);
-    promises[i] = std::move(p);
+    futures[i] = promises[i].MakeFuture();
   }
 
   auto all = [&futures] {
@@ -156,14 +152,14 @@ void ErrorFails() {
   EXPECT_TRUE(all.Ready());
 
   // Second error
-  std::move(promises[1]).Set(std::error_code{});
+  EXPECT_FALSE(promises[1].Valid());
 }
 
-TYPED_TEST(WaitAllT, VectorErrorFails) {
+TYPED_TEST(WhenAllT, VectorErrorFails) {
   ErrorFails<TestSuite::Vector, typename TestFixture::Type>();
 }
 
-TYPED_TEST(WaitAllT, ArrayErrorFails) {
+TYPED_TEST(WhenAllT, ArrayErrorFails) {
   ErrorFails<TestSuite::Array, typename TestFixture::Type>();
 }
 
@@ -172,8 +168,7 @@ void EmptyInput() {
   auto empty = std::vector<Future<T>>{};
   auto all = WhenAll(empty.begin(), empty.end());
 
-  EXPECT_TRUE(all.Ready());
-  EXPECT_NO_THROW(std::move(all).Get().Ok());
+  EXPECT_FALSE(all.Valid());
 }
 
 TEST(Vector, EmptyInput) {
@@ -234,12 +229,36 @@ void MultiThreaded() {
   tp->Wait();
 }
 
-TYPED_TEST(WaitAllT, VectorMultiThreaded) {
+TYPED_TEST(WhenAllT, VectorMultiThreaded) {
   MultiThreaded<TestSuite::Vector, typename TestFixture::Type>();
 }
 
-TYPED_TEST(WaitAllT, ArrayMultiThreaded) {
+TYPED_TEST(WhenAllT, ArrayMultiThreaded) {
   MultiThreaded<TestSuite::Array, typename TestFixture::Type>();
+}
+
+TEST(WhenAll, FirstFail) {
+  auto tp = yaclib::MakeThreadPool();
+  std::vector<yaclib::Future<void>> ints;
+  size_t count = std::thread::hardware_concurrency() * 4;
+  ints.reserve(count * 2);
+  for (int j = 0; j != 200; ++j) {
+    for (size_t i = 0; i != count; ++i) {
+      ints.push_back(yaclib::Run(tp, [] {
+        std::this_thread::sleep_for(4ms);
+      }));
+    }
+    for (size_t i = 0; i != count; ++i) {
+      ints.push_back(yaclib::Run(tp, [] {
+        std::this_thread::sleep_for(2ms);
+        return yaclib::util::Result<void>{std::error_code{}};
+      }));
+    }
+    EXPECT_THROW(WhenAll(ints.begin(), ints.end()).Get().Ok(), util::ResultError);
+    ints.clear();
+  }
+  tp->Stop();
+  tp->Wait();
 }
 
 }  // namespace
