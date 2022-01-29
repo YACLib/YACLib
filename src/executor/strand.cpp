@@ -2,8 +2,8 @@
 
 #include <yaclib/config.hpp>
 #include <yaclib/executor/executor.hpp>
+#include <yaclib/fault/atomic.hpp>
 
-#include <atomic>
 #include <utility>
 
 namespace yaclib {
@@ -65,7 +65,7 @@ class Strand : public IExecutor, public ITask {
   IExecutorPtr _executor;
   util::MPSCStack _tasks;
   // TODO remove _work_counter, make active/inactive like libunifex
-  alignas(kCacheLineSize) std::atomic_int32_t _work_counter{0};
+  alignas(kCacheLineSize) yaclib_std::atomic_int32_t _work_counter{0};
 };
 
 }  // namespace

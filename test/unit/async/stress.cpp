@@ -1,10 +1,10 @@
 #include <yaclib/algo/wait_group.hpp>
 #include <yaclib/async/run.hpp>
 #include <yaclib/executor/thread_pool.hpp>
+#include <yaclib/fault/random.hpp>
+#include <yaclib/fault/thread.hpp>
 
 #include <array>
-#include <random>
-#include <thread>
 #include <vector>
 
 #include <gtest/gtest.h>
@@ -14,8 +14,8 @@ static constexpr uint32_t kNumRounds = 100000;
 
 struct StressTest : testing::Test {
   struct Value {
-    inline static std::atomic_uint32_t created{0};
-    inline static std::atomic_uint32_t destroyed{0};
+    inline static yaclib_std::atomic_uint32_t created{0};
+    inline static yaclib_std::atomic_uint32_t destroyed{0};
     explicit Value(uint32_t value) noexcept : v{value} {
       created.fetch_add(1, std::memory_order_relaxed);
     }
@@ -31,16 +31,16 @@ struct StressTest : testing::Test {
   }
 
   struct alignas(64) Slot {
-    std::atomic_uint32_t round{0};
+    yaclib_std::atomic_uint32_t round{0};
     yaclib::Future<Value> future;
   };
 
   template <typename C>
   void Run(yaclib::IExecutorPtr e, C consumer) {
     EXPECT_GT(kNumThreads, 1);
-    std::atomic_uint32_t producer_idx{0};
-    std::atomic_uint32_t consumer_idx{0};
-    std::atomic_uint32_t num_resolved_futures{0};
+    yaclib_std::atomic_uint32_t producer_idx{0};
+    yaclib_std::atomic_uint32_t consumer_idx{0};
+    yaclib_std::atomic_uint32_t num_resolved_futures{0};
     uint32_t num_slots{64 * kNumThreads};
     std::vector<StressTest::Slot> slots{num_slots};
     std::vector<std::thread> threads;
@@ -55,7 +55,7 @@ struct StressTest : testing::Test {
           auto slot_round = (idx / num_slots) * 2;
           idx %= num_slots;
           while (slots[idx].round.load(std::memory_order_acquire) != slot_round) {
-            std::this_thread::yield();
+            yaclib_std::this_thread::yield();
           }
           EXPECT_FALSE(slots[idx].future.Valid());
           slots[idx].future = std::move(f).Via(e);
@@ -81,7 +81,7 @@ struct StressTest : testing::Test {
           idx %= num_slots;
           EXPECT_TRUE(slot_round % 2 != 0);
           while (slots[idx].round.load(std::memory_order_acquire) != slot_round) {
-            std::this_thread::yield();
+            yaclib_std::this_thread::yield();
           }
           auto f = std::move(slots[idx].future);
           EXPECT_TRUE(f.Valid());

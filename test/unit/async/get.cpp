@@ -1,7 +1,6 @@
 #include <yaclib/algo/wait_for.hpp>
 #include <yaclib/async/future.hpp>
-
-#include <thread>
+#include <yaclib/fault/thread.hpp>
 
 #include <gtest/gtest.h>
 
@@ -19,8 +18,8 @@ TEST(Get, FulFill) {
 TEST(Get, PromiseFuture) {
   {
     auto [f, p] = yaclib::MakeContract<int>();
-    auto t = std::thread([p = std::move(p)]() mutable {
-      std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    auto t = yaclib_std::thread([p = std::move(p)]() mutable {
+      yaclib_std::this_thread::sleep_for(std::chrono::milliseconds(1));
       std::move(p).Set(43);
     });
     EXPECT_EQ(43, std::move(f).Get().Ok());
@@ -28,7 +27,7 @@ TEST(Get, PromiseFuture) {
   }
   {
     auto [f, p] = yaclib::MakeContract<int>();
-    auto t = std::thread([p = std::move(p)]() mutable {
+    auto t = yaclib_std::thread([p = std::move(p)]() mutable {
       std::move(p).Set(43);
     });
     t.join();

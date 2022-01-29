@@ -1,9 +1,8 @@
 #pragma once
 
 #include <yaclib/config.hpp>
+#include <yaclib/fault/atomic.hpp>
 #include <yaclib/util/intrusive_node.hpp>
-
-#include <atomic>
 
 namespace yaclib::util {
 
@@ -19,7 +18,7 @@ class MPSCStack final {
   [[nodiscard]] detail::Node* TakeAllFIFO();
 
  private:
-  alignas(kCacheLineSize) std::atomic<detail::Node*> _head{nullptr};
+  alignas(kCacheLineSize) yaclib_std::atomic<detail::Node*> _head{nullptr};
 };
 
 }  // namespace yaclib::util

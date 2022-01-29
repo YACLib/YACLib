@@ -3,10 +3,10 @@
 
 #include <yaclib/executor/inline.hpp>
 #include <yaclib/executor/thread_pool.hpp>
+#include <yaclib/fault/atomic.hpp>
+#include <yaclib/fault/thread.hpp>
 
-#include <atomic>
 #include <iostream>
-#include <thread>
 
 #include <gtest/gtest.h>
 
@@ -169,11 +169,11 @@ void AfterStopImpl(IThreadPoolPtr& tp, StopType stop_type, bool need_wait) {
     tp->Execute([&] {
       ready = true;
       if (!need_wait) {
-        std::this_thread::sleep_for(1ms);
+        yaclib_std::this_thread::sleep_for(1ms);
       }
     });
     if (need_wait && stop_type == StopType::HardStop) {
-      std::this_thread::sleep_for(10ms);
+      yaclib_std::this_thread::sleep_for(10ms);
     }
   }
 
@@ -254,14 +254,14 @@ void TwoThreadPool(IThreadPoolPtr& tp1, IThreadPoolPtr& tp2) {
     tp2->Execute([&] {
       done1 = true;
     });
-    std::this_thread::sleep_for(200ms);
+    yaclib_std::this_thread::sleep_for(200ms);
   });
 
   tp2->Execute([&] {
     tp1->Execute([&] {
       done2 = true;
     });
-    std::this_thread::sleep_for(200ms);
+    yaclib_std::this_thread::sleep_for(200ms);
   });
 
   tp1->SoftStop();
@@ -391,7 +391,7 @@ TEST_F(SingleHeavyThread, Exception) {
 void ManyTask(IThreadPoolPtr& tp, StopType stop_type, size_t threads_count) {
   const size_t tasks{1024 * threads_count / 3};
 
-  std::atomic_size_t completed{0};
+  yaclib_std::atomic_size_t completed{0};
   for (size_t i = 0; i != tasks; ++i) {
     tp->Execute([&completed] {
       completed.fetch_add(1, std::memory_order_relaxed);
@@ -433,10 +433,10 @@ TEST_F(MultiHeavyThread, ManyTask) {
 }
 
 void UseAllThreads(IThreadPoolPtr& tp, StopType stop_type) {
-  std::atomic_size_t counter{0};
+  yaclib_std::atomic_size_t counter{0};
 
   auto sleeper = [&counter] {
-    std::this_thread::sleep_for(50ms * YACLIB_CI_SLOWDOWN);
+    yaclib_std::this_thread::sleep_for(50ms * YACLIB_CI_SLOWDOWN);
     counter.fetch_add(1, std::memory_order_relaxed);
   };
 
@@ -471,10 +471,10 @@ TEST_F(MultiHeavyThread, UseAllThreads) {
 
 void NotSequentialAndParallel(IThreadPoolPtr& tp, StopType stop_type) {
   // Not sequential start and parallel running
-  std::atomic_int counter{0};
+  yaclib_std::atomic_int counter{0};
 
   tp->Execute([&] {
-    std::this_thread::sleep_for(300ms);
+    yaclib_std::this_thread::sleep_for(300ms);
     counter.store(2, std::memory_order_release);
   });
 
@@ -482,7 +482,7 @@ void NotSequentialAndParallel(IThreadPoolPtr& tp, StopType stop_type) {
     counter.store(1, std::memory_order_release);
   });
 
-  std::this_thread::sleep_for(100ms);
+  yaclib_std::this_thread::sleep_for(100ms);
 
   EXPECT_EQ(counter.load(std::memory_order_acquire), 1);
 
@@ -511,13 +511,13 @@ void Current(IThreadPoolPtr& tp) {
 
   tp->Execute([&] {
     EXPECT_EQ(CurrentThreadPool(), tp);
-    std::this_thread::sleep_for(10ms);
+    yaclib_std::this_thread::sleep_for(10ms);
     EXPECT_EQ(CurrentThreadPool(), tp);
   });
 
   EXPECT_EQ(CurrentThreadPool(), nullptr);
 
-  std::this_thread::sleep_for(1ms);
+  yaclib_std::this_thread::sleep_for(1ms);
 
   EXPECT_EQ(CurrentThreadPool(), nullptr);
 
@@ -551,7 +551,7 @@ void Lifetime(IThreadPoolPtr& tp, size_t threads) {
     Task& operator=(Task&&) = delete;
     Task& operator=(const Task&) = delete;
 
-    explicit Task(std::atomic<int>& counter) : _counter{counter} {
+    explicit Task(yaclib_std::atomic<int>& counter) : _counter{counter} {
     }
 
     ~Task() {
@@ -561,22 +561,22 @@ void Lifetime(IThreadPoolPtr& tp, size_t threads) {
     }
 
     void operator()() {
-      std::this_thread::sleep_for(50ms * YACLIB_CI_SLOWDOWN);
+      yaclib_std::this_thread::sleep_for(50ms * YACLIB_CI_SLOWDOWN);
       _done = true;
     }
 
    private:
     bool _done{false};
-    std::atomic_int& _counter;
+    yaclib_std::atomic_int& _counter;
   };
 
-  std::atomic_int dead{0};
+  yaclib_std::atomic_int dead{0};
 
   for (size_t i = 0; i != threads; ++i) {
     tp->Execute(Task(dead));
   }
 
-  std::this_thread::sleep_for(50ms * YACLIB_CI_SLOWDOWN * threads / 2);
+  yaclib_std::this_thread::sleep_for(50ms * YACLIB_CI_SLOWDOWN * threads / 2);
   EXPECT_EQ(dead.load(std::memory_order_acquire), threads);
 
   tp->Stop();
@@ -599,15 +599,15 @@ TEST_F(MultiHeavyThread, Lifetime) {
 void RacyCounter(IThreadFactoryPtr& factory) {
   auto tp = MakeThreadPool(2 * kCoresCount, factory);
 
-  std::atomic<size_t> counter1{0};
-  std::atomic<size_t> counter2{0};
+  yaclib_std::atomic<size_t> counter1{0};
+  yaclib_std::atomic<size_t> counter2{0};
 
   static const size_t kIncrements = 123456;
   for (size_t i = 0; i < kIncrements; ++i) {
     tp->Execute([&] {
       auto old = counter1.load(std::memory_order_relaxed);
       counter2.fetch_add(1, std::memory_order_relaxed);
-      std::this_thread::yield();
+      yaclib_std::this_thread::yield();
       counter1.store(old + 1, std::memory_order_relaxed);
     });
   }
@@ -636,7 +636,7 @@ void NotBurnCPU(IThreadPoolPtr& tp, size_t threads) {
   // Warmup
   for (size_t i = 0; i != threads; ++i) {
     tp->Execute([&] {
-      std::this_thread::sleep_for(100ms);
+      yaclib_std::this_thread::sleep_for(100ms);
     });
   }
 

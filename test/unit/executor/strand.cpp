@@ -2,10 +2,10 @@
 
 #include <yaclib/executor/strand.hpp>
 #include <yaclib/executor/thread_pool.hpp>
+#include <yaclib/fault/atomic.hpp>
+#include <yaclib/fault/thread.hpp>
 
-#include <atomic>
 #include <stack>
-#include <thread>
 #include <vector>
 
 #include <gtest/gtest.h>
@@ -126,7 +126,7 @@ TEST(batching, simple) {
   EXPECT_EQ(tp->Tag(), yaclib::IExecutor::Type::SingleThread);
   tp->Execute([] {
     // bubble
-    std::this_thread::sleep_for(1s);
+    yaclib_std::this_thread::sleep_for(1s);
   });
 
   auto strand = MakeStrand(tp);
@@ -206,7 +206,7 @@ TEST(keep_strong_ref, simple) {
 
   tp->Execute([] {
     // bubble
-    std::this_thread::sleep_for(1s);
+    yaclib_std::this_thread::sleep_for(1s);
   });
 
   bool done = false;
@@ -226,15 +226,15 @@ TEST(do_not_occupy_thread, simple) {
 
   tp->Execute([] {
     // bubble
-    std::this_thread::sleep_for(1s);
+    yaclib_std::this_thread::sleep_for(1s);
   });
 
-  std::atomic<bool> stop{false};
+  yaclib_std::atomic<bool> stop{false};
 
   static const auto kStepPause = 10ms;
 
   auto step = [] {
-    std::this_thread::sleep_for(kStepPause);
+    yaclib_std::this_thread::sleep_for(kStepPause);
   };
 
   for (size_t i = 0; i < 100; ++i) {
@@ -247,7 +247,7 @@ TEST(do_not_occupy_thread, simple) {
 
   while (!stop.load()) {
     strand->Execute(step);
-    std::this_thread::sleep_for(kStepPause);
+    yaclib_std::this_thread::sleep_for(kStepPause);
   }
 
   tp->HardStop();
@@ -259,7 +259,7 @@ TEST(exceptions, simple) {
   auto strand = MakeStrand(tp);
 
   tp->Execute([] {
-    std::this_thread::sleep_for(1s);
+    yaclib_std::this_thread::sleep_for(1s);
   });
 
   bool done = false;
@@ -281,10 +281,10 @@ TEST(non_blocking_execute, simple) {
   auto strand = MakeStrand(tp);
 
   strand->Execute([] {
-    std::this_thread::sleep_for(2s);
+    yaclib_std::this_thread::sleep_for(2s);
   });
 
-  std::this_thread::sleep_for(500ms);
+  yaclib_std::this_thread::sleep_for(500ms);
 
   test::util::StopWatch stop_watch;
   strand->Execute([] {
@@ -300,22 +300,22 @@ TEST(do_not_block_thread_pool, simple) {
   auto strand = MakeStrand(tp);
 
   strand->Execute([] {
-    std::this_thread::sleep_for(1s);
+    yaclib_std::this_thread::sleep_for(1s);
   });
 
-  std::this_thread::sleep_for(100ms);
+  yaclib_std::this_thread::sleep_for(100ms);
 
   strand->Execute([] {
-    std::this_thread::sleep_for(1s);
+    yaclib_std::this_thread::sleep_for(1s);
   });
 
-  std::atomic<bool> done{false};
+  yaclib_std::atomic<bool> done{false};
 
   tp->Execute([&done] {
     done.store(true);
   });
 
-  std::this_thread::sleep_for(200ms);
+  yaclib_std::this_thread::sleep_for(200ms);
   EXPECT_TRUE(done.load());
 
   tp->HardStop();
@@ -327,7 +327,7 @@ TEST(memory_leak, simple) {
   auto strand = MakeStrand(tp);
 
   tp->Execute([] {
-    std::this_thread::sleep_for(1s);
+    yaclib_std::this_thread::sleep_for(1s);
   });
   strand->Execute([] {
     // No-op
