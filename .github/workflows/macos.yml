@@ -1,0 +1,50 @@
+name: macOS
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'doc/**'
+      - '**.md'
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - 'doc/**'
+      - '**.md'
+  schedule:
+    - cron: '0 * * * *'
+
+jobs:
+  main:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ macos-10.15, macos-11 ]
+        build_type: [ Debug, RelWithDebInfo ]
+        # TODO Add 20, 23 standard and llvm clang
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Configure CMake
+        run:
+          cmake -S . -B build
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+          -DCMAKE_C_COMPILER=clang
+          -DCMAKE_CXX_COMPILER=clang++
+          -DYACLIB_BUILD_TESTING=ON
+          -DYACLIB_BUILD_EXAMPLES=ON
+          -DYACLIB_CXX_STANDARD=17
+          -DYACLIB_DEFINITIONS=/DYACLIB_CI_SLOWDOWN=10
+
+      - name: Build
+        run:
+          cmake --build build --config ${{ matrix.build_type }}
+
+      - name: Test
+        run: |
+          cd build
+          ctest --output-on-failure -C ${{ matrix.build_type }} -VV

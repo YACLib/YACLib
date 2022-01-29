@@ -1,0 +1,104 @@
+name: Sanitizer
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'doc/**'
+      - '**.md'
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - 'doc/**'
+      - '**.md'
+  schedule:
+    - cron: '0 * * * *'
+
+jobs:
+  main:
+    runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
+      matrix:
+        sanitizers: [ UBSAN, ASAN, TSAN ]
+        compilers: [ "gcc-11 g++-11",
+                     "clang-14 clang++-14" ]
+    env:
+      BUILD_TYPES: "Debug RelWithDebInfo"
+      # TODO Add windows ASAN, UBSAN and some macos and MEMSAN
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Update dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get upgrade
+          sudo apt-get install ninja-build
+
+      - name: Install dependencies gcc
+        if: ${{ matrix.compilers == 'gcc-11 g++-11' }}
+        run: |
+          sudo apt-get install ${{ matrix.compilers }}
+
+      - name: Install dependencies clang
+        if: ${{ matrix.compilers != 'gcc-11 g++-11' }}
+        run: |
+          wget https://apt.llvm.org/llvm.sh
+          chmod +x ./llvm.sh
+          sudo     ./llvm.sh 14 shit
+          rm       ./llvm.sh
+
+      - name: Configure CMake
+        run: |
+          cmake --version
+          sanitizer=${{ matrix.sanitizer }}
+          compilers=(${{ matrix.compilers }})
+          for build_type in ${BUILD_TYPES[*]}; do
+            for (( i=0; i<${#compilers[*]}; i+=2 )); do
+              dir="build_${sanitizer}_${build_type}_${compilers[$i]}"
+              echo $dir
+              cmake -S . -B $dir                          \
+                -GNinja                                   \
+                -DCMAKE_BUILD_TYPE=${build_type}          \
+                -DCMAKE_C_COMPILER=${compilers[$i]}       \
+                -DCMAKE_CXX_COMPILER=${compilers[$i + 1]} \
+                -DYACLIB_BUILD_TESTING=ON                 \
+                -DYACLIB_BUILD_EXAMPLES=ON                \
+                -DYACLIB_SANITIZER=${sanitizer}           \
+                -DYACLIB_CXX_STANDARD=23
+              echo
+            done
+          done
+
+      - name: Build
+        run: |
+          sanitizer=${{ matrix.sanitizer }}
+          compilers=(${{ matrix.compilers }})
+          for build_type in ${BUILD_TYPES[*]}; do
+            for (( i=0; i<${#compilers[*]}; i+=2 )); do
+              dir="build_${sanitizer}_${build_type}_${compilers[$i]}"
+              echo $dir
+              ninja -C $dir
+              echo
+            done
+          done
+
+      - name: Test
+        run: |
+          sanitizer=${{ matrix.sanitizer }}
+          compilers=(${{ matrix.compilers }})
+          export ASAN_OPTIONS=help=0:verbosity=0:halt_on_error=0:check_initialization_order=1:detect_stack_use_after_return=1:strict_init_order=1:strict_string_checks=1:debug=1
+          export TSAN_OPTIONS=help=0:verbosity=0
+          for build_type in ${BUILD_TYPES[*]}; do
+            for (( i=0; i<${#compilers[*]}; i+=2 )); do
+              dir="build_${sanitizer}_${build_type}_${compilers[$i]}"
+              echo $dir
+              cd $dir
+                ctest --output-on-failure -C ${build_type} -VV
+              cd ..
+              echo
+            done
+          done
