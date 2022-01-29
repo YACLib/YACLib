@@ -12,7 +12,7 @@ if (NOT GTEST_FOUND OR NOT BENCHMARK_FOUND)
     # For Windows: Prevent overriding the parent project's compiler/linker settings
     set(gtest_force_shared_crt ON CACHE BOOL "Always use msvcrt.dll")
     FetchContent_MakeAvailable(googletest)
-    set(GTEST_BOTH_LIBRARIES GTest::gtest)
+    set(GTEST_BOTH_LIBRARIES GTest::gtest GTest::gtest_main)
   endif ()
   if (NOT BENCHMARK_FOUND)
     set(BENCHMARK_ENABLE_TESTING NO)
@@ -78,20 +78,38 @@ endif ()
 #TODO(MBkkt) Add options which shuffle tests list
 set(YACLIB_TEST_SOURCES ${YACLIB_UNIT_SOURCES} ${YACLIB_EXAMPLE_SOURCES})
 
-foreach (TEST_SOURCE ${YACLIB_TEST_SOURCES})
-  string(REPLACE "/" "_" TEST_NAME ${TEST_SOURCE})
-  add_executable(${TEST_NAME} ${TEST_SOURCE}.cpp)
-  target_sources(${TEST_NAME}
+if (YACLIB_ALL_TESTS_IN_ONE_EXECUTABLE)
+  list(TRANSFORM YACLIB_TEST_SOURCES APPEND .cpp)
+  add_executable(all_tests ${YACLIB_TEST_SOURCES})
+  target_sources(all_tests
     PRIVATE ${TEST_UTIL_INCLUDES}
     )
-  target_link_libraries(${TEST_NAME}
-    PRIVATE ${GTEST_BOTH_LIBRARIES}
+  target_link_libraries(all_tests
+    PRIVATE GTest::gtest
     PRIVATE benchmark::benchmark benchmark::benchmark_main
     PRIVATE ${PROJECT_NAME}
     )
-  target_include_directories(${TEST_NAME}
+  target_include_directories(all_tests
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
     PRIVATE ${YACLIB_SOURCE_DIR}/src
     )
-  add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
-endforeach ()
+  add_test(NAME all_tests COMMAND all_tests)
+else ()
+  foreach (TEST_SOURCE ${YACLIB_TEST_SOURCES})
+    string(REPLACE "/" "_" TEST_NAME ${TEST_SOURCE})
+    add_executable(${TEST_NAME} ${TEST_SOURCE}.cpp)
+    target_sources(${TEST_NAME}
+      PRIVATE ${TEST_UTIL_INCLUDES}
+      )
+    target_link_libraries(${TEST_NAME}
+      PRIVATE ${GTEST_BOTH_LIBRARIES}
+      PRIVATE benchmark::benchmark benchmark::benchmark_main
+      PRIVATE ${PROJECT_NAME}
+      )
+    target_include_directories(${TEST_NAME}
+      PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
+      PRIVATE ${YACLIB_SOURCE_DIR}/src
+      )
+    add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
+  endforeach ()
+endif ()
