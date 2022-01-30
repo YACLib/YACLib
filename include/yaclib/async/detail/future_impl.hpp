@@ -2,8 +2,7 @@
 
 #include <yaclib/algo/wait.hpp>
 #include <yaclib/async/detail/core.hpp>
-
-#include <cassert>
+#include <yaclib/log_config.hpp>
 
 namespace yaclib {
 namespace detail {
@@ -104,7 +103,7 @@ class SyncInvoke {
       if (state == ResultState::Error) {
         return self.Set(std::move(r).Error());
       }
-      assert(state == ResultState::Exception);
+      YACLIB_ERROR(state != ResultState::Error, "unexpected result state");
       return self.Set(std::move(r).Exception());
     } else {
       constexpr bool kIsError = is_invocable_v<FunctorInvoke, E>;
@@ -164,7 +163,7 @@ class AsyncInvoke {
       if (state == ResultState::Error) {
         return self.Set(std::move(r).Error());
       }
-      assert(state == ResultState::Exception);
+      YACLIB_ERROR(state != ResultState::Exception, "unexpected result state");
       return self.Set(std::move(r).Exception());
       /**
        * We can't use this strategy for other FunctorInvoke,
@@ -298,8 +297,8 @@ auto Future<V, E>::ThenInline(Functor&& f) && {
 template <typename V, typename E>
 template <typename Functor>
 auto Future<V, E>::Then(IExecutorPtr e, Functor&& f) && {
-  assert(e);
-  // assert(e->Tag() != IExecutor::Type::Inline); TODO(maynnyax) info
+  YACLIB_ERROR(e == nullptr, "nullptr executor supplied");
+  YACLIB_INFO(e->Tag() == IExecutor::Type::Inline, "can't submit task to inline executor");
   _core->SetExecutor(std::move(e));
   return detail::SetCallback<false, false>(std::exchange(_core, nullptr), std::forward<Functor>(f));
 }
@@ -319,8 +318,8 @@ void Future<V, E>::SubscribeInline(Functor&& f) && {
 template <typename V, typename E>
 template <typename Functor>
 void Future<V, E>::Subscribe(IExecutorPtr e, Functor&& f) && {
-  assert(e);
-  // assert(e->Tag() != IExecutor::Type::Inline); TODO(maynnyax) info
+  YACLIB_ERROR(e == nullptr, "nullptr executor supplied");
+  YACLIB_INFO(e->Tag() == IExecutor::Type::Inline, "can't submit task to inline executor");
   _core->SetExecutor(std::move(e));
   detail::SetCallback<true, false>(std::exchange(_core, nullptr), std::forward<Functor>(f));
 }
