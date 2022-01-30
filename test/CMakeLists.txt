@@ -27,6 +27,20 @@ set(TEST_UTIL_INCLUDES
   util/error_code.hpp
   util/time.hpp
   )
+set(TEST_UTIL_SOURCES
+  test.cpp
+  )
+
+#TODO(myannyax) any ways this can be avoided?
+if (YACLIB_FAULT)
+  list(APPEND YACLIB_DEFINITIONS YACLIB_FAULT)
+endif ()
+
+if (YACLIB_LOG STREQUAL "ERROR")
+  list(APPEND YACLIB_DEFINITIONS YACLIB_LOG_ERROR)
+elseif (YACLIB_LOG STREQUAL "INFO")
+  list(APPEND YACLIB_DEFINITIONS YACLIB_LOG_INFO)
+endif()
 
 set(YACLIB_EXAMPLE_SOURCES
   example/async/simple

@@ -31,6 +31,8 @@ jobs:
             -DCMAKE_BUILD_TYPE=Debug         \
             -DCMAKE_C_COMPILER=gcc-10        \
             -DCMAKE_CXX_COMPILER=g++-10      \
+            -DYACLIB_LOG_ERROR=ON            \
+            -DYACLIB_FAULT=ON                \
             -DYACLIB_TEST=SINGLE             \
             -DYACLIB_FLAGS="COVERAGE;CORO"   \
             -DYACLIB_CXX_STANDARD=20         \
@@ -51,6 +53,7 @@ jobs:
           lcov --rc lcov_branch_coverage=1 -r lcov_cond.info "/usr/*"    -o lcov_cond.info
           lcov --rc lcov_branch_coverage=1 -r lcov_cond.info "*/_deps/*" -o lcov_cond.info
           lcov --rc lcov_branch_coverage=1 -r lcov_cond.info "*/fault/*" -o lcov_cond.info
+          lcov --rc lcov_branch_coverage=1 -r lcov_cond.info "*/log_config.*" -o lcov_cond.info
           lcov --rc lcov_branch_coverage=1 -r lcov_cond.info "*/test/*"  -o lcov_cond.info
           lcov                             -r lcov_cond.info             -o lcov.info
           lcov --rc lcov_branch_coverage=1 --list lcov_cond.info

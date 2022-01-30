@@ -3,6 +3,7 @@
 #include <yaclib/async/detail/core.hpp>
 #include <yaclib/async/future.hpp>
 #include <yaclib/executor/executor.hpp>
+#include <yaclib/log_config.hpp>
 #include <yaclib/util/type_traits.hpp>
 
 namespace yaclib {
@@ -16,8 +17,8 @@ namespace yaclib {
  */
 template <typename E = StopError, typename Functor>
 auto Run(const IExecutorPtr& e, Functor&& f) {
-  assert(e);
-  // assert(e->Tag() != IExecutor::Type::Inline); // TODO(myannyax) info
+  YACLIB_ERROR(e == nullptr, "nullptr executor supplied");
+  YACLIB_INFO(e->Tag() == IExecutor::Type::Inline, "can't submit task to inline executor");
   using AsyncRet = result_value_t<typename detail::Return<void, E, Functor, 2>::Type>;
   constexpr bool kIsAsync = is_future_v<AsyncRet>;
   using Ret = result_value_t<future_value_t<AsyncRet>>;

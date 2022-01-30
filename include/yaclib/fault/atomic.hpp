@@ -6,6 +6,8 @@
 #include <yaclib/fault/detail/atomic/atomic_flag.hpp>
 #include <yaclib/fault/detail/atomic/atomic_reference.hpp>
 
+#include <atomic>
+
 namespace yaclib_std {
 
 template <typename T>

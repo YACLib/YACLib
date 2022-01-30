@@ -10,6 +10,8 @@ namespace yaclib_std {
 
 using thread = yaclib::detail::Thread;
 
+}  // namespace yaclib_std
+
 #else
 
 #include <thread>

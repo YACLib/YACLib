@@ -51,6 +51,9 @@ jobs:
             os: 2022
             build_type: RelWithDebInfo
 
+    env:
+      YACLIB_FAULT: 'OFF ON'
+
     steps:
       - uses: actions/checkout@v2
 
@@ -85,17 +88,20 @@ jobs:
           options=("-A $arch -T ClangCL" "-DCMAKE_BUILD_TYPE=${{ matrix.build_type }}" "-A $arch")
 
           for (( i=0; i<${#names[*]}; i+=1 )); do
-            dir="build_${names[$i]}"
-            echo $dir
-
-            cmake -S . -B $dir                                    \
-              -DYACLIB_CXX_STANDARD=17                            \
-              -DYACLIB_FLAGS="CORO"                               \
-              -DYACLIB_TEST=SINGLE                                \
-              -G"${generators[$i]}"                               \
-              ${options[$i]}                                      \
-              -DYACLIB_DEFINITIONS="YACLIB_CI_SLOWDOWN=$slowdown"
-
+            for yaclib_fault in ${YACLIB_FAULT[*]}; do
+              dir="build_${names[$i]}_fault_${yaclib_fault}"
+              echo $dir
+          
+              cmake -S . -B $dir                                    \
+                -DYACLIB_CXX_STANDARD=17                            \
+                -DYACLIB_FLAGS="CORO"                               \
+                -DYACLIB_TEST=SINGLE                                \
+                -DYACLIB_FAULT=$yaclib_fault                        \
+                -G"${generators[$i]}"                               \
+                ${options[$i]}                                      \
+                -DYACLIB_DEFINITIONS="YACLIB_CI_SLOWDOWN=$slowdown"
+          
+            done
           done
 
       - name: Build
@@ -115,12 +121,14 @@ jobs:
           arch=${{ matrix.arch }}
 
           for (( i=0; i<${#names[*]}; i+=1 )); do
-            if [[ ${names[$i]} == "MinGW" || 
-                  ( $arch == "Win32" && $build_type == "RelWithDebInfo" && "${names[$i]}" == "ClangCL" ) ]]; then
-              continue; # second condition about some seh error in gtest code. BEST OS FOREVER
-            fi
-            dir="build_${names[$i]}"
-            cd $dir
-            ctest --output-on-failure -C ${{ matrix.build_type }} -V
-            cd ..
+            for yaclib_fault in ${YACLIB_FAULT[*]}; do
+              if [[ ${names[$i]} == "MinGW" || 
+                    ( $arch == "Win32" && $build_type == "RelWithDebInfo" && "${names[$i]}" == "ClangCL" ) ]]; then
+                continue; # second condition about some seh error in gtest code. BEST OS FOREVER
+              fi
+              dir="build_${names[$i]}_fault_${yaclib_fault}"
+              cd $dir
+              ctest --output-on-failure -C ${{ matrix.build_type }} -V
+              cd ..
+            done
           done

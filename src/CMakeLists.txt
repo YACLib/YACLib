@@ -11,10 +11,12 @@ set(YACLIB_INCLUDE_DIR ${YACLIB_SOURCE_DIR}/include/yaclib)
 set(YACLIB_INCLUDES
   ${YACLIB_BINARY_DIR}/include/yaclib/config.hpp
   ${YACLIB_INCLUDE_DIR}/fwd.hpp
+  ${YACLIB_INCLUDE_DIR}/log_config.hpp
   )
 set(YACLIB_HEADERS
   )
 set(YACLIB_SOURCES
+  ${CMAKE_CURRENT_SOURCE_DIR}/log_config.cpp
   )
 
 add_subdirectory(algo)
@@ -25,6 +27,16 @@ add_subdirectory(fault)
 
 if (CORO)
     add_subdirectory(coroutine)
+endif()
+
+if (YACLIB_FAULT)
+  list(APPEND YACLIB_DEFINITIONS YACLIB_FAULT)
+endif ()
+
+if (YACLIB_LOG STREQUAL "ERROR")
+  list(APPEND YACLIB_DEFINITIONS YACLIB_LOG_ERROR)
+elseif (YACLIB_LOG STREQUAL "INFO")
+  list(APPEND YACLIB_DEFINITIONS YACLIB_LOG_INFO)
 endif()
 
 add_library(${PROJECT_NAME} STATIC)
