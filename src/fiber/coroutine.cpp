@@ -24,6 +24,8 @@ void Coroutine::Resume() {
 }
 
 void Coroutine::Yield() {
+  if (current == nullptr)
+    return;
   current->_impl.Yield();
 }
 

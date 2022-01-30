@@ -42,6 +42,10 @@ if (YACLIB_FIBER)
   add_subdirectory(fiber)
 endif ()
 
+if (YACLIB_FIBER)
+  add_compile_definitions(YACLIB_FIBER)
+endif ()
+
 set(YACLIB_IDE ON)
 
 if (YACLIB_IDE)

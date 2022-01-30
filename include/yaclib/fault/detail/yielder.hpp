@@ -2,7 +2,7 @@
 
 // TODO(myannayx): define in cmake depending on system
 
-#include "yaclib/fault/thread.hpp"
+#include <yaclib/fault/thread.hpp>
 
 #include <atomic>
 #include <random>

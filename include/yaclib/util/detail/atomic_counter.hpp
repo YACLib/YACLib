@@ -1,8 +1,8 @@
 #pragma once
 
 #include <yaclib/config.hpp>
-#include <yaclib/fault/atomic.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <utility>
 
@@ -32,7 +32,7 @@ struct AtomicCounter final : CounterBase {
     // Thread Sanitizer have false positive error with std::atomic_thread_fence
     // https://www.boost.org/doc/libs/1_76_0/doc/html/atomic/usage_examples.html#boost_atomic.usage_examples.example_reference_counters
     if (count.fetch_sub(1, std::memory_order_release) == 1) {
-      yaclib_std::atomic_thread_fence(std::memory_order_acquire);
+      std::atomic_thread_fence(std::memory_order_acquire);
 #endif
       Deleter::Delete(this);
     }
@@ -46,7 +46,7 @@ struct AtomicCounter final : CounterBase {
     return count.fetch_sub(n, std::memory_order_acq_rel) == n;
   }
 
-  yaclib_std::atomic_size_t count;
+  std::atomic_size_t count;
 };
 
 }  // namespace yaclib::detail

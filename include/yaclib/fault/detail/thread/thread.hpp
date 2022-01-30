@@ -1,6 +1,8 @@
 #pragma once
 
+#include <yaclib/fiber/coroutine.hpp>
 #include <yaclib/log_config.hpp>
+#include <yaclib/util/func.hpp>
 
 #include <functional>
 #include <thread>
@@ -18,7 +20,16 @@ class Thread {
   Thread() noexcept;
 
   template <class Fp, class... Args>
-  inline explicit Thread(Fp&& f, Args&&... args) : _impl(std::forward<Fp>(f), std::move(args)...) {
+  inline explicit Thread(Fp&& f, Args&&... args)
+      : _impl([&]() {
+          yaclib::IFuncPtr func = yaclib::MakeFunc([&] {
+            f(std::move(args)...);
+          });
+          yaclib::Coroutine coroutine{func};
+          while (!coroutine.IsCompleted()) {
+            coroutine();
+          }
+        }) {
   }
 
   Thread(Thread&& t) noexcept;

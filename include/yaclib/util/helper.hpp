@@ -1,7 +1,6 @@
 #pragma once
 
 #include <yaclib/config.hpp>
-#include <yaclib/fault/atomic.hpp>
 #include <yaclib/util/detail/atomic_counter.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 

@@ -14,7 +14,11 @@ Yielder::Yielder() : _eng(1142), _count(0) {
 
 void Yielder::MaybeYield() {
   if (ShouldYield()) {
+#ifdef YACLIB_FIBER
+    // yaclib_std::this_thread::yield();
+#else
     yaclib_std::this_thread::sleep_for(std::chrono::nanoseconds(RandNumber(sleep_time)));
+#endif
   }
 }
 

@@ -5,22 +5,16 @@
 
 #include <gtest/gtest.h>
 
-template <typename Func>
-auto MakeMyFunc(Func&& f) {
-  return yaclib::util::NothingCounter<yaclib::util::detail::CallImpl<yaclib::util::IFunc, std::decay_t<Func>>>{
-      std::forward<Func>(f)};
-}
-
 TEST(fiber, basic) {
   std::string test;
-  auto test_task = MakeMyFunc([&] {
+  auto test_task = yaclib::MakeFunc([&] {
     for (int i = 0; i < 10; i++) {
       int k = i * 8;
       test.append(std::to_string(k));
       yaclib::Coroutine::Yield();
     }
   });
-  yaclib::Coroutine coroutine{&test_task};
+  yaclib::Coroutine coroutine{test_task};
   while (!coroutine.IsCompleted()) {
     test.append("!");
     coroutine.Resume();
@@ -30,19 +24,19 @@ TEST(fiber, basic) {
 
 TEST(fiber, basic2) {
   std::string test;
-  auto test_task1 = MakeMyFunc([&] {
+  auto test_task1 = yaclib::MakeFunc([&] {
     test.append("1");
     yaclib::Coroutine::Yield();
     test.append("3");
   });
 
-  auto test_task2 = MakeMyFunc([&] {
+  auto test_task2 = yaclib::MakeFunc([&] {
     test.append("2");
     yaclib::Coroutine::Yield();
     test.append("4");
   });
-  yaclib::Coroutine coroutine1{&test_task1};
-  yaclib::Coroutine coroutine2{&test_task2};
+  yaclib::Coroutine coroutine1{test_task1};
+  yaclib::Coroutine coroutine2{test_task2};
 
   coroutine1.Resume();
   coroutine2.Resume();
@@ -55,7 +49,7 @@ TEST(fiber, basic2) {
 
 TEST(fiber, basic3) {
   std::string test;
-  auto test_task = MakeMyFunc([&test]() {
+  auto test_task = yaclib::MakeFunc([&test]() {
     test.append("1");
     yaclib::Coroutine::Yield();
     test.append("2");
@@ -65,7 +59,7 @@ TEST(fiber, basic3) {
     test.append("4");
   });
 
-  yaclib::Coroutine coroutine{&test_task};
+  yaclib::Coroutine coroutine{test_task};
 
   for (size_t i = 0; i < 4; ++i) {
     std::thread t([&] {
@@ -79,12 +73,12 @@ TEST(fiber, basic3) {
 }
 
 static int TestFunctionWith2Args(const int* rsi, const int* rdi) {
-  auto test_task = MakeMyFunc([&] {
+  auto test_task = yaclib::MakeFunc([&] {
     for (int i = 0; i < 10; i++) {
       yaclib::Coroutine::Yield();
     }
   });
-  yaclib::Coroutine coroutine{&test_task};
+  yaclib::Coroutine coroutine{test_task};
 
   int iter_count = 0;
   while (!coroutine.IsCompleted()) {
@@ -100,12 +94,12 @@ TEST(fiber, basic4) {
   int rdi = 2;
   int sum = TestFunctionWith2Args(&rsi, &rdi);
 
-  auto test_task = MakeMyFunc([&] {
+  auto test_task = yaclib::MakeFunc([&] {
     for (int i = 0; i < 10; i++) {
       yaclib::Coroutine::Yield();
     }
   });
-  yaclib::Coroutine coroutine{&test_task};
+  yaclib::Coroutine coroutine{test_task};
 
   int iter_count = 0;
   while (!coroutine.IsCompleted()) {

@@ -8,7 +8,7 @@
 
 namespace yaclib {
 
-using Routine = yaclib::util::IFuncPtr;
+using Routine = yaclib::IFuncPtr;
 
 /**
  * Base coroutine class
