@@ -4,10 +4,6 @@ macro(add_files)
   set(YACLIB_SOURCES ${YACLIB_SOURCES} PARENT_SCOPE)
 endmacro()
 
-# yaclib library
-add_compile_options(${YACLIB_COMPILE_OPTIONS})
-add_link_options(${YACLIB_LINK_OPTIONS})
-
 configure_file(config.hpp.in ${YACLIB_BINARY_DIR}/include/yaclib/config.hpp)
 
 set(YACLIB_INCLUDE_DIR ${YACLIB_SOURCE_DIR}/include/yaclib)
@@ -26,20 +22,18 @@ add_subdirectory(executor)
 add_subdirectory(util)
 add_subdirectory(fault)
 
-add_library(
-  ${PROJECT_NAME} STATIC
-  ${YACLIB_SOURCES}
-)
-target_sources(
-  ${PROJECT_NAME}
+add_library(${PROJECT_NAME} STATIC ${YACLIB_SOURCES})
+
+target_sources(${PROJECT_NAME}
   PUBLIC ${YACLIB_INCLUDES}
   PRIVATE ${YACLIB_HEADERS}
-)
+  )
+
+target_compile_options(${PROJECT_NAME} PRIVATE ${YACLIB_COMPILE_OPTIONS})
+target_compile_definitions(${PROJECT_NAME} PRIVATE ${YACLIB_DEFINITIONS})
 
 find_package(Threads REQUIRED)
-target_link_libraries(${PROJECT_NAME}
-  PUBLIC Threads::Threads
-  )
+target_link_libraries(${PROJECT_NAME} PUBLIC Threads::Threads)
 
 target_include_directories(${PROJECT_NAME}
   PUBLIC ${YACLIB_SOURCE_DIR}/include

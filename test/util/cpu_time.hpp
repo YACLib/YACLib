@@ -14,17 +14,17 @@ class ProcessCPUTimer {
     Reset();
   }
 
-  std::chrono::microseconds Elapsed() const {
+  [[nodiscard]] std::chrono::microseconds Elapsed() const {
     return std::chrono::microseconds(ElapsedMicros());
   }
 
   void Reset() {
-    start_ts_ = std::clock();
+    _start_ts = std::clock();
   }
 
  private:
-  size_t ElapsedMicros() const {
-    const size_t clocks = std::clock() - start_ts_;
+  [[nodiscard]] size_t ElapsedMicros() const {
+    const auto clocks = static_cast<size_t>(std::clock() - _start_ts);
     return ClocksToMicros(clocks);
   }
 
@@ -32,8 +32,7 @@ class ProcessCPUTimer {
     return (clocks * 1'000'000) / CLOCKS_PER_SEC;
   }
 
- private:
-  std::clock_t start_ts_;
+  std::clock_t _start_ts{};
 };
 
 class ThreadCPUTimer {
@@ -42,28 +41,27 @@ class ThreadCPUTimer {
     Reset();
   }
 
-  std::chrono::nanoseconds Elapsed() const {
+  [[nodiscard]] std::chrono::nanoseconds Elapsed() const {
     return std::chrono::nanoseconds(ElapsedNanos());
   }
 
   void Reset() {
-    clock_gettime(CLOCK_THREAD_CPUTIME_ID, &start_);
+    clock_gettime(CLOCK_THREAD_CPUTIME_ID, &_start);
   }
 
  private:
-  uint64_t ElapsedNanos() const {
-    struct timespec now;
+  [[nodiscard]] uint64_t ElapsedNanos() const {
+    timespec now{};
     clock_gettime(CLOCK_THREAD_CPUTIME_ID, &now);
 
-    return ToNanos(now) - ToNanos(start_);
+    return ToNanos(now) - ToNanos(_start);
   }
 
-  static uint64_t ToNanos(const struct timespec& tp) {
-    return tp.tv_sec * 1'000'000'000 + tp.tv_nsec;
+  static uint64_t ToNanos(const timespec& tp) {
+    return static_cast<uint64_t>(tp.tv_sec * 1'000'000'000 + tp.tv_nsec);
   }
 
- private:
-  struct timespec start_;
+  timespec _start{};
 };
 #endif  // linux
 

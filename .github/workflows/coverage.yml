@@ -2,19 +2,18 @@ name: Coverage
 
 on:
   push:
-    branches:
-      - main
-    paths-ignore:
-      - 'doc/**'
-      - '**.md'
+    branches: [ main ]
+    paths-ignore: [ 'doc/**', '**.md' ]
   pull_request:
-    branches:
-      - main
-    paths-ignore:
-      - 'doc/**'
-      - '**.md'
+    branches: [ main ]
+    types: [ assigned ]
+    paths-ignore: [ 'doc/**', '**.md' ]
+  schedule:
+    - cron: '0 * * * *'
 
 jobs:
+  # TODO(MBkkt) Use gcc-11, now doesn't work in CI, only locally.
+
   main:
     runs-on: ubuntu-20.04
 
@@ -25,21 +24,21 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get upgrade
-          sudo apt-get install pip ninja-build gcc-10 g++-10 lcov
+          sudo apt-get install pip ninja-build lld gcc-10 g++-10 lcov
+          sudo ln -sf /usr/local/bin/ld /usr/bin/lld
           sudo pip install -U gcovr
 
       - name: Configure CMake
-        run:
-          cmake -S . -B build
-          -GNinja
-          -DCMAKE_BUILD_TYPE=Debug
-          -DCMAKE_C_COMPILER=gcc-10
-          -DCMAKE_CXX_COMPILER=g++-10
-          -DYACLIB_BUILD_TESTING=ON
-          -DYACLIB_BUILD_EXAMPLES=ON
-          -DYACLIB_COVERAGE=ON
-          -DYACLIB_CXX_STANDARD=20
-          -DYACLIB_DEFINITIONS=/DNDEBUG
+        run: |
+          cmake -S . -B build           \
+            -G "Ninja"                  \
+            -DCMAKE_BUILD_TYPE=Debug    \
+            -DCMAKE_C_COMPILER=gcc-10   \
+            -DCMAKE_CXX_COMPILER=g++-10 \
+            -DYACLIB_BUILD_TESTING=ON   \
+            -DYACLIB_BUILD_EXAMPLES=ON  \
+            -DYACLIB_COVERAGE=ON        \
+            -DYACLIB_CXX_STANDARD=20    \
 
       - name: Build
         run:
@@ -54,10 +53,10 @@ jobs:
         run: |
           cd build
           lcov --rc lcov_branch_coverage=1 -d . -c                       -o lcov_cond.info
-          lcov --rc lcov_branch_coverage=1 -r lcov_cond.info '/usr/*'    -o lcov_cond.info
-          lcov --rc lcov_branch_coverage=1 -r lcov_cond.info '*/_deps/*' -o lcov_cond.info
-          lcov --rc lcov_branch_coverage=1 -r lcov_cond.info '*/fault/*' -o lcov_cond.info
-          lcov --rc lcov_branch_coverage=1 -r lcov_cond.info '*/test/*'  -o lcov_cond.info
+          lcov --rc lcov_branch_coverage=1 -r lcov_cond.info "/usr/*"    -o lcov_cond.info
+          lcov --rc lcov_branch_coverage=1 -r lcov_cond.info "*/_deps/*" -o lcov_cond.info
+          lcov --rc lcov_branch_coverage=1 -r lcov_cond.info "*/fault/*" -o lcov_cond.info
+          lcov --rc lcov_branch_coverage=1 -r lcov_cond.info "*/test/*"  -o lcov_cond.info
           lcov                             -r lcov_cond.info             -o lcov.info
           lcov --rc lcov_branch_coverage=1 --list lcov_cond.info
 

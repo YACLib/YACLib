@@ -2,19 +2,22 @@ name: Format
 
 on:
   push:
-    branches:
-      - main
-    paths-ignore:
-      - 'doc/**'
-      - '**.md'
+    branches: [ main ]
+    paths-ignore: [ 'doc/**', '**.md' ]
   pull_request:
-    branches:
-      - main
-    paths-ignore:
-      - 'doc/**'
-      - '**.md'
+    branches: [ main ]
+    types: [ assigned ]
+    paths-ignore: [ 'doc/**', '**.md' ]
+  schedule:
+    - cron: '0 * * * *'
 
 jobs:
+  # TODO(MBkkt) clang-format 14, now this extension doesn't work, because clang-14 not really released yet
+  # TODO(MBkkt) Use our own script instead of github action, same as in /.githooks
+  # TODO(MBkkt) Check cmake format?
+  # TODO(MBkkt) Check markdown format?
+  # TODO(MBkkt) Add option or workflow for reformat
+
   main:
     runs-on: ubuntu-20.04
     strategy:

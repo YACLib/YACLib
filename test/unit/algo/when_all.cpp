@@ -220,7 +220,7 @@ void MultiThreaded() {
     auto result = std::move(ints).Ok();
     std::sort(result.begin(), result.end());
     EXPECT_EQ(result.size(), kValues);
-    for (int i = 0; i < (int)kValues; ++i) {
+    for (int i = 0; i < kValues; ++i) {
       EXPECT_EQ(result[i], i);
     }
   }

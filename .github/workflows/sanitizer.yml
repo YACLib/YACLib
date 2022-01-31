@@ -2,48 +2,49 @@ name: Sanitizer
 
 on:
   push:
-    branches:
-      - main
-    paths-ignore:
-      - 'doc/**'
-      - '**.md'
+    branches: [ main ]
+    paths-ignore: [ 'doc/**', '**.md' ]
   pull_request:
-    branches:
-      - main
-    paths-ignore:
-      - 'doc/**'
-      - '**.md'
+    branches: [ main ]
+    types: [ assigned ]
+    paths-ignore: [ 'doc/**', '**.md' ]
   schedule:
     - cron: '0 * * * *'
 
 jobs:
-  main:
+  # TODO(MBkkt) Add MEMSAN?
+  # TODO(MBkkt) Add windows ASAN and ...?
+  # TODO(MBkkt) Add some macOS sanitizers?
+  # TODO(MBkkt) Maybe better merge undefined, address, leak?
+  # TODO(MBkkt) Other not google sanitizers?
+
+  linux:
     runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
       matrix:
-        sanitizers: [ UBSAN, ASAN, TSAN ]
-        compilers: [ "gcc-11 g++-11",
-                     "clang-14 clang++-14" ]
+        sanitizers: [ ASAN, UBSAN, LSAN, TSAN ]
+        compilers: [ 'gcc-11 g++-11',
+                     'clang-14 clang++-14' ]
     env:
-      BUILD_TYPES: "Debug RelWithDebInfo"
-      # TODO Add windows ASAN, UBSAN and some macos and MEMSAN
+      BUILD_TYPES: 'Debug RelWithDebInfo'
 
     steps:
       - uses: actions/checkout@v2
 
-      - name: Update dependencies
+      - name: Update deps
         run: |
           sudo apt-get update
           sudo apt-get upgrade
-          sudo apt-get install ninja-build
+          sudo apt-get install ninja-build lld
+          sudo ln -sf /usr/local/bin/ld /usr/bin/lld
 
-      - name: Install dependencies gcc
+      - name: Install gcc
         if: ${{ matrix.compilers == 'gcc-11 g++-11' }}
         run: |
           sudo apt-get install ${{ matrix.compilers }}
 
-      - name: Install dependencies clang
+      - name: Install clang
         if: ${{ matrix.compilers != 'gcc-11 g++-11' }}
         run: |
           wget https://apt.llvm.org/llvm.sh
@@ -54,51 +55,39 @@ jobs:
       - name: Configure CMake
         run: |
           cmake --version
-          sanitizer=${{ matrix.sanitizer }}
           compilers=(${{ matrix.compilers }})
           for build_type in ${BUILD_TYPES[*]}; do
-            for (( i=0; i<${#compilers[*]}; i+=2 )); do
-              dir="build_${sanitizer}_${build_type}_${compilers[$i]}"
-              echo $dir
-              cmake -S . -B $dir                          \
-                -GNinja                                   \
-                -DCMAKE_BUILD_TYPE=${build_type}          \
-                -DCMAKE_C_COMPILER=${compilers[$i]}       \
-                -DCMAKE_CXX_COMPILER=${compilers[$i + 1]} \
-                -DYACLIB_BUILD_TESTING=ON                 \
-                -DYACLIB_BUILD_EXAMPLES=ON                \
-                -DYACLIB_SANITIZER=${sanitizer}           \
-                -DYACLIB_CXX_STANDARD=23
-              echo
-            done
+            dir="build_${build_type}"; echo $dir
+            cmake -S . -B $dir                           \
+              -G "Ninja"                                 \
+              -DCMAKE_BUILD_TYPE=${build_type}           \
+              -DCMAKE_C_COMPILER=${compilers[0]}         \
+              -DCMAKE_CXX_COMPILER=${compilers[1]}       \
+              -DYACLIB_BUILD_TESTING=ON                  \
+              -DYACLIB_BUILD_EXAMPLES=ON                 \
+              -DYACLIB_SANITIZER=${{ matrix.sanitizer }} \
+              -DYACLIB_WARNING=ON                        \
+              -DYACLIB_CXX_STANDARD=23
+            echo
           done
 
       - name: Build
         run: |
-          sanitizer=${{ matrix.sanitizer }}
-          compilers=(${{ matrix.compilers }})
           for build_type in ${BUILD_TYPES[*]}; do
-            for (( i=0; i<${#compilers[*]}; i+=2 )); do
-              dir="build_${sanitizer}_${build_type}_${compilers[$i]}"
-              echo $dir
-              ninja -C $dir
-              echo
-            done
+            dir="build_${build_type}"; echo $dir
+            ninja -C $dir
+            echo
           done
 
       - name: Test
         run: |
-          sanitizer=${{ matrix.sanitizer }}
-          compilers=(${{ matrix.compilers }})
-          export ASAN_OPTIONS=help=0:verbosity=0:halt_on_error=0:check_initialization_order=1:detect_stack_use_after_return=1:strict_init_order=1:strict_string_checks=1:debug=1
-          export TSAN_OPTIONS=help=0:verbosity=0
+          default="help=0 verbosity=2 halt_on_error=0"
+          export  ASAN_OPTIONS="$default debug=1 detect_leaks=0 check_initialization_order=1 detect_stack_use_after_return=1 strict_init_order=1 strict_string_checks=1 detect_invalid_pointer_pairs=2"
+          export UBSAN_OPTIONS="$default print_stacktrace=1"
+          export  LSAN_OPTIONS="$default debug=1 detect_leaks=1"
+          export  TSAN_OPTIONS="$default history_size=0 io_sync=0 detect_deadlocks=1 second_deadlock_stack=1"
           for build_type in ${BUILD_TYPES[*]}; do
-            for (( i=0; i<${#compilers[*]}; i+=2 )); do
-              dir="build_${sanitizer}_${build_type}_${compilers[$i]}"
-              echo $dir
-              cd $dir
-                ctest --output-on-failure -C ${build_type} -VV
-              cd ..
-              echo
-            done
+            dir="build_${build_type}"; echo $dir; cd $dir
+            ctest --output-on-failure -C ${build_type} -VV
+            cd ..; echo
           done
