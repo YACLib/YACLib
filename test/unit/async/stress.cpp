@@ -16,12 +16,20 @@ struct StressTest : testing::Test {
   struct Value {
     inline static yaclib_std::atomic_uint32_t created{0};
     inline static yaclib_std::atomic_uint32_t destroyed{0};
+
+    Value(const Value&) noexcept = default;
+    Value(Value&&) noexcept = default;
+    Value& operator=(Value&&) noexcept = default;
+    Value& operator=(const Value&) noexcept = default;
+
     explicit Value(uint32_t value) noexcept : v{value} {
       created.fetch_add(1, std::memory_order_relaxed);
     }
+
     ~Value() {
       destroyed.fetch_add(1, std::memory_order_relaxed);
     }
+
     uint32_t v;
   };
 

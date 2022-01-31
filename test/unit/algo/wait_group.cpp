@@ -9,6 +9,8 @@
 
 #include <gtest/gtest.h>
 
+namespace {
+
 using namespace yaclib;
 using namespace std::chrono_literals;
 
@@ -210,10 +212,10 @@ TYPED_TEST(WaitGroupT, CallbackWorksVoid) {
 void TestMultithreaded() {
   constexpr int kThreads = 4;
   auto tp = MakeThreadPool(kThreads);
-  Future<int> f[kThreads];
+  Future<int> fs[kThreads];
 
   for (int i = 0; i < kThreads; ++i) {
-    f[i] = Run(tp, [i] {
+    fs[i] = Run(tp, [i] {
       yaclib_std::this_thread::sleep_for(50ms * YACLIB_CI_SLOWDOWN);
       return i;
     });
@@ -222,18 +224,18 @@ void TestMultithreaded() {
   test::util::StopWatch timer;
   WaitGroup wg;
 
-  for (int i = 0; i < kThreads; ++i) {
-    wg.Add(f[i]);
+  for (auto& f : fs) {
+    wg.Add(f);
   }
   wg.Wait();
 
   EXPECT_LE(timer.Elapsed(), 100ms * YACLIB_CI_SLOWDOWN);
-  EXPECT_TRUE(std::all_of(std::begin(f), std::end(f), [](auto& f) {
+  EXPECT_TRUE(std::all_of(std::begin(fs), std::end(fs), [](auto& f) {
     return f.Ready();
   }));
 
   for (int i = 0; i < kThreads; ++i) {
-    EXPECT_EQ(std::move(f[i]).Get().Value(), i);
+    EXPECT_EQ(std::move(fs[i]).Get().Value(), i);
   }
   tp->Stop();
   tp->Wait();
@@ -247,3 +249,5 @@ TEST(WaitGroup, Empty) {
   yaclib::WaitGroup wg;
   wg.Wait();
 }
+
+}  // namespace

@@ -9,15 +9,18 @@ https://raw.githubusercontent.com/YACLib/YACLib/main/LICENSE)
 https://app.fossa.com/api/projects/git%2Bgithub.com%2FYACLib%2FYACLib.svg?type=shield)](
 https://app.fossa.com/projects/git%2Bgithub.com%2FYACLib%2FYACLib)
 
-[![Test](
-https://github.com/YACLib/YACLib/actions/workflows/test.yml/badge.svg?branch=main)](
-https://github.com/YACLib/YACLib/actions/workflows/test.yml)
-[![Test with Google sanitizer](
-https://github.com/YACLib/YACLib/actions/workflows/google_sanitizer.yml/badge.svg?branch=main)](
-https://github.com/YACLib/YACLib/actions/workflows/google_sanitizer.yml)
-[![Check code format](
-https://github.com/YACLib/YACLib/actions/workflows/code_format.yml/badge.svg?branch=main)](
-https://github.com/YACLib/YACLib/actions/workflows/code_format.yml)
+[![Linux](
+https://github.com/YACLib/YACLib/actions/workflows/linux.yml/badge.svg?branch=main)](
+https://github.com/YACLib/YACLib/actions/workflows/linux.yml)
+[![macOS](
+https://github.com/YACLib/YACLib/actions/workflows/macos.yml/badge.svg?branch=main)](
+https://github.com/YACLib/YACLib/actions/workflows/macos.yml)
+[![Windows](
+https://github.com/YACLib/YACLib/actions/workflows/windows.yml/badge.svg?branch=main)](
+https://github.com/YACLib/YACLib/actions/workflows/windows.yml)
+[![Sanitizers](
+https://github.com/YACLib/YACLib/actions/workflows/sanitizer.yml/badge.svg?branch=main)](
+https://github.com/YACLib/YACLib/actions/workflows/sanitizer.yml)
 
 [![Test coverage](
 https://codecov.io/gh/YACLib/YACLib/branch/main/graph/badge.svg)](
@@ -46,9 +49,6 @@ https://discord.gg/xy2fDKj8VZ)
     * [Error recovering](#error-recovering)
     * [Using Result for smart recovering](#use-result-for-smart-recovering)
 * [Requirements](#requirements)
-    * [Operating systems](#operating-systems)
-    * [Compilers](#compilers)
-    * [Build systems](#build-systems)
 * [Releases](#releases)
 * [Contributing](#contributing)
 * [Contacts](#contacts)
@@ -319,12 +319,12 @@ We test following configurations:
 
 👌 - manually tested
 
-OS\Compiler | Linux | Windows | macOS | Android
------------ | :---: | :-----: | :---: | :-----:
-GCC 7.0+    | ✅    |         |       | 👌
-Clang 5.0+  | ✅    |         |       | 👌
-AppleClang  | —     | —       | ✅    | —
-MSVC        | —     | ✅      | —     | —
+| OS\Compiler | Linux | Windows   | macOS | Android |
+|-------------|-------|-----------|-------|---------|
+| GCC         | ✅ 7+  | ✅ MinGW   | ✅ 9+  | 👌      |
+| Clang       | ✅ 7+  | ✅ ClangCL |       | 👌      |
+| AppleClang  | —     | —         | ✅ 12+ | —       |
+| MSVC        | —     | ✅ 14.20+  | —     | —       |
 
 ## Releases
 

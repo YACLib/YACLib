@@ -17,33 +17,73 @@ on:
     - cron: '0 * * * *'
 
 jobs:
+  # TODO(MBkkt) Add windows-2016?
+  # TODO(MBkkt) Add Cygwin?
+
   main:
-    runs-on: ${{ matrix.os }}
+    runs-on: 'windows-${{ matrix.os }}'
     strategy:
       fail-fast: false
       matrix:
-        os: [ windows-2019, windows-2022 ]
+        arch: [ Win32, x64 ]
+        os: [ 2019, 2022 ]
         build_type: [ Debug, RelWithDebInfo ]
-      # TODO(MBkkt) Add windows-2016
 
     steps:
       - uses: actions/checkout@v2
 
+      - name: Set up MinGW x86
+        if: ${{ matrix.arch != 'x64' }}
+        uses: egor-tensin/setup-mingw@v2
+        with:
+          platform: x86
+
+      - name: Set up MinGW x64
+        if: ${{ matrix.arch == 'x64' }}
+        uses: egor-tensin/setup-mingw@v2
+        with:
+          platform: x64
+
       - name: Configure CMake
-        run:
-          cmake -S . -B build
-          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-          -DCMAKE_C_COMPILER=cl
-          -DCMAKE_CXX_COMPILER=cl
-          -DYACLIB_BUILD_TESTING=ON
-          -DYACLIB_BUILD_EXAMPLES=ON
-          -DYACLIB_CXX_STANDARD=17
+        shell: bash
+        run: |
+          cmake --version
+          names=("ClangCL" "MinGW" "MSVC")
+          if [[ "${{ matrix.os }}" == "2022" ]]; then
+            msvc="17 2022"
+          else
+            msvc="16 2019"
+          fi
+          generators=("Visual Studio $msvc" "MinGW Makefiles" "Visual Studio $msvc")
+          options=("-A ${{ matrix.arch }} -T ClangCL" "" "-A ${{ matrix.arch }}")
+          for (( i=0; i<${#names[*]}; i+=1 )); do
+            dir="build_${names[$i]}"; echo $dir
+            cmake -S . -B $dir                            \
+              -G "${generators[$i]}"                      \
+              ${options[$i]}                              \
+              -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+              -DYACLIB_BUILD_TESTING=ON                   \
+              -DYACLIB_BUILD_EXAMPLES=ON                  \
+              -DYACLIB_CXX_STANDARD=17
+            echo
+          done
 
       - name: Build
-        run:
-          cmake --build build --config ${{ matrix.build_type }}
+        shell: bash
+        run: |
+          names=("ClangCL" "MinGW" "MSVC")
+          for (( i=0; i<${#names[*]}; i+=1 )); do
+            dir="build_${names[$i]}"; echo $dir
+            cmake --build $dir --config ${{ matrix.build_type }} --parallel 4
+            echo
+          done
 
       - name: Test
+        shell: bash
         run: |
-          cd build
-          ctest --output-on-failure -C ${{ matrix.build_type }} -VV
+          names=("ClangCL" "MinGW" "MSVC")
+          for (( i=0; i<${#names[*]}; i+=1 )); do
+            dir="build_${names[$i]}"; echo $dir; cd $dir
+            ctest --output-on-failure -C ${{ matrix.build_type }} -VV;
+            cd ..; echo
+          done

@@ -9,7 +9,7 @@ namespace yaclib {
  *
  * \tparam It type of passed iterator
  * \tparam T type of all passed futures
- * \param begin, size the range of futures to combine
+ * \param begin , size the range of futures to combine
  * \return Future<std::vector<T>>
  */
 template <WhenPolicy P = WhenPolicy::FirstFail, typename It,
@@ -29,8 +29,7 @@ auto WhenAll(It begin, size_t size) {
  * Create \ref Future which will be ready when all futures are ready
  *
  * \tparam It type of passed iterator
- * \tparam T type of all passed futures
- * \param begin, end the range of futures to combine
+ * \param begin , end the range of futures to combine
  * \return Future<std::vector<T>>
  */
 template <WhenPolicy P = WhenPolicy::FirstFail, typename It>
@@ -45,7 +44,7 @@ auto WhenAll(It begin, It end) {
  * Create \ref Future which will be ready when all futures are ready
  *
  * \tparam T type of all passed futures
- * \param head, tail one or more futures to combine
+ * \param head , tail one or more futures to combine
  * \return Future<std::array<T>>
  */
 template <WhenPolicy P = WhenPolicy::FirstFail, typename T, typename... Ts>

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.11) # TODO(MBkkt) We can support older version here
+cmake_minimum_required(VERSION 3.3)
 
 project(yaclib
   LANGUAGES CXX
@@ -34,48 +34,84 @@ set(CMAKE_C_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-if (MSVC)
-  list(APPEND YACLIB_COMPILE_OPTIONS /W3)
-  #TODO(MBkkt) We have to use /Wall. But MSVC is dumb and uses this flag for external projects, like gtest.
-  if (YACLIB_SANITIZER)
-    message("Sanitizer's work only on Linux")
-  endif ()
-else ()
-  list(APPEND YACLIB_COMPILE_OPTIONS -Wall -Wextra -pedantic)
-  if (YACLIB_SANITIZER STREQUAL ASAN)
-    set(SANITIZER_ENABLE_OPTION -fsanitize=address)
-    set(SANITIZER_COMPILE_OPTIONS
-      # -fsanitize-address-use-after-return=runtime
-      -fsanitize-recover=address
-      -fsanitize-address-use-after-scope
-      )
-  elseif (YACLIB_SANITIZER STREQUAL TSAN)
-    set(SANITIZER_ENABLE_OPTION -fsanitize=thread)
-    set(SANITIZER_COMPILE_OPTIONS
-      -gcolumn-info
-      )
-  elseif (YACLIB_SANITIZER STREQUAL UBSAN)
-    set(SANITIZER_ENABLE_OPTION -fsanitize=undefined)
-  elseif (YACLIB_SANITIZER STREQUAL MEMSAN) # Memory Santizer doesn't work with GTest (https://github.com/google/sanitizers/issues/648)
-    set(SANITIZER_ENABLE_OPTION -fsanitize=memory)
-  endif ()
-  list(APPEND YACLIB_COMPILE_OPTIONS
-    ${SANITIZER_ENABLE_OPTION}
-    ${SANITIZER_COMPILE_OPTIONS}
-    )
-  list(APPEND YACLIB_LINK_OPTIONS ${SANITIZER_ENABLE_OPTION})
-  if (YACLIB_COVERAGE)
+if (YACLIB_WARNING)
+  if (MSVC)
+    #TODO(MBkkt) We have to use /Wall. But MSVC is dumb and uses this flag for external projects, like gtest.
     list(APPEND YACLIB_COMPILE_OPTIONS
-      --coverage
+      /W3
       )
-    list(APPEND YACLIB_LINK_OPTIONS
-      --coverage
+  elseif (CMAKE_CXX_COMPILER_ID STREQUAL Clang)
+    list(APPEND YACLIB_COMPILE_OPTIONS
+      -Weverything
+      -Wno-c++98-compat
+      -Wno-c++98-compat-pedantic
+      -Wno-ctad-maybe-unsupported
+      -Wno-padded
+      -Wno-exit-time-destructors
+      -Wno-undefined-func-template # Needed for some hacks that speed up compilation
+      -Wno-global-constructors   # TODO(MBkkt) Maybe fix it: Needed only for tests?
+      -Wno-weak-template-vtables # TODO(MBkkt) Maybe fix it
+      -Wno-switch-enum           # TODO(MBkkt) Maybe fix it
+      -Wno-sign-conversion       # TODO(MBkkt) Maybe fix it
+      -Wno-weak-vtables                       # TODO(MBkkt) Fix it
+      -Wno-gnu-zero-variadic-macro-arguments  # TODO(MBkkt) Fix it
+      -Wno-covered-switch-default  # TODO(MBkkt) Fix it: test/unit/algo/when_any.cpp
+      -Wno-shadow-uncaptured-local # TODO(MBkkt) Fix it: test/unit/algo/when_any.cpp
+      )
+  else ()
+    list(APPEND YACLIB_COMPILE_OPTIONS
+      -Wall
+      -Wextra
+      -pedantic
       )
   endif ()
 endif ()
+
+if (YACLIB_SANITIZER STREQUAL ASAN)
+  list(APPEND YACLIB_LINK_OPTIONS -fsanitize=address)
+  list(APPEND YACLIB_COMPILE_OPTIONS
+    -fsanitize=address,pointer-compare,pointer-subtract
+    -fsanitize-address-use-after-scope
+    -fno-common
+    -mllvm -asan-use-private-alias=1
+    )
+elseif (YACLIB_SANITIZER STREQUAL TSAN)
+  list(APPEND YACLIB_LINK_OPTIONS -fsanitize=thread)
+  list(APPEND YACLIB_COMPILE_OPTIONS
+    -fsanitize=thread
+    # -gcolumn-info
+    )
+elseif (YACLIB_SANITIZER STREQUAL UBSAN)
+  list(APPEND YACLIB_LINK_OPTIONS -fsanitize=undefined)
+  list(APPEND YACLIB_COMPILE_OPTIONS
+    -fsanitize=undefined,float-divide-by-zero,implicit-conversion,local-bounds
+    )
+elseif (YACLIB_SANITIZER STREQUAL LSAN)
+  list(APPEND YACLIB_LINK_OPTIONS -fsanitize=leak)
+  list(APPEND YACLIB_COMPILE_OPTIONS -fsanitize=leak)
+elseif (YACLIB_SANITIZER STREQUAL MEMSAN)
+  # Memory Sanitizer doesn't work without compile stdlib with it
+  list(APPEND YACLIB_LINK_OPTIONS -fsanitize=memory)
+  list(APPEND YACLIB_COMPILE_OPTIONS -fsanitize=memory)
+endif ()
+if (YACLIB_SANITIZER) # Nicer stack trace
+  list(APPEND YACLIB_COMPILE_OPTIONS -fno-omit-frame-pointer -fsanitize-recover=all)
+endif ()
+
+if (YACLIB_COVERAGE)
+  list(APPEND YACLIB_COMPILE_OPTIONS
+    --coverage
+    )
+  list(APPEND YACLIB_LINK_OPTIONS
+    --coverage
+    )
+endif ()
+
+add_definitions(${YACLIB_DEFINITIONS})
+
 message("YACLIB_COMPILE_OPTIONS: ${YACLIB_COMPILE_OPTIONS}")
 message("YACLIB_LINK_OPTIONS   : ${YACLIB_LINK_OPTIONS}")
-add_definitions(${YACLIB_DEFINITIONS})
+message("YACLIB_DEFINITIONS    : ${YACLIB_DEFINITIONS}")
 
 # Create static library
 add_subdirectory(src)

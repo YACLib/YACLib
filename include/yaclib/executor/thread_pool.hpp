@@ -50,7 +50,7 @@ IThreadPool* CurrentThreadPool() noexcept;
  * Create new ThreadPool object
  *
  * \param threads the number of threads to create for this ThreadPool
- * \param f thread factory to use for thread creation. \see IThreadFactory
+ * \param tf thread factory to use for thread creation. \see IThreadFactory
  * \return intrusive pointer to the new ThreadPool
  */
 IThreadPoolPtr MakeThreadPool(size_t threads = std::thread::hardware_concurrency(),

@@ -18,7 +18,7 @@ class Core : public IRef {
     ++sInstances;
   }
 
-  ~Core() {
+  ~Core() override {
     --sInstances;
   }
 };
