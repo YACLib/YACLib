@@ -44,7 +44,7 @@ TEST(counter, simple) {
     strand->Execute([&counter] {
       ++counter;
     });
-  };
+  }
 
   tp->SoftStop();
   tp->Wait();
@@ -138,7 +138,7 @@ TEST(batching, simple) {
     strand->Execute([&completed] {
       ++completed;
     });
-  };
+  }
 
   tp->SoftStop();
   tp->Wait();

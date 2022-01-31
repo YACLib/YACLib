@@ -10,7 +10,7 @@ namespace yaclib {
  * \tparam P policy WhenAny errors
  * \tparam It type of passed iterator
  * \tparam T type of all passed futures
- * \param begin, size the range of futures to combine
+ * \param begin , size the range of futures to combine
  * \return Future<T>
  */
 template <WhenPolicy P = WhenPolicy::LastFail, typename It,
@@ -25,7 +25,7 @@ Future<T> WhenAny(It begin, size_t size) {
  * \tparam P policy WhenAny errors
  * \tparam It type of passed iterator
  * \tparam T type of all passed futures
- * \param begin, end the range of futures to combine
+ * \param begin , end the range of futures to combine
  * \return Future<T>
  */
 template <WhenPolicy P = WhenPolicy::LastFail, typename It,
@@ -39,7 +39,7 @@ Future<T> WhenAny(It begin, It end) {
  *
  * \tparam P policy WhenAny errors
  * \tparam T type of all passed futures
- * \param head, tail one or more futures to combine
+ * \param head , tail one or more futures to combine
  * \return Future<T>
  */
 template <WhenPolicy P = WhenPolicy::LastFail, typename T, typename... Ts>

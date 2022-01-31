@@ -57,7 +57,7 @@ class Future final {
   /**
    * Check that \ref Result that corresponds to this \ref Future is computed
    *
-   * \return false if the \Result of this \ref Future is not computed yet, otherwise true
+   * \return false if the \ref Result of this \ref Future is not computed yet, otherwise true
    */
   [[nodiscard]] bool Ready() const& noexcept;
 
@@ -137,7 +137,7 @@ class Future final {
    * \param f A continuation to be attached
    */
   template <typename Functor>
-  void Subscribe(Functor&& functor) &&;
+  void Subscribe(Functor&& f) &&;
 
   /**
    * Attach the final continuation functor to *this

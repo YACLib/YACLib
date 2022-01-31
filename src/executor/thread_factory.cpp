@@ -186,8 +186,8 @@ class HeavyThreadFactory : public ThreadFactory {
   explicit HeavyThreadFactory(size_t cache_threads) : _cache_threads{cache_threads} {
   }
 
-  ~HeavyThreadFactory() {
-    while (auto thread = _threads.PopFront()) {
+  ~HeavyThreadFactory() override {
+    while (auto* thread = _threads.PopFront()) {
       delete thread;
     }
   }

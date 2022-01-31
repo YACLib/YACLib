@@ -23,7 +23,7 @@ TEST(Example, WhenAny) {
 
   // Run sync computations in parallel
 
-  for (size_t i = 0; i < 5; ++i) {
+  for (int i = 0; i < 5; ++i) {
     futs.push_back(yaclib::Run(tp, [i]() -> int {
       return i;
     }));

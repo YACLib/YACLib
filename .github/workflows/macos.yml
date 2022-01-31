@@ -2,21 +2,19 @@ name: macOS
 
 on:
   push:
-    branches:
-      - main
-    paths-ignore:
-      - 'doc/**'
-      - '**.md'
+    branches: [ main ]
+    paths-ignore: [ 'doc/**', '**.md' ]
   pull_request:
-    branches:
-      - main
-    paths-ignore:
-      - 'doc/**'
-      - '**.md'
+    branches: [ main ]
+    types: [ assigned ]
+    paths-ignore: [ 'doc/**', '**.md' ]
   schedule:
     - cron: '0 * * * *'
 
 jobs:
+  # TODO(MBkkt) Add 20, 23 standard
+  # TODO(MBkkt) Add llvm clang?
+
   main:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -24,27 +22,43 @@ jobs:
       matrix:
         os: [ macos-10.15, macos-11 ]
         build_type: [ Debug, RelWithDebInfo ]
-        # TODO Add 20, 23 standard and llvm clang
+    env:
+      COMPILERS: 'clang clang++ gcc-9 g++-9 gcc-10 g++-10 gcc-11 g++-11'
 
     steps:
       - uses: actions/checkout@v2
 
       - name: Configure CMake
-        run:
-          cmake -S . -B build
-          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-          -DCMAKE_C_COMPILER=clang
-          -DCMAKE_CXX_COMPILER=clang++
-          -DYACLIB_BUILD_TESTING=ON
-          -DYACLIB_BUILD_EXAMPLES=ON
-          -DYACLIB_CXX_STANDARD=17
-          -DYACLIB_DEFINITIONS=/DYACLIB_CI_SLOWDOWN=10
+        run: |
+          cmake --version
+          compilers=($COMPILERS)
+          for (( i=0; i<${#compilers[*]}; i+=2 )); do
+            dir="build_${compilers[$i]}"; echo $dir
+            cmake -S . -B $dir                            \
+              -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+              -DCMAKE_C_COMPILER=${compilers[$i]}         \
+              -DCMAKE_CXX_COMPILER=${compilers[$i + 1]}   \
+              -DYACLIB_BUILD_TESTING=ON                   \
+              -DYACLIB_BUILD_EXAMPLES=ON                  \
+              -DYACLIB_CXX_STANDARD=17                    \
+              -DYACLIB_DEFINITIONS="YACLIB_CI_SLOWDOWN=10"
+            echo
+          done
 
       - name: Build
-        run:
-          cmake --build build --config ${{ matrix.build_type }}
+        run: |
+          compilers=($COMPILERS)
+          for (( i=0; i<${#compilers[*]}; i+=2 )); do
+            dir="build_${compilers[$i]}"; echo $dir
+            cmake --build $dir --config ${{ matrix.build_type }} --parallel 6
+            echo
+          done
 
       - name: Test
         run: |
-          cd build
-          ctest --output-on-failure -C ${{ matrix.build_type }} -VV
+          compilers=($COMPILERS)
+          for (( i=0; i<${#compilers[*]}; i+=2 )); do
+            dir="build_${compilers[$i]}"; echo $dir; cd $dir
+            ctest --output-on-failure -C ${{ matrix.build_type }} -VV
+            cd ..; echo
+          done

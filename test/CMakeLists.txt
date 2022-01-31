@@ -1,10 +1,7 @@
-if (YACLIB_SANITIZER STREQUAL MEMSAN)
-  add_compile_options(${YACLIB_COMPILE_OPTIONS})
-  add_link_options(${YACLIB_LINK_OPTIONS})
-else ()
-  find_package(GTest QUIET)
-  find_package(benchmark QUIET)
-endif ()
+cmake_minimum_required(VERSION 3.13)
+
+find_package(GTest QUIET)
+find_package(benchmark QUIET)
 
 if (NOT GTEST_FOUND OR NOT BENCHMARK_FOUND)
   include(FetchContent)
@@ -28,11 +25,6 @@ if (NOT GTEST_FOUND OR NOT BENCHMARK_FOUND)
     )
     FetchContent_MakeAvailable(benchmark)
   endif ()
-endif ()
-
-if (NOT YACLIB_SANITIZER STREQUAL MEMSAN)
-  add_compile_options(${YACLIB_COMPILE_OPTIONS})
-  add_link_options(${YACLIB_LINK_OPTIONS})
 endif ()
 
 set(TEST_UTIL_INCLUDES
@@ -74,6 +66,9 @@ set(YACLIB_TEST_SOURCES ${YACLIB_UNIT_SOURCES} ${YACLIB_EXAMPLE_SOURCES})
 foreach (TEST_SOURCE ${YACLIB_TEST_SOURCES})
   string(REPLACE "/" "_" TEST_NAME ${TEST_SOURCE})
   add_executable(${TEST_NAME} ${TEST_SOURCE}.cpp)
+  target_link_options(${TEST_NAME} PRIVATE ${YACLIB_LINK_OPTIONS})
+  target_compile_options(${TEST_NAME} PRIVATE ${YACLIB_COMPILE_OPTIONS})
+  target_compile_definitions(${TEST_NAME} PRIVATE ${YACLIB_DEFINITIONS})
   target_sources(${TEST_NAME}
     PRIVATE ${TEST_UTIL_INCLUDES}
     )

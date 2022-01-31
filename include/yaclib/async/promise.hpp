@@ -47,7 +47,7 @@ class Promise final {
    * Set \ref Promise result
    *
    * \tparam Type \ref Result<T> should be constructable from this type
-   * @param value
+   * \param value value
    */
   template <typename Type>
   void Set(Type&& value) &&;
@@ -83,7 +83,7 @@ struct Contract {
 /**
  * Creates related future and promise
  *
- * \return \see Contract object with new future and promise
+ * \return a \see Contract object with new future and promise
  */
 template <typename T>
 [[nodiscard]] Contract<T> MakeContract();
