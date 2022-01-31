@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.11) # TODO(MBkkt) We can support older version here
+cmake_minimum_required(VERSION 3.3)
 
 project(yaclib
   LANGUAGES CXX
@@ -34,53 +34,16 @@ set(CMAKE_C_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-if (MSVC)
-  list(APPEND YACLIB_COMPILE_OPTIONS /W3)
-  #TODO(MBkkt) We have to use /Wall. But MSVC is dumb and uses this flag for external projects, like gtest.
-  if (YACLIB_SANITIZER)
-    message("Sanitizer's work only on Linux")
-  endif ()
-else ()
-  list(APPEND YACLIB_COMPILE_OPTIONS -Wall -Wextra -pedantic)
-  if (YACLIB_SANITIZER STREQUAL ASAN)
-    set(SANITIZER_ENABLE_OPTION -fsanitize=address)
-    set(SANITIZER_COMPILE_OPTIONS
-      # -fsanitize-address-use-after-return=runtime
-      -fsanitize-recover=address
-      -fsanitize-address-use-after-scope
-      )
-  elseif (YACLIB_SANITIZER STREQUAL TSAN)
-    set(SANITIZER_ENABLE_OPTION -fsanitize=thread)
-    set(SANITIZER_COMPILE_OPTIONS
-      -gcolumn-info
-      )
-  elseif (YACLIB_SANITIZER STREQUAL UBSAN)
-    set(SANITIZER_ENABLE_OPTION -fsanitize=undefined)
-  elseif (YACLIB_SANITIZER STREQUAL MEMSAN) # Memory Santizer doesn't work with GTest (https://github.com/google/sanitizers/issues/648)
-    set(SANITIZER_ENABLE_OPTION -fsanitize=memory)
-  endif ()
-  list(APPEND YACLIB_COMPILE_OPTIONS
-    ${SANITIZER_ENABLE_OPTION}
-    ${SANITIZER_COMPILE_OPTIONS}
-    )
-  list(APPEND YACLIB_LINK_OPTIONS ${SANITIZER_ENABLE_OPTION})
-  if (YACLIB_COVERAGE)
-    list(APPEND YACLIB_COMPILE_OPTIONS
-      --coverage
-      )
-    list(APPEND YACLIB_LINK_OPTIONS
-      --coverage
-      )
-  endif ()
-endif ()
-message("YACLIB_COMPILE_OPTIONS: ${YACLIB_COMPILE_OPTIONS}")
+list(APPEND CMAKE_MODULE_PATH "${YACLIB_SOURCE_DIR}/cmake")
+include(yaclib_flags)
+
 message("YACLIB_LINK_OPTIONS   : ${YACLIB_LINK_OPTIONS}")
-add_definitions(${YACLIB_DEFINITIONS})
+message("YACLIB_COMPILE_OPTIONS: ${YACLIB_COMPILE_OPTIONS}")
+message("YACLIB_DEFINITIONS    : ${YACLIB_DEFINITIONS}")
 
-# Create static library
-add_subdirectory(src)
+add_subdirectory(src) # Create static library
 
-if (YACLIB_BUILD_TESTING)
+if (YACLIB_TEST)
   enable_testing()
   add_subdirectory(test)
 endif ()

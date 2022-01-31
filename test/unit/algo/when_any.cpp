@@ -148,7 +148,7 @@ void MultiThreaded() {
 
   std::array<Future<V>, 6> fs;
   for (int i = 0; i < kValues; ++i) {
-    fs[i] = async_value(i);
+    fs[static_cast<size_t>(i)] = async_value(i);
   }
   auto gen_fs = [&fs] {
     if constexpr (C == Container::Vector) {

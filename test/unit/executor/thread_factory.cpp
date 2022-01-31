@@ -15,7 +15,7 @@ constexpr bool kSanitizer{YACLIB_SLOWDOWN != 1};
 
 // TODO(kononovk): usage better random
 static auto init_rand = [] {
-  srand(time(0));
+  std::srand(static_cast<unsigned>(std::time(nullptr)));
   return 0;
 }();
 

@@ -2,48 +2,101 @@ name: Windows
 
 on:
   push:
-    branches:
-      - main
-    paths-ignore:
-      - 'doc/**'
-      - '**.md'
+    branches: [ main ]
+    paths-ignore: [ 'doc/**', '**.md' ]
   pull_request:
-    branches:
-      - main
-    paths-ignore:
-      - 'doc/**'
-      - '**.md'
+    branches: [ main ]
+    types: [ assigned ]
+    paths-ignore: [ 'doc/**', '**.md' ]
   schedule:
     - cron: '0 * * * *'
 
 jobs:
+  # TODO(MBkkt) Add windows-2016?
+  # TODO(MBkkt) Add Cygwin?
+  # TODO(MBkkt) Run tests with MinGW
+
   main:
-    runs-on: ${{ matrix.os }}
+    runs-on: 'windows-${{ matrix.os }}'
     strategy:
       fail-fast: false
       matrix:
-        os: [ windows-2019, windows-2022 ]
+        arch: [ Win32, x64 ]
+        os: [ 2019, 2022 ]
         build_type: [ Debug, RelWithDebInfo ]
-      # TODO(MBkkt) Add windows-2016
 
     steps:
       - uses: actions/checkout@v2
+        if: ${{ github.event_name != 'pull_request' || (matrix.arch == 'x64' && matrix.os == '2019' && matrix.build_type == 'Debug') }}
+
+      - name: Set up MinGW x86
+        if: ${{ matrix.arch != 'x64' && github.event_name != 'pull_request' }}
+        uses: egor-tensin/setup-mingw@v2
+        with:
+          platform: x86
+
+      - name: Set up MinGW x64
+        if: ${{ matrix.arch == 'x64' && (github.event_name != 'pull_request' || (matrix.os == '2019' && matrix.build_type == 'Debug')) }}
+        uses: egor-tensin/setup-mingw@v2
+        with:
+          platform: x64
 
       - name: Configure CMake
-        run:
-          cmake -S . -B build
-          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-          -DCMAKE_C_COMPILER=cl
-          -DCMAKE_CXX_COMPILER=cl
-          -DYACLIB_BUILD_TESTING=ON
-          -DYACLIB_BUILD_EXAMPLES=ON
-          -DYACLIB_CXX_STANDARD=17
+        if: ${{ github.event_name != 'pull_request' || (matrix.arch == 'x64' && matrix.os == '2019' && matrix.build_type == 'Debug') }}
+        shell: bash
+        run: |
+          names=("ClangCL" "MinGW" "MSVC")
+          build_type=${{ matrix.build_type }}
+          arch=${{ matrix.arch }}
+          if [[ ${{ matrix.os }} == "2022" ]]; then
+            msvc="17 2022"
+          else
+            msvc="16 2019"
+          fi
+          if [[ $arch == "Win32" ]]; then
+            slowdown=5
+          else
+            slowdown=1
+          fi
+          generators=("Visual Studio $msvc" "MinGW Makefiles" "Visual Studio $msvc")
+          options=("-A $arch -T ClangCL" "" "-A $arch")
+
+          for (( i=0; i<${#names[*]}; i+=1 )); do
+            dir="build_${names[$i]}"
+            cmake -S . -B $dir                            \
+              -G "${generators[$i]}"                      \
+              ${options[$i]}                              \
+              -DCMAKE_BUILD_TYPE=$build_type              \
+              -DYACLIB_BUILD_TESTING=ON                   \
+              -DYACLIB_SINGLE_TEST=ON                     \
+              -DYACLIB_CXX_STANDARD=17                    \
+              -DYACLIB_DEFINITIONS="YACLIB_CI_SLOWDOWN=$slowdown"
+          done
 
       - name: Build
-        run:
-          cmake --build build --config ${{ matrix.build_type }}
+        if: ${{ github.event_name != 'pull_request' || (matrix.arch == 'x64' && matrix.os == '2019' && matrix.build_type == 'Debug') }}
+        shell: bash
+        run: |
+          build_type=${{ matrix.build_type }}
+          for dir in build*/; do
+            cmake --build $dir --config $build_type --parallel 4
+          done
 
       - name: Test
+        if: ${{ github.event_name != 'pull_request' || (matrix.arch == 'x64' && matrix.os == '2019' && matrix.build_type == 'Debug') }}
+        shell: bash
         run: |
-          cd build
-          ctest --output-on-failure -C ${{ matrix.build_type }} -VV
+          names=("ClangCL" "MinGW" "MSVC")
+          build_type=${{ matrix.build_type }}
+          arch=${{ matrix.arch }}
+
+          for (( i=0; i<${#names[*]}; i+=1 )); do
+            if [[ ${names[$i]} == "MinGW" || 
+                  ( $arch == "Win32" && $build_type == "RelWithDebInfo" && "${names[$i]}" == "ClangCL" ) ]]; then
+              continue; # second condition about some seh error in gtest code, FUCK MSVC SHIT
+            fi
+            dir="build_${names[$i]}"
+            cd $dir
+            ctest --output-on-failure -C $build_type -VV
+            cd ..
+          done

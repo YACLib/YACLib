@@ -2,10 +2,11 @@ name: Documentation
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
+  # TODO(MBkkt) Use our own script instead of github action, same as in /.githooks
+
   main:
     runs-on: ubuntu-20.04
 

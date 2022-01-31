@@ -2,49 +2,77 @@ name: macOS
 
 on:
   push:
-    branches:
-      - main
-    paths-ignore:
-      - 'doc/**'
-      - '**.md'
+    branches: [ main ]
+    paths-ignore: [ 'doc/**', '**.md' ]
   pull_request:
-    branches:
-      - main
-    paths-ignore:
-      - 'doc/**'
-      - '**.md'
+    branches: [ main ]
+    types: [ assigned ]
+    paths-ignore: [ 'doc/**', '**.md' ]
   schedule:
     - cron: '0 * * * *'
 
 jobs:
+  # TODO(MBkkt) Add 20, 23 standard
+  # TODO(MBkkt) Add stdlib?
+
   main:
-    runs-on: ${{ matrix.os }}
+    runs-on: 'macos-${{ matrix.os }}'
     strategy:
       fail-fast: false
       matrix:
-        os: [ macos-10.15, macos-11 ]
+        os: [ 10.15, 11 ]
         build_type: [ Debug, RelWithDebInfo ]
-        # TODO Add 20, 23 standard and llvm clang
+    env:
+      COMPILERS: 'clang-8 clang++8 clang-9 clang++9 clang-10 clang++10 clang-11 clang++12 clang-13 clang++13 gcc-9 g++-9 gcc-10 g++-10 gcc-11 g++-11 clang clang++'
+      COMPILERS_PR: 'clang-8 clang++-8 gcc-9 g++-9 clang clang++'
 
     steps:
       - uses: actions/checkout@v2
+        if: ${{ github.event_name != 'pull_request' || (matrix.os == '10.15' && matrix.build_type == 'Debug') }}
+
+      - name: Update deps on macOS
+        if: ${{ github.event_name != 'pull_request' || (matrix.os == '10.15' && matrix.build_type == 'Debug') }}
+        run: |
+          brew update
+          if [[ ${{ github.event_name }} != "pull_request" ]]; then
+            brew install ninja llvm@8 llvm@9 llvm@10 llvm@11 llvm@12 llvm@13
+          else
+            brew install ninja llvm@8
+          fi
 
       - name: Configure CMake
-        run:
-          cmake -S . -B build
-          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-          -DCMAKE_C_COMPILER=clang
-          -DCMAKE_CXX_COMPILER=clang++
-          -DYACLIB_BUILD_TESTING=ON
-          -DYACLIB_BUILD_EXAMPLES=ON
-          -DYACLIB_CXX_STANDARD=17
-          -DYACLIB_DEFINITIONS=/DYACLIB_CI_SLOWDOWN=10
+        if: ${{ github.event_name != 'pull_request' || (matrix.os == '10.15' && matrix.build_type == 'Debug') }}
+        run: |
+          if [[ ${{ github.event_name }} != "pull_request" ]]; then
+            compilers=($COMPILERS)
+          else
+            compilers=($COMPILERS_PR)
+          fi
+
+          for (( i=0; i<${#compilers[*]}; i+=2 )); do
+            dir="build_${compilers[$i]}"
+            cmake -S . -B $dir                            \
+              -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+              -DCMAKE_C_COMPILER=${compilers[$i]}         \
+              -DCMAKE_CXX_COMPILER=${compilers[$i + 1]}   \
+              -DYACLIB_BUILD_TESTING=ON                   \
+              -DYACLIB_SINGLE_TEST=ON                     \
+              -DYACLIB_CXX_STANDARD=17                    \
+              -DYACLIB_DEFINITIONS="YACLIB_CI_SLOWDOWN=10"
+          done
 
       - name: Build
-        run:
-          cmake --build build --config ${{ matrix.build_type }}
+        if: ${{ github.event_name != 'pull_request' || (matrix.os == '10.15' && matrix.build_type == 'Debug') }}
+        run: |
+          for dir in build*/; do
+            ninja -C $dir
+          done
 
       - name: Test
+        if: ${{ github.event_name != 'pull_request' || (matrix.os == '10.15' && matrix.build_type == 'Debug') }}
         run: |
-          cd build
-          ctest --output-on-failure -C ${{ matrix.build_type }} -VV
+          for dir in build*/; do
+            cd $dir;
+            ctest --output-on-failure -C ${build_type} -VV
+            cd ..
+          done

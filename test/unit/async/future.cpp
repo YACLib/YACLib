@@ -153,10 +153,9 @@ TEST(JustWorks, AsyncRun) {
     return std::string{"Hello!"};
   };
 
-  auto bad = [&] {
+  auto bad = [&]() -> int {
     EXPECT_EQ(yaclib::CurrentThreadPool(), tp);
     throw std::logic_error("test");
-    return int{};
   };
   auto f1 = yaclib::Run(tp, good);
   auto f2 = yaclib::Run(tp, bad);
@@ -224,9 +223,9 @@ TEST(Subscribe, ExceptionSimple) {
 
   bool called = false;
 
-  std::move(f).Subscribe([&called](yaclib::util::Result<int> result) {
+  std::move(f).Subscribe([&called](yaclib::util::Result<int> r) {
     called = true;
-    EXPECT_THROW(std::move(result).Ok(), std::runtime_error);
+    EXPECT_THROW(std::move(r).Ok(), std::runtime_error);
   });
 
   EXPECT_TRUE(called);
@@ -673,20 +672,20 @@ struct Counter {
     dtor = 0;
   }
 
-  Counter() {
+  Counter() noexcept {
     ++default_ctor;
   }
-  Counter(const Counter&) {
+  Counter(const Counter&) noexcept {
     ++copy_ctor;
   }
-  Counter(Counter&&) {
+  Counter(Counter&&) noexcept {
     ++move_ctor;
   }
-  Counter& operator=(Counter&&) {
+  [[maybe_unused]] Counter& operator=(Counter&&) noexcept {
     ++move_assign;
     return *this;
   }
-  Counter& operator=(const Counter&) {
+  Counter& operator=(const Counter&) noexcept {
     ++copy_assign;
     return *this;
   }

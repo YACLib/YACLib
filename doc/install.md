@@ -46,21 +46,14 @@ CMake options:
   ([more info](https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html)).
 * `-D CMAKE_CXX_COMPILER=<cxx-compiler-path>`
   Path to your C++ compiler.
-* `-D YACLIB_BUILD_TESTING=<OFF(default) or ON>`
-  If ON, then build tests.
-* `-D YACLIB_SANITIZER=<EMPTY(default) or ASAN or TSAN or UBSAN or MEMSAN>`
-  If ON, then.
-* `-D YACLIB_COVERAGE=<OFF(default) or ON>`
+* `-D YACLIB_BUILD_TEST=<OFF(default) or ON or SINGLE>`
+  If ON, then build tests, SINGLE, then make one test target
+* `-D YACLIB_FLAFS=<EMPTY(default) or WARN or ASAN or TSAN or UBSAN or MEMSAN or COVERAGE>`
   If ON, then.
 
 ```
 cmake --build . -- <build-options>
 ```
-
-Build options:
-
-* `-j <parallel-jobs>`
-  The logical number of cores, how many threads the compiler will use.
 
 #### Example
 
@@ -69,8 +62,6 @@ In POSIX compliant shell:
 ```bash
 git clone git@github.com:YACLib/YACLib.git
 cd YACLib
-mkdir build
-cd build
-cmake .. -G Ninja -D YACLIB_BUILD_TESTING=ON
-cmake --build . -j
+cmake -S . -B ./build -GNinja -DYACLIB_TEST=ON
+cmake --build ./build - --parallel
 ```

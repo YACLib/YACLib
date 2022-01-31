@@ -2,6 +2,7 @@
 
 #include <yaclib/config.hpp>
 #include <yaclib/executor/executor.hpp>
+#include <yaclib/executor/strand.hpp>
 #include <yaclib/fault/atomic.hpp>
 
 #include <utility>

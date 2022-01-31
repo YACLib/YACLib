@@ -2,103 +2,177 @@ name: Sanitizer
 
 on:
   push:
-    branches:
-      - main
-    paths-ignore:
-      - 'doc/**'
-      - '**.md'
+    branches: [ main ]
+    paths-ignore: [ 'doc/**', '**.md' ]
   pull_request:
-    branches:
-      - main
-    paths-ignore:
-      - 'doc/**'
-      - '**.md'
+    branches: [ main ]
+    paths-ignore: [ 'doc/**', '**.md' ]
   schedule:
     - cron: '0 * * * *'
 
 jobs:
+  # TODO(MBkkt) Add MEMSAN?
+  # TODO(MBkkt) Maybe better merge undefined, address, leak?
+  # TODO(MBkkt) Other not google sanitizers?
+
   main:
-    runs-on: ubuntu-20.04
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        sanitizers: [ UBSAN, ASAN, TSAN ]
-        compilers: [ "gcc-11 g++-11",
-                     "clang-14 clang++-14" ]
+        flags: [ WARN, ASAN, UBSAN, LSAN, TSAN ]
+        os: [ ubuntu-20.04, macos-11 , windows-2022 ]
+        build_type: [ Debug ] # , RelWithDebInfo
     env:
-      BUILD_TYPES: "Debug RelWithDebInfo"
-      # TODO Add windows ASAN, UBSAN and some macos and MEMSAN
+      YACLIB_FAULT: 'OFF ON' # TODO(myannyax)
 
     steps:
       - uses: actions/checkout@v2
 
-      - name: Update dependencies
+      - name: Update deps on Linux
+        if: ${{ matrix.os == 'ubuntu-20.04' }}
         run: |
           sudo apt-get update
-          sudo apt-get upgrade
-          sudo apt-get install ninja-build
+          sudo wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+          sudo add-apt-repository "deb http://apt.llvm.org/focal/     llvm-toolchain-focal-14   main"
+          sudo apt-get update
+          sudo apt-get install ninja-build gcc-11 g++-11 clang-14 lld-14 libc++-14-dev libc++abi-14-dev googletest
+          sudo ln -sf /usr/bin/lld-14 /usr/local/bin/ld
 
-      - name: Install dependencies gcc
-        if: ${{ matrix.compilers == 'gcc-11 g++-11' }}
+      - name: Update deps on macOS
+        if: ${{ matrix.os == 'macos-11' }}
         run: |
-          sudo apt-get install ${{ matrix.compilers }}
+          brew update
+          brew install ninja llvm@13
 
-      - name: Install dependencies clang
-        if: ${{ matrix.compilers != 'gcc-11 g++-11' }}
-        run: |
-          wget https://apt.llvm.org/llvm.sh
-          chmod +x ./llvm.sh
-          sudo     ./llvm.sh 14 shit
-          rm       ./llvm.sh
+      - name: Set up MinGW x64
+        if: ${{ matrix.os == 'windows-2022' }}
+        uses: egor-tensin/setup-mingw@v2
+        with:
+          platform: x64
 
-      - name: Configure CMake
+      - name: Configure CMake Posix
+        if: ${{ matrix.os != 'windows-2022' }}
         run: |
-          cmake --version
-          sanitizer=${{ matrix.sanitizer }}
-          compilers=(${{ matrix.compilers }})
-          for build_type in ${BUILD_TYPES[*]}; do
-            for (( i=0; i<${#compilers[*]}; i+=2 )); do
-              dir="build_${sanitizer}_${build_type}_${compilers[$i]}"
+          flags=${{ matrix.flags }}
+          build_type=${{ matrix.build_type }}
+          compilers_name=(clang gnu apple_clang)
+          stdlibs_name=(libcxx libstdcxx apple_libcxx)
+          if [[ ${{ matrix.os }} == "macos-11" ]]; then
+            llvm=/usr/local/opt/llvm
+            c_compilers=("$llvm/bin/clang" gcc-11 clang)
+            cxx_compilers=("$llvm/bin/clang++" g++-11 clang++)
+            link_options=(
+              "-L$llvm/lib;-Wl,-rpath,$llvm/lib"
+              "-stdlib=libstdc++"
+              "" # Apple
+            )
+            compile_options=(
+              "-I$llvm/include;-I$llvm/include/c++/v1/"
+              "-stdlib=libstdc++"
+              "" # Apple
+            )
+            slowdown=2
+          else
+            c_compilers=(clang-14 gcc-11)
+            cxx_compilers=(clang++-14 g++-11)
+            link_options=(
+              "-stdlib=libc++;-lc++abi"
+              "-stdlib=libstdc++"
+            )
+            compile_options=(
+              "-stdlib=libc++"
+              "-stdlib=libstdc++"
+            )
+            slowdown=1
+          fi
+
+          for (( i=0; i<${#c_compilers[*]}; i+=1 )); do
+            for (( j=0; j<${#link_options[*]}; j+=1 )); do
+              for yaclib_fault in ${YACLIB_FAULT[*]}; do
+                if [[ $yaclib_fault == ON ]]; then
+                  continue
+                fi
+                link_option=${link_options[$j]}
+                compile_option=${compile_options[$j]}
+                if [[ ${compilers_name[$i]} == "gnu" ]]; then
+                  if [[ ${stdlibs_name[$j]} == "libstdcxx" ]]; then
+                    link_option=""
+                    compile_option=""
+                  else
+                    continue
+                  fi
+                fi
+
+                dir="build_${compilers_name[$i]}_${stdlibs_name[$j]}_fault_${yaclib_fault}"
+                echo $dir
+
+                cmake -S . -B $dir                           \
+                  -DCMAKE_BUILD_TYPE=$build_type             \
+                  -DYACLIB_CXX_STANDARD=20                   \
+                  -DYACLIB_TEST=SINGLE                       \
+                  -DYACLIB_FLAGS=$flags                      \
+                  -DCMAKE_C_COMPILER=${c_compilers[$i]}      \
+                  -DCMAKE_CXX_COMPILER=${cxx_compilers[$i]}  \
+                  -G"Ninja"                                  \
+                  -DYACLIB_LINK_OPTIONS="$link_option"       \
+                  -DYACLIB_COMPILE_OPTIONS="$compile_option" \
+                  -DYACLIB_DEFINITIONS="YACLIB_CI_SLOWDOWN=$slowdown"
+
+              done
+            done
+          done
+
+      - name: Configure CMake Windows
+        if: ${{ matrix.os == 'windows-2022' }}
+        shell: bash
+        run: |
+          flags=${{ matrix.flags }}
+          build_type=${{ matrix.build_type }}
+
+          names=(ClangCL MinGW MSVC)
+          generators=("Visual Studio 17 2022" "MinGW Makefiles" "Visual Studio 17 2022")
+          options=("-A x64 -T ClangCL" "" "-A x64")
+
+          for (( i=0; i<${#names[*]}; i+=1 )); do
+            for yaclib_fault in ${YACLIB_FAULT[*]}; do
+              if [[ $yaclib_fault == "ON" ]]; then
+                continue
+              fi
+
+              dir="build_${names[$i]}_fault_${yaclib_fault}"
               echo $dir
-              cmake -S . -B $dir                          \
-                -GNinja                                   \
-                -DCMAKE_BUILD_TYPE=${build_type}          \
-                -DCMAKE_C_COMPILER=${compilers[$i]}       \
-                -DCMAKE_CXX_COMPILER=${compilers[$i + 1]} \
-                -DYACLIB_BUILD_TESTING=ON                 \
-                -DYACLIB_BUILD_EXAMPLES=ON                \
-                -DYACLIB_SANITIZER=${sanitizer}           \
-                -DYACLIB_CXX_STANDARD=23
-              echo
+
+              cmake -S . -B $dir               \
+                -DCMAKE_BUILD_TYPE=$build_type \
+                -DYACLIB_CXX_STANDARD=20       \
+                -DYACLIB_TEST=SINGLE           \
+                -DYACLIB_FLAGS=$flags          \
+                -G"${generators[$i]}"          \
+                ${options[$i]}
+
             done
           done
 
       - name: Build
+        shell: bash
         run: |
-          sanitizer=${{ matrix.sanitizer }}
-          compilers=(${{ matrix.compilers }})
-          for build_type in ${BUILD_TYPES[*]}; do
-            for (( i=0; i<${#compilers[*]}; i+=2 )); do
-              dir="build_${sanitizer}_${build_type}_${compilers[$i]}"
-              echo $dir
-              ninja -C $dir
-              echo
-            done
+          for dir in build*/; do
+            echo $dir
+            cmake --build $dir --config ${{ matrix.build_type }} --parallel
+            echo
           done
 
       - name: Test
+        shell: bash
         run: |
-          sanitizer=${{ matrix.sanitizer }}
-          compilers=(${{ matrix.compilers }})
-          export ASAN_OPTIONS=help=0:verbosity=0:halt_on_error=0:check_initialization_order=1:detect_stack_use_after_return=1:strict_init_order=1:strict_string_checks=1:debug=1
-          export TSAN_OPTIONS=help=0:verbosity=0
-          for build_type in ${BUILD_TYPES[*]}; do
-            for (( i=0; i<${#compilers[*]}; i+=2 )); do
-              dir="build_${sanitizer}_${build_type}_${compilers[$i]}"
-              echo $dir
-              cd $dir
-                ctest --output-on-failure -C ${build_type} -VV
-              cd ..
-              echo
-            done
+          default="help=0 verbosity=0 halt_on_error=0"
+          export  ASAN_OPTIONS="$default debug=1 detect_leaks=0 check_initialization_order=1 detect_stack_use_after_return=1 strict_init_order=1 strict_string_checks=1 detect_invalid_pointer_pairs=2"
+          export UBSAN_OPTIONS="$default print_stacktrace=1"
+          export  LSAN_OPTIONS="$default debug=1 detect_leaks=1"
+          export  TSAN_OPTIONS="$default history_size=0 io_sync=0 detect_deadlocks=1 second_deadlock_stack=1"
+          for dir in build*/; do
+            cd $dir;
+            ctest --output-on-failure -C ${{ matrix.build_type }} -VV
+            cd ..
           done
