@@ -23,25 +23,6 @@ jobs:
         flags: [ WARN, ASAN, UBSAN, LSAN, TSAN ]
         os: [ ubuntu-20.04, macos-11 , windows-2022 ]
         build_type: [ Debug ] # , RelWithDebInfo
-        exclude:
-          - os: windows-2022
-            flags: UBSAN
-            build_type: Debug
-          - os: windows-2022
-            flags: LSAN
-            build_type: Debug
-          - os: windows-2022
-            flags: TSAN
-            build_type: Debug
-          - os: windows-2022
-            flags: UBSAN
-            build_type: RelWithDebInfo
-          - os: windows-2022
-            flags: LSAN
-            build_type: RelWithDebInfo
-          - os: windows-2022
-            flags: TSAN
-            build_type: RelWithDebInfo
     env:
       YACLIB_FAULT: 'OFF ON' # TODO(myannyax)
 
