@@ -23,7 +23,6 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get upgrade
           sudo apt-get install pip ninja-build lld gcc-10 g++-10 lcov
           sudo ln -sf /usr/local/bin/ld /usr/bin/lld
           sudo pip install -U gcovr

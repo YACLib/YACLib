@@ -19,29 +19,37 @@ jobs:
   # TODO(MBkkt) Add other compilers, like Intel C++?
 
   main:
-    runs-on: ${{ matrix.os }}
+    runs-on: 'ubuntu-${{ matrix.os }}'
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-18.04, ubuntu-20.04 ]
-        compilers: [ 'clang-8 clang++-8 clang-9 clang++-9 clang-10 clang++-10 clang-11 clang++-11 clang-12 clang++-12 clang-13 clang++-13 clang-14 clang++-14',
-                     'gcc-7 g++-7 gcc-8 g++-8 gcc-9 g++-9 gcc-10 g++-10 gcc-11 g++-11' ]
+        os: [ 18.04, 20.04 ]
+        compiler: [ clang, gcc ]
         build_type: [ Debug, RelWithDebInfo ]
+    env:
+      COMPILERS_CLANG: 'clang-8 clang++-8 clang-9 clang++-9 clang-10 clang++-10 clang-11 clang++-11 clang-12 clang++-12 clang-13 clang++-13 clang-14 clang++-14'
+      COMPILERS_GCC: 'gcc-7 g++-7 gcc-8 g++-8 gcc-9 g++-9 gcc-10 g++-10 gcc-11 g++-11'
+      COMPILERS_CLANG_PR: 'clang-8 clang++-8'
+      COMPILERS_GCC_PR: 'gcc-7 g++-7'
 
     steps:
       - uses: actions/checkout@v2
+        if: ${{ github.event_name != 'pull_request' || (matrix.os == '18.04' && matrix.build_type == 'Debug') }}
 
       - name: Update dependencies
+        if: ${{ github.event_name != 'pull_request' || (matrix.os == '18.04' && matrix.build_type == 'Debug') }}
         run: |
           sudo apt-get update
-          sudo apt-get upgrade
           sudo apt-get install ninja-build lld
           sudo ln -sf /usr/local/bin/ld /usr/bin/lld
 
       - name: Install dependencies clang
-        if: ${{ matrix.compilers != 'gcc-7 g++-7 gcc-8 g++-8 gcc-9 g++-9 gcc-10 g++-10 gcc-11 g++-11' }}
+        if: ${{ matrix.compilers == 'clang' && (github.event_name != 'pull_request' || (matrix.os == '18.04' && matrix.build_type == 'Debug')) }}
         run: |
           sudo apt-get install clang-8
+          if [[ ${{ github.event_name }} == 'pull_request' ]]; then
+            exit
+          fi
           wget https://apt.llvm.org/llvm.sh
           chmod +x ./llvm.sh
           sudo     ./llvm.sh 9  shit
@@ -53,41 +61,55 @@ jobs:
           rm       ./llvm.sh
 
       - name: Install dependencies gcc
-        if: ${{ matrix.compilers == 'gcc-7 g++-7 gcc-8 g++-8 gcc-9 g++-9 gcc-10 g++-10 gcc-11 g++-11' }}
+        if: ${{ matrix.compilers == 'gcc' && (github.event_name != 'pull_request' || (matrix.os == '18.04' && matrix.build_type == 'Debug')) }}
         run: |
-          sudo apt-get install ${{ matrix.compilers }}
+          if [[ ${{ github.event_name }} == 'pull_request' ]]; then
+            sudo apt-get install $COMPILERS_GCC_PR
+          else
+            sudo apt-get install $COMPILERS_GCC
+          fi
 
       - name: Configure CMake
+        if: ${{ github.event_name != 'pull_request' || (matrix.os == '18.04' && matrix.build_type == 'Debug') }}
         run: |
-          cmake --version
-          compilers=(${{ matrix.compilers }})
+          if [[ ${{ github.event_name }} != 'pull_request' ]]; then
+            if [[ ${{ github.compiler }} == 'clang' ]]; then
+              compilers=($COMPILERS_CLANG)
+            else
+              compilers=($COMPILERS_GCC)
+            fi
+          else
+            if [[ ${{ github.compiler }} == 'clang' ]]; then
+              compilers=($COMPILERS_CLANG_PR)
+            else
+              compilers=($COMPILERS_GCC_PR)
+            fi
+          fi
+
           for (( i=0; i<${#compilers[*]}; i+=2 )); do
-            dir="build_${compilers[$i]}"; echo $dir
+            dir="build_${compilers[$i]}"
             cmake -S . -B $dir                            \
               -G "Ninja"                                  \
               -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
               -DCMAKE_C_COMPILER=${compilers[$i]}         \
               -DCMAKE_CXX_COMPILER=${compilers[$i + 1]}   \
               -DYACLIB_BUILD_TESTING=ON                   \
-              -DYACLIB_BUILD_EXAMPLES=ON                  \
+              -DYACLIB_SINGLE_TEST=ON                     \
               -DYACLIB_CXX_STANDARD=17
-            echo
           done
 
       - name: Build
+        if: ${{ github.event_name != 'pull_request' || (matrix.os == '18.04' && matrix.build_type == 'Debug') }}
         run: |
-          compilers=(${{ matrix.compilers }})
-          for (( i=0; i<${#compilers[*]}; i+=2 )); do
-            dir="build_${compilers[$i]}"; echo $dir
+          for dir in build*/; do
             ninja -C $dir
-            echo
           done
 
       - name: Test
+        if: ${{ github.event_name != 'pull_request' || (matrix.os == '18.04' && matrix.build_type == 'Debug') }}
         run: |
-          compilers=(${{ matrix.compilers }})
-          for (( i=0; i<${#compilers[*]}; i+=2 )); do
-            dir="build_${compilers[$i]}"; echo $dir; cd $dir
-            ctest --output-on-failure -C ${{ matrix.build_type }} -VV
-            cd ..; echo
+          for dir in build*/; do
+            cd $dir;
+            ctest --output-on-failure -C ${build_type} -VV
+            cd ..
           done

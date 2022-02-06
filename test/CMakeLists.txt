@@ -1,39 +1,36 @@
 cmake_minimum_required(VERSION 3.13)
 
-find_package(GTest QUIET)
-find_package(benchmark QUIET)
+if (YACLIB_LINK_OPTIONS OR YACLIB_COMPILE_OPTIONS OR YACLIB_DEFINITIONS)
+  add_link_options(${YACLIB_LINK_OPTIONS})
+  #add_compile_options(${YACLIB_COMPILE_OPTIONS})
+  #add_compile_definitions(${YACLIB_DEFINITIONS})
+else ()
+  find_package(GTest QUIET)
+endif ()
 
-if (NOT GTEST_FOUND OR NOT BENCHMARK_FOUND)
+if (NOT GTEST_FOUND)
   include(FetchContent)
-  if (NOT GTEST_FOUND)
-    FetchContent_Declare(
-      googletest
-      GIT_REPOSITORY https://github.com/google/googletest.git
-      GIT_TAG release-1.11.0
+  FetchContent_Declare(googletest
+    GIT_REPOSITORY https://github.com/google/googletest.git
+    GIT_TAG main
     )
-    # For Windows: Prevent overriding the parent project's compiler/linker settings
-    set(gtest_force_shared_crt ON CACHE BOOL "Always use msvcrt.dll")
-    FetchContent_MakeAvailable(googletest)
-    set(GTEST_BOTH_LIBRARIES GTest::gtest GTest::gtest_main)
-  endif ()
-  if (NOT BENCHMARK_FOUND)
-    set(BENCHMARK_ENABLE_TESTING NO)
-    FetchContent_Declare(
-      benchmark
-      GIT_REPOSITORY https://github.com/google/benchmark.git
-      GIT_TAG v1.5.5
-    )
-    FetchContent_MakeAvailable(benchmark)
-  endif ()
+  # For Windows: Prevent overriding the parent project's compiler/linker settings
+  set(gtest_force_shared_crt ON CACHE BOOL "Always use msvcrt.dll")
+  FetchContent_MakeAvailable(googletest)
 endif ()
 
 set(TEST_UTIL_INCLUDES
   util/cpu_time.hpp
   util/time.hpp
   )
-set(YACLIB_EXAMPLE_SOURCES)
-set(YACLIB_EXAMPLE_INCLUDES)
 
+set(YACLIB_EXAMPLE_SOURCES
+  example/async/simple
+  example/executor/thread_pool
+  example/executor/strand
+  example/async/when_all
+  example/async/when_any
+  )
 set(YACLIB_UNIT_SOURCES
   unit/util/intrusive_ptr
   unit/util/result
@@ -50,22 +47,10 @@ set(YACLIB_UNIT_SOURCES
   unit/executor/strand
   )
 
-if (YACLIB_BUILD_EXAMPLES)
-  set(YACLIB_EXAMPLE_SOURCES
-    example/async/simple
-    example/executor/thread_pool
-    example/executor/strand
-    example/async/when_all
-    example/async/when_any
-    )
-endif ()
-
-#TODO(MBkkt) Add options which shuffle tests list
+#TODO(MBkkt) Add options which shuffle tests list, maybe just use gtest options?
 set(YACLIB_TEST_SOURCES ${YACLIB_UNIT_SOURCES} ${YACLIB_EXAMPLE_SOURCES})
 
-foreach (TEST_SOURCE ${YACLIB_TEST_SOURCES})
-  string(REPLACE "/" "_" TEST_NAME ${TEST_SOURCE})
-  add_executable(${TEST_NAME} ${TEST_SOURCE}.cpp)
+function(yaclib_add_test TEST_NAME)
   target_link_options(${TEST_NAME} PRIVATE ${YACLIB_LINK_OPTIONS})
   target_compile_options(${TEST_NAME} PRIVATE ${YACLIB_COMPILE_OPTIONS})
   target_compile_definitions(${TEST_NAME} PRIVATE ${YACLIB_DEFINITIONS})
@@ -73,8 +58,7 @@ foreach (TEST_SOURCE ${YACLIB_TEST_SOURCES})
     PRIVATE ${TEST_UTIL_INCLUDES}
     )
   target_link_libraries(${TEST_NAME}
-    PRIVATE ${GTEST_BOTH_LIBRARIES}
-    PRIVATE benchmark::benchmark benchmark::benchmark_main
+    PRIVATE GTest::gtest
     PRIVATE ${PROJECT_NAME}
     )
   target_include_directories(${TEST_NAME}
@@ -82,4 +66,16 @@ foreach (TEST_SOURCE ${YACLIB_TEST_SOURCES})
     PRIVATE ${YACLIB_SOURCE_DIR}/src
     )
   add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
-endforeach ()
+endfunction()
+
+if (YACLIB_TEST STREQUAL SINGLE)
+  list(TRANSFORM YACLIB_TEST_SOURCES APPEND .cpp)
+  add_executable(yaclib_test test.cpp ${YACLIB_TEST_SOURCES})
+  yaclib_add_test(yaclib_test)
+else ()
+  foreach (TEST_SOURCE ${YACLIB_TEST_SOURCES})
+    string(REPLACE "/" "_" TEST_NAME ${TEST_SOURCE})
+    add_executable(${TEST_NAME} test.cpp ${TEST_SOURCE}.cpp)
+    yaclib_add_test(${TEST_NAME})
+  endforeach ()
+endif ()

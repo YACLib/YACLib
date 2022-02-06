@@ -27,71 +27,76 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        if: ${{ github.event_name != 'pull_request' || (matrix.arch == 'x64' && matrix.os == '2019' && matrix.build_type == 'Debug') }}
 
       - name: Set up MinGW x86
-        if: ${{ matrix.arch != 'x64' }}
+        if: ${{ matrix.arch != 'x64' && github.event_name != 'pull_request' }}
         uses: egor-tensin/setup-mingw@v2
         with:
           platform: x86
 
       - name: Set up MinGW x64
-        if: ${{ matrix.arch == 'x64' }}
+        if: ${{ matrix.arch == 'x64' && (github.event_name != 'pull_request' || (matrix.os == '2019' && matrix.build_type == 'Debug')) }}
         uses: egor-tensin/setup-mingw@v2
         with:
           platform: x64
 
       - name: Configure CMake
+        if: ${{ github.event_name != 'pull_request' || (matrix.arch == 'x64' && matrix.os == '2019' && matrix.build_type == 'Debug') }}
         shell: bash
         run: |
-          cmake --version
           names=("ClangCL" "MinGW" "MSVC")
-          if [[ "${{ matrix.os }}" == "2022" ]]; then
+          build_type=${{ matrix.build_type }}
+          arch=${{ matrix.arch }}
+          if [[ ${{ matrix.os }} == "2022" ]]; then
             msvc="17 2022"
           else
             msvc="16 2019"
           fi
+          if [[ $arch == "Win32" ]]; then
+            slowdown=5
+          else
+            slowdown=1
+          fi
           generators=("Visual Studio $msvc" "MinGW Makefiles" "Visual Studio $msvc")
-          options=("-A ${{ matrix.arch }} -T ClangCL" "" "-A ${{ matrix.arch }}")
+          options=("-A $arch -T ClangCL" "" "-A $arch")
+
           for (( i=0; i<${#names[*]}; i+=1 )); do
-            if [[ "${{ matrix.arch }}" == "Win32" ]]; then
-              slowdown=5
-            else
-              slowdown=1
-            fi
-            dir="build_${names[$i]}"; echo $dir
+            dir="build_${names[$i]}"
             cmake -S . -B $dir                            \
               -G "${generators[$i]}"                      \
               ${options[$i]}                              \
-              -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+              -DCMAKE_BUILD_TYPE=$build_type              \
               -DYACLIB_BUILD_TESTING=ON                   \
-              -DYACLIB_BUILD_EXAMPLES=ON                  \
+              -DYACLIB_SINGLE_TEST=ON                     \
               -DYACLIB_CXX_STANDARD=17                    \
               -DYACLIB_DEFINITIONS="YACLIB_CI_SLOWDOWN=$slowdown"
-            echo
           done
 
       - name: Build
+        if: ${{ github.event_name != 'pull_request' || (matrix.arch == 'x64' && matrix.os == '2019' && matrix.build_type == 'Debug') }}
         shell: bash
         run: |
-          names=("ClangCL" "MinGW" "MSVC")
-          for (( i=0; i<${#names[*]}; i+=1 )); do
-            dir="build_${names[$i]}"; echo $dir
-            cmake --build $dir --config ${{ matrix.build_type }} --parallel 4
-            echo
+          build_type=${{ matrix.build_type }}
+          for dir in build*/; do
+            cmake --build $dir --config $build_type --parallel 4
           done
 
       - name: Test
+        if: ${{ github.event_name != 'pull_request' || (matrix.arch == 'x64' && matrix.os == '2019' && matrix.build_type == 'Debug') }}
         shell: bash
         run: |
           names=("ClangCL" "MinGW" "MSVC")
+          build_type=${{ matrix.build_type }}
+          arch=${{ matrix.arch }}
+
           for (( i=0; i<${#names[*]}; i+=1 )); do
-            if [[ "${names[$i]}" == "MinGW" || 
-                  ( "${{ matrix.arch }}" == "Win32" && 
-                    "${{ matrix.build_type }}" == "RelWithDebInfo" && 
-                    "${names[$i]}" == "ClangCL" ) ]]; then
+            if [[ ${names[$i]} == "MinGW" || 
+                  ( $arch == "Win32" && $build_type == "RelWithDebInfo" && "${names[$i]}" == "ClangCL" ) ]]; then
               continue; # second condition about some seh error in gtest code, FUCK MSVC SHIT
             fi
-            dir="build_${names[$i]}"; echo $dir; cd $dir
-            ctest --output-on-failure -C ${{ matrix.build_type }} -VV
-            cd ..; echo
+            dir="build_${names[$i]}"
+            cd $dir
+            ctest --output-on-failure -C $build_type -VV
+            cd ..
           done
