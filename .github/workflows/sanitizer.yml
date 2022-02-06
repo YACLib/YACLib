@@ -75,8 +75,8 @@ jobs:
         run: |
           flags=${{ matrix.flags }}
           build_type=${{ matrix.build_type }}
-          compilers_name=(llvm_clang gcc apple_clang)
-          stdlibs_name=(llvm_libcxx libstdcxx apple_libcxx)
+          compilers_name=(clang gnu apple_clang)
+          stdlibs_name=(libcxx libstdcxx apple_libcxx)
           if [[ ${{ matrix.os }} == "macos-11" ]]; then
             llvm=/usr/local/opt/llvm
             c_compilers=("$llvm/bin/clang" gcc-11 clang)
@@ -112,13 +112,11 @@ jobs:
                 fi
                 link_option=${link_options[$j]}
                 compile_option=${compile_options[$j]}
-                if [[ ${compilers[$i]} == "gcc-11" ]]; then
-                  if [[ $link_option == "" || $link_option == "-stdlib=libstdc++" ]]; then
-                    link_option=""
-                    compile_option=""
-                  else
-                    continue
-                  fi
+                if [[ ${compilers_name[$i]} == "gnu" && ${stdlibs_name[$j]} == "libstdcxx" ]]; then
+                  link_option=""
+                  compile_option=""
+                else
+                  continue
                 fi
 
                 dir="build_${compilers_name[$i]}_${stdlibs_name[$j]}_fault_${yaclib_fault}"
@@ -143,13 +141,8 @@ jobs:
         if: ${{ matrix.os == 'windows-2022' }}
         shell: bash
         run: |
-          sanitizer=${{ matrix.sanitizer }}
+          flags=${{ matrix.flags }}
           build_type=${{ matrix.build_type }}
-
-          warning="OFF"
-          if [[ ${{ matrix.sanitizer }} == "OFF" ]]; then
-            warning="ON"
-          fi
 
           names=(ClangCL MinGW MSVC)
           generators=("Visual Studio 17 2022" "MinGW Makefiles" "Visual Studio 17 2022")
@@ -179,17 +172,13 @@ jobs:
         shell: bash
         run: |
           for dir in build*/; do
-            if [[ ${{ matrix.os }} == "windows-2022" ]]; then 
-              cmake --build $dir --config ${{ matrix.build_type }} --parallel 4
-            else
-              ninja -C $dir
-            fi
+            cmake --build $dir --config ${{ matrix.build_type }} --parallel
           done
 
       - name: Test
         shell: bash
         run: |
-          default="help=0 verbosity=2 halt_on_error=0"
+          default="help=0 verbosity=1 halt_on_error=0"
           export  ASAN_OPTIONS="$default debug=1 detect_leaks=0 check_initialization_order=1 detect_stack_use_after_return=1 strict_init_order=1 strict_string_checks=1 detect_invalid_pointer_pairs=2"
           export UBSAN_OPTIONS="$default print_stacktrace=1"
           export  LSAN_OPTIONS="$default debug=1 detect_leaks=1"
