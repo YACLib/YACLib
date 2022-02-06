@@ -75,9 +75,12 @@ jobs:
         run: |
           flags=${{ matrix.flags }}
           build_type=${{ matrix.build_type }}
+          compilers_name=(llvm_clang gcc apple_clang)
+          stdlibs_name=(llvm_libcxx libstdcxx apple_libcxx)
           if [[ ${{ matrix.os }} == "macos-11" ]]; then
             llvm=/usr/local/opt/llvm
-            compilers=("$llvm/bin/clang" "$llvm/bin/clang++" gcc-11 g++-11 clang clang++)
+            c_compilers=("$llvm/bin/clang" gcc-11 clang)
+            cxx_compilers=("$llvm/bin/clang++" g++-11 clang++)
             link_options=(
               "-L$llvm/lib;-Wl,-rpath,$llvm/lib"
               "-stdlib=libstdc++"
@@ -89,7 +92,8 @@ jobs:
               "" # Apple
             )
           else
-            compilers=(clang-14 clang++-14 gcc-11 g++-11)
+            c_compilers=(clang-14 gcc-11)
+            cxx_compilers=(clang++-14 g++-11)
             link_options=(
               "-stdlib=libc++;-lc++abi"
               "-stdlib=libstdc++"
@@ -100,7 +104,7 @@ jobs:
             )
           fi
 
-          for (( i=0; i<${#compilers[*]}; i+=2 )); do
+          for (( i=0; i<${#c_compilers[*]}; i+=1 )); do
             for (( j=0; j<${#link_options[*]}; j+=1 )); do
               for yaclib_fault in ${YACLIB_FAULT[*]}; do
                 if [[ $yaclib_fault == ON ]]; then
@@ -117,7 +121,7 @@ jobs:
                   fi
                 fi
 
-                dir="build_${compilers[$i]}_${j}_${yaclib_fault}"
+                dir="build_${compilers_name[$i]}_${stdlibs_name[$j]}_fault_${yaclib_fault}"
                 echo $dir
 
                 cmake -S . -B $dir                          \
@@ -125,8 +129,8 @@ jobs:
                   -DYACLIB_CXX_STANDARD=20                  \
                   -DYACLIB_TEST=SINGLE                      \
                   -DYACLIB_FLAGS=$flags                     \
-                  -DCMAKE_C_COMPILER=${compilers[$i]}       \
-                  -DCMAKE_CXX_COMPILER=${compilers[$i + 1]} \
+                  -DCMAKE_C_COMPILER=${c_compilers[$i]}     \
+                  -DCMAKE_CXX_COMPILER=${cxx_compilers[$i]} \
                   -G "Ninja"                                \
                   -DYACLIB_LINK_OPTIONS="$link_option"      \
                   -DYACLIB_COMPILE_OPTIONS="$compile_option"
