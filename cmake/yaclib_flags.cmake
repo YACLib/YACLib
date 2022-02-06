@@ -31,7 +31,7 @@ if (MEMSAN IN_LIST YACLIB_FLAGS)
   set(SAN ON)
   include(yaclib_memsan)
 endif ()
-if (NOT MSVC AND SAN) # Nicer stack trace and recover
+if (NOT CMAKE_CXX_COMPILER_ID STREQUAL MSVC AND SAN) # Nicer stack trace and recover
   list(APPEND YACLIB_COMPILE_OPTIONS -fno-omit-frame-pointer -fsanitize-recover=all)
 endif ()
 

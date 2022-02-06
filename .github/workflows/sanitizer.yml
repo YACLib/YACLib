@@ -91,6 +91,7 @@ jobs:
               "-stdlib=libstdc++"
               "" # Apple
             )
+            slowdown=2
           else
             c_compilers=(clang-14 gcc-11)
             cxx_compilers=(clang++-14 g++-11)
@@ -102,6 +103,7 @@ jobs:
               "-stdlib=libc++"
               "-stdlib=libstdc++"
             )
+            slowdown=1
           fi
 
           for (( i=0; i<${#c_compilers[*]}; i+=1 )); do
@@ -112,26 +114,29 @@ jobs:
                 fi
                 link_option=${link_options[$j]}
                 compile_option=${compile_options[$j]}
-                if [[ ${compilers_name[$i]} == "gnu" && ${stdlibs_name[$j]} == "libstdcxx" ]]; then
-                  link_option=""
-                  compile_option=""
-                else
-                  continue
+                if [[ ${compilers_name[$i]} == "gnu" ]]; then
+                  if [[ ${stdlibs_name[$j]} == "libstdcxx" ]]; then
+                    link_option=""
+                    compile_option=""
+                  else
+                    continue
+                  fi
                 fi
 
                 dir="build_${compilers_name[$i]}_${stdlibs_name[$j]}_fault_${yaclib_fault}"
                 echo $dir
 
-                cmake -S . -B $dir                          \
-                  -DCMAKE_BUILD_TYPE=$build_type            \
-                  -DYACLIB_CXX_STANDARD=20                  \
-                  -DYACLIB_TEST=SINGLE                      \
-                  -DYACLIB_FLAGS=$flags                     \
-                  -DCMAKE_C_COMPILER=${c_compilers[$i]}     \
-                  -DCMAKE_CXX_COMPILER=${cxx_compilers[$i]} \
-                  -G "Ninja"                                \
-                  -DYACLIB_LINK_OPTIONS="$link_option"      \
-                  -DYACLIB_COMPILE_OPTIONS="$compile_option"
+                cmake -S . -B $dir                           \
+                  -DCMAKE_BUILD_TYPE=$build_type             \
+                  -DYACLIB_CXX_STANDARD=20                   \
+                  -DYACLIB_TEST=SINGLE                       \
+                  -DYACLIB_FLAGS=$flags                      \
+                  -DCMAKE_C_COMPILER=${c_compilers[$i]}      \
+                  -DCMAKE_CXX_COMPILER=${cxx_compilers[$i]}  \
+                  -G"Ninja"                                  \
+                  -DYACLIB_LINK_OPTIONS="$link_option"       \
+                  -DYACLIB_COMPILE_OPTIONS="$compile_option" \
+                  -DYACLIB_DEFINITIONS="YACLIB_CI_SLOWDOWN=$slowdown"
 
               done
             done
@@ -154,7 +159,7 @@ jobs:
                 continue
               fi
 
-              dir="build_${names[$i]}_${yaclib_fault}"
+              dir="build_${names[$i]}_fault_${yaclib_fault}"
               echo $dir
 
               cmake -S . -B $dir               \
@@ -162,7 +167,7 @@ jobs:
                 -DYACLIB_CXX_STANDARD=20       \
                 -DYACLIB_TEST=SINGLE           \
                 -DYACLIB_FLAGS=$flags          \
-                -G "${generators[$i]}"         \
+                -G"${generators[$i]}"          \
                 ${options[$i]}
 
             done
@@ -172,13 +177,15 @@ jobs:
         shell: bash
         run: |
           for dir in build*/; do
+            echo $dir
             cmake --build $dir --config ${{ matrix.build_type }} --parallel
+            echo
           done
 
       - name: Test
         shell: bash
         run: |
-          default="help=0 verbosity=1 halt_on_error=0"
+          default="help=0 verbosity=0 halt_on_error=0"
           export  ASAN_OPTIONS="$default debug=1 detect_leaks=0 check_initialization_order=1 detect_stack_use_after_return=1 strict_init_order=1 strict_string_checks=1 detect_invalid_pointer_pairs=2"
           export UBSAN_OPTIONS="$default print_stacktrace=1"
           export  LSAN_OPTIONS="$default debug=1 detect_leaks=1"

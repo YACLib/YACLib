@@ -1,4 +1,4 @@
-if (MSVC)
+if (CMAKE_CXX_COMPILER_ID STREQUAL MSVC)
   #TODO(MBkkt) We have to use /Wall. But MSVC is dumb and uses this flag for external projects, like gtest.
   list(APPEND YACLIB_COMPILE_OPTIONS
     /W3

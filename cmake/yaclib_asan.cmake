@@ -1,4 +1,4 @@
-if (MSVC)
+if (CMAKE_CXX_COMPILER_ID STREQUAL MSVC)
   list(APPEND YACLIB_COMPILE_OPTIONS
     /fsanitize=address
     /fsanitize-address-use-after-return
