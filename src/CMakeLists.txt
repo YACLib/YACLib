@@ -29,7 +29,11 @@ target_sources(${PROJECT_NAME}
   PRIVATE ${YACLIB_HEADERS}
   )
 
-target_compile_options(${PROJECT_NAME} PRIVATE ${YACLIB_COMPILE_OPTIONS})
+if (WARN IN_LIST YACLIB_FLAGS)
+  include(yaclib_warn_lib)
+  message("library warnings: ${YACLIB_WARN}")
+endif ()
+target_compile_options(${PROJECT_NAME} PRIVATE ${YACLIB_COMPILE_OPTIONS} ${YACLIB_WARN})
 target_compile_definitions(${PROJECT_NAME} PRIVATE ${YACLIB_DEFINITIONS})
 
 find_package(Threads REQUIRED)

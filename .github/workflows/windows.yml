@@ -6,10 +6,9 @@ on:
     paths-ignore: [ 'doc/**', '**.md' ]
   pull_request:
     branches: [ main ]
-    types: [ assigned ]
     paths-ignore: [ 'doc/**', '**.md' ]
   schedule:
-    - cron: '0 * * * *'
+    - cron: '0 15 * * 1-5'
 
 jobs:
   # TODO(MBkkt) Add windows-2016?
@@ -24,12 +23,39 @@ jobs:
         arch: [ Win32, x64 ]
         os: [ 2019, 2022 ]
         build_type: [ Debug, RelWithDebInfo ]
+        isPR:
+          - ${{ github.event_name == 'pull_request' }}
+        exclude:
+          - isPR: true
+            arch: Win32
+            os: 2019
+            build_type: Debug
+          - isPR: true
+            arch: Win32
+            os: 2019
+            build_type: RelWithDebInfo
+          - isPR: true
+            arch: Win32
+            os: 2022
+            build_type: Debug
+          - isPR: true
+            arch: Win32
+            os: 2022
+            build_type: RelWithDebInfo
+          - isPR: true
+            arch: x64
+            os: 2022
+            build_type: Debug
+          - isPR: true
+            arch: x64
+            os: 2022
+            build_type: RelWithDebInfo
 
     steps:
       - uses: actions/checkout@v2
 
       - name: Set up MinGW x86
-        if: ${{ matrix.arch != 'x64' }}
+        if: ${{ matrix.arch == 'Win32' }}
         uses: egor-tensin/setup-mingw@v2
         with:
           platform: x86
@@ -43,55 +69,57 @@ jobs:
       - name: Configure CMake
         shell: bash
         run: |
-          cmake --version
-          names=("ClangCL" "MinGW" "MSVC")
-          if [[ "${{ matrix.os }}" == "2022" ]]; then
+          if [[ ${{ matrix.os }} == "2022" ]]; then
             msvc="17 2022"
           else
             msvc="16 2019"
           fi
+          arch=${{ matrix.arch }}
+          if [[ $arch == "Win32" ]]; then
+            slowdown=5
+          else
+            slowdown=1
+          fi
+          names=(ClangCL MinGW MSVC)
           generators=("Visual Studio $msvc" "MinGW Makefiles" "Visual Studio $msvc")
-          options=("-A ${{ matrix.arch }} -T ClangCL" "" "-A ${{ matrix.arch }}")
+          options=("-A $arch -T ClangCL" "-DCMAKE_BUILD_TYPE=${{ matrix.build_type }}" "-A $arch")
+
           for (( i=0; i<${#names[*]}; i+=1 )); do
-            if [[ "${{ matrix.arch }}" == "Win32" ]]; then
-              slowdown=5
-            else
-              slowdown=1
-            fi
-            dir="build_${names[$i]}"; echo $dir
-            cmake -S . -B $dir                            \
-              -G "${generators[$i]}"                      \
-              ${options[$i]}                              \
-              -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-              -DYACLIB_BUILD_TESTING=ON                   \
-              -DYACLIB_BUILD_EXAMPLES=ON                  \
-              -DYACLIB_CXX_STANDARD=17                    \
+            dir="build_${names[$i]}"
+            echo $dir
+
+            cmake -S . -B $dir                                    \
+              -DYACLIB_CXX_STANDARD=17                            \
+              -DYACLIB_TEST=SINGLE                                \
+              -G"${generators[$i]}"                               \
+              ${options[$i]}                                      \
               -DYACLIB_DEFINITIONS="YACLIB_CI_SLOWDOWN=$slowdown"
-            echo
+
           done
 
       - name: Build
         shell: bash
         run: |
-          names=("ClangCL" "MinGW" "MSVC")
-          for (( i=0; i<${#names[*]}; i+=1 )); do
-            dir="build_${names[$i]}"; echo $dir
-            cmake --build $dir --config ${{ matrix.build_type }} --parallel 4
+          for dir in build*/; do
+            echo $dir
+            cmake --build $dir --config ${{ matrix.build_type }} --parallel
             echo
           done
 
       - name: Test
         shell: bash
         run: |
-          names=("ClangCL" "MinGW" "MSVC")
+          names=(ClangCL MinGW MSVC)
+          build_type=${{ matrix.build_type }}
+          arch=${{ matrix.arch }}
+
           for (( i=0; i<${#names[*]}; i+=1 )); do
-            if [[ "${names[$i]}" == "MinGW" || 
-                  ( "${{ matrix.arch }}" == "Win32" && 
-                    "${{ matrix.build_type }}" == "RelWithDebInfo" && 
-                    "${names[$i]}" == "ClangCL" ) ]]; then
-              continue; # second condition about some seh error in gtest code, FUCK MSVC SHIT
+            if [[ ${names[$i]} == "MinGW" || 
+                  ( $arch == "Win32" && $build_type == "RelWithDebInfo" && "${names[$i]}" == "ClangCL" ) ]]; then
+              continue; # second condition about some seh error in gtest code. BEST OS FOREVER
             fi
-            dir="build_${names[$i]}"; echo $dir; cd $dir
-            ctest --output-on-failure -C ${{ matrix.build_type }} -VV
-            cd ..; echo
+            dir="build_${names[$i]}"
+            cd $dir
+            ctest --output-on-failure -C ${{ matrix.build_type }}
+            cd ..
           done

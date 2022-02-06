@@ -6,59 +6,112 @@ on:
     paths-ignore: [ 'doc/**', '**.md' ]
   pull_request:
     branches: [ main ]
-    types: [ assigned ]
     paths-ignore: [ 'doc/**', '**.md' ]
   schedule:
-    - cron: '0 * * * *'
+    - cron: '0 15 * * 1-5'
 
 jobs:
   # TODO(MBkkt) Add 20, 23 standard
-  # TODO(MBkkt) Add llvm clang?
 
   main:
-    runs-on: ${{ matrix.os }}
+    runs-on: 'macos-${{ matrix.os }}'
     strategy:
       fail-fast: false
       matrix:
-        os: [ macos-10.15, macos-11 ]
+        os: [ 10.15, 11 ]
         build_type: [ Debug, RelWithDebInfo ]
-    env:
-      COMPILERS: 'clang clang++ gcc-9 g++-9 gcc-10 g++-10 gcc-11 g++-11'
+        isPR:
+          - ${{ github.event_name == 'pull_request' }}
+        exclude:
+          - isPR: true
+            os: 11
+            build_type: Debug
+          - isPR: true
+            os: 11
+            build_type: RelWithDebInfo
 
     steps:
       - uses: actions/checkout@v2
 
+      - name: Update deps on macOS
+        run: |
+          brew update
+          brew install ninja llvm@8
+
       - name: Configure CMake
         run: |
-          cmake --version
-          compilers=($COMPILERS)
-          for (( i=0; i<${#compilers[*]}; i+=2 )); do
-            dir="build_${compilers[$i]}"; echo $dir
-            cmake -S . -B $dir                            \
-              -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-              -DCMAKE_C_COMPILER=${compilers[$i]}         \
-              -DCMAKE_CXX_COMPILER=${compilers[$i + 1]}   \
-              -DYACLIB_BUILD_TESTING=ON                   \
-              -DYACLIB_BUILD_EXAMPLES=ON                  \
-              -DYACLIB_CXX_STANDARD=17                    \
-              -DYACLIB_DEFINITIONS="YACLIB_CI_SLOWDOWN=10"
-            echo
+          stdlibs_name=(libcxx libstdcxx apple_libcxx)
+          compilers_name=(clang gnu-9 apple_clang gnu-10 gnu-11)
+
+          llvm=/usr/local/opt/llvm
+
+          link_options=(
+            "-L$llvm/lib;-Wl,-rpath,$llvm/lib"
+            "-stdlib=libstdc++"
+            "" # Apple
+          )
+          compile_options=(
+            "-I$llvm/include;-I$llvm/include/c++/v1/"
+            "-stdlib=libstdc++"
+            "" # Apple
+          )
+
+          if [[ "${{ github.event_name }}" != "pull_request" ]]; then
+            c_compilers=("$llvm/bin/clang" gcc-9 clang gcc-10 gcc-11)
+            cxx_compilers=("$llvm/bin/clang++" g++-9 clang++ g++-10 g++-11)
+          else
+            c_compilers=("$llvm/bin/clang" gcc-9 clang)
+            cxx_compilers=("$llvm/bin/clang++" g++-9 clang++)
+          fi
+
+          for (( i=0; i<${#c_compilers[*]}; i+=1 )); do
+            for (( j=0; j<${#link_options[*]}; j+=1 )); do
+              if [[ ${compilers_name[$i]} == "clang" && ${stdlibs_name[$j]} == "libstdcxx" ]]; then
+                continue  # TODO(MBkkt) I think we should specify path to libstdcxx
+              fi
+              link_option=""; compile_option=""
+              if [[ ${compilers_name[$i]} == "apple_clang" ]]; then
+                if [[ ${stdlibs_name[$j]} != "apple_libcxx" ]]; then
+                  continue  # TODO(MBkkt) I dunno how to get AppleClang to work with other stdlibs
+                fi
+              elif [[ ${compilers_name[$i]} == gnu-* ]]; then
+                if [[ ${stdlibs_name[$j]} != "libstdcxx" ]]; then
+                  continue  # TODO(MBkkt) I dunno how to get GNU GCC to work with other stdlibs
+                  # Btw I dunno what stdlib would be using libstdcxx or apple_libcxx, just some default
+                fi
+              else
+                link_option=${link_options[$j]}; compile_option=${compile_options[$j]}
+              fi
+
+              dir="build_${compilers_name[$i]}_${stdlibs_name[$j]}"
+              echo $dir
+
+              cmake -S . -B $dir                            \
+                -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+                -DYACLIB_CXX_STANDARD=17                    \
+                -DYACLIB_TEST=SINGLE                        \
+                -DCMAKE_C_COMPILER=${c_compilers[$i]}       \
+                -DCMAKE_CXX_COMPILER=${cxx_compilers[$i]}   \
+                -G"Ninja"                                   \
+                -DYACLIB_LINK_OPTIONS="$link_option"        \
+                -DYACLIB_COMPILE_OPTIONS="$compile_option"  \
+                -DYACLIB_DEFINITIONS="YACLIB_CI_SLOWDOWN=8"
+
+            done
           done
 
       - name: Build
         run: |
-          compilers=($COMPILERS)
-          for (( i=0; i<${#compilers[*]}; i+=2 )); do
-            dir="build_${compilers[$i]}"; echo $dir
-            cmake --build $dir --config ${{ matrix.build_type }} --parallel 6
+          for dir in build*/; do
+            echo $dir
+            cmake --build $dir --config ${{ matrix.build_type }} --parallel
             echo
           done
 
       - name: Test
         run: |
-          compilers=($COMPILERS)
-          for (( i=0; i<${#compilers[*]}; i+=2 )); do
-            dir="build_${compilers[$i]}"; echo $dir; cd $dir
-            ctest --output-on-failure -C ${{ matrix.build_type }} -VV
-            cd ..; echo
+          for dir in build*/; do
+            cd $dir;
+            ctest --output-on-failure -C ${{ matrix.build_type }}
+            cd ..
           done

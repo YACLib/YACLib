@@ -6,27 +6,50 @@ on:
     paths-ignore: [ 'doc/**', '**.md' ]
   pull_request:
     branches: [ main ]
-    types: [ assigned ]
     paths-ignore: [ 'doc/**', '**.md' ]
   schedule:
-    - cron: '0 * * * *'
+    - cron: '0 15 * * 1-5'
 
 jobs:
   # TODO(MBkkt) Add clang-5.0, clang-6.0, clang-7
-  #             Fucking cppreference liars, clang don't support simple variant usage, before clang-8!
+  #             Fucking cppreference liars, clang doesn't support simple variant usage, before clang-8!
   #             We can only support this when we remove the variant from the Result
   # TODO(MBkkt) Add gcc-12 when it release
   # TODO(MBkkt) Add other compilers, like Intel C++?
 
   main:
-    runs-on: ${{ matrix.os }}
+    runs-on: 'ubuntu-${{ matrix.os }}'
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-18.04, ubuntu-20.04 ]
-        compilers: [ 'clang-8 clang++-8 clang-9 clang++-9 clang-10 clang++-10 clang-11 clang++-11 clang-12 clang++-12 clang-13 clang++-13 clang-14 clang++-14',
-                     'gcc-7 g++-7 gcc-8 g++-8 gcc-9 g++-9 gcc-10 g++-10 gcc-11 g++-11' ]
+        os: [ 18.04, 20.04 ]
+        compiler: [ clang, gcc ]
         build_type: [ Debug, RelWithDebInfo ]
+        isPR:
+          - ${{ github.event_name == 'pull_request' }}
+        exclude:
+          - isPR: true
+            os: 20.04
+            compiler: clang
+            build_type: Debug
+          - isPR: true
+            os: 20.04
+            compiler: clang
+            build_type: RelWithDebInfo
+          - isPR: true
+            os: 20.04
+            compiler: gcc
+            build_type: Debug
+          - isPR: true
+            os: 20.04
+            compiler: gcc
+            build_type: RelWithDebInfo
+
+    env:
+      COMPILERS_CLANG: 'clang-8 clang++-8 clang-9 clang++-9 clang-10 clang++-10 clang-11 clang++-11 clang-12 clang++-12 clang-13 clang++-13 clang-14 clang++-14'
+      COMPILERS_GCC: 'gcc-7 g++-7 gcc-8 g++-8 gcc-9 g++-9 gcc-10 g++-10 gcc-11 g++-11'
+      COMPILERS_CLANG_PR: 'clang-8 clang++-8'
+      COMPILERS_GCC_PR: 'gcc-7 g++-7'
 
     steps:
       - uses: actions/checkout@v2
@@ -34,60 +57,97 @@ jobs:
       - name: Update dependencies
         run: |
           sudo apt-get update
-          sudo apt-get upgrade
-          sudo apt-get install ninja-build lld
-          sudo ln -sf /usr/local/bin/ld /usr/bin/lld
+          sudo apt-get install ninja-build
 
       - name: Install dependencies clang
-        if: ${{ matrix.compilers != 'gcc-7 g++-7 gcc-8 g++-8 gcc-9 g++-9 gcc-10 g++-10 gcc-11 g++-11' }}
+        if: ${{ matrix.compiler == 'clang' }}
         run: |
           sudo apt-get install clang-8
+          if [[ ${{ github.event_name }} == 'pull_request' ]]; then
+            exit
+          fi
           wget https://apt.llvm.org/llvm.sh
           chmod +x ./llvm.sh
-          sudo     ./llvm.sh 9  shit
-          sudo     ./llvm.sh 10 shit
-          sudo     ./llvm.sh 11 shit
-          sudo     ./llvm.sh 12 shit
-          sudo     ./llvm.sh 13 shit
-          sudo     ./llvm.sh 14 shit
+          sudo     ./llvm.sh 9  all
+          sudo     ./llvm.sh 10 all
+          sudo     ./llvm.sh 11 all
+          sudo     ./llvm.sh 12 all
+          sudo     ./llvm.sh 13 all
+          sudo     ./llvm.sh 14 all
           rm       ./llvm.sh
 
       - name: Install dependencies gcc
-        if: ${{ matrix.compilers == 'gcc-7 g++-7 gcc-8 g++-8 gcc-9 g++-9 gcc-10 g++-10 gcc-11 g++-11' }}
+        if: ${{ matrix.compiler == 'gcc' }}
         run: |
-          sudo apt-get install ${{ matrix.compilers }}
+          if [[ ${{ github.event_name }} == 'pull_request' ]]; then
+            sudo apt-get install $COMPILERS_GCC_PR
+          else
+            sudo apt-get install $COMPILERS_GCC
+          fi
 
       - name: Configure CMake
         run: |
-          cmake --version
-          compilers=(${{ matrix.compilers }})
+          if [[ ${{ github.event_name }} != "pull_request" ]]; then
+            if [[ ${{ matrix.compiler }} == "clang" ]]; then
+              compilers=($COMPILERS_CLANG)
+            else
+              compilers=($COMPILERS_GCC)
+            fi
+          else
+            if [[ ${{ matrix.compiler }} == "clang" ]]; then
+              compilers=($COMPILERS_CLANG_PR)
+            else
+              compilers=($COMPILERS_GCC_PR)
+            fi
+          fi
+
+          stdlibs_name=(libcxx libstdcxx)
+          link_options=(
+            "-stdlib=libc++;-lc++abi"
+            "-stdlib=libstdc++"
+          )
+          compile_options=(
+            "-stdlib=libc++"
+            "-stdlib=libstdc++"
+          )
+
           for (( i=0; i<${#compilers[*]}; i+=2 )); do
-            dir="build_${compilers[$i]}"; echo $dir
-            cmake -S . -B $dir                            \
-              -G "Ninja"                                  \
-              -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-              -DCMAKE_C_COMPILER=${compilers[$i]}         \
-              -DCMAKE_CXX_COMPILER=${compilers[$i + 1]}   \
-              -DYACLIB_BUILD_TESTING=ON                   \
-              -DYACLIB_BUILD_EXAMPLES=ON                  \
-              -DYACLIB_CXX_STANDARD=17
-            echo
+            for (( j=0; j<${#link_options[*]}; j+=1 )); do
+              link_option=""; compile_option=""
+              if [[ ${compilers[$i]} == gcc-* ]]; then
+                if [[ ${stdlibs_name[$j]} != "libstdcxx" ]]; then
+                  continue  # TODO(MBkkt) I dunno how to get GNU GCC to work with other stdlibs
+                fi
+              else
+                link_option=${link_options[$j]}; compile_option=${compile_options[$j]}
+              fi
+
+              dir="build_${compilers[$i]}_${stdlibs_name[$j]}"
+              echo $dir
+
+              cmake -S . -B $dir                           \
+                -DCMAKE_BUILD_TYPE=$build_type             \
+                -DYACLIB_CXX_STANDARD=17                   \
+                -DYACLIB_TEST=SINGLE                       \
+                -DCMAKE_C_COMPILER=${compilers[$i]}        \
+                -DCMAKE_CXX_COMPILER=${compilers[$i + 1]}  \
+                -G"Ninja"                                  \
+                -DYACLIB_LINK_OPTIONS="$link_option"       \
+                -DYACLIB_COMPILE_OPTIONS="$compile_option"
+
+            done
           done
 
       - name: Build
         run: |
-          compilers=(${{ matrix.compilers }})
-          for (( i=0; i<${#compilers[*]}; i+=2 )); do
-            dir="build_${compilers[$i]}"; echo $dir
+          for dir in build*/; do
             ninja -C $dir
-            echo
           done
 
       - name: Test
         run: |
-          compilers=(${{ matrix.compilers }})
-          for (( i=0; i<${#compilers[*]}; i+=2 )); do
-            dir="build_${compilers[$i]}"; echo $dir; cd $dir
-            ctest --output-on-failure -C ${{ matrix.build_type }} -VV
-            cd ..; echo
+          for dir in build*/; do
+            cd $dir;
+            ctest --output-on-failure -C ${{ matrix.build_type }}
+            cd ..
           done

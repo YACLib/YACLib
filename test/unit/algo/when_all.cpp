@@ -71,7 +71,7 @@ void JustWorks() {
     if constexpr (suite == TestSuite::Vector) {
       return std::vector{7, 3, 5};
     } else {
-      return std::array{7, 3, 5};
+      return std::array<int, 3>{7, 3, 5};
     }
   }();
   if constexpr (is_void) {
