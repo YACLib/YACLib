@@ -436,7 +436,10 @@ void UseAllThreads(IThreadPoolPtr& tp, StopType stop_type) {
   yaclib_std::atomic_size_t counter{0};
 
   auto sleeper = [&counter] {
-    yaclib_std::this_thread::sleep_for(50ms * YACLIB_CI_SLOWDOWN);
+    auto point = std::chrono::steady_clock::now() + 50ms * YACLIB_CI_SLOWDOWN;
+    do {
+      yaclib_std::this_thread::sleep_until(point);
+    } while (point > std::chrono::steady_clock::now());  // Workaround for MinGW
     counter.fetch_add(1, std::memory_order_relaxed);
   };
 

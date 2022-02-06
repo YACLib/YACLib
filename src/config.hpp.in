@@ -2,12 +2,22 @@
 
 #include <cstddef>
 
-// clang-format off
+// other sanitizers don't really need this
+#if defined(__has_feature)
+#  if __has_feature(address_sanitizer)
+#    define YACLIB_ASAN
+#  elif __has_feature(thread_sanitizer)
+#    define YACLIB_TSAN
+#  elif __has_feature(memory_sanitizer)
+#    define YACLIB_MEMSAN
+#  endif
+#endif
 
-// ASAN, TSAN, UBSAN, MEMSAN
-#define YACLIB_${YACLIB_SANITIZER}
-
-// clang-format on
+#if defined(__SANITIZE_ADDRESS__)
+#  define YACLIB_ASAN
+#elif defined(__SANITIZE_THREAD__)
+#  define YACLIB_TSAN
+#endif
 
 // Maybe we should increase some of this
 #ifndef YACLIB_SLOWDOWN
@@ -15,8 +25,6 @@
 #    define YACLIB_SLOWDOWN 2
 #  elif defined(YACLIB_TSAN)
 #    define YACLIB_SLOWDOWN 2
-#  elif defined(YACLIB_UBSAN)
-#    define YACLIB_SLOWDOWN 1
 #  elif defined(YACLIB_MEMSAN)
 #    define YACLIB_SLOWDOWN 1
 #  else
@@ -29,8 +37,6 @@
 #    define YACLIB_MEMORY_OVERHEAD 3
 #  elif defined(YACLIB_TSAN)
 #    define YACLIB_MEMORY_OVERHEAD 3
-#  elif defined(YACLIB_UBSAN)
-#    define YACLIB_MEMORY_OVERHEAD 1
 #  elif defined(YACLIB_MEMSAN)
 #    define YACLIB_MEMORY_OVERHEAD 1
 #  else

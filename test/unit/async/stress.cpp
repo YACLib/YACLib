@@ -22,7 +22,7 @@ struct StressTest : testing::Test {
     Value& operator=(Value&&) noexcept = default;
     Value& operator=(const Value&) noexcept = default;
 
-    explicit Value(uint32_t value) noexcept : v{value} {
+    Value(uint32_t value) noexcept : v{value} {
       created.fetch_add(1, std::memory_order_relaxed);
     }
 
@@ -72,7 +72,7 @@ struct StressTest : testing::Test {
           for (uint32_t x = 0; x < work; ++x) {
             [[maybe_unused]] auto _ = work;
           }
-          std::move(p).Set(Value{idx * (slot_round + 1)});
+          std::move(p).Set(idx * (slot_round + 1));
         }
       }));
     }
@@ -108,7 +108,9 @@ struct StressTest : testing::Test {
     wg.Wait();
     EXPECT_EQ(kNumRounds * (kNumThreads / 2), num_resolved_futures.load());
     EXPECT_EQ(kNumRounds * (kNumThreads / 2), Value::created.load());
-    // EXPECT_EQ(kNumRounds * kNumThreads / 2, Value::destroyed.load());
+    std::cerr << " Value::destroyed expectation: " << kNumRounds * (kNumThreads / 2)
+              << " reality: " << Value::destroyed.load() << std::endl;
+    // EXPECT_EQ(kNumRounds * (kNumThreads / 2), Value::destroyed.load());
     // TODO(MBkkt) Uncomment when we make Result great again
   }
 };
@@ -118,10 +120,10 @@ TEST_F(StressTest, ThenInline) {
       [](yaclib::WaitGroup&, auto future, uint32_t idx, uint32_t slot_round, auto& num_resolved_futures) {
         std::array<char, 64> data{};
         std::move(future)
-            .ThenInline([slot_round](StressTest::Value x) noexcept {
+            .ThenInline([slot_round](StressTest::Value&& x) noexcept {
               return x.v / slot_round;
             })
-            .SubscribeInline([idx, data, &num_resolved_futures](uint32_t x) noexcept {
+            .SubscribeInline([data, &num_resolved_futures, idx](uint32_t x) noexcept {
               (void)data;
               EXPECT_EQ(idx, x);
               num_resolved_futures.fetch_add(1, std::memory_order_relaxed);
@@ -133,7 +135,7 @@ TEST_F(StressTest, Then) {
   auto tp = yaclib::MakeThreadPool();
   Run(tp, [](yaclib::WaitGroup& wg, auto future, uint32_t idx, uint32_t slot_round, auto& num_resolved_futures) {
     auto f = std::move(future)
-                 .Then([slot_round](StressTest::Value x) noexcept {
+                 .Then([slot_round](StressTest::Value&& x) noexcept {
                    return x.v / slot_round;
                  })
                  .Then([idx, &num_resolved_futures](uint32_t x) noexcept {
