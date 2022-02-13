@@ -1,51 +1,52 @@
 #pragma once
 
 #include <yaclib/algo/when_policy.hpp>
+#include <yaclib/async/detail/result_core.hpp>
 #include <yaclib/async/future.hpp>
-#include <yaclib/async/promise.hpp>
 #include <yaclib/fault/atomic.hpp>
 
+#include <cstddef>
 #include <iterator>
 #include <type_traits>
 #include <utility>
 
 namespace yaclib::detail {
 
-template <typename T, WhenPolicy P /*None*/>
+template <typename V, typename E, WhenPolicy P /*None*/>
 class AnyCombinatorBase {
  protected:
   yaclib_std::atomic_bool _done;
-  PromiseCorePtr<T> _core;
+  ResultCorePtr<V, E> _core;
 
-  explicit AnyCombinatorBase(size_t /*size*/, PromiseCorePtr<T>&& core) : _done{false}, _core{std::move(core)} {
+  explicit AnyCombinatorBase(std::size_t /*size*/, ResultCorePtr<V, E>&& core) : _done{false}, _core{std::move(core)} {
   }
 
   bool Done() {
     return _done.load(std::memory_order_acquire);
   }
 
-  void Combine(util::Result<T>&& result) {
+  void Combine(Result<V, E>&& result) {
     if (!_done.exchange(true, std::memory_order_acq_rel)) {
       _core->Set(std::move(result));
     }
   }
 };
 
-template <typename T>
-class AnyCombinatorBase<T, WhenPolicy::LastFail> {
+template <typename V, typename E>
+class AnyCombinatorBase<V, E, WhenPolicy::LastFail> {
   yaclib_std::atomic_size_t _state;
 
  protected:
-  PromiseCorePtr<T> _core;
+  ResultCorePtr<V, E> _core;
 
-  explicit AnyCombinatorBase(size_t size, PromiseCorePtr<T>&& core) : _state{2 * size}, _core{std::move(core)} {
+  explicit AnyCombinatorBase(std::size_t size, ResultCorePtr<V, E>&& core) : _state{2 * size}, _core{std::move(core)} {
   }
 
   bool Done() {
     return (_state.load(std::memory_order_acquire) & 1U) != 0;
   }
 
-  void Combine(util::Result<T>&& result) {
+  void Combine(Result<V, E>&& result) {
     if (result) {
       if ((_state.exchange(1, std::memory_order_acq_rel) & 1U) == 0) {
         _core->Set(std::move(result));
@@ -56,100 +57,101 @@ class AnyCombinatorBase<T, WhenPolicy::LastFail> {
   }
 };
 
-template <typename T>
-class AnyCombinatorBase<T, WhenPolicy::FirstFail> : public AnyCombinatorBase<T, WhenPolicy::None> {
-  using Base = AnyCombinatorBase<T, WhenPolicy::None>;
+template <typename V, typename E>
+class AnyCombinatorBase<V, E, WhenPolicy::FirstFail> : public AnyCombinatorBase<V, E, WhenPolicy::None> {
+  using Base = AnyCombinatorBase<V, E, WhenPolicy::None>;
 
-  yaclib_std::atomic<util::ResultState> _state;
+  yaclib_std::atomic<ResultState> _state;
   union {
-    util::Unit _unit;
-    std::error_code _error;
+    Unit _unit;
+    E _error;
     std::exception_ptr _exception;
   };
 
  protected:
-  explicit AnyCombinatorBase(size_t size, PromiseCorePtr<T>&& core)
-      : Base{size, std::move(core)}, _state{util::ResultState::Empty}, _unit{} {
+  explicit AnyCombinatorBase(std::size_t size, ResultCorePtr<V, E>&& core)
+      : Base{size, std::move(core)}, _state{ResultState::Empty}, _unit{} {
   }
 
   ~AnyCombinatorBase() {
     auto done = Base::_done.load(std::memory_order_acquire);
     auto state = _state.load(std::memory_order_acquire);
-    if (state == util::ResultState::Error) {
+    if (state == ResultState::Error) {
       if (!done) {
-        Base::_core->Set(_error);
+        Base::_core->Set(std::move(_error));
       }
-      _error.std::error_code::~error_code();
-    } else if (state == util::ResultState::Exception) {
+      _error.~E();
+    } else if (state == ResultState::Exception) {
       if (!done) {
         Base::_core->Set(std::move(_exception));
       }
-      _exception.std::exception_ptr::~exception_ptr();
+      _exception.~exception_ptr();
     }
   }
 
-  void Combine(util::Result<T>&& result) {
+  void Combine(Result<V, E>&& result) {
     auto state = result.State();
-    if (state == util::ResultState::Value) {
+    if (state == ResultState::Value) {
       return Base::Combine(std::move(result));
     }
-    auto old_state = _state.load(std::memory_order_relaxed);
-    if (old_state == util::ResultState::Empty &&
+    auto old_state = _state.load(std::memory_order_acquire);
+    if (old_state == ResultState::Empty &&
         _state.compare_exchange_strong(old_state, state, std::memory_order_acq_rel, std::memory_order_relaxed)) {
-      if (state == util::ResultState::Exception) {
+      if (state == ResultState::Exception) {
         new (&_exception) std::exception_ptr{std::move(result).Exception()};
       } else {
-        assert(state == util::ResultState::Error);
-        new (&_error) std::error_code{std::move(result).Error()};
+        assert(state == ResultState::Error);
+        new (&_error) E{std::move(result).Error()};
       }
     }
   }
 };
 
-template <typename T, WhenPolicy P>
-class AnyCombinator : public AnyCombinatorBase<T, P>, public InlineCore {
-  using Base = AnyCombinatorBase<T, P>;
+template <typename V, typename E, WhenPolicy P>
+class AnyCombinator : public AnyCombinatorBase<V, E, P>, public InlineCore {
+  using Base = AnyCombinatorBase<V, E, P>;
 
-  void CallInline(InlineCore* context) noexcept final {
-    if (Base::_core->GetState() != BaseCore::State::HasStop && !Base::Done()) {
-      Base::Combine(std::move(static_cast<ResultCore<T>*>(context)->Get()));
+  void CallInline(InlineCore* context, State) noexcept final {
+    if (Base::_core->Alive() && !Base::Done()) {
+      Base::Combine(std::move(static_cast<ResultCore<V, E>*>(context)->Get()));
     }
   }
 
  public:
-  static std::pair<Future<T>, util::Ptr<AnyCombinator>> Make(size_t size) {
+  static auto Make(std::size_t size) {
     assert(size >= 2);
-    auto core = util::MakeIntrusive<detail::ResultCore<T>>();
-    auto combinator = util::MakeIntrusive<AnyCombinator<T, P>>(size, core);
-    return {Future<T>{std::move(core)}, std::move(combinator)};
+    // TODO(MBkkt) Should be single allocation
+    auto core = MakeIntrusive<detail::ResultCore<V, E>>();
+    auto combinator = MakeIntrusive<AnyCombinator<V, E, P>>(size, core);
+    return std::pair{Future<V, E>{std::move(core)}, std::move(combinator)};
   }
 
-  explicit AnyCombinator(size_t size, PromiseCorePtr<T> core) : Base{size, std::move(core)} {
+  explicit AnyCombinator(std::size_t size, ResultCorePtr<V, E> core) : Base{size, std::move(core)} {
   }
 };
 
-template <typename T, WhenPolicy P>
-using AnyCombinatorPtr = util::Ptr<AnyCombinator<T, P>>;
+template <typename V, typename E, WhenPolicy P>
+using AnyCombinatorPtr = IntrusivePtr<AnyCombinator<V, E, P>>;
 
-template <WhenPolicy P, typename T, typename ValueIt, typename RangeIt>
-Future<T> WhenAnyImpl(ValueIt it, RangeIt begin, RangeIt end) {
+template <WhenPolicy P, typename V, typename E, typename ValueIt, typename RangeIt>
+Future<V, E> WhenAnyImpl(ValueIt it, RangeIt begin, RangeIt end) {
   if (begin == end) {
     return {};
   }
   if (auto next = begin; ++next == end) {
     return std::move(*it);
   }
-  const auto combinator_size = [&] {
+  const auto combinator_size = [&]() -> std::size_t {
     if constexpr (P == WhenPolicy::None || P == WhenPolicy::FirstFail) {
       return 2;
     } else {
       // We don't use std::distance because we want to alert the user to the fact that it can be expensive.
       // Maybe the user has the size of the range, or he is satisfied with another WhenPolicy,
-      // as a last resort, it is suggested to call WhenAny<WhenPolicy::LastFail>(begin, std::distance(begin, end));
-      return static_cast<size_t>(end - begin);
+      // as a last resort it is suggested to call WhenAny<WhenPolicy::LastFail>(begin, distance(begin, end))
+      return end - begin;
     }
   }();
-  auto [future, combinator] = AnyCombinator<T, P>::Make(combinator_size);
+  auto [future, combinator] = AnyCombinator<V, E, P>::Make(combinator_size);
   for (; begin != end; ++begin) {
     std::exchange(it->GetCore(), nullptr)->SetCallbackInline(combinator);
     ++it;
@@ -157,12 +159,9 @@ Future<T> WhenAnyImpl(ValueIt it, RangeIt begin, RangeIt end) {
   return std::move(future);
 }
 
-template <WhenPolicy P, typename T, typename... Ts>
-void WhenAnyImpl(AnyCombinatorPtr<T, P>& combinator, Future<T>&& head, Future<Ts>&&... tail) {
-  std::exchange(head.GetCore(), nullptr)->SetCallbackInline(combinator);
-  if constexpr (sizeof...(tail) != 0) {
-    WhenAnyImpl<P>(combinator, std::move(tail)...);
-  }
+template <WhenPolicy P, typename V, typename E, typename... Vs, typename... Es>
+void WhenAnyImpl(AnyCombinatorPtr<V, E, P>& combinator, Future<Vs, Es>&&... futures) {
+  (..., std::exchange(futures.GetCore(), nullptr)->SetCallbackInline(combinator));
 }
 
 }  // namespace yaclib::detail

@@ -2,7 +2,9 @@
 
 #include <yaclib/async/detail/wait_core.hpp>
 #include <yaclib/async/future.hpp>
-#include <yaclib/util/counters.hpp>
+#include <yaclib/util/detail/atomic_counter.hpp>
+
+#include <cassert>
 
 namespace yaclib {
 
@@ -16,9 +18,10 @@ class WaitGroup {
    * You also can't use future before Wait
    * \param f one futures to wait
    */
-  template <typename T>
-  void Add(Future<T>& f) {
-    f.GetCore()->SetWait(_callback);
+  template <typename V, typename E>
+  void Add(Future<V, E>& f) {
+    assert(f.Valid());
+    Add(*f.GetCore());
   }
 
   /**
@@ -27,9 +30,9 @@ class WaitGroup {
   void Wait();
 
  private:
-  util::Counter<detail::WaitCore, detail::WaitCoreDeleter> _callback;
-};
+  void Add(detail::BaseCore& core);
 
-extern template void WaitGroup::Add<void>(Future<void>& f);
+  detail::AtomicCounter<detail::WaitCore, detail::WaitCoreDeleter> _callback{1};
+};
 
 }  // namespace yaclib

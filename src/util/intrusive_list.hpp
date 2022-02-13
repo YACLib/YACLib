@@ -1,10 +1,12 @@
 #pragma once
 
-#include <yaclib/util/intrusive_node.hpp>
+#include <yaclib/executor/task.hpp>
+#include <yaclib/executor/thread_factory.hpp>
+#include <yaclib/util/detail/node.hpp>
 
 #include <cstddef>
 
-namespace yaclib::util {
+namespace yaclib {
 
 template <typename T>
 class List final {
@@ -42,4 +44,4 @@ class List final {
   detail::Node _head;  // sentinel node
 };
 
-}  // namespace yaclib::util
+}  // namespace yaclib

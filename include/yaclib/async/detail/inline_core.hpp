@@ -6,10 +6,20 @@ namespace yaclib::detail {
 
 class InlineCore : public ITask {
  public:
-  virtual void CallInline(InlineCore* caller) noexcept = 0;
+  enum class State {
+    Empty = 0,
+    HasResult,
+    HasCallback,
+    HasCallbackInline,
+    HasAsyncCallback,
+    HasWait,
+    HasStop,
+  };
 
   void Call() noexcept override;
   void Cancel() noexcept override;
+
+  virtual void CallInline(InlineCore*, State) noexcept;
 };
 
 }  // namespace yaclib::detail

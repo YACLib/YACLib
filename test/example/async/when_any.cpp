@@ -5,9 +5,14 @@
 #include <yaclib/algo/when_any.hpp>
 #include <yaclib/async/run.hpp>
 #include <yaclib/executor/thread_pool.hpp>
+#include <yaclib/util/intrusive_ptr.hpp>
+#include <yaclib/util/result.hpp>
 
 #include <chrono>
-#include <thread>
+#include <iostream>
+#include <type_traits>
+#include <utility>
+#include <vector>
 
 #include <gtest/gtest.h>
 
@@ -32,7 +37,7 @@ TEST(Example, WhenAny) {
   // Parallel composition
   // Any combinator: std::vector<Future<T>> -> Future<T>
   // Non-blocking!
-  yaclib::Future<int> any = yaclib::WhenAny(futs.begin(), futs.size());
+  yaclib::Future<int> any = WhenAny(futs.begin(), futs.size());
 
   // First value
   std::cout << "Any value: " << std::move(any).Get().Ok() << std::endl;

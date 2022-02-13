@@ -17,7 +17,14 @@ Checks: '*,
          -modernize-use-trailing-return-type,
          -readability-identifier-length,
          -fuchsia-overloaded-operator,
-         -cppcoreguidelines-pro-type-union-access'
+         -cppcoreguidelines-pro-type-union-access,
+         -hicpp-named-parameter,
+         -modernize-use-default-member-init,
+         -readability-named-parameter,
+         -google-explicit-constructor,
+         -hicpp-explicit-conversions,
+         -llvm-header-guard,
+         -cppcoreguidelines-owning-memory'
 
 WarningsAsErrors: '*'
 

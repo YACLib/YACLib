@@ -1,10 +1,16 @@
+#include <util/error_code.hpp>
+
 #include <yaclib/util/result.hpp>
+
+#include <exception>
+#include <stdexcept>
+#include <type_traits>
+#include <utility>
 
 #include <gtest/gtest.h>
 
+namespace test {
 namespace {
-
-using namespace yaclib::util;
 
 struct NotDefaultConstructible {
   NotDefaultConstructible() = delete;
@@ -13,90 +19,95 @@ struct NotDefaultConstructible {
 };
 
 TEST(Simple, Simple) {
-  Result<int> result;
-  EXPECT_EQ(result.State(), ResultState::Empty);
+  yaclib::Result<int> result;
+  EXPECT_EQ(result.State(), yaclib::ResultState::Empty);
   result = 5;
-  EXPECT_EQ(result.State(), ResultState::Value);
+  EXPECT_EQ(result.State(), yaclib::ResultState::Value);
   EXPECT_EQ(std::move(result).Ok(), 5);
 }
 
 TEST(Simple, NotDefaultConstructible) {
-  Result<NotDefaultConstructible> result;
+  yaclib::Result<NotDefaultConstructible> result;
   result = NotDefaultConstructible{5};
 }
 
-void TestState(ResultState state) {
-  Result<int> result;
-  EXPECT_EQ(result.State(), ResultState::Empty);
+void TestState(yaclib::ResultState state) {
+  yaclib::Result<int> result;
+  EXPECT_EQ(result.State(), yaclib::ResultState::Empty);
   switch (state) {
-    case ResultState::Value: {
+    case yaclib::ResultState::Value: {
       result = 1;
     } break;
-    case ResultState::Error: {
-      result = std::error_code{};
+    case yaclib::ResultState::Error: {
+      result = yaclib::StopTag{};
     } break;
-    case ResultState::Exception: {
+    case yaclib::ResultState::Exception: {
       result = std::make_exception_ptr(std::runtime_error{""});
     } break;
-    case ResultState::Empty: {
+    case yaclib::ResultState::Empty: {
     } break;
   }
   EXPECT_EQ(result.State(), state);
 }
 
 TEST(State, Empty) {
-  TestState(ResultState::Empty);
+  TestState(yaclib::ResultState::Empty);
 }
 
 TEST(State, Error) {
-  TestState(ResultState::Error);
+  TestState(yaclib::ResultState::Error);
 }
 
 TEST(State, Exception) {
-  TestState(ResultState::Exception);
+  TestState(yaclib::ResultState::Exception);
 }
 
 TEST(State, Value) {
-  TestState(ResultState::Value);
+  TestState(yaclib::ResultState::Value);
 }
-
-void TestOk(ResultState state) {
-  Result<int> result;
-  EXPECT_EQ(result.State(), ResultState::Empty);
+template <typename E = yaclib::StopError>
+void TestOk(yaclib::ResultState state) {
+  yaclib::Result<int, E> result;
+  EXPECT_EQ(result.State(), yaclib::ResultState::Empty);
   switch (state) {
-    case ResultState::Value: {
+    case yaclib::ResultState::Value: {
       result = 1;
       EXPECT_NO_THROW(std::move(result).Ok());
     } break;
-    case ResultState::Error: {
-      result = std::error_code{};
-      EXPECT_THROW(std::move(result).Ok(), ResultError);
+    case yaclib::ResultState::Error: {
+      result = yaclib::StopTag{};
+      EXPECT_THROW(std::move(result).Ok(), yaclib::ResultError<E>);
     } break;
-    case ResultState::Exception: {
+    case yaclib::ResultState::Exception: {
       result = std::make_exception_ptr(std::runtime_error{""});
       EXPECT_THROW(std::move(result).Ok(), std::runtime_error);
     } break;
-    case ResultState::Empty: {
-      EXPECT_THROW(std::move(result).Ok(), ResultEmpty);
+    case yaclib::ResultState::Empty: {
+      EXPECT_THROW(std::move(result).Ok(), yaclib::ResultEmpty);
     } break;
   }
   EXPECT_EQ(result.State(), state);
 }
 
 TEST(Ok, Value) {
-  TestOk(ResultState::Value);
+  TestOk(yaclib::ResultState::Value);
+  TestOk<LikeErrorCode>(yaclib::ResultState::Value);
 }
 
 TEST(Ok, Error) {
-  TestOk(ResultState::Error);
+  TestOk(yaclib::ResultState::Error);
+  TestOk<LikeErrorCode>(yaclib::ResultState::Error);
 }
 
 TEST(Ok, Exception) {
-  TestOk(ResultState::Exception);
+  TestOk(yaclib::ResultState::Exception);
+  TestOk<LikeErrorCode>(yaclib::ResultState::Exception);
 }
 
 TEST(Ok, Empty) {
-  TestOk(ResultState::Empty);
+  TestOk(yaclib::ResultState::Empty);
+  TestOk<LikeErrorCode>(yaclib::ResultState::Empty);
 }
 
 }  // namespace
+}  // namespace test

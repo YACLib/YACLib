@@ -1,9 +1,29 @@
 #include <yaclib/algo/when_any.hpp>
+#include <yaclib/async/contract.hpp>
+#include <yaclib/async/detail/result_core.hpp>
+#include <yaclib/async/promise.hpp>
 #include <yaclib/async/run.hpp>
+#include <yaclib/config.hpp>
 #include <yaclib/executor/thread_pool.hpp>
+#include <yaclib/fault/chrono.hpp>
+#include <yaclib/fault/thread.hpp>
+#include <yaclib/util/intrusive_ptr.hpp>
+#include <yaclib/util/result.hpp>
 
 #include <array>
+#include <chrono>
+#include <exception>
+#include <iosfwd>
+#include <iterator>
+#include <ratio>
+#include <set>
+#include <stdexcept>
 #include <string>
+#include <thread>
+#include <tuple>
+#include <type_traits>
+#include <utility>
+#include <vector>
 
 #include <gtest/gtest.h>
 
@@ -32,9 +52,7 @@ enum class Value {
 template <Container C, WhenPolicy P, typename V, int kSize = 3, bool UseDefault = false>
 auto FillArrays(std::array<Promise<V>, kSize>& promises, std::array<Future<V>, kSize>& futures) {
   for (int i = 0; i < kSize; ++i) {
-    auto [f, p] = MakeContract<V>();
-    futures[i] = std::move(f);
-    promises[i] = std::move(p);
+    std::tie(futures[i], promises[i]) = yaclib::MakeContract<V>();
   }
   return [&futures] {
     if (UseDefault) {
@@ -79,7 +97,7 @@ void JustWork() {
 
 template <Result R, Container C, WhenPolicy P, typename V, bool UseDefault = false>
 void Fail() {
-  auto f1 = std::error_code{};
+  auto f1 = StopError{StopTag{}};
   auto f2 = std::make_exception_ptr(std::runtime_error{""});
   constexpr int kSize = 3;
   std::array<Promise<V>, kSize> promises;
@@ -103,7 +121,7 @@ void Fail() {
   EXPECT_TRUE(any.Ready());
   if constexpr ((P == WhenPolicy::LastFail && R == Result::Exception) ||
                 ((P == WhenPolicy::None || P == WhenPolicy::FirstFail) && R == Result::Error)) {
-    EXPECT_THROW(std::move(any).Get().Ok(), util::ResultError);
+    EXPECT_THROW(std::move(any).Get().Ok(), yaclib::ResultError<StopError>);
   } else {
     EXPECT_THROW(std::move(any).Get().Ok(), std::runtime_error);
   }
@@ -122,8 +140,8 @@ void EmptyInput() {
   //  Return this code if we decide to return an empty ready future
   //  EXPECT_TRUE(any.Ready());
   //  auto result = std::move(any).Get();
-  //  EXPECT_EQ(result.State(), util::ResultState::Empty);
-  //  EXPECT_THROW(std::move(result).Ok(), util::ResultEmpty);
+  //  EXPECT_EQ(result.State(), ResultState::Empty);
+  //  EXPECT_THROW(std::move(result).Ok(), ResultEmpty);
 }
 
 template <Result R, Container C, WhenPolicy P, typename V>
@@ -283,13 +301,13 @@ class WhenAnyMatrix : public testing::TestWithParam<Param> {};
 
 using WhenAnyOK = WhenAnyMatrix;
 INSTANTIATE_TEST_SUITE_P(
-    WhenAnyOK, WhenAnyOK,
-    testing::Combine(testing::Values(Result::Ok), testing::Values(Container::Vector, Container::Array),
-                     testing::Values(WhenPolicy::None, WhenPolicy::FirstFail, WhenPolicy::LastFail),
-                     testing::Values(Value::Int, Value::Void)),
-    [](const testing::TestParamInfo<WhenAnyMatrix::ParamType>& info) {
-      return ToString(info.param);
-    });
+  WhenAnyOK, WhenAnyOK,
+  testing::Combine(testing::Values(Result::Ok), testing::Values(Container::Vector, Container::Array),
+                   testing::Values(WhenPolicy::None, WhenPolicy::FirstFail, WhenPolicy::LastFail),
+                   testing::Values(Value::Int, Value::Void)),
+  [](const testing::TestParamInfo<WhenAnyMatrix::ParamType>& info) {
+    return ToString(info.param);
+  });
 
 using WhenAnyFail = WhenAnyMatrix;
 INSTANTIATE_TEST_SUITE_P(WhenAnyFail, WhenAnyFail,
@@ -322,52 +340,52 @@ INSTANTIATE_TEST_SUITE_P(WhenAnyDefault, WhenAnyDefault,
                            return ToString(info.param);
                          });
 
-#define CALL_F_R_C_P(Function, Result, Container, Policy) \
-  switch (v) {                                            \
-    case Value::Int:                                      \
-      return Function<Result, Container, Policy, int>();  \
-    case Value::Void:                                     \
-      return Function<Result, Container, Policy, void>(); \
-    default:                                              \
-      FAIL();                                             \
-      return;                                             \
+#define CALL_F_R_C_P(Function, Result, Container, Policy)                                                              \
+  switch (v) {                                                                                                         \
+    case Value::Int:                                                                                                   \
+      return Function<Result, Container, Policy, int>();                                                               \
+    case Value::Void:                                                                                                  \
+      return Function<Result, Container, Policy, void>();                                                              \
+    default:                                                                                                           \
+      FAIL();                                                                                                          \
+      return;                                                                                                          \
   }
 
-#define CALL_F_R_C(Function, Result, Container)                        \
-  switch (p) {                                                         \
-    case WhenPolicy::None:                                             \
-      CALL_F_R_C_P(Function, Result, Container, WhenPolicy::None)      \
-    case WhenPolicy::FirstFail:                                        \
-      CALL_F_R_C_P(Function, Result, Container, WhenPolicy::FirstFail) \
-    case WhenPolicy::LastFail:                                         \
-      CALL_F_R_C_P(Function, Result, Container, WhenPolicy::LastFail)  \
-    default:                                                           \
-      FAIL();                                                          \
-      return;                                                          \
+#define CALL_F_R_C(Function, Result, Container)                                                                        \
+  switch (p) {                                                                                                         \
+    case WhenPolicy::None:                                                                                             \
+      CALL_F_R_C_P(Function, Result, Container, WhenPolicy::None)                                                      \
+    case WhenPolicy::FirstFail:                                                                                        \
+      CALL_F_R_C_P(Function, Result, Container, WhenPolicy::FirstFail)                                                 \
+    case WhenPolicy::LastFail:                                                                                         \
+      CALL_F_R_C_P(Function, Result, Container, WhenPolicy::LastFail)                                                  \
+    default:                                                                                                           \
+      FAIL();                                                                                                          \
+      return;                                                                                                          \
   }
 
-#define CALL_F_R(Function, Result)                    \
-  switch (c) {                                        \
-    case Container::Vector:                           \
-      CALL_F_R_C(Function, Result, Container::Vector) \
-    case Container::Array:                            \
-      CALL_F_R_C(Function, Result, Container::Array)  \
-    default:                                          \
-      FAIL();                                         \
-      return;                                         \
+#define CALL_F_R(Function, Result)                                                                                     \
+  switch (c) {                                                                                                         \
+    case Container::Vector:                                                                                            \
+      CALL_F_R_C(Function, Result, Container::Vector)                                                                  \
+    case Container::Array:                                                                                             \
+      CALL_F_R_C(Function, Result, Container::Array)                                                                   \
+    default:                                                                                                           \
+      FAIL();                                                                                                          \
+      return;                                                                                                          \
   }
 
-#define CALL_F(Function)                    \
-  switch (r) {                              \
-    case Result::Ok:                        \
-      CALL_F_R(Function, Result::Ok)        \
-    case Result::Error:                     \
-      CALL_F_R(Function, Result::Error)     \
-    case Result::Exception:                 \
-      CALL_F_R(Function, Result::Exception) \
-    default:                                \
-      FAIL();                               \
-      return;                               \
+#define CALL_F(Function)                                                                                               \
+  switch (r) {                                                                                                         \
+    case Result::Ok:                                                                                                   \
+      CALL_F_R(Function, Result::Ok)                                                                                   \
+    case Result::Error:                                                                                                \
+      CALL_F_R(Function, Result::Error)                                                                                \
+    case Result::Exception:                                                                                            \
+      CALL_F_R(Function, Result::Exception)                                                                            \
+    default:                                                                                                           \
+      FAIL();                                                                                                          \
+      return;                                                                                                          \
   }
 
 TEST_P(WhenAnyOK, JustWork) {
@@ -411,7 +429,7 @@ TEST_P(WhenAnyDefault, Default) {
 TEST(WhenAny, LengthOne) {
   std::array<Future<int>, 1> fs;
   const void* old_addr = fs[0].GetCore().Get();
-  auto new_future = yaclib::WhenAny(std::begin(fs), 1);
+  auto new_future = WhenAny(std::begin(fs), 1);
   const void* new_addr = new_future.GetCore().Get();
   EXPECT_EQ(old_addr, new_addr);
 }

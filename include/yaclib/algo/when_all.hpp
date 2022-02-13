@@ -1,6 +1,13 @@
 #pragma once
 
 #include <yaclib/algo/detail/when_all_impl.hpp>
+#include <yaclib/algo/when_policy.hpp>
+#include <yaclib/async/future.hpp>
+#include <yaclib/util/type_traits.hpp>
+
+#include <cstddef>
+#include <iterator>
+#include <utility>
 
 namespace yaclib {
 
@@ -12,14 +19,13 @@ namespace yaclib {
  * \param begin , size the range of futures to combine
  * \return Future<std::vector<T>>
  */
-template <WhenPolicy P = WhenPolicy::FirstFail, typename It,
-          typename T = util::detail::FutureValueT<typename std::iterator_traits<It>::value_type>>
-auto WhenAll(It begin, size_t size) {
+template <WhenPolicy P = WhenPolicy::FirstFail, typename It, typename T = typename std::iterator_traits<It>::value_type>
+auto WhenAll(It begin, std::size_t size) {
   static_assert(P == WhenPolicy::FirstFail, "TODO(Ri7ay) Add other policy for WhenAll");
-  auto [future, combinator] = detail::AllCombinator<T>::Make(size);
-  for (size_t i = 0; i != size; ++i) {
-    begin->GetCore()->SetCallbackInline(combinator);
-    std::move(*begin).Detach();
+  static_assert(is_future_v<T>, "WhenAll function Iterator must be point to some Future");
+  auto [future, combinator] = detail::AllCombinator<future_value_t<T>, future_error_t<T>>::Make(size);
+  for (std::size_t i = 0; i != size; ++i) {
+    std::exchange(begin->GetCore(), nullptr)->SetCallbackInline(combinator);
     ++begin;
   }
   return std::move(future);
@@ -32,27 +38,29 @@ auto WhenAll(It begin, size_t size) {
  * \param begin , end the range of futures to combine
  * \return Future<std::vector<T>>
  */
-template <WhenPolicy P = WhenPolicy::FirstFail, typename It>
+template <WhenPolicy P = WhenPolicy::FirstFail, typename It, typename T = typename std::iterator_traits<It>::value_type>
 auto WhenAll(It begin, It end) {
   static_assert(P == WhenPolicy::FirstFail, "TODO(Ri7ay) Add other policy for WhenAll");
-  static_assert(util::IsFutureV<typename std::iterator_traits<It>::value_type>,
-                "When function Iterator must be point to some Future");
-  return WhenAll(begin, std::distance(begin, end));
+  static_assert(is_future_v<T>, "WhenAll function Iterator must be point to some Future");
+  // We don't use std::distance because we want to alert the user to the fact that it can be expensive.
+  // Maybe the user has the size of the range, otherwise it is suggested to call WhenAll(begin, distance(begin, end))
+  return WhenAll(begin, end - begin);
 }
 
 /**
  * Create \ref Future which will be ready when all futures are ready
  *
- * \tparam T type of all passed futures
+ * \tparam V type of value all passed futures
+ * \tparam E type of error all passed futures
  * \param head , tail one or more futures to combine
  * \return Future<std::array<T>>
  */
-template <WhenPolicy P = WhenPolicy::FirstFail, typename T, typename... Ts>
-auto WhenAll(Future<T>&& head, Future<Ts>&&... tail) {
+template <WhenPolicy P = WhenPolicy::FirstFail, typename V, typename E, typename... Vs, typename... Es>
+auto WhenAll(Future<V, E>&& head, Future<Vs, Es>&&... tail) {
   static_assert(P == WhenPolicy::FirstFail, "TODO(Ri7ay) Add other policy for WhenAll");
-  constexpr size_t kSize = 1 + sizeof...(Ts);
+  constexpr std::size_t kSize = 1 + sizeof...(Vs);
   static_assert(kSize >= 2, "WhenAll wants at least two futures");
-  auto [future, combinator] = detail::AllCombinator<T, kSize>::Make(1);
+  auto [future, combinator] = detail::AllCombinator<V, E, kSize>::Make(1);
   detail::WhenAllImpl<kSize>(combinator, std::move(head), std::move(tail)...);
   return std::move(future);
 }

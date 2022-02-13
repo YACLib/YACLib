@@ -1,4 +1,6 @@
+#include <yaclib/executor/executor.hpp>
 #include <yaclib/executor/inline.hpp>
+#include <yaclib/executor/task.hpp>
 
 namespace yaclib {
 
@@ -8,9 +10,9 @@ class Inline final : public IExecutor {
     return Type::Inline;
   }
 
-  bool Execute(ITask& task) noexcept final {
+  bool Submit(ITask& task) noexcept final {
     task.Call();
-    return true;
+    return false;
   }
 
   void IncRef() noexcept final {
@@ -19,8 +21,9 @@ class Inline final : public IExecutor {
   }
 };
 
+static Inline sInline;  // TODO(MBkkt) correct?
+
 IExecutorPtr MakeInline() noexcept {
-  static Inline sInline;
   return &sInline;
 }
 

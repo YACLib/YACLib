@@ -3,13 +3,22 @@
  * Simple Future examples
  */
 
+#include <yaclib/async/contract.hpp>
+#include <yaclib/async/future.hpp>
+#include <yaclib/async/promise.hpp>
 #include <yaclib/async/run.hpp>
 #include <yaclib/executor/executor.hpp>
 #include <yaclib/executor/strand.hpp>
 #include <yaclib/executor/thread_pool.hpp>
+#include <yaclib/util/intrusive_ptr.hpp>
+#include <yaclib/util/result.hpp>
 
-#include <atomic>
+#include <chrono>
+#include <exception>
 #include <iostream>
+#include <string>
+#include <type_traits>
+#include <utility>
 
 #include <gtest/gtest.h>
 
@@ -22,7 +31,7 @@ TEST(Example, HelloWorld) {
 
   EXPECT_TRUE(f.Ready());
 
-  yaclib::util::Result<int> result = std::move(f).Get();
+  yaclib::Result<int> result = std::move(f).Get();
 
   EXPECT_EQ(std::move(result).Ok(), 42);
 }
@@ -34,7 +43,7 @@ TEST(Example, Subscribe) {
     return 42;
   });
 
-  std::move(f).Subscribe([](yaclib::util::Result<int> result) {
+  std::move(f).Subscribe([](yaclib::Result<int> result) {
     std::cout << "Async result from thread pool: " << std::move(result).Ok() << std::endl;
   });
 
@@ -88,7 +97,7 @@ TEST(Example, Pipeline) {
     return std::to_string(r);
   };
 
-  auto last = [](yaclib::util::Result<std::string> r) {
+  auto last = [](yaclib::Result<std::string> r) {
     std::cout << "Pipeline result: <" << std::move(r).Ok() << ">" << std::endl;
   };
 
@@ -126,15 +135,15 @@ TEST(Example, AsyncPipeline) {
   CalculatorService calculator(tp);
 
   calculator.Increment(1)
-      .Then([&](int r) {
-        return calculator.Double(r);
-      })
-      .Then([&](int r) {
-        return calculator.Increment(r);
-      })
-      .Subscribe([](yaclib::util::Result<int> r) {
-        std::cout << "Result: " << std::move(r).Ok() << std::endl;
-      });
+    .Then([&](int r) {
+      return calculator.Double(r);
+    })
+    .Then([&](int r) {
+      return calculator.Increment(r);
+    })
+    .Subscribe([](yaclib::Result<int> r) {
+      std::cout << "Result: " << std::move(r).Ok() << std::endl;
+    });
 
   tp->SoftStop();
   tp->Wait();
@@ -154,7 +163,7 @@ TEST(Example, Race) {
     std::move(p).Set(42);
   });
 
-  std::move(f).Subscribe(tp2, [](yaclib::util::Result<int> /*r*/) {
+  std::move(f).Subscribe(tp2, [](yaclib::Result<int> /*r*/) {
     std::cout << "Hello from the second thread pool!";
   });
 
@@ -181,11 +190,11 @@ TEST(Example, StrandAsync) {
   };
 
   yaclib::Run(tp, first)
-      .Then(strand, second)  // Serialized
-      .Then(tp, third)
-      .Subscribe([](yaclib::util::Result<int> r) {
-        std::cout << "Final result: " << std::move(r).Value() << std::endl;
-      });
+    .Then(strand, second)  // Serialized
+    .Then(tp, third)
+    .Subscribe([](yaclib::Result<int> r) {
+      std::cout << "Final result: " << std::move(r).Value() << std::endl;
+    });
 
   tp->SoftStop();
   tp->Wait();

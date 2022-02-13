@@ -19,7 +19,7 @@ class IThreadPool : public IExecutor {
   virtual void SoftStop() = 0;
 
   /**
-   * Disable further Execute() calls from being accepted
+   * Disable further Submit() calls from being accepted
    */
   virtual void Stop() = 0;
 
@@ -38,7 +38,7 @@ class IThreadPool : public IExecutor {
   virtual void Wait() = 0;
 };
 
-using IThreadPoolPtr = util::Ptr<IThreadPool>;
+using IThreadPoolPtr = IntrusivePtr<IThreadPool>;
 
 /**
  * \return Thread local pointer to the ThreadPool that owns the current thread
@@ -53,7 +53,7 @@ IThreadPool* CurrentThreadPool() noexcept;
  * \param tf thread factory to use for thread creation. \see IThreadFactory
  * \return intrusive pointer to the new ThreadPool
  */
-IThreadPoolPtr MakeThreadPool(size_t threads = std::thread::hardware_concurrency(),
+IThreadPoolPtr MakeThreadPool(std::size_t threads = std::thread::hardware_concurrency(),
                               IThreadFactoryPtr tf = MakeThreadFactory());
 
 }  // namespace yaclib

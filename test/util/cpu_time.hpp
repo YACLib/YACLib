@@ -23,12 +23,12 @@ class ProcessCPUTimer {
   }
 
  private:
-  [[nodiscard]] size_t ElapsedMicros() const {
+  [[nodiscard]] std::size_t ElapsedMicros() const {
     const auto clocks = static_cast<size_t>(std::clock() - _start_ts);
     return ClocksToMicros(clocks);
   }
 
-  static size_t ClocksToMicros(const size_t clocks) {
+  static std::size_t ClocksToMicros(const std::size_t clocks) {
     return (clocks * 1'000'000) / CLOCKS_PER_SEC;
   }
 

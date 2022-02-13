@@ -3,8 +3,12 @@
 #include <yaclib/config.hpp>
 #include <yaclib/executor/executor.hpp>
 #include <yaclib/executor/strand.hpp>
+#include <yaclib/executor/task.hpp>
 #include <yaclib/fault/atomic.hpp>
+#include <yaclib/util/helper.hpp>
+#include <yaclib/util/intrusive_ptr.hpp>
 
+#include <cstdint>
 #include <utility>
 
 namespace yaclib {
@@ -32,23 +36,23 @@ class Strand : public IExecutor, public ITask {
     return Type::Strand;
   }
 
-  bool Execute(ITask& task) noexcept final {
+  bool Submit(ITask& task) noexcept final {
     task.IncRef();
     _tasks.Put(&task);
 
     if (_work_counter.fetch_add(1, std::memory_order_acq_rel) == 0) {
-      _executor->Execute(*this);
+      _executor->Submit(*this);
     }
     return true;
   }
 
   void Call() noexcept final {
-    auto nodes{_tasks.TakeAllFIFO()};
-    int32_t size{0};
+    auto* nodes = _tasks.TakeAllFIFO();
+    std::int32_t size = 0;
 
-    auto task = static_cast<ITask*>(nodes);
+    auto* task = static_cast<ITask*>(nodes);
     while (task != nullptr) {
-      auto next = static_cast<ITask*>(task->_next);
+      auto* next = static_cast<ITask*>(task->_next);
       task->Call();
       task->DecRef();
       task = next;
@@ -56,7 +60,7 @@ class Strand : public IExecutor, public ITask {
     }
 
     if (_work_counter.fetch_sub(size, std::memory_order_acq_rel) > size) {
-      _executor->Execute(*this);
+      _executor->Submit(*this);
     }
   }
 
@@ -72,7 +76,7 @@ class Strand : public IExecutor, public ITask {
 }  // namespace
 
 IExecutorPtr MakeStrand(IExecutorPtr executor) {
-  return util::MakeIntrusive<Strand, IExecutor>(std::move(executor));
+  return MakeIntrusive<Strand, IExecutor>(std::move(executor));
 }
 
 }  // namespace yaclib

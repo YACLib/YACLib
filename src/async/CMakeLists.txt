@@ -1,7 +1,8 @@
 list(APPEND YACLIB_INCLUDES
-  ${YACLIB_INCLUDE_DIR}/async/run.hpp
+  ${YACLIB_INCLUDE_DIR}/async/contract.hpp
   ${YACLIB_INCLUDE_DIR}/async/future.hpp
   ${YACLIB_INCLUDE_DIR}/async/promise.hpp
+  ${YACLIB_INCLUDE_DIR}/async/run.hpp
   )
 list(APPEND YACLIB_HEADERS
   ${YACLIB_INCLUDE_DIR}/async/detail/base_core.hpp

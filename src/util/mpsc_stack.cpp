@@ -1,10 +1,12 @@
 #include <util/mpsc_stack.hpp>
 
+#include <yaclib/util/detail/node.hpp>
+
 namespace yaclib::util {
 namespace {
 
 detail::Node* Reverse(detail::Node* node) {
-  detail::Node* prev{};
+  detail::Node* prev = nullptr;
   while (node != nullptr) {
     auto* next{node->_next};
     node->_next = prev;

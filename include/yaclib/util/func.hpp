@@ -1,13 +1,14 @@
 #pragma once
 
-#include <yaclib/util/counters.hpp>
+#include <yaclib/util/detail/safe_call.hpp>
+#include <yaclib/util/helper.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 #include <yaclib/util/ref.hpp>
 
 #include <type_traits>
 #include <utility>
 
-namespace yaclib::util {
+namespace yaclib {
 
 /**
  * Shared callable interface
@@ -17,32 +18,7 @@ class IFunc : public IRef {
   virtual void Call() noexcept = 0;
 };
 
-using IFuncPtr = Ptr<IFunc>;
-
-namespace detail {
-
-template <typename Interface, typename Functor>
-class CallImpl : public Interface {
- public:
-  explicit CallImpl(Functor&& functor) : _functor{std::move(functor)} {
-  }
-
-  explicit CallImpl(const Functor& functor) : _functor{functor} {
-  }
-
- private:
-  void Call() noexcept final {
-    try {
-      _functor();
-    } catch (...) {
-      // TODO(MBkkt): create issue
-    }
-  }
-
-  Functor _functor;
-};
-
-}  // namespace detail
+using IFuncPtr = IntrusivePtr<IFunc>;
 
 /**
  * Create \ref IFunc object from any Callable functor
@@ -51,7 +27,7 @@ class CallImpl : public Interface {
  */
 template <typename Functor>
 IFuncPtr MakeFunc(Functor&& f) {
-  return MakeIntrusive<detail::CallImpl<IFunc, std::decay_t<Functor>>, IFunc>(std::forward<Functor>(f));
+  return MakeIntrusive<detail::SafeCall<IFunc, Functor>, IFunc>(std::forward<Functor>(f));
 }
 
-}  // namespace yaclib::util
+}  // namespace yaclib

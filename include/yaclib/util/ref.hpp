@@ -1,6 +1,6 @@
 #pragma once
 
-namespace yaclib::util {
+namespace yaclib {
 
 /**
  * Reference counting interface
@@ -20,4 +20,4 @@ class IRef {
   virtual ~IRef() = default;
 };
 
-}  // namespace yaclib::util
+}  // namespace yaclib

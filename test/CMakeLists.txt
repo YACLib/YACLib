@@ -22,6 +22,9 @@ endif ()
 
 set(TEST_UTIL_INCLUDES
   util/cpu_time.hpp
+  util/error_suite.hpp
+  util/inline_helper.hpp
+  util/error_code.hpp
   util/time.hpp
   )
 
@@ -38,6 +41,8 @@ set(YACLIB_UNIT_SOURCES
   unit/executor/task
   unit/async/get
   unit/async/future
+  unit/async/future_inline
+  unit/async/future_functor
   unit/algo/when_all
   unit/algo/wait
   unit/executor/thread_factory

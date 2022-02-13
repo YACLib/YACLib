@@ -2,11 +2,6 @@
 
 namespace yaclib {
 
-template class Future<void>;
-
-Future<void> MakeFuture() {
-  // TODO(MBkkt) Do we really need this?
-  return Future<void>{util::MakeIntrusive<detail::ResultCore<void>>(util::Unit{})};
-}
+template class Future<void, StopError>;
 
 }  // namespace yaclib

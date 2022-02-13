@@ -2,7 +2,7 @@
 
 #include <yaclib/config.hpp>
 #include <yaclib/fault/atomic.hpp>
-#include <yaclib/util/intrusive_node.hpp>
+#include <yaclib/util/detail/node.hpp>
 
 namespace yaclib::util {
 

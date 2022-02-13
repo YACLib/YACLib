@@ -1,17 +1,32 @@
 #include <util/time.hpp>
 
 #include <yaclib/algo/wait_group.hpp>
+#include <yaclib/async/contract.hpp>
+#include <yaclib/async/future.hpp>
+#include <yaclib/async/promise.hpp>
 #include <yaclib/async/run.hpp>
+#include <yaclib/config.hpp>
+#include <yaclib/executor/submit.hpp>
 #include <yaclib/executor/thread_pool.hpp>
-#include <yaclib/fault/chrono.hpp>
+#include <yaclib/fault/thread.hpp>
+#include <yaclib/util/intrusive_ptr.hpp>
+#include <yaclib/util/result.hpp>
 
+#include <algorithm>
 #include <array>
+#include <chrono>
+#include <iosfwd>
+#include <iterator>
+#include <ratio>
+#include <thread>
+#include <tuple>
+#include <type_traits>
+#include <utility>
 
 #include <gtest/gtest.h>
 
 namespace {
 
-using namespace yaclib;
 using namespace std::chrono_literals;
 
 template <typename T>
@@ -39,19 +54,20 @@ using MyTypes = ::testing::Types<void, int>;
 TYPED_TEST_SUITE(WaitGroupT, MyTypes, TypesNames);
 
 void TestJustWorks() {
-  auto tp = MakeThreadPool(1);
-  auto [f, p] = MakeContract<void>();
+  auto tp = yaclib::MakeThreadPool(1);
+  auto [f, p] = yaclib::MakeContract<void>();
 
-  WaitGroup wg;
+  yaclib::WaitGroup wg;
   test::util::StopWatch timer;
 
-  tp->Execute([p = std::move(p)]() mutable {
+  Submit(tp, [p = std::move(p)]() mutable {
     yaclib_std::this_thread::sleep_for(150ms * YACLIB_CI_SLOWDOWN);
     std::move(p).Set();
   });
 
+  EXPECT_FALSE(f.Ready());
   wg.Add(f);
-  EXPECT_FALSE(f.Ready());  // TODO() We shouldn't touch the future until Wait
+  EXPECT_LE(timer.Elapsed(), 50ms * YACLIB_CI_SLOWDOWN);
   wg.Wait();
   EXPECT_TRUE(f.Ready());
 
@@ -67,22 +83,20 @@ TEST(WaitGroup, JustWorks) {
 
 template <typename T>
 void TestManyWorks() {
-  auto tp = MakeThreadPool(1);
+  auto tp = yaclib::MakeThreadPool(1);
 
   constexpr int kSize = 10;
-  std::array<Promise<T>, kSize> promises;
-  std::array<Future<T>, kSize> futures;
+  std::array<yaclib::Promise<T>, kSize> promises;
+  std::array<yaclib::Future<T>, kSize> futures;
   for (int i = 0; i < kSize; ++i) {
-    auto [f, p] = MakeContract<T>();
-    futures[i] = std::move(f);
-    promises[i] = std::move(p);
+    std::tie(futures[i], promises[i]) = yaclib::MakeContract<T>();
   }
 
-  WaitGroup wg;
+  yaclib::WaitGroup wg;
   test::util::StopWatch timer;
 
   for (int i = 0; i < kSize; ++i) {
-    tp->Execute([p = std::move(promises[i])]() mutable {
+    Submit(tp, [p = std::move(promises[i])]() mutable {
       yaclib_std::this_thread::sleep_for(150ms * YACLIB_CI_SLOWDOWN);
       if constexpr (std::is_void_v<T>) {
         std::move(p).Set();
@@ -128,13 +142,13 @@ TYPED_TEST(WaitGroupT, ManyWorks) {
 
 template <typename T>
 void TestGetWorks() {
-  auto tp = MakeThreadPool(1);
-  auto [f, p] = MakeContract<T>();
+  auto tp = yaclib::MakeThreadPool(1);
+  auto [f, p] = yaclib::MakeContract<T>();
 
-  WaitGroup wg;
+  yaclib::WaitGroup wg;
   test::util::StopWatch timer;
 
-  tp->Execute([p = std::move(p)]() mutable {
+  Submit(tp, [p = std::move(p)]() mutable {
     yaclib_std::this_thread::sleep_for(150ms * YACLIB_CI_SLOWDOWN);
     if constexpr (std::is_void_v<T>) {
       std::move(p).Set();
@@ -143,8 +157,9 @@ void TestGetWorks() {
     }
   });
 
+  EXPECT_FALSE(f.Ready());
   wg.Add(f);
-  EXPECT_FALSE(f.Ready());  // TODO() We shouldn't touch the future until Wait
+  EXPECT_LE(timer.Elapsed(), 50ms * YACLIB_CI_SLOWDOWN);
   wg.Wait();
   EXPECT_TRUE(f.Ready());
 
@@ -164,13 +179,13 @@ TYPED_TEST(WaitGroupT, GetWorksVoid) {
 
 template <typename T>
 void TestCallbackWorks() {
-  auto tp = MakeThreadPool(1);
-  auto [f, p] = MakeContract<T>();
+  auto tp = yaclib::MakeThreadPool(1);
+  auto [f, p] = yaclib::MakeContract<T>();
 
-  WaitGroup wg;
+  yaclib::WaitGroup wg;
   test::util::StopWatch timer;
 
-  tp->Execute([p = std::move(p)]() mutable {
+  Submit(tp, [p = std::move(p)]() mutable {
     yaclib_std::this_thread::sleep_for(150ms * YACLIB_CI_SLOWDOWN);
     if constexpr (std::is_void_v<T>) {
       std::move(p).Set();
@@ -179,19 +194,20 @@ void TestCallbackWorks() {
     }
   });
 
+  EXPECT_FALSE(f.Ready());
   wg.Add(f);
-  EXPECT_FALSE(f.Ready());  // TODO() We shouldn't touch the future until Wait
+  EXPECT_LE(timer.Elapsed(), 50ms * YACLIB_CI_SLOWDOWN);
   wg.Wait();
   EXPECT_TRUE(f.Ready());
 
   bool called = false;
 
   if constexpr (std::is_void_v<T>) {
-    std::move(f).Subscribe([&called]() {
+    std::move(f).SubscribeInline([&called]() {
       called = true;
     });
   } else {
-    std::move(f).Subscribe([&called](int result) {
+    std::move(f).SubscribeInline([&called](int result) {
       EXPECT_EQ(result, 5);
       called = true;
     });
@@ -211,8 +227,8 @@ TYPED_TEST(WaitGroupT, CallbackWorksVoid) {
 
 void TestMultithreaded() {
   constexpr int kThreads = 4;
-  auto tp = MakeThreadPool(kThreads);
-  Future<int> fs[kThreads];
+  auto tp = yaclib::MakeThreadPool(kThreads);
+  yaclib::Future<int> fs[kThreads];
 
   for (int i = 0; i < kThreads; ++i) {
     fs[i] = Run(tp, [i] {
@@ -222,7 +238,7 @@ void TestMultithreaded() {
   }
 
   test::util::StopWatch timer;
-  WaitGroup wg;
+  yaclib::WaitGroup wg;
 
   for (auto& f : fs) {
     wg.Add(f);

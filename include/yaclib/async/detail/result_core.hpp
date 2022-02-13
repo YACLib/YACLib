@@ -1,11 +1,15 @@
 #pragma once
 
 #include <yaclib/async/detail/base_core.hpp>
+#include <yaclib/async/detail/inline_core.hpp>
+#include <yaclib/util/intrusive_ptr.hpp>
 #include <yaclib/util/result.hpp>
+
+#include <utility>
 
 namespace yaclib::detail {
 
-template <typename Value>
+template <typename V, typename E>
 class ResultCore : public BaseCore {
  public:
   ResultCore() noexcept : BaseCore{State::Empty} {
@@ -17,43 +21,39 @@ class ResultCore : public BaseCore {
 
   template <typename T>
   void Set(T&& value) noexcept {
-    _caller = nullptr;
     _result = std::forward<T>(value);
+    _caller = nullptr;  // Order is matter, because we want move value before destroy object that owned value
     const auto state = _state.exchange(State::HasResult, std::memory_order_acq_rel);
-    switch (state) {
+    switch (state) {  //  TODO(MBkkt) rel + fence(acquire) instead of acq_rel
       case State::HasCallback:
-        BaseCore::Execute();
-        break;
+        return Submit();
       case State::HasCallbackInline:
-        BaseCore::ExecuteInline();
-        break;
+        [[fallthrough]];
+      case State::HasAsyncCallback:
+        static_cast<InlineCore&>(*_callback).CallInline(this, state);
+        [[fallthrough]];
       case State::HasStop:
         _executor = nullptr;
         [[fallthrough]];
       case State::HasWait:
         _callback = nullptr;
-        break;
+        [[fallthrough]];
       default:
-        break;
+        return;
     }
   }
 
-  [[nodiscard]] util::Result<Value>& Get() noexcept {
+  [[nodiscard]] Result<V, E>& Get() noexcept {
     return _result;
   }
 
  private:
-  void CallInline(InlineCore* caller) noexcept override {
-    if (BaseCore::GetState() == BaseCore::State::HasStop) {
-      // Don't need to call Cancel, because we call Clean after CallInline and our _caller is nullptr
-      return;
-    }
-    Set(std::move(static_cast<ResultCore<Value>*>(caller)->Get()));
-  }
-
-  util::Result<Value> _result;
+  Result<V, E> _result;
 };
 
-extern template class ResultCore<void>;
+extern template class ResultCore<void, StopError>;
+
+template <typename V, typename E>
+using ResultCorePtr = IntrusivePtr<ResultCore<V, E>>;
 
 }  // namespace yaclib::detail

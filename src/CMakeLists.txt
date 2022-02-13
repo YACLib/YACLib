@@ -10,6 +10,7 @@ set(YACLIB_INCLUDE_DIR ${YACLIB_SOURCE_DIR}/include/yaclib)
 
 set(YACLIB_INCLUDES
   ${YACLIB_BINARY_DIR}/include/yaclib/config.hpp
+  ${YACLIB_INCLUDE_DIR}/fwd.hpp
   )
 set(YACLIB_HEADERS
   )
@@ -22,12 +23,21 @@ add_subdirectory(executor)
 add_subdirectory(util)
 add_subdirectory(fault)
 
-add_library(${PROJECT_NAME} STATIC ${YACLIB_SOURCES})
+add_library(${PROJECT_NAME} STATIC)
 
-target_sources(${PROJECT_NAME}
-  PUBLIC ${YACLIB_INCLUDES}
-  PRIVATE ${YACLIB_HEADERS}
-  )
+set(YACLIB_IDE ON)
+
+if (YACLIB_IDE)
+  target_sources(${PROJECT_NAME}
+    PUBLIC ${YACLIB_INCLUDES}
+    PRIVATE ${YACLIB_HEADERS}
+    PRIVATE ${YACLIB_SOURCES}
+    )
+else ()
+  target_sources(${PROJECT_NAME}
+    PRIVATE ${YACLIB_SOURCES}
+    )
+endif ()
 
 if (WARN IN_LIST YACLIB_FLAGS)
   include(yaclib_warn_lib)
