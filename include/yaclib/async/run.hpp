@@ -14,30 +14,21 @@ namespace yaclib {
  * \param f functor to execute
  * \return \ref Future corresponding f return value
  */
-template <typename Functor>
+template <typename E = StopError, typename Functor>
 auto Run(const IExecutorPtr& e, Functor&& f) {
   assert(e);
-  assert(e->Tag() != IExecutor::Type::Inline);
-  using AsyncRet = util::detail::ResultValueT<typename detail::Return<void, Functor, 2>::Type>;
-  constexpr bool kIsAsync = util::IsFutureV<AsyncRet>;
-  using Ret = util::detail::ResultValueT<util::detail::FutureValueT<AsyncRet>>;
-  if constexpr (kIsAsync) {
-    auto callback = util::MakeIntrusive<detail::ResultCore<Ret>>();
-    callback->SetExecutor(e);
-    using InvokeT = detail::AsyncInvoke<Ret, decltype(std::forward<Functor>(f)), void>;
-    using CoreT = detail::Core<void, InvokeT, void, true>;
-    auto core = util::MakeIntrusive<CoreT>(callback, std::forward<Functor>(f));
-    core->SetExecutor(e);
-    e->Execute(*core);
-    return Future<Ret>{std::move(callback)};
-  } else {
-    using InvokeT = detail::SyncInvoke<Ret, decltype(std::forward<Functor>(f)), void>;
-    using CoreT = detail::Core<Ret, InvokeT, void, true>;
-    auto core = util::MakeIntrusive<CoreT>(std::forward<Functor>(f));
-    core->SetExecutor(e);
-    e->Execute(*core);
-    return Future<Ret>{std::move(core)};
-  }
+  // assert(e->Tag() != IExecutor::Type::Inline); // TODO(myannyax) info
+  using AsyncRet = result_value_t<typename detail::Return<void, E, Functor, 2>::Type>;
+  constexpr bool kIsAsync = is_future_v<AsyncRet>;
+  using Ret = result_value_t<future_value_t<AsyncRet>>;
+  using Invoke = std::conditional_t<kIsAsync,  //
+                                    detail::AsyncInvoke<Ret, void, E, decltype(std::forward<Functor>(f))>,
+                                    detail::SyncInvoke<Ret, void, E, decltype(std::forward<Functor>(f))>>;
+  using Core = detail::Core<Ret, void, E, Invoke, true>;
+  auto core = MakeIntrusive<Core>(std::forward<Functor>(f));
+  core->SetExecutor(e);
+  e->Submit(*core);
+  return Future<Ret, E>{std::move(core)};
 }
 
 }  // namespace yaclib

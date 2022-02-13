@@ -50,6 +50,6 @@
 
 namespace yaclib {
 
-constexpr size_t kCacheLineSize = 64;
+inline constexpr std::size_t kCacheLineSize = 64;  // TODO(MBkkt) Make better
 
 }  // namespace yaclib

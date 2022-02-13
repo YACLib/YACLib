@@ -1,6 +1,10 @@
 #pragma once
 
 #include <yaclib/algo/detail/wait_impl.hpp>
+#include <yaclib/async/future.hpp>
+
+#include <chrono>
+#include <cstddef>
 
 namespace yaclib {
 
@@ -13,8 +17,8 @@ namespace yaclib {
  * \param fs futures to wait
  * \return The result of \ref Ready upon exiting
  */
-template <typename Rep, typename Period, typename... T>
-bool WaitFor(const std::chrono::duration<Rep, Period>& timeout_duration, Future<T>&... fs) {
+template <typename Rep, typename Period, typename... V, typename... E>
+bool WaitFor(const std::chrono::duration<Rep, Period>& timeout_duration, Future<V, E>&... fs) {
   return detail::WaitCores(timeout_duration, static_cast<detail::BaseCore&>(*fs.GetCore())...);
 }
 
@@ -29,8 +33,8 @@ bool WaitFor(const std::chrono::duration<Rep, Period>& timeout_duration, Future<
  * \return The result of \ref Ready upon exiting
  */
 template <typename Rep, typename Period, typename Iterator>
-std::enable_if_t<!util::IsFutureV<Iterator>, bool> WaitFor(const std::chrono::duration<Rep, Period>& timeout_duration,
-                                                           Iterator begin, Iterator end) {
+std::enable_if_t<!is_future_v<Iterator>, bool> WaitFor(const std::chrono::duration<Rep, Period>& timeout_duration,
+                                                       Iterator begin, Iterator end) {
   return detail::WaitIters(timeout_duration, begin, begin, end);
 }
 
@@ -45,8 +49,8 @@ std::enable_if_t<!util::IsFutureV<Iterator>, bool> WaitFor(const std::chrono::du
  * \return The result of \ref Ready upon exiting
  */
 template <typename Rep, typename Period, typename Iterator>
-bool WaitFor(const std::chrono::duration<Rep, Period>& timeout_duration, Iterator begin, size_t size) {
-  return detail::WaitIters(timeout_duration, begin, size_t{0}, size);
+bool WaitFor(const std::chrono::duration<Rep, Period>& timeout_duration, Iterator begin, std::size_t size) {
+  return detail::WaitIters(timeout_duration, begin, std::size_t{0}, size);
 }
 
 }  // namespace yaclib

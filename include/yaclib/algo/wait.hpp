@@ -3,6 +3,8 @@
 #include <yaclib/algo/detail/wait_impl.hpp>
 #include <yaclib/async/future.hpp>
 
+#include <cstddef>
+
 namespace yaclib {
 
 /**
@@ -10,8 +12,8 @@ namespace yaclib {
  *
  * \param fs one or more futures to wait
  */
-template <typename... T>
-void Wait(Future<T>&... fs) {
+template <typename... V, typename... E>
+void Wait(Future<V, E>&... fs) {
   detail::WaitCores(detail::NoTimeoutTag{}, static_cast<detail::BaseCore&>(*fs.GetCore())...);
 }
 
@@ -22,7 +24,7 @@ void Wait(Future<T>&... fs) {
  * \param end Iterator to futures to wait
  */
 template <typename Iterator>
-std::enable_if_t<!util::IsFutureV<Iterator>, void> Wait(Iterator begin, Iterator end) {
+std::enable_if_t<!is_future_v<Iterator>, void> Wait(Iterator begin, Iterator end) {
   detail::WaitIters(detail::NoTimeoutTag{}, begin, begin, end);
 }
 
@@ -33,8 +35,8 @@ std::enable_if_t<!util::IsFutureV<Iterator>, void> Wait(Iterator begin, Iterator
  * \param size count of futures to wait
  */
 template <typename Iterator>
-void Wait(Iterator begin, size_t size) {
-  detail::WaitIters(detail::NoTimeoutTag{}, begin, size_t{0}, size);
+void Wait(Iterator begin, std::size_t size) {
+  detail::WaitIters(detail::NoTimeoutTag{}, begin, std::size_t{0}, size);
 }
 
 }  // namespace yaclib

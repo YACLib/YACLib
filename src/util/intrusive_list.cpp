@@ -1,9 +1,6 @@
 #include <util/intrusive_list.hpp>
 
-#include <yaclib/executor/task.hpp>
-#include <yaclib/executor/thread_factory.hpp>
-
-namespace yaclib::util {
+namespace yaclib {
 
 template <typename T>
 T* List<T>::PopBack() noexcept {
@@ -48,4 +45,4 @@ void List<T>::Append(List& other) noexcept {
 template class List<ITask>;
 template class List<IThread>;
 
-}  // namespace yaclib::util
+}  // namespace yaclib

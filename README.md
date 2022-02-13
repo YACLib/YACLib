@@ -111,10 +111,10 @@ yaclib::Run(tp, [] {
 
 ```C++
 auto tp = yaclib::MakeThreadPool(/*threads=*/4);
-tp->Execute([] {
+Submit(tp, [] {
   // some computations...
 });
-tp->Execute([] {
+Submit(tp, [] {
   // some computations...
 });
 
@@ -132,9 +132,9 @@ auto strand = yaclib::MakeStrand(tp);
 size_t counter = 0;
 auto tp2 = yaclib::MakeThreadPool(4);
 
-for (size_t i = 0; i < 100; ++i) {
-  tp2->Execute([&] {
-    strand->Execute([&] {
+for (std::size_t i = 0; i < 100; ++i) {
+  Submit(tp2, [&] {
+    Submit(strand, [&] {
       ++counter; // no data race!
     });
   });
@@ -148,14 +148,14 @@ auto tp = yaclib::MakeThreadPool(/*threads=*/4);
 std::vector<yaclib::Future<int>> fs;
 
 // Run parallel computations
-for (size_t i = 0; i < 5; ++i) {
+for (std::size_t i = 0; i < 5; ++i) {
   fs.push_back(yaclib::Run(tp, [i]() -> int {
     return random() * i;
   }));
 }
 
 // Will be ready when all futures are ready
-yaclib::Future<std::vector<int>> all = yaclib::WhenAll(fs.begin(), fs.size());
+yaclib::Future<std::vector<int>> all = WhenAll(fs.begin(), fs.size());
 std::vector<int> unique_ints = std::move(all).Then([](std::vector<int> ints) {
   ints.erase(std::unique(ints.begin(), ints.end()), ints.end());
   return ints;
@@ -169,7 +169,7 @@ auto tp = yaclib::MakeThreadPool(/*threads=*/4);
 std::vector<yaclib::Future<int>> fs;
 
 // Run parallel computations
-for (size_t i = 0; i < 5; ++i) {
+for (std::size_t i = 0; i < 5; ++i) {
   fs.push_back(yaclib::Run(tp, [i] {
     // connect with one of the database shard
     return i;
@@ -177,7 +177,7 @@ for (size_t i = 0; i < 5; ++i) {
 }
 
 // Will be ready when any future is ready
-yaclib::WhenAny(fs.begin(), fs.size()).Subscribe([](int i) {
+WhenAny(fs.begin(), fs.size()).Subscribe([](int i) {
   // some work with database
 });
 ```
@@ -214,7 +214,7 @@ auto tp = yaclib:MakeThreadPool(/*threads=*/4);
 yaclib::Future<int> f1 = yaclib::Run(tp, [] { return 42; });
 yaclib::Future<double> f2 = yaclib::Run(tp, [] { return 15.0; });
 
-yaclib::WaitFor(10ms, f1, f2);  // or yaclib::Wait / yaclib::WaitUntil
+WaitFor(10ms, f1, f2);  // or Wait / WaitUntil
 
 if (f1.Ready()) {
   Process(std::as_const(f1).Get());
@@ -259,7 +259,7 @@ int x = std::move(f).Get().Value();
 
 ```C++
 auto tp = yaclib::MakeThreadPool(/*threads=*/4);
-auto f = yaclib::Run(tp, [] {
+auto f = yaclib::Run<std::error_code>(tp, [] {
     if (random() % 2) {
       return std::make_error_code(1);
     }

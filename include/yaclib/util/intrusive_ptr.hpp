@@ -2,13 +2,11 @@
 
 #include <yaclib/util/ref.hpp>
 
-#include <algorithm>
 #include <type_traits>
-#include <utility>
 
-namespace yaclib::util {
+namespace yaclib {
 
-struct NoIncRefTag {};
+struct NoRefTag {};
 
 /**
  * A intrusive pointer to objects with an embedded reference count
@@ -16,152 +14,105 @@ struct NoIncRefTag {};
  * https://www.boost.org/doc/libs/1_77_0/libs/smart_ptr/doc/html/smart_ptr.html#intrusive_ptr
  */
 template <typename T>
-class Ptr {
-  static_assert(std::is_base_of_v<IRef, T>, "T must be derived class of yaclib::IRef");
+class IntrusivePtr {
+  static_assert(std::is_base_of_v<IRef, T>, "T must be derived class of IRef");
 
  public:
-  constexpr Ptr() noexcept : _ptr{nullptr} {
-  }
+  IntrusivePtr() noexcept;
 
-  Ptr(T* other) noexcept : _ptr{other} {
-    if (_ptr) {
-      _ptr->IncRef();
-    }
-  }
+  IntrusivePtr(T* other) noexcept;
+  IntrusivePtr(IntrusivePtr&& other) noexcept;
+  IntrusivePtr(const IntrusivePtr& other) noexcept;
 
-  Ptr(T* other, NoIncRefTag) noexcept : _ptr{other} {
-  }
+  IntrusivePtr& operator=(T* other) noexcept;
+  IntrusivePtr& operator=(IntrusivePtr&& other) noexcept;
+  IntrusivePtr& operator=(const IntrusivePtr& other) noexcept;
 
-  Ptr(Ptr&& other) noexcept : _ptr{std::exchange(other._ptr, nullptr)} {
-  }
-  Ptr(const Ptr& other) noexcept : _ptr{other._ptr} {
-    if (_ptr) {
-      _ptr->IncRef();
-    }
-  }
   template <typename U>
-  Ptr(Ptr<U>&& other) noexcept : _ptr{std::exchange(other._ptr, nullptr)} {
-  }
+  IntrusivePtr(IntrusivePtr<U>&& other) noexcept;
   template <typename U>
-  Ptr(const Ptr<U>& other) noexcept : _ptr{other._ptr} {
-    if (_ptr) {
-      _ptr->IncRef();
-    }
-  }
+  IntrusivePtr(const IntrusivePtr<U>& other) noexcept;
 
-  Ptr& operator=(T* other) noexcept {
-    Ptr{other}.Swap(*this);
-    return *this;
-  }
-  Ptr& operator=(Ptr&& other) noexcept {
-    Swap(other);
-    return *this;
-  }
-  Ptr& operator=(const Ptr& other) noexcept {
-    Ptr{other}.Swap(*this);
-    return *this;
-  }
   template <typename U>
-  Ptr& operator=(const Ptr<U>& other) noexcept {
-    Ptr{other}.Swap(*this);
-    return *this;
-  }
+  IntrusivePtr& operator=(IntrusivePtr<U>&& other) noexcept;
   template <typename U>
-  Ptr& operator=(Ptr<U>&& other) noexcept {
-    Ptr{std::move(other)}.Swap(*this);
-    return *this;
-  }
+  IntrusivePtr& operator=(const IntrusivePtr<U>& other) noexcept;
 
-  ~Ptr() {
-    if (_ptr) {
-      _ptr->DecRef();
-    }
-  }
+  ~IntrusivePtr();
 
-  T* Get() const noexcept {
-    return _ptr;
-  }
+  T* Get() const noexcept;
+  T* Release() noexcept;
 
-  T* Release() {
-    return std::exchange(_ptr, nullptr);
-  }
+  explicit operator bool() const noexcept;
 
-  T& operator*() const noexcept {
-    // TODO(MBkkt): assert(_ptr != nullptr);
-    return *_ptr;
-  }
+  T& operator*() const noexcept;
+  T* operator->() const noexcept;
 
-  T* operator->() const noexcept {
-    // TODO(MBkkt): assert(_ptr != nullptr);
-    return _ptr;
-  }
+  void Swap(IntrusivePtr& other) noexcept;
 
-  explicit operator bool() const noexcept {
-    return _ptr != nullptr;
-  }
-
-  inline void Swap(Ptr& other) noexcept {
-    std::swap(_ptr, other._ptr);
-  }
+  IntrusivePtr(NoRefTag, T* other) noexcept;
+  void Reset(NoRefTag, T* other) noexcept;
 
  private:
-  T* _ptr;
-
   template <typename U>
-  friend class Ptr;
+  friend class IntrusivePtr;
+
+  T* _ptr;
 };
 
 template <typename T, typename U>
-inline bool operator==(const Ptr<T>& lhs, const Ptr<U>& rhs) noexcept {
+inline bool operator==(const IntrusivePtr<T>& lhs, const IntrusivePtr<U>& rhs) noexcept {
   return lhs.Get() == rhs.Get();
 }
 template <typename T, typename U>
-inline bool operator!=(const Ptr<T>& lhs, const Ptr<U>& rhs) noexcept {
+inline bool operator!=(const IntrusivePtr<T>& lhs, const IntrusivePtr<U>& rhs) noexcept {
   return lhs.Get() != rhs.Get();
 }
 
 template <typename T, typename U>
-inline bool operator==(const Ptr<T>& lhs, U* rhs) noexcept {
+inline bool operator==(const IntrusivePtr<T>& lhs, U* rhs) noexcept {
   return lhs.Get() == rhs;
 }
 
 template <typename T, typename U>
-inline bool operator!=(const Ptr<T>& lhs, U* rhs) noexcept {
+inline bool operator!=(const IntrusivePtr<T>& lhs, U* rhs) noexcept {
   return lhs.Get() != rhs;
 }
 
 template <typename T, typename U>
-inline bool operator==(T* lhs, const Ptr<U>& rhs) noexcept {
+inline bool operator==(T* lhs, const IntrusivePtr<U>& rhs) noexcept {
   return lhs == rhs.Get();
 }
 
 template <typename T, typename U>
-inline bool operator!=(T* lhs, const Ptr<U>& rhs) noexcept {
+inline bool operator!=(T* lhs, const IntrusivePtr<U>& rhs) noexcept {
   return lhs != rhs.Get();
 }
 template <typename T>
-inline bool operator==(const Ptr<T>& lhs, std::nullptr_t) noexcept {
+inline bool operator==(const IntrusivePtr<T>& lhs, std::nullptr_t) noexcept {
   return lhs.Get() == nullptr;
 }
 
 template <typename T>
-inline bool operator==(std::nullptr_t, const Ptr<T>& rhs) noexcept {
+inline bool operator==(std::nullptr_t, const IntrusivePtr<T>& rhs) noexcept {
   return rhs.Get() == nullptr;
 }
 
 template <typename T>
-inline bool operator!=(const Ptr<T>& lhs, std::nullptr_t) noexcept {
+inline bool operator!=(const IntrusivePtr<T>& lhs, std::nullptr_t) noexcept {
   return lhs.Get() != nullptr;
 }
 
 template <typename T>
-inline bool operator!=(std::nullptr_t, const Ptr<T>& rhs) noexcept {
+inline bool operator!=(std::nullptr_t, const IntrusivePtr<T>& rhs) noexcept {
   return rhs.Get() != nullptr;
 }
 
 template <typename T>
-inline bool operator<(const Ptr<T>& lhs, const Ptr<T>& rhs) noexcept {
+inline bool operator<(const IntrusivePtr<T>& lhs, const IntrusivePtr<T>& rhs) noexcept {
   return lhs.Get() < rhs.Get();
 }
 
-}  // namespace yaclib::util
+}  // namespace yaclib
+
+#include <yaclib/util/detail/intrusive_ptr_impl.hpp>

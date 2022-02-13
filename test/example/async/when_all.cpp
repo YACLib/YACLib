@@ -5,9 +5,14 @@
 #include <yaclib/algo/when_all.hpp>
 #include <yaclib/async/run.hpp>
 #include <yaclib/executor/thread_pool.hpp>
+#include <yaclib/util/intrusive_ptr.hpp>
+#include <yaclib/util/result.hpp>
 
 #include <chrono>
-#include <thread>
+#include <iostream>
+#include <type_traits>
+#include <utility>
+#include <vector>
 
 #include <gtest/gtest.h>
 
@@ -33,7 +38,7 @@ TEST(Example, WhenAll) {
   // Parallel composition
   // All combinator: std::vector<Future<T>> -> Future<std::vector<T>>
   // Non-blocking!
-  yaclib::Future<std::vector<int>> all = yaclib::WhenAll(futs.begin(), futs.size());
+  yaclib::Future<std::vector<int>> all = WhenAll(futs.begin(), futs.size());
 
   // Blocks
   std::vector<int> ints = std::move(all).Get().Ok();

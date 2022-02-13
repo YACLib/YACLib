@@ -6,44 +6,37 @@
 #include <yaclib/executor/task.hpp>
 #include <yaclib/fault/atomic.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
+#include <yaclib/util/ref.hpp>
 
 namespace yaclib::detail {
 
 class BaseCore : public InlineCore {
  public:
-  enum class State {
-    Empty,
-    HasResult,
-    HasCallback,
-    HasCallbackInline,
-    HasWait,
-    HasStop,
-  };
-
   explicit BaseCore(State s) noexcept;
 
-  [[nodiscard]] State GetState() const noexcept;
-  void SetState(State s) noexcept;
-
-  [[nodiscard]] IExecutorPtr GetExecutor() const noexcept;
   void SetExecutor(IExecutorPtr executor) noexcept;
+  [[nodiscard]] IExecutorPtr GetExecutor() const noexcept;
 
-  void SetCallback(util::Ptr<BaseCore> callback);
-  void SetCallbackInline(util::Ptr<InlineCore> callback);
-  bool SetWait(util::IRef& callback) noexcept;
-  bool ResetWait() noexcept;
+  void SetCallback(IntrusivePtr<BaseCore> callback);
+  void SetCallbackInline(IntrusivePtr<InlineCore> callback, bool async = false);
+  [[nodiscard]] bool SetWait(IRef& callback) noexcept;
+  [[nodiscard]] bool ResetWait() noexcept;
+
+  void Stop() noexcept;
+  [[nodiscard]] bool Empty() const noexcept;
+  [[nodiscard]] bool Alive() const noexcept;
 
  protected:
   yaclib_std::atomic<State> _state;
-  util::Ptr<ITask> _caller;
-  IExecutorPtr _executor{MakeInline()};
-  util::Ptr<IRef> _callback;
+  IntrusivePtr<ITask> _caller;
+  IExecutorPtr _executor;
+  IntrusivePtr<IRef> _callback;
 
-  void Execute() noexcept;
-  void ExecuteInline() noexcept;
-
-  void Clean() noexcept;
+  void Submit() noexcept;
   void Cancel() noexcept final;
+
+ private:
+  void Clean() noexcept;
 };
 
 }  // namespace yaclib::detail

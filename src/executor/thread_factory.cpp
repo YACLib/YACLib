@@ -4,15 +4,22 @@
 #include <yaclib/fault/condition_variable.hpp>
 #include <yaclib/fault/mutex.hpp>
 #include <yaclib/fault/thread.hpp>
+#include <yaclib/util/func.hpp>
+#include <yaclib/util/helper.hpp>
+#include <yaclib/util/intrusive_ptr.hpp>
 
 #include <cassert>
+#include <cstddef>
+#include <iosfwd>
+#include <string>
+#include <string_view>
+#include <thread>
 #include <utility>
 
 namespace yaclib {
 namespace {
 
-void CallFunc(size_t /*priority*/, std::string_view /*name*/, util::IFunc& f, util::IFunc* acquire,
-              util::IFunc* release) {
+void CallFunc(std::size_t /*priority*/, std::string_view /*name*/, IFunc& f, IFunc* acquire, IFunc* release) {
   if (acquire != nullptr) {
     acquire->Call();
   }
@@ -26,8 +33,7 @@ void CallFunc(size_t /*priority*/, std::string_view /*name*/, util::IFunc& f, ut
 
 class LightThread final : public IThread {
  public:
-  LightThread(size_t priority, std::string_view name, util::IFuncPtr func, util::IFuncPtr acquire,
-              util::IFuncPtr release)
+  LightThread(std::size_t priority, std::string_view name, IFuncPtr func, IFuncPtr acquire, IFuncPtr release)
       : _thread{[priority, name, func = std::move(func), acquire = std::move(acquire), release = std::move(release)] {
           CallFunc(priority, name, *func, acquire.Get(), release.Get());
         }} {
@@ -50,10 +56,9 @@ class HeavyThread final : public IThread {
         }} {
   }
 
-  void Set(size_t priority, std::string_view name, util::IFuncPtr func, util::IFuncPtr acquire,
-           util::IFuncPtr release) {
+  void Set(std::size_t priority, std::string_view name, IFuncPtr func, IFuncPtr acquire, IFuncPtr release) {
     {
-      std::lock_guard guard{_m};
+      std::lock_guard lock{_m};
       assert(_state == State::Idle);
       _state = State::Run;
       _priority = priority;
@@ -66,15 +71,15 @@ class HeavyThread final : public IThread {
   }
 
   void Wait() {
-    std::unique_lock guard{_m};
+    std::unique_lock lock{_m};
     while (_state == State::Run) {
-      _cv.wait(guard);
+      _cv.wait(lock);
     }
   }
 
   ~HeavyThread() final {
     {
-      std::lock_guard guard{_m};
+      std::lock_guard lock{_m};
       _state = State::Stop;
     }
     _cv.notify_all();
@@ -84,7 +89,7 @@ class HeavyThread final : public IThread {
 
  private:
   void Loop() {
-    std::unique_lock guard{_m};
+    std::unique_lock lock{_m};
     while (true) {
       while (_func) {
         auto priority = std::exchange(_priority, 0);
@@ -93,16 +98,16 @@ class HeavyThread final : public IThread {
         auto acquire = std::exchange(_acquire, nullptr);
         auto release = std::exchange(_release, nullptr);
 
-        guard.unlock();
+        lock.unlock();
         CallFunc(priority, name, *func, acquire.Get(), release.Get());
-        guard.lock();
+        lock.lock();
       }
       if (_state == State::Stop) {
         return;
       }
       _state = State::Idle;
       _cv.notify_all();
-      _cv.wait(guard);
+      _cv.wait(lock);
     }
   }
 
@@ -115,11 +120,11 @@ class HeavyThread final : public IThread {
   };
   State _state{State::Idle};
 
-  size_t _priority{0};
+  std::size_t _priority{0};
   std::string_view _name;
-  util::IFuncPtr _func;
-  util::IFuncPtr _acquire;
-  util::IFuncPtr _release;
+  IFuncPtr _func;
+  IFuncPtr _acquire;
+  IFuncPtr _release;
 
   yaclib_std::thread _thread;
 };
@@ -129,45 +134,45 @@ class ThreadFactory;
 class BaseFactory : public IThreadFactory {
  public:
   virtual ThreadFactory& GetThreadFactory() = 0;
-  virtual size_t GetPriority() const = 0;
+  virtual std::size_t GetPriority() const = 0;
   virtual std::string_view GetName() const = 0;
-  virtual util::IFuncPtr GetAcquire() const = 0;
-  virtual util::IFuncPtr GetRelease() const = 0;
+  virtual IFuncPtr GetAcquire() const = 0;
+  virtual IFuncPtr GetRelease() const = 0;
 };
 
 class ThreadFactory : public BaseFactory {
  public:
   explicit ThreadFactory() = default;
 
-  virtual IThreadPtr Acquire(util::IFuncPtr func, size_t priority, std::string_view name, util::IFuncPtr acquire,
-                             util::IFuncPtr release) = 0;
+  virtual IThreadPtr Acquire(IFuncPtr func, std::size_t priority, std::string_view name, IFuncPtr acquire,
+                             IFuncPtr release) = 0;
 
  private:
-  IThreadPtr Acquire(util::IFuncPtr func) final {
+  IThreadPtr Acquire(IFuncPtr func) final {
     return Acquire(std::move(func), GetPriority(), GetName(), GetAcquire(), GetRelease());
   }
 
   ThreadFactory& GetThreadFactory() final {
     return *this;
   }
-  size_t GetPriority() const final {
+  std::size_t GetPriority() const final {
     return 0;
   }
   std::string_view GetName() const final {
     return "";
   }
-  util::IFuncPtr GetAcquire() const final {
+  IFuncPtr GetAcquire() const final {
     return nullptr;
   }
-  util::IFuncPtr GetRelease() const final {
+  IFuncPtr GetRelease() const final {
     return nullptr;
   }
 };
 
 class LightThreadFactory final : public ThreadFactory {
  private:
-  IThreadPtr Acquire(util::IFuncPtr func, size_t priority, std::string_view name, util::IFuncPtr acquire,
-                     util::IFuncPtr release) final {
+  IThreadPtr Acquire(IFuncPtr func, std::size_t priority, std::string_view name, IFuncPtr acquire,
+                     IFuncPtr release) final {
     return new LightThread{priority, name, std::move(func), std::move(acquire), std::move(release)};
   }
 
@@ -183,7 +188,7 @@ class LightThreadFactory final : public ThreadFactory {
 
 class HeavyThreadFactory : public ThreadFactory {
  public:
-  explicit HeavyThreadFactory(size_t cache_threads) : _cache_threads{cache_threads} {
+  explicit HeavyThreadFactory(std::size_t cache_threads) : _cache_threads{cache_threads} {
   }
 
   ~HeavyThreadFactory() override {
@@ -193,22 +198,22 @@ class HeavyThreadFactory : public ThreadFactory {
   }
 
  private:
-  IThreadPtr Acquire(util::IFuncPtr func, size_t priority, std::string_view name, util::IFuncPtr acquire,
-                     util::IFuncPtr release) final {
-    std::unique_lock guard{_m};
+  IThreadPtr Acquire(IFuncPtr func, std::size_t priority, std::string_view name, IFuncPtr acquire,
+                     IFuncPtr release) final {
+    std::unique_lock lock{_m};
     IThreadPtr t{_threads.PopBack()};
     if (t == nullptr) {
       t = new HeavyThread{};
       ++_threads_count;
     }
-    guard.unlock();
+    lock.unlock();
 
     static_cast<HeavyThread&>(*t).Set(priority, name, std::move(func), std::move(acquire), std::move(release));
     return t;
   }
 
   void Release(IThreadPtr t) final {
-    std::unique_lock guard{_m};
+    std::unique_lock lock{_m};
     if (_threads_count <= _cache_threads) {
       static_cast<HeavyThread&>(*t).Wait();
       _threads.PushBack(t);
@@ -218,11 +223,11 @@ class HeavyThreadFactory : public ThreadFactory {
     }
   }
 
-  const size_t _cache_threads;
+  const std::size_t _cache_threads;
 
   yaclib_std::mutex _m;
-  size_t _threads_count{0};
-  util::List<IThread> _threads;
+  std::size_t _threads_count{0};
+  List<IThread> _threads;
 };
 
 class DecoratorThreadFactory : public BaseFactory {
@@ -230,7 +235,7 @@ class DecoratorThreadFactory : public BaseFactory {
   explicit DecoratorThreadFactory(IThreadFactoryPtr base) : _base{std::move(base)} {
   }
 
-  IThreadPtr Acquire(util::IFuncPtr func) final {
+  IThreadPtr Acquire(IFuncPtr func) final {
     return GetThreadFactory().Acquire(std::move(func), GetPriority(), GetName(), GetAcquire(), GetRelease());
   }
   void Release(IThreadPtr thread) final {
@@ -244,16 +249,16 @@ class DecoratorThreadFactory : public BaseFactory {
   ThreadFactory& GetThreadFactory() final {
     return static_cast<BaseFactory&>(*_base).GetThreadFactory();
   }
-  size_t GetPriority() const override {
+  std::size_t GetPriority() const override {
     return GetBase().GetPriority();
   }
   std::string_view GetName() const override {
     return GetBase().GetName();
   }
-  util::IFuncPtr GetAcquire() const override {
+  IFuncPtr GetAcquire() const override {
     return GetBase().GetAcquire();
   }
-  util::IFuncPtr GetRelease() const override {
+  IFuncPtr GetRelease() const override {
     return GetBase().GetRelease();
   }
 
@@ -263,26 +268,26 @@ class DecoratorThreadFactory : public BaseFactory {
 
 class PriorityThreadFactory : public DecoratorThreadFactory {
  public:
-  PriorityThreadFactory(IThreadFactoryPtr base, size_t priority)
+  PriorityThreadFactory(IThreadFactoryPtr base, std::size_t priority)
       : DecoratorThreadFactory{std::move(base)}, _priority{priority} {
   }
 
  private:
-  size_t GetPriority() const final {
+  std::size_t GetPriority() const final {
     return _priority;
   }
 
-  size_t _priority;
+  std::size_t _priority;
 };
 
 class NamedThreadFactory : public DecoratorThreadFactory {
  public:
-  NamedThreadFactory(IThreadFactoryPtr base, std::string name)
-      : DecoratorThreadFactory{std::move(base)}, _name{std::move(name)} {
+  NamedThreadFactory(IThreadFactoryPtr base, std::string_view name)
+      : DecoratorThreadFactory{std::move(base)}, _name{name} {
   }
 
  private:
-  std::string_view GetName() const final {
+  [[nodiscard]] std::string_view GetName() const final {
     return _name;
   }
 
@@ -291,76 +296,76 @@ class NamedThreadFactory : public DecoratorThreadFactory {
 
 class AcquireThreadFactory : public DecoratorThreadFactory {
  public:
-  AcquireThreadFactory(IThreadFactoryPtr base, util::IFuncPtr acquire)
+  AcquireThreadFactory(IThreadFactoryPtr base, IFuncPtr acquire)
       : DecoratorThreadFactory{std::move(base)}, _acquire{std::move(acquire)} {
   }
 
  private:
-  util::IFuncPtr GetAcquire() const final {
+  IFuncPtr GetAcquire() const final {
     return _acquire;
   }
 
-  util::IFuncPtr _acquire;
+  IFuncPtr _acquire;
 };
 
 class ReleaseThreadFactory : public DecoratorThreadFactory {
  public:
-  ReleaseThreadFactory(IThreadFactoryPtr base, util::IFuncPtr release)
+  ReleaseThreadFactory(IThreadFactoryPtr base, IFuncPtr release)
       : DecoratorThreadFactory{std::move(base)}, _release{std::move(release)} {
   }
 
  private:
-  util::IFuncPtr GetRelease() const final {
+  IFuncPtr GetRelease() const final {
     return _release;
   }
 
-  util::IFuncPtr _release;
+  IFuncPtr _release;
 };
 
 class CallbackThreadFactory : public DecoratorThreadFactory {
  public:
-  CallbackThreadFactory(IThreadFactoryPtr base, util::IFuncPtr acquire, util::IFuncPtr release)
+  CallbackThreadFactory(IThreadFactoryPtr base, IFuncPtr acquire, IFuncPtr release)
       : DecoratorThreadFactory{std::move(base)}, _acquire{std::move(acquire)}, _release{std::move(release)} {
   }
 
  private:
-  util::IFuncPtr GetAcquire() const final {
+  IFuncPtr GetAcquire() const final {
     return _acquire;
   }
-  util::IFuncPtr GetRelease() const final {
+  IFuncPtr GetRelease() const final {
     return _release;
   }
 
-  util::IFuncPtr _acquire;
-  util::IFuncPtr _release;
+  IFuncPtr _acquire;
+  IFuncPtr _release;
 };
 
 }  // namespace
 
-IThreadFactoryPtr MakeThreadFactory(size_t cache_threads) {
+IThreadFactoryPtr MakeThreadFactory(std::size_t cache_threads) {
   if (cache_threads == 0) {
     static LightThreadFactory sFactory;
     return IThreadFactoryPtr{&sFactory};
   }
-  return util::MakeIntrusive<HeavyThreadFactory, IThreadFactory>(cache_threads);
+  return MakeIntrusive<HeavyThreadFactory, IThreadFactory>(cache_threads);
 }
 
-IThreadFactoryPtr MakeThreadFactory(IThreadFactoryPtr base, size_t priority) {
-  return util::MakeIntrusive<PriorityThreadFactory, IThreadFactory>(std::move(base), priority);
+IThreadFactoryPtr MakeThreadFactory(IThreadFactoryPtr base, std::size_t priority) {
+  return MakeIntrusive<PriorityThreadFactory, IThreadFactory>(std::move(base), priority);
 }
 
-IThreadFactoryPtr MakeThreadFactory(IThreadFactoryPtr base, std::string name) {
-  return util::MakeIntrusive<NamedThreadFactory, IThreadFactory>(std::move(base), std::move(name));
+IThreadFactoryPtr MakeThreadFactory(IThreadFactoryPtr base, std::string_view name) {
+  return MakeIntrusive<NamedThreadFactory, IThreadFactory>(std::move(base), name);
 }
 
-IThreadFactoryPtr MakeThreadFactory(IThreadFactoryPtr base, util::IFuncPtr acquire, util::IFuncPtr release) {
+IThreadFactoryPtr MakeThreadFactory(IThreadFactoryPtr base, IFuncPtr acquire, IFuncPtr release) {
   if (acquire && release) {
-    return util::MakeIntrusive<CallbackThreadFactory, IThreadFactory>(std::move(base), std::move(acquire),
-                                                                      std::move(release));
+    return MakeIntrusive<CallbackThreadFactory, IThreadFactory>(std::move(base), std::move(acquire),
+                                                                std::move(release));
   } else if (acquire) {
-    return util::MakeIntrusive<AcquireThreadFactory, IThreadFactory>(std::move(base), std::move(acquire));
+    return MakeIntrusive<AcquireThreadFactory, IThreadFactory>(std::move(base), std::move(acquire));
   } else if (release) {
-    return util::MakeIntrusive<ReleaseThreadFactory, IThreadFactory>(std::move(base), std::move(release));
+    return MakeIntrusive<ReleaseThreadFactory, IThreadFactory>(std::move(base), std::move(release));
   }
   return base;  // Copy elision doesn't work for function arguments, but implicit move guaranteed by standard
 }

@@ -4,9 +4,15 @@
  */
 
 #include <yaclib/executor/strand.hpp>
+#include <yaclib/executor/submit.hpp>
 #include <yaclib/executor/thread_pool.hpp>
+#include <yaclib/util/detail/node.hpp>
+#include <yaclib/util/intrusive_ptr.hpp>
 
+#include <cstddef>
 #include <iostream>
+#include <thread>
+#include <vector>
 
 #include <gtest/gtest.h>
 
@@ -19,17 +25,17 @@ TEST(Example, Strand) {
 
   auto strand = MakeStrand(tp);
 
-  size_t counter = 0;
+  std::size_t counter = 0;
 
-  static constexpr size_t kThreads = 5;
-  static constexpr size_t kIncrementsPerThread = 12345;
+  static constexpr std::size_t kThreads = 5;
+  static constexpr std::size_t kIncrementsPerThread = 12345;
 
   std::vector<std::thread> threads;
 
-  for (size_t i = 0; i < kThreads; ++i) {
+  for (std::size_t i = 0; i < kThreads; ++i) {
     threads.emplace_back([&]() {
-      for (size_t j = 0; j < kIncrementsPerThread; ++j) {
-        strand->Execute([&] {
+      for (std::size_t j = 0; j < kIncrementsPerThread; ++j) {
+        Submit(strand, [&] {
           ++counter;
         });
       }

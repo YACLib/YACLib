@@ -2,6 +2,6 @@
 
 namespace yaclib::detail {
 
-template class ResultCore<void>;
+template class ResultCore<void, StopError>;
 
 }  // namespace yaclib::detail

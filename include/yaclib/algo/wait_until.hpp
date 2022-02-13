@@ -3,6 +3,9 @@
 #include <yaclib/algo/detail/wait_impl.hpp>
 #include <yaclib/async/future.hpp>
 
+#include <chrono>
+#include <cstddef>
+
 namespace yaclib {
 
 /**
@@ -15,8 +18,8 @@ namespace yaclib {
  * \param fs futures to wait
  * \return The result of \ref Ready upon exiting
  */
-template <typename Clock, typename Duration, typename... T>
-bool WaitUntil(const std::chrono::time_point<Clock, Duration>& timeout_time, Future<T>&... fs) {
+template <typename Clock, typename Duration, typename... V, typename... E>
+bool WaitUntil(const std::chrono::time_point<Clock, Duration>& timeout_time, Future<V, E>&... fs) {
   return detail::WaitCores(timeout_time, static_cast<detail::BaseCore&>(*fs.GetCore())...);
 }
 
@@ -32,8 +35,8 @@ bool WaitUntil(const std::chrono::time_point<Clock, Duration>& timeout_time, Fut
  * \return The result of \ref Ready upon exiting
  */
 template <typename Clock, typename Duration, typename Iterator>
-std::enable_if_t<!util::IsFutureV<Iterator>, bool> WaitUntil(
-    const std::chrono::time_point<Clock, Duration>& timeout_time, Iterator begin, Iterator end) {
+std::enable_if_t<!is_future_v<Iterator>, bool> WaitUntil(const std::chrono::time_point<Clock, Duration>& timeout_time,
+                                                         Iterator begin, Iterator end) {
   return detail::WaitIters(timeout_time, begin, begin, end);
 }
 
@@ -49,8 +52,8 @@ std::enable_if_t<!util::IsFutureV<Iterator>, bool> WaitUntil(
  * \return The result of \ref Ready upon exiting
  */
 template <typename Clock, typename Duration, typename Iterator>
-bool WaitUntil(const std::chrono::time_point<Clock, Duration>& timeout_time, Iterator begin, size_t size) {
-  return detail::WaitIters(timeout_time, begin, size_t{0}, size);
+bool WaitUntil(const std::chrono::time_point<Clock, Duration>& timeout_time, Iterator begin, std::size_t size) {
+  return detail::WaitIters(timeout_time, begin, std::size_t{0}, size);
 }
 
 }  // namespace yaclib

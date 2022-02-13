@@ -4,44 +4,38 @@
 #include <yaclib/util/type_traits.hpp>
 
 namespace yaclib {
-namespace detail {
 
-template <typename Value>
-using PromiseCorePtr = util::Ptr<ResultCore<Value>>;
-
-}  // namespace detail
-
-template <typename T>
-class Future;
-
-template <typename T>
+template <typename V, typename E = StopError>
 class Promise final {
-  static_assert(!std::is_reference_v<T>,
-                "Promise cannot be instantiated with reference, you can use std::reference_wrapper or pointer");
-  static_assert(!std::is_volatile_v<T> && !std::is_const_v<T>,
-                "Promise cannot be instantiated with cv qualifiers, because it's unnecessary");
-  static_assert(!util::IsResultV<T>, "Promise cannot be instantiated with Result");
-  static_assert(!util::IsFutureV<T>, "Promise cannot be instantiated with Future");
-  static_assert(!std::is_same_v<T, std::error_code>, "Promise cannot be instantiated with std::error_code");
-  static_assert(!std::is_same_v<T, std::exception_ptr>, "Promise cannot be instantiated with std::exception_ptr");
+  static_assert(Check<V>(), "V should be valid");
+  static_assert(Check<E>(), "E should be valid");
+  static_assert(!std::is_same_v<V, E>, "Promise cannot be instantiated with same V and E, because it's ambiguous");
 
  public:
   Promise(const Promise& other) = delete;
   Promise& operator=(const Promise& other) = delete;
 
-  Promise();
   Promise(Promise&& other) noexcept = default;
   Promise& operator=(Promise&& other) noexcept = default;
+
+  /**
+   * The default constructor creates not a \ref Valid Promise
+   *
+   * Needed only for usability, e.g. instead of std::optional<Promise<T>> in containers.
+   */
+  Promise() = default;
+
+  /**
+   * If Promise is \ref Valid then set \ref StopTag
+   */
   ~Promise();
 
-  [[nodiscard]] bool Valid() const& noexcept;
   /**
-   * Create and return \ref Future associated with this promise
+   * Check if this \ref Promise has \ref Future
    *
-   * \note You cat extract \ref Future only once.
-   * \return New \ref Future object associated with *this
+   * \return false if this \ref Promise is default-constructed or moved to, otherwise true
    */
-  [[nodiscard]] Future<T> MakeFuture();
+  [[nodiscard]] bool Valid() const& noexcept;
 
   /**
    * Set \ref Promise result
@@ -57,48 +51,18 @@ class Promise final {
    */
   void Set() &&;
 
-  /// DETAIL
-  explicit Promise(detail::PromiseCorePtr<T> core) noexcept;
-  [[nodiscard]] detail::PromiseCorePtr<T>& GetCore() noexcept;
-  /// DETAIL
+  /**
+   * Part of unsafe but internal API
+   */
+  explicit Promise(detail::ResultCorePtr<V, E> core) noexcept;
+  [[nodiscard]] detail::ResultCorePtr<V, E>& GetCore() noexcept;
 
  private:
-  detail::PromiseCorePtr<T> _core;
+  detail::ResultCorePtr<V, E> _core;
 };
 
-extern template class Promise<void>;
-
-/**
- * Describes channel with future and promise
- */
-template <typename T>
-#if !defined(__clang__) && __GNUC__ < 8
-using Contract = std::pair<Future<T>, Promise<T>>;
-#else
-struct Contract {
-  Future<T> future;
-  Promise<T> promise;
-};
-#endif
-/**
- * Creates related future and promise
- *
- * \return a \see Contract object with new future and promise
- */
-template <typename T>
-[[nodiscard]] Contract<T> MakeContract();
+extern template class Promise<void, StopError>;
 
 }  // namespace yaclib
 
-#ifndef YACLIB_ASYNC_DECL
-
-#define YACLIB_ASYNC_DECL
-#include <yaclib/async/future.hpp>
-#undef YACLIB_ASYNC_DECL
-
-#define YACLIB_ASYNC_IMPL
-#include <yaclib/async/detail/future_impl.hpp>
 #include <yaclib/async/detail/promise_impl.hpp>
-#undef YACLIB_ASYNC_IMPL
-
-#endif

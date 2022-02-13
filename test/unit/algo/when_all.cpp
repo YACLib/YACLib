@@ -1,15 +1,32 @@
+#include <util/error_code.hpp>
+
 #include <yaclib/algo/when_all.hpp>
+#include <yaclib/async/contract.hpp>
+#include <yaclib/async/future.hpp>
+#include <yaclib/async/promise.hpp>
 #include <yaclib/async/run.hpp>
 #include <yaclib/executor/thread_pool.hpp>
+#include <yaclib/fault/thread.hpp>
+#include <yaclib/util/intrusive_ptr.hpp>
+#include <yaclib/util/result.hpp>
 
-#include <iostream>
-#include <string>
+#include <algorithm>
+#include <array>
+#include <chrono>
+#include <cstddef>
+#include <exception>
+#include <stdexcept>
+#include <thread>
+#include <tuple>
+#include <type_traits>
+#include <utility>
+#include <vector>
 
 #include <gtest/gtest.h>
 
+namespace test {
 namespace {
 
-using namespace yaclib;
 using namespace std::chrono_literals;
 
 enum class TestSuite {
@@ -32,10 +49,10 @@ void JustWorks() {
   constexpr int kSize = 3;
   static constexpr bool is_void = std::is_void_v<T>;
 
-  std::array<Promise<T>, kSize> promises;
-  std::array<Future<T>, kSize> futures;
+  std::array<yaclib::Promise<T>, kSize> promises;
+  std::array<yaclib::Future<T>, kSize> futures;
   for (int i = 0; i < kSize; ++i) {
-    futures[i] = promises[i].MakeFuture();
+    std::tie(futures[i], promises[i]) = yaclib::MakeContract<T>();
   }
 
   auto all = [&futures] {
@@ -75,7 +92,7 @@ void JustWorks() {
     }
   }();
   if constexpr (is_void) {
-    EXPECT_EQ(std::move(all).Get().State(), util::ResultState::Value);
+    EXPECT_EQ(std::move(all).Get().State(), yaclib::ResultState::Value);
   } else {
     EXPECT_EQ(std::move(all).Get().Ok(), expected);
   }
@@ -89,13 +106,13 @@ TYPED_TEST(WhenAllT, ArrayJustWorks) {
   JustWorks<TestSuite::Array, typename TestFixture::Type>();
 }
 
-template <TestSuite suite, typename T = void>
+template <TestSuite suite, typename T = void, typename E = yaclib::StopError>
 void AllFails() {
   constexpr int kSize = 3;
-  std::array<Promise<T>, kSize> promises;
-  std::array<Future<T>, kSize> futures;
+  std::array<yaclib::Promise<T, E>, kSize> promises;
+  std::array<yaclib::Future<T, E>, kSize> futures;
   for (int i = 0; i < kSize; ++i) {
-    auto [f, p] = MakeContract<T>();
+    auto [f, p] = yaclib::MakeContract<T, E>();
     futures[i] = std::move(f);
     promises[i] = std::move(p);
   }
@@ -115,26 +132,28 @@ void AllFails() {
   EXPECT_TRUE(all.Ready());
 
   // Second error
-  std::move(promises[0]).Set(std::error_code{});
+  std::move(promises[0]).Set(yaclib::StopTag{});
 
   EXPECT_THROW(std::move(all).Get().Ok(), std::runtime_error);
 }
 
 TYPED_TEST(WhenAllT, VectorAllFails) {
   AllFails<TestSuite::Vector, typename TestFixture::Type>();
+  AllFails<TestSuite::Vector, typename TestFixture::Type, LikeErrorCode>();
 }
 
 TYPED_TEST(WhenAllT, ArrayAllFails) {
   AllFails<TestSuite::Array, typename TestFixture::Type>();
+  AllFails<TestSuite::Array, typename TestFixture::Type, LikeErrorCode>();
 }
 
-template <TestSuite suite, typename T = void>
+template <TestSuite suite, typename T = void, typename E = yaclib::StopError>
 void ErrorFails() {
   constexpr int kSize = 3;
-  std::array<Promise<T>, kSize> promises;
-  std::array<Future<T>, kSize> futures;
+  std::array<yaclib::Promise<T, E>, kSize> promises;
+  std::array<yaclib::Future<T, E>, kSize> futures;
   for (int i = 0; i < kSize; ++i) {
-    futures[i] = promises[i].MakeFuture();
+    std::tie(futures[i], promises[i]) = yaclib::MakeContract<T, E>();
   }
 
   auto all = [&futures] {
@@ -147,25 +166,24 @@ void ErrorFails() {
 
   EXPECT_FALSE(all.Ready());
 
-  std::move(promises[1]).Set(std::error_code{});
-
+  std::move(promises[1]).Set(yaclib::StopTag{});
   EXPECT_TRUE(all.Ready());
-
-  // Second error
   EXPECT_FALSE(promises[1].Valid());
 }
 
 TYPED_TEST(WhenAllT, VectorErrorFails) {
   ErrorFails<TestSuite::Vector, typename TestFixture::Type>();
+  ErrorFails<TestSuite::Vector, typename TestFixture::Type, LikeErrorCode>();
 }
 
 TYPED_TEST(WhenAllT, ArrayErrorFails) {
   ErrorFails<TestSuite::Array, typename TestFixture::Type>();
+  ErrorFails<TestSuite::Array, typename TestFixture::Type, LikeErrorCode>();
 }
 
 template <typename T = int>
 void EmptyInput() {
-  auto empty = std::vector<Future<T>>{};
+  auto empty = std::vector<yaclib::Future<T>>{};
   auto all = WhenAll(empty.begin(), empty.end());
 
   EXPECT_FALSE(all.Valid());
@@ -183,7 +201,7 @@ template <TestSuite suite, typename T = int>
 void MultiThreaded() {
   static constexpr bool is_void = std::is_void_v<T>;
 
-  auto tp = MakeThreadPool(4);
+  auto tp = yaclib::MakeThreadPool(4);
 
   auto async_value = [tp](int value) {
     return Run(tp, [value] {
@@ -198,21 +216,21 @@ void MultiThreaded() {
 
   static const int kValues = 6;
 
-  std::array<Future<T>, 6> fs;
+  std::array<yaclib::Future<T>, 6> fs;
   for (int i = 0; i < kValues; ++i) {
     fs[i] = async_value(i);
   }
 
   auto ints =
-      [&fs] {
-        if constexpr (suite == TestSuite::Vector) {
-          return WhenAll(fs.begin(), fs.end());
-        } else {
-          return WhenAll(std::move(fs[0]), std::move(fs[1]), std::move(fs[2]), std::move(fs[3]), std::move(fs[4]),
-                         std::move(fs[5]));
-        }
-      }()
-          .Get();
+    [&fs] {
+      if constexpr (suite == TestSuite::Vector) {
+        return WhenAll(fs.begin(), fs.end());
+      } else {
+        return WhenAll(std::move(fs[0]), std::move(fs[1]), std::move(fs[2]), std::move(fs[3]), std::move(fs[4]),
+                       std::move(fs[5]));
+      }
+    }()
+      .Get();
 
   if constexpr (is_void) {
     EXPECT_NO_THROW(std::move(ints).Ok());
@@ -237,28 +255,35 @@ TYPED_TEST(WhenAllT, ArrayMultiThreaded) {
   MultiThreaded<TestSuite::Array, typename TestFixture::Type>();
 }
 
-TEST(WhenAll, FirstFail) {
+template <typename Error = yaclib::StopError>
+void FirstFail() {
   auto tp = yaclib::MakeThreadPool();
-  std::vector<yaclib::Future<void>> ints;
-  size_t count = std::thread::hardware_concurrency() * 4;
+  std::vector<yaclib::Future<void, Error>> ints;
+  std::size_t count = std::thread::hardware_concurrency() * 4;
   ints.reserve(count * 2);
   for (int j = 0; j != 200; ++j) {
-    for (size_t i = 0; i != count; ++i) {
-      ints.push_back(yaclib::Run(tp, [] {
+    for (std::size_t i = 0; i != count; ++i) {
+      ints.push_back(yaclib::Run<Error>(tp, [] {
         std::this_thread::sleep_for(4ms);
       }));
     }
-    for (size_t i = 0; i != count; ++i) {
-      ints.push_back(yaclib::Run(tp, [] {
+    for (std::size_t i = 0; i != count; ++i) {
+      ints.push_back(yaclib::Run<Error>(tp, [] {
         std::this_thread::sleep_for(2ms);
-        return yaclib::util::Result<void>{std::error_code{}};
+        return yaclib::Result<void, Error>{Error{yaclib::StopTag{}}};
       }));
     }
-    EXPECT_THROW(WhenAll(ints.begin(), ints.end()).Get().Ok(), util::ResultError);
+    EXPECT_THROW(WhenAll(ints.begin(), ints.end()).Get().Ok(), yaclib::ResultError<Error>);
     ints.clear();
   }
   tp->Stop();
   tp->Wait();
 }
 
+TEST(WhenAll, FirstFail) {
+  FirstFail();
+  FirstFail<LikeErrorCode>();
+}
+
 }  // namespace
+}  // namespace test

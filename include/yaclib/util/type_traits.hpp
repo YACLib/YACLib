@@ -1,75 +1,46 @@
 #pragma once
 
-#include <cassert>
+#include <yaclib/fwd.hpp>
+#include <yaclib/util/detail/type_traits_impl.hpp>
+
 #include <exception>
 #include <type_traits>
 
 namespace yaclib {
 
-template <typename T>
-class Future;
-
-namespace util {
-namespace detail {
-
-template <typename U>
-struct FutureValue {
-  using type = U;
-};
-
-template <typename U>
-struct FutureValue<Future<U>> {
-  using type = U;
-};
-
-template <typename T>
-using FutureValueT = typename FutureValue<T>::type;
-
-}  // namespace detail
-
-template <template <typename...> class T, typename... U>
-struct IsInstantiationOf : std::false_type {};
-
-template <template <typename...> class T, typename... U>
-struct IsInstantiationOf<T, T<U...>> : std::true_type {};
+template <typename Functor, typename... Arg>
+inline constexpr bool is_invocable_v = detail::IsInvocable<Functor, Arg...>::Value;
 
 template <typename Functor, typename... Arg>
-struct Invoke {
-  using type = std::invoke_result_t<Functor, Arg...>;
-};
-
-template <typename Functor>
-struct Invoke<Functor, void> {
-  using type = std::invoke_result_t<Functor>;
-};
-
-template <typename Functor, typename... Arg>
-using InvokeT = typename Invoke<Functor, Arg...>::type;
-
-template <typename Functor, typename Arg>
-struct IsInvocable {
-  static constexpr bool value = std::is_invocable_v<Functor, Arg>;
-};
-
-template <typename Functor>
-struct IsInvocable<Functor, void> {
-  static constexpr bool value = std::is_invocable_v<Functor>;
-};
-
-template <typename Functor, typename Arg>
-inline constexpr bool IsInvocableV = IsInvocable<Functor, Arg>::value;
+using invoke_t = typename detail::Invoke<Functor, Arg...>::Type;
 
 template <typename T>
-using DecayT = std::remove_reference_t<std::decay_t<T>>;
+inline constexpr bool is_result_v = detail::IsInstantiationOf<Result, T>::Value;
 
 template <typename T>
-class Result;
+using result_value_t = typename detail::InstantiationTypes<Result, T>::Value;
 
 template <typename T>
-inline constexpr bool IsFutureV = std::integral_constant<bool, IsInstantiationOf<Future, T>::value>::value;
+using result_error_t = typename detail::InstantiationTypes<Result, T>::Error;
 
 template <typename T>
-inline constexpr bool IsResultV = std::integral_constant<bool, IsInstantiationOf<Result, T>::value>::value;
+inline constexpr bool is_future_v = detail::IsInstantiationOf<Future, T>::Value;
 
-}  // namespace util
+template <typename T>
+using future_value_t = typename detail::InstantiationTypes<Future, T>::Value;
+
+template <typename T>
+using future_error_t = typename detail::InstantiationTypes<Future, T>::Error;
+
+template <typename T>
+constexpr bool Check() noexcept {
+  static_assert(!std::is_reference_v<T>, "T cannot be V&, just use pointer or std::reference_wrapper");
+  static_assert(!std::is_const_v<T>, "T cannot be const, because it's unnecessary");
+  static_assert(!std::is_volatile_v<T>, "T cannot be volatile, because it's unnecessary");
+  static_assert(!is_result_v<T>, "T cannot be Result, because it's ambiguous");
+  static_assert(!is_future_v<T>, "T cannot be Future, because it's ambiguous");
+  static_assert(!std::is_same_v<T, std::exception_ptr>, "T cannot be std::exception_ptr, because it's ambiguous");
+  return true;
+}
+
 }  // namespace yaclib

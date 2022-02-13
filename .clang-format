@@ -13,6 +13,14 @@ AllowShortCaseLabelsOnASingleLine: false
 AllowShortEnumsOnASingleLine: true # if false then enums would be formatted as Allman braces style
 AllowShortIfStatementsOnASingleLine: Never
 AllowShortLoopsOnASingleLine: false
+AllowAllParametersOfDeclarationOnNextLine: false
+AllowAllArgumentsOnNextLine: false
+LambdaBodyIndentation: Signature
+BraceWrapping:
+  BeforeLambdaBody: true
+AlignEscapedNewlines: Right
+ContinuationIndentWidth: 2
+AlignAfterOpenBracket: Align # TODO(MBkkt) Try BlockIndent clang-format 15
 
 IncludeCategories:
   - Regex: '^".*"$'              # relative includes

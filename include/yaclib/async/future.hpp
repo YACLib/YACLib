@@ -5,12 +5,6 @@
 #include <yaclib/util/type_traits.hpp>
 
 namespace yaclib {
-namespace detail {
-
-template <typename Value>
-using FutureCorePtr = util::Ptr<ResultCore<Value>>;
-
-}  // namespace detail
 
 /**
  * Provides a mechanism to access the result of async operations
@@ -18,29 +12,25 @@ using FutureCorePtr = util::Ptr<ResultCore<Value>>;
  * Future and \ref Promise are like a Single Producer/Single Consumer one-shot one-element channel.
  * Use the \ref Promise to fulfill the \ref Future.
  */
-template <typename T>
+template <typename V, typename E = StopError>
 class Future final {
  public:
-  static_assert(!std::is_reference_v<T>,
-                "Future cannot be instantiated with reference, you can use std::reference_wrapper or pointer");
-  static_assert(!std::is_volatile_v<T> && !std::is_const_v<T>,
-                "Future cannot be instantiated with cv qualifiers, because it's unnecessary");
-  static_assert(!util::IsFutureV<T>, "Future cannot be instantiated with Future");
-  static_assert(!util::IsResultV<T>, "Future cannot be instantiated with Result");
-  static_assert(!std::is_same_v<T, std::error_code>, "Future cannot be instantiated with std::error_code");
-  static_assert(!std::is_same_v<T, std::exception_ptr>, "Future cannot be instantiated with std::exception_ptr");
+  static_assert(Check<V>(), "V should be valid");
+  static_assert(Check<E>(), "E should be valid");
+  static_assert(!std::is_same_v<V, E>, "Future cannot be instantiated with same V and E, because it's ambiguous");
 
   Future(const Future&) = delete;
   Future& operator=(const Future&) = delete;
 
+  Future(Future&& other) noexcept = default;
+  Future& operator=(Future&& other) noexcept = default;
+
   /**
    * The default constructor creates not a \ref Valid Future
    *
-   * Needed only for usability, e.g. instead of std::optional<util::Future<T>> in containers.
+   * Needed only for usability, e.g. instead of std::optional<Future<T>> in containers.
    */
   Future() = default;
-  Future(Future&& other) noexcept = default;
-  Future& operator=(Future&& other) noexcept = default;
 
   /**
    * If Future is \ref Valid then call \ref Stop
@@ -71,7 +61,7 @@ class Future final {
    * \note The behavior is undefined if \ref Valid is false before the call to this function.
    * \return \ref Result stored in the shared state
    */
-  [[nodiscard]] const util::Result<T>* Get() const& noexcept;
+  [[nodiscard]] const Result<V, E>* Get() const& noexcept;
 
   /**
    * Wait until \def Ready is true and move \ref Result from Future
@@ -79,7 +69,7 @@ class Future final {
    * \note The behavior is undefined if \ref Valid is false before the call to this function.
    * \return The \ref Result that Future received
    */
-  [[nodiscard]] util::Result<T> Get() && noexcept;
+  [[nodiscard]] Result<V, E> Get() && noexcept;
 
   /**
    * Stop pipeline before current step, if possible.
@@ -161,39 +151,31 @@ class Future final {
   void Subscribe(IExecutorPtr e, Functor&& f) &&;
 
   /// DETAIL
-  explicit Future(detail::FutureCorePtr<T> core) noexcept;
-  [[nodiscard]] detail::FutureCorePtr<T>& GetCore() noexcept;
+  Future(detail::ResultCorePtr<V, E> core) noexcept;
+  [[nodiscard]] detail::ResultCorePtr<V, E>& GetCore() noexcept;
   /// DETAIL
 
  private:
-  detail::FutureCorePtr<T> _core;
+  detail::ResultCorePtr<V, E> _core;
 };
 
-extern template class Future<void>;
+extern template class Future<void, StopError>;
 
-Future<void> MakeFuture();
-
-template <typename V, typename T = std::remove_reference_t<V>>
-Future<T> MakeFuture(V&& value) {
-  return Future<T>{util::MakeIntrusive<detail::ResultCore<T>>(std::forward<V>(value))};
+template <typename E = StopError>
+Future<void, E> MakeFuture() {
+  return {MakeIntrusive<detail::ResultCore<void, E>>(Unit{})};
 }
 
-template <typename T, typename V>
-std::enable_if_t<!std::is_same_v<T, std::remove_reference_t<V>>, Future<T>> MakeFuture(V&& value) {
-  return Future<T>{util::MakeIntrusive<detail::ResultCore<T>>(std::forward<V>(value))};
+template <typename T, typename E = StopError, typename V = std::remove_reference_t<T>>
+Future<V, E> MakeFuture(T&& value) {
+  return {MakeIntrusive<detail::ResultCore<V, E>>(std::forward<T>(value))};
+}
+
+template <typename V, typename E = StopError, typename T>
+std::enable_if_t<!std::is_same_v<V, std::remove_reference_t<T>>, Future<V, E>> MakeFuture(T&& value) {
+  return {MakeIntrusive<detail::ResultCore<V, E>>(std::forward<T>(value))};
 }
 
 }  // namespace yaclib
 
-#ifndef YACLIB_ASYNC_DECL
-
-#define YACLIB_ASYNC_DECL
-#include <yaclib/async/promise.hpp>
-#undef YACLIB_ASYNC_DECL
-
-#define YACLIB_ASYNC_IMPL
 #include <yaclib/async/detail/future_impl.hpp>
-#include <yaclib/async/detail/promise_impl.hpp>
-#undef YACLIB_ASYNC_IMPL
-
-#endif

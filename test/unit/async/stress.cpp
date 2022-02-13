@@ -1,10 +1,20 @@
 #include <yaclib/algo/wait_group.hpp>
-#include <yaclib/async/run.hpp>
+#include <yaclib/async/contract.hpp>
+#include <yaclib/async/future.hpp>
+#include <yaclib/executor/executor.hpp>
+#include <yaclib/executor/inline.hpp>
 #include <yaclib/executor/thread_pool.hpp>
-#include <yaclib/fault/random.hpp>
+#include <yaclib/fault/atomic.hpp>
 #include <yaclib/fault/thread.hpp>
+#include <yaclib/util/intrusive_ptr.hpp>
 
 #include <array>
+#include <cstdint>
+#include <iostream>
+#include <random>
+#include <thread>
+#include <type_traits>
+#include <utility>
 #include <vector>
 
 #include <gtest/gtest.h>
@@ -120,14 +130,14 @@ TEST_F(StressTest, ThenInline) {
       [](yaclib::WaitGroup&, auto future, uint32_t idx, uint32_t slot_round, auto& num_resolved_futures) {
         std::array<char, 64> data{};
         std::move(future)
-            .ThenInline([slot_round](StressTest::Value&& x) noexcept {
-              return x.v / slot_round;
-            })
-            .SubscribeInline([data, &num_resolved_futures, idx](uint32_t x) noexcept {
-              (void)data;
-              EXPECT_EQ(idx, x);
-              num_resolved_futures.fetch_add(1, std::memory_order_relaxed);
-            });
+          .ThenInline([slot_round](StressTest::Value&& x) noexcept {
+            return x.v / slot_round;
+          })
+          .SubscribeInline([data, &num_resolved_futures, idx](uint32_t x) noexcept {
+            (void)data;
+            EXPECT_EQ(idx, x);
+            num_resolved_futures.fetch_add(1, std::memory_order_relaxed);
+          });
       });
 }
 
@@ -135,14 +145,14 @@ TEST_F(StressTest, Then) {
   auto tp = yaclib::MakeThreadPool();
   Run(tp, [](yaclib::WaitGroup& wg, auto future, uint32_t idx, uint32_t slot_round, auto& num_resolved_futures) {
     auto f = std::move(future)
-                 .Then([slot_round](StressTest::Value&& x) noexcept {
-                   return x.v / slot_round;
-                 })
-                 .Then([idx, &num_resolved_futures](uint32_t x) noexcept {
-                   EXPECT_EQ(idx, x);
-                   num_resolved_futures.fetch_add(1, std::memory_order_relaxed);
-                   return x;
-                 });
+               .Then([slot_round](StressTest::Value&& x) noexcept {
+                 return x.v / slot_round;
+               })
+               .Then([idx, &num_resolved_futures](uint32_t x) noexcept {
+                 EXPECT_EQ(idx, x);
+                 num_resolved_futures.fetch_add(1, std::memory_order_relaxed);
+                 return x;
+               });
     wg.Add(f);
     std::move(f).Detach();
   });

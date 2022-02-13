@@ -3,9 +3,26 @@
 #include <yaclib/algo/wait.hpp>
 #include <yaclib/algo/wait_for.hpp>
 #include <yaclib/algo/wait_until.hpp>
+#include <yaclib/async/contract.hpp>
+#include <yaclib/async/future.hpp>
+#include <yaclib/async/promise.hpp>
 #include <yaclib/async/run.hpp>
+#include <yaclib/config.hpp>
+#include <yaclib/executor/submit.hpp>
 #include <yaclib/executor/thread_pool.hpp>
 #include <yaclib/fault/chrono.hpp>
+#include <yaclib/fault/thread.hpp>
+#include <yaclib/util/intrusive_ptr.hpp>
+#include <yaclib/util/result.hpp>
+
+#include <algorithm>
+#include <chrono>
+#include <iterator>
+#include <ratio>
+#include <thread>
+#include <type_traits>
+#include <utility>
+#include <vector>
 
 #include <gtest/gtest.h>
 
@@ -24,20 +41,20 @@ void TestJustWorks() {
 
   test::util::StopWatch timer;
 
-  tp->Execute([p = std::move(p)]() mutable {
+  Submit(tp, [p = std::move(p)]() mutable {
     yaclib_std::this_thread::sleep_for(150ms * YACLIB_CI_SLOWDOWN);
     std::move(p).Set();
   });
   if constexpr (policy == WaitPolicy::Endless) {
-    yaclib::Wait(f);
+    Wait(f);
     EXPECT_TRUE(f.Ready());
     EXPECT_LE(timer.Elapsed(), 200ms * YACLIB_CI_SLOWDOWN);
   } else if constexpr (policy == WaitPolicy::For) {
-    yaclib::WaitFor(50ms * YACLIB_CI_SLOWDOWN, f);
+    WaitFor(50ms * YACLIB_CI_SLOWDOWN, f);
     EXPECT_TRUE(!f.Ready());
     EXPECT_LE(timer.Elapsed(), 100ms * YACLIB_CI_SLOWDOWN);
   } else if constexpr (policy == WaitPolicy::Until) {
-    yaclib::WaitUntil(yaclib_std::chrono::system_clock::now() + 50ms * YACLIB_CI_SLOWDOWN, f);
+    WaitUntil(yaclib_std::chrono::system_clock::now() + 50ms * YACLIB_CI_SLOWDOWN, f);
     EXPECT_TRUE(!f.Ready());
     EXPECT_LE(timer.Elapsed(), 100ms * YACLIB_CI_SLOWDOWN);
   }
@@ -87,14 +104,14 @@ void TestMultiThreaded() {
   }
   test::util::StopWatch timer;
   if constexpr (kPolicy == WaitPolicy::Endless) {
-    yaclib::Wait(fs[0], fs[1], fs[2], fs[3]);
+    Wait(fs[0], fs[1], fs[2], fs[3]);
     EXPECT_LE(timer.Elapsed(), 100ms * YACLIB_CI_SLOWDOWN);
   } else if constexpr (kPolicy == WaitPolicy::For) {
-    bool ready = yaclib::WaitFor(100ms * YACLIB_CI_SLOWDOWN, fs[0], fs[1], fs[2], fs[3]);
+    bool ready = WaitFor(100ms * YACLIB_CI_SLOWDOWN, fs[0], fs[1], fs[2], fs[3]);
     EXPECT_TRUE(ready);
   } else if constexpr (kPolicy == WaitPolicy::Until) {
-    bool ready = yaclib::WaitUntil(yaclib_std::chrono::system_clock::now() + 100ms * YACLIB_CI_SLOWDOWN, fs[0], fs[1],
-                                   fs[2], fs[3]);
+    bool ready =
+      WaitUntil(yaclib_std::chrono::system_clock::now() + 100ms * YACLIB_CI_SLOWDOWN, fs[0], fs[1], fs[2], fs[3]);
     EXPECT_TRUE(ready);
   }
   EXPECT_LE(timer.Elapsed(), 150ms * YACLIB_CI_SLOWDOWN);
@@ -129,17 +146,17 @@ void TestHaveResults() {
   auto [f1, p1] = yaclib::MakeContract<void>();
   auto [f2, p2] = yaclib::MakeContract<void>();
   auto tp = yaclib::MakeThreadPool(1);
-  tp->Execute([p1 = std::move(p1), p2 = std::move(p2)]() mutable {
+  Submit(tp, [p1 = std::move(p1), p2 = std::move(p2)]() mutable {
     std::move(p1).Set();
     std::move(p2).Set();
   });
   yaclib_std::this_thread::sleep_for(50ms * YACLIB_CI_SLOWDOWN);
   if constexpr (kPolicy == WaitPolicy::Endless) {
-    yaclib::Wait(f1, f2);
+    Wait(f1, f2);
   } else if constexpr (kPolicy == WaitPolicy::Until) {
-    EXPECT_TRUE(yaclib::WaitUntil(yaclib_std::chrono::steady_clock::now(), f1, f2));
+    EXPECT_TRUE(WaitUntil(yaclib_std::chrono::steady_clock::now(), f1, f2));
   } else {
-    EXPECT_TRUE(yaclib::WaitFor(0ns, f1, f2));
+    EXPECT_TRUE(WaitFor(0ns, f1, f2));
   }
 
   EXPECT_TRUE(f1.Ready());
@@ -170,7 +187,7 @@ TEST(WaitFor, Diff) {
     });
   }
   test::util::StopWatch timer;
-  bool ready = yaclib::WaitFor(100ms * YACLIB_CI_SLOWDOWN, std::begin(fs), std::end(fs));
+  bool ready = WaitFor(100ms * YACLIB_CI_SLOWDOWN, std::begin(fs), std::end(fs));
   EXPECT_FALSE(ready);
   EXPECT_LE(timer.Elapsed(), 150ms * YACLIB_CI_SLOWDOWN);
 
@@ -186,5 +203,20 @@ TEST(WaitFor, Diff) {
     EXPECT_EQ(std::move(fs[i]).Get().Value(), i);
   }
   tp->Stop();
+  tp->Wait();
+}
+
+TEST(Wait, ResetWait) {
+  auto tp = yaclib::MakeThreadPool();
+  std::vector<yaclib::Future<size_t>> fs;
+  fs.reserve(1000 * std::thread::hardware_concurrency());
+  for (size_t i = 0; i != 1000 * std::thread::hardware_concurrency(); ++i) {
+    fs.push_back(yaclib::Run(tp, [i] {
+      std::this_thread::sleep_for(1ns);
+      return i;
+    }));
+  }
+  yaclib::WaitFor(0ns, fs.begin(), fs.end());
+  tp->HardStop();
   tp->Wait();
 }

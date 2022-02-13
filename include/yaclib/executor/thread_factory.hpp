@@ -1,35 +1,35 @@
 #pragma once
 
 #include <yaclib/executor/task.hpp>
-#include <yaclib/util/intrusive_node.hpp>
+#include <yaclib/util/detail/node.hpp>
 
 #include <cstddef>
-#include <string>
+#include <string_view>
 
 namespace yaclib {
 
-class IThread : public util::detail::Node {
+class IThread : public detail::Node {
  public:
   virtual ~IThread() = default;
 };
 
 using IThreadPtr = IThread*;
 
-class IThreadFactory : public util::IRef {
+class IThreadFactory : public IRef {
  public:
-  virtual IThreadPtr Acquire(util::IFuncPtr f) = 0;
+  virtual IThreadPtr Acquire(IFuncPtr f) = 0;
 
   virtual void Release(IThreadPtr t) = 0;
 };
 
-using IThreadFactoryPtr = util::Ptr<IThreadFactory>;
+using IThreadFactoryPtr = IntrusivePtr<IThreadFactory>;
 
-IThreadFactoryPtr MakeThreadFactory(size_t cache = 0);
+IThreadFactoryPtr MakeThreadFactory(std::size_t cache = 0);
 
-IThreadFactoryPtr MakeThreadFactory(IThreadFactoryPtr base, std::string name);
+IThreadFactoryPtr MakeThreadFactory(IThreadFactoryPtr base, std::string_view name);
 
-IThreadFactoryPtr MakeThreadFactory(IThreadFactoryPtr base, size_t priority);
+IThreadFactoryPtr MakeThreadFactory(IThreadFactoryPtr base, std::size_t priority);
 
-IThreadFactoryPtr MakeThreadFactory(IThreadFactoryPtr base, util::IFuncPtr acquire, util::IFuncPtr release);
+IThreadFactoryPtr MakeThreadFactory(IThreadFactoryPtr base, IFuncPtr acquire, IFuncPtr release);
 
 }  // namespace yaclib
