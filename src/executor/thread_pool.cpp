@@ -50,7 +50,7 @@ class ThreadPool : public IThreadPool {
   [[nodiscard]] bool NoTasks() const noexcept {
     return (_task_count >> 2U) == 0;
   }
-  void Stop(std::unique_lock<std::mutex>&& lock) noexcept {
+  void Stop(std::unique_lock<yaclib_std::mutex>&& lock) noexcept {
     _task_count |= 1U;
     lock.unlock();
     _cv.notify_all();
