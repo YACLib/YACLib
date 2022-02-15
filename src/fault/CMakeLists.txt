@@ -48,8 +48,8 @@ if (YACLIB_FAULT)
     ${YACLIB_INCLUDE_DIR}/fault/detail/mutex/timed_mutex.hpp
 
     # antagonist
-    ${YACLIB_INCLUDE_DIR}/fault/detail/antagonist/yielder.hpp
-    ${YACLIB_INCLUDE_DIR}/fault/detail/antagonist/inject_fault.hpp
+    ${YACLIB_INCLUDE_DIR}/fault/detail/yielder.hpp
+    ${YACLIB_INCLUDE_DIR}/fault/detail/inject_fault.hpp
 
     # atomics
     ${YACLIB_INCLUDE_DIR}/fault/detail/atomic/atomic.hpp

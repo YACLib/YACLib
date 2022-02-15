@@ -40,7 +40,9 @@ class LightThread final : public IThread {
   }
 
   ~LightThread() final {
-    YACLIB_ERROR(_thread.get_id() == yaclib_std::this_thread::get_id(), "join itself called");
+    YACLIB_ERROR(_thread.get_id() == yaclib_std::this_thread::get_id(),
+                 "Thread try to join itself, probably because you forgot Stop ThreadPool, and ThreadPool dtor was "
+                 "called in ThreadPool thread");
     _thread.join();
   }
 
@@ -59,7 +61,7 @@ class HeavyThread final : public IThread {
   void Set(std::size_t priority, std::string_view name, IFuncPtr func, IFuncPtr acquire, IFuncPtr release) {
     {
       std::lock_guard lock{_m};
-      YACLIB_ERROR(_state != State::Idle, "non idle state");
+      YACLIB_ERROR(_state != State::Idle, "Trying run some func on not idle thread");
       _state = State::Run;
       _priority = priority;
       _name = name;
@@ -83,7 +85,9 @@ class HeavyThread final : public IThread {
       _state = State::Stop;
     }
     _cv.notify_all();
-    YACLIB_ERROR(_thread.get_id() == yaclib_std::this_thread::get_id(), "join itself called");
+    YACLIB_ERROR(_thread.get_id() == yaclib_std::this_thread::get_id(),
+                 "Thread try to join itself, probably because you forgot Stop ThreadPool, and ThreadPool dtor was "
+                 "called in ThreadPool thread");
     _thread.join();
   }
 

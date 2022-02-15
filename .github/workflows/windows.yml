@@ -97,6 +97,7 @@ jobs:
                 -DYACLIB_FLAGS="CORO"                               \
                 -DYACLIB_TEST=SINGLE                                \
                 -DYACLIB_FAULT=$yaclib_fault                        \
+                -DYACLIB_LOG="ERROR"                                \
                 -G"${generators[$i]}"                               \
                 ${options[$i]}                                      \
                 -DYACLIB_DEFINITIONS="YACLIB_CI_SLOWDOWN=$slowdown"

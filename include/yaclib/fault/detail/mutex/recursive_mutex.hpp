@@ -1,6 +1,6 @@
 #pragma once
 
-#include <yaclib/fault/detail/antagonist/inject_fault.hpp>
+#include <yaclib/fault/detail/inject_fault.hpp>
 #include <yaclib/log_config.hpp>
 
 #include <mutex>
@@ -26,8 +26,8 @@ class RecursiveMutex {
  private:
   std::recursive_mutex _m;
   // TODO(myannyax) yaclib wrapper
-  yaclib_std::thread::id _owner{yaclib::detail::kInvalidThreadId};
-  unsigned _lock_level{0};
+  yaclib_std::thread::id _owner = yaclib::detail::kInvalidThreadId;
+  uint32_t _lock_level = 0;
   void UpdateOnLock();
 };
 

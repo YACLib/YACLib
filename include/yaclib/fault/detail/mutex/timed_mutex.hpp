@@ -1,7 +1,7 @@
 #pragma once
 
 #include <yaclib/fault/chrono.hpp>
-#include <yaclib/fault/detail/antagonist/inject_fault.hpp>
+#include <yaclib/fault/detail/inject_fault.hpp>
 #include <yaclib/log_config.hpp>
 
 #include <atomic>
@@ -38,7 +38,7 @@ class TimedMutex {
  private:
   std::timed_mutex _m;
   // TODO(myannyax) yaclib wrapper
-  yaclib_std::thread::id _owner{yaclib::detail::kInvalidThreadId};
+  yaclib_std::thread::id _owner = yaclib::detail::kInvalidThreadId;
 };
 
 }  // namespace yaclib::detail

@@ -11,14 +11,13 @@ void ConditionVariable::notify_all() noexcept {
 }
 
 void ConditionVariable::wait(std::unique_lock<yaclib::detail::Mutex>& lock) noexcept {
-  auto m = lock.release();
-  auto guard = std::unique_lock<std::mutex>(m->GetImpl(), std::adopt_lock);
-  m->UpdateOwner(yaclib::detail::kInvalidThreadId);
+  YACLIB_ERROR(!lock.owns_lock(), "Trying to call wait on not owned lock");
+  auto* m = lock.release();
+  std::unique_lock guard{m->GetImpl(), std::adopt_lock};
   YACLIB_INJECT_FAULT(_impl.wait(guard));
-  guard.release();
   m->UpdateOwner(yaclib_std::this_thread::get_id());
-  auto new_lock = std::unique_lock(*m, std::adopt_lock);
-  lock.swap(new_lock);
+  guard.release();
+  lock = std::unique_lock{*m, std::adopt_lock};
 }
 
 ConditionVariable::native_handle_type ConditionVariable::native_handle() {

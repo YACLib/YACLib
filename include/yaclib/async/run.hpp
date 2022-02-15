@@ -18,7 +18,8 @@ namespace yaclib {
 template <typename E = StopError, typename Functor>
 auto Run(const IExecutorPtr& e, Functor&& f) {
   YACLIB_ERROR(e == nullptr, "nullptr executor supplied");
-  YACLIB_INFO(e->Tag() == IExecutor::Type::Inline, "can't submit task to inline executor");
+  YACLIB_INFO(e->Tag() == IExecutor::Type::Inline,
+              "better way is use ThenInline(...) instead of Then(MakeInline(), ...)");
   using AsyncRet = result_value_t<typename detail::Return<void, E, Functor, 2>::Type>;
   constexpr bool kIsAsync = is_future_v<AsyncRet>;
   using Ret = result_value_t<future_value_t<AsyncRet>>;

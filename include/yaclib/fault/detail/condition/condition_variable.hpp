@@ -22,69 +22,64 @@ class ConditionVariable {
 
   template <typename Predicate>
   void wait(std::unique_lock<yaclib::detail::Mutex>& lock, Predicate predicate) {
-    auto m = lock.release();
-    auto guard = std::unique_lock<std::mutex>(m->GetImpl(), std::adopt_lock);
-    m->UpdateOwner(yaclib::detail::kInvalidThreadId);
+    YACLIB_ERROR(!lock.owns_lock(), "Trying to call wait on not owned lock");
+    auto* m = lock.release();
+    std::unique_lock guard{m->GetImpl(), std::adopt_lock};
     YACLIB_INJECT_FAULT(_impl.wait(guard, predicate));
-    guard.release();
     m->UpdateOwner(yaclib_std::this_thread::get_id());
-    auto new_lock = std::unique_lock(*m, std::adopt_lock);
-    lock.swap(new_lock);
+    guard.release();
+    lock = std::unique_lock{*m, std::adopt_lock};
   }
 
   template <typename Clock, typename Duration>
   std::cv_status wait_until(std::unique_lock<yaclib::detail::Mutex>& lock,
                             const std::chrono::time_point<Clock, Duration>& time_point) {
-    auto m = lock.release();
-    auto guard = std::unique_lock<std::mutex>(m->GetImpl(), std::adopt_lock);
-    m->UpdateOwner(yaclib::detail::kInvalidThreadId);
+    YACLIB_ERROR(!lock.owns_lock(), "Trying to call wait on not owned lock");
+    auto* m = lock.release();
+    std::unique_lock guard{m->GetImpl(), std::adopt_lock};
     YACLIB_INJECT_FAULT(auto result = _impl.wait_until(guard, time_point));
-    guard.release();
     m->UpdateOwner(yaclib_std::this_thread::get_id());
-    auto new_lock = std::unique_lock(*m, std::adopt_lock);
-    lock.swap(new_lock);
+    guard.release();
+    lock = std::unique_lock{*m, std::adopt_lock};
     return result;
   }
 
   template <typename Clock, typename Duration, typename Predicate>
   bool wait_until(std::unique_lock<yaclib::detail::Mutex>& lock,
                   const std::chrono::time_point<Clock, Duration>& time_point, Predicate predicate) {
-    auto m = lock.release();
-    auto guard = std::unique_lock<std::mutex>(m->GetImpl(), std::adopt_lock);
-    m->UpdateOwner(yaclib::detail::kInvalidThreadId);
+    YACLIB_ERROR(!lock.owns_lock(), "Trying to call wait on not owned lock");
+    auto* m = lock.release();
+    std::unique_lock guard{m->GetImpl(), std::adopt_lock};
     YACLIB_INJECT_FAULT(auto result = _impl.wait_until(guard, time_point, predicate));
-    guard.release();
     m->UpdateOwner(yaclib_std::this_thread::get_id());
-    auto new_lock = std::unique_lock(*m, std::adopt_lock);
-    lock.swap(new_lock);
+    guard.release();
+    lock = std::unique_lock{*m, std::adopt_lock};
     return result;
   }
 
   template <typename Rep, typename Period>
   std::cv_status wait_for(std::unique_lock<yaclib::detail::Mutex>& lock,
                           const std::chrono::duration<Rep, Period>& duration) {
-    auto m = lock.release();
-    auto guard = std::unique_lock<std::mutex>(m->GetImpl(), std::adopt_lock);
-    m->UpdateOwner(yaclib::detail::kInvalidThreadId);
+    YACLIB_ERROR(!lock.owns_lock(), "Trying to call wait on not owned lock");
+    auto* m = lock.release();
+    std::unique_lock guard{m->GetImpl(), std::adopt_lock};
     YACLIB_INJECT_FAULT(auto result = _impl.wait_for(guard, duration));
-    guard.release();
     m->UpdateOwner(yaclib_std::this_thread::get_id());
-    auto new_lock = std::unique_lock(*m, std::adopt_lock);
-    lock.swap(new_lock);
+    guard.release();
+    lock = std::unique_lock{*m, std::adopt_lock};
     return result;
   }
 
   template <typename Rep, typename Period, typename Predicate>
   bool wait_for(std::unique_lock<yaclib::detail::Mutex>& lock, const std::chrono::duration<Rep, Period>& duration,
                 Predicate predicate) {
-    auto m = lock.release();
-    auto guard = std::unique_lock<std::mutex>(m->GetImpl(), std::adopt_lock);
-    m->UpdateOwner(yaclib::detail::kInvalidThreadId);
+    YACLIB_ERROR(!lock.owns_lock(), "Trying to call wait on not owned lock");
+    auto* m = lock.release();
+    std::unique_lock guard{m->GetImpl(), std::adopt_lock};
     YACLIB_INJECT_FAULT(auto result = _impl.wait_for(guard, duration, predicate));
-    guard.release();
     m->UpdateOwner(yaclib_std::this_thread::get_id());
-    auto new_lock = std::unique_lock(*m, std::adopt_lock);
-    lock.swap(new_lock);
+    guard.release();
+    lock = std::unique_lock{*m, std::adopt_lock};
     return result;
   }
 
@@ -95,4 +90,5 @@ class ConditionVariable {
  private:
   std::condition_variable _impl;
 };
+
 }  // namespace yaclib::detail

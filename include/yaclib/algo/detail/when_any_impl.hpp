@@ -101,7 +101,7 @@ class AnyCombinatorBase<V, E, WhenPolicy::FirstFail> : public AnyCombinatorBase<
       if (state == ResultState::Exception) {
         new (&_exception) std::exception_ptr{std::move(result).Exception()};
       } else {
-        YACLIB_ERROR(state != ResultState::Error, "unexpected result state");
+        YACLIB_ERROR(state != ResultState::Error, "state should be Error, but here it's Empty");
         new (&_error) E{std::move(result).Error()};
       }
     }
