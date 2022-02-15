@@ -1,6 +1,7 @@
 #pragma once
 
 #include <yaclib/algo/detail/when_any_impl.hpp>
+#include <yaclib/algo/detail/when_impl.hpp>
 #include <yaclib/algo/when_policy.hpp>
 #include <yaclib/async/future.hpp>
 #include <yaclib/util/type_traits.hpp>
@@ -23,7 +24,17 @@ namespace yaclib {
 template <WhenPolicy P = WhenPolicy::LastFail, typename It, typename T = typename std::iterator_traits<It>::value_type>
 auto WhenAny(It begin, std::size_t size) {
   static_assert(is_future_v<T>, "WhenAny function Iterator must be point to some Future");
-  return detail::WhenAnyImpl<P, future_value_t<T>, future_error_t<T>>(begin, std::size_t{0}, size);
+  using V = future_value_t<T>;
+  using E = future_error_t<T>;
+  if (size == 0) {
+    return Future<V, E>{};
+  }
+  if (size == 1) {
+    return std::move(*begin);
+  }
+  auto [future, combinator] = detail::AnyCombinator<V, E, P>::Make(size);
+  detail::WhenImpl(combinator, begin, size);
+  return std::move(future);
 }
 
 /**
@@ -38,7 +49,9 @@ auto WhenAny(It begin, std::size_t size) {
 template <WhenPolicy P = WhenPolicy::LastFail, typename It, typename T = typename std::iterator_traits<It>::value_type>
 auto WhenAny(It begin, It end) {
   static_assert(is_future_v<T>, "WhenAny function Iterator must be point to some Future");
-  return detail::WhenAnyImpl<P, future_value_t<T>, future_error_t<T>>(begin, begin, end);
+  // We don't use std::distance because we want to alert the user to the fact that it can be expensive.
+  // Maybe the user has the size of the range, otherwise it is suggested to call WhenAny(begin, distance(begin, end))
+  return WhenAny<P>(begin, end - begin);
 }
 
 /**
@@ -55,7 +68,7 @@ Future<V, E> WhenAny(Future<V, E>&& head, Future<Vs, Es>&&... tail) {
   constexpr std::size_t kSize = 1 + sizeof...(Vs);
   static_assert(kSize >= 2, "WhenAny wants at least two futures");
   auto [future, combinator] = detail::AnyCombinator<V, E, P>::Make(kSize);
-  detail::WhenAnyImpl<P>(combinator, std::move(head), std::move(tail)...);
+  detail::WhenImpl(combinator, std::move(head), std::move(tail)...);
   return std::move(future);
 }
 

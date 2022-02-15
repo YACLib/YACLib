@@ -26,19 +26,17 @@ IExecutorPtr BaseCore::GetExecutor() const noexcept {
   return _executor;
 }
 
-void BaseCore::SetCallback(IntrusivePtr<BaseCore> callback) {
-  assert(callback != nullptr);
+void BaseCore::SetCallback(BaseCore& callback) noexcept {
   assert(_callback == nullptr);
-  _callback = std::move(callback);
+  _callback.Reset(NoRefTag{}, &callback);
   const auto state = _state.exchange(State::HasCallback, std::memory_order_acq_rel);
   if (state == State::HasResult) {  //  TODO(MBkkt) rel + fence(acquire) instead of acq_rel
     Submit();
   }
 }
-void BaseCore::SetCallbackInline(IntrusivePtr<InlineCore> callback, bool async) {
-  assert(callback != nullptr);
+void BaseCore::SetCallbackInline(InlineCore& callback, bool async) noexcept {
   assert(_callback == nullptr);
-  _callback = std::move(callback);
+  _callback.Reset(NoRefTag{}, &callback);
   const auto new_state = State{static_cast<int>(State::HasCallbackInline) + static_cast<int>(async)};
   const auto old_state = _state.exchange(new_state, std::memory_order_acq_rel);
   if (old_state == State::HasResult) {  //  TODO(MBkkt) rel + fence(acquire) instead of acq_rel

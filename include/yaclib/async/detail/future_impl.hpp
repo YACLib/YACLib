@@ -151,7 +151,8 @@ class AsyncInvoke {
   template <typename T>
   void WrapperSubscribe(ResultCore<Ret, E>& self, T&& value) {
     auto future = std::forward<FunctorInvoke>(_f)(std::forward<T>(value));
-    std::exchange(future.GetCore(), nullptr)->SetCallbackInline(&self, true);
+    self.IncRef();
+    std::exchange(future.GetCore(), nullptr)->SetCallbackInline(self, true);
   }
 
   void WrapperOther(ResultCore<Ret, E>& self, Result<Arg, E>&& r) {
@@ -212,15 +213,15 @@ auto SetCallback(ResultCorePtr<Arg, E> caller, Functor&& f) {
   //   }
   // }
   using Core = detail::Core<Ret, Arg, E, Invoke>;
-  auto callback = MakeIntrusive<Core>(std::forward<Functor>(f));
+  auto callback = new detail::AtomicCounter<Core>{1 + static_cast<std::size_t>(!Subscribe), std::forward<Functor>(f)};
   callback->SetExecutor(caller->GetExecutor());
   if constexpr (Inline) {
-    caller->SetCallbackInline(callback);
+    caller->SetCallbackInline(*callback);
   } else {
-    caller->SetCallback(callback);
+    caller->SetCallback(*callback);
   }
-  if constexpr (!Subscribe) {
-    return Future<Ret, E>{std::move(callback)};
+  if constexpr (!Subscribe) {  // TODO(MBkkt) exception safety?
+    return Future<Ret, E>{IntrusivePtr{NoRefTag{}, callback}};
   }
 }
 
