@@ -1,10 +1,9 @@
 #pragma once
 
-#include <yaclib/fault/detail/antagonist/inject_fault.hpp>
+#include <yaclib/fault/detail/inject_fault.hpp>
 #include <yaclib/log_config.hpp>
 
 #include <shared_mutex>
-#include <unordered_set>
 
 namespace yaclib::detail {
 
@@ -29,8 +28,8 @@ class SharedMutex {
  private:
   std::shared_timed_mutex _m;
   // TODO(myannyax) yaclib wrapper
-  yaclib_std::thread::id _exclusive_owner{yaclib::detail::kInvalidThreadId};
-  bool _shared_mode{false};
+  yaclib_std::thread::id _exclusive_owner = yaclib::detail::kInvalidThreadId;
+  std::atomic_bool _shared_mode = false;
 };
 
 }  // namespace yaclib::detail

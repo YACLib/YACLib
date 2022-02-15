@@ -1,7 +1,7 @@
 #pragma once
 
-#ifdef YACLIB_FAULT
-
+// TODO(myannyax): modify and use for fiber-based implementation
+/*
 #include <yaclib/fault/detail/chrono/steady_clock.hpp>
 #include <yaclib/fault/detail/chrono/system_clock.hpp>
 
@@ -14,8 +14,7 @@ using high_resolution_clock = yaclib::detail::SystemClock;
 using system_clock = yaclib::detail::SystemClock;
 
 }  // namespace yaclib_std::chrono
-
-#else
+ */
 
 #include <chrono>
 
@@ -28,5 +27,3 @@ using high_resolution_clock = std::chrono::high_resolution_clock;
 using system_clock = std::chrono::system_clock;
 
 }  // namespace yaclib_std::chrono
-
-#endif

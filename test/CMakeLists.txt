@@ -38,6 +38,7 @@ endif ()
 
 if (YACLIB_LOG STREQUAL "ERROR")
   list(APPEND YACLIB_DEFINITIONS YACLIB_LOG_ERROR)
+  list(APPEND YACLIB_DEFINITIONS YACLIB_LOG_INFO)
 elseif (YACLIB_LOG STREQUAL "INFO")
   list(APPEND YACLIB_DEFINITIONS YACLIB_LOG_INFO)
 endif()
@@ -52,6 +53,7 @@ set(YACLIB_EXAMPLE_SOURCES
 set(YACLIB_UNIT_SOURCES
   unit/util/intrusive_ptr
   unit/util/result
+  unit/util/logging
   unit/executor/task
   unit/async/get
   unit/async/future

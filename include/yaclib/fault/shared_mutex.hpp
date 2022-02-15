@@ -4,7 +4,7 @@
 
 #ifdef YACLIB_FAULT
 
-#include <yaclib/fault/detail/antagonist/inject_fault.hpp>
+#include <yaclib/fault/detail/inject_fault.hpp>
 #include <yaclib/fault/detail/mutex/shared_mutex.hpp>
 #include <yaclib/fault/detail/mutex/shared_timed_mutex.hpp>
 

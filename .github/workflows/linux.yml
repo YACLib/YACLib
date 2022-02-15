@@ -143,6 +143,7 @@ jobs:
                     -G"Ninja"                                  \
                     -DYACLIB_LINK_OPTIONS="$link_option"       \
                     -DYACLIB_FAULT=$yaclib_fault               \
+                    -DYACLIB_LOG="ERROR"                       \
                     -DYACLIB_COMPILE_OPTIONS="$compile_option"
                 done
               done

@@ -5,7 +5,7 @@
 
 #include <gtest/gtest.h>
 
-#define GTEST_COUT std::cerr << "[          ] [ INFO ]"
+#define GTEST_COUT std::cerr << "[          ] [ INFO ] "
 
 int main(int argc, char** argv) {
 #ifdef __GLIBCPP__
@@ -18,14 +18,15 @@ int main(int argc, char** argv) {
   std::fprintf(stderr, "libc++: %d\n", _LIBCPP_VERSION);
 #endif
   ::testing::InitGoogleTest(&argc, argv);
-  SetErrorCallback([](std::string_view msg, std::string_view file, size_t line, std::string_view function) {
-    GTEST_FATAL_FAILURE_(msg.data());
+  SetErrorCallback([](std::string_view file, std::size_t line, std::string_view /*function*/,
+                      std::string_view /*condition*/, std::string_view message) {
+    GTEST_MESSAGE_AT_(file.data(), line, message.data(), ::testing::TestPartResult::kFatalFailure);
   });
-  SetInfoCallback([](std::string_view msg, std::string_view file, size_t line, std::string_view function) {
-    GTEST_COUT << msg << " in" << file << ":" << line << ". Function name: " << function;
+  SetInfoCallback([](std::string_view file, std::size_t line, std::string_view function, std::string_view /*condition*/,
+                     std::string_view message) {
+    GTEST_COUT << message << " in" << file << ":" << line << ". Function name: " << function;
   });
   SetFrequency(8u);
   SetSleepTime(200u);
-  YACLIB_INFO(true, "check YACLIB_INFO");
   return RUN_ALL_TESTS();
 }

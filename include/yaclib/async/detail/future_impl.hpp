@@ -103,7 +103,7 @@ class SyncInvoke {
       if (state == ResultState::Error) {
         return self.Set(std::move(r).Error());
       }
-      YACLIB_ERROR(state != ResultState::Error, "unexpected result state");
+      YACLIB_ERROR(state != ResultState::Exception, "state should be Exception, but here it's Empty");
       return self.Set(std::move(r).Exception());
     } else {
       constexpr bool kIsError = is_invocable_v<FunctorInvoke, E>;
@@ -163,7 +163,7 @@ class AsyncInvoke {
       if (state == ResultState::Error) {
         return self.Set(std::move(r).Error());
       }
-      YACLIB_ERROR(state != ResultState::Exception, "unexpected result state");
+      YACLIB_ERROR(state != ResultState::Exception, "state should be Exception, but here it's Empty");
       return self.Set(std::move(r).Exception());
       /**
        * We can't use this strategy for other FunctorInvoke,
@@ -298,7 +298,8 @@ template <typename V, typename E>
 template <typename Functor>
 auto Future<V, E>::Then(IExecutorPtr e, Functor&& f) && {
   YACLIB_ERROR(e == nullptr, "nullptr executor supplied");
-  YACLIB_INFO(e->Tag() == IExecutor::Type::Inline, "can't submit task to inline executor");
+  YACLIB_INFO(e->Tag() == IExecutor::Type::Inline,
+              "better way is use ThenInline(...) instead of Then(MakeInline(), ...)");
   _core->SetExecutor(std::move(e));
   return detail::SetCallback<false, false>(std::exchange(_core, nullptr), std::forward<Functor>(f));
 }
@@ -319,7 +320,8 @@ template <typename V, typename E>
 template <typename Functor>
 void Future<V, E>::Subscribe(IExecutorPtr e, Functor&& f) && {
   YACLIB_ERROR(e == nullptr, "nullptr executor supplied");
-  YACLIB_INFO(e->Tag() == IExecutor::Type::Inline, "can't submit task to inline executor");
+  YACLIB_INFO(e->Tag() == IExecutor::Type::Inline,
+              "better way is use ThenInline(...) instead of Then(MakeInline(), ...)");
   _core->SetExecutor(std::move(e));
   detail::SetCallback<true, false>(std::exchange(_core, nullptr), std::forward<Functor>(f));
 }

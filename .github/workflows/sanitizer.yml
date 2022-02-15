@@ -202,6 +202,7 @@ jobs:
                   -DYACLIB_LINK_OPTIONS="$link_option"               \
                   -DYACLIB_COMPILE_OPTIONS="$compile_option"         \
                   -DYACLIB_FAULT=$yaclib_fault                       \
+                  -DYACLIB_LOG="ERROR"                               \
                   -DYACLIB_DEFINITIONS="YACLIB_CI_SLOWDOWN=$slowdown"
 
               done

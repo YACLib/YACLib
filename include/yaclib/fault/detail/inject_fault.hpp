@@ -1,6 +1,6 @@
 #pragma once
 
-#include <yaclib/fault/detail/antagonist/yielder.hpp>
+#include "yielder.hpp"
 
 #define YACLIB_INJECT_FAULT(statement)                                                                                 \
   yaclib::detail::InjectFault();                                                                                       \

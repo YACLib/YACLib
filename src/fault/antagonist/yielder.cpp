@@ -1,14 +1,15 @@
-#include <yaclib/fault/detail/antagonist/yielder.hpp>
-
-#define YACLIB_FAULT_SLEEP_TIME_NS 200
+#include <yaclib/fault/detail/yielder.hpp>
 
 namespace yaclib::detail {
 
+inline constexpr int kFreq = 16;
+inline constexpr int kSleepTimeNs = 200;
+
 std::atomic_uint32_t Yielder::yield_frequency = kFreq;
-std::atomic_uint32_t Yielder::sleep_time = YACLIB_FAULT_SLEEP_TIME_NS;
+std::atomic_uint32_t Yielder::sleep_time = kSleepTimeNs;
 
 // TODO(myannyax) maybe scheduler-wide random engine?
-Yielder::Yielder() : _eng(1142) {
+Yielder::Yielder() : _eng(1142), _count(0) {
 }
 
 void Yielder::MaybeYield() {
@@ -29,7 +30,7 @@ void Yielder::Reset() {
   _count.exchange(RandNumber(yield_frequency));
 }
 
-unsigned Yielder::RandNumber(uint32_t max) {
+uint32_t Yielder::RandNumber(uint32_t max) {
   return 1 + _eng() % (max - 1);
 }
 
