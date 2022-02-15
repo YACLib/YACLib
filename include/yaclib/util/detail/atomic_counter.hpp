@@ -38,7 +38,7 @@ struct AtomicCounter final : CounterBase {
     }
   }
 
-  std::size_t GetRef() noexcept {  // Deprecated, only for test
+  std::size_t GetRef() const noexcept {  // Deprecated, only for test
     return count.load(std::memory_order_relaxed);
   }
 
