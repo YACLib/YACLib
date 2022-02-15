@@ -197,8 +197,10 @@ auto SetCallback(ResultCorePtr<Arg, E> caller, Functor&& f) {
   //  when T is constructable from Result
   // TODO(myannyax) info if subscribe and Ret != void
   using AsyncRet = result_value_t<typename detail::Return<Arg, E, Functor>::Type>;
-  constexpr bool kIsAsync = is_future_v<AsyncRet>;
-  using Ret = result_value_t<future_value_t<AsyncRet>>;
+  static_assert(!Subscribe || std::is_void_v<AsyncRet>,
+                "It makes no sense to return some value in Subscribe, since no one will be able to use it");
+  using Ret = std::conditional_t<Subscribe, detail::SubscribeTag, result_value_t<future_value_t<AsyncRet>>>;
+  constexpr bool kIsAsync = !Subscribe && is_future_v<AsyncRet>;
   using Invoke = std::conditional_t<kIsAsync,  //
                                     detail::AsyncInvoke<Ret, Arg, E, decltype(std::forward<Functor>(f))>,
                                     detail::SyncInvoke<Ret, Arg, E, decltype(std::forward<Functor>(f))>>;
