@@ -17,8 +17,8 @@ class BaseCore : public InlineCore {
   void SetExecutor(IExecutorPtr executor) noexcept;
   [[nodiscard]] IExecutorPtr GetExecutor() const noexcept;
 
-  void SetCallback(IntrusivePtr<BaseCore> callback);
-  void SetCallbackInline(IntrusivePtr<InlineCore> callback, bool async = false);
+  void SetCallback(BaseCore& callback) noexcept;
+  void SetCallbackInline(InlineCore& callback, bool async = false) noexcept;
   [[nodiscard]] bool SetWait(IRef& callback) noexcept;
   [[nodiscard]] bool ResetWait() noexcept;
 

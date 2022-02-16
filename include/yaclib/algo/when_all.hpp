@@ -1,6 +1,7 @@
 #pragma once
 
 #include <yaclib/algo/detail/when_all_impl.hpp>
+#include <yaclib/algo/detail/when_impl.hpp>
 #include <yaclib/algo/when_policy.hpp>
 #include <yaclib/async/future.hpp>
 #include <yaclib/util/type_traits.hpp>
@@ -24,10 +25,7 @@ auto WhenAll(It begin, std::size_t size) {
   static_assert(P == WhenPolicy::FirstFail, "TODO(Ri7ay) Add other policy for WhenAll");
   static_assert(is_future_v<T>, "WhenAll function Iterator must be point to some Future");
   auto [future, combinator] = detail::AllCombinator<future_value_t<T>, future_error_t<T>>::Make(size);
-  for (std::size_t i = 0; i != size; ++i) {
-    std::exchange(begin->GetCore(), nullptr)->SetCallbackInline(combinator);
-    ++begin;
-  }
+  detail::WhenImpl(combinator, begin, size);
   return std::move(future);
 }
 
@@ -60,8 +58,8 @@ auto WhenAll(Future<V, E>&& head, Future<Vs, Es>&&... tail) {
   static_assert(P == WhenPolicy::FirstFail, "TODO(Ri7ay) Add other policy for WhenAll");
   constexpr std::size_t kSize = 1 + sizeof...(Vs);
   static_assert(kSize >= 2, "WhenAll wants at least two futures");
-  auto [future, combinator] = detail::AllCombinator<V, E, kSize>::Make(1);
-  detail::WhenAllImpl<kSize>(combinator, std::move(head), std::move(tail)...);
+  auto [future, combinator] = detail::AllCombinator<V, E, kSize>::Make(kSize);
+  detail::WhenImpl(combinator, std::move(head), std::move(tail)...);
   return std::move(future);
 }
 

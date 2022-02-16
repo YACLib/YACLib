@@ -35,15 +35,17 @@ class AllCombinator : public InlineCore, public AllCombinatorBase<FutureValue> {
   using Base = AllCombinatorBase<FutureValue>;
 
  public:
-  static std::pair<Future<FutureValue, E>, IntrusivePtr<AllCombinator>> Make(std::size_t size) {
+  static std::pair<Future<FutureValue, E>, AllCombinator*> Make(std::size_t size) {
     if constexpr (N == 0) {
       if (size == 0) {
         return {Future<FutureValue, E>{}, nullptr};
       }
     }
-    auto core = MakeIntrusive<detail::ResultCore<FutureValue, E>>();
-    auto combinator = MakeIntrusive<AllCombinator>(core, size);
-    return {Future<FutureValue, E>{std::move(core)}, std::move(combinator)};
+    auto raw_core = new detail::AtomicCounter<detail::ResultCore<FutureValue, E>>{2};
+    IntrusivePtr combine_core{NoRefTag{}, raw_core};
+    IntrusivePtr future_core{NoRefTag{}, raw_core};
+    auto combinator = new detail::AtomicCounter<AllCombinator>{size, std::move(combine_core), size};
+    return {Future<FutureValue, E>{std::move(future_core)}, combinator};
   }
 
   explicit AllCombinator(ResultCorePtr<FutureValue, E> promise, [[maybe_unused]] std::size_t size)
@@ -88,10 +90,5 @@ class AllCombinator : public InlineCore, public AllCombinatorBase<FutureValue> {
  private:
   detail::ResultCorePtr<FutureValue, E> _promise;
 };
-
-template <size_t N, typename V, typename E, typename... Vs, typename... Es>
-void WhenAllImpl(IntrusivePtr<AllCombinator<V, E, N>>& combinator, Future<Vs, Es>&&... futures) {
-  (..., (std::exchange(futures.GetCore(), nullptr)->SetCallbackInline(combinator)));
-}
 
 }  // namespace yaclib::detail

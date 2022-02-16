@@ -120,6 +120,6 @@ jobs:
             fi
             dir="build_${names[$i]}"
             cd $dir
-            ctest --output-on-failure -C ${{ matrix.build_type }}
+            ctest --output-on-failure -C ${{ matrix.build_type }} -V
             cd ..
           done

@@ -151,7 +151,8 @@ class AsyncInvoke {
   template <typename T>
   void WrapperSubscribe(ResultCore<Ret, E>& self, T&& value) {
     auto future = std::forward<FunctorInvoke>(_f)(std::forward<T>(value));
-    std::exchange(future.GetCore(), nullptr)->SetCallbackInline(&self, true);
+    self.IncRef();
+    std::exchange(future.GetCore(), nullptr)->SetCallbackInline(self, true);
   }
 
   void WrapperOther(ResultCore<Ret, E>& self, Result<Arg, E>&& r) {
@@ -197,8 +198,10 @@ auto SetCallback(ResultCorePtr<Arg, E> caller, Functor&& f) {
   //  when T is constructable from Result
   // TODO(myannyax) info if subscribe and Ret != void
   using AsyncRet = result_value_t<typename detail::Return<Arg, E, Functor>::Type>;
-  constexpr bool kIsAsync = is_future_v<AsyncRet>;
-  using Ret = result_value_t<future_value_t<AsyncRet>>;
+  static_assert(!Subscribe || std::is_void_v<AsyncRet>,
+                "It makes no sense to return some value in Subscribe, since no one will be able to use it");
+  using Ret = std::conditional_t<Subscribe, detail::SubscribeTag, result_value_t<future_value_t<AsyncRet>>>;
+  constexpr bool kIsAsync = !Subscribe && is_future_v<AsyncRet>;
   using Invoke = std::conditional_t<kIsAsync,  //
                                     detail::AsyncInvoke<Ret, Arg, E, decltype(std::forward<Functor>(f))>,
                                     detail::SyncInvoke<Ret, Arg, E, decltype(std::forward<Functor>(f))>>;
@@ -210,15 +213,15 @@ auto SetCallback(ResultCorePtr<Arg, E> caller, Functor&& f) {
   //   }
   // }
   using Core = detail::Core<Ret, Arg, E, Invoke>;
-  auto callback = MakeIntrusive<Core>(std::forward<Functor>(f));
+  auto callback = new detail::AtomicCounter<Core>{1 + static_cast<std::size_t>(!Subscribe), std::forward<Functor>(f)};
   callback->SetExecutor(caller->GetExecutor());
   if constexpr (Inline) {
-    caller->SetCallbackInline(callback);
+    caller->SetCallbackInline(*callback);
   } else {
-    caller->SetCallback(callback);
+    caller->SetCallback(*callback);
   }
-  if constexpr (!Subscribe) {
-    return Future<Ret, E>{std::move(callback)};
+  if constexpr (!Subscribe) {  // TODO(MBkkt) exception safety?
+    return Future<Ret, E>{IntrusivePtr{NoRefTag{}, callback}};
   }
 }
 

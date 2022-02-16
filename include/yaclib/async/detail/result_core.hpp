@@ -51,6 +51,21 @@ class ResultCore : public BaseCore {
   Result<V, E> _result;
 };
 
+struct SubscribeTag {};
+
+template <typename E>
+class ResultCore<SubscribeTag, E> : public BaseCore {
+ public:
+  ResultCore() noexcept : BaseCore{State::Empty} {
+  }
+
+  template <typename T>
+  void Set(T&&) noexcept {
+    BaseCore::Cancel();
+  }
+};
+
+// extern template class ResultCore<void, void>;
 extern template class ResultCore<void, StopError>;
 
 template <typename V, typename E>

@@ -118,50 +118,17 @@ class AnyCombinator : public AnyCombinatorBase<V, E, P>, public InlineCore {
   }
 
  public:
+  using Base::Base;
+
   static auto Make(std::size_t size) {
     assert(size >= 2);
     // TODO(MBkkt) Should be single allocation
-    auto core = MakeIntrusive<detail::ResultCore<V, E>>();
-    auto combinator = MakeIntrusive<AnyCombinator<V, E, P>>(size, core);
-    return std::pair{Future<V, E>{std::move(core)}, std::move(combinator)};
-  }
-
-  explicit AnyCombinator(std::size_t size, ResultCorePtr<V, E> core) : Base{size, std::move(core)} {
+    auto raw_core = new detail::AtomicCounter<detail::ResultCore<V, E>>{2};
+    IntrusivePtr combine_core{NoRefTag{}, raw_core};
+    IntrusivePtr future_core{NoRefTag{}, raw_core};
+    auto combinator = new detail::AtomicCounter<AnyCombinator<V, E, P>>{size, size, std::move(combine_core)};
+    return std::pair{Future<V, E>{std::move(future_core)}, combinator};
   }
 };
-
-template <typename V, typename E, WhenPolicy P>
-using AnyCombinatorPtr = IntrusivePtr<AnyCombinator<V, E, P>>;
-
-template <WhenPolicy P, typename V, typename E, typename ValueIt, typename RangeIt>
-Future<V, E> WhenAnyImpl(ValueIt it, RangeIt begin, RangeIt end) {
-  if (begin == end) {
-    return {};
-  }
-  if (auto next = begin; ++next == end) {
-    return std::move(*it);
-  }
-  const auto combinator_size = [&]() -> std::size_t {
-    if constexpr (P == WhenPolicy::None || P == WhenPolicy::FirstFail) {
-      return 2;
-    } else {
-      // We don't use std::distance because we want to alert the user to the fact that it can be expensive.
-      // Maybe the user has the size of the range, or he is satisfied with another WhenPolicy,
-      // as a last resort it is suggested to call WhenAny<WhenPolicy::LastFail>(begin, distance(begin, end))
-      return end - begin;
-    }
-  }();
-  auto [future, combinator] = AnyCombinator<V, E, P>::Make(combinator_size);
-  for (; begin != end; ++begin) {
-    std::exchange(it->GetCore(), nullptr)->SetCallbackInline(combinator);
-    ++it;
-  }
-  return std::move(future);
-}
-
-template <WhenPolicy P, typename V, typename E, typename... Vs, typename... Es>
-void WhenAnyImpl(AnyCombinatorPtr<V, E, P>& combinator, Future<Vs, Es>&&... futures) {
-  (..., std::exchange(futures.GetCore(), nullptr)->SetCallbackInline(combinator));
-}
 
 }  // namespace yaclib::detail

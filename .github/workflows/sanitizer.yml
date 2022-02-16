@@ -267,6 +267,6 @@ jobs:
           fi
           for dir in build*/; do
             cd $dir;
-            ctest --output-on-failure -C ${{ matrix.build_type }}
+            ctest --output-on-failure -C ${{ matrix.build_type }} -V
             cd ..
           done
