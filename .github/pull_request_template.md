@@ -1,11 +1,8 @@
 ### Purpose
 
-~~Please describe the changes in this PR for reviewers~~
+~~Please use labels for this PR~~
 
-- [ ] :hankey: Bugfix
-- [ ] :pizza: New feature
-- [ ] :fire: Performance improvement
-- [ ] :hammer: Refactoring/simplification
+~~Please describe the changes in this PR for reviewers~~
 
 ### Related Information
 
