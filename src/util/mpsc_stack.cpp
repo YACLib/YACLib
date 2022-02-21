@@ -8,8 +8,8 @@ namespace {
 detail::Node* Reverse(detail::Node* node) {
   detail::Node* prev = nullptr;
   while (node != nullptr) {
-    auto* next{node->_next};
-    node->_next = prev;
+    auto* next = node->next;
+    node->next = prev;
     prev = node;
     node = next;
   }
@@ -19,8 +19,8 @@ detail::Node* Reverse(detail::Node* node) {
 }  // namespace
 
 void MPSCStack::Put(detail::Node* node) {
-  node->_next = _head.load(std::memory_order_relaxed);
-  while (!_head.compare_exchange_weak(node->_next, node, std::memory_order_release, std::memory_order_relaxed)) {
+  node->next = _head.load(std::memory_order_relaxed);
+  while (!_head.compare_exchange_weak(node->next, node, std::memory_order_release, std::memory_order_relaxed)) {
   }
 }
 

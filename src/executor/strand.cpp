@@ -21,10 +21,10 @@ class Strand : public IExecutor, public ITask {
   }
 
   ~Strand() override {
-    auto* nodes{_tasks.TakeAllLIFO()};
+    auto* nodes = _tasks.TakeAllLIFO();
     auto* task = static_cast<ITask*>(nodes);
     while (task != nullptr) {
-      auto* next = static_cast<ITask*>(task->_next);
+      auto* next = static_cast<ITask*>(task->next);
       task->Cancel();
       task->DecRef();
       task = next;
@@ -52,7 +52,7 @@ class Strand : public IExecutor, public ITask {
 
     auto* task = static_cast<ITask*>(nodes);
     while (task != nullptr) {
-      auto* next = static_cast<ITask*>(task->_next);
+      auto* next = static_cast<ITask*>(task->next);
       task->Call();
       task->DecRef();
       task = next;

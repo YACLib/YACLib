@@ -27,7 +27,8 @@ class ThreadPool : public IThreadPool {
       tlCurrentThreadPool = nullptr;
     });
     for (std::size_t i = 0; i != threads; ++i) {
-      _threads.PushBack(_factory->Acquire(loop));
+      auto* thread = _factory->Acquire(loop);
+      _threads.PushBack(*thread);
     }
   }
 
@@ -64,7 +65,7 @@ class ThreadPool : public IThreadPool {
       return false;
     }
     task.IncRef();
-    _tasks.PushBack(&task);
+    _tasks.PushBack(task);
     _task_count += 4;  // Add Task
     lock.unlock();
     _cv.notify_one();
@@ -85,18 +86,19 @@ class ThreadPool : public IThreadPool {
   }
 
   void HardStop() final {
-    List<ITask> tasks;
     std::unique_lock lock{_m};
-    tasks.Append(_tasks);
+    List<ITask> tasks{std::move(_tasks)};
     Stop(std::move(lock));
-    while (auto* task = tasks.PopBack()) {
-      task->Cancel();
-      task->DecRef();
+    while (!tasks.Empty()) {
+      auto& task = tasks.PopFront();
+      task.Cancel();
+      task.DecRef();
     }
   }
 
   void Wait() final {
-    while (auto* thread = _threads.PopFront()) {
+    while (!_threads.Empty()) {
+      auto* thread = &_threads.PopFront();
       _factory->Release(IThreadPtr{thread});
     }
   }
@@ -104,10 +106,11 @@ class ThreadPool : public IThreadPool {
   void Loop() noexcept {
     std::unique_lock lock{_m};
     while (true) {
-      while (auto* task = _tasks.PopFront()) {
+      while (!_tasks.Empty()) {
+        auto& task = _tasks.PopFront();
         lock.unlock();
-        task->Call();
-        task->DecRef();
+        task.Call();
+        task.DecRef();
         lock.lock();
         _task_count -= 4;  // Pop Task
         if (NoTasks() && WantStop()) {
