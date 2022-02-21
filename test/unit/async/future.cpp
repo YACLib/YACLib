@@ -529,14 +529,15 @@ TEST(Simple, MakePromiseContract) {
 
     bool Submit(yaclib::ITask& f) noexcept final {
       f.IncRef();
-      _tasks.PushBack(&f);
+      _tasks.PushFront(f);
       return true;
     }
 
     void Drain() {
-      while (auto* task = _tasks.PopBack()) {
-        task->Call();
-        task->DecRef();
+      while (!_tasks.Empty()) {
+        auto& task = _tasks.PopFront();
+        task.Call();
+        task.DecRef();
       }
     }
   };

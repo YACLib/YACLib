@@ -192,7 +192,8 @@ class HeavyThreadFactory : public ThreadFactory {
   }
 
   ~HeavyThreadFactory() override {
-    while (auto* thread = _threads.PopFront()) {
+    while (!_threads.Empty()) {
+      auto* thread = &_threads.PopFront();
       delete thread;
     }
   }
@@ -200,14 +201,13 @@ class HeavyThreadFactory : public ThreadFactory {
  private:
   IThreadPtr Acquire(IFuncPtr func, std::size_t priority, std::string_view name, IFuncPtr acquire,
                      IFuncPtr release) final {
-    std::unique_lock lock{_m};
-    IThreadPtr t{_threads.PopBack()};
-    if (t == nullptr) {
+    IThreadPtr t;
+    if (std::lock_guard lock{_m}; _threads.Empty()) {
       t = new HeavyThread{};
       ++_threads_count;
+    } else {
+      t = &_threads.PopFront();
     }
-    lock.unlock();
-
     static_cast<HeavyThread&>(*t).Set(priority, name, std::move(func), std::move(acquire), std::move(release));
     return t;
   }
@@ -216,7 +216,7 @@ class HeavyThreadFactory : public ThreadFactory {
     std::unique_lock lock{_m};
     if (_threads_count <= _cache_threads) {
       static_cast<HeavyThread&>(*t).Wait();
-      _threads.PushBack(t);
+      _threads.PushFront(*t);
     } else {
       delete t;
       --_threads_count;

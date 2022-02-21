@@ -34,20 +34,20 @@ const auto kDoNothing = MakeFunc([] {
 
 void MakeFactoryEmpty(IThreadFactoryPtr factory, std::size_t acquire_threads, ThreadsContainter& threads) {
   for (std::size_t i = 0; i != acquire_threads; ++i) {
-    auto thread_ptr = factory->Acquire(kDoNothing);
+    auto* thread_ptr = factory->Acquire(kDoNothing);
     EXPECT_NE(thread_ptr, nullptr);
     if (rand() % 2 == 0) {
-      threads.PushBack(thread_ptr);
+      threads.PushBack(*thread_ptr);
     } else {
-      threads.PushFront(thread_ptr);
+      threads.PushFront(*thread_ptr);
     }
   }
 }
 
 void MakeFactoryAvailable(IThreadFactoryPtr factory, std::size_t release_threads, ThreadsContainter& threads) {
-  while (release_threads != 0 && !threads.IsEmpty()) {
-    auto release_thread = rand() % 2 == 0 ? threads.PopBack() : threads.PopFront();
-    factory->Release(IThreadPtr{release_thread});
+  while (release_threads != 0 && !threads.Empty()) {
+    auto* thread = &threads.PopFront();
+    factory->Release(thread);
     --release_threads;
   }
   EXPECT_EQ(release_threads, 0);
@@ -118,14 +118,15 @@ TEST(multi_threaded, simple) {
       const auto thread_func = MakeFunc([&factory, max_threads] {
         run_tests(kIterCount, factory, max_threads);
       });
-      threads.PushBack(test_threads->Acquire(thread_func));
+      auto& thread = *test_threads->Acquire(thread_func);
+      threads.PushBack(thread);
 
       remaining_threads -= max_threads;
     }
 
-    while (!threads.IsEmpty()) {
-      auto release_thread = IThreadPtr{threads.PopFront()};
-      test_threads->Release(std::move(release_thread));
+    while (!threads.Empty()) {
+      auto* thread = &threads.PopFront();
+      test_threads->Release(thread);
     }
   }
 }
