@@ -9,7 +9,7 @@ on:
     paths-ignore: [ 'doc/**', '**.md' ]
     types: [ assigned ]
   schedule:
-    - cron: '0 15 * * 1-5'
+    - cron: '0 12 * * 1-5'
 
 jobs:
   # TODO(MBkkt) Add MEMSAN?
