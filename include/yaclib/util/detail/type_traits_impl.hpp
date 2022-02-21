@@ -2,7 +2,7 @@
 
 #include <type_traits>
 
-namespace yaclib ::detail {
+namespace yaclib::detail {
 
 template <typename Functor, typename... Arg>
 struct IsInvocable {

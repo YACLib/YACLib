@@ -2,7 +2,7 @@
 
 #include <utility>
 
-namespace yaclib {
+namespace yaclib::detail {
 
 template <typename T>
 List<T>::List(List&& other) noexcept {
@@ -14,7 +14,7 @@ List<T>::List(List&& other) noexcept {
 }
 
 template <typename T>
-void List<T>::PushFront(detail::Node& node) noexcept {
+void List<T>::PushFront(Node& node) noexcept {
   if (Empty()) {
     _tail = &node;
   }
@@ -22,7 +22,7 @@ void List<T>::PushFront(detail::Node& node) noexcept {
   _head.next = &node;
 }
 template <typename T>
-void List<T>::PushBack(detail::Node& node) noexcept {
+void List<T>::PushBack(Node& node) noexcept {
   // for circular should be node.next = _tail->next;
   assert(_tail->next == nullptr);
   node.next = nullptr;
@@ -49,4 +49,4 @@ T& List<T>::PopFront() noexcept {
 template class List<ITask>;
 template class List<IThread>;
 
-}  // namespace yaclib
+}  // namespace yaclib::detail

@@ -6,7 +6,7 @@
 
 #include <cstddef>
 
-namespace yaclib {
+namespace yaclib::detail {
 
 template <typename T>
 class List final {
@@ -18,18 +18,18 @@ class List final {
   List() noexcept = default;
   List(List&&) noexcept;
 
-  void PushFront(detail::Node& node) noexcept;
-  void PushBack(detail::Node& node) noexcept;
+  void PushFront(Node& node) noexcept;
+  void PushBack(Node& node) noexcept;
 
   [[nodiscard]] bool Empty() const noexcept;
   [[nodiscard]] T& PopFront() noexcept;
 
  private:
-  detail::Node _head;
-  detail::Node* _tail = &_head;  // need for PushBack
+  Node _head;
+  Node* _tail = &_head;  // need for PushBack
 };
 
 extern template class List<ITask>;
 extern template class List<IThread>;
 
-}  // namespace yaclib
+}  // namespace yaclib::detail

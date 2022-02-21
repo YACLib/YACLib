@@ -38,7 +38,7 @@ class Strand : public IExecutor, public ITask {
 
   bool Submit(ITask& task) noexcept final {
     task.IncRef();
-    _tasks.Put(&task);
+    _tasks.Put(task);
 
     if (_work_counter.fetch_add(1, std::memory_order_acq_rel) == 0) {
       _executor->Submit(*this);
@@ -68,7 +68,7 @@ class Strand : public IExecutor, public ITask {
   }
 
   IExecutorPtr _executor;
-  util::MPSCStack _tasks;
+  detail::MPSCStack _tasks;
   // TODO remove _work_counter, make active/inactive like libunifex
   alignas(kCacheLineSize) yaclib_std::atomic_int32_t _work_counter{0};
 };

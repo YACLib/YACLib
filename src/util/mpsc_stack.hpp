@@ -4,21 +4,21 @@
 #include <yaclib/fault/atomic.hpp>
 #include <yaclib/util/detail/node.hpp>
 
-namespace yaclib::util {
+namespace yaclib::detail {
 
 /**
  * Lock free multi-producer/single-consumer stack
  */
 class MPSCStack final {
  public:
-  void Put(detail::Node* node);
+  void Put(Node& node);
 
-  [[nodiscard]] detail::Node* TakeAllLIFO();
+  [[nodiscard]] Node* TakeAllLIFO();
 
-  [[nodiscard]] detail::Node* TakeAllFIFO();
+  [[nodiscard]] Node* TakeAllFIFO();
 
  private:
-  alignas(kCacheLineSize) yaclib_std::atomic<detail::Node*> _head{nullptr};
+  alignas(kCacheLineSize) yaclib_std::atomic<Node*> _head{nullptr};
 };
 
-}  // namespace yaclib::util
+}  // namespace yaclib::detail
