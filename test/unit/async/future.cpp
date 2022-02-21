@@ -520,7 +520,7 @@ TEST(Pipeline, Simple2) {
 TEST(Simple, MakePromiseContract) {
   class ManualExecutor : public yaclib::IExecutor {
    private:
-    yaclib::List<yaclib::ITask> _tasks;
+    yaclib::detail::List<yaclib::ITask> _tasks;
 
    public:
     [[nodiscard]] Type Tag() const final {

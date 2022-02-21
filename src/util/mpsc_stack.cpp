@@ -2,11 +2,11 @@
 
 #include <yaclib/util/detail/node.hpp>
 
-namespace yaclib::util {
+namespace yaclib::detail {
 namespace {
 
-detail::Node* Reverse(detail::Node* node) {
-  detail::Node* prev = nullptr;
+Node* Reverse(Node* node) {
+  Node* prev = nullptr;
   while (node != nullptr) {
     auto* next = node->next;
     node->next = prev;
@@ -18,18 +18,18 @@ detail::Node* Reverse(detail::Node* node) {
 
 }  // namespace
 
-void MPSCStack::Put(detail::Node* node) {
-  node->next = _head.load(std::memory_order_relaxed);
-  while (!_head.compare_exchange_weak(node->next, node, std::memory_order_release, std::memory_order_relaxed)) {
+void MPSCStack::Put(Node& node) {
+  node.next = _head.load(std::memory_order_relaxed);
+  while (!_head.compare_exchange_weak(node.next, &node, std::memory_order_release, std::memory_order_relaxed)) {
   }
 }
 
-detail::Node* MPSCStack::TakeAllLIFO() {
+Node* MPSCStack::TakeAllLIFO() {
   return _head.exchange(nullptr, std::memory_order_acquire);
 }
 
-detail::Node* MPSCStack::TakeAllFIFO() {
+Node* MPSCStack::TakeAllFIFO() {
   return Reverse(TakeAllLIFO());
 }
 
-}  // namespace yaclib::util
+}  // namespace yaclib::detail

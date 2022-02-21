@@ -227,7 +227,7 @@ class HeavyThreadFactory : public ThreadFactory {
 
   yaclib_std::mutex _m;
   std::size_t _threads_count{0};
-  List<IThread> _threads;
+  detail::List<IThread> _threads;
 };
 
 class DecoratorThreadFactory : public BaseFactory {

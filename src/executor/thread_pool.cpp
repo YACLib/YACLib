@@ -87,7 +87,7 @@ class ThreadPool : public IThreadPool {
 
   void HardStop() final {
     std::unique_lock lock{_m};
-    List<ITask> tasks{std::move(_tasks)};
+    detail::List<ITask> tasks{std::move(_tasks)};
     Stop(std::move(lock));
     while (!tasks.Empty()) {
       auto& task = tasks.PopFront();
@@ -127,8 +127,8 @@ class ThreadPool : public IThreadPool {
   yaclib_std::mutex _m;
   yaclib_std::condition_variable _cv;
   IThreadFactoryPtr _factory;
-  List<IThread> _threads;
-  List<ITask> _tasks;
+  detail::List<IThread> _threads;
+  detail::List<ITask> _tasks;
   std::size_t _task_count;
 };
 

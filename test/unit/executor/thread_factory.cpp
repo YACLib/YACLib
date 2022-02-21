@@ -27,7 +27,7 @@ static auto init_rand = [] {
 
 using namespace yaclib;
 
-using ThreadsContainter = List<IThread>;
+using ThreadsContainter = detail::List<IThread>;
 
 const auto kDoNothing = MakeFunc([] {
 });
