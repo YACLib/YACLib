@@ -262,6 +262,19 @@ Result<V, E> Future<V, E>::Get() && noexcept {
 }
 
 template <typename V, typename E>
+const Result<V, E>& Future<V, E>::GetUnsafe() const& noexcept {
+  assert(Ready());
+  return _core->Get();
+}
+
+template <typename V, typename E>
+Result<V, E> Future<V, E>::GetUnsafe() && noexcept {
+  assert(Ready());
+  auto core = std::exchange(_core, nullptr);
+  return std::move(core->Get());
+}
+
+template <typename V, typename E>
 void Future<V, E>::Stop() && {
   _core->Stop();
   _core = nullptr;

@@ -29,3 +29,8 @@ if (COVERAGE IN_LIST YACLIB_FLAGS)
   list(APPEND YACLIB_COMPILE_OPTIONS --coverage)
   list(APPEND YACLIB_DEFINITIONS NDEBUG)
 endif ()
+
+if (CORO IN_LIST YACLIB_FLAGS)
+  set (CORO ON)
+  include (yaclib_coro)
+endif ()

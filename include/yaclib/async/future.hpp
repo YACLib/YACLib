@@ -53,6 +53,8 @@ class Future final {
 
   void Get() & = delete;
   void Get() const&& = delete;
+  void GetUnsafe() & = delete;
+  void GetUnsafe() const&& = delete;
 
   /**
    * Return copy of \ref Result from \ref Future
@@ -70,6 +72,23 @@ class Future final {
    * \return The \ref Result that Future received
    */
   [[nodiscard]] Result<V, E> Get() && noexcept;
+
+  /**
+   * Return const ref of \ref Result from \ref Future
+   *
+   * Assume Ready is true. This method is NOT thread-safe and can be called multiple
+   * times. \note The behavior is undefined if \ref Valid is false before the call to this function. \return \ref Result
+   * stored in the shared state
+   */
+  [[nodiscard]] const Result<V, E>& GetUnsafe() const& noexcept;
+
+  /**
+   * Assume \def Ready is true and move \ref Result from Future
+   *
+   * \note The behavior is undefined if \ref Valid or Ready is false before the call to this function.
+   * \return The \ref Result that Future received
+   */
+  [[nodiscard]] Result<V, E> GetUnsafe() && noexcept;
 
   /**
    * Stop pipeline before current step, if possible.

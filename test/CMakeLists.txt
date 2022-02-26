@@ -53,6 +53,15 @@ set(YACLIB_UNIT_SOURCES
   unit/executor/strand
   )
 
+if (CORO)
+  list(APPEND YACLIB_UNIT_SOURCES
+    unit/coroutine/await
+    unit/coroutine/dummy
+    unit/coroutine/future_coro_traits
+    unit/coroutine/stress
+    )
+endif ()
+
 #TODO(MBkkt) Add options which shuffle tests list, maybe just use gtest options?
 set(YACLIB_TEST_SOURCES ${YACLIB_UNIT_SOURCES} ${YACLIB_EXAMPLE_SOURCES})
 

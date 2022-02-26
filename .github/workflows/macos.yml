@@ -12,7 +12,7 @@ on:
 
 jobs:
   # TODO(MBkkt) Add 20, 23 standard
-
+  # TODO(mkornaukhov03) Add CORO flag
   main:
     runs-on: 'macos-${{ matrix.os }}'
     strategy:
@@ -86,10 +86,13 @@ jobs:
               dir="build_${compilers_name[$i]}_${stdlibs_name[$j]}"
               echo $dir
 
+              pwd
+            
               cmake -S . -B $dir                            \
                 -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
                 -DYACLIB_CXX_STANDARD=17                    \
                 -DYACLIB_TEST=SINGLE                        \
+                -DYACLIB_FLAGS="CORO"                       \
                 -DCMAKE_C_COMPILER=${c_compilers[$i]}       \
                 -DCMAKE_CXX_COMPILER=${cxx_compilers[$i]}   \
                 -G"Ninja"                                   \

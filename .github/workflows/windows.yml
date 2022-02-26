@@ -90,6 +90,7 @@ jobs:
 
             cmake -S . -B $dir                                    \
               -DYACLIB_CXX_STANDARD=17                            \
+              -DYACLIB_FLAGS="CORO"                               \
               -DYACLIB_TEST=SINGLE                                \
               -G"${generators[$i]}"                               \
               ${options[$i]}                                      \

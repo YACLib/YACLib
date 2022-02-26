@@ -21,7 +21,7 @@ bool WaitRange(const Timeout& t, const Range& range, std::size_t count) {
   auto const wait_count = range([&](detail::BaseCore& core) {
     return core.Empty() && core.SetWait(wait_core);
   });
-  if (wait_count == 0 || wait_core.FetchSub(count - wait_count + 1)) {
+  if (wait_count == 0 || wait_core.SubEqual(count - wait_count + 1)) {
     return true;
   }
   std::unique_lock lock{wait_core.m};
@@ -35,7 +35,7 @@ bool WaitRange(const Timeout& t, const Range& range, std::size_t count) {
     reset_count = range([](detail::BaseCore& core) {
       return core.ResetWait();
     });
-    if (reset_count != 0 && (reset_count == wait_count || wait_core.FetchSub(reset_count))) {
+    if (reset_count != 0 && (reset_count == wait_count || wait_core.SubEqual(reset_count))) {
       return false;
     }
     // We know we have Result, but we must wait until wait_core was not used by cs
