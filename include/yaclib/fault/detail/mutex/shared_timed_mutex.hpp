@@ -27,11 +27,6 @@ class SharedTimedMutex {
   template <typename _Clock, typename _Duration>
   bool try_lock_until(const std::chrono::time_point<_Clock, _Duration>& duration) {
     YACLIB_INJECT_FAULT(auto res = _m.try_lock_until(duration));
-
-    if (res) {
-      _exclusive_owner = yaclib_std::this_thread::get_id();
-      _shared_mode = false;
-    }
     return res;
   }
 
@@ -46,18 +41,11 @@ class SharedTimedMutex {
   template <typename _Clock, typename _Duration>
   bool try_lock_shared_until(const std::chrono::time_point<_Clock, _Duration>& duration) {
     YACLIB_INJECT_FAULT(auto res = _m.try_lock_shared_until(duration));
-
-    if (res) {
-      _shared_mode = true;
-    }
     return res;
   }
 
  private:
   std::shared_timed_mutex _m;
-  // TODO(myannyax) yaclib wrapper
-  yaclib_std::thread::id _exclusive_owner = yaclib::detail::kInvalidThreadId;
-  std::atomic_bool _shared_mode = false;
 };
 
 }  // namespace yaclib::detail

@@ -27,9 +27,6 @@ class SharedMutex {
 
  private:
   std::shared_timed_mutex _m;
-  // TODO(myannyax) yaclib wrapper
-  yaclib_std::thread::id _exclusive_owner = yaclib::detail::kInvalidThreadId;
-  std::atomic_bool _shared_mode = false;
 };
 
 }  // namespace yaclib::detail

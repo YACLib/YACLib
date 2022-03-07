@@ -26,7 +26,6 @@ class ConditionVariable {
     auto* m = lock.release();
     std::unique_lock guard{m->GetImpl(), std::adopt_lock};
     YACLIB_INJECT_FAULT(_impl.wait(guard, predicate));
-    m->UpdateOwner(yaclib_std::this_thread::get_id());
     guard.release();
     lock = std::unique_lock{*m, std::adopt_lock};
   }
@@ -38,7 +37,6 @@ class ConditionVariable {
     auto* m = lock.release();
     std::unique_lock guard{m->GetImpl(), std::adopt_lock};
     YACLIB_INJECT_FAULT(auto result = _impl.wait_until(guard, time_point));
-    m->UpdateOwner(yaclib_std::this_thread::get_id());
     guard.release();
     lock = std::unique_lock{*m, std::adopt_lock};
     return result;
@@ -51,7 +49,6 @@ class ConditionVariable {
     auto* m = lock.release();
     std::unique_lock guard{m->GetImpl(), std::adopt_lock};
     YACLIB_INJECT_FAULT(auto result = _impl.wait_until(guard, time_point, predicate));
-    m->UpdateOwner(yaclib_std::this_thread::get_id());
     guard.release();
     lock = std::unique_lock{*m, std::adopt_lock};
     return result;
@@ -64,7 +61,6 @@ class ConditionVariable {
     auto* m = lock.release();
     std::unique_lock guard{m->GetImpl(), std::adopt_lock};
     YACLIB_INJECT_FAULT(auto result = _impl.wait_for(guard, duration));
-    m->UpdateOwner(yaclib_std::this_thread::get_id());
     guard.release();
     lock = std::unique_lock{*m, std::adopt_lock};
     return result;
@@ -77,7 +73,6 @@ class ConditionVariable {
     auto* m = lock.release();
     std::unique_lock guard{m->GetImpl(), std::adopt_lock};
     YACLIB_INJECT_FAULT(auto result = _impl.wait_for(guard, duration, predicate));
-    m->UpdateOwner(yaclib_std::this_thread::get_id());
     guard.release();
     lock = std::unique_lock{*m, std::adopt_lock};
     return result;

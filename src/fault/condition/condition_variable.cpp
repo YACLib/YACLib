@@ -15,7 +15,6 @@ void ConditionVariable::wait(std::unique_lock<yaclib::detail::Mutex>& lock) noex
   auto* m = lock.release();
   std::unique_lock guard{m->GetImpl(), std::adopt_lock};
   YACLIB_INJECT_FAULT(_impl.wait(guard));
-  m->UpdateOwner(yaclib_std::this_thread::get_id());
   guard.release();
   lock = std::unique_lock{*m, std::adopt_lock};
 }

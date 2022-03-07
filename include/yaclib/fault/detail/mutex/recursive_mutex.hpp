@@ -25,10 +25,6 @@ class RecursiveMutex {
 
  private:
   std::recursive_mutex _m;
-  // TODO(myannyax) yaclib wrapper
-  yaclib_std::thread::id _owner = yaclib::detail::kInvalidThreadId;
-  uint32_t _lock_level = 0;
-  void UpdateOnLock();
 };
 
 }  // namespace yaclib::detail

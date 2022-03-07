@@ -28,12 +28,8 @@ class Mutex {
 
   impl_type& GetImpl();
 
-  void UpdateOwner(yaclib_std::thread::id);
-
  private:
   std::mutex _m;
-  // TODO(myannyax) yaclib wrapper
-  yaclib_std::thread::id _owner = yaclib::detail::kInvalidThreadId;
 };
 
 }  // namespace yaclib::detail

@@ -27,19 +27,11 @@ class RecursiveTimedMutex {
   template <typename _Clock, typename _Duration>
   bool try_lock_until(const std::chrono::time_point<_Clock, _Duration>& duration) {
     YACLIB_INJECT_FAULT(auto res = _m.try_lock_until(duration));
-
-    if (res) {
-      UpdateOnLock();
-    }
     return res;
   }
 
  private:
   std::recursive_timed_mutex _m;
-  // TODO(myannyax) yaclib wrapper
-  yaclib_std::thread::id _owner = yaclib::detail::kInvalidThreadId;
-  uint32_t _lock_level = 0;
-  void UpdateOnLock();
 };
 
 }  // namespace yaclib::detail
