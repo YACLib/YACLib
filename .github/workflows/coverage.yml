@@ -42,7 +42,6 @@ jobs:
               -DYACLIB_LOG="ERROR"                                               \
               -DYACLIB_TEST=SINGLE                                               \
               -DYACLIB_FLAGS="COVERAGE;CORO"                                     \
-              -DYACLIB_COMPILE_OPTIONS="-O2;-fno-inline;-fno-omit-frame-pointer" \
               -DYACLIB_CXX_STANDARD=20     
           
           done
