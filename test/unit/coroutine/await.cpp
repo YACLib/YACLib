@@ -25,7 +25,7 @@ TEST(Await, JustWorksPack) {
   auto tp = yaclib::MakeThreadPool();
   auto coro = [&](yaclib::IThreadPoolPtr tp) -> yaclib::Future<int> {
     auto f1 = yaclib::Run(tp, [] {
-      yaclib_std::this_thread::sleep_for(10ms * YACLIB_CI_SLOWDOWN);
+      yaclib_std::this_thread::sleep_for(1ms * YACLIB_CI_SLOWDOWN);
       return 1;
     });
     auto f2 = yaclib::Run(tp, [] {
