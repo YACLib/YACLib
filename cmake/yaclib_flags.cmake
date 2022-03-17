@@ -1,4 +1,5 @@
 set(SAN OFF)
+set(YACLIB_UBSAN 0)
 if (ASAN IN_LIST YACLIB_FLAGS)
   set(SAN ON)
   include(yaclib_asan)
