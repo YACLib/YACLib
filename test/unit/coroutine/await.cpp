@@ -1,6 +1,7 @@
 #include <util/time.hpp>
 
 #include <yaclib/async/run.hpp>
+#include <yaclib/config.hpp>
 #include <yaclib/coroutine/await.hpp>
 #include <yaclib/coroutine/future_coro_traits.hpp>
 #include <yaclib/executor/thread_pool.hpp>
@@ -15,6 +16,8 @@
 
 namespace {
 using namespace std::chrono_literals;
+
+#if !((defined(YACLIB_UBSAN) || defined(YACLIB_TSAN)) && defined(__GNUG__))
 
 TEST(Await, JustWorksPack) {
   auto tp = yaclib::MakeThreadPool();
@@ -89,6 +92,8 @@ TEST(Await, CheckSuspend) {
   tp->HardStop();
   tp->Wait();
 }
+
+#endif
 
 TEST(Await, NoSuspend) {
   int counter = 0;

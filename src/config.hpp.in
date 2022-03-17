@@ -10,6 +10,8 @@
 #    define YACLIB_TSAN
 #  elif __has_feature(memory_sanitizer)
 #    define YACLIB_MEMSAN
+#  elif __has_feature(undefined_sanitizer)
+#    define YACLIB_UBSAN
 #  endif
 #endif
 
