@@ -18,8 +18,23 @@ namespace {
 using namespace std::chrono_literals;
 
 TEST(Await, JustWorksPack) {
-#if (defined(YACLIB_UBSAN) || defined(__SANITIZE_THREAD__)) && defined(__GNUG__)
+#if defined(__GNUG__)
+#if defined(YACLIB_TSAN)
   GTEST_SKIP();
+#endif
+#if defined(YACLIB_UBSAN)
+
+#define REAL_STRINGIZE(x) #x
+#define STRINGIZE(x) REAL_STRINGIZE(x)
+
+  if (STRINGIZE(YACLIB_UBSAN)[0] != '\0') {
+    GTEST_SKIP();
+  }
+
+#undef REAL_STRINGSIZE
+#undef STRINGSIZE
+
+#endif
 #endif
 
   auto tp = yaclib::MakeThreadPool();
@@ -42,8 +57,23 @@ TEST(Await, JustWorksPack) {
 }
 
 TEST(Await, JustWorksRange) {
-#if (defined(YACLIB_UBSAN) || defined(__SANITIZE_THREAD__)) && defined(__GNUG__)
+#if defined(__GNUG__)
+#if defined(YACLIB_TSAN)
   GTEST_SKIP();
+#endif
+#if defined(YACLIB_UBSAN)
+
+#define REAL_STRINGIZE(x) #x
+#define STRINGIZE(x) REAL_STRINGIZE(x)
+
+  if (STRINGIZE(YACLIB_UBSAN)[0] != '\0') {
+    GTEST_SKIP();
+  }
+
+#undef REAL_STRINGSIZE
+#undef STRINGSIZE
+
+#endif
 #endif
   auto tp = yaclib::MakeThreadPool();
   auto coro = [&](yaclib::IThreadPoolPtr tp) -> yaclib::Future<int> {
@@ -66,8 +96,23 @@ TEST(Await, JustWorksRange) {
 }
 
 TEST(Await, CheckSuspend) {
-#if (defined(YACLIB_UBSAN) || defined(__SANITIZE_THREAD__)) && defined(__GNUG__)
+#if defined(__GNUG__)
+#if defined(YACLIB_TSAN)
   GTEST_SKIP();
+#endif
+#if defined(YACLIB_UBSAN)
+
+#define REAL_STRINGIZE(x) #x
+#define STRINGIZE(x) REAL_STRINGIZE(x)
+
+  if (STRINGIZE(YACLIB_UBSAN)[0] != '\0') {
+    GTEST_SKIP();
+  }
+
+#undef REAL_STRINGSIZE
+#undef STRINGSIZE
+
+#endif
 #endif
   int counter = 0;
   auto tp = yaclib::MakeThreadPool();
