@@ -16,7 +16,7 @@ struct [[maybe_unused]] DefaultDeleter {
 };
 
 template <typename CounterBase, typename Deleter = detail::DefaultDeleter>
-struct AtomicCounter final : CounterBase {
+struct AtomicCounter : CounterBase {
   template <typename... Args>
   AtomicCounter(std::size_t n, Args&&... args) : CounterBase{std::forward<Args>(args)...}, count{n} {
   }
@@ -42,7 +42,7 @@ struct AtomicCounter final : CounterBase {
     return count.load(std::memory_order_acquire);
   }
 
-  bool FetchSub(std::size_t n) noexcept {
+  bool SubEqual(std::size_t n) noexcept {
     return count.fetch_sub(n, std::memory_order_acq_rel) == n;
   }
 

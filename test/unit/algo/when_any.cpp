@@ -185,7 +185,7 @@ void MultiThreaded() {
   if constexpr (kIsVoid) {
     EXPECT_NO_THROW(std::move(ints).Ok());
   } else {
-    decltype(std::move(ints).Ok()) result;
+    std::remove_reference_t<decltype(std::move(ints).Ok())> result;
     EXPECT_NO_THROW(result = std::move(ints).Ok());
     EXPECT_TRUE(kOuts.find(result) != kOuts.end());
   }

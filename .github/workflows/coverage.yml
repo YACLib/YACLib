@@ -26,14 +26,14 @@ jobs:
 
       - name: Configure CMake
         run: |
-          cmake -S . -B build           \
-            -G "Ninja"                  \
-            -DCMAKE_BUILD_TYPE=Debug    \
-            -DCMAKE_C_COMPILER=gcc-10   \
-            -DCMAKE_CXX_COMPILER=g++-10 \
-            -DYACLIB_TEST=SINGLE        \
-            -DYACLIB_FLAGS="COVERAGE"   \
-            -DYACLIB_CXX_STANDARD=20    \
+          cmake -S . -B build                \
+            -G "Ninja"                       \
+            -DCMAKE_BUILD_TYPE=Debug         \
+            -DCMAKE_C_COMPILER=gcc-10        \
+            -DCMAKE_CXX_COMPILER=g++-10      \
+            -DYACLIB_TEST=SINGLE             \
+            -DYACLIB_FLAGS="COVERAGE;CORO"   \
+            -DYACLIB_CXX_STANDARD=20         \
 
       - name: Build
         run:

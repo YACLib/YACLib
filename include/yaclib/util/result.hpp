@@ -81,6 +81,8 @@ class Result {
 
   using ValueT = std::conditional_t<std::is_void_v<V>, Unit, V>;
   using VariantT = std::variant<ValueT, std::exception_ptr, E, std::monostate>;
+  using ConstValueRef = std::conditional_t<std::is_void_v<V>, void, const ValueT&>;
+  using MoveValue = std::conditional_t<std::is_void_v<V>, void, ValueT&&>;
 
  public:
   Result(Result&& other) noexcept(std::is_nothrow_move_constructible_v<VariantT>) = default;
@@ -105,7 +107,7 @@ class Result {
     return State() == ResultState::Value;
   }
 
-  /*[[nodiscard]]*/ V Ok() && {
+  /*[[nodiscard]]*/ MoveValue Ok() && {
     switch (State()) {
       case ResultState::Value:
         return std::move(*this).Value();
@@ -118,20 +120,49 @@ class Result {
     }
   }
 
+  ConstValueRef Ok() const& {
+    switch (State()) {
+      case ResultState::Value:
+        return Value();
+      case ResultState::Exception:
+        std::rethrow_exception(Exception());
+      case ResultState::Error:
+        throw ResultError{Error()};
+      default:
+        throw ResultEmpty{};
+    }
+  }
+
   [[nodiscard]] ResultState State() const noexcept {
     return ResultState{static_cast<char>(_result.index())};
   }
 
-  [[nodiscard]] V Value() && noexcept {
+  [[nodiscard]] MoveValue Value() && noexcept {
     if constexpr (!std::is_void_v<V>) {
       return std::get<V>(std::move(_result));
     }
   }
-  [[nodiscard]] E Error() && noexcept {
+
+  [[nodiscard]] ConstValueRef Value() const& noexcept {
+    if constexpr (!std::is_void_v<V>) {
+      return std::get<V>(_result);
+    }
+  }
+
+  [[nodiscard]] E&& Error() && noexcept {
     return std::get<E>(std::move(_result));
   }
-  [[nodiscard]] std::exception_ptr Exception() && noexcept {
+
+  [[nodiscard]] const E& Error() const& noexcept {
+    return std::get<E>(_result);
+  }
+
+  [[nodiscard]] std::exception_ptr&& Exception() && noexcept {
     return std::get<std::exception_ptr>(std::move(_result));
+  }
+
+  [[nodiscard]] const std::exception_ptr& Exception() const& noexcept {
+    return std::get<std::exception_ptr>(_result);
   }
 
   template <typename T>

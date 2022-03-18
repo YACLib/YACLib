@@ -13,6 +13,8 @@
 #  endif
 #endif
 
+#define YACLIB_UBSAN ${YACLIB_UBSAN}
+
 #if defined(__SANITIZE_ADDRESS__)
 #  define YACLIB_ASAN
 #elif defined(__SANITIZE_THREAD__)

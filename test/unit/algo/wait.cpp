@@ -209,14 +209,35 @@ TEST(WaitFor, Diff) {
 TEST(Wait, ResetWait) {
   auto tp = yaclib::MakeThreadPool();
   std::vector<yaclib::Future<size_t>> fs;
-  fs.reserve(1000 * std::thread::hardware_concurrency());
-  for (size_t i = 0; i != 1000 * std::thread::hardware_concurrency(); ++i) {
+  fs.reserve(1000 * yaclib_std::thread::hardware_concurrency());
+  for (size_t i = 0; i != 1000 * yaclib_std::thread::hardware_concurrency(); ++i) {
     fs.push_back(yaclib::Run(tp, [i] {
-      std::this_thread::sleep_for(1ns);
+      yaclib_std::this_thread::sleep_for(1ns);
       return i;
     }));
   }
   yaclib::WaitFor(0ns, fs.begin(), fs.end());
+  tp->HardStop();
+  tp->Wait();
+}
+// silly test to pass codecov
+TEST(SillyTest, ForGetUnsafe) {
+  auto tp = yaclib::MakeThreadPool();
+  yaclib::Future<int> fut = yaclib::Run(tp, [] {
+    yaclib_std::this_thread::sleep_for(1ms);
+    return 42;
+  });
+  yaclib::Wait(fut);
+  EXPECT_EQ(std::move(fut).GetUnsafe().Ok(), 42);
+
+  fut = yaclib::Run(tp, [] {
+    yaclib_std::this_thread::sleep_for(1ms);
+    return 42;
+  });
+
+  yaclib::Wait(fut);
+  auto res = std::as_const(fut).GetUnsafe();
+  EXPECT_EQ(std::move(res).Ok(), 42);
   tp->HardStop();
   tp->Wait();
 }

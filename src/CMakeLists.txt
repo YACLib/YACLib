@@ -23,6 +23,10 @@ add_subdirectory(executor)
 add_subdirectory(util)
 add_subdirectory(fault)
 
+if (CORO)
+    add_subdirectory(coroutine)
+endif()
+
 add_library(${PROJECT_NAME} STATIC)
 
 set(YACLIB_IDE ON)
