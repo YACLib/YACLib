@@ -14,6 +14,10 @@
 #include <cstddef>
 #include <utility>
 
+#include <iostream> // debug
+#include <yaclib/fault/thread.hpp>
+
+
 namespace yaclib {
 namespace {
 
@@ -111,7 +115,12 @@ class ThreadPool : public IThreadPool {
         auto& task = _tasks.PopFront();
         lock.unlock();
         task.Call();
+        std::cout << "Call done!(LOOP)" << std::endl;
+        using namespace std::chrono_literals; 
+        yaclib_std::this_thread::sleep_for(2s);
         task.DecRef();
+        std::cout << "DecRef done!(LOOP)" << std::endl; 
+
         lock.lock();
         _task_count -= 4;  // Pop Task
         if (NoTasks() && WantStop()) {

@@ -9,5 +9,6 @@ list(APPEND YACLIB_HEADERS
 list(APPEND YACLIB_INCLUDES
   ${YACLIB_INCLUDE_DIR}/coroutine/await.hpp
   ${YACLIB_INCLUDE_DIR}/coroutine/future_coro_traits.hpp
-  )
+  ${YACLIB_INCLUDE_DIR}/coroutine/switch.hpp
+)
 add_files()

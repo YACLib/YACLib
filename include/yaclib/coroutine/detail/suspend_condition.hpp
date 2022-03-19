@@ -3,6 +3,8 @@
 #include <yaclib/config.hpp>
 #include <yaclib/coroutine/detail/coroutine.hpp>
 
+#include <iostream>
+
 namespace yaclib::detail {
 
 class SuspendCondition {
@@ -11,6 +13,7 @@ class SuspendCondition {
   }
 
   bool await_ready() noexcept {
+    std::cout << "Condition in suspendCondition: " << _condition << std::endl;
     return _condition;
   }
   void await_resume() noexcept {
