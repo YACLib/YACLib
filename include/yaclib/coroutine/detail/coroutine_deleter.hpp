@@ -2,9 +2,13 @@
 
 #include <yaclib/async/detail/result_core.hpp>
 #include <yaclib/async/future.hpp>
+<<<<<<< HEAD
 #include <yaclib/config.hpp>
 #include <yaclib/coroutine/detail/suspend_condition.hpp>
+=======
+>>>>>>> 23981a3 (Minor fixes)
 #include <yaclib/util/detail/atomic_counter.hpp>
+#include <yaclib/coroutine/detail/coroutine.hpp>
 #include <yaclib/util/result.hpp>
 
 namespace yaclib::detail {

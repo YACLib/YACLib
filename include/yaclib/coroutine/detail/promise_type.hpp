@@ -4,9 +4,9 @@
 #include <yaclib/async/future.hpp>
 #include <yaclib/config.hpp>
 #include <yaclib/coroutine/detail/coroutine_deleter.hpp>
-#include <yaclib/coroutine/detail/suspend_condition.hpp>
 #include <yaclib/util/detail/atomic_counter.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
+#include <yaclib/coroutine/detail/coroutine.hpp>
 
 #include <exception>
 #include <type_traits>
@@ -84,9 +84,7 @@ struct PromiseType<void, E> : AtomicCounter<ResultCore<void, E>, CoroutineDelete
   }
 
   void return_void() noexcept {
-
     Base::Set(Unit{});
-
   }
 
   void unhandled_exception() noexcept {
