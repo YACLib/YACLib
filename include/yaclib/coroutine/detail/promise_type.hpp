@@ -84,8 +84,8 @@ struct PromiseType<void, E> : AtomicCounter<ResultCore<void, E>, CoroutineDelete
   }
 
   void return_void() noexcept {
+
     Base::Set(Unit{});
-    std::cout << "PromiseType::return_void end" << std::endl;
 
   }
 
