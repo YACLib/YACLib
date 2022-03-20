@@ -51,9 +51,6 @@ jobs:
             os: 2022
             build_type: RelWithDebInfo
 
-    env:
-      YACLIB_FAULT: 'OFF ON'
-
     steps:
       - uses: actions/checkout@v2
 
@@ -88,21 +85,18 @@ jobs:
           options=("-A $arch -T ClangCL" "-DCMAKE_BUILD_TYPE=${{ matrix.build_type }}" "-A $arch")
 
           for (( i=0; i<${#names[*]}; i+=1 )); do
-            for yaclib_fault in ${YACLIB_FAULT[*]}; do
-              dir="build_${names[$i]}_fault_${yaclib_fault}"
-              echo $dir
+            dir="build_${names[$i]}_fault_${yaclib_fault}"
+            echo $dir
           
-              cmake -S . -B $dir                                    \
-                -DYACLIB_CXX_STANDARD=17                            \
-                -DYACLIB_FLAGS="CORO"                               \
-                -DYACLIB_TEST=SINGLE                                \
-                -DYACLIB_FAULT=$yaclib_fault                        \
-                -DYACLIB_LOG="ERROR"                                \
-                -G"${generators[$i]}"                               \
-                ${options[$i]}                                      \
-                -DYACLIB_DEFINITIONS="YACLIB_CI_SLOWDOWN=$slowdown"
-          
-            done
+            cmake -S . -B $dir                                    \
+              -DYACLIB_CXX_STANDARD=17                            \
+              -DYACLIB_FLAGS="CORO"                               \
+              -DYACLIB_TEST=SINGLE                                \
+              -DYACLIB_FAULT=OFF                                  \
+              -DYACLIB_LOG="ERROR"                                \
+              -G"${generators[$i]}"                               \
+              ${options[$i]}                                      \
+              -DYACLIB_DEFINITIONS="YACLIB_CI_SLOWDOWN=$slowdown"
           done
 
       - name: Build

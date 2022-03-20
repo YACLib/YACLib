@@ -4,7 +4,7 @@
 
 #ifdef YACLIB_FAULT
 
-#include <yaclib/fault/detail/thread/thread.hpp>
+#  include <yaclib/fault/detail/thread/thread.hpp>
 
 namespace yaclib_std {
 
@@ -14,7 +14,7 @@ using thread = yaclib::detail::Thread;
 
 #else
 
-#include <thread>
+#  include <thread>
 
 namespace yaclib_std {
 

@@ -26,8 +26,8 @@ add_subdirectory(util)
 add_subdirectory(fault)
 
 if (CORO)
-    add_subdirectory(coroutine)
-endif()
+  add_subdirectory(coroutine)
+endif ()
 
 if (YACLIB_FAULT)
   list(APPEND YACLIB_DEFINITIONS YACLIB_FAULT)
@@ -38,7 +38,7 @@ if (YACLIB_LOG STREQUAL "ERROR")
   list(APPEND YACLIB_DEFINITIONS YACLIB_LOG_INFO)
 elseif (YACLIB_LOG STREQUAL "INFO")
   list(APPEND YACLIB_DEFINITIONS YACLIB_LOG_INFO)
-endif()
+endif ()
 
 add_library(${PROJECT_NAME} STATIC)
 

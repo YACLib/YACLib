@@ -69,7 +69,6 @@ jobs:
 
     env:
       BUILD_TYPE: 'Debug RelWithDebInfo'
-      YACLIB_FAULT: 'OFF ON'
 
     steps:
       - uses: actions/checkout@v2
@@ -134,41 +133,39 @@ jobs:
             "-stdlib=libc++"
             "-stdlib=libstdc++"
           )
-
+          
           
           for (( j=0; j<${#link_options[*]}; j+=1 )); do
             for build_type in ${BUILD_TYPE[*]}; do
-              for yaclib_fault in ${YACLIB_FAULT[*]}; do
-                link_option=""; compile_option=""
-                if [[ ${compilers[0]} == gcc* ]]; then
-                  if [[ ${stdlibs_name[$j]} != "libstdcxx" ]]; then
-                    continue  # TODO(MBkkt) I dunno how to get GNU GCC to work with other stdlibs
-                  fi
-                else
-                  link_option=${link_options[$j]}; compile_option=${compile_options[$j]}
-                  if [[ ${stdlibs_name[$j]} == "libstdcxx" || ${compilers[0]} == clang-8 ]]; then
-                    standard=17
-                  else
-                    standard=20
-                  fi
+              link_option=""; compile_option=""
+              if [[ ${compilers[0]} == gcc* ]]; then
+                if [[ ${stdlibs_name[$j]} != "libstdcxx" ]]; then
+                  continue  # TODO(MBkkt) I dunno how to get GNU GCC to work with other stdlibs
                 fi
+              else
+                link_option=${link_options[$j]}; compile_option=${compile_options[$j]}
+                if [[ ${stdlibs_name[$j]} == "libstdcxx" || ${compilers[0]} == clang-8 ]]; then
+                  standard=17
+                else
+                  standard=20
+                fi
+              fi
           
-                dir="build_${compilers[0]}_${stdlibs_name[$j]}_$build_type"
-                echo $dir
-  
-                cmake -S . -B $dir                           \
-                  -DCMAKE_BUILD_TYPE=$build_type             \
-                  -DYACLIB_CXX_STANDARD=$standard            \
-                  -DYACLIB_TEST=SINGLE                       \
-                  -DYACLIB_FLAGS="CORO"                      \
-                  -DCMAKE_C_COMPILER=${compilers[0]}         \
-                  -DCMAKE_CXX_COMPILER=${compilers[1]}       \
-                  -G"Ninja"                                  \
-                  -DYACLIB_LINK_OPTIONS="$link_option"       \
-                  -DYACLIB_FAULT=$yaclib_fault               \
-                  -DYACLIB_LOG="ERROR"                       \
-                  -DYACLIB_COMPILE_OPTIONS="$compile_option"
-              done
+              dir="build_${compilers[0]}_${stdlibs_name[$j]}_$build_type"
+              echo $dir
+          
+              cmake -S . -B $dir                           \
+                -DCMAKE_BUILD_TYPE=$build_type             \
+                -DYACLIB_CXX_STANDARD=$standard            \
+                -DYACLIB_TEST=SINGLE                       \
+                -DYACLIB_FLAGS="CORO"                      \
+                -DCMAKE_C_COMPILER=${compilers[0]}         \
+                -DCMAKE_CXX_COMPILER=${compilers[1]}       \
+                -G"Ninja"                                  \
+                -DYACLIB_LINK_OPTIONS="$link_option"       \
+                -DYACLIB_FAULT=OFF                         \
+                -DYACLIB_LOG="ERROR"                       \
+                -DYACLIB_COMPILE_OPTIONS="$compile_option"
             done
           done
 

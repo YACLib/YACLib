@@ -2,10 +2,10 @@
 
 #ifdef YACLIB_FAULT
 
-#include <yaclib/fault/detail/mutex/mutex.hpp>
-#include <yaclib/fault/detail/mutex/recursive_mutex.hpp>
-#include <yaclib/fault/detail/mutex/recursive_timed_mutex.hpp>
-#include <yaclib/fault/detail/mutex/timed_mutex.hpp>
+#  include <yaclib/fault/detail/mutex/mutex.hpp>
+#  include <yaclib/fault/detail/mutex/recursive_mutex.hpp>
+#  include <yaclib/fault/detail/mutex/recursive_timed_mutex.hpp>
+#  include <yaclib/fault/detail/mutex/timed_mutex.hpp>
 
 namespace yaclib_std {
 
@@ -19,7 +19,7 @@ using recursive_mutex = yaclib::detail::RecursiveMutex;
 
 #else
 
-#include <mutex>
+#  include <mutex>
 
 namespace yaclib_std {
 

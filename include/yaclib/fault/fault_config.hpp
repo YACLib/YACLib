@@ -3,7 +3,7 @@
 #include <cstdint>
 
 #ifdef YACLIB_FAULT
-#include <yaclib/fault/detail/yielder.hpp>
+#  include <yaclib/fault/detail/yielder.hpp>
 #endif
 
 /**

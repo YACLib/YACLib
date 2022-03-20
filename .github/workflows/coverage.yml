@@ -39,7 +39,6 @@ jobs:
               -DCMAKE_C_COMPILER=gcc-10                                          \
               -DCMAKE_CXX_COMPILER=g++-10                                        \
               -DYACLIB_FAULT=$yaclib_fault                                       \
-              -DYACLIB_LOG="ERROR"                                               \
               -DYACLIB_TEST=SINGLE                                               \
               -DYACLIB_FLAGS="COVERAGE;CORO"                                     \
               -DYACLIB_CXX_STANDARD=20     

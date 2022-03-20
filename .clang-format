@@ -34,3 +34,4 @@ IncludeCategories:
   - Regex: '.*'                  # other libraries (system headers in our case)
     Priority: 50
 IncludeBlocks: Regroup
+IndentPPDirectives: AfterHash

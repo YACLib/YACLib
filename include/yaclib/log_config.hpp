@@ -12,21 +12,21 @@ void SetInfoCallback(callback_type callback);
 
 #ifndef YACLIB_FUNCTION_NAME
 [[maybe_unused]] inline void FuncHelper() noexcept {
-#ifdef __PRETTY_FUNCTION__
-#define YACLIB_FUNCTION_NAME 2
-#elif defined(__FUNCSIG__)
-#define YACLIB_FUNCTION_NAME 1
-#else
-#define YACLIB_FUNCTION_NAME 0
-#endif
+#  ifdef __PRETTY_FUNCTION__
+#    define YACLIB_FUNCTION_NAME 2
+#  elif defined(__FUNCSIG__)
+#    define YACLIB_FUNCTION_NAME 1
+#  else
+#    define YACLIB_FUNCTION_NAME 0
+#  endif
 }
-#if YACLIB_FUNCTION_NAME == 2
-#define YACLIB_FUNCTION_NAME __PRETTY_FUNCTION__
-#elif YACLIB_FUNCTION_NAME == 1
-#define YACLIB_FUNCTION_NAME __FUNCSIG__
-#else
-#define YACLIB_FUNCTION_NAME __func__
-#endif
+#  if YACLIB_FUNCTION_NAME == 2
+#    define YACLIB_FUNCTION_NAME __PRETTY_FUNCTION__
+#  elif YACLIB_FUNCTION_NAME == 1
+#    define YACLIB_FUNCTION_NAME __FUNCSIG__
+#  else
+#    define YACLIB_FUNCTION_NAME __func__
+#  endif
 #endif
 
 #define YACLIB_ERROR(cond, message)                                                                                    \
