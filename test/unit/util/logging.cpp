@@ -1,3 +1,5 @@
+#define YACLIB_LOG_ERROR
+#define YACLIB_LOG_INFO
 #include <yaclib/log_config.hpp>
 
 #include <fstream>
@@ -33,7 +35,7 @@ TEST_F(LoggingTest, Error) {
   YACLIB_ERROR(1 != 2, "1 != 2");
   YACLIB_ERROR(1 == 2, "1 == 2");
   std::stringstream expected;
-  expected << __FILE__ << ":" << 33 << " " << YACLIB_FUNCTION_NAME << " "
+  expected << __FILE__ << ":" << 35 << " " << YACLIB_FUNCTION_NAME << " "
            << "1 != 2"
            << " :kek: "
            << "1 != 2";
@@ -53,7 +55,7 @@ TEST_F(LoggingTest, Info) {
   YACLIB_INFO(1 != 2, "1 != 2");
   YACLIB_INFO(1 == 2, "1 == 2");
   std::stringstream expected;
-  expected << __FILE__ << ":" << 53 << " " << YACLIB_FUNCTION_NAME << " "
+  expected << __FILE__ << ":" << 55 << " " << YACLIB_FUNCTION_NAME << " "
            << "1 != 2"
            << " :kek: "
            << "1 != 2";
@@ -107,4 +109,25 @@ TEST_F(LoggingTest, ResetCallback) {
   std::stringstream buffer;
   buffer << logFile.rdbuf();
   ASSERT_EQ(buffer.str(), "0123");
+}
+
+int testFuncName() {
+  YACLIB_ERROR(true, "kek");
+  return 0;
+}
+
+TEST_F(LoggingTest, Function) {
+  SetErrorCallback([](std::string_view /*file*/, std::size_t /*line*/, std::string_view function,
+                      std::string_view /*condition*/, std::string_view /*message*/) {
+    std::ofstream logFile("resultFunction");
+    logFile << function;
+    logFile.close();
+  });
+
+  testFuncName();
+
+  std::ifstream logFile("resultFunction");
+  std::stringstream buffer;
+  buffer << logFile.rdbuf();
+  ASSERT_EQ(buffer.str(), "testFuncName");
 }
