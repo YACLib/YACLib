@@ -37,7 +37,7 @@ class Thread {
   native_handle_type native_handle() noexcept;
 
   // TODO(myannyax) don't use auto?
-  static auto hardware_concurrency() noexcept;
+  static unsigned int hardware_concurrency() noexcept;
 
  private:
   std::thread _impl;

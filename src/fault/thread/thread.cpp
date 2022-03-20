@@ -40,7 +40,7 @@ Thread::native_handle_type Thread::native_handle() noexcept {
   return _impl.native_handle();
 }
 
-auto Thread::hardware_concurrency() noexcept {
+unsigned int Thread::hardware_concurrency() noexcept {
   return std::thread::hardware_concurrency();
 }
 

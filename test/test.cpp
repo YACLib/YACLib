@@ -24,7 +24,7 @@ int main(int argc, char** argv) {
   });
   SetInfoCallback([](std::string_view file, std::size_t line, std::string_view function, std::string_view /*condition*/,
                      std::string_view message) {
-    GTEST_COUT << message << " in" << file << ":" << line << ". Function name: " << function;
+    GTEST_COUT << message << " in" << file << ":" << line << ". Function name: " << function << '\n';
   });
   SetFrequency(8u);
   SetSleepTime(200u);
