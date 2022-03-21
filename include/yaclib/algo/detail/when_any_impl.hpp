@@ -4,7 +4,7 @@
 #include <yaclib/async/detail/result_core.hpp>
 #include <yaclib/async/future.hpp>
 #include <yaclib/fault/atomic.hpp>
-#include <yaclib/log_config.hpp>
+#include <yaclib/log.hpp>
 
 #include <cstddef>
 #include <iterator>

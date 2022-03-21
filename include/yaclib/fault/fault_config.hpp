@@ -2,17 +2,18 @@
 
 #include <cstdint>
 
-#ifdef YACLIB_FAULT
-#  include <yaclib/fault/detail/yielder.hpp>
-#endif
+namespace yaclib {
 
 /**
- * Sets frequency with which fault will be injected, default is 16.
+ * Sets frequency with which fault will be injected.
+ * Default is 16.
  */
-void SetFrequency(uint32_t freq);
+void SetFrequency(std::uint32_t freq);
 
 /**
- * Sets sleep time if sleep is used instead of yield for interrupting thread execution for fault injection, default is
- * 200
+ * Sets sleep time if sleep is used instead of yield for interrupting thread execution for fault injection.
+ * Default is 200
  */
-void SetSleepTime(uint32_t ns);
+void SetSleepTime(std::uint32_t ns);
+
+}  // namespace yaclib

@@ -1,11 +1,10 @@
 #include <yaclib/fault/fault_config.hpp>
-#include <yaclib/log_config.hpp>
+#include <yaclib/log.hpp>
 
 #include <cstdio>
+#include <iostream>
 
 #include <gtest/gtest.h>
-
-#define GTEST_COUT std::cerr << "[          ] [ INFO ] "
 
 int main(int argc, char** argv) {
 #ifdef __GLIBCPP__
@@ -18,15 +17,15 @@ int main(int argc, char** argv) {
   std::fprintf(stderr, "libc++: %d\n", _LIBCPP_VERSION);
 #endif
   ::testing::InitGoogleTest(&argc, argv);
-  SetErrorCallback([](std::string_view file, std::size_t line, std::string_view /*function*/,
-                      std::string_view /*condition*/, std::string_view message) {
+  yaclib::SetErrorCallback([](std::string_view file, std::size_t line, std::string_view /*function*/,
+                              std::string_view /*condition*/, std::string_view message) {
     GTEST_MESSAGE_AT_(file.data(), line, message.data(), ::testing::TestPartResult::kFatalFailure);
   });
-  SetInfoCallback([](std::string_view file, std::size_t line, std::string_view function, std::string_view /*condition*/,
-                     std::string_view message) {
-    GTEST_COUT << message << " in" << file << ":" << line << ". Function name: " << function << '\n';
+  yaclib::SetInfoCallback([](std::string_view file, std::size_t line, std::string_view function,
+                             std::string_view /*condition*/, std::string_view message) {
+    std::cerr << "[          ] [ INFO ] " << message << " in" << file << ":" << line << ":" << function << '\n';
   });
-  SetFrequency(8u);
-  SetSleepTime(200u);
+  yaclib::SetFrequency(8);
+  yaclib::SetSleepTime(200);
   return RUN_ALL_TESTS();
 }

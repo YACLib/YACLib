@@ -1,7 +1,7 @@
 #pragma once
 
 #include <yaclib/fault/detail/inject_fault.hpp>
-#include <yaclib/log_config.hpp>
+#include <yaclib/log.hpp>
 
 #include <mutex>
 

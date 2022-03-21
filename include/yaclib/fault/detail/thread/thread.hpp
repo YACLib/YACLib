@@ -1,6 +1,6 @@
 #pragma once
 
-#include <yaclib/log_config.hpp>
+#include <yaclib/log.hpp>
 
 #include <functional>
 #include <thread>

@@ -4,7 +4,7 @@
 #include <yaclib/fault/condition_variable.hpp>
 #include <yaclib/fault/mutex.hpp>
 #include <yaclib/fault/thread.hpp>
-#include <yaclib/log_config.hpp>
+#include <yaclib/log.hpp>
 #include <yaclib/util/func.hpp>
 #include <yaclib/util/helper.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
