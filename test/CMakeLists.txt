@@ -59,6 +59,7 @@ if (CORO)
     unit/coroutine/dummy
     unit/coroutine/future_coro_traits
     unit/coroutine/stress
+    unit/coroutine/via
     )
 endif ()
 
