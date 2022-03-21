@@ -10,7 +10,7 @@
 
 namespace yaclib::detail {
 
-struct ResumeDeleter {
+struct CoroutineDeleter {
   template <typename V, typename E>
   static void Delete(ResultCore<V, E>* res_core) noexcept {
     using promise_type = typename yaclib_std::coroutine_traits<Future<V, E>>::promise_type;
