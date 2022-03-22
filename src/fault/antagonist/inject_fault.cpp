@@ -3,7 +3,7 @@
 namespace yaclib::detail {
 
 Yielder* GetYielder() {
-  static Yielder instance;
+  thread_local static Yielder instance;
   return &instance;
 }
 

@@ -27,7 +27,7 @@ class Yielder {
   static std::atomic_uint32_t yield_frequency;
   static std::atomic_uint32_t sleep_time;
 
-  std::atomic_uint32_t _count;
+  uint32_t _count;
   std::mt19937 _eng;
 };
 

@@ -19,7 +19,7 @@ void Yielder::MaybeYield() {
 }
 
 bool Yielder::ShouldYield() {
-  if (_count.fetch_add(1, std::memory_order_acq_rel) >= yield_frequency) {
+  if (_count += 1 >= yield_frequency) {
     Reset();
     return true;
   }
@@ -27,7 +27,7 @@ bool Yielder::ShouldYield() {
 }
 
 void Yielder::Reset() {
-  _count.exchange(RandNumber(yield_frequency));
+  _count = RandNumber(yield_frequency);
 }
 
 uint32_t Yielder::RandNumber(uint32_t max) {
