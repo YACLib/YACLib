@@ -1,11 +1,11 @@
 #include <yaclib/coroutine/detail/promise_type.hpp>
-#include <yaclib/coroutine/detail/suspend_condition.hpp>
 
 #include <gtest/gtest.h>
 
 namespace {
-TEST(CoroDummy, SuspendConditionResume) {
-  yaclib::detail::SuspendCondition sc(false);
+TEST(CoroDummy, DestroyResume) {
+  yaclib::detail::Destroy<void, void> sc;
   sc.await_resume();
 }
+
 }  // namespace

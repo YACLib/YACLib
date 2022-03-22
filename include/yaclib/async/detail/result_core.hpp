@@ -43,6 +43,10 @@ class ResultCore : public BaseCore {
     }
   }
 
+  [[maybe_unused]] void SetStop() final {
+    Set(StopTag{});
+  }
+
   [[nodiscard]] Result<V, E>& Get() noexcept {
     return _result;
   }
@@ -62,6 +66,10 @@ class ResultCore<SubscribeTag, E> : public BaseCore {
   template <typename T>
   void Set(T&&) noexcept {
     BaseCore::Cancel();
+  }
+
+  [[maybe_unused]] void SetStop() final {
+    Set(StopTag{});
   }
 };
 
