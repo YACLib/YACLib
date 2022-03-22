@@ -2,9 +2,11 @@
 
 #ifdef YACLIB_FAULT
 
-#include <yaclib/fault/detail/atomic/atomic.hpp>
-#include <yaclib/fault/detail/atomic/atomic_flag.hpp>
-#include <yaclib/fault/detail/atomic/atomic_reference.hpp>
+#  include <yaclib/fault/detail/atomic/atomic.hpp>
+#  include <yaclib/fault/detail/atomic/atomic_flag.hpp>
+#  include <yaclib/fault/detail/atomic/atomic_reference.hpp>
+
+#  include <atomic>
 
 namespace yaclib_std {
 
@@ -27,7 +29,7 @@ inline void atomic_signal_fence(std::memory_order order) noexcept {
 
 #else
 
-#include <atomic>
+#  include <atomic>
 
 namespace yaclib_std {
 

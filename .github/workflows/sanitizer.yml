@@ -91,7 +91,7 @@ jobs:
             build_type: RelWithDebInfo
 
     env:
-      YACLIB_FAULT: 'OFF ON' # TODO(myannyax)
+      YACLIB_FAULT: 'OFF ON'
 
     steps:
       - uses: actions/checkout@v2
@@ -157,10 +157,6 @@ jobs:
           for (( i=0; i<${#c_compilers[*]}; i+=1 )); do
             for (( j=0; j<${#link_options[*]}; j+=1 )); do
               for yaclib_fault in ${YACLIB_FAULT[*]}; do
-                if [[ $yaclib_fault == ON ]]; then
-                  continue  # TODO(myannyax)
-                fi
-
                 if [[ ${{ matrix.os }} == "macos-11" ]]; then # macOS workarounds
                   if [[ ${compilers_name[$i]} != "gnu" && $flags == "LSAN" ]]; then
                     # AppleClang doesn't support LSAN.
@@ -205,6 +201,8 @@ jobs:
                   -G"Ninja"                                          \
                   -DYACLIB_LINK_OPTIONS="$link_option"               \
                   -DYACLIB_COMPILE_OPTIONS="$compile_option"         \
+                  -DYACLIB_FAULT=$yaclib_fault                       \
+                  -DYACLIB_LOG="ERROR"                               \
                   -DYACLIB_DEFINITIONS="YACLIB_CI_SLOWDOWN=$slowdown"
 
               done

@@ -3,7 +3,7 @@
 #include <yaclib/coro_config.hpp>
 
 #if YACLIB_CORO_EXPERIMENTAL
-#include <experimental/coroutine>
+#  include <experimental/coroutine>
 
 namespace yaclib_std {
 
@@ -15,7 +15,7 @@ using std::experimental::suspend_never;
 }  // namespace yaclib_std
 
 #elif YACLIB_CORO_FINAL
-#include <coroutine>
+#  include <coroutine>
 
 namespace yaclib_std {
 
