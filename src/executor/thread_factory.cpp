@@ -4,11 +4,11 @@
 #include <yaclib/fault/condition_variable.hpp>
 #include <yaclib/fault/mutex.hpp>
 #include <yaclib/fault/thread.hpp>
+#include <yaclib/log.hpp>
 #include <yaclib/util/func.hpp>
 #include <yaclib/util/helper.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 
-#include <cassert>
 #include <cstddef>
 #include <iosfwd>
 #include <string>
@@ -40,7 +40,9 @@ class LightThread final : public IThread {
   }
 
   ~LightThread() final {
-    assert(_thread.get_id() != yaclib_std::this_thread::get_id());
+    YACLIB_ERROR(_thread.get_id() == yaclib_std::this_thread::get_id(),
+                 "Thread try to join itself, probably because you forgot Stop ThreadPool, and ThreadPool dtor was "
+                 "called in ThreadPool thread");
     _thread.join();
   }
 
@@ -59,7 +61,7 @@ class HeavyThread final : public IThread {
   void Set(std::size_t priority, std::string_view name, IFuncPtr func, IFuncPtr acquire, IFuncPtr release) {
     {
       std::lock_guard lock{_m};
-      assert(_state == State::Idle);
+      YACLIB_ERROR(_state != State::Idle, "Trying run some func on not idle thread");
       _state = State::Run;
       _priority = priority;
       _name = name;
@@ -83,7 +85,9 @@ class HeavyThread final : public IThread {
       _state = State::Stop;
     }
     _cv.notify_all();
-    assert(_thread.get_id() != yaclib_std::this_thread::get_id());
+    YACLIB_ERROR(_thread.get_id() == yaclib_std::this_thread::get_id(),
+                 "Thread try to join itself, probably because you forgot Stop ThreadPool, and ThreadPool dtor was "
+                 "called in ThreadPool thread");
     _thread.join();
   }
 

@@ -1,4 +1,4 @@
-set (YACLIB_UBSAN 1)
+set(YACLIB_UBSAN 1)
 if (NOT CMAKE_CXX_SIMULATE_ID STREQUAL "MSVC")
   list(APPEND YACLIB_LINK_OPTIONS -fsanitize=undefined)
 endif ()

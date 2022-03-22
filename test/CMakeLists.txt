@@ -27,6 +27,14 @@ set(TEST_UTIL_INCLUDES
   util/error_code.hpp
   util/time.hpp
   )
+set(TEST_UTIL_SOURCES
+  test.cpp
+  )
+
+#TODO(myannyax) any ways this can be avoided?
+if (YACLIB_FAULT)
+  list(APPEND YACLIB_DEFINITIONS YACLIB_FAULT)
+endif ()
 
 set(YACLIB_EXAMPLE_SOURCES
   example/async/simple
@@ -52,6 +60,13 @@ set(YACLIB_UNIT_SOURCES
   unit/async/stress
   unit/executor/strand
   )
+
+if (YACLIB_LOG STREQUAL "ERROR")
+  list(APPEND YACLIB_DEFINITIONS YACLIB_LOG_ERROR)
+elseif (YACLIB_LOG STREQUAL "INFO")
+  list(APPEND YACLIB_DEFINITIONS YACLIB_LOG_ERROR)
+  list(APPEND YACLIB_DEFINITIONS YACLIB_LOG_INFO)
+endif ()
 
 if (CORO)
   list(APPEND YACLIB_UNIT_SOURCES
@@ -86,6 +101,7 @@ if (WARN IN_LIST YACLIB_FLAGS)
   include(yaclib_warn_test)
   message("test warnings: ${YACLIB_WARN}")
 endif ()
+
 if (YACLIB_TEST STREQUAL "SINGLE")
   list(TRANSFORM YACLIB_TEST_SOURCES APPEND .cpp)
   add_executable(yaclib_test test.cpp ${YACLIB_TEST_SOURCES})
@@ -97,3 +113,18 @@ else ()
     yaclib_add_test(${TEST_NAME})
   endforeach ()
 endif ()
+
+add_executable(unit_util_logging test.cpp unit/util/logging.cpp)
+
+set(OLD_YACLIB_DEFINITIONS YACLIB_DEFINITIONS)
+
+if (YACLIB_LOG STREQUAL "ERROR")
+  list(APPEND YACLIB_DEFINITIONS YACLIB_LOG_INFO)
+elseif (NOT YACLIB_LOG STREQUAL "INFO")
+  list(APPEND YACLIB_DEFINITIONS YACLIB_LOG_ERROR)
+  list(APPEND YACLIB_DEFINITIONS YACLIB_LOG_INFO)
+endif ()
+
+yaclib_add_test(unit_util_logging)
+
+set(YACLIB_DEFINITIONS OLD_YACLIB_DEFINITIONS)

@@ -4,6 +4,7 @@
 #include <yaclib/async/detail/result_core.hpp>
 #include <yaclib/async/future.hpp>
 #include <yaclib/fault/atomic.hpp>
+#include <yaclib/log.hpp>
 
 #include <cstddef>
 #include <iterator>
@@ -100,7 +101,7 @@ class AnyCombinatorBase<V, E, WhenPolicy::FirstFail> : public AnyCombinatorBase<
       if (state == ResultState::Exception) {
         new (&_exception) std::exception_ptr{std::move(result).Exception()};
       } else {
-        assert(state == ResultState::Error);
+        YACLIB_ERROR(state != ResultState::Error, "state should be Error, but here it's Empty");
         new (&_error) E{std::move(result).Error()};
       }
     }

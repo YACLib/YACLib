@@ -32,6 +32,6 @@ if (COVERAGE IN_LIST YACLIB_FLAGS)
 endif ()
 
 if (CORO IN_LIST YACLIB_FLAGS)
-  set (CORO ON)
-  include (yaclib_coro)
+  set(CORO ON)
+  include(yaclib_coro)
 endif ()
