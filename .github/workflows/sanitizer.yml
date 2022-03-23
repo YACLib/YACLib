@@ -258,7 +258,7 @@ jobs:
           flags=${{ matrix.flags }}
           default="help=0 verbosity=0 halt_on_error=0"
           export ASAN_OPTIONS="$default debug=1 detect_leaks=0 check_initialization_order=1 detect_stack_use_after_return=1 strict_init_order=1 strict_string_checks=1 detect_invalid_pointer_pairs=2"
-          export TSAN_OPTIONS="$default history_size=0 io_sync=0 detect_deadlocks=1 second_deadlock_stack=1"  
+          export TSAN_OPTIONS="$default history_size=2 io_sync=0 detect_deadlocks=1 second_deadlock_stack=1"  
           export UBSAN_OPTIONS="$default print_stacktrace=1"
           if [[ $flags == "LSAN" ]]; then  # This is necessary for the schizo macOS ASAN, who for some reason reads LSAN_OPTIONS
             export LSAN_OPTIONS="$default debug=1 detect_leaks=1"

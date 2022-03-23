@@ -2,7 +2,7 @@
 
 #include <yaclib/async/detail/result_core.hpp>
 #include <yaclib/async/future.hpp>
-#include <yaclib/coroutine/detail/resume_deleter.hpp>
+#include <yaclib/coroutine/detail/coroutine_deleter.hpp>
 #include <yaclib/coroutine/detail/suspend_condition.hpp>
 #include <yaclib/util/detail/atomic_counter.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
@@ -13,8 +13,29 @@
 namespace yaclib::detail {
 
 template <typename V, typename E>
-struct PromiseType : AtomicCounter<ResultCore<V, E>, ResumeDeleter> {
-  using Base = AtomicCounter<ResultCore<V, E>, ResumeDeleter>;
+struct PromiseType;
+
+template <typename V, typename E>
+class Destroy {
+ public:
+  Destroy() noexcept {
+  }
+
+  bool await_ready() noexcept {
+    return false;
+  }
+
+  void await_resume() noexcept {
+  }
+
+  void await_suspend(yaclib_std::coroutine_handle<PromiseType<V, E>> handle) noexcept {
+    handle.promise().DecRef();
+  }
+};
+
+template <typename V, typename E>
+struct PromiseType : AtomicCounter<ResultCore<V, E>, CoroutineDeleter> {
+  using Base = AtomicCounter<ResultCore<V, E>, CoroutineDeleter>;
   PromiseType() : Base{2} {  // get_return_object is gonna be invoked right after ctor
   }
 
@@ -26,8 +47,8 @@ struct PromiseType : AtomicCounter<ResultCore<V, E>, ResumeDeleter> {
     return {};
   }
 
-  SuspendCondition final_suspend() noexcept {
-    return SuspendCondition(Base::SubEqual(1));
+  Destroy<V, E> final_suspend() noexcept {
+    return {};
   }
 
   void return_value(const V& value) noexcept(std::is_nothrow_copy_constructible_v<V>) {
@@ -44,8 +65,8 @@ struct PromiseType : AtomicCounter<ResultCore<V, E>, ResumeDeleter> {
 };
 
 template <typename E>
-struct PromiseType<void, E> : AtomicCounter<ResultCore<void, E>, ResumeDeleter> {
-  using Base = AtomicCounter<ResultCore<void, E>, ResumeDeleter>;
+struct PromiseType<void, E> : AtomicCounter<ResultCore<void, E>, CoroutineDeleter> {
+  using Base = AtomicCounter<ResultCore<void, E>, CoroutineDeleter>;
   PromiseType() : Base{2} {  // get_return_object is gonna be invoked right after ctor
   }
 
@@ -57,8 +78,8 @@ struct PromiseType<void, E> : AtomicCounter<ResultCore<void, E>, ResumeDeleter> 
     return {};
   }
 
-  SuspendCondition final_suspend() noexcept {
-    return SuspendCondition(Base::SubEqual(1));
+  Destroy<void, E> final_suspend() noexcept {
+    return {};
   }
 
   void return_void() noexcept {

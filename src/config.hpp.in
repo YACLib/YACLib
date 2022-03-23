@@ -13,7 +13,9 @@
 #  endif
 #endif
 
-#define YACLIB_UBSAN ${YACLIB_UBSAN}
+#if ${YACLIB_UBSAN}
+#  define YACLIB_UBSAN
+#endif
 
 #if defined(__SANITIZE_ADDRESS__)
 #  define YACLIB_ASAN

@@ -22,6 +22,8 @@ class BaseCore : public InlineCore {
   [[nodiscard]] bool SetWait(IRef& callback) noexcept;
   [[nodiscard]] bool ResetWait() noexcept;
 
+  virtual void SetStop() = 0;
+
   void Stop() noexcept;
   [[nodiscard]] bool Empty() const noexcept;
   [[nodiscard]] bool Alive() const noexcept;
