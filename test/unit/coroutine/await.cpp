@@ -17,50 +17,12 @@
 namespace {
 using namespace std::chrono_literals;
 
-TEST(Await, JustWorksPack) {
-  auto tp = yaclib::MakeThreadPool();
-  auto coro = [&](yaclib::IThreadPoolPtr tp) -> yaclib::Future<int> {
-    auto f1 = yaclib::Run(tp, [] {
-      yaclib_std::this_thread::sleep_for(1ms * YACLIB_CI_SLOWDOWN);
-      return 1;
-    });
-    auto f2 = yaclib::Run(tp, [] {
-      return 2;
-    });
-
-    co_await Await(f1, f2);
-    co_return std::move(f1).GetUnsafe().Ok() + std::move(f2).GetUnsafe().Ok();
-  };
-  auto f = coro(tp);
-  EXPECT_EQ(std::move(f).Get().Ok(), 3);
-  tp->HardStop();
-  tp->Wait();
-}
-
-TEST(Await, JustWorksRange) {
-  auto tp = yaclib::MakeThreadPool();
-  auto coro = [&](yaclib::IThreadPoolPtr tp) -> yaclib::Future<int> {
-    std::array<yaclib::Future<int>, 2> arr;
-    arr[0] = yaclib::Run(tp, [] {
-      yaclib_std::this_thread::sleep_for(50ms * YACLIB_CI_SLOWDOWN);
-      return 1;
-    });
-    arr[1] = yaclib::Run(tp, [] {
-      return 2;
-    });
-
-    co_await yaclib::Await(arr.begin(), 2);
-    co_return std::move(arr[0]).GetUnsafe().Ok() + std::move(arr[1]).GetUnsafe().Ok();
-  };
-  auto future = coro(tp);
-  EXPECT_EQ(std::move(future).Get().Ok(), 3);
-  tp->HardStop();
-  tp->Wait();
-}
-
 TEST(Await, CheckSuspend) {
+#if defined(YACLIB_UBSAN) && (defined(__GLIBCPP__) || defined(__GLIBCXX__))
+  // GTEST_SKIP();
+#endif
   int counter = 0;
-  auto tp = yaclib::MakeThreadPool();
+  auto tp = yaclib::MakeThreadPool(2);
   const auto coro_sleep_time = 50ms * YACLIB_CI_SLOWDOWN;
   auto was = std::chrono::steady_clock::now();
   std::atomic_bool barrier = false;
@@ -74,7 +36,9 @@ TEST(Await, CheckSuspend) {
       yaclib_std::this_thread::sleep_for(coro_sleep_time);
     });
 
+    std::cerr << "future1 %p" << &future1 << "; future2 %p" << &future2 << std::endl;
     co_await Await(future1, future2);
+    std::cerr << "future1 %p" << &future1 << "; future2 %p" << &future2 << std::endl;
 
     EXPECT_TRUE(barrier.load(std::memory_order_acquire));
     while (!barrier.load(std::memory_order_acquire)) {
@@ -91,6 +55,7 @@ TEST(Await, CheckSuspend) {
 
   EXPECT_LT(std::chrono::steady_clock::now() - was, coro_sleep_time);
 
+  std::cerr << "Get thread: " << std::this_thread::get_id() << std::endl;
   std::ignore = std::move(outer_future).Get();
 
   EXPECT_EQ(2, counter);
