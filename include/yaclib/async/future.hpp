@@ -30,7 +30,7 @@ class Future final {
    *
    * Needed only for usability, e.g. instead of std::optional<Future<T>> in containers.
    */
-  Future() = default;
+  Future();
 
   /**
    * If Future is \ref Valid then call \ref Stop

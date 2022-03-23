@@ -53,6 +53,7 @@ class FutureAwaiter final {
     static void Delete(CoroHandler* handle) noexcept {
       assert(handle);
       assert(!handle->handle.done());
+      std::cerr << "resume thread: " << std::this_thread::get_id() << std::endl;
       handle->handle.resume();  // TODO(mkornaukhov03) resume on custom IExecutor
     }
   };

@@ -4,6 +4,8 @@
 #include <yaclib/async/detail/core.hpp>
 #include <yaclib/log.hpp>
 
+#include <iostream>
+
 namespace yaclib {
 namespace detail {
 
@@ -227,7 +229,13 @@ auto SetCallback(ResultCorePtr<Arg, E> caller, Functor&& f) {
 }  // namespace detail
 
 template <typename V, typename E>
+Future<V, E>::Future() {
+  std::cerr << "Future() %p: " << this << "; thread: " << std::this_thread::get_id() << std::endl;
+}
+
+template <typename V, typename E>
 Future<V, E>::~Future() {
+  std::cerr << "~Future() %p: " << this << "; thread: " << std::this_thread::get_id() << std::endl;
   if (_core) {
     _core->Stop();
   }
@@ -341,6 +349,7 @@ void Future<V, E>::Subscribe(IExecutorPtr e, Functor&& f) && {
 
 template <typename V, typename E>
 Future<V, E>::Future(detail::ResultCorePtr<V, E> core) noexcept : _core{std::move(core)} {
+  std::cerr << "Future(core) %p: " << this << "; thread: " << std::this_thread::get_id() << std::endl;
 }
 
 template <typename V, typename E>
