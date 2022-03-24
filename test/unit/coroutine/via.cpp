@@ -3,31 +3,31 @@
 #include <yaclib/async/run.hpp>
 #include <yaclib/config.hpp>
 #include <yaclib/coroutine/await.hpp>
+#include <yaclib/coroutine/detail/via_awaiter.hpp>
 #include <yaclib/coroutine/future_coro_traits.hpp>
-#include <yaclib/coroutine/switch.hpp>
+#include <yaclib/executor/strand.hpp>
 #include <yaclib/executor/thread_pool.hpp>
 #include <yaclib/fault/thread.hpp>
 
-#include <array>
 #include <exception>
-#include <sstream>
-#include <stack>
 #include <utility>
 #include <vector>
 
 #include <gtest/gtest.h>
 
+// TODO(mkornaukhov03)
+// TSAN error
+// Read in ResumeDeleter (handle.done()), write in ViaAwaiter.Call()
+
 namespace {
 using namespace std::chrono_literals;
 
-TEST(Switch, JustWorks) {
+TEST(Via, JustWorks) {
   auto main_thread = yaclib_std::this_thread::get_id();
-
-  std::cout << "MAIN THREAD = " << yaclib_std::this_thread::get_id() << '\n';
 
   auto tp = yaclib::MakeThreadPool();
   auto coro = [&](yaclib::IThreadPoolPtr tp) -> yaclib::Future<void> {
-    co_await yaclib::detail::SwitchAwaiter<void, yaclib::StopError>(tp);
+    co_await yaclib::detail::ViaAwaiter(tp);
     auto other_thread = yaclib_std::this_thread::get_id();
     EXPECT_NE(other_thread, main_thread);
     co_return;
@@ -38,18 +38,17 @@ TEST(Switch, JustWorks) {
   tp->Wait();
 }
 
-TEST(Switch, ManyCoros) {
+TEST(Via, ManyCoros) {
   auto tp = yaclib::MakeThreadPool();
 
   yaclib_std::atomic_int32_t sum = 0;
 
   auto coro = [&](int a) -> yaclib::Future<void> {
-    co_await yaclib::detail::SwitchAwaiter<void, yaclib::StopError>(tp);
+    co_await yaclib::detail::ViaAwaiter(tp);
     auto other_thread = yaclib_std::this_thread::get_id();
 
     std::stringstream ss;
 
-    ss << "thread_id: " << yaclib_std::this_thread::get_id() << ", value: " << a << '\n';
     sum.fetch_add(a, std::memory_order_acquire);
 
     std::cout << ss.str();
@@ -76,7 +75,7 @@ TEST(Switch, ManyCoros) {
   tp->Wait();
 }
 
-TEST(Switch, Cancel) {
+TEST(Via, Cancel) {
   using namespace std::chrono_literals;
   auto tp = yaclib::MakeThreadPool();
 
@@ -85,11 +84,9 @@ TEST(Switch, Cancel) {
   auto main_thread = yaclib_std::this_thread::get_id();
 
   auto coro = [&](int a) -> yaclib::Future<void> {
-
     yaclib_std::this_thread::sleep_for(10ms);
 
-
-    co_await yaclib::detail::SwitchAwaiter<void, yaclib::StopError>(tp);
+    co_await yaclib::detail::ViaAwaiter(tp);
     auto other_thread = yaclib_std::this_thread::get_id();
 
     EXPECT_EQ(other_thread, main_thread);
@@ -99,11 +96,12 @@ TEST(Switch, Cancel) {
   };
 
   tp->HardStop();
+  tp->Wait();
 
-  const int N = 10;
+  constexpr std::size_t N = 10;
   std::vector<yaclib::Future<void>> vec;
   vec.reserve(N);
-  for (int i = 0; i < N; ++i) {
+  for (std::size_t i = 0; i < N; ++i) {
     vec.push_back(coro(i));
   }
 
@@ -112,7 +110,35 @@ TEST(Switch, Cancel) {
   }
 
   ASSERT_EQ((0 + 9) * 10 / 2, sum.fetch_add(0, std::memory_order_relaxed));
+}
 
+TEST(Via, LockWithStrand) {
+  using namespace std::chrono_literals;
+  auto tp = yaclib::MakeThreadPool();
+  auto strand = yaclib::MakeStrand(tp);
+
+  static const std::size_t kIncrements = 32768;
+  std::size_t sum = 0;
+
+  auto coro = [&](int a) -> yaclib::Future<void> {
+    co_await yaclib::detail::ViaAwaiter(strand);  // lock
+    ++sum;
+    co_return;  // automatic unlocking
+  };
+
+  std::vector<yaclib::Future<void>> vec;
+  vec.reserve(kIncrements);
+  for (int i = 0; i < kIncrements; ++i) {
+    vec.push_back(coro(i));
+  }
+
+  for (auto& cor : vec) {
+    std::ignore = std::move(cor).Get();
+  }
+
+  ASSERT_EQ(kIncrements, sum);
+
+  tp->HardStop();
   tp->Wait();
 }
 

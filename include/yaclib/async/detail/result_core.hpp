@@ -44,7 +44,7 @@ class ResultCore : public BaseCore {
     }
   }
 
-  [[maybe_unused]] void SetStop() final {
+  void SetStop() final {
     Set(StopTag{});
   }
 
@@ -67,7 +67,7 @@ class ResultCore<void, void> : public BaseCore {
     BaseCore::Cancel();
   }
 
-  [[maybe_unused]] void SetStop() final {
+  void SetStop() final {
     Set(StopTag{});
   }
 };

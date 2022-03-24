@@ -72,10 +72,9 @@ endif ()
 if (CORO)
   list(APPEND YACLIB_UNIT_SOURCES
     unit/coroutine/await
-    unit/coroutine/dummy
     unit/coroutine/future_coro_traits
     unit/coroutine/stress
-    unit/coroutine/switch
+    unit/coroutine/via
     )
 endif ()
 

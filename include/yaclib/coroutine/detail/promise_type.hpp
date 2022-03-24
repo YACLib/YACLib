@@ -2,37 +2,15 @@
 
 #include <yaclib/async/detail/result_core.hpp>
 #include <yaclib/async/future.hpp>
-#include <yaclib/config.hpp>
+#include <yaclib/coroutine/detail/coroutine.hpp>
 #include <yaclib/coroutine/detail/coroutine_deleter.hpp>
 #include <yaclib/util/detail/atomic_counter.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
-#include <yaclib/coroutine/detail/coroutine.hpp>
-
-#include <exception>
-#include <type_traits>
 
 namespace yaclib::detail {
 
 template <typename V, typename E>
 struct PromiseType;
-
-template <typename V, typename E>
-class Destroy {
- public:
-  Destroy() noexcept {
-  }
-
-  bool await_ready() noexcept {
-    return false;
-  }
-
-  void await_resume() noexcept {
-  }
-
-  void await_suspend(yaclib_std::coroutine_handle<PromiseType<V, E>> handle) noexcept {
-    handle.promise().DecRef();
-  }
-};
 
 template <typename V, typename E>
 struct PromiseType : AtomicCounter<ResultCore<V, E>, CoroutineDeleter> {
@@ -48,7 +26,23 @@ struct PromiseType : AtomicCounter<ResultCore<V, E>, CoroutineDeleter> {
     return {};
   }
 
-  Destroy<V, E> final_suspend() noexcept {
+  class Destroy {
+   public:
+    Destroy() noexcept {
+    }
+
+    bool await_ready() noexcept {
+      return false;
+    }
+    void await_resume() noexcept {
+    }
+
+    void await_suspend(yaclib_std::coroutine_handle<PromiseType> handle) noexcept {
+      handle.promise().DecRef();
+    }
+  };
+
+  Destroy final_suspend() noexcept {
     return {};
   }
 
@@ -79,7 +73,23 @@ struct PromiseType<void, E> : AtomicCounter<ResultCore<void, E>, CoroutineDelete
     return {};
   }
 
-  Destroy<void, E> final_suspend() noexcept {
+  class Destroy {
+   public:
+    Destroy() noexcept {
+    }
+
+    bool await_ready() noexcept {
+      return false;
+    }
+    void await_resume() noexcept {
+    }
+
+    void await_suspend(yaclib_std::coroutine_handle<PromiseType> handle) noexcept {
+      handle.promise().DecRef();
+    }
+  };
+
+  Destroy final_suspend() noexcept {
     return {};
   }
 
