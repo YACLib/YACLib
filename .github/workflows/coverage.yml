@@ -94,15 +94,12 @@ jobs:
             echo $dir
           
             cd $dir
-            gcovr --root=".." --exclude "/usr/*" --exclude "*/_deps/*" --exclude="*/test/*" --exclude="*/fault/*" --exclude-unreachable-branches --exclude-throw-branches --gcov-executable="gcov" --json-pretty="./coverage_data.json"
+            gcovr --root ".." --exclude "/usr/*" --exclude "*/_deps/*" --exclude "*/test/*" --exclude "*/fault/*" --exclude-unreachable-branches --exclude-throw-branches --gcov-executable "gcov" --json-pretty "./coverage_data.json"
             cat ./coverage_data.json
             cd ..
           done
 
-          gcovr                                                                                                        \
-            --add-tracefile="./build_fault_OFF/coverage_data.json"                                                     \
-            --add-tracefile="./build_fault_ON/coverage_data.json"                                                      \
-            --coveralls-pretty="./total.coveralls.json"
+          gcovr --add-tracefile "./build_fault_OFF/coverage_data.json" --add-tracefile "./build_fault_ON/coverage_data.json" --coveralls-pretty "./total.coveralls.json"
 
           cat ./total.coveralls.json
 
