@@ -47,6 +47,7 @@ set(YACLIB_UNIT_SOURCES
   unit/util/intrusive_ptr
   unit/util/result
   unit/executor/task
+  unit/async/make_future
   unit/async/get
   unit/async/future
   unit/async/future_inline
@@ -88,7 +89,7 @@ function(yaclib_add_test TEST_NAME)
     )
   target_link_libraries(${TEST_NAME}
     PRIVATE GTest::gtest
-    PRIVATE ${PROJECT_NAME}
+    PRIVATE yaclib
     )
   target_include_directories(${TEST_NAME}
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
@@ -99,7 +100,7 @@ endfunction()
 
 if (WARN IN_LIST YACLIB_FLAGS)
   include(yaclib_warn_test)
-  message("test warnings: ${YACLIB_WARN}")
+  message("YACLib/test warnings: ${YACLIB_WARN}")
 endif ()
 
 if (YACLIB_TEST STREQUAL "SINGLE")

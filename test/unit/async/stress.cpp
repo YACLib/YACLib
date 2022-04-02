@@ -118,10 +118,7 @@ struct StressTest : testing::Test {
     wg.Wait();
     EXPECT_EQ(kNumRounds * (kNumThreads / 2), num_resolved_futures.load());
     EXPECT_EQ(kNumRounds * (kNumThreads / 2), Value::created.load());
-    std::cerr << " Value::destroyed expectation: " << kNumRounds * (kNumThreads / 2)
-              << " reality: " << Value::destroyed.load() << std::endl;
-    // EXPECT_EQ(kNumRounds * (kNumThreads / 2), Value::destroyed.load());
-    // TODO(MBkkt) Uncomment when we make Result great again
+    EXPECT_EQ(kNumRounds * (kNumThreads / 2), Value::destroyed.load());
   }
 };
 

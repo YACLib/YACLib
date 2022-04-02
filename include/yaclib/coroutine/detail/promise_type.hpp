@@ -2,6 +2,7 @@
 
 #include <yaclib/async/detail/result_core.hpp>
 #include <yaclib/async/future.hpp>
+#include <yaclib/config.hpp>
 #include <yaclib/coroutine/detail/coroutine_deleter.hpp>
 #include <yaclib/coroutine/detail/suspend_condition.hpp>
 #include <yaclib/util/detail/atomic_counter.hpp>

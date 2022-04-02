@@ -2,6 +2,7 @@
 
 #include <yaclib/async/detail/base_core.hpp>
 #include <yaclib/async/detail/inline_core.hpp>
+#include <yaclib/config.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 #include <yaclib/util/result.hpp>
 
@@ -15,8 +16,8 @@ class ResultCore : public BaseCore {
   ResultCore() noexcept : BaseCore{State::Empty} {
   }
 
-  template <typename T>
-  explicit ResultCore(T&& value) : BaseCore{State::HasResult}, _result{std::forward<T>(value)} {
+  template <typename... Args>
+  explicit ResultCore(Args&&... args) : BaseCore{State::HasResult}, _result{std::forward<Args>(args)...} {
   }
 
   template <typename T>
@@ -30,7 +31,7 @@ class ResultCore : public BaseCore {
       case State::HasCallbackInline:
         [[fallthrough]];
       case State::HasAsyncCallback:
-        static_cast<InlineCore&>(*_callback).CallInline(this, state);
+        static_cast<InlineCore&>(*_callback).CallInline(*this, state);
         [[fallthrough]];
       case State::HasStop:
         _executor = nullptr;
@@ -55,10 +56,8 @@ class ResultCore : public BaseCore {
   Result<V, E> _result;
 };
 
-struct SubscribeTag {};
-
-template <typename E>
-class ResultCore<SubscribeTag, E> : public BaseCore {
+template <>
+class ResultCore<void, void> : public BaseCore {
  public:
   ResultCore() noexcept : BaseCore{State::Empty} {
   }
@@ -73,7 +72,6 @@ class ResultCore<SubscribeTag, E> : public BaseCore {
   }
 };
 
-// extern template class ResultCore<void, void>;
 extern template class ResultCore<void, StopError>;
 
 template <typename V, typename E>

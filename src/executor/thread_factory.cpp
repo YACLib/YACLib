@@ -1,5 +1,6 @@
 #include <util/intrusive_list.hpp>
 
+#include <yaclib/config.hpp>
 #include <yaclib/executor/thread_factory.hpp>
 #include <yaclib/fault/condition_variable.hpp>
 #include <yaclib/fault/mutex.hpp>

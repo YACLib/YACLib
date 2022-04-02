@@ -1,5 +1,10 @@
 #pragma once
 
+#include <yaclib/config.hpp>
+
+#include <cstddef>
+#include <cstdint>
+
 #ifdef YACLIB_FAULT
 
 #  include <yaclib/fault/detail/atomic/atomic.hpp>
@@ -64,38 +69,38 @@ using atomic_char16_t = atomic<char16_t>;
 using atomic_char32_t = atomic<char32_t>;
 using atomic_wchar_t = atomic<wchar_t>;
 
-using atomic_int_least8_t = atomic<int_least8_t>;
-using atomic_uint_least8_t = atomic<uint_least8_t>;
-using atomic_int_least16_t = atomic<int_least16_t>;
-using atomic_uint_least16_t = atomic<uint_least16_t>;
-using atomic_int_least32_t = atomic<int_least32_t>;
-using atomic_uint_least32_t = atomic<uint_least32_t>;
-using atomic_int_least64_t = atomic<int_least64_t>;
-using atomic_uint_least64_t = atomic<uint_least64_t>;
+using atomic_int_least8_t = atomic<std::int_least8_t>;
+using atomic_uint_least8_t = atomic<std::uint_least8_t>;
+using atomic_int_least16_t = atomic<std::int_least16_t>;
+using atomic_uint_least16_t = atomic<std::uint_least16_t>;
+using atomic_int_least32_t = atomic<std::int_least32_t>;
+using atomic_uint_least32_t = atomic<std::uint_least32_t>;
+using atomic_int_least64_t = atomic<std::int_least64_t>;
+using atomic_uint_least64_t = atomic<std::uint_least64_t>;
 
-using atomic_int_fast8_t = atomic<int_fast8_t>;
-using atomic_uint_fast8_t = atomic<uint_fast8_t>;
-using atomic_int_fast16_t = atomic<int_fast16_t>;
-using atomic_uint_fast16_t = atomic<uint_fast16_t>;
-using atomic_int_fast32_t = atomic<int_fast32_t>;
-using atomic_uint_fast32_t = atomic<uint_fast32_t>;
-using atomic_int_fast64_t = atomic<int_fast64_t>;
-using atomic_uint_fast64_t = atomic<uint_fast64_t>;
+using atomic_int_fast8_t = atomic<std::int_fast8_t>;
+using atomic_uint_fast8_t = atomic<std::uint_fast8_t>;
+using atomic_int_fast16_t = atomic<std::int_fast16_t>;
+using atomic_uint_fast16_t = atomic<std::uint_fast16_t>;
+using atomic_int_fast32_t = atomic<std::int_fast32_t>;
+using atomic_uint_fast32_t = atomic<std::uint_fast32_t>;
+using atomic_int_fast64_t = atomic<std::int_fast64_t>;
+using atomic_uint_fast64_t = atomic<std::uint_fast64_t>;
 
-using atomic_int8_t = atomic<int8_t>;
-using atomic_uint8_t = atomic<uint8_t>;
-using atomic_int16_t = atomic<int16_t>;
-using atomic_uint16_t = atomic<uint16_t>;
-using atomic_int32_t = atomic<int32_t>;
-using atomic_uint32_t = atomic<uint32_t>;
-using atomic_int64_t = atomic<int64_t>;
-using atomic_uint64_t = atomic<uint64_t>;
+using atomic_int8_t = atomic<std::int8_t>;
+using atomic_uint8_t = atomic<std::uint8_t>;
+using atomic_int16_t = atomic<std::int16_t>;
+using atomic_uint16_t = atomic<std::uint16_t>;
+using atomic_int32_t = atomic<std::int32_t>;
+using atomic_uint32_t = atomic<std::uint32_t>;
+using atomic_int64_t = atomic<std::int64_t>;
+using atomic_uint64_t = atomic<std::uint64_t>;
 
-using atomic_intptr_t = atomic<intptr_t>;
-using atomic_uintptr_t = atomic<uintptr_t>;
-using atomic_size_t = atomic<size_t>;
-using atomic_ptrdiff_t = atomic<ptrdiff_t>;
-using atomic_intmax_t = atomic<intmax_t>;
-using atomic_uintmax_t = atomic<uintmax_t>;
+using atomic_intptr_t = atomic<std::intptr_t>;
+using atomic_uintptr_t = atomic<std::uintptr_t>;
+using atomic_size_t = atomic<std::size_t>;
+using atomic_ptrdiff_t = atomic<std::ptrdiff_t>;
+using atomic_intmax_t = atomic<std::intmax_t>;
+using atomic_uintmax_t = atomic<std::uintmax_t>;
 
 }  // namespace yaclib_std

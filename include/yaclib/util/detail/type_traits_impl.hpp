@@ -1,12 +1,22 @@
 #pragma once
 
+#include <yaclib/config.hpp>
+
 #include <type_traits>
 
 namespace yaclib::detail {
 
-template <typename Functor, typename... Arg>
+template <typename...>
+struct Head;
+
+template <typename T, typename... Args>
+struct Head<T, Args...> {
+  using Type = T;
+};
+
+template <typename Functor, typename... Args>
 struct IsInvocable {
-  static constexpr bool Value = std::is_invocable_v<Functor, Arg...>;
+  static constexpr bool Value = std::is_invocable_v<Functor, Args...>;
 };
 
 template <typename Functor>
@@ -14,9 +24,9 @@ struct IsInvocable<Functor, void> {
   static constexpr bool Value = std::is_invocable_v<Functor>;
 };
 
-template <typename Functor, typename... Arg>
+template <typename Functor, typename... Args>
 struct Invoke {
-  using Type = std::invoke_result_t<Functor, Arg...>;
+  using Type = std::invoke_result_t<Functor, Args...>;
 };
 
 template <typename Functor>

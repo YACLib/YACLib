@@ -69,10 +69,10 @@ void ValueCheck() {
   auto result = std::move(f).Get();
   EXPECT_EQ(result.State(), yaclib::ResultState::Value);
   if constexpr (!std::is_void_v<FutureType>) {
-    EXPECT_EQ(std::move(result).Value(), FutureType{});
+    EXPECT_EQ(std::move(result).Ok(), FutureType{});
   } else {
-    static_assert(std::is_void_v<decltype(std::move(result).Value())>);
-    EXPECT_NO_THROW(std::move(result).Value());
+    static_assert(std::is_void_v<decltype(std::move(result).Ok())>);
+    EXPECT_NO_THROW(std::move(result).Ok());
   }
 }
 
@@ -649,7 +649,7 @@ TEST(BruhTestCov, InlineCoreCall) {
     auto& core = *p.GetCore();
     core.InlineCore::Call();
     core.InlineCore::Cancel();
-    core.InlineCore::CallInline(nullptr, yaclib::detail::InlineCore::State::Empty);
+    core.InlineCore::CallInline(core, yaclib::detail::InlineCore::State::Empty);
   }
 }
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <yaclib/config.hpp>
 #include <yaclib/executor/task.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 

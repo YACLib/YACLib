@@ -38,7 +38,8 @@ struct AtomicCounter : CounterBase {
     }
   }
 
-  std::size_t GetRef() const noexcept {  // Dangerous! Use only to sync with release or if synchronization is not needed
+  [[nodiscard]] std::size_t GetRef() const noexcept {
+    // Dangerous! Use only to sync with release or if synchronization is not needed
     return count.load(std::memory_order_acquire);
   }
 

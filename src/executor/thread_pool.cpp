@@ -1,5 +1,6 @@
 #include <util/intrusive_list.hpp>
 
+#include <yaclib/config.hpp>
 #include <yaclib/executor/executor.hpp>
 #include <yaclib/executor/task.hpp>
 #include <yaclib/executor/thread_factory.hpp>

@@ -1,5 +1,7 @@
 #undef YACLIB_LOG_ERROR
 #define YACLIB_LOG_ERROR
+
+#include <yaclib/config.hpp>
 #include <yaclib/log.hpp>
 
 #include <utility>

@@ -32,7 +32,6 @@ if (YACLIB_FAULT)
   list(APPEND YACLIB_DEFINITIONS YACLIB_FAULT)
 endif ()
 
-
 if (YACLIB_LOG STREQUAL "INFO")
   list(APPEND YACLIB_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/log_info.cpp)
   list(APPEND YACLIB_DEFINITIONS YACLIB_LOG_INFO)
@@ -49,33 +48,25 @@ elseif (YACLIB_TEST)
   list(APPEND YACLIB_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/log_error.cpp)
 endif ()
 
-add_library(${PROJECT_NAME} STATIC)
+add_library(yaclib STATIC)
 
-set(YACLIB_IDE ON)
-
-if (YACLIB_IDE)
-  target_sources(${PROJECT_NAME}
-    PUBLIC ${YACLIB_INCLUDES}
-    PRIVATE ${YACLIB_HEADERS}
-    PRIVATE ${YACLIB_SOURCES}
-    )
-else ()
-  target_sources(${PROJECT_NAME}
-    PRIVATE ${YACLIB_SOURCES}
-    )
-endif ()
+target_sources(yaclib
+  PUBLIC ${YACLIB_INCLUDES}
+  PRIVATE ${YACLIB_HEADERS}
+  PRIVATE ${YACLIB_SOURCES}
+  )
 
 if (WARN IN_LIST YACLIB_FLAGS)
   include(yaclib_warn_lib)
-  message("library warnings: ${YACLIB_WARN}")
+  message("YACLib/library warnings: ${YACLIB_WARN}")
 endif ()
-target_compile_options(${PROJECT_NAME} PRIVATE ${YACLIB_COMPILE_OPTIONS} ${YACLIB_WARN})
-target_compile_definitions(${PROJECT_NAME} PRIVATE ${YACLIB_DEFINITIONS})
+target_compile_options(yaclib PRIVATE ${YACLIB_COMPILE_OPTIONS} ${YACLIB_WARN})
+target_compile_definitions(yaclib PRIVATE ${YACLIB_DEFINITIONS})
 
 find_package(Threads REQUIRED)
-target_link_libraries(${PROJECT_NAME} PUBLIC Threads::Threads)
+target_link_libraries(yaclib PUBLIC Threads::Threads)
 
-target_include_directories(${PROJECT_NAME}
+target_include_directories(yaclib
   PUBLIC ${YACLIB_SOURCE_DIR}/include
   PUBLIC ${YACLIB_BINARY_DIR}/include # for config.hpp
   PRIVATE ${YACLIB_SOURCE_DIR}/src

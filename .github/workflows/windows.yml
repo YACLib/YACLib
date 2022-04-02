@@ -52,7 +52,7 @@ jobs:
             build_type: RelWithDebInfo
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Set up MinGW x86
         if: ${{ matrix.arch == 'Win32' }}
@@ -75,7 +75,7 @@ jobs:
             msvc="16 2019"
           fi
           arch=${{ matrix.arch }}
-          if [[ $arch == "Win32" ]]; then
+          if [[ "$arch" == "Win32" ]]; then
             slowdown=5
           else
             slowdown=1
@@ -88,14 +88,13 @@ jobs:
             dir="build_${names[$i]}_fault_${yaclib_fault}"
             echo $dir
           
-            cmake -S . -B $dir                                    \
-              -DYACLIB_CXX_STANDARD=17                            \
-              -DYACLIB_FLAGS="CORO"                               \
-              -DYACLIB_TEST=SINGLE                                \
-              -DYACLIB_FAULT=OFF                                  \
-              -DYACLIB_LOG="ERROR"                                \
-              -G"${generators[$i]}"                               \
-              ${options[$i]}                                      \
+            cmake -S . -B $dir                                                                                         \
+              -DYACLIB_CXX_STANDARD=17                                                                                 \
+              -DYACLIB_FLAGS="CORO"                                                                                    \
+              -DYACLIB_TEST=SINGLE                                                                                     \
+              -DYACLIB_LOG="ERROR"                                                                                     \
+              -G"${generators[$i]}"                                                                                    \
+              ${options[$i]}                                                                                           \
               -DYACLIB_DEFINITIONS="YACLIB_CI_SLOWDOWN=$slowdown"
           done
 

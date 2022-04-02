@@ -2,6 +2,7 @@
 
 #include <yaclib/algo/detail/wait_impl.hpp>
 #include <yaclib/async/future.hpp>
+#include <yaclib/config.hpp>
 
 #include <cstddef>
 
@@ -12,9 +13,9 @@ namespace yaclib {
  *
  * \param fs one or more futures to wait
  */
-template <typename... V, typename... E>
+template <typename Event = detail::DefaultEvent, typename... V, typename... E>
 void Wait(Future<V, E>&... fs) {
-  detail::WaitCores(detail::NoTimeoutTag{}, static_cast<detail::BaseCore&>(*fs.GetCore())...);
+  detail::WaitCore<Event>(detail::NoTimeoutTag{}, static_cast<detail::BaseCore&>(*fs.GetCore())...);
 }
 
 /**
@@ -23,9 +24,11 @@ void Wait(Future<V, E>&... fs) {
  * \param begin Iterator to futures to wait
  * \param end Iterator to futures to wait
  */
-template <typename Iterator>
-std::enable_if_t<!is_future_v<Iterator>, void> Wait(Iterator begin, Iterator end) {
-  detail::WaitIters(detail::NoTimeoutTag{}, begin, begin, end);
+template <typename Event = detail::DefaultEvent, typename It>
+std::enable_if_t<!is_future_v<It>, void> Wait(It begin, It end) {
+  // We don't use std::distance because we want to alert the user to the fact that it can be expensive.
+  // Maybe the user has the size of the range, otherwise it is suggested to call Wait*(..., begin, distance(begin, end))
+  detail::WaitIterator<Event>(detail::NoTimeoutTag{}, begin, end - begin);
 }
 
 /**
@@ -34,9 +37,9 @@ std::enable_if_t<!is_future_v<Iterator>, void> Wait(Iterator begin, Iterator end
  * \param begin Iterator to futures to wait
  * \param size count of futures to wait
  */
-template <typename Iterator>
-void Wait(Iterator begin, std::size_t size) {
-  detail::WaitIters(detail::NoTimeoutTag{}, begin, std::size_t{0}, size);
+template <typename Event = detail::DefaultEvent, typename It>
+void Wait(It begin, std::size_t size) {
+  detail::WaitIterator<Event>(detail::NoTimeoutTag{}, begin, size);
 }
 
 }  // namespace yaclib

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <yaclib/config.hpp>
+
 #ifdef YACLIB_FAULT
 
 #  include <yaclib/fault/detail/random/random_device.hpp>

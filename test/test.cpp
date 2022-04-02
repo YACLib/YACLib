@@ -23,7 +23,7 @@ int main(int argc, char** argv) {
   });
   yaclib::SetInfoCallback([](std::string_view file, std::size_t line, std::string_view function,
                              std::string_view /*condition*/, std::string_view message) {
-    std::cerr << "[          ] [ INFO ] " << message << " in" << file << ":" << line << ":" << function << '\n';
+    std::cerr << message << " in " << file << ":" << line << '\n';
   });
   yaclib::SetFrequency(8);
   yaclib::SetSleepTime(200);

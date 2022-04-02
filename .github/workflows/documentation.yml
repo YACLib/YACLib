@@ -11,10 +11,10 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Build
-        uses: mattnotmitt/doxygen-action@v1.9.2
+        uses: mattnotmitt/doxygen-action@v1.9.3
         with:
           doxyfile-path: ./doc/doxygen/Doxyfile
           working-directory: .

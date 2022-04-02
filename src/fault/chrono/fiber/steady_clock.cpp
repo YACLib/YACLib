@@ -1,3 +1,4 @@
+#include <yaclib/config.hpp>
 #include <yaclib/fault/detail/chrono/steady_clock.hpp>
 
 namespace yaclib::detail {

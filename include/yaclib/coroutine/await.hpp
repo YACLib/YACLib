@@ -1,6 +1,7 @@
 #pragma once
 
 #include <yaclib/async/future.hpp>
+#include <yaclib/config.hpp>
 #include <yaclib/coroutine/detail/coroutine.hpp>
 #include <yaclib/coroutine/detail/future_awaiter.hpp>
 #include <yaclib/util/detail/atomic_counter.hpp>
