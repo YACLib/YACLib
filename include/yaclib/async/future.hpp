@@ -180,19 +180,19 @@ class Future final {
 
 extern template class Future<void, StopError>;
 
-template <typename E = StopError>
-Future<void, E> MakeFuture() {
-  return {MakeIntrusive<detail::ResultCore<void, E>>(Unit{})};
-}
-
-template <typename T, typename E = StopError, typename V = std::remove_reference_t<T>>
-Future<V, E> MakeFuture(T&& value) {
-  return {MakeIntrusive<detail::ResultCore<V, E>>(std::forward<T>(value))};
-}
-
-template <typename V, typename E = StopError, typename T>
-std::enable_if_t<!std::is_same_v<V, std::remove_reference_t<T>>, Future<V, E>> MakeFuture(T&& value) {
-  return {MakeIntrusive<detail::ResultCore<V, E>>(std::forward<T>(value))};
+template <typename V = void, typename E = StopError, typename... Args>
+auto MakeFuture(Args&&... args) {
+  if constexpr (sizeof...(Args) == 0) {
+    static_assert(std::is_void_v<V>);
+    return Future{MakeIntrusive<detail::ResultCore<V, E>>(Unit{})};
+  } else if constexpr (sizeof...(Args) == 1) {
+    using T = std::conditional_t<std::is_void_v<V>, head_t<Args...>, V>;
+    static_assert(!std::is_void_v<T>);
+    return Future{MakeIntrusive<detail::ResultCore<T, E>>(std::forward<Args>(args)...)};
+  } else {
+    static_assert(!std::is_void_v<V>);
+    return Future{MakeIntrusive<detail::ResultCore<V, E>>(std::forward<Args>(args)...)};
+  }
 }
 
 }  // namespace yaclib

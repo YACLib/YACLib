@@ -4,9 +4,17 @@
 
 namespace yaclib::detail {
 
-template <typename Functor, typename... Arg>
+template <typename...>
+struct Head;
+
+template <typename T, typename... Args>
+struct Head<T, Args...> {
+  using Type = T;
+};
+
+template <typename Functor, typename... Args>
 struct IsInvocable {
-  static constexpr bool Value = std::is_invocable_v<Functor, Arg...>;
+  static constexpr bool Value = std::is_invocable_v<Functor, Args...>;
 };
 
 template <typename Functor>

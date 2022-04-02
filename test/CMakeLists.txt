@@ -47,6 +47,7 @@ set(YACLIB_UNIT_SOURCES
   unit/util/intrusive_ptr
   unit/util/result
   unit/executor/task
+  unit/async/make_future
   unit/async/get
   unit/async/future
   unit/async/future_inline

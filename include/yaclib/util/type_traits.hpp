@@ -8,6 +8,9 @@
 
 namespace yaclib {
 
+template <typename... Args>
+using head_t = typename detail::Head<Args...>::Type;
+
 template <typename Functor, typename... Arg>
 inline constexpr bool is_invocable_v = detail::IsInvocable<Functor, Arg...>::Value;
 
@@ -40,6 +43,7 @@ constexpr bool Check() noexcept {
   static_assert(!is_result_v<T>, "T cannot be Result, because it's ambiguous");
   static_assert(!is_future_v<T>, "T cannot be Future, because it's ambiguous");
   static_assert(!std::is_same_v<T, std::exception_ptr>, "T cannot be std::exception_ptr, because it's ambiguous");
+  static_assert(!std::is_same_v<T, Unit>, "T cannot be Unit, because Unit for internal instead of void usage");
   return true;
 }
 
