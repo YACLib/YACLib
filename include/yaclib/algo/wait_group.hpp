@@ -1,8 +1,10 @@
 #pragma once
 
-#include <yaclib/async/detail/wait_core.hpp>
 #include <yaclib/async/future.hpp>
+#include <yaclib/config.hpp>
 #include <yaclib/util/detail/atomic_counter.hpp>
+#include <yaclib/util/detail/event_deleter.hpp>
+#include <yaclib/util/detail/mutex_event.hpp>
 
 #include <cassert>
 
@@ -32,7 +34,7 @@ class WaitGroup {
  private:
   void Add(detail::BaseCore& core);
 
-  detail::AtomicCounter<detail::WaitCore, detail::WaitCoreDeleter> _callback{1};
+  detail::AtomicCounter<detail::DefaultEvent, detail::EventDeleter> _event{1};
 };
 
 }  // namespace yaclib

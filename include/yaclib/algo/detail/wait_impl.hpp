@@ -1,10 +1,15 @@
 #pragma once
 
 #include <yaclib/async/detail/base_core.hpp>
-#include <yaclib/async/detail/wait_core.hpp>
+#include <yaclib/config.hpp>
 #include <yaclib/fault/atomic.hpp>
 #include <yaclib/util/detail/atomic_counter.hpp>
+#include <yaclib/util/detail/event_deleter.hpp>
+#include <yaclib/util/detail/mutex_event.hpp>
 #include <yaclib/util/type_traits.hpp>
+#ifdef YACLIB_ATOMIC_EVENT
+#  include <yaclib/util/detail/atomic_event.hpp>
+#endif
 
 #include <cstddef>
 #include <iterator>
@@ -14,70 +19,72 @@ namespace yaclib::detail {
 
 struct NoTimeoutTag {};
 
-template <typename Timeout, typename Range>
-bool WaitRange(const Timeout& t, const Range& range, std::size_t count) {
-  AtomicCounter<WaitCore, WaitCoreDeleter> wait_core{count + 1};
-  // wait_core ref counter = n + 1, it is optimization: we don't want to notify when return true immediately
+template <typename Event, typename Timeout, typename Range>
+bool WaitRange(const Timeout& timeout, const Range& range, std::size_t count) {
+  AtomicCounter<Event, EventDeleter> event{count + 1};
+  // event ref counter = n + 1, it is optimization: we don't want to notify when return true immediately
   auto const wait_count = range([&](detail::BaseCore& core) {
-    return core.Empty() && core.SetWait(wait_core);
+    return core.Empty() && core.SetWait(event);
   });
-  if (wait_count == 0 || wait_core.SubEqual(count - wait_count + 1)) {
+  if (wait_count == 0 || event.SubEqual(count - wait_count + 1)) {
     return true;
   }
-  std::unique_lock lock{wait_core.m};
+  auto token = event.Make();
   std::size_t reset_count = 0;
   if constexpr (!std::is_same_v<Timeout, NoTimeoutTag>) {
     // If you have problem with TSAN here, check this link: https://github.com/google/sanitizers/issues/1259
     // TLDR: new pthread function is not supported by thread sanitizer yet.
-    if (wait_core.Wait(lock, t)) {
+    if (event.Wait(token, timeout)) {
       return true;
     }
     reset_count = range([](detail::BaseCore& core) {
       return core.ResetWait();
     });
-    if (reset_count != 0 && (reset_count == wait_count || wait_core.SubEqual(reset_count))) {
+    if (reset_count != 0 && (reset_count == wait_count || event.SubEqual(reset_count))) {
       return false;
     }
-    // We know we have Result, but we must wait until wait_core was not used by cs
+    // We know we have `wait_count - reset_count` Results, but we must wait until event was not used by cores
   }
-  wait_core.Wait(lock);
+  event.Wait(token);
   return reset_count == 0;
 }
 
-template <typename Timeout, typename... Cores>
-bool WaitCores(const Timeout& t, Cores&... cs) {
-  static_assert(sizeof...(cs) >= 1, "Number of futures must be at least one");
+template <typename Event, typename Timeout, typename... Cores>
+bool WaitCore(const Timeout& timeout, Cores&... cores) {
+  static_assert(sizeof...(cores) >= 1, "Number of futures must be at least one");
   static_assert((... && std::is_same_v<detail::BaseCore, Cores>), "Futures must be Future in Wait function");
   auto range = [&](auto&& functor) {
-    return (... + static_cast<std::size_t>(functor(cs)));
+    return (... + static_cast<std::size_t>(functor(cores)));
   };
-  return WaitRange(t, range, sizeof...(cs));
+  return WaitRange<Event>(timeout, range, sizeof...(cores));
 }
 
-extern template bool WaitCores<NoTimeoutTag, BaseCore>(const NoTimeoutTag&, BaseCore&);
-
-template <typename Timeout, typename ValueIt, typename RangeIt>
-bool WaitIters(const Timeout& t, ValueIt it, RangeIt begin, RangeIt end) {
-  static_assert(is_future_v<typename std::iterator_traits<ValueIt>::value_type>,
+template <typename Event, typename Timeout, typename Iterator>
+bool WaitIterator(const Timeout& timeout, Iterator it, std::size_t size) {
+  static_assert(is_future_v<typename std::iterator_traits<Iterator>::value_type>,
                 "Wait function Iterator must be point to some Future");
-  // We don't use std::distance because we want to alert the user to the fact that it can be expensive.
-  // Maybe the user has the size of the range, otherwise it is suggested to call Wait*(..., begin, distance(begin, end))
-  auto const size = end - begin;
   if (size == 0) {
     return true;
   }
   auto range = [&](auto&& functor) {
     auto temp_it = it;
-    auto temp_begin = begin;
     std::size_t count = 0;
-    while (temp_begin != end) {
+    for (std::size_t i = 0; i != size; ++i) {
       count += static_cast<std::size_t>(functor(*temp_it->GetCore()));
       ++temp_it;
-      ++temp_begin;
     }
     return count;
   };
-  return WaitRange(t, range, size);
+  return WaitRange<Event>(timeout, range, size);
 }
+
+extern template bool WaitCore<detail::MutexEvent, NoTimeoutTag, BaseCore>(const NoTimeoutTag&, BaseCore&);
+
+#ifdef YACLIB_ATOMIC_EVENT
+extern template bool WaitCore<detail::AtomicEvent, NoTimeoutTag, BaseCore>(const NoTimeoutTag&, BaseCore&);
+using DefaultEvent = AtomicEvent;
+#else
+using DefaultEvent = MutexEvent;
+#endif
 
 }  // namespace yaclib::detail

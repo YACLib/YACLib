@@ -8,7 +8,9 @@ list(APPEND YACLIB_INCLUDES
   )
 list(APPEND YACLIB_HEADERS
   ${YACLIB_INCLUDE_DIR}/util/detail/atomic_counter.hpp
+  ${YACLIB_INCLUDE_DIR}/util/detail/event_deleter.hpp
   ${YACLIB_INCLUDE_DIR}/util/detail/intrusive_ptr_impl.hpp
+  ${YACLIB_INCLUDE_DIR}/util/detail/mutex_event.hpp
   ${YACLIB_INCLUDE_DIR}/util/detail/node.hpp
   ${YACLIB_INCLUDE_DIR}/util/detail/nope_counter.hpp
   ${YACLIB_INCLUDE_DIR}/util/detail/safe_call.hpp
@@ -19,6 +21,16 @@ list(APPEND YACLIB_HEADERS
 list(APPEND YACLIB_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/intrusive_list.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/mpsc_stack.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/mutex_event.cpp
   )
+
+if (YACLIB_ATOMIC_EVENT)
+  list(APPEND YACLIB_HEADERS
+    ${YACLIB_INCLUDE_DIR}/util/detail/atomic_event.hpp
+    )
+  list(APPEND YACLIB_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/atomic_event.cpp
+    )
+endif ()
 
 add_files()
