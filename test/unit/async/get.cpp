@@ -58,9 +58,12 @@ TEST(Get, FulFillTimeout2) {
 }
 
 TEST(Dummy, SetStop) {
-  auto ptr = yaclib::MakeIntrusive<yaclib::detail::ResultCore<int, yaclib::StopTag>>(42);
-  ptr->SetStop();
-
-  auto ptr2 = yaclib::MakeIntrusive<yaclib::detail::ResultCore<yaclib::detail::SubscribeTag, yaclib::StopTag>>();
-  ptr2->SetStop();
+  {
+    auto core = yaclib::MakeIntrusive<yaclib::detail::ResultCore<int, yaclib::StopError>>(42);
+    core->SetStop();
+  }
+  {
+    auto core = yaclib::MakeIntrusive<yaclib::detail::ResultCore<void, void>>();
+    core->SetStop();
+  }
 }

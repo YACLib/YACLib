@@ -89,7 +89,7 @@ function(yaclib_add_test TEST_NAME)
     )
   target_link_libraries(${TEST_NAME}
     PRIVATE GTest::gtest
-    PRIVATE ${PROJECT_NAME}
+    PRIVATE yaclib
     )
   target_include_directories(${TEST_NAME}
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
@@ -100,7 +100,7 @@ endfunction()
 
 if (WARN IN_LIST YACLIB_FLAGS)
   include(yaclib_warn_test)
-  message("test warnings: ${YACLIB_WARN}")
+  message("YACLib/test warnings: ${YACLIB_WARN}")
 endif ()
 
 if (YACLIB_TEST STREQUAL "SINGLE")
