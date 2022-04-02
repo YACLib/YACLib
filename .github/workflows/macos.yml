@@ -31,7 +31,7 @@ jobs:
             build_type: RelWithDebInfo
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Update deps on macOS
         run: |
@@ -88,17 +88,17 @@ jobs:
 
               pwd
             
-              cmake -S . -B $dir                            \
-                -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-                -DYACLIB_CXX_STANDARD=17                    \
-                -DYACLIB_TEST=SINGLE                        \
-                -DYACLIB_FLAGS="CORO"                       \
-                -DCMAKE_C_COMPILER=${c_compilers[$i]}       \
-                -DCMAKE_CXX_COMPILER=${cxx_compilers[$i]}   \
-                -G"Ninja"                                   \
-                -DYACLIB_LINK_OPTIONS="$link_option"        \
-                -DYACLIB_COMPILE_OPTIONS="$compile_option"  \
-                -DYACLIB_LOG="ERROR"                        \
+              cmake -S . -B $dir                                                                                       \
+                -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}                                                            \
+                -DYACLIB_CXX_STANDARD=17                                                                               \
+                -DYACLIB_TEST=SINGLE                                                                                   \
+                -DYACLIB_FLAGS="CORO"                                                                                  \
+                -DCMAKE_C_COMPILER=${c_compilers[$i]}                                                                  \
+                -DCMAKE_CXX_COMPILER=${cxx_compilers[$i]}                                                              \
+                -G"Ninja"                                                                                              \
+                -DYACLIB_LINK_OPTIONS="$link_option"                                                                   \
+                -DYACLIB_COMPILE_OPTIONS="$compile_option"                                                             \
+                -DYACLIB_LOG="ERROR"                                                                                   \
                 -DYACLIB_DEFINITIONS="YACLIB_CI_SLOWDOWN=8"
 
             done

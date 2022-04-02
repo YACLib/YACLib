@@ -94,7 +94,7 @@ jobs:
       YACLIB_FAULT: 'OFF ON'
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Update deps on Linux
         if: ${{ matrix.os == 'ubuntu-20.04' }}
@@ -103,8 +103,25 @@ jobs:
           sudo wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
           sudo add-apt-repository "deb http://apt.llvm.org/focal/     llvm-toolchain-focal-14   main"
           sudo apt-get update
-          sudo apt-get install ninja-build gcc-11 g++-11 clang-14 lld-14 libc++-14-dev libc++abi-14-dev googletest
+          sudo apt-get install ninja-build googletest                                                                  \
+                               gcc-11 g++-11 libstdc++-11-dev                                                          \
+                               clang-14 lld-14 libc++-14-dev libc++abi-14-dev
           sudo ln -sf /usr/bin/lld-14 /usr/local/bin/ld
+
+          sudo update-alternatives                                                                                     \
+            --install /usr/bin/gcc        gcc        /usr/bin/gcc-11        200                                        \
+            --slave   /usr/bin/g++        g++        /usr/bin/g++-11                                                   \
+            --slave   /usr/bin/gcc-ar     gcc-ar     /usr/bin/gcc-ar-11                                                \
+            --slave   /usr/bin/gcc-nm     gcc-nm     /usr/bin/gcc-nm-11                                                \
+            --slave   /usr/bin/gcc-ranlib gcc-ranlib /usr/bin/gcc-ranlib-11                                            \
+            --slave   /usr/bin/gcov       gcov       /usr/bin/gcov-11                                                  \
+            --slave   /usr/bin/gcov-tool  gcov-tool  /usr/bin/gcov-tool-11                                             \
+            --slave   /usr/bin/gcov-dump  gcov-dump  /usr/bin/gcov-dump-11
+          sudo update-alternatives --auto gcc
+
+          sudo update-alternatives                                                                                     \
+            --install /usr/bin/cpp        cpp        /usr/bin/cpp-11        200
+          sudo update-alternatives --auto cpp
 
       - name: Update deps on macOS
         if: ${{ matrix.os == 'macos-11' }}
@@ -141,8 +158,9 @@ jobs:
             )
             slowdown=8
           else
-            c_compilers=(clang-14 gcc-11)
-            cxx_compilers=(clang++-14 g++-11)
+            flags="$flags;ATOMIC_EVENT"
+            c_compilers=(clang-14 gcc)
+            cxx_compilers=(clang++-14 g++)
             link_options=(
               "-stdlib=libc++;-lc++abi"
               "-stdlib=libstdc++"
@@ -191,18 +209,18 @@ jobs:
                 dir="build_${compilers_name[$i]}_${stdlibs_name[$j]}_fault_${yaclib_fault}"
                 echo $dir
 
-                cmake -S . -B $dir                                   \
-                  -DCMAKE_BUILD_TYPE=$build_type                     \
-                  -DYACLIB_CXX_STANDARD=20                           \
-                  -DYACLIB_TEST=SINGLE                               \
-                  -DYACLIB_FLAGS="CORO;$flags"                       \
-                  -DCMAKE_C_COMPILER=${c_compilers[$i]}              \
-                  -DCMAKE_CXX_COMPILER=${cxx_compilers[$i]}          \
-                  -G"Ninja"                                          \
-                  -DYACLIB_LINK_OPTIONS="$link_option"               \
-                  -DYACLIB_COMPILE_OPTIONS="$compile_option"         \
-                  -DYACLIB_FAULT=$yaclib_fault                       \
-                  -DYACLIB_LOG="ERROR"                               \
+                cmake -S . -B $dir                                                                                     \
+                  -DCMAKE_BUILD_TYPE=$build_type                                                                       \
+                  -DYACLIB_CXX_STANDARD=20                                                                             \
+                  -DYACLIB_TEST=SINGLE                                                                                 \
+                  -DYACLIB_FLAGS="CORO;$flags"                                                                         \
+                  -DCMAKE_C_COMPILER=${c_compilers[$i]}                                                                \
+                  -DCMAKE_CXX_COMPILER=${cxx_compilers[$i]}                                                            \
+                  -G"Ninja"                                                                                            \
+                  -DYACLIB_LINK_OPTIONS="$link_option"                                                                 \
+                  -DYACLIB_COMPILE_OPTIONS="$compile_option"                                                           \
+                  -DYACLIB_FAULT=$yaclib_fault                                                                         \
+                  -DYACLIB_LOG="ERROR"                                                                                 \
                   -DYACLIB_DEFINITIONS="YACLIB_CI_SLOWDOWN=$slowdown"
 
               done
@@ -233,11 +251,11 @@ jobs:
               dir="build_${names[$i]}_fault_${yaclib_fault}"
               echo $dir
 
-              cmake -S . -B $dir         \
-                -DYACLIB_CXX_STANDARD=20 \
-                -DYACLIB_TEST=SINGLE     \
-                -DYACLIB_FLAGS=$flags    \
-                -G"${generators[$i]}"    \
+              cmake -S . -B $dir                                                                                       \
+                -DYACLIB_CXX_STANDARD=20                                                                               \
+                -DYACLIB_TEST=SINGLE                                                                                   \
+                -DYACLIB_FLAGS="$flags"                                                                                \
+                -G"${generators[$i]}"                                                                                  \
                 ${options[$i]}
 
             done

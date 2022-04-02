@@ -22,7 +22,10 @@ https://github.com/YACLib/YACLib/actions/workflows/windows.yml)
 https://github.com/YACLib/YACLib/actions/workflows/sanitizer.yml/badge.svg?branch=main)](
 https://github.com/YACLib/YACLib/actions/workflows/sanitizer.yml)
 
-[![Test coverage](
+[![Test coverage: coveralls](
+https://coveralls.io/repos/github/YACLib/YACLib/badge.svg?branch=main)](
+https://coveralls.io/github/YACLib/YACLib?branch=main)
+[![Test coverage: codecov](
 https://codecov.io/gh/YACLib/YACLib/branch/main/graph/badge.svg)](
 https://codecov.io/gh/YACLib/YACLib)
 [![Codacy Badge](

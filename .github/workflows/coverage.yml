@@ -9,8 +9,6 @@ on:
     paths-ignore: [ 'doc/**', '**.md' ]
 
 jobs:
-  # TODO(MBkkt) Use gcc-11, now doesn't work in CI, only locally.
-
   main:
     runs-on: ubuntu-20.04
 
@@ -18,31 +16,54 @@ jobs:
       YACLIB_FAULT: 'OFF ON'
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install pip ninja-build lld gcc-10 g++-10 lcov
+          sudo apt-get install pip ninja-build lld gcc-11 g++-11 libstdc++-11-dev lcov
           sudo ln -sf /usr/local/bin/ld /usr/bin/lld
           sudo pip install -U gcovr
 
+          sudo update-alternatives                                                                                     \
+            --install /usr/bin/gcc        gcc        /usr/bin/gcc-11        200                                        \
+            --slave   /usr/bin/g++        g++        /usr/bin/g++-11                                                   \
+            --slave   /usr/bin/gcc-ar     gcc-ar     /usr/bin/gcc-ar-11                                                \
+            --slave   /usr/bin/gcc-nm     gcc-nm     /usr/bin/gcc-nm-11                                                \
+            --slave   /usr/bin/gcc-ranlib gcc-ranlib /usr/bin/gcc-ranlib-11                                            \
+            --slave   /usr/bin/gcov       gcov       /usr/bin/gcov-11                                                  \
+            --slave   /usr/bin/gcov-tool  gcov-tool  /usr/bin/gcov-tool-11                                             \
+            --slave   /usr/bin/gcov-dump  gcov-dump  /usr/bin/gcov-dump-11
+          sudo update-alternatives --auto gcc
+
+          sudo update-alternatives                                                                                     \
+            --install /usr/bin/cpp        cpp        /usr/bin/cpp-11        200
+          sudo update-alternatives --auto cpp
+
+          gcc --version; gcov --version
+
       - name: Configure CMake
         run: |
+          wait_type=""
           for yaclib_fault in ${YACLIB_FAULT[*]}; do
             dir="build_fault_${yaclib_fault}"
             echo $dir
           
-            cmake -S . -B $dir                                                   \
-              -G "Ninja"                                                         \
-              -DCMAKE_BUILD_TYPE=Debug                                           \
-              -DCMAKE_C_COMPILER=gcc-10                                          \
-              -DCMAKE_CXX_COMPILER=g++-10                                        \
-              -DYACLIB_FAULT=$yaclib_fault                                       \
-              -DYACLIB_TEST=SINGLE                                               \
-              -DYACLIB_FLAGS="COVERAGE;CORO"                                     \
-              -DYACLIB_CXX_STANDARD=20     
-          
+            cmake -S . -B $dir                                                                                         \
+              -G "Ninja"                                                                                               \
+              -DCMAKE_BUILD_TYPE=Debug                                                                                 \
+              -DCMAKE_C_COMPILER=gcc                                                                                   \
+              -DCMAKE_CXX_COMPILER=g++                                                                                 \
+              -DYACLIB_FAULT=$yaclib_fault                                                                             \
+              -DYACLIB_TEST=SINGLE                                                                                     \
+              -DYACLIB_FLAGS="COVERAGE;CORO;$wait_type"                                                                \
+              -DYACLIB_CXX_STANDARD=20
+
+            if [[ "$wait_type" == "" ]]; then
+              wait_type="ATOMIC_EVENT"
+            else
+              wait_type=""
+            fi
           done
 
       - name: Build
@@ -72,21 +93,28 @@ jobs:
             echo $dir
           
             cd $dir
-            lcov --rc lcov_branch_coverage=1 -d . -c                       -o lcov_cond.info
-            lcov --rc lcov_branch_coverage=1 -r lcov_cond.info "/usr/*"    -o lcov_cond.info
-            lcov --rc lcov_branch_coverage=1 -r lcov_cond.info "*/_deps/*" -o lcov_cond.info
-            lcov --rc lcov_branch_coverage=1 -r lcov_cond.info "*/fault/*" -o lcov_cond.info
-            lcov --rc lcov_branch_coverage=1 -r lcov_cond.info "*/test/*"  -o lcov_cond.info
-            lcov                             -r lcov_cond.info             -o lcov.info
-            lcov --rc lcov_branch_coverage=1 --list lcov_cond.info
+            lcov --rc lcov_branch_coverage=1 -d . -c                  -o lcov.info
+            lcov --rc lcov_branch_coverage=1 -r lcov.info "/usr/*"    -o lcov.info
+            lcov --rc lcov_branch_coverage=1 -r lcov.info "*/_deps/*" -o lcov.info
+            lcov --rc lcov_branch_coverage=1 -r lcov.info "*/fault/*" -o lcov.info
+            lcov --rc lcov_branch_coverage=1 -r lcov.info "*/test/*"  -o lcov.info
             cd ..
           done
           
-          lcov --add-tracefile build_fault_ON/lcov.info --add-tracefile build_fault_OFF/lcov.info --output-file ./total.info
+          lcov --rc lcov_branch_coverage=1                                                                             \
+            --add-tracefile ./build_fault_ON/lcov.info                                                                 \
+            --add-tracefile ./build_fault_OFF/lcov.info                                                                \
+            --output-file   ./total.info
           lcov --rc lcov_branch_coverage=1 --list ./total.info
 
-      - name: codecov
-        uses: codecov/codecov-action@v2.0.3
+      - name: Coveralls
+        uses: coverallsapp/github-action@v1.1.2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: ./total.info
+
+      - name: Codecov
+        uses: codecov/codecov-action@v2.1.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: ./total.info
