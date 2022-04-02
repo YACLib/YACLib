@@ -57,7 +57,8 @@ jobs:
               -DYACLIB_FAULT=$yaclib_fault                                                                             \
               -DYACLIB_TEST=SINGLE                                                                                     \
               -DYACLIB_FLAGS="COVERAGE;CORO;$wait_type"                                                                \
-              -DYACLIB_CXX_STANDARD=20
+              -DYACLIB_CXX_STANDARD=20                                                                                 \
+              -DYACLIB_COMPILE_OPTIONS="-O1;-fno-inline"
 
             if [[ "$wait_type" == "" ]]; then
               wait_type="ATOMIC_EVENT"
@@ -86,35 +87,35 @@ jobs:
             cd ..
           done
 
-      - name: Collect lcov info
+      - name: Collect with gcovr
         run: |
           for yaclib_fault in ${YACLIB_FAULT[*]}; do
             dir="build_fault_${yaclib_fault}"
             echo $dir
           
             cd $dir
-            lcov --rc lcov_branch_coverage=1 -d . -c                  -o lcov.info
-            lcov --rc lcov_branch_coverage=1 -r lcov.info "/usr/*"    -o lcov.info
-            lcov --rc lcov_branch_coverage=1 -r lcov.info "*/_deps/*" -o lcov.info
-            lcov --rc lcov_branch_coverage=1 -r lcov.info "*/fault/*" -o lcov.info
-            lcov --rc lcov_branch_coverage=1 -r lcov.info "*/test/*"  -o lcov.info
+            gcovr                                                                                                      \ 
+              --root=".."                                                                                              \
+              --exclude="/usr/*"                                                                                       \          
+              --exclude="*/_deps/*"                                                                                    \          
+              --exclude="*/test/*"                                                                                     \          
+              --exclude="*/fault/*"                                                                                    \          
+              --exclude-unreachable-branches                                                                           \
+              --exclude-throw-branches                                                                                 \
+              --gcov-executable="gcov"                                                                                 \
+              --json="./coverage_data.json"
             cd ..
           done
-          
-          lcov --rc lcov_branch_coverage=1                                                                             \
-            --add-tracefile ./build_fault_ON/lcov.info                                                                 \
-            --add-tracefile ./build_fault_OFF/lcov.info                                                                \
-            --output-file   ./total.info
-          lcov --rc lcov_branch_coverage=1 --list ./total.info
+
+          gcovr                                                                                                        \
+            --add-tracefile="./build_fault_OFF/coverage_data.json"                                                     \
+            --add-tracefile="./build_fault_ON/coverage_data.json"                                                      \
+            --coveralls-pretty="./total.coveralls.json"
+
+          cat ./total.coveralls.json
 
       - name: Coveralls
         uses: coverallsapp/github-action@v1.1.2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          path-to-lcov: ./total.info
-
-      - name: Codecov
-        uses: codecov/codecov-action@v2.1.0
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          file: ./total.info
+          path-to-lcov: ./total.coveralls.json
