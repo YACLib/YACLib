@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-20.04
 
     env:
-      YACLIB_FAULT: 'OFF ON'
+      YACLIB_FAULT: 'OFF'
 
     steps:
       - uses: actions/checkout@v3
@@ -94,9 +94,7 @@ jobs:
             echo $dir
           
             cd $dir
-            gcovr .                                                                                                    \ 
-              --root=".."                                                                                              \
-              --exclude="/usr/*"                                                                                       \          
+            gcovr --exclude="/usr/*"                                                                                       \          
               --exclude="*/_deps/*"                                                                                    \          
               --exclude="*/test/*"                                                                                     \          
               --exclude="*/fault/*"                                                                                    \          
