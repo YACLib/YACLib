@@ -2,6 +2,7 @@
 
 #include <yaclib/async/detail/core.hpp>
 #include <yaclib/async/future.hpp>
+#include <yaclib/config.hpp>
 #include <yaclib/executor/executor.hpp>
 #include <yaclib/log.hpp>
 #include <yaclib/util/type_traits.hpp>

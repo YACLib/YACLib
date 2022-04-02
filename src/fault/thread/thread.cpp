@@ -1,3 +1,4 @@
+#include <yaclib/config.hpp>
 #include <yaclib/fault/detail/thread/thread.hpp>
 #include <yaclib/fault/thread.hpp>
 

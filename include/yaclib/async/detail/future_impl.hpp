@@ -2,6 +2,7 @@
 
 #include <yaclib/algo/wait.hpp>
 #include <yaclib/async/detail/core.hpp>
+#include <yaclib/config.hpp>
 #include <yaclib/log.hpp>
 
 namespace yaclib {

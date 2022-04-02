@@ -1,6 +1,7 @@
 #pragma once
 
 #include <yaclib/async/future.hpp>
+#include <yaclib/config.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 
 #include <cstddef>

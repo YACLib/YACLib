@@ -1,5 +1,6 @@
 #pragma once
 
+#include <yaclib/config.hpp>
 #include <yaclib/util/detail/node.hpp>
 #include <yaclib/util/func.hpp>
 

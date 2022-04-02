@@ -3,6 +3,7 @@
 #include <yaclib/algo/when_policy.hpp>
 #include <yaclib/async/detail/result_core.hpp>
 #include <yaclib/async/future.hpp>
+#include <yaclib/config.hpp>
 #include <yaclib/fault/atomic.hpp>
 #include <yaclib/log.hpp>
 

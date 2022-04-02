@@ -1,5 +1,6 @@
 #pragma once
 
+#include <yaclib/config.hpp>
 #include <yaclib/coroutine/detail/coroutine.hpp>
 
 namespace yaclib::detail {

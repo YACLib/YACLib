@@ -4,6 +4,7 @@
 #include <yaclib/algo/detail/when_impl.hpp>
 #include <yaclib/algo/when_policy.hpp>
 #include <yaclib/async/future.hpp>
+#include <yaclib/config.hpp>
 #include <yaclib/util/type_traits.hpp>
 
 #include <cstddef>

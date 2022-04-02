@@ -1,5 +1,6 @@
 #pragma once
 
+#include <yaclib/config.hpp>
 #include <yaclib/executor/task.hpp>
 
 namespace yaclib::detail {

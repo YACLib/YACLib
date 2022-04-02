@@ -1,4 +1,5 @@
 #include <yaclib/async/promise.hpp>
+#include <yaclib/config.hpp>
 
 namespace yaclib {
 

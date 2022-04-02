@@ -1,3 +1,4 @@
+#include <yaclib/config.hpp>
 #include <yaclib/executor/executor.hpp>
 #include <yaclib/executor/inline.hpp>
 #include <yaclib/executor/task.hpp>

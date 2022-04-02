@@ -1,5 +1,6 @@
 #pragma once
 
+#include <yaclib/config.hpp>
 #include <yaclib/fault/chrono.hpp>
 
 #ifdef YACLIB_FAULT

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <yaclib/config.hpp>
+
 #include <string_view>
 
 namespace yaclib {

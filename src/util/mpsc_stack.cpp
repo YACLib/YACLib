@@ -1,5 +1,6 @@
 #include <util/mpsc_stack.hpp>
 
+#include <yaclib/config.hpp>
 #include <yaclib/util/detail/node.hpp>
 
 namespace yaclib::detail {

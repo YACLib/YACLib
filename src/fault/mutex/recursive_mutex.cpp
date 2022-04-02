@@ -1,3 +1,4 @@
+#include <yaclib/config.hpp>
 #include <yaclib/fault/detail/mutex/recursive_mutex.hpp>
 
 // TODO(myannyax) avoid copypaste from recursive_timed_mutex

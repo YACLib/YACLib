@@ -1,5 +1,7 @@
 #pragma once
 
+#include <yaclib/config.hpp>
+
 #include <random>
 #include <string>
 

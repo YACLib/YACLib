@@ -1,5 +1,7 @@
 #include <util/intrusive_list.hpp>
 
+#include <yaclib/config.hpp>
+
 #include <utility>
 
 namespace yaclib::detail {

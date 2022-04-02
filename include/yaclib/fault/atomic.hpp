@@ -1,5 +1,10 @@
 #pragma once
 
+#include <yaclib/config.hpp>
+
+#include <cstddef>
+#include <cstdint>
+
 #ifdef YACLIB_FAULT
 
 #  include <yaclib/fault/detail/atomic/atomic.hpp>

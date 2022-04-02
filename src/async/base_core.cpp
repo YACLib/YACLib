@@ -1,5 +1,6 @@
 #include <yaclib/async/detail/base_core.hpp>
 #include <yaclib/async/detail/inline_core.hpp>
+#include <yaclib/config.hpp>
 #include <yaclib/executor/executor.hpp>
 #include <yaclib/executor/task.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>

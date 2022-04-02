@@ -1,5 +1,6 @@
 #pragma once
 
+#include <yaclib/config.hpp>
 #include <yaclib/coro_config.hpp>
 
 #if YACLIB_CORO_EXPERIMENTAL

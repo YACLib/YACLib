@@ -1,5 +1,6 @@
 #pragma once
 
+#include <yaclib/config.hpp>
 #include <yaclib/util/type_traits.hpp>
 
 #include <exception>

@@ -1,3 +1,4 @@
+#include <yaclib/config.hpp>
 #include <yaclib/fault/detail/random/random_device.hpp>
 
 namespace yaclib::detail {

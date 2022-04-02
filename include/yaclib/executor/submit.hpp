@@ -1,5 +1,6 @@
 #pragma once
 
+#include <yaclib/config.hpp>
 #include <yaclib/executor/detail/unique_task.hpp>
 #include <yaclib/executor/executor.hpp>
 

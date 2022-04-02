@@ -1,3 +1,4 @@
+#include <yaclib/config.hpp>
 #include <yaclib/fault/detail/inject_fault.hpp>
 
 namespace yaclib::detail {

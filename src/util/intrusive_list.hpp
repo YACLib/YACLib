@@ -1,5 +1,6 @@
 #pragma once
 
+#include <yaclib/config.hpp>
 #include <yaclib/executor/task.hpp>
 #include <yaclib/executor/thread_factory.hpp>
 #include <yaclib/util/detail/node.hpp>

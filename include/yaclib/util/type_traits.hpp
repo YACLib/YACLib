@@ -1,5 +1,6 @@
 #pragma once
 
+#include <yaclib/config.hpp>
 #include <yaclib/fwd.hpp>
 #include <yaclib/util/detail/type_traits_impl.hpp>
 
