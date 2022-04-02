@@ -21,7 +21,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install pip ninja-build lld gcc-11 g++-11 libstdc++-11-dev lcov
+          sudo apt-get install pip ninja-build lld gcc-11 g++-11 libstdc++-11-dev
           sudo ln -sf /usr/local/bin/ld /usr/bin/lld
           sudo pip install -U gcovr
 
@@ -94,7 +94,7 @@ jobs:
             echo $dir
           
             cd $dir
-            gcovr                                                                                                      \ 
+            gcovr .                                                                                                    \ 
               --root=".."                                                                                              \
               --exclude="/usr/*"                                                                                       \          
               --exclude="*/_deps/*"                                                                                    \          
@@ -103,7 +103,8 @@ jobs:
               --exclude-unreachable-branches                                                                           \
               --exclude-throw-branches                                                                                 \
               --gcov-executable="gcov"                                                                                 \
-              --json="./coverage_data.json"
+              --json-pretty="./coverage_data.json"
+            cat ./coverage_data.json
             cd ..
           done
 
