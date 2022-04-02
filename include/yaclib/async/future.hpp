@@ -104,7 +104,6 @@ class Future final {
   /**
    * Specify executor for continuation.
    */
-  Future& Via(IExecutorPtr executor) &;
   Future&& Via(IExecutorPtr executor) &&;
 
   /**

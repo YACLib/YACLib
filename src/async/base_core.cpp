@@ -14,7 +14,7 @@ void InlineCore::Call() noexcept {
 }
 void InlineCore::Cancel() noexcept {
 }
-void InlineCore::CallInline(InlineCore*, InlineCore::State) noexcept {
+void InlineCore::CallInline(InlineCore&, InlineCore::State) noexcept {
 }
 
 BaseCore::BaseCore(State state) noexcept : _state{state} {
@@ -23,7 +23,7 @@ BaseCore::BaseCore(State state) noexcept : _state{state} {
 void BaseCore::SetExecutor(IExecutorPtr executor) noexcept {
   _executor = std::move(executor);
 }
-IExecutorPtr BaseCore::GetExecutor() const noexcept {
+const IExecutorPtr& BaseCore::GetExecutor() const noexcept {
   return _executor;
 }
 
@@ -41,7 +41,7 @@ void BaseCore::SetCallbackInline(InlineCore& callback, bool async) noexcept {
   const auto new_state = State{static_cast<int>(State::HasCallbackInline) + static_cast<int>(async)};
   const auto old_state = _state.exchange(new_state, std::memory_order_acq_rel);
   if (old_state == State::HasResult) {  //  TODO(MBkkt) rel + fence(acquire) instead of acq_rel
-    static_cast<InlineCore&>(*_callback).CallInline(this, new_state);
+    static_cast<InlineCore&>(*_callback).CallInline(*this, new_state);
     Clean();
   }
 }

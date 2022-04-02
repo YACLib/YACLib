@@ -113,9 +113,10 @@ template <typename V, typename E, WhenPolicy P>
 class AnyCombinator : public AnyCombinatorBase<V, E, P>, public InlineCore {
   using Base = AnyCombinatorBase<V, E, P>;
 
-  void CallInline(InlineCore* context, State) noexcept final {
+  void CallInline(InlineCore& caller, State) noexcept final {
     if (Base::_core->Alive() && !Base::Done()) {
-      Base::Combine(std::move(static_cast<ResultCore<V, E>*>(context)->Get()));
+      auto& core = static_cast<ResultCore<V, E>&>(caller);
+      Base::Combine(std::move(core.Get()));
     }
   }
 

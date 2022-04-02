@@ -20,7 +20,7 @@ class InlineCore : public ITask {
   void Call() noexcept override;
   void Cancel() noexcept override;
 
-  virtual void CallInline(InlineCore*, State) noexcept;
+  virtual void CallInline(InlineCore&, State) noexcept;
 };
 
 }  // namespace yaclib::detail

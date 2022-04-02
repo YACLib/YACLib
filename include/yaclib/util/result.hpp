@@ -8,8 +8,6 @@
 
 namespace yaclib {
 
-struct Unit {};
-
 /**
  * Result states \see Result
  * \enum Empty, Value, Error, Exception
@@ -81,26 +79,37 @@ class Result {
   static_assert(!std::is_same_v<V, E>, "Result cannot be instantiated with same V and E, because it's ambiguous");
 
   using ValueT = std::conditional_t<std::is_void_v<V>, Unit, V>;
-  using VariantT = std::variant<ValueT, std::exception_ptr, E, std::monostate>;
-  using ConstValueRef = std::conditional_t<std::is_void_v<V>, void, const ValueT&>;
-  using MoveValue = std::conditional_t<std::is_void_v<V>, void, ValueT&&>;
+  using LetValue = std::conditional_t<std::is_void_v<V>, void, const ValueT&>;
+  using MutValue = std::conditional_t<std::is_void_v<V>, void, ValueT&&>;
+  using Variant = std::variant<ValueT, std::exception_ptr, E, std::monostate>;
 
  public:
-  Result(Result&& other) noexcept(std::is_nothrow_move_constructible_v<VariantT>) = default;
-  Result(const Result& other) noexcept(std::is_nothrow_copy_constructible_v<VariantT>) = default;
-  Result& operator=(Result&& other) noexcept(std::is_nothrow_move_assignable_v<VariantT>) = default;
-  Result& operator=(const Result& other) noexcept(std::is_nothrow_copy_assignable_v<VariantT>) = default;
+  Result(Result&& other) noexcept(std::is_nothrow_move_constructible_v<Variant>) = default;
+  Result(const Result& other) noexcept(std::is_nothrow_copy_constructible_v<Variant>) = default;
+  Result& operator=(Result&& other) noexcept(std::is_nothrow_move_assignable_v<Variant>) = default;
+  Result& operator=(const Result& other) noexcept(std::is_nothrow_copy_assignable_v<Variant>) = default;
+
+  template <typename... Args>
+  Result(Args&&... args) noexcept(std::is_nothrow_constructible_v<Variant, Args...>)
+      : _result{std::in_place_type_t<ValueT>{}, std::forward<Args>(args)...} {
+  }
+
+  Result(std::exception_ptr exception) noexcept
+      : _result{std::in_place_type_t<std::exception_ptr>{}, std::move(exception)} {
+  }
+
+  Result(E error) noexcept : _result{std::in_place_type_t<E>{}, std::move(error)} {
+  }
 
   Result() noexcept : _result{std::monostate{}} {
   }
 
-  template <typename U>
-  Result(U&& value) noexcept(std::is_nothrow_constructible_v<VariantT, U>) : _result{std::forward<U>(value)} {
+  Result(StopTag tag) noexcept : _result{std::in_place_type_t<E>{}, tag} {
   }
 
-  template <typename U>
-  Result& operator=(U&& value) noexcept(std::is_nothrow_assignable_v<VariantT, U>) {
-    _result = std::forward<U>(value);
+  template <typename Arg>
+  Result& operator=(Arg&& arg) noexcept(std::is_nothrow_assignable_v<Variant, Arg>) {
+    _result = std::forward<Arg>(arg);
     return *this;
   }
 
@@ -108,10 +117,14 @@ class Result {
     return State() == ResultState::Value;
   }
 
-  /*[[nodiscard]]*/ MoveValue Ok() && {
+  /*[[nodiscard]]*/ MutValue Ok() && {
     switch (State()) {
       case ResultState::Value:
-        return std::move(*this).Value();
+        if constexpr (std::is_void_v<V>) {
+          return;
+        } else {
+          return std::move(*this).Value();
+        }
       case ResultState::Exception:
         std::rethrow_exception(std::move(*this).Exception());
       case ResultState::Error:
@@ -121,10 +134,14 @@ class Result {
     }
   }
 
-  ConstValueRef Ok() const& {
+  /*[[nodiscard]]*/ LetValue Ok() const& {
     switch (State()) {
       case ResultState::Value:
-        return Value();
+        if constexpr (std::is_void_v<V>) {
+          return;
+        } else {
+          return Value();
+        }
       case ResultState::Exception:
         std::rethrow_exception(Exception());
       case ResultState::Error:
@@ -138,16 +155,12 @@ class Result {
     return ResultState{static_cast<char>(_result.index())};
   }
 
-  [[nodiscard]] MoveValue Value() && noexcept {
-    if constexpr (!std::is_void_v<V>) {
-      return std::get<V>(std::move(_result));
-    }
+  [[nodiscard]] ValueT&& Value() && noexcept {
+    return std::get<ValueT>(std::move(_result));
   }
 
-  [[nodiscard]] ConstValueRef Value() const& noexcept {
-    if constexpr (!std::is_void_v<V>) {
-      return std::get<V>(_result);
-    }
+  [[nodiscard]] const ValueT& Value() const& noexcept {
+    return std::get<ValueT>(_result);
   }
 
   [[nodiscard]] E&& Error() && noexcept {
@@ -172,7 +185,7 @@ class Result {
   }
 
  private:
-  VariantT _result;
+  Variant _result;
 };
 
 }  // namespace yaclib

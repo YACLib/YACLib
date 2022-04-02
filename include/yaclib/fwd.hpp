@@ -13,4 +13,9 @@ class Future;
 template <typename V, typename E>
 class Promise;
 
+/**
+ * For internal instead of void usage
+ */
+struct Unit {};
+
 }  // namespace yaclib

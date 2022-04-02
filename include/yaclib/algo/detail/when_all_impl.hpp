@@ -56,9 +56,10 @@ class AllCombinator : public InlineCore, public AllCombinatorBase<FutureValue> {
     }
   }
 
-  void CallInline(InlineCore* context, State) noexcept final {
+  void CallInline(InlineCore& caller, State) noexcept final {
     if (_promise->Alive() && !Base::_done.load(std::memory_order_acquire)) {
-      Combine(std::move(static_cast<ResultCore<V, E>*>(context)->Get()));
+      auto& core = static_cast<ResultCore<V, E>&>(caller);
+      Combine(std::move(core.Get()));
     }
   }
 

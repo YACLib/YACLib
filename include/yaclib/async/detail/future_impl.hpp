@@ -4,6 +4,7 @@
 #include <yaclib/async/detail/core.hpp>
 #include <yaclib/config.hpp>
 #include <yaclib/log.hpp>
+#include <yaclib/util/result.hpp>
 
 namespace yaclib {
 namespace detail {
@@ -46,182 +47,137 @@ struct Return<V, E, Functor, 8> {
   using Type = invoke_t<Functor, std::exception_ptr>;
 };
 
-template <typename Ret, typename Arg, typename E, typename Functor>
-class SyncInvoke {
+template <bool Subscribe, bool Async, typename Ret, typename Arg, typename E, typename Functor>
+class FunctorWrapper {
   //  using FunctorStore = std::remove_cv_t<std::remove_reference_t<Functor>>;
   //  using FunctorInvoke = Functor;
-  using FunctorStore = std::decay_t<Functor>;
-  using FunctorInvoke = std::conditional_t<std::is_function_v<std::remove_reference_t<Functor>>, FunctorStore, Functor>;
+  using Store = std::decay_t<Functor>;
+  using Invoke = std::conditional_t<std::is_function_v<std::remove_reference_t<Functor>>, Store, Functor>;
+  using Core = std::conditional_t<Subscribe, ResultCore<void, void>, ResultCore<Ret, E>>;
 
  public:
-  static constexpr bool kIsAsync = false;
+  static constexpr bool kIsAsync = Async;
 
-  explicit SyncInvoke(FunctorStore&& f) noexcept(std::is_nothrow_move_constructible_v<FunctorStore>)
-      : _f{std::move(f)} {
+  explicit FunctorWrapper(Store&& f) noexcept(std::is_nothrow_move_constructible_v<Store>) : _f{std::move(f)} {
   }
 
-  explicit SyncInvoke(const FunctorStore& f) noexcept(std::is_nothrow_copy_constructible_v<FunctorStore>) : _f{f} {
+  explicit FunctorWrapper(const Store& f) noexcept(std::is_nothrow_copy_constructible_v<Store>) : _f{f} {
   }
 
-  void Wrapper(ResultCore<Ret, E>& self, Result<Arg, E>&& r) noexcept {
+  template <typename T>
+  void Call(Core& self, T&& r) noexcept {
     try {
-      if constexpr (is_invocable_v<FunctorInvoke, Result<Arg, E>>) {
-        return WrapperResult(self, std::move(r));
+      constexpr bool kIsRun = std::is_same_v<T, Unit>;
+      static_assert(kIsRun || std::is_same_v<T, Result<Arg, E>>);
+      if constexpr (kIsRun || is_invocable_v<Invoke, Result<Arg, E>>) {
+        CallResolveAsync(self, std::forward<T>(r));
       } else {
-        return WrapperOther(self, std::move(r));
+        CallResolveState(self, std::forward<T>(r));
       }
     } catch (...) {
-      return self.Set(std::current_exception());
+      self.Set(std::current_exception());
     }
   }
 
  private:
-  template <typename T>
-  void WrapperResult(ResultCore<Ret, E>& self, T&& value) {
-    if constexpr (std::is_void_v<invoke_t<FunctorInvoke, T>>) {
-      std::forward<FunctorInvoke>(_f)(std::forward<T>(value));
-      return self.Set(Unit{});
-    } else {
-      return self.Set(std::forward<FunctorInvoke>(_f)(std::forward<T>(value)));
-    }
-  }
-
-  void WrapperOther(ResultCore<Ret, E>& self, Result<Arg, E>&& r) {
+  void CallResolveState(Core& self, Result<Arg, E>&& r) {
     const auto state = r.State();
-    if constexpr (is_invocable_v<FunctorInvoke, Arg>) {
+    if constexpr (is_invocable_v<Invoke, Arg>) {
       if (state == ResultState::Value) {
-        if constexpr (std::is_void_v<Arg>) {
-          if constexpr (std::is_void_v<invoke_t<FunctorInvoke, Arg>>) {
-            std::forward<FunctorInvoke>(_f)();
-            return self.Set(Unit{});
-          } else {
-            return self.Set(std::forward<FunctorInvoke>(_f)());
-          }
-        } else {
-          return WrapperResult(self, std::move(r).Value());
-        }
-      }
-      if (state == ResultState::Error) {
-        return self.Set(std::move(r).Error());
-      }
-      YACLIB_ERROR(state != ResultState::Exception, "state should be Exception, but here it's Empty");
-      return self.Set(std::move(r).Exception());
-    } else {
-      constexpr bool kIsError = is_invocable_v<FunctorInvoke, E>;
-      constexpr ResultState kState = kIsError ? ResultState::Error : ResultState::Exception;
-      using T = std::conditional_t<kIsError, E, std::exception_ptr>;
-      if (state == kState) {
-        return WrapperResult(self, std::move(r).template Extract<T>());
-      }
-      return self.Set(std::move(r));
-    }
-  }
-
-  FunctorStore _f;
-};
-
-template <typename Ret, typename Arg, typename E, typename Functor>
-class AsyncInvoke {
-  using FunctorStore = std::decay_t<Functor>;
-  using FunctorInvoke = std::conditional_t<std::is_function_v<std::remove_reference_t<Functor>>, FunctorStore, Functor>;
-
- public:
-  static constexpr bool kIsAsync = true;
-
-  explicit AsyncInvoke(FunctorStore&& f) noexcept(std::is_nothrow_move_constructible_v<FunctorStore>)
-      : _f{std::move(f)} {
-  }
-
-  explicit AsyncInvoke(const FunctorStore& f) noexcept(std::is_nothrow_copy_constructible_v<FunctorStore>) : _f{f} {
-  }
-
-  void Wrapper(ResultCore<Ret, E>& self, Result<Arg, E>&& r) noexcept {
-    try {
-      if constexpr (is_invocable_v<FunctorInvoke, Result<Arg, E>>) {
-        return WrapperSubscribe(self, std::move(r));
+        CallResolveAsync(self, std::move(r).Value());
+      } else if (state == ResultState::Error) {
+        self.Set(std::move(r).Error());
       } else {
-        return WrapperOther(self, std::move(r));
+        assert(state == ResultState::Exception);
+        self.Set(std::move(r).Exception());
       }
-    } catch (...) {
-      return self.Set(std::current_exception());
-    }
-  }
-
- private:
-  template <typename T>
-  void WrapperSubscribe(ResultCore<Ret, E>& self, T&& value) {
-    auto future = std::forward<FunctorInvoke>(_f)(std::forward<T>(value));
-    self.IncRef();
-    std::exchange(future.GetCore(), nullptr)->SetCallbackInline(self, true);
-  }
-
-  void WrapperOther(ResultCore<Ret, E>& self, Result<Arg, E>&& r) {
-    const auto state = r.State();
-    if constexpr (is_invocable_v<FunctorInvoke, Arg>) {
-      if (state == ResultState::Value) {
-        return WrapperSubscribe(self, std::move(r).Value());
-      }
-      if (state == ResultState::Error) {
-        return self.Set(std::move(r).Error());
-      }
-      YACLIB_ERROR(state != ResultState::Exception, "state should be Exception, but here it's Empty");
-      return self.Set(std::move(r).Exception());
+    } else {
       /**
-       * We can't use this strategy for other FunctorInvoke,
+       * We can't use this strategy for other Functor::Invoke,
        * because in that case user will not have compile error for that case:
-       * MakeFuture(32) // state == ResultState::Value
-       *   .ThenInline([](E/std::exception_ptr) -> yaclib::Future<double> {
+       * MakeFuture<void>() // state == ResultState::Value
+       *   .ThenInline([](E/std::exception_ptr) -> yaclib::Result/Future<double> {
        *     throw std::runtime_error{""};
-       *   })
-       *   .ThenInline([](yaclib::Result<double>) { // need double Value
+       *   }).ThenInline([](yaclib::Result<double>) { // need double value, we only have void
        *     return 1;
        *   });
        * TLDR: Before and after the "recovery" callback must have the same value type
        */
-    } else {
-      constexpr bool kIsError = is_invocable_v<FunctorInvoke, E>;
-      constexpr ResultState kState = kIsError ? ResultState::Error : ResultState::Exception;
-      using T = std::conditional_t<kIsError, E, std::exception_ptr>;
+      constexpr bool kIsError = is_invocable_v<Invoke, E>;
+      constexpr bool kIsException = is_invocable_v<Invoke, std::exception_ptr>;
+      static_assert(kIsError ^ kIsException, "Recovery callback should be invokable with E or std::exception_ptr");
+      constexpr auto kState = kIsError ? ResultState::Error : ResultState::Exception;
       if (state == kState) {
-        return WrapperSubscribe(self, std::move(r).template Extract<T>());
+        using T = std::conditional_t<kIsError, E, std::exception_ptr>;
+        CallResolveAsync(self, std::move(r).template Extract<T>());
+      } else {
+        self.Set(std::move(r));
       }
-      return self.Set(std::move(r));
     }
   }
 
-  FunctorStore _f;
+  template <typename T>
+  void CallResolveAsync(Core& self, T&& value) {
+    if constexpr (Async) {
+      auto future = CallResolveVoid(std::forward<T>(value));
+      auto core = std::exchange(future.GetCore(), nullptr);
+      self.IncRef();
+      core->SetCallbackInline(self, true);
+    } else {
+      self.Set(CallResolveVoid(std::forward<T>(value)));
+    }
+  }
+
+  template <typename T>
+  auto CallResolveVoid(T&& value) {
+    constexpr bool kArgVoid = std::is_same_v<T, Unit>;
+    constexpr bool kRetVoid = std::is_void_v<invoke_t<Invoke, std::conditional_t<kArgVoid, void, T>>>;
+    if constexpr (kRetVoid) {
+      if constexpr (kArgVoid) {
+        std::forward<Invoke>(_f)();
+      } else {
+        std::forward<Invoke>(_f)(std::forward<T>(value));
+      }
+      return Unit{};
+    } else if constexpr (kArgVoid) {
+      return std::forward<Invoke>(_f)();
+    } else {
+      return std::forward<Invoke>(_f)(std::forward<T>(value));
+    }
+  }
+
+  Store _f;
 };
 
-template <bool Subscribe, bool Inline, typename Arg, typename E, typename Functor>
-auto SetCallback(ResultCorePtr<Arg, E> caller, Functor&& f) {
-  // TODO(kononovk/MBkkt): think about how to distinguish first and second overloads,
-  //  when T is constructable from Result
-  // TODO(myannyax) info if subscribe and Ret != void
+template <CoreType Type, typename Arg, typename E, typename Functor>
+auto* MakeCore(Functor&& f) {
+  static_assert(Type != CoreType::Run || std::is_void_v<Arg>, "It makes no sense to receive some value in first step");
   using AsyncRet = result_value_t<typename detail::Return<Arg, E, Functor>::Type>;
-  static_assert(!Subscribe || std::is_void_v<AsyncRet>,
+  static_assert(Type != CoreType::Subscribe || std::is_void_v<AsyncRet>,
                 "It makes no sense to return some value in Subscribe, since no one will be able to use it");
-  using Ret = std::conditional_t<Subscribe, detail::SubscribeTag, result_value_t<future_value_t<AsyncRet>>>;
-  constexpr bool kIsAsync = !Subscribe && is_future_v<AsyncRet>;
-  using Invoke = std::conditional_t<kIsAsync,  //
-                                    detail::AsyncInvoke<Ret, Arg, E, decltype(std::forward<Functor>(f))>,
-                                    detail::SyncInvoke<Ret, Arg, E, decltype(std::forward<Functor>(f))>>;
-  // TODO(MBkkt) Think about inline/subscribe optimization, something like
-  // if constexpr (Subscribe && Inline && !kIsAsync) {
-  //   if (!caller->Empty()) {
-  //     Invoke invoke{std::forward<Functor>(f)};
-  //     return invoke.Wrapper(nullptr, caller->Get());
-  //   }
-  // }
-  using Core = detail::Core<Ret, Arg, E, Invoke>;
-  auto callback = new detail::AtomicCounter<Core>{1 + static_cast<std::size_t>(!Subscribe), std::forward<Functor>(f)};
+  using Ret = result_value_t<future_value_t<AsyncRet>>;
+  constexpr bool kIsAsync = is_future_v<AsyncRet>;
+  using Wrapper =
+    detail::FunctorWrapper<Type == CoreType::Subscribe, kIsAsync, Ret, Arg, E, decltype(std::forward<Functor>(f))>;
+  // TODO(MBkkt) Think about inline/subscribe optimization
+  using Core = detail::Core<Ret, Arg, E, Wrapper, Type>;
+  constexpr std::size_t kRef = 1 + static_cast<std::size_t>(Type == CoreType::Then);
+  return new detail::AtomicCounter<Core>{kRef, std::forward<Functor>(f)};
+}
+
+template <CoreType Type, bool Inline, typename Arg, typename E, typename Functor>
+auto SetCallback(ResultCorePtr<Arg, E> caller, Functor&& f) {
+  static_assert(Type != CoreType::Run);
+  auto* callback = MakeCore<Type, Arg, E>(std::forward<Functor>(f));
   callback->SetExecutor(caller->GetExecutor());
   if constexpr (Inline) {
     caller->SetCallbackInline(*callback);
   } else {
     caller->SetCallback(*callback);
   }
-  if constexpr (!Subscribe) {  // TODO(MBkkt) exception safety?
-    return Future<Ret, E>{IntrusivePtr{NoRefTag{}, callback}};
+  if constexpr (Type == CoreType::Then) {  // TODO(MBkkt) exception safety?
+    using ResultCoreT = typename std::remove_reference_t<decltype(*callback)>::Base;
+    return Future{IntrusivePtr<ResultCoreT>{NoRefTag{}, callback}};
   }
 }
 
@@ -286,26 +242,21 @@ void Future<V, E>::Detach() && {
 }
 
 template <typename V, typename E>
-Future<V, E>& Future<V, E>::Via(IExecutorPtr e) & {
-  _core->SetExecutor(std::move(e));
-  return *this;
-}
-
-template <typename V, typename E>
 Future<V, E>&& Future<V, E>::Via(IExecutorPtr e) && {
-  return std::move(Via(std::move(e)));
+  _core->SetExecutor(std::move(e));
+  return std::move(*this);
 }
 
 template <typename V, typename E>
 template <typename Functor>
 auto Future<V, E>::Then(Functor&& f) && {
-  return detail::SetCallback<false, false>(std::exchange(_core, nullptr), std::forward<Functor>(f));
+  return detail::SetCallback<detail::CoreType::Then, false>(std::move(_core), std::forward<Functor>(f));
 }
 
 template <typename V, typename E>
 template <typename Functor>
 auto Future<V, E>::ThenInline(Functor&& f) && {
-  return detail::SetCallback<false, true>(std::exchange(_core, nullptr), std::forward<Functor>(f));
+  return detail::SetCallback<detail::CoreType::Then, true>(std::move(_core), std::forward<Functor>(f));
 }
 
 template <typename V, typename E>
@@ -315,19 +266,19 @@ auto Future<V, E>::Then(IExecutorPtr e, Functor&& f) && {
   YACLIB_INFO(e->Tag() == IExecutor::Type::Inline,
               "better way is use ThenInline(...) instead of Then(MakeInline(), ...)");
   _core->SetExecutor(std::move(e));
-  return detail::SetCallback<false, false>(std::exchange(_core, nullptr), std::forward<Functor>(f));
+  return detail::SetCallback<detail::CoreType::Then, false>(std::move(_core), std::forward<Functor>(f));
 }
 
 template <typename V, typename E>
 template <typename Functor>
 void Future<V, E>::Subscribe(Functor&& f) && {
-  detail::SetCallback<true, false>(std::exchange(_core, nullptr), std::forward<Functor>(f));
+  detail::SetCallback<detail::CoreType::Subscribe, false>(std::move(_core), std::forward<Functor>(f));
 }
 
 template <typename V, typename E>
 template <typename Functor>
 void Future<V, E>::SubscribeInline(Functor&& f) && {
-  detail::SetCallback<true, true>(std::exchange(_core, nullptr), std::forward<Functor>(f));
+  detail::SetCallback<detail::CoreType::Subscribe, true>(std::move(_core), std::forward<Functor>(f));
 }
 
 template <typename V, typename E>
@@ -337,7 +288,7 @@ void Future<V, E>::Subscribe(IExecutorPtr e, Functor&& f) && {
   YACLIB_INFO(e->Tag() == IExecutor::Type::Inline,
               "better way is use ThenInline(...) instead of Then(MakeInline(), ...)");
   _core->SetExecutor(std::move(e));
-  detail::SetCallback<true, false>(std::exchange(_core, nullptr), std::forward<Functor>(f));
+  detail::SetCallback<detail::CoreType::Subscribe, false>(std::move(_core), std::forward<Functor>(f));
 }
 
 template <typename V, typename E>
