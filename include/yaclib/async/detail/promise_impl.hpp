@@ -10,13 +10,15 @@ template <typename V, typename E>
 template <typename Type>
 void Promise<V, E>::Set(Type&& value) && {
   static_assert(std::is_constructible_v<Result<V, E>, Type>, "TODO(MBkkt): Add message");
-  std::exchange(_core, nullptr)->Set(std::forward<Type>(value));
+  auto core = std::exchange(_core, nullptr);
+  core->Set(std::forward<Type>(value));
 }
 
 template <typename V, typename E>
 void Promise<V, E>::Set() && {
   static_assert(std::is_void_v<V>);
-  std::exchange(_core, nullptr)->Set(Unit{});
+  auto core = std::exchange(_core, nullptr);
+  core->Set(Unit{});
 }
 
 template <typename V, typename E>

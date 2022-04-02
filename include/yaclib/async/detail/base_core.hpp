@@ -16,7 +16,7 @@ class BaseCore : public InlineCore {
   explicit BaseCore(State s) noexcept;
 
   void SetExecutor(IExecutorPtr executor) noexcept;
-  [[nodiscard]] IExecutorPtr GetExecutor() const noexcept;
+  [[nodiscard]] const IExecutorPtr& GetExecutor() const noexcept;
 
   void SetCallback(BaseCore& callback) noexcept;
   void SetCallbackInline(InlineCore& callback, bool async = false) noexcept;

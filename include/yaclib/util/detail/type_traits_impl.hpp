@@ -24,9 +24,9 @@ struct IsInvocable<Functor, void> {
   static constexpr bool Value = std::is_invocable_v<Functor>;
 };
 
-template <typename Functor, typename... Arg>
+template <typename Functor, typename... Args>
 struct Invoke {
-  using Type = std::invoke_result_t<Functor, Arg...>;
+  using Type = std::invoke_result_t<Functor, Args...>;
 };
 
 template <typename Functor>

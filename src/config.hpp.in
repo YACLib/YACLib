@@ -2,25 +2,29 @@
 
 #include <cstddef>
 
-// other sanitizers don't really need this
 #if defined(__has_feature)
-#  if __has_feature(address_sanitizer)
+#  if __has_feature(address_sanitizer) || ${YACLIB_ASAN}
 #    define YACLIB_ASAN
-#  elif __has_feature(thread_sanitizer)
+#  endif
+#  if __has_feature(thread_sanitizer) || ${YACLIB_TSAN}
 #    define YACLIB_TSAN
-#  elif __has_feature(memory_sanitizer)
+#  endif
+#  if __has_feature(memory_sanitizer) || ${YACLIB_MEMSAN}
 #    define YACLIB_MEMSAN
 #  endif
-#endif
-
-#if ${YACLIB_UBSAN}
-#  define YACLIB_UBSAN
-#endif
-
-#if defined(__SANITIZE_ADDRESS__)
-#  define YACLIB_ASAN
-#elif defined(__SANITIZE_THREAD__)
-#  define YACLIB_TSAN
+#  if __has_feature(undefined_behavior_sanitizer) || ${YACLIB_UBSAN}
+#    define YACLIB_UBSAN
+#  endif
+#else
+#  if defined(__SANITIZE_ADDRESS__) || ${YACLIB_ASAN}
+#    define YACLIB_ASAN
+#  endif
+#  if defined(__SANITIZE_THREAD__) || ${YACLIB_TSAN}
+#    define YACLIB_TSAN
+#  endif
+#  if defined(__SANITIZE_UNDEFINED__) || ${YACLIB_UBSAN}
+#    define YACLIB_UBSAN
+#  endif
 #endif
 
 // Maybe we should increase some of this
@@ -50,6 +54,10 @@
 
 #ifndef YACLIB_CI_SLOWDOWN
 #  define YACLIB_CI_SLOWDOWN 1
+#endif
+
+#if ${YACLIB_ATOMIC_EVENT}
+#  define YACLIB_ATOMIC_EVENT
 #endif
 
 namespace yaclib {

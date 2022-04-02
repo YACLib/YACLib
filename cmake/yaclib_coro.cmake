@@ -41,7 +41,7 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES MSVC)
     set(YACLIB_CORO_FLAGS "/await")
   else ()
     set(YACLIB_CORO_FINAL 1)
-    set(YACLIB_CORO_FLAGS "/await")
+    set(YACLIB_CORO_FLAGS "/await") # /await:heapelide experimental but maybe useful for performance
   endif ()
 else ()
   set(CORO OFF)
