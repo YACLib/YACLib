@@ -94,7 +94,7 @@ jobs:
             echo $dir
           
             cd $dir
-            gcovr --root ".." --exclude "/usr/*" --exclude "*/_deps/*" --exclude "*/test/*" --exclude "*/fault/*" --exclude-unreachable-branches --exclude-throw-branches --gcov-executable "gcov" --json-pretty "./coverage_data.json"
+            gcovr --gcov-executable "gcov" --root ".." --json-pretty "./coverage_data.json"
             cat ./coverage_data.json
             cd ..
           done

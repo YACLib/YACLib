@@ -16,11 +16,11 @@ void SetInfoCallback(LogCallback callback) {
 
 void detail::LogInfo(std::string_view file, std::size_t line, std::string_view function, std::string_view condition,
                      std::string_view message) {
-  // GCOVR_EXCL_START
+  // GCOV_EXCL_START
   if (g_info_callback == nullptr) {
     return;
   }
   g_info_callback(file, line, function, condition, message);
-  // GCOVR_EXCL_END
+  // GCOV_EXCL_STOP
 }
 }  // namespace yaclib
