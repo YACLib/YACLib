@@ -94,12 +94,12 @@ jobs:
             echo $dir
           
             cd $dir
-            gcovr --gcov-executable "gcov" --root ".." --json-pretty "./coverage_data.json"
+            gcovr --gcov-executable "gcov" --root ".." --json-pretty --output "./coverage_data.json"
             cat ./coverage_data.json
             cd ..
           done
 
-          gcovr --add-tracefile "./build_fault_OFF/coverage_data.json" --add-tracefile "./build_fault_ON/coverage_data.json" --coveralls-pretty "./total.coveralls.json"
+          gcovr --add-tracefile "./build_fault_OFF/coverage_data.json" --add-tracefile "./build_fault_ON/coverage_data.json" --coveralls-pretty --output "./total.coveralls.json"
 
           cat ./total.coveralls.json
 
