@@ -115,7 +115,7 @@ jobs:
       - name: Test
         run: |
           for dir in build*/; do
-            cd $dir;
+            cd $dir
             ctest --output-on-failure -C ${{ matrix.build_type }} -V
             cd ..
           done

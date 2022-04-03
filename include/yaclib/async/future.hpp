@@ -180,17 +180,16 @@ class Future final {
 
 extern template class Future<void, StopError>;
 
-template <typename V = void, typename E = StopError, typename... Args>
+template <typename V = Unit, typename E = StopError, typename... Args>
 auto MakeFuture(Args&&... args) {
   if constexpr (sizeof...(Args) == 0) {
-    static_assert(std::is_void_v<V>);
-    return Future{MakeIntrusive<detail::ResultCore<V, E>>(Unit{})};
+    return Future{MakeIntrusive<detail::ResultCore<void, E>>(Unit{})};
   } else if constexpr (sizeof...(Args) == 1) {
-    using T = std::conditional_t<std::is_void_v<V>, head_t<Args...>, V>;
-    static_assert(!std::is_void_v<T>);
+    using T = std::conditional_t<std::is_same_v<V, Unit>, head_t<Args...>, V>;
+    static_assert(!std::is_same_v<T, Unit>);
     return Future{MakeIntrusive<detail::ResultCore<T, E>>(std::forward<Args>(args)...)};
   } else {
-    static_assert(!std::is_void_v<V>);
+    static_assert(!std::is_same_v<V, Unit>);
     return Future{MakeIntrusive<detail::ResultCore<V, E>>(std::forward<Args>(args)...)};
   }
 }

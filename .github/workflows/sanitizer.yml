@@ -282,7 +282,7 @@ jobs:
             export LSAN_OPTIONS="$default debug=1 detect_leaks=1"
           fi
           for dir in build*/; do
-            cd $dir;
+            cd $dir
             ctest --output-on-failure -C ${{ matrix.build_type }} -V
             cd ..
           done
