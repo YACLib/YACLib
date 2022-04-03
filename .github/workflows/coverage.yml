@@ -21,9 +21,13 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install pip ninja-build lld gcc-11 g++-11 libstdc++-11-dev lcov
-          sudo ln -sf /usr/local/bin/ld /usr/bin/lld
-          sudo pip install -U gcovr
+          sudo wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+          sudo add-apt-repository "deb http://apt.llvm.org/focal/     llvm-toolchain-focal-14   main"
+          sudo apt-get update
+          sudo apt-get install ninja-build lcov googletest                                                             \
+                               gcc-11 g++-11 libstdc++-11-dev lld-14
+          # llvm-14  clang-14 libc++-14-dev libc++abi-14-dev
+          sudo ln -sf /usr/bin/lld-14 /usr/local/bin/ld
 
           sudo update-alternatives                                                                                     \
             --install /usr/bin/gcc        gcc        /usr/bin/gcc-11        200                                        \
@@ -45,66 +49,80 @@ jobs:
       - name: Configure CMake
         run: |
           wait_type=""
-          for yaclib_fault in ${YACLIB_FAULT[*]}; do
-            dir="build_fault_${yaclib_fault}"
-            echo $dir
-          
-            cmake -S . -B $dir                                                                                         \
-              -G "Ninja"                                                                                               \
-              -DCMAKE_BUILD_TYPE=Debug                                                                                 \
-              -DCMAKE_C_COMPILER=gcc                                                                                   \
-              -DCMAKE_CXX_COMPILER=g++                                                                                 \
-              -DYACLIB_FAULT=$yaclib_fault                                                                             \
-              -DYACLIB_TEST=SINGLE                                                                                     \
-              -DYACLIB_FLAGS="COVERAGE;CORO;$wait_type"                                                                \
-              -DYACLIB_CXX_STANDARD=20
+          compilers=(gcc g++)
+          for (( i=0; i<${#compilers[*]}; i+=2 )); do
+            for yaclib_fault in ${YACLIB_FAULT[*]}; do
+              dir="build_${compilers[$i]}_fault_${yaclib_fault}"
+              echo $dir
 
-            if [[ "$wait_type" == "" ]]; then
-              wait_type="ATOMIC_EVENT"
-            else
-              wait_type=""
-            fi
+              cmake -S . -B $dir                                                                                       \
+                -G "Ninja"                                                                                             \
+                -DCMAKE_BUILD_TYPE=Debug                                                                               \
+                -DCMAKE_C_COMPILER="${compilers[$i]}"                                                                  \
+                -DCMAKE_CXX_COMPILER="${compilers[$i+1]}"                                                              \
+                -DYACLIB_FAULT=$yaclib_fault                                                                           \
+                -DYACLIB_TEST=SINGLE                                                                                   \
+                -DYACLIB_FLAGS="COVERAGE;CORO;$wait_type"                                                              \
+                -DYACLIB_CXX_STANDARD=20                                                                               \
+                -DYACLIB_COMPILE_OPTIONS="-O1;-fno-inline"
+
+              lcov --zerocounters --directory .
+
+              if [[ "$wait_type" == "" ]]; then
+                wait_type="ATOMIC_EVENT"
+              else
+                wait_type=""
+              fi
+            done
           done
 
       - name: Build
         run: |
-          for yaclib_fault in ${YACLIB_FAULT[*]}; do
-            dir="build_fault_${yaclib_fault}"
-            echo $dir
-          
+          for dir in build*/; do
             ninja -C $dir
           done
 
       - name: Test
         run: |
-          for yaclib_fault in ${YACLIB_FAULT[*]}; do
-            dir="build_fault_${yaclib_fault}"
-            echo $dir
-          
+          for dir in build*/; do
             cd $dir
             ctest --output-on-failure -C Debug -V
             cd ..
           done
 
-      - name: Collect lcov info
+      - name: Collect with lcov
         run: |
-          for yaclib_fault in ${YACLIB_FAULT[*]}; do
-            dir="build_fault_${yaclib_fault}"
-            echo $dir
-          
-            cd $dir
-            lcov --rc lcov_branch_coverage=1 -d . -c                  -o lcov.info
-            lcov --rc lcov_branch_coverage=1 -r lcov.info "/usr/*"    -o lcov.info
-            lcov --rc lcov_branch_coverage=1 -r lcov.info "*/_deps/*" -o lcov.info
-            lcov --rc lcov_branch_coverage=1 -r lcov.info "*/fault/*" -o lcov.info
-            lcov --rc lcov_branch_coverage=1 -r lcov.info "*/test/*"  -o lcov.info
-            cd ..
+          echo '#!/bin/bash 
+                exec llvm-cov-14 gcov "$@"' > ./llvm_gcov.sh
+          chmod +x ./llvm_gcov.sh
+          compilers=(gcc g++)
+          for (( i=0; i<${#compilers[*]}; i+=2 )); do
+            for yaclib_fault in ${YACLIB_FAULT[*]}; do
+              if [[ "${compilers[i]}" == "gcc" ]]; then
+                gcov_tool="gcov"
+              else
+                gcov_tool="`pwd`/llvm_gcov.sh"
+              fi
+              dir="build_${compilers[$i]}_fault_${yaclib_fault}"
+              echo $dir
+
+              cd $dir
+              lcov --rc lcov_branch_coverage=1 --gcov-tool "$gcov_tool" -d . -c -o lcov.info
+              lcov --rc lcov_branch_coverage=1                                                                         \
+                -r lcov.info "/usr/*"                                                                                  \
+                -r lcov.info "*/_deps/*"                                                                               \
+                -r lcov.info "*/test/*"                                                                                \
+                -r lcov.info "*/fault/*"                                                                               \
+                -o lcov.info
+              cd ..
+            done
           done
-          
+
           lcov --rc lcov_branch_coverage=1                                                                             \
-            --add-tracefile ./build_fault_ON/lcov.info                                                                 \
-            --add-tracefile ./build_fault_OFF/lcov.info                                                                \
+            --add-tracefile ./build_gcc_fault_OFF/lcov.info                                                            \
+            --add-tracefile ./build_gcc_fault_ON/lcov.info                                                             \
             --output-file   ./total.info
+          lcov --rc lcov_branch_coverage=1 -r ./total.info -o ./total_without_branch.info
           lcov --rc lcov_branch_coverage=1 --list ./total.info
 
       - name: Coveralls
@@ -117,4 +135,4 @@ jobs:
         uses: codecov/codecov-action@v2.1.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          file: ./total.info
+          file: ./total_without_branch.info

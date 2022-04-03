@@ -189,7 +189,7 @@ jobs:
       - name: Test
         run: |
           for dir in build*/; do
-            cd $dir;
+            cd $dir
             ctest --output-on-failure -V
             cd ..
           done
