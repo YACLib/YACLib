@@ -4,9 +4,6 @@ on:
   push:
     branches: [ main ]
     paths-ignore: [ 'doc/**', '**.md' ]
-  pull_request:
-    branches: [ main ]
-    paths-ignore: [ 'doc/**', '**.md' ]
 
 jobs:
   # TODO(MBkkt) clang-format 14, now this extension doesn't work, because clang-14 not really released yet

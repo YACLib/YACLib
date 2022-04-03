@@ -78,10 +78,10 @@ bool WaitIterator(const Timeout& timeout, Iterator it, std::size_t size) {
   return WaitRange<Event>(timeout, range, size);
 }
 
-extern template bool WaitCore<detail::MutexEvent, NoTimeoutTag, BaseCore>(const NoTimeoutTag&, BaseCore&);
+extern template bool WaitCore<MutexEvent, NoTimeoutTag, BaseCore>(const NoTimeoutTag&, BaseCore&);
 
 #ifdef YACLIB_ATOMIC_EVENT
-extern template bool WaitCore<detail::AtomicEvent, NoTimeoutTag, BaseCore>(const NoTimeoutTag&, BaseCore&);
+extern template bool WaitCore<AtomicEvent, NoTimeoutTag, BaseCore>(const NoTimeoutTag&, BaseCore&);
 using DefaultEvent = AtomicEvent;
 #else
 using DefaultEvent = MutexEvent;

@@ -3,9 +3,9 @@
 
 namespace yaclib::detail {
 
-template bool WaitCore<detail::MutexEvent, NoTimeoutTag, BaseCore>(const NoTimeoutTag&, BaseCore&);
+template bool WaitCore<MutexEvent, NoTimeoutTag, BaseCore>(const NoTimeoutTag&, BaseCore&);
 #ifdef YACLIB_ATOMIC_EVENT
-template bool WaitCore<detail::AtomicEvent, NoTimeoutTag, BaseCore>(const NoTimeoutTag&, BaseCore&);
+template bool WaitCore<AtomicEvent, NoTimeoutTag, BaseCore>(const NoTimeoutTag&, BaseCore&);
 #endif
 
 }  // namespace yaclib::detail
