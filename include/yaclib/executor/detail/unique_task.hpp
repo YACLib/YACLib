@@ -9,12 +9,17 @@
 namespace yaclib::detail {
 
 template <typename Functor>
-class UniqueTask final : public SafeCall<ITask, Functor> {
+class UniqueTask final : public ITask, public SafeCall<Functor> {
  public:
-  using SafeCall<ITask, Functor>::SafeCall;
+  using SafeCall<Functor>::SafeCall;
 
  private:
+  void Call() noexcept final {
+    SafeCall<Functor>::Call();
+    DecRef();
+  }
   void Cancel() noexcept final {
+    DecRef();
   }
 
   void IncRef() noexcept final {

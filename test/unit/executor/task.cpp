@@ -1,5 +1,6 @@
 #include <yaclib/executor/task.hpp>
 #include <yaclib/util/detail/node.hpp>
+#include <yaclib/util/detail/shared_func.hpp>
 #include <yaclib/util/func.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 

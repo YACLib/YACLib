@@ -161,7 +161,7 @@ auto* MakeCore(Functor&& f) {
     detail::FunctorWrapper<Type == CoreType::Subscribe, kIsAsync, Ret, Arg, E, decltype(std::forward<Functor>(f))>;
   // TODO(MBkkt) Think about inline/subscribe optimization
   using Core = detail::Core<Ret, Arg, E, Wrapper, Type>;
-  constexpr std::size_t kRef = 1 + static_cast<std::size_t>(Type == CoreType::Then);
+  constexpr std::size_t kRef = 1 + static_cast<std::size_t>(Type != CoreType::Subscribe);
   return new detail::AtomicCounter<Core>{kRef, std::forward<Functor>(f)};
 }
 

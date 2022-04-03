@@ -115,7 +115,11 @@ else ()
   endforeach ()
 endif ()
 
-add_executable(unit_util_logging test.cpp unit/util/logging.cpp)
+add_executable(unit_util_log
+  test.cpp
+  unit/util/logging.cpp
+  unit/not_implemented.cpp
+  )
 
 set(OLD_YACLIB_DEFINITIONS YACLIB_DEFINITIONS)
 
@@ -126,6 +130,6 @@ elseif (NOT YACLIB_LOG STREQUAL "INFO")
   list(APPEND YACLIB_DEFINITIONS YACLIB_LOG_INFO)
 endif ()
 
-yaclib_add_test(unit_util_logging)
+yaclib_add_test(unit_util_log)
 
 set(YACLIB_DEFINITIONS OLD_YACLIB_DEFINITIONS)

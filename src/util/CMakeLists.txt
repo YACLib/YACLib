@@ -14,6 +14,7 @@ list(APPEND YACLIB_HEADERS
   ${YACLIB_INCLUDE_DIR}/util/detail/node.hpp
   ${YACLIB_INCLUDE_DIR}/util/detail/nope_counter.hpp
   ${YACLIB_INCLUDE_DIR}/util/detail/safe_call.hpp
+  ${YACLIB_INCLUDE_DIR}/util/detail/shared_func.hpp
   ${YACLIB_INCLUDE_DIR}/util/detail/type_traits_impl.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/intrusive_list.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/mpsc_stack.hpp

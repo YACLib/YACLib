@@ -3,6 +3,7 @@
 #include <yaclib/config.hpp>
 #include <yaclib/executor/executor.hpp>
 #include <yaclib/executor/task.hpp>
+#include <yaclib/log.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 
 #include <cassert>
@@ -11,10 +12,13 @@
 namespace yaclib::detail {
 
 void InlineCore::Call() noexcept {
+  YACLIB_ERROR(true, "Pure virtual call");
 }
 void InlineCore::Cancel() noexcept {
+  YACLIB_ERROR(true, "Pure virtual call");
 }
 void InlineCore::CallInline(InlineCore&, InlineCore::State) noexcept {
+  YACLIB_ERROR(true, "Pure virtual call");
 }
 
 BaseCore::BaseCore(State state) noexcept : _state{state} {
@@ -82,8 +86,8 @@ bool BaseCore::Alive() const noexcept {
 void BaseCore::Submit() noexcept {
   assert(_callback != nullptr);
   assert(_executor != nullptr);
-  auto& callback = static_cast<BaseCore&>(*_callback);
-  callback._caller = this;
+  auto& callback = static_cast<BaseCore&>(*_callback.Release());
+  callback._caller = this;  // TODO(MBkkt) We want store without IncRef, destructive move
   _executor->Submit(callback);
   Clean();
 }
@@ -91,6 +95,7 @@ void BaseCore::Submit() noexcept {
 void BaseCore::Cancel() noexcept {  // Opposite for Call with SetResult
   _caller = nullptr;
   Clean();
+  this->DecRef();
 }
 
 void BaseCore::Clean() noexcept {

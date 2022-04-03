@@ -3,6 +3,7 @@
 #include <yaclib/config.hpp>
 #include <yaclib/executor/task.hpp>
 #include <yaclib/util/detail/node.hpp>
+#include <yaclib/util/detail/shared_func.hpp>
 
 #include <cstddef>
 #include <string_view>

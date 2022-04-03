@@ -527,18 +527,19 @@ TEST(Simple, MakePromiseContract) {
       return yaclib::IExecutor::Type::Custom;
     }
 
-    bool Submit(yaclib::ITask& f) noexcept final {
-      f.IncRef();
+    void Submit(yaclib::ITask& f) noexcept final {
       _tasks.PushFront(f);
-      return true;
     }
 
     void Drain() {
       while (!_tasks.Empty()) {
         auto& task = _tasks.PopFront();
         task.Call();
-        task.DecRef();
       }
+    }
+
+    ~ManualExecutor() {
+      EXPECT_TRUE(_tasks.Empty());
     }
   };
 
@@ -641,16 +642,6 @@ TEST(Future, StopInFlight) {
   std::move(f).Stop();
   tp->Stop();
   tp->Wait();
-}
-
-TEST(BruhTestCov, InlineCoreCall) {
-  {  // This test needed only for stupid test coverage info
-    auto [f, p] = yaclib::MakeContract<int>();
-    auto& core = *p.GetCore();
-    core.InlineCore::Call();
-    core.InlineCore::Cancel();
-    core.InlineCore::CallInline(core, yaclib::detail::InlineCore::State::Empty);
-  }
 }
 
 }  // namespace

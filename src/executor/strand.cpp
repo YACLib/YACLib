@@ -26,7 +26,6 @@ class Strand : public IExecutor, public ITask {
     while (task != nullptr) {
       auto* next = static_cast<ITask*>(task->next);
       task->Cancel();
-      task->DecRef();
       task = next;
     }
   }
@@ -36,14 +35,13 @@ class Strand : public IExecutor, public ITask {
     return Type::Strand;
   }
 
-  bool Submit(ITask& task) noexcept final {
-    task.IncRef();
+  void Submit(ITask& task) noexcept final {
     _tasks.Put(task);
 
     if (_work_counter.fetch_add(1, std::memory_order_acq_rel) == 0) {
+      static_cast<ITask&>(*this).IncRef();
       _executor->Submit(*this);
     }
-    return true;
   }
 
   void Call() noexcept final {
@@ -54,17 +52,19 @@ class Strand : public IExecutor, public ITask {
     while (task != nullptr) {
       auto* next = static_cast<ITask*>(task->next);
       task->Call();
-      task->DecRef();
       task = next;
       ++size;
     }
 
     if (_work_counter.fetch_sub(size, std::memory_order_acq_rel) > size) {
       _executor->Submit(*this);
+    } else {
+      static_cast<ITask&>(*this).DecRef();
     }
   }
 
   void Cancel() noexcept final {
+    static_cast<ITask&>(*this).DecRef();
   }
 
   IExecutorPtr _executor;

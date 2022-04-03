@@ -58,19 +58,17 @@ class ThreadPool : public IThreadPool {
     _cv.notify_all();
   }
 
-  bool Submit(ITask& task) noexcept final {
+  void Submit(ITask& task) noexcept final {
     std::unique_lock lock{_m};
     if (WasStop()) {
       lock.unlock();
       task.Cancel();
-      return false;
+      return;
     }
-    task.IncRef();
     _tasks.PushBack(task);
     _task_count += 4;  // Add Task
     lock.unlock();
     _cv.notify_one();
-    return true;
   }
 
   void SoftStop() final {
@@ -93,7 +91,6 @@ class ThreadPool : public IThreadPool {
     while (!tasks.Empty()) {
       auto& task = tasks.PopFront();
       task.Cancel();
-      task.DecRef();
     }
   }
 
@@ -111,7 +108,6 @@ class ThreadPool : public IThreadPool {
         auto& task = _tasks.PopFront();
         lock.unlock();
         task.Call();
-        task.DecRef();
         lock.lock();
         _task_count -= 4;  // Pop Task
         if (NoTasks() && WantStop()) {

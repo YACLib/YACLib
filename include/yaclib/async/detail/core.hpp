@@ -34,6 +34,7 @@ class Core : public ResultCoreT<Type, Ret, E> {
       auto& core = static_cast<ResultCore<Arg, E>&>(*Base::_caller);
       _wrapper.Call(*this, std::move(core.Get()));
     }
+    this->DecRef();
   }
 
   void CallInline(InlineCore& caller, [[maybe_unused]] InlineCore::State state) noexcept final {

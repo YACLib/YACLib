@@ -11,9 +11,8 @@ class Inline final : public IExecutor {
     return Type::Inline;
   }
 
-  bool Submit(ITask& task) noexcept final {
+  void Submit(ITask& task) noexcept final {
     task.Call();
-    return false;
   }
 
   void IncRef() noexcept final {
