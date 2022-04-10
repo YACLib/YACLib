@@ -55,7 +55,7 @@ TEST(Await, JustWorksRange) {
       return 2;
     });
 
-    co_await yaclib::Await(arr.begin(), 2);
+    co_await Await(arr.begin(), arr.end());
     co_return std::move(arr[0]).GetUnsafe().Ok() + std::move(arr[1]).GetUnsafe().Ok();
   };
   auto future = coro(tp);

@@ -13,6 +13,20 @@ template <typename V, typename E>
 struct PromiseType;
 
 template <typename V, typename E>
+class Destroy {
+ public:
+  bool await_ready() noexcept {
+    return false;
+  }
+  void await_resume() noexcept {
+  }
+
+  void await_suspend(yaclib_std::coroutine_handle<PromiseType<V, E>> handle) noexcept {
+    handle.promise().DecRef();
+  }
+};
+
+template <typename V, typename E>
 struct PromiseType : AtomicCounter<ResultCore<V, E>, CoroutineDeleter> {
   using Base = AtomicCounter<ResultCore<V, E>, CoroutineDeleter>;
   PromiseType() : Base{2} {  // get_return_object is gonna be invoked right after ctor
@@ -26,23 +40,7 @@ struct PromiseType : AtomicCounter<ResultCore<V, E>, CoroutineDeleter> {
     return {};
   }
 
-  class Destroy {
-   public:
-    Destroy() noexcept {
-    }
-
-    bool await_ready() noexcept {
-      return false;
-    }
-    void await_resume() noexcept {
-    }
-
-    void await_suspend(yaclib_std::coroutine_handle<PromiseType> handle) noexcept {
-      handle.promise().DecRef();
-    }
-  };
-
-  Destroy final_suspend() noexcept {
+  Destroy<V, E> final_suspend() noexcept {
     return {};
   }
 
@@ -73,23 +71,7 @@ struct PromiseType<void, E> : AtomicCounter<ResultCore<void, E>, CoroutineDelete
     return {};
   }
 
-  class Destroy {
-   public:
-    Destroy() noexcept {
-    }
-
-    bool await_ready() noexcept {
-      return false;
-    }
-    void await_resume() noexcept {
-    }
-
-    void await_suspend(yaclib_std::coroutine_handle<PromiseType> handle) noexcept {
-      handle.promise().DecRef();
-    }
-  };
-
-  Destroy final_suspend() noexcept {
+  Destroy<void, E> final_suspend() noexcept {
     return {};
   }
 

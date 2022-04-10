@@ -5,6 +5,7 @@
 #include <yaclib/coroutine/await.hpp>
 #include <yaclib/coroutine/detail/via_awaiter.hpp>
 #include <yaclib/coroutine/future_coro_traits.hpp>
+#include <yaclib/coroutine/via.hpp>
 #include <yaclib/executor/strand.hpp>
 #include <yaclib/executor/thread_pool.hpp>
 #include <yaclib/fault/thread.hpp>
@@ -15,10 +16,6 @@
 
 #include <gtest/gtest.h>
 
-// TODO(mkornaukhov03)
-// TSAN error
-// Read in ResumeDeleter (handle.done()), write in ViaAwaiter.Call()
-
 namespace {
 using namespace std::chrono_literals;
 
@@ -27,7 +24,7 @@ TEST(Via, JustWorks) {
 
   auto tp = yaclib::MakeThreadPool();
   auto coro = [&](yaclib::IThreadPoolPtr tp) -> yaclib::Future<void> {
-    co_await yaclib::detail::ViaAwaiter(tp);
+    co_await Via(tp);
     auto other_thread = yaclib_std::this_thread::get_id();
     EXPECT_NE(other_thread, main_thread);
     co_return;
@@ -44,14 +41,11 @@ TEST(Via, ManyCoros) {
   yaclib_std::atomic_int32_t sum = 0;
 
   auto coro = [&](int a) -> yaclib::Future<void> {
-    co_await yaclib::detail::ViaAwaiter(tp);
+    co_await Via(tp);
     auto other_thread = yaclib_std::this_thread::get_id();
-
-    std::stringstream ss;
 
     sum.fetch_add(a, std::memory_order_acquire);
 
-    std::cout << ss.str();
     co_return;
   };
 
@@ -63,7 +57,6 @@ TEST(Via, ManyCoros) {
   }
 
   using namespace std::chrono_literals;
-  yaclib_std::this_thread::sleep_for(10ms);  // kind of hard work
 
   for (auto& cor : vec) {
     std::ignore = std::move(cor).Get();
@@ -86,7 +79,7 @@ TEST(Via, Cancel) {
   auto coro = [&](int a) -> yaclib::Future<void> {
     yaclib_std::this_thread::sleep_for(10ms);
 
-    co_await yaclib::detail::ViaAwaiter(tp);
+    co_await Via(tp);
     auto other_thread = yaclib_std::this_thread::get_id();
 
     EXPECT_EQ(other_thread, main_thread);
@@ -96,7 +89,6 @@ TEST(Via, Cancel) {
   };
 
   tp->HardStop();
-  tp->Wait();
 
   constexpr std::size_t N = 10;
   std::vector<yaclib::Future<void>> vec;
@@ -106,10 +98,11 @@ TEST(Via, Cancel) {
   }
 
   for (auto& cor : vec) {
-    std::ignore = std::move(cor).Get();
+    EXPECT_FALSE(static_cast<bool>(std::move(cor).Get()));
   }
 
-  ASSERT_EQ((0 + 9) * 10 / 2, sum.fetch_add(0, std::memory_order_relaxed));
+  ASSERT_EQ(0, sum.fetch_add(0, std::memory_order_relaxed));
+  tp->Wait();
 }
 
 TEST(Via, LockWithStrand) {
@@ -121,7 +114,7 @@ TEST(Via, LockWithStrand) {
   std::size_t sum = 0;
 
   auto coro = [&](int a) -> yaclib::Future<void> {
-    co_await yaclib::detail::ViaAwaiter(strand);  // lock
+    co_await Via(strand);  // lock
     ++sum;
     co_return;  // automatic unlocking
   };

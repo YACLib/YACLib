@@ -2,8 +2,8 @@
 
 #include <yaclib/async/detail/result_core.hpp>
 #include <yaclib/async/future.hpp>
-#include <yaclib/util/detail/atomic_counter.hpp>
 #include <yaclib/coroutine/detail/coroutine.hpp>
+#include <yaclib/util/detail/atomic_counter.hpp>
 #include <yaclib/util/result.hpp>
 
 namespace yaclib::detail {
