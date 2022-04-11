@@ -12,6 +12,9 @@
 
 #include <gtest/gtest.h>
 
+namespace test {
+namespace {
+
 TEST(Example, ThreadPool) {
   std::cout << "ThreadPool" << std::endl;
 
@@ -22,7 +25,7 @@ TEST(Example, ThreadPool) {
   static constexpr std::size_t kIncrements = 100500;
 
   for (std::size_t i = 0; i < kIncrements; ++i) {
-    Submit(tp, [&counter] {
+    Submit(*tp, [&counter] {
       counter.store(counter.load() + 1);
     });
   }
@@ -34,3 +37,6 @@ TEST(Example, ThreadPool) {
 
   std::cout << std::endl;
 }
+
+}  // namespace
+}  // namespace test

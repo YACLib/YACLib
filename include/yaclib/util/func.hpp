@@ -1,6 +1,5 @@
 #pragma once
 
-#include <yaclib/config.hpp>
 #include <yaclib/util/ref.hpp>
 
 #include <type_traits>
@@ -11,7 +10,7 @@ namespace yaclib {
 /**
  * Callable interface
  */
-class IFunc : public IRef {
+class IFunc : public IRef {  // TODO(MBkkt) Remove inheritance from IRef
  public:
   virtual void Call() noexcept = 0;
 };

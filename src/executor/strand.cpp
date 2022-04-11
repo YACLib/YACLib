@@ -1,33 +1,24 @@
-#include <util/mpsc_stack.hpp>
-
-#include <yaclib/config.hpp>
 #include <yaclib/executor/executor.hpp>
 #include <yaclib/executor/strand.hpp>
 #include <yaclib/executor/task.hpp>
 #include <yaclib/fault/atomic.hpp>
+#include <yaclib/log.hpp>
 #include <yaclib/util/helper.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 
-#include <cstdint>
 #include <utility>
 
 namespace yaclib {
 namespace {
 
-class Strand : public IExecutor, public ITask {
+class /*alignas(kCacheLineSize)*/ Strand : public IExecutor, public ITask {
   // Inheritance from two IRef's, but that's okay, because they are pure virtual
  public:
   explicit Strand(IExecutorPtr executor) : _executor{std::move(executor)} {
   }
 
   ~Strand() override {
-    auto* nodes = _tasks.TakeAllLIFO();
-    auto* task = static_cast<ITask*>(nodes);
-    while (task != nullptr) {
-      auto* next = static_cast<ITask*>(task->next);
-      task->Cancel();
-      task = next;
-    }
+    YACLIB_DEBUG(_tasks.load(std::memory_order_acquire) != Mark(), "strand in dtor not empty");
   }
 
  private:
@@ -36,27 +27,32 @@ class Strand : public IExecutor, public ITask {
   }
 
   void Submit(ITask& task) noexcept final {
-    _tasks.Put(task);
-
-    if (_work_counter.fetch_add(1, std::memory_order_acq_rel) == 0) {
+    auto* old = _tasks.load(std::memory_order_relaxed);
+    do {
+      task.next = old == Mark() ? nullptr : old;
+    } while (!_tasks.compare_exchange_weak(old, &task, std::memory_order_acq_rel, std::memory_order_relaxed));
+    if (old == Mark()) {
       static_cast<ITask&>(*this).IncRef();
       _executor->Submit(*this);
     }
   }
 
   void Call() noexcept final {
-    auto* nodes = _tasks.TakeAllFIFO();
-    std::int32_t size = 0;
-
-    auto* task = static_cast<ITask*>(nodes);
-    while (task != nullptr) {
-      auto* next = static_cast<ITask*>(task->next);
-      task->Call();
-      task = next;
-      ++size;
-    }
-
-    if (_work_counter.fetch_sub(size, std::memory_order_acq_rel) > size) {
+    auto* node = _tasks.exchange(nullptr, std::memory_order_acquire);
+    Node* prev = nullptr;
+    do {
+      auto* next = node->next;
+      node->next = prev;
+      prev = node;
+      node = next;
+    } while (node != nullptr);
+    do {
+      auto* next = prev->next;
+      static_cast<ITask*>(prev)->Call();
+      prev = next;
+    } while (prev != nullptr);
+    if (_tasks.load(std::memory_order_acquire) != node ||
+        !_tasks.compare_exchange_strong(node, Mark(), std::memory_order_release, std::memory_order_acquire)) {
       _executor->Submit(*this);
     } else {
       static_cast<ITask&>(*this).DecRef();
@@ -64,13 +60,21 @@ class Strand : public IExecutor, public ITask {
   }
 
   void Cancel() noexcept final {
+    auto* node = _tasks.exchange(Mark(), std::memory_order_acq_rel);
+    do {
+      auto* next = node->next;
+      static_cast<ITask*>(node)->Cancel();
+      node = next;
+    } while (node != nullptr);
     static_cast<ITask&>(*this).DecRef();
   }
 
+  Node* Mark() noexcept {
+    return static_cast<Node*>(this);
+  }
+
   IExecutorPtr _executor;
-  detail::MPSCStack _tasks;
-  // TODO remove _work_counter, make active/inactive like libunifex
-  alignas(kCacheLineSize) yaclib_std::atomic_int32_t _work_counter{0};
+  std::atomic<Node*> _tasks{Mark()};
 };
 
 }  // namespace

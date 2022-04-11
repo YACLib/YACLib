@@ -16,6 +16,9 @@
 
 #include <gtest/gtest.h>
 
+namespace test {
+namespace {
+
 using namespace std::chrono_literals;
 
 // All combinator:
@@ -30,7 +33,7 @@ TEST(Example, WhenAll) {
 
   futs.reserve(5);
   for (int i = 0; i < 5; ++i) {
-    futs.push_back(yaclib::Run(tp, [i]() -> int {
+    futs.push_back(yaclib::Run(*tp, [i]() -> int {
       return i;
     }));
   }
@@ -51,3 +54,6 @@ TEST(Example, WhenAll) {
   tp->Stop();
   tp->Wait();
 }
+
+}  // namespace
+}  // namespace test

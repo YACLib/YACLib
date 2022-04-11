@@ -1,9 +1,8 @@
 #pragma once
 
 #include <yaclib/config.hpp>
-#include <yaclib/coro_config.hpp>
 
-#if YACLIB_CORO_FINAL
+#if YACLIB_CORO == 2
 #  include <coroutine>
 
 namespace yaclib_std {
@@ -14,7 +13,7 @@ using std::suspend_always;
 using std::suspend_never;
 
 }  // namespace yaclib_std
-#elif YACLIB_CORO_EXPERIMENTAL
+#elif YACLIB_CORO == 1
 #  include <experimental/coroutine>
 
 namespace yaclib_std {

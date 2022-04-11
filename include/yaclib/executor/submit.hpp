@@ -1,6 +1,5 @@
 #pragma once
 
-#include <yaclib/config.hpp>
 #include <yaclib/executor/detail/unique_task.hpp>
 #include <yaclib/executor/executor.hpp>
 
@@ -15,10 +14,10 @@ namespace yaclib {
  * \param f functor to execute
  */
 template <typename Functor>
-void Submit(const IExecutorPtr& executor, Functor&& f) {
+void Submit(IExecutor& executor, Functor&& f) {
   static_assert(!std::is_base_of_v<ITask, std::decay_t<Functor>>);
   auto task = detail::MakeUniqueTask(std::forward<Functor>(f));
-  executor->Submit(*task);
+  executor.Submit(*task);
 }
 
 }  // namespace yaclib

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <yaclib/config.hpp>
 #include <yaclib/log.hpp>
 
 #include <functional>
@@ -16,17 +15,14 @@ class Thread {
   using id = std::thread::id;
   using native_handle_type = std::thread::native_handle_type;
 
-  Thread() noexcept;
-
-  template <class Fp, class... Args>
-  inline explicit Thread(Fp&& f, Args&&... args) : _impl(std::forward<Fp>(f), std::move(args)...) {
+  template <typename... Args>
+  explicit Thread(Args&&... args) : _impl{std::forward<Args>(args)...} {
   }
 
+  Thread() noexcept;
   Thread(Thread&& t) noexcept;
-
-  ~Thread() = default;
-
   Thread& operator=(Thread&& t) noexcept;
+  ~Thread() = default;
 
   void swap(Thread& t) noexcept;
   [[nodiscard]] bool joinable() const noexcept;

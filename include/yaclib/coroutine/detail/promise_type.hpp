@@ -1,43 +1,47 @@
 #pragma once
 
 #include <yaclib/async/detail/result_core.hpp>
-#include <yaclib/async/future.hpp>
-#include <yaclib/config.hpp>
-#include <yaclib/coroutine/detail/coroutine_deleter.hpp>
-#include <yaclib/coroutine/detail/suspend_condition.hpp>
+#include <yaclib/coroutine/coroutine.hpp>
 #include <yaclib/util/detail/atomic_counter.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 
 #include <exception>
-#include <type_traits>
 
 namespace yaclib::detail {
 
 template <typename V, typename E>
-struct PromiseType;
+class PromiseType;
 
 template <typename V, typename E>
-class Destroy {
- public:
-  Destroy() noexcept {
-  }
-
-  bool await_ready() noexcept {
+struct Destroy {
+  static bool await_ready() noexcept {
     return false;
   }
 
-  void await_resume() noexcept {
+  static void await_suspend(yaclib_std::coroutine_handle<PromiseType<V, E>> handle) noexcept {
+    handle.promise().DecRef();
   }
 
-  void await_suspend(yaclib_std::coroutine_handle<PromiseType<V, E>> handle) noexcept {
-    handle.promise().DecRef();
+  static void await_resume() noexcept {
+  }
+};
+
+struct PromiseTypeDeleter {
+  template <typename V, typename E>
+  static void Delete(ResultCore<V, E>& core) noexcept {
+    auto& promise = static_cast<PromiseType<V, E>&>(core);
+    auto handle = yaclib_std::coroutine_handle<PromiseType<V, E>>::from_promise(promise);
+    YACLIB_DEBUG(!handle, "handle from promise is null");
+    handle.destroy();
   }
 };
 
 template <typename V, typename E>
-struct PromiseType : AtomicCounter<ResultCore<V, E>, CoroutineDeleter> {
-  using Base = AtomicCounter<ResultCore<V, E>, CoroutineDeleter>;
-  PromiseType() : Base{2} {  // get_return_object is gonna be invoked right after ctor
+class BasePromiseType : public AtomicCounter<ResultCore<V, E>, PromiseTypeDeleter> {
+  using Base = AtomicCounter<ResultCore<V, E>, PromiseTypeDeleter>;
+
+ public:
+  BasePromiseType() : Base{2} {  // get_return_object is gonna be invoked right after ctor
   }
 
   Future<V, E> get_return_object() {
@@ -52,43 +56,46 @@ struct PromiseType : AtomicCounter<ResultCore<V, E>, CoroutineDeleter> {
     return {};
   }
 
+  void unhandled_exception() noexcept {
+    this->Set(std::current_exception());
+  }
+
+  /*
+    TODO(MBkkt) Think about add zero-cost ability to return error
+     now works only co_return MakeFuture(std::make_exception_ptr(...))
+     and co_await Via(stopped_executor) for StopTag{}
+    Maybe:
+     co_await yaclib::Cancel();
+     co_await yaclib::Cancel(StopError{});
+     co_await yaclib::Cancel(std::make_exception_ptr(...));
+  */
+
+ private:
+  void Call() noexcept final {
+    auto handle = yaclib_std::coroutine_handle<PromiseType<V, E>>::from_promise(static_cast<PromiseType<V, E>&>(*this));
+    YACLIB_DEBUG(!handle, "handle from promise is null");
+    YACLIB_DEBUG(handle.done(), "handle for resume is done");
+    handle.resume();
+  }
+};
+
+template <typename V, typename E>
+class PromiseType : public BasePromiseType<V, E> {
+ public:
   void return_value(const V& value) noexcept(std::is_nothrow_copy_constructible_v<V>) {
-    Base::Set(value);
+    this->Set(value);
   }
 
   void return_value(V&& value) noexcept(std::is_nothrow_move_constructible_v<V>) {
-    Base::Set(std::move(value));
-  }
-
-  void unhandled_exception() noexcept {
-    Base::Set(std::current_exception());
+    this->Set(std::move(value));
   }
 };
 
 template <typename E>
-struct PromiseType<void, E> : AtomicCounter<ResultCore<void, E>, CoroutineDeleter> {
-  using Base = AtomicCounter<ResultCore<void, E>, CoroutineDeleter>;
-  PromiseType() : Base{2} {  // get_return_object is gonna be invoked right after ctor
-  }
-
-  Future<void, E> get_return_object() noexcept {
-    return {ResultCorePtr<void, E>{NoRefTag{}, this}};
-  }
-
-  yaclib_std::suspend_never initial_suspend() noexcept {
-    return {};
-  }
-
-  Destroy<void, E> final_suspend() noexcept {
-    return {};
-  }
-
+class PromiseType<void, E> : public BasePromiseType<void, E> {
+ public:
   void return_void() noexcept {
-    Base::Set(Unit{});
-  }
-
-  void unhandled_exception() noexcept {
-    Base::Set(std::current_exception());
+    this->Set(Unit{});
   }
 };
 

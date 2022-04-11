@@ -1,6 +1,5 @@
 #pragma once
 
-#include <yaclib/config.hpp>
 #include <yaclib/util/type_traits.hpp>
 
 #include <exception>
@@ -163,14 +162,6 @@ class Result {
     return std::get<ValueT>(_result);
   }
 
-  [[nodiscard]] E&& Error() && noexcept {
-    return std::get<E>(std::move(_result));
-  }
-
-  [[nodiscard]] const E& Error() const& noexcept {
-    return std::get<E>(_result);
-  }
-
   [[nodiscard]] std::exception_ptr&& Exception() && noexcept {
     return std::get<std::exception_ptr>(std::move(_result));
   }
@@ -179,8 +170,16 @@ class Result {
     return std::get<std::exception_ptr>(_result);
   }
 
+  [[nodiscard]] E&& Error() && noexcept {
+    return std::get<E>(std::move(_result));
+  }
+
+  [[nodiscard]] const E& Error() const& noexcept {
+    return std::get<E>(_result);
+  }
+
   template <typename T>
-  [[nodiscard]] T Extract() && noexcept {
+  [[nodiscard]] T&& Extract() && noexcept {
     return std::get<T>(std::move(_result));
   }
 

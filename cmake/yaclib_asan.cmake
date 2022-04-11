@@ -10,8 +10,10 @@ else ()
   endif ()
   list(APPEND YACLIB_COMPILE_OPTIONS -fsanitize=address)
   if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    # TODO(MBkkt) add -fsanitize=pointer-compare when will be fixed:
+    # https://github.com/google/sanitizers/issues/1324 also see mentioned issue
     list(APPEND YACLIB_COMPILE_OPTIONS
-      -fsanitize=pointer-compare,pointer-subtract
+      -fsanitize=pointer-subtract
       -fsanitize-address-use-after-scope
       )
   elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")

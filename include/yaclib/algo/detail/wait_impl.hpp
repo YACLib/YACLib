@@ -1,15 +1,10 @@
 #pragma once
 
 #include <yaclib/async/detail/base_core.hpp>
-#include <yaclib/config.hpp>
-#include <yaclib/fault/atomic.hpp>
 #include <yaclib/util/detail/atomic_counter.hpp>
-#include <yaclib/util/detail/event_deleter.hpp>
-#include <yaclib/util/detail/mutex_event.hpp>
+#include <yaclib/util/detail/default_event.hpp>
+#include <yaclib/util/detail/set_one_deleter.hpp>
 #include <yaclib/util/type_traits.hpp>
-#ifdef YACLIB_ATOMIC_EVENT
-#  include <yaclib/util/detail/atomic_event.hpp>
-#endif
 
 #include <cstddef>
 #include <iterator>
@@ -21,9 +16,9 @@ struct NoTimeoutTag {};
 
 template <typename Event, typename Timeout, typename Range>
 bool WaitRange(const Timeout& timeout, const Range& range, std::size_t count) {
-  AtomicCounter<Event, EventDeleter> event{count + 1};
+  AtomicCounter<Event, SetOneDeleter> event{count + 1};
   // event ref counter = n + 1, it is optimization: we don't want to notify when return true immediately
-  auto const wait_count = range([&](detail::BaseCore& core) {
+  auto const wait_count = range([&](BaseCore& core) {
     return core.Empty() && core.SetWait(event);
   });
   if (wait_count == 0 || event.SubEqual(count - wait_count + 1)) {
@@ -37,7 +32,7 @@ bool WaitRange(const Timeout& timeout, const Range& range, std::size_t count) {
     if (event.Wait(token, timeout)) {
       return true;
     }
-    reset_count = range([](detail::BaseCore& core) {
+    reset_count = range([](BaseCore& core) {
       return core.ResetWait();
     });
     if (reset_count != 0 && (reset_count == wait_count || event.SubEqual(reset_count))) {
@@ -52,7 +47,7 @@ bool WaitRange(const Timeout& timeout, const Range& range, std::size_t count) {
 template <typename Event, typename Timeout, typename... Cores>
 bool WaitCore(const Timeout& timeout, Cores&... cores) {
   static_assert(sizeof...(cores) >= 1, "Number of futures must be at least one");
-  static_assert((... && std::is_same_v<detail::BaseCore, Cores>), "Futures must be Future in Wait function");
+  static_assert((... && std::is_same_v<BaseCore, Cores>), "Futures must be Future in Wait function");
   auto range = [&](auto&& functor) {
     return (... + static_cast<std::size_t>(functor(cores)));
   };
@@ -60,31 +55,24 @@ bool WaitCore(const Timeout& timeout, Cores&... cores) {
 }
 
 template <typename Event, typename Timeout, typename Iterator>
-bool WaitIterator(const Timeout& timeout, Iterator it, std::size_t size) {
+bool WaitIterator(const Timeout& timeout, Iterator it, std::size_t count) {
   static_assert(is_future_v<typename std::iterator_traits<Iterator>::value_type>,
                 "Wait function Iterator must be point to some Future");
-  if (size == 0) {
+  if (count == 0) {
     return true;
   }
   auto range = [&](auto&& functor) {
-    auto temp_it = it;
-    std::size_t count = 0;
-    for (std::size_t i = 0; i != size; ++i) {
-      count += static_cast<std::size_t>(functor(*temp_it->GetCore()));
-      ++temp_it;
+    std::size_t wait_count = 0;
+    std::conditional_t<std::is_same_v<Timeout, NoTimeoutTag>, Iterator&, Iterator> range_it = it;
+    for (std::size_t i = 0; i != count; ++i) {
+      wait_count += static_cast<std::size_t>(functor(*range_it->GetCore()));
+      ++range_it;
     }
-    return count;
+    return wait_count;
   };
-  return WaitRange<Event>(timeout, range, size);
+  return WaitRange<Event>(timeout, range, count);
 }
 
-extern template bool WaitCore<MutexEvent, NoTimeoutTag, BaseCore>(const NoTimeoutTag&, BaseCore&);
-
-#ifdef YACLIB_ATOMIC_EVENT
-extern template bool WaitCore<AtomicEvent, NoTimeoutTag, BaseCore>(const NoTimeoutTag&, BaseCore&);
-using DefaultEvent = AtomicEvent;
-#else
-using DefaultEvent = MutexEvent;
-#endif
+extern template bool WaitCore<DefaultEvent, NoTimeoutTag, BaseCore>(const NoTimeoutTag&, BaseCore&);
 
 }  // namespace yaclib::detail

@@ -92,7 +92,7 @@ jobs:
               -DYACLIB_CXX_STANDARD=17                                                                                 \
               -DYACLIB_FLAGS="CORO"                                                                                    \
               -DYACLIB_TEST=SINGLE                                                                                     \
-              -DYACLIB_LOG="ERROR"                                                                                     \
+              -DYACLIB_LOG="ERROR;DEBUG"                                                                               \
               -G"${generators[$i]}"                                                                                    \
               ${options[$i]}                                                                                           \
               -DYACLIB_DEFINITIONS="YACLIB_CI_SLOWDOWN=$slowdown"

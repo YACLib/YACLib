@@ -1,6 +1,5 @@
 #include <util/intrusive_list.hpp>
 
-#include <yaclib/config.hpp>
 #include <yaclib/executor/thread_factory.hpp>
 #include <yaclib/fault/condition_variable.hpp>
 #include <yaclib/fault/mutex.hpp>
@@ -42,8 +41,8 @@ class LightThread final : public IThread {
 
   ~LightThread() final {
     YACLIB_ERROR(_thread.get_id() == yaclib_std::this_thread::get_id(),
-                 "Thread try to join itself, probably because you forgot Stop ThreadPool, and ThreadPool dtor was "
-                 "called in ThreadPool thread");
+                 "Thread try to join itself, probably because you forgot Stop ThreadPool, "
+                 "and ThreadPool dtor was called in ThreadPool thread");
     _thread.join();
   }
 
@@ -81,14 +80,14 @@ class HeavyThread final : public IThread {
   }
 
   ~HeavyThread() final {
+    YACLIB_ERROR(_thread.get_id() == yaclib_std::this_thread::get_id(),
+                 "Thread try to join itself, probably because you forgot Stop ThreadPool, "
+                 "and ThreadPool dtor was called in ThreadPool thread");
     {
       std::lock_guard lock{_m};
       _state = State::Stop;
     }
     _cv.notify_all();
-    YACLIB_ERROR(_thread.get_id() == yaclib_std::this_thread::get_id(),
-                 "Thread try to join itself, probably because you forgot Stop ThreadPool, and ThreadPool dtor was "
-                 "called in ThreadPool thread");
     _thread.join();
   }
 
@@ -149,11 +148,11 @@ class ThreadFactory : public BaseFactory {
  public:
   explicit ThreadFactory() = default;
 
-  virtual IThreadPtr Acquire(IFuncPtr func, std::size_t priority, std::string_view name, IFuncPtr acquire,
-                             IFuncPtr release) = 0;
+  virtual IThread* Acquire(IFuncPtr func, std::size_t priority, std::string_view name, IFuncPtr acquire,
+                           IFuncPtr release) = 0;
 
  private:
-  IThreadPtr Acquire(IFuncPtr func) final {
+  IThread* Acquire(IFuncPtr func) final {
     return Acquire(std::move(func), GetPriority(), GetName(), GetAcquire(), GetRelease());
   }
 
@@ -176,12 +175,12 @@ class ThreadFactory : public BaseFactory {
 
 class LightThreadFactory final : public ThreadFactory {
  private:
-  IThreadPtr Acquire(IFuncPtr func, std::size_t priority, std::string_view name, IFuncPtr acquire,
-                     IFuncPtr release) final {
+  IThread* Acquire(IFuncPtr func, std::size_t priority, std::string_view name, IFuncPtr acquire,
+                   IFuncPtr release) final {
     return new LightThread{priority, name, std::move(func), std::move(acquire), std::move(release)};
   }
 
-  void Release(IThreadPtr thread) final {
+  void Release(IThread* thread) final {
     delete thread;
   }
 
@@ -198,32 +197,32 @@ class HeavyThreadFactory : public ThreadFactory {
 
   ~HeavyThreadFactory() override {
     while (!_threads.Empty()) {
-      auto* thread = &_threads.PopFront();
-      delete thread;
+      auto& thread = _threads.PopFront();
+      delete &static_cast<IThread&>(thread);
     }
   }
 
  private:
-  IThreadPtr Acquire(IFuncPtr func, std::size_t priority, std::string_view name, IFuncPtr acquire,
-                     IFuncPtr release) final {
-    IThreadPtr t;
+  IThread* Acquire(IFuncPtr func, std::size_t priority, std::string_view name, IFuncPtr acquire,
+                   IFuncPtr release) final {
+    HeavyThread* thread = nullptr;
     if (std::lock_guard lock{_m}; _threads.Empty()) {
-      t = new HeavyThread{};
+      thread = new HeavyThread{};
       ++_threads_count;
     } else {
-      t = &_threads.PopFront();
+      thread = &static_cast<HeavyThread&>(_threads.PopFront());
     }
-    static_cast<HeavyThread&>(*t).Set(priority, name, std::move(func), std::move(acquire), std::move(release));
-    return t;
+    thread->Set(priority, name, std::move(func), std::move(acquire), std::move(release));
+    return thread;
   }
 
-  void Release(IThreadPtr t) final {
+  void Release(IThread* thread) final {
     std::unique_lock lock{_m};
     if (_threads_count <= _cache_threads) {
-      static_cast<HeavyThread&>(*t).Wait();
-      _threads.PushFront(*t);
+      static_cast<HeavyThread&>(*thread).Wait();
+      _threads.PushFront(*thread);
     } else {
-      delete t;
+      delete thread;
       --_threads_count;
     }
   }
@@ -232,7 +231,7 @@ class HeavyThreadFactory : public ThreadFactory {
 
   yaclib_std::mutex _m;
   std::size_t _threads_count{0};
-  detail::List<IThread> _threads;
+  detail::List _threads;
 };
 
 class DecoratorThreadFactory : public BaseFactory {
@@ -240,11 +239,11 @@ class DecoratorThreadFactory : public BaseFactory {
   explicit DecoratorThreadFactory(IThreadFactoryPtr base) : _base{std::move(base)} {
   }
 
-  IThreadPtr Acquire(IFuncPtr func) final {
+  IThread* Acquire(IFuncPtr func) final {
     return GetThreadFactory().Acquire(std::move(func), GetPriority(), GetName(), GetAcquire(), GetRelease());
   }
-  void Release(IThreadPtr thread) final {
-    _base->Release(std::move(thread));
+  void Release(IThread* thread) final {
+    _base->Release(thread);
   }
 
   const BaseFactory& GetBase() const {
@@ -345,11 +344,12 @@ class CallbackThreadFactory : public DecoratorThreadFactory {
   IFuncPtr _release;
 };
 
+LightThreadFactory sFactory;
+
 }  // namespace
 
 IThreadFactoryPtr MakeThreadFactory(std::size_t cache_threads) {
   if (cache_threads == 0) {
-    static LightThreadFactory sFactory;
     return IThreadFactoryPtr{&sFactory};
   }
   return MakeIntrusive<HeavyThreadFactory, IThreadFactory>(cache_threads);

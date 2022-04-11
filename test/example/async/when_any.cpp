@@ -16,6 +16,9 @@
 
 #include <gtest/gtest.h>
 
+namespace test {
+namespace {
+
 using namespace std::chrono_literals;
 
 // Any combinator:
@@ -29,7 +32,7 @@ TEST(Example, WhenAny) {
   // Run sync computations in parallel
 
   for (int i = 0; i < 5; ++i) {
-    futs.push_back(yaclib::Run(tp, [i]() -> int {
+    futs.push_back(yaclib::Run(*tp, [i]() -> int {
       return i;
     }));
   }
@@ -45,3 +48,6 @@ TEST(Example, WhenAny) {
   tp->Stop();
   tp->Wait();
 }
+
+}  // namespace
+}  // namespace test

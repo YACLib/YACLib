@@ -1,7 +1,5 @@
 #pragma once
 
-#include <yaclib/config.hpp>
-
 #ifdef YACLIB_FAULT
 
 #  include <yaclib/fault/detail/condition/condition_variable.hpp>

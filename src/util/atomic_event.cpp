@@ -1,4 +1,4 @@
-#include <yaclib/config.hpp>
+
 #include <yaclib/util/detail/atomic_event.hpp>
 
 namespace yaclib::detail {
@@ -13,14 +13,20 @@ void AtomicEvent::Wait(Token) noexcept {
   }
 }
 
-void AtomicEvent::Reset(Token) noexcept {
-  _state.store(0, std::memory_order_relaxed);
-}
-
-void AtomicEvent::Set() noexcept {
+void AtomicEvent::SetOne() noexcept {
   _state.store(1, std::memory_order_relaxed);
   _state.notify_one();
   _state.store(2, std::memory_order_release);
+}
+
+void AtomicEvent::SetAll() noexcept {
+  _state.store(1, std::memory_order_relaxed);
+  _state.notify_all();
+  _state.store(2, std::memory_order_release);
+}
+
+void AtomicEvent::Reset() noexcept {
+  _state.store(0, std::memory_order_relaxed);
 }
 
 }  // namespace yaclib::detail

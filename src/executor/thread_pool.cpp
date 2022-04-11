@@ -1,12 +1,12 @@
 #include <util/intrusive_list.hpp>
 
-#include <yaclib/config.hpp>
 #include <yaclib/executor/executor.hpp>
 #include <yaclib/executor/task.hpp>
 #include <yaclib/executor/thread_factory.hpp>
 #include <yaclib/executor/thread_pool.hpp>
 #include <yaclib/fault/condition_variable.hpp>
 #include <yaclib/fault/mutex.hpp>
+#include <yaclib/log.hpp>
 #include <yaclib/util/func.hpp>
 #include <yaclib/util/helper.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
@@ -29,6 +29,7 @@ class ThreadPool : public IThreadPool {
     });
     for (std::size_t i = 0; i != threads; ++i) {
       auto* thread = _factory->Acquire(loop);
+      YACLIB_ERROR(thread == nullptr, "Acquired from thread factory thread is null");
       _threads.PushBack(*thread);
     }
   }
@@ -86,18 +87,18 @@ class ThreadPool : public IThreadPool {
 
   void HardStop() final {
     std::unique_lock lock{_m};
-    detail::List<ITask> tasks{std::move(_tasks)};
+    detail::List tasks{std::move(_tasks)};
     Stop(std::move(lock));
     while (!tasks.Empty()) {
       auto& task = tasks.PopFront();
-      task.Cancel();
+      static_cast<ITask&>(task).Cancel();
     }
   }
 
   void Wait() final {
     while (!_threads.Empty()) {
-      auto* thread = &_threads.PopFront();
-      _factory->Release(IThreadPtr{thread});
+      auto& thread = _threads.PopFront();
+      _factory->Release(&static_cast<IThread&>(thread));
     }
   }
 
@@ -107,7 +108,7 @@ class ThreadPool : public IThreadPool {
       while (!_tasks.Empty()) {
         auto& task = _tasks.PopFront();
         lock.unlock();
-        task.Call();
+        static_cast<ITask&>(task).Call();
         lock.lock();
         _task_count -= 4;  // Pop Task
         if (NoTasks() && WantStop()) {
@@ -124,8 +125,8 @@ class ThreadPool : public IThreadPool {
   yaclib_std::mutex _m;
   yaclib_std::condition_variable _cv;
   IThreadFactoryPtr _factory;
-  detail::List<IThread> _threads;
-  detail::List<ITask> _tasks;
+  detail::List _threads;
+  detail::List _tasks;
   std::size_t _task_count;
 };
 

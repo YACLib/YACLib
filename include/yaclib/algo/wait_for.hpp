@@ -20,7 +20,7 @@ namespace yaclib {
  * \return The result of \ref Ready upon exiting
  */
 template <typename Event = detail::MutexEvent, typename Rep, typename Period, typename... V, typename... E>
-bool WaitFor(const std::chrono::duration<Rep, Period>& timeout_duration, Future<V, E>&... fs) {
+YACLIB_INLINE bool WaitFor(const std::chrono::duration<Rep, Period>& timeout_duration, Future<V, E>&... fs) {
   return detail::WaitCore<Event>(timeout_duration, static_cast<detail::BaseCore&>(*fs.GetCore())...);
 }
 
@@ -30,13 +30,13 @@ bool WaitFor(const std::chrono::duration<Rep, Period>& timeout_duration, Future<
  * The behavior is undefined if \ref Valid is false before the call to this function.
  * This function may block for longer than timeout_duration due to scheduling or resource contention delays.
  * \param timeout_duration maximum duration to block for
- * \param begin Iterator to futures to wait
- * \param end Iterator to futures to wait
+ * \param begin iterator to futures to wait
+ * \param end iterator to futures to wait
  * \return The result of \ref Ready upon exiting
  */
 template <typename Event = detail::MutexEvent, typename Rep, typename Period, typename Iterator>
-std::enable_if_t<!is_future_v<Iterator>, bool> WaitFor(const std::chrono::duration<Rep, Period>& timeout_duration,
-                                                       Iterator begin, Iterator end) {
+YACLIB_INLINE std::enable_if_t<!is_future_v<Iterator>, bool> WaitFor(
+  const std::chrono::duration<Rep, Period>& timeout_duration, Iterator begin, Iterator end) {
   // We don't use std::distance because we want to alert the user to the fact that it can be expensive.
   // Maybe the user has the size of the range, otherwise it is suggested to call Wait*(..., begin, distance(begin, end))
   return detail::WaitIterator<Event>(timeout_duration, begin, end - begin);
@@ -48,13 +48,14 @@ std::enable_if_t<!is_future_v<Iterator>, bool> WaitFor(const std::chrono::durati
  * The behavior is undefined if \ref Valid is false before the call to this function.
  * This function may block for longer than timeout_duration due to scheduling or resource contention delays.
  * \param timeout_duration maximum duration to block for
- * \param begin Iterator to futures to wait
- * \param size count of futures to wait
+ * \param begin iterator to futures to wait
+ * \param count of futures to wait
  * \return The result of \ref Ready upon exiting
  */
 template <typename Event = detail::MutexEvent, typename Rep, typename Period, typename Iterator>
-bool WaitFor(const std::chrono::duration<Rep, Period>& timeout_duration, Iterator begin, std::size_t size) {
-  return detail::WaitIterator<Event>(timeout_duration, begin, size);
+YACLIB_INLINE bool WaitFor(const std::chrono::duration<Rep, Period>& timeout_duration, Iterator begin,
+                           std::size_t count) {
+  return detail::WaitIterator<Event>(timeout_duration, begin, count);
 }
 
 }  // namespace yaclib

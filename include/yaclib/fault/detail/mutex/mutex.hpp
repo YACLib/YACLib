@@ -1,6 +1,5 @@
 #pragma once
 
-#include <yaclib/config.hpp>
 #include <yaclib/fault/detail/inject_fault.hpp>
 #include <yaclib/log.hpp>
 
@@ -23,7 +22,7 @@ class Mutex {
 
   using native_handle_type = std::mutex::native_handle_type;
 
-  inline native_handle_type native_handle();
+  native_handle_type native_handle();
 
   using impl_type = std::mutex;
 

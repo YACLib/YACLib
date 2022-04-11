@@ -1,4 +1,10 @@
 #include <yaclib/async/contract.hpp>
+#include <yaclib/config.hpp>
+#include <yaclib/executor/detail/unique_task.hpp>
+
+#if YACLIB_CORO
+#  include <yaclib/coroutine/detail/promise_type.hpp>
+#endif
 
 #include <gtest/gtest-spi.h>
 #include <gtest/gtest.h>
@@ -13,6 +19,9 @@ void CallInlineState() {
 }
 
 TEST(InlineCore, CallInline) {
+#ifndef YACLIB_LOG_ERROR
+  GTEST_SKIP();
+#endif
   EXPECT_FATAL_FAILURE(CallInlineState(), "");
 }
 
@@ -23,6 +32,9 @@ void CallState() {
 }
 
 TEST(InlineCore, Call) {
+#ifndef YACLIB_LOG_ERROR
+  GTEST_SKIP();
+#endif
   EXPECT_FATAL_FAILURE(CallState(), "");
 }
 
@@ -33,7 +45,25 @@ void CancelState() {
 }
 
 TEST(InlineCore, Cancel) {
+#ifndef YACLIB_LOG_ERROR
+  GTEST_SKIP();
+#endif
   EXPECT_FATAL_FAILURE(CancelState(), "");
+}
+
+TEST(UniqueTask, IncRef) {
+  auto task = yaclib::detail::MakeUniqueTask([] {
+  });
+  task->IncRef();
+  task->DecRef();
+}
+
+TEST(CoroDummy, DestroyResume) {
+#if YACLIB_CORO
+  yaclib::detail::Destroy<void, yaclib::StopError>::await_resume();
+#else
+  GTEST_SKIP();
+#endif
 }
 
 }  // namespace

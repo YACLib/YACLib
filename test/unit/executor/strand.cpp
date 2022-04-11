@@ -1,6 +1,5 @@
 #include <util/time.hpp>
 
-#include <yaclib/config.hpp>
 #include <yaclib/executor/executor.hpp>
 #include <yaclib/executor/strand.hpp>
 #include <yaclib/executor/submit.hpp>
@@ -20,19 +19,19 @@
 #include <gtest/gtest.h>
 
 namespace {
-using namespace yaclib;
+
 using namespace std::chrono_literals;
 
 // TODO(kononovk): add expect threads, current_executes
 
 TEST(ExecuteTask, Simple) {
-  auto tp = MakeThreadPool(4);
+  auto tp = yaclib::MakeThreadPool(4);
   auto strand = MakeStrand(tp);
   EXPECT_EQ(strand->Tag(), yaclib::IExecutor::Type::Strand);
 
   bool done{false};
 
-  Submit(strand, [&done] {
+  Submit(*strand, [&done] {
     done = true;
   });
 
@@ -43,14 +42,14 @@ TEST(ExecuteTask, Simple) {
 }
 
 TEST(counter, simple) {
-  auto tp = MakeThreadPool(13);
+  auto tp = yaclib::MakeThreadPool(13);
   auto strand = MakeStrand(tp);
 
   std::size_t counter = 0;
   static const std::size_t kIncrements = 65536;
 
   for (std::size_t i = 0; i < kIncrements; ++i) {
-    Submit(strand, [&counter] {
+    Submit(*strand, [&counter] {
       ++counter;
     });
   }
@@ -62,14 +61,14 @@ TEST(counter, simple) {
 }
 
 TEST(fifo, simple) {
-  auto tp = MakeThreadPool(13);
+  auto tp = yaclib::MakeThreadPool(13);
   auto strand = MakeStrand(tp);
 
   std::size_t next_ticket = 0;
   static const std::size_t kTickets = 123456;
 
   for (std::size_t t = 0; t < kTickets; ++t) {
-    Submit(strand, [&next_ticket, t] {
+    Submit(*strand, [&next_ticket, t] {
       EXPECT_EQ(next_ticket, t);
       ++next_ticket;
     });
@@ -83,11 +82,11 @@ TEST(fifo, simple) {
 
 class Counter {
  public:
-  Counter(IExecutorPtr e) : _strand{MakeStrand(e)} {
+  Counter(yaclib::IExecutorPtr e) : _strand{MakeStrand(e)} {
   }
 
   void Increment() {
-    Submit(_strand, [&] {
+    Submit(*_strand, [&] {
       ++_value;
     });
   }
@@ -98,11 +97,11 @@ class Counter {
 
  private:
   std::size_t _value = 0;
-  IExecutorPtr _strand;
+  yaclib::IExecutorPtr _strand;
 };
 
 TEST(concurrent_strands, simple) {
-  auto tp = MakeThreadPool(16);
+  auto tp = yaclib::MakeThreadPool(16);
 
   static const std::size_t kStrands = 50;
 
@@ -131,9 +130,9 @@ TEST(concurrent_strands, simple) {
 }
 
 TEST(batching, simple) {
-  auto tp = MakeThreadPool(1);
+  auto tp = yaclib::MakeThreadPool(1);
   EXPECT_EQ(tp->Tag(), yaclib::IExecutor::Type::ThreadPool);
-  Submit(tp, [] {
+  Submit(*tp, [] {
     // bubble
     yaclib_std::this_thread::sleep_for(1s);
   });
@@ -144,7 +143,7 @@ TEST(batching, simple) {
 
   std::size_t completed = 0;
   for (std::size_t i = 0; i < kStrandTasks; ++i) {
-    Submit(strand, [&completed] {
+    Submit(*strand, [&completed] {
       ++completed;
     });
   }
@@ -156,12 +155,12 @@ TEST(batching, simple) {
 }
 
 TEST(strand_over_strand, simple) {
-  auto tp = MakeThreadPool(4);
+  auto tp = yaclib::MakeThreadPool(4);
 
   auto strand = MakeStrand(MakeStrand(MakeStrand(tp)));
 
   bool done = false;
-  Submit(strand, [&done] {
+  Submit(*strand, [&done] {
     done = true;
   });
 
@@ -196,11 +195,11 @@ TEST(strand_over_strand, simple) {
 //
 //  int steps = 0;
 //
-//  Submit(strand, [&steps] {
+//  Submit(*strand, [&steps] {
 //    EXPECT_EQ(steps, 0);
 //    ++steps;
 //  });
-//  Submit(strand, [&steps] {
+//  Submit(*strand, [&steps] {
 //    EXPECT_EQ(steps, 1);
 //    ++steps;
 //  });
@@ -211,15 +210,16 @@ TEST(strand_over_strand, simple) {
 //}
 
 TEST(keep_strong_ref, simple) {
-  auto tp = MakeThreadPool(1);
+  auto tp = yaclib::MakeThreadPool(1);
 
-  Submit(tp, [] {
+  Submit(*tp, [] {
     // bubble
     yaclib_std::this_thread::sleep_for(1s);
   });
 
   bool done = false;
-  Submit(MakeStrand(tp), [&done] {
+  auto strand = MakeStrand(tp);
+  Submit(*strand, [&done] {
     done = true;
   });
 
@@ -229,11 +229,11 @@ TEST(keep_strong_ref, simple) {
 }
 
 TEST(do_not_occupy_thread, simple) {
-  auto tp = MakeThreadPool(1);
+  auto tp = yaclib::MakeThreadPool(1);
 
   auto strand = MakeStrand(tp);
 
-  Submit(tp, [] {
+  Submit(*tp, [] {
     // bubble
     yaclib_std::this_thread::sleep_for(1s);
   });
@@ -247,15 +247,15 @@ TEST(do_not_occupy_thread, simple) {
   };
 
   for (std::size_t i = 0; i < 100; ++i) {
-    Submit(strand, step);
+    Submit(*strand, step);
   }
 
-  Submit(tp, [&stop] {
+  Submit(*tp, [&stop] {
     stop.store(true);
   });
 
   while (!stop.load()) {
-    Submit(strand, step);
+    Submit(*strand, step);
     yaclib_std::this_thread::sleep_for(kStepPause);
   }
 
@@ -264,19 +264,19 @@ TEST(do_not_occupy_thread, simple) {
 }
 
 TEST(exceptions, simple) {
-  auto tp = MakeThreadPool(1);
+  auto tp = yaclib::MakeThreadPool(1);
   auto strand = MakeStrand(tp);
 
-  Submit(tp, [] {
+  Submit(*tp, [] {
     yaclib_std::this_thread::sleep_for(1s);
   });
 
   bool done = false;
 
-  Submit(strand, [] {
+  Submit(*strand, [] {
     throw std::runtime_error("You shall not pass!");
   });
-  Submit(strand, [&done] {
+  Submit(*strand, [&done] {
     done = true;
   });
 
@@ -286,17 +286,17 @@ TEST(exceptions, simple) {
 }
 
 TEST(non_blocking_execute, simple) {
-  auto tp = MakeThreadPool(1);
+  auto tp = yaclib::MakeThreadPool(1);
   auto strand = MakeStrand(tp);
 
-  Submit(strand, [] {
+  Submit(*strand, [] {
     yaclib_std::this_thread::sleep_for(2s);
   });
 
   yaclib_std::this_thread::sleep_for(500ms);
 
   test::util::StopWatch stop_watch;
-  Submit(strand, [] {
+  Submit(*strand, [] {
   });
   EXPECT_LE(stop_watch.Elapsed(), 100ms);
 
@@ -305,22 +305,22 @@ TEST(non_blocking_execute, simple) {
 }
 
 TEST(do_not_block_thread_pool, simple) {
-  auto tp = MakeThreadPool(2);
+  auto tp = yaclib::MakeThreadPool(2);
   auto strand = MakeStrand(tp);
 
-  Submit(strand, [] {
+  Submit(*strand, [] {
     yaclib_std::this_thread::sleep_for(100ms * YACLIB_CI_SLOWDOWN);
   });
 
   yaclib_std::this_thread::sleep_for(10ms * YACLIB_CI_SLOWDOWN);
 
-  Submit(strand, [] {
+  Submit(*strand, [] {
     yaclib_std::this_thread::sleep_for(100ms * YACLIB_CI_SLOWDOWN);
   });
 
   yaclib_std::atomic<bool> done = false;
 
-  Submit(tp, [&done] {
+  Submit(*tp, [&done] {
     done.store(true);
   });
 
@@ -332,13 +332,13 @@ TEST(do_not_block_thread_pool, simple) {
 }
 
 TEST(memory_leak, simple) {
-  auto tp = MakeThreadPool(1);
+  auto tp = yaclib::MakeThreadPool(1);
   auto strand = MakeStrand(tp);
 
-  Submit(tp, [] {
+  Submit(*tp, [] {
     yaclib_std::this_thread::sleep_for(1s);
   });
-  Submit(strand, [] {
+  Submit(*strand, [] {
   });
 
   tp->HardStop();

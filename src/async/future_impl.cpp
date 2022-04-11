@@ -1,5 +1,4 @@
 #include <yaclib/async/future.hpp>
-#include <yaclib/config.hpp>
 
 namespace yaclib {
 

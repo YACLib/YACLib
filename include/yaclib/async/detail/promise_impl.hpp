@@ -1,7 +1,5 @@
 #pragma once
 
-#include <yaclib/config.hpp>
-
 #include <type_traits>
 
 namespace yaclib {
@@ -24,10 +22,12 @@ void Promise<V, E>::Set() && {
 template <typename V, typename E>
 Promise<V, E>::Promise(detail::ResultCorePtr<V, E> core) noexcept : _core{std::move(core)} {
 }
+
 template <typename V, typename E>
 detail::ResultCorePtr<V, E>& Promise<V, E>::GetCore() noexcept {
   return _core;
 }
+
 template <typename V, typename E>
 Promise<V, E>::~Promise() {
   if (_core) {

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <yaclib/config.hpp>
-
 #include <type_traits>
 #include <utility>
 
@@ -20,7 +18,7 @@ class SafeCall {
 
  protected:
   void Call() noexcept {
-    if constexpr (std::is_nothrow_invocable_v<Invoke>) {
+    if constexpr (std::is_nothrow_invocable_v<Invoke>) {  // TODO(MBkkt) Is it really necessary?
       std::forward<Invoke>(_functor)();
     } else {
       try {

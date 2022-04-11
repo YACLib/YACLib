@@ -19,23 +19,24 @@ namespace yaclib {
  * \tparam P policy WhenAny errors
  * \tparam It type of passed iterator
  * \tparam T type of all passed futures
- * \param begin , size the range of futures to combine
+ * \param begin , count the range of futures to combine
  * \return Future<T>
  */
 template <WhenPolicy P = WhenPolicy::LastFail, typename It, typename T = typename std::iterator_traits<It>::value_type>
-auto WhenAny(It begin, std::size_t size) {
+auto WhenAny(It begin, std::size_t count) {
   static_assert(is_future_v<T>, "WhenAny function Iterator must be point to some Future");
   using V = future_value_t<T>;
   using E = future_error_t<T>;
-  if (size == 0) {
+  YACLIB_INFO(count < 2, "Don't use combinators for zero or one futures");
+  if (count == 0) {
     return Future<V, E>{};
   }
-  if (size == 1) {
+  if (count == 1) {
     return std::move(*begin);
   }
-  auto [future, combinator] = detail::AnyCombinator<V, E, P>::Make(size);
-  detail::WhenImpl(combinator, begin, size);
-  return std::move(future);
+  auto [future_core, combinator] = detail::AnyCombinator<V, E, P>::Make(count);
+  detail::WhenImpl(combinator, begin, count);
+  return Future{std::move(future_core)};
 }
 
 /**
@@ -48,7 +49,7 @@ auto WhenAny(It begin, std::size_t size) {
  * \return Future<T>
  */
 template <WhenPolicy P = WhenPolicy::LastFail, typename It, typename T = typename std::iterator_traits<It>::value_type>
-auto WhenAny(It begin, It end) {
+YACLIB_INLINE auto WhenAny(It begin, It end) {
   static_assert(is_future_v<T>, "WhenAny function Iterator must be point to some Future");
   // We don't use std::distance because we want to alert the user to the fact that it can be expensive.
   // Maybe the user has the size of the range, otherwise it is suggested to call WhenAny(begin, distance(begin, end))
@@ -61,16 +62,16 @@ auto WhenAny(It begin, It end) {
  * \tparam P policy WhenAny errors
  * \tparam V type of value all passed futures
  * \tparam E type of error all passed futures
- * \param head , tail one or more futures to combine
+ * \param futures two or more futures to combine
  * \return Future<T>
  */
-template <WhenPolicy P = WhenPolicy::LastFail, typename V, typename E, typename... Vs, typename Es>
-Future<V, E> WhenAny(Future<V, E>&& head, Future<Vs, Es>&&... tail) {
-  constexpr std::size_t kSize = 1 + sizeof...(Vs);
+template <WhenPolicy P = WhenPolicy::LastFail, typename E, typename... V>
+auto WhenAny(Future<V, E>&&... futures) {
+  constexpr std::size_t kSize = sizeof...(V);
   static_assert(kSize >= 2, "WhenAny wants at least two futures");
-  auto [future, combinator] = detail::AnyCombinator<V, E, P>::Make(kSize);
-  detail::WhenImpl(combinator, std::move(head), std::move(tail)...);
-  return std::move(future);
+  auto [future_core, combinator] = detail::AnyCombinator<head_t<V...>, E, P>::Make(kSize);
+  detail::WhenImpl(combinator, std::move(futures)...);
+  return Future{std::move(future_core)};
 }
 
 }  // namespace yaclib

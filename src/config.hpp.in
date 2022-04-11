@@ -52,12 +52,38 @@
 #  endif
 #endif
 
-#ifndef YACLIB_CI_SLOWDOWN
-#  define YACLIB_CI_SLOWDOWN 1
-#endif
-
 #if ${YACLIB_ATOMIC_EVENT}
 #  define YACLIB_ATOMIC_EVENT
+#endif
+
+#define YACLIB_CORO ${YACLIB_CORO}
+
+// TODO(MBkkt) Maybe make all single line not virtual functions are YACLIB_INLINE?
+// Now I use YACLIB_INLINE for
+// * AtomicCounter::SubEqual
+//     Because I want to compiler generate code without jmp and with correct barriers
+// * Wait like functions, that just template single line wrappers for general functions
+//     Because I want to compiler don't store the instantiation of these functions,
+//     in other words, so that this template code has a minimal impact, primarily on compile time
+// Now I interested in
+// * await_resume/suspend/ready
+//     TODO(MBkkt, mkornaukhov03) Research performance impact of visibility/inlining these functions
+// * all single-line/single-if header-only yaclib functions
+
+#if !defined(YACLIB_INLINE)  // Can be used only in special case
+#  if ${YACLIB_COVERAGE}
+#    define YACLIB_INLINE inline
+#  elif defined(_MSC_VER)
+#    if (_MSC_VER >= 1900 && !defined(_DEBUG))  // old and debug MSVC have problems with "__forceinline"
+#      define YACLIB_INLINE __forceinline
+#    else
+#      define YACLIB_INLINE inline
+#    endif
+#  elif defined(__GNUC__) && (defined(__clang__) || __GNUC__ > 5)  // old GCC have problems with "__always_inline__"
+#    define YACLIB_INLINE inline __attribute__((__always_inline__))
+#  else
+#    define YACLIB_INLINE inline
+#  endif
 #endif
 
 namespace yaclib {

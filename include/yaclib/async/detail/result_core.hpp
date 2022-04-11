@@ -2,7 +2,6 @@
 
 #include <yaclib/async/detail/base_core.hpp>
 #include <yaclib/async/detail/inline_core.hpp>
-#include <yaclib/config.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 #include <yaclib/util/result.hpp>
 
@@ -44,12 +43,13 @@ class ResultCore : public BaseCore {
     }
   }
 
-  void SetStop() final {
-    Set(StopTag{});
-  }
-
   [[nodiscard]] Result<V, E>& Get() noexcept {
     return _result;
+  }
+
+  void Cancel() noexcept final {
+    Set(StopTag{});
+    DecRef();
   }
 
  private:
@@ -66,7 +66,8 @@ class ResultCore<void, void> : public BaseCore {
   void Set(T&&) noexcept {
   }
 
-  void SetStop() final {
+  void Cancel() noexcept final {
+    DecRef();
   }
 };
 

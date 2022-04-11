@@ -1,7 +1,5 @@
 #pragma once
 
-#include <yaclib/config.hpp>
-
 namespace yaclib::detail {
 
 /**

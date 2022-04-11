@@ -1,7 +1,6 @@
 #pragma once
 
 #include <yaclib/async/detail/result_core.hpp>
-#include <yaclib/config.hpp>
 #include <yaclib/executor/executor.hpp>
 #include <yaclib/util/helper.hpp>
 #include <yaclib/util/type_traits.hpp>
@@ -55,8 +54,8 @@ class Future final {
 
   void Get() & = delete;
   void Get() const&& = delete;
-  void GetUnsafe() & = delete;
-  void GetUnsafe() const&& = delete;
+  void Touch() & = delete;
+  void Touch() const&& = delete;
 
   /**
    * Return copy of \ref Result from \ref Future
@@ -79,10 +78,10 @@ class Future final {
    * Return const ref of \ref Result from \ref Future
    *
    * Assume Ready is true. This method is NOT thread-safe and can be called multiple
-   * times. \note The behavior is undefined if \ref Valid is false before the call to this function. \return \ref Result
-   * stored in the shared state
+   * \note The behavior is undefined if \ref Valid or Ready is false before the call to this function.
+   * \return The \ref Result stored in the shared state
    */
-  [[nodiscard]] const Result<V, E>& GetUnsafe() const& noexcept;
+  [[nodiscard]] const Result<V, E>& Touch() const& noexcept;
 
   /**
    * Assume \def Ready is true and move \ref Result from Future
@@ -90,7 +89,7 @@ class Future final {
    * \note The behavior is undefined if \ref Valid or Ready is false before the call to this function.
    * \return The \ref Result that Future received
    */
-  [[nodiscard]] Result<V, E> GetUnsafe() && noexcept;
+  [[nodiscard]] Result<V, E> Touch() && noexcept;
 
   /**
    * Stop pipeline before current step, if possible.
@@ -98,14 +97,9 @@ class Future final {
   void Stop() &&;
 
   /**
-   * Disable calling \ref Stop in destructor
-   */
-  void Detach() &&;
-
-  /**
    * Specify executor for continuation.
    */
-  Future&& Via(IExecutorPtr executor) &&;
+  Future&& Via(IExecutor& executor) &&;
 
   /**
    * Attach the continuation functor to *this
@@ -138,29 +132,34 @@ class Future final {
    * \return New \ref Future object associated with the functor result
    */
   template <typename Functor>
-  [[nodiscard]] auto Then(IExecutorPtr e, Functor&& f) &&;
+  [[nodiscard]] auto Then(IExecutor& e, Functor&& f) &&;
 
   /**
-   * Attach the final continuation functor to *this
+   * Disable calling \ref Stop in destructor
+   */
+  void Detach() &&;
+
+  /**
+   * Attach the final continuation functor to *this and \ref Detach *this
    *
    * \note Functor must return void type.
    * \param f A continuation to be attached
    */
   template <typename Functor>
-  void Subscribe(Functor&& f) &&;
+  void Detach(Functor&& f) &&;
 
   /**
-   * Attach the final continuation functor to *this
+   * Attach the final continuation functor to *this and \ref Detach *this
    *
    * The functor will be executed via \ref Inline executor.
    * \note The behavior is undefined if \ref Valid is false before the call to this function.
    * \param f A continuation to be attached
    */
   template <typename Functor>
-  void SubscribeInline(Functor&& f) &&;
+  void DetachInline(Functor&& f) &&;
 
   /**
-   * Attach the final continuation functor to *this
+   * Attach the final continuation functor to *this and \ref Detach *this
    *
    * The functor will be executed via the specified executor.
    * \note The behavior is undefined if \ref Valid is false before the call to this function.
@@ -168,7 +167,7 @@ class Future final {
    * \param f A continuation to be attached
    */
   template <typename Functor>
-  void Subscribe(IExecutorPtr e, Functor&& f) &&;
+  void Detach(IExecutor& e, Functor&& f) &&;
 
   /// DETAIL
   Future(detail::ResultCorePtr<V, E> core) noexcept;
@@ -181,6 +180,15 @@ class Future final {
 
 extern template class Future<void, StopError>;
 
+/**
+ * Function for create Ready Future
+ *
+ * \tparam V if not default value, it's type of Future value
+ * \tparam E type of Future error, by default its
+ * \tparam Args if single, and V default, then used as type of Future value
+ * \param args for fulfill Future
+ * \return Ready Future
+ */
 template <typename V = Unit, typename E = StopError, typename... Args>
 auto MakeFuture(Args&&... args) {
   if constexpr (sizeof...(Args) == 0) {

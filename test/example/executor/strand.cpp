@@ -16,12 +16,13 @@
 
 #include <gtest/gtest.h>
 
-using namespace yaclib;
+namespace test {
+namespace {
 
 TEST(Example, Strand) {
   std::cout << "Strand" << std::endl;
 
-  auto tp = MakeThreadPool(4);
+  auto tp = yaclib::MakeThreadPool(4);
 
   auto strand = MakeStrand(tp);
 
@@ -35,7 +36,7 @@ TEST(Example, Strand) {
   for (std::size_t i = 0; i < kThreads; ++i) {
     threads.emplace_back([&]() {
       for (std::size_t j = 0; j < kIncrementsPerThread; ++j) {
-        Submit(strand, [&] {
+        Submit(*strand, [&] {
           ++counter;
         });
       }
@@ -53,3 +54,6 @@ TEST(Example, Strand) {
 
   std::cout << std::endl;
 }
+
+}  // namespace
+}  // namespace test

@@ -1,4 +1,3 @@
-#include <yaclib/config.hpp>
 #include <yaclib/util/detail/atomic_counter.hpp>
 #include <yaclib/util/helper.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
@@ -8,11 +7,10 @@
 
 #include <gtest/gtest.h>
 
+namespace test {
 namespace {
 
-using namespace yaclib;
-
-class Core : public IRef {
+class Core : public yaclib::IRef {
  public:
   static std::size_t sInstances;
 
@@ -33,11 +31,11 @@ size_t Core::sInstances = 0;
 class X : public Core {};
 class Y : public X {};
 
-using CounterX = detail::AtomicCounter<X>;
-using CounterY = detail::AtomicCounter<Y>;
+using CounterX = yaclib::detail::AtomicCounter<X>;
+using CounterY = yaclib::detail::AtomicCounter<Y>;
 
 TEST(ctor, default) {
-  IntrusivePtr<Core> px;
+  yaclib::IntrusivePtr<Core> px;
   EXPECT_EQ(px.Get(), nullptr);
   EXPECT_EQ(px, nullptr);
   EXPECT_EQ(nullptr, px);
@@ -46,12 +44,12 @@ TEST(ctor, default) {
 TEST(ctor, pointer) {
   EXPECT_EQ(Core::sInstances, 0);
   {
-    IntrusivePtr<Core> px{nullptr};
+    yaclib::IntrusivePtr<Core> px{nullptr};
     EXPECT_EQ(px, nullptr);
   }
   EXPECT_EQ(Core::sInstances, 0);
   {
-    IntrusivePtr<Core> px{NoRefTag{}, nullptr};
+    yaclib::IntrusivePtr<Core> px{yaclib::NoRefTag{}, nullptr};
     EXPECT_EQ(px, nullptr);
   }
   EXPECT_EQ(Core::sInstances, 0);
@@ -61,7 +59,7 @@ TEST(ctor, pointer) {
 
     EXPECT_EQ(Core::sInstances, 1);
 
-    IntrusivePtr<Core> px{NoRefTag{}, p};
+    yaclib::IntrusivePtr<Core> px{yaclib::NoRefTag{}, p};
     EXPECT_EQ(px.Get(), p);
     EXPECT_EQ(px, p);
     EXPECT_EQ(p, px);
@@ -75,9 +73,9 @@ TEST(ctor, pointer) {
     p->IncRef();
     EXPECT_EQ(p->GetRef(), 2);
 
-    IntrusivePtr<Core> pb{NoRefTag{}, p};
+    yaclib::IntrusivePtr<Core> pb{yaclib::NoRefTag{}, p};
     {
-      IntrusivePtr<CounterX> pc{NoRefTag{}, p};
+      yaclib::IntrusivePtr<CounterX> pc{yaclib::NoRefTag{}, p};
       EXPECT_EQ(pb, pc);
       EXPECT_EQ(p->GetRef(), 2);
     }
@@ -89,27 +87,27 @@ TEST(ctor, pointer) {
 TEST(ctor, copy) {
   EXPECT_EQ(Core::sInstances, 0);
   {
-    IntrusivePtr<CounterX> pc1;
-    IntrusivePtr<CounterX> pc2{pc1};
+    yaclib::IntrusivePtr<CounterX> pc1;
+    yaclib::IntrusivePtr<CounterX> pc2{pc1};
     EXPECT_EQ(pc1, pc2);
   }
   EXPECT_EQ(Core::sInstances, 0);
   {
-    IntrusivePtr<Y> py;
-    IntrusivePtr<X> px{py};
+    yaclib::IntrusivePtr<Y> py;
+    yaclib::IntrusivePtr<X> px{py};
     EXPECT_EQ(py, px);
   }
   EXPECT_EQ(Core::sInstances, 0);
   {
-    IntrusivePtr<X> px1 = MakeIntrusive<X>();
-    IntrusivePtr<X> px2(px1);
+    yaclib::IntrusivePtr<X> px1 = yaclib::MakeIntrusive<X>();
+    yaclib::IntrusivePtr<X> px2(px1);
     EXPECT_EQ(px1, px2);
     EXPECT_EQ(Core::sInstances, 1);
   }
   EXPECT_EQ(Core::sInstances, 0);
   {
-    IntrusivePtr<Y> py = MakeIntrusive<Y>();
-    IntrusivePtr<X> px(py);
+    yaclib::IntrusivePtr<Y> py = yaclib::MakeIntrusive<Y>();
+    yaclib::IntrusivePtr<X> px(py);
     EXPECT_EQ(py, px);
     EXPECT_EQ(Core::sInstances, 1);
   }
@@ -119,19 +117,19 @@ TEST(ctor, copy) {
 TEST(dtor, simple) {
   EXPECT_EQ(Core::sInstances, 0);
   {
-    IntrusivePtr<CounterX> pc1;
-    IntrusivePtr<CounterX> pc2{pc1};
+    yaclib::IntrusivePtr<CounterX> pc1;
+    yaclib::IntrusivePtr<CounterX> pc2{pc1};
     EXPECT_EQ(pc1, pc2);
   }
   EXPECT_EQ(Core::sInstances, 0);
 
   {
-    auto x = new CounterX{1};
-    IntrusivePtr<X> px1{NoRefTag{}, x};
+    auto* x = new CounterX{1};
+    yaclib::IntrusivePtr<X> px1{yaclib::NoRefTag{}, x};
     EXPECT_EQ(x->GetRef(), 1);
     EXPECT_EQ(Core::sInstances, 1);
     {
-      IntrusivePtr<X> px2{x};
+      yaclib::IntrusivePtr<X> px2{x};
       EXPECT_EQ(x->GetRef(), 2);
       EXPECT_EQ(Core::sInstances, 1);
     }
@@ -145,14 +143,14 @@ TEST(assign, copy) {
   EXPECT_EQ(Core::sInstances, 0);
 
   {
-    IntrusivePtr<X> p1;
+    yaclib::IntrusivePtr<X> p1;
     p1 = p1;
     EXPECT_EQ(p1, p1);
     EXPECT_TRUE(p1 ? false : true);
     EXPECT_FALSE(p1);
     EXPECT_EQ(p1, nullptr);
 
-    IntrusivePtr<X> p2;
+    yaclib::IntrusivePtr<X> p2;
 
     p1 = p2;
 
@@ -161,7 +159,7 @@ TEST(assign, copy) {
     EXPECT_FALSE(p1);
     EXPECT_EQ(p1, nullptr);
 
-    IntrusivePtr<X> p3(p1);
+    yaclib::IntrusivePtr<X> p3(p1);
 
     p1 = p3;
 
@@ -172,7 +170,7 @@ TEST(assign, copy) {
 
     EXPECT_EQ(Core::sInstances, 0);
 
-    IntrusivePtr<X> p4 = MakeIntrusive<X>();
+    yaclib::IntrusivePtr<X> p4 = yaclib::MakeIntrusive<X>();
 
     EXPECT_EQ(Core::sInstances, 1);
 
@@ -200,9 +198,9 @@ TEST(assign, copy) {
 TEST(assign, conversation) {
   EXPECT_EQ(Core::sInstances, 0);
   {
-    IntrusivePtr<X> p1;
+    yaclib::IntrusivePtr<X> p1;
 
-    IntrusivePtr<Y> p2;
+    yaclib::IntrusivePtr<Y> p2;
 
     p1 = p2;
     EXPECT_EQ(p1, p2);
@@ -212,12 +210,12 @@ TEST(assign, conversation) {
 
     EXPECT_EQ(Core::sInstances, 0);
 
-    IntrusivePtr<Y> p4 = MakeIntrusive<Y>();
+    yaclib::IntrusivePtr<Y> p4 = yaclib::MakeIntrusive<Y>();
 
     EXPECT_EQ(Core::sInstances, 1);
     EXPECT_EQ(static_cast<CounterY&>(*p4).GetRef(), 1);
 
-    IntrusivePtr<X> p5(p4);
+    yaclib::IntrusivePtr<X> p5(p4);
     EXPECT_EQ(static_cast<CounterY&>(*p4).GetRef(), 2);
 
     p1 = p4;
@@ -246,7 +244,7 @@ TEST(assign, conversation) {
 TEST(assign, pointer) {
   EXPECT_EQ(Core::sInstances, 0);
   {
-    IntrusivePtr<X> p1;
+    yaclib::IntrusivePtr<X> p1;
 
     p1 = p1.Get();
 
@@ -255,7 +253,7 @@ TEST(assign, pointer) {
     EXPECT_FALSE(p1);
     EXPECT_EQ(p1, nullptr);
 
-    IntrusivePtr<X> p2;
+    yaclib::IntrusivePtr<X> p2;
 
     p1 = p2.Get();
 
@@ -264,7 +262,7 @@ TEST(assign, pointer) {
     EXPECT_FALSE(p1);
     EXPECT_EQ(p1, nullptr);
 
-    IntrusivePtr<X> p3(p1);
+    yaclib::IntrusivePtr<X> p3(p1);
 
     p1 = p3.Get();
 
@@ -275,7 +273,7 @@ TEST(assign, pointer) {
 
     EXPECT_EQ(Core::sInstances, 0);
 
-    IntrusivePtr<X> p4 = MakeIntrusive<X>();
+    yaclib::IntrusivePtr<X> p4 = yaclib::MakeIntrusive<X>();
 
     EXPECT_EQ(Core::sInstances, 1);
 
@@ -299,8 +297,8 @@ TEST(assign, pointer) {
   }
 
   {
-    IntrusivePtr<X> p1;
-    IntrusivePtr<Y> p2;
+    yaclib::IntrusivePtr<X> p1;
+    yaclib::IntrusivePtr<Y> p2;
 
     p1 = p2.Get();
 
@@ -311,12 +309,12 @@ TEST(assign, pointer) {
 
     EXPECT_EQ(Core::sInstances, 0);
 
-    IntrusivePtr<Y> p4 = MakeIntrusive<Y>();
+    yaclib::IntrusivePtr<Y> p4 = yaclib::MakeIntrusive<Y>();
 
     EXPECT_EQ(Core::sInstances, 1);
     EXPECT_EQ(static_cast<CounterY&>(*p4).GetRef(), 1);
 
-    IntrusivePtr<X> p5(p4);
+    yaclib::IntrusivePtr<X> p5(p4);
     EXPECT_EQ(static_cast<CounterY&>(*p4).GetRef(), 2);
 
     p1 = p4.Get();
@@ -346,7 +344,7 @@ TEST(assign, pointer) {
 //  BOOST_TEST(N::base::instances == 0);
 //
 //  {
-//    IntrusivePtr<X> px;
+//    yaclib::IntrusivePtr<X> px;
 //    BOOST_TEST(px.get() == 0);
 //
 //    px.reset();
@@ -367,7 +365,7 @@ TEST(assign, pointer) {
 //  BOOST_TEST(N::base::instances == 0);
 //
 //  {
-//    IntrusivePtr<X> px(new X);
+//    yaclib::IntrusivePtr<X> px(new X);
 //    BOOST_TEST(N::base::instances == 1);
 //
 //    px.reset(0);
@@ -377,7 +375,7 @@ TEST(assign, pointer) {
 //  BOOST_TEST(N::base::instances == 0);
 //
 //  {
-//    IntrusivePtr<X> px(new X);
+//    yaclib::IntrusivePtr<X> px(new X);
 //    BOOST_TEST(N::base::instances == 1);
 //
 //    px.reset(0, false);
@@ -387,7 +385,7 @@ TEST(assign, pointer) {
 //  BOOST_TEST(N::base::instances == 0);
 //
 //  {
-//    IntrusivePtr<X> px(new X);
+//    yaclib::IntrusivePtr<X> px(new X);
 //    BOOST_TEST(N::base::instances == 1);
 //
 //    px.reset(0, true);
@@ -402,7 +400,7 @@ TEST(assign, pointer) {
 //
 //    BOOST_TEST(N::base::instances == 1);
 //
-//    IntrusivePtr<X> px;
+//    yaclib::IntrusivePtr<X> px;
 //    BOOST_TEST(px.get() == 0);
 //
 //    px.reset(p, true);
@@ -421,7 +419,7 @@ TEST(assign, pointer) {
 //    intrusive_ptr_add_ref(p);
 //    BOOST_TEST(p->use_count() == 1);
 //
-//    IntrusivePtr<X> px;
+//    yaclib::IntrusivePtr<X> px;
 //    BOOST_TEST(px.get() == 0);
 //
 //    px.reset(p, false);
@@ -432,7 +430,7 @@ TEST(assign, pointer) {
 //  BOOST_TEST(N::base::instances == 0);
 //
 //  {
-//    IntrusivePtr<X> px(new X);
+//    yaclib::IntrusivePtr<X> px(new X);
 //    BOOST_TEST(px.get() != 0);
 //    BOOST_TEST(px->use_count() == 1);
 //
@@ -453,7 +451,7 @@ TEST(assign, pointer) {
 //  BOOST_TEST(N::base::instances == 0);
 //
 //  {
-//    IntrusivePtr<X> px(new X);
+//    yaclib::IntrusivePtr<X> px(new X);
 //    BOOST_TEST(px.get() != 0);
 //    BOOST_TEST(px->use_count() == 1);
 //
@@ -474,7 +472,7 @@ TEST(assign, pointer) {
 //  BOOST_TEST(N::base::instances == 0);
 //
 //  {
-//    IntrusivePtr<X> px(new X);
+//    yaclib::IntrusivePtr<X> px(new X);
 //    BOOST_TEST(px.get() != 0);
 //    BOOST_TEST(px->use_count() == 1);
 //
@@ -500,7 +498,7 @@ TEST(assign, pointer) {
 //
 // TEST(access, simple) {
 //  {
-//    IntrusivePtr<X> px;
+//    yaclib::IntrusivePtr<X> px;
 //    BOOST_TEST(px ? false : true);
 //    BOOST_TEST(!px);
 //
@@ -508,7 +506,7 @@ TEST(assign, pointer) {
 //  }
 //
 //  {
-//    IntrusivePtr<X> px(0);
+//    yaclib::IntrusivePtr<X> px(0);
 //    BOOST_TEST(px ? false : true);
 //    BOOST_TEST(!px);
 //
@@ -516,7 +514,7 @@ TEST(assign, pointer) {
 //  }
 //
 //  {
-//    IntrusivePtr<X> px(new X);
+//    yaclib::IntrusivePtr<X> px(new X);
 //    BOOST_TEST(px ? true : false);
 //    BOOST_TEST(!!px);
 //    BOOST_TEST(&*px == px.get());
@@ -526,7 +524,7 @@ TEST(assign, pointer) {
 //  }
 //
 //  {
-//    IntrusivePtr<X> px;
+//    yaclib::IntrusivePtr<X> px;
 //    X* detached = px.detach();
 //    BOOST_TEST(px.get() == 0);
 //    BOOST_TEST(detached == 0);
@@ -536,7 +534,7 @@ TEST(assign, pointer) {
 //    X* p = new X;
 //    BOOST_TEST(p->use_count() == 0);
 //
-//    IntrusivePtr<X> px(p);
+//    yaclib::IntrusivePtr<X> px(p);
 //    BOOST_TEST(px.get() == p);
 //    BOOST_TEST(px->use_count() == 1);
 //
@@ -552,8 +550,8 @@ TEST(assign, pointer) {
 
 // TEST(swap, simple) {
 //   {
-//     IntrusivePtr<X> px;
-//     IntrusivePtr<X> px2;
+//     yaclib::IntrusivePtr<X> px;
+//     yaclib::IntrusivePtr<X> px2;
 //
 //     px.swap(px2);
 //
@@ -569,9 +567,9 @@ TEST(assign, pointer) {
 //
 //   {
 //     X* p = new X;
-//     IntrusivePtr<X> px;
-//     IntrusivePtr<X> px2(p);
-//     IntrusivePtr<X> px3(px2);
+//     yaclib::IntrusivePtr<X> px;
+//     yaclib::IntrusivePtr<X> px2(p);
+//     yaclib::IntrusivePtr<X> px3(px2);
 //
 //     px.swap(px2);
 //
@@ -594,9 +592,9 @@ TEST(assign, pointer) {
 //   {
 //     X* p1 = new X;
 //     X* p2 = new X;
-//     IntrusivePtr<X> px(p1);
-//     IntrusivePtr<X> px2(p2);
-//     IntrusivePtr<X> px3(px2);
+//     yaclib::IntrusivePtr<X> px(p1);
+//     yaclib::IntrusivePtr<X> px2(p2);
+//     yaclib::IntrusivePtr<X> px3(px2);
 //
 //     px.swap(px2);
 //
@@ -622,14 +620,14 @@ TEST(assign, pointer) {
 // namespace n_comparison {
 //
 // template <class T, class U>
-// void test2(IntrusivePtr<T> const& p, IntrusivePtr<U> const&
+// void test2(yaclib::IntrusivePtr<T> const& p, yaclib::IntrusivePtr<U> const&
 // q) {
 //   BOOST_TEST((p == q) == (p.get() == q.get()));
 //   BOOST_TEST((p != q) == (p.get() != q.get()));
 // }
 //
 // template <class T>
-// void test3(IntrusivePtr<T> const& p, IntrusivePtr<T> const&
+// void test3(yaclib::IntrusivePtr<T> const& p, yaclib::IntrusivePtr<T> const&
 // q) {
 //   BOOST_TEST((p == q) == (p.get() == q.get()));
 //   BOOST_TEST((p.get() == q) == (p.get() == q.get()));
@@ -645,39 +643,39 @@ TEST(assign, pointer) {
 //
 // void test() {
 //   {
-//     IntrusivePtr<X> px;
+//     yaclib::IntrusivePtr<X> px;
 //     test3(px, px);
 //
-//     IntrusivePtr<X> px2;
+//     yaclib::IntrusivePtr<X> px2;
 //     test3(px, px2);
 //
-//     IntrusivePtr<X> px3(px);
+//     yaclib::IntrusivePtr<X> px3(px);
 //     test3(px3, px3);
 //     test3(px, px3);
 //   }
 //
 //   {
-//     IntrusivePtr<X> px;
+//     yaclib::IntrusivePtr<X> px;
 //
-//     IntrusivePtr<X> px2(new X);
+//     yaclib::IntrusivePtr<X> px2(new X);
 //     test3(px, px2);
 //     test3(px2, px2);
 //
-//     IntrusivePtr<X> px3(new X);
+//     yaclib::IntrusivePtr<X> px3(new X);
 //     test3(px2, px3);
 //
-//     IntrusivePtr<X> px4(px2);
+//     yaclib::IntrusivePtr<X> px4(px2);
 //     test3(px2, px4);
 //     test3(px4, px4);
 //   }
 //
 //   {
-//     IntrusivePtr<X> px(new X);
+//     yaclib::IntrusivePtr<X> px(new X);
 //
-//     IntrusivePtr<Y> py(new Y);
+//     yaclib::IntrusivePtr<Y> py(new Y);
 //     test2(px, py);
 //
-//     IntrusivePtr<X> px2(py);
+//     yaclib::IntrusivePtr<X> px2(py);
 //     test2(px2, py);
 //     test3(px, px2);
 //     test3(px2, px2);
@@ -690,22 +688,22 @@ TEST(assign, pointer) {
 //
 // void test() {
 //   {
-//     IntrusivePtr<X> px(new Y);
+//     yaclib::IntrusivePtr<X> px(new Y);
 //
-//     IntrusivePtr<Y> py = boost::static_pointer_cast<Y>(px);
+//     yaclib::IntrusivePtr<Y> py = boost::static_pointer_cast<Y>(px);
 //     BOOST_TEST(px.get() == py.get());
 //     BOOST_TEST(px->use_count() == 2);
 //     BOOST_TEST(py->use_count() == 2);
 //
-//     IntrusivePtr<X> px2(py);
+//     yaclib::IntrusivePtr<X> px2(py);
 //     BOOST_TEST(px2.get() == px.get());
 //   }
 //
 //   BOOST_TEST(N::base::instances == 0);
 //
 //   {
-//     IntrusivePtr<Y> py =
-//         boost::static_pointer_cast<Y>(IntrusivePtr<X>(new Y));
+//     yaclib::IntrusivePtr<Y> py =
+//         boost::static_pointer_cast<Y>(yaclib::IntrusivePtr<X>(new Y));
 //     BOOST_TEST(py.get() != 0);
 //     BOOST_TEST(py->use_count() == 1);
 //   }
@@ -719,24 +717,24 @@ TEST(assign, pointer) {
 //
 // void test() {
 //   {
-//     IntrusivePtr<X const> px;
+//     yaclib::IntrusivePtr<X const> px;
 //
-//     IntrusivePtr<X> px2 = boost::const_pointer_cast<X>(px);
+//     yaclib::IntrusivePtr<X> px2 = boost::const_pointer_cast<X>(px);
 //     BOOST_TEST(px2.get() == 0);
 //   }
 //
 //   {
-//     IntrusivePtr<X> px2 =
-//         boost::const_pointer_cast<X>(IntrusivePtr<X const>());
+//     yaclib::IntrusivePtr<X> px2 =
+//         boost::const_pointer_cast<X>(yaclib::IntrusivePtr<X const>());
 //     BOOST_TEST(px2.get() == 0);
 //   }
 //
 //   BOOST_TEST(N::base::instances == 0);
 //
 //   {
-//     IntrusivePtr<X const> px(new X);
+//     yaclib::IntrusivePtr<X const> px(new X);
 //
-//     IntrusivePtr<X> px2 = boost::const_pointer_cast<X>(px);
+//     yaclib::IntrusivePtr<X> px2 = boost::const_pointer_cast<X>(px);
 //     BOOST_TEST(px2.get() == px.get());
 //     BOOST_TEST(px2->use_count() == 2);
 //     BOOST_TEST(px->use_count() == 2);
@@ -745,8 +743,8 @@ TEST(assign, pointer) {
 //   BOOST_TEST(N::base::instances == 0);
 //
 //   {
-//     IntrusivePtr<X> px =
-//         boost::const_pointer_cast<X>(IntrusivePtr<X const>(new X));
+//     yaclib::IntrusivePtr<X> px =
+//         boost::const_pointer_cast<X>(yaclib::IntrusivePtr<X const>(new X));
 //     BOOST_TEST(px.get() != 0);
 //     BOOST_TEST(px->use_count() == 1);
 //   }
@@ -760,52 +758,52 @@ TEST(assign, pointer) {
 //
 // void test() {
 //   {
-//     IntrusivePtr<X> px;
+//     yaclib::IntrusivePtr<X> px;
 //
-//     IntrusivePtr<Y> py = boost::dynamic_pointer_cast<Y>(px);
+//     yaclib::IntrusivePtr<Y> py = boost::dynamic_pointer_cast<Y>(px);
 //     BOOST_TEST(py.get() == 0);
 //   }
 //
 //   {
-//     IntrusivePtr<Y> py =
-//         boost::dynamic_pointer_cast<Y>(IntrusivePtr<X>());
+//     yaclib::IntrusivePtr<Y> py =
+//         boost::dynamic_pointer_cast<Y>(yaclib::IntrusivePtr<X>());
 //     BOOST_TEST(py.get() == 0);
 //   }
 //
 //   {
-//     IntrusivePtr<X> px(static_cast<X*>(0));
+//     yaclib::IntrusivePtr<X> px(static_cast<X*>(0));
 //
-//     IntrusivePtr<Y> py = boost::dynamic_pointer_cast<Y>(px);
+//     yaclib::IntrusivePtr<Y> py = boost::dynamic_pointer_cast<Y>(px);
 //     BOOST_TEST(py.get() == 0);
 //   }
 //
 //   {
-//     IntrusivePtr<Y> py = boost::dynamic_pointer_cast<Y>(
-//         IntrusivePtr<X>(static_cast<X*>(0)));
+//     yaclib::IntrusivePtr<Y> py = boost::dynamic_pointer_cast<Y>(
+//         yaclib::IntrusivePtr<X>(static_cast<X*>(0)));
 //     BOOST_TEST(py.get() == 0);
 //   }
 //
 //   {
-//     IntrusivePtr<X> px(new X);
+//     yaclib::IntrusivePtr<X> px(new X);
 //
-//     IntrusivePtr<Y> py = boost::dynamic_pointer_cast<Y>(px);
-//     BOOST_TEST(py.get() == 0);
-//   }
-//
-//   BOOST_TEST(N::base::instances == 0);
-//
-//   {
-//     IntrusivePtr<Y> py =
-//         boost::dynamic_pointer_cast<Y>(IntrusivePtr<X>(new X));
+//     yaclib::IntrusivePtr<Y> py = boost::dynamic_pointer_cast<Y>(px);
 //     BOOST_TEST(py.get() == 0);
 //   }
 //
 //   BOOST_TEST(N::base::instances == 0);
 //
 //   {
-//     IntrusivePtr<X> px(new Y);
+//     yaclib::IntrusivePtr<Y> py =
+//         boost::dynamic_pointer_cast<Y>(yaclib::IntrusivePtr<X>(new X));
+//     BOOST_TEST(py.get() == 0);
+//   }
 //
-//     IntrusivePtr<Y> py = boost::dynamic_pointer_cast<Y>(px);
+//   BOOST_TEST(N::base::instances == 0);
+//
+//   {
+//     yaclib::IntrusivePtr<X> px(new Y);
+//
+//     yaclib::IntrusivePtr<Y> py = boost::dynamic_pointer_cast<Y>(px);
 //     BOOST_TEST(py.get() == px.get());
 //     BOOST_TEST(py->use_count() == 2);
 //     BOOST_TEST(px->use_count() == 2);
@@ -814,10 +812,10 @@ TEST(assign, pointer) {
 //   BOOST_TEST(N::base::instances == 0);
 //
 //   {
-//     IntrusivePtr<X> px(new Y);
+//     yaclib::IntrusivePtr<X> px(new Y);
 //
-//     IntrusivePtr<Y> py =
-//         boost::dynamic_pointer_cast<Y>(IntrusivePtr<X>(new Y));
+//     yaclib::IntrusivePtr<Y> py =
+//         boost::dynamic_pointer_cast<Y>(yaclib::IntrusivePtr<X>(new Y));
 //     BOOST_TEST(py.get() != 0);
 //     BOOST_TEST(py->use_count() == 1);
 //   }
@@ -830,12 +828,12 @@ TEST(assign, pointer) {
 // namespace n_transitive {
 //
 // struct X : public N::base {
-//   IntrusivePtr<X> next;
+//   yaclib::IntrusivePtr<X> next;
 // };
 //
 // void test() {
-//   IntrusivePtr<X> p(new X);
-//   p->next = IntrusivePtr<X>(new X);
+//   yaclib::IntrusivePtr<X> p(new X);
+//   p->next = yaclib::IntrusivePtr<X>(new X);
 //   BOOST_TEST(!p->next->next);
 //   p = p->next;
 //   BOOST_TEST(!p->next);
@@ -855,7 +853,7 @@ TEST(assign, pointer) {
 //   }
 //
 //  private:
-//   IntrusivePtr<foo> m_self;
+//   yaclib::IntrusivePtr<foo> m_self;
 // };
 //
 // void test() {
@@ -866,3 +864,4 @@ TEST(assign, pointer) {
 // }  // namespace n_report_1
 
 }  // namespace
+}  // namespace test

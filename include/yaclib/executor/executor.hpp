@@ -1,6 +1,5 @@
 #pragma once
 
-#include <yaclib/config.hpp>
 #include <yaclib/executor/task.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 
@@ -13,12 +12,12 @@ class IExecutor : public IRef {
    *
    * \enum Custom, Inline, Strand, ThreadPool, SingleThread
    */
-  enum class Type {
+  enum class Type : char {
     Custom = 0,
-    Inline,
-    Strand,
-    ThreadPool,
-    SingleThread,
+    Inline = 1,
+    Strand = 2,
+    ThreadPool = 3,
+    SingleThread = 4,
   };
 
   /**
