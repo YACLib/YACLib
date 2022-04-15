@@ -5,6 +5,8 @@
 
 #include <algorithm>
 
+#include <ucontext.h>
+
 namespace yaclib {
 
 class ExecutionContext {
@@ -14,7 +16,7 @@ class ExecutionContext {
   void SwitchTo(ExecutionContext& other);
 
  private:
-  void* _context[kAsmContextSize];
+  ucontext_t _context;
 };
 
 }  // namespace yaclib
