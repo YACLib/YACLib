@@ -39,16 +39,9 @@ Allocation DefaultAllocator::Allocate() {
 }
 
 void DefaultAllocator::Release(Allocation allocation) {
-  if (allocation.size == PagesToBytes(_stack_size_pages)) {
-    _pool.push_back(allocation);
-  } else {
-    if (allocation.start == nullptr) {
-      return;
-    }
-
-    munmap(static_cast<void*>(allocation.start), allocation.size);
-    // TODO(myannyax) check returns not -1
-  }
+  //TODO save to pool
+  munmap(static_cast<void*>(allocation.start), allocation.size);
+  // TODO(myannyax) check returns not -1
 }
 
 void DefaultAllocator::SetMinStackSize(size_t bytes) {

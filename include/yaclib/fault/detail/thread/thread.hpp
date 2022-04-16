@@ -21,7 +21,7 @@ class Thread {
 
   template <class Fp, class... Args>
   inline explicit Thread(Fp&& f, Args&&... args)
-      : _impl([&]() {
+      : _impl([=]() {
           yaclib::IFuncPtr func = yaclib::MakeFunc([&] {
             f(std::move(args)...);
           });

@@ -4,6 +4,7 @@
 #include <yaclib/fiber/stack_view.hpp>
 
 #include <algorithm>
+#include <ucontext.h>
 
 #include <ucontext.h>
 
