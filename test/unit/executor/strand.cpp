@@ -173,20 +173,20 @@ TEST(strand_over_strand, simple) {
 // TODO(kononovk)
 // class LifoManualExecutor final : public IExecutor {
 // public:
-//  void Submit(yaclib::ITaskPtr task) final {
+//  void Submit(yaclib::JobPtr task) final {
 //    tasks_.push(std::move(task));
 //  }
 //
 //  void Drain() {
 //    while (!tasks_.empty()) {
-//      ITaskPtr next = std::move(tasks_.top());
+//      JobPtr next = std::move(tasks_.top());
 //      tasks_.pop();
 //      next->Call();
 //    }
 //  }
 //
 // private:
-//  std::stack<yaclib::ITaskPtr> tasks_;
+//  std::stack<yaclib::JobPtr> tasks_;
 //};
 //
 // TEST(stack, cimple) {

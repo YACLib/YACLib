@@ -78,7 +78,7 @@ void AsyncSimple() {
   auto [f, p] = yaclib::MakeContract<std::string>();
   bool called = false;
   InlineDetach<Inline>(std::move(f), [&](yaclib::Result<std::string> r) {
-    EXPECT_EQ(yaclib::CurrentThreadPool(), tp);
+    EXPECT_EQ(&yaclib::CurrentThreadPool(), tp);
     EXPECT_EQ(std::move(r).Ok(), "Hello!");
     called = true;
   });

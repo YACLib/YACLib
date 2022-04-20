@@ -45,7 +45,7 @@ TEST(Await, JustWorksRange) {
 #endif
   auto tp = yaclib::MakeThreadPool();
   auto coro = [&](yaclib::IThreadPoolPtr tp) -> yaclib::Future<int> {
-    std::array<yaclib::Future<int>, 2> arr;
+    std::array<yaclib::FutureOn<int>, 2> arr;
     arr[0] = yaclib::Run(*tp, [] {
       yaclib_std::this_thread::sleep_for(50ms * YACLIB_CI_SLOWDOWN);
       return 1;

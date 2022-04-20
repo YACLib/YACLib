@@ -216,7 +216,7 @@ void MultiThreaded() {
 
   static const int kValues = 6;
 
-  std::array<yaclib::Future<T>, 6> fs;
+  std::array<yaclib::FutureOn<T>, 6> fs;
   for (int i = 0; i < kValues; ++i) {
     fs[i] = async_value(i);
   }
@@ -258,7 +258,7 @@ TYPED_TEST(WhenAllT, ArrayMultiThreaded) {
 template <typename Error = yaclib::StopError>
 void FirstFail() {
   auto tp = yaclib::MakeThreadPool();
-  std::vector<yaclib::Future<void, Error>> ints;
+  std::vector<yaclib::FutureOn<void, Error>> ints;
   std::size_t count = std::thread::hardware_concurrency() * 4;
   ints.reserve(count * 2);
   for (int j = 0; j != 200; ++j) {

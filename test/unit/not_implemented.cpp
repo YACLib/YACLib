@@ -1,6 +1,6 @@
 #include <yaclib/async/contract.hpp>
 #include <yaclib/config.hpp>
-#include <yaclib/executor/detail/unique_task.hpp>
+#include <yaclib/executor/detail/unique_job.hpp>
 
 #if YACLIB_CORO
 #  include <yaclib/coroutine/detail/promise_type.hpp>
@@ -51,8 +51,8 @@ TEST(InlineCore, Cancel) {
   EXPECT_FATAL_FAILURE(CancelState(), "");
 }
 
-TEST(UniqueTask, IncRef) {
-  auto task = yaclib::detail::MakeUniqueTask([] {
+TEST(UniqueJob, IncRef) {
+  auto task = yaclib::detail::MakeUniqueJob([] {
   });
   task->IncRef();
   task->DecRef();

@@ -3,7 +3,7 @@
 #include <yaclib/async/run.hpp>
 #include <yaclib/coroutine/await.hpp>
 #include <yaclib/coroutine/future_traits.hpp>
-#include <yaclib/coroutine/via.hpp>
+#include <yaclib/coroutine/on.hpp>
 #include <yaclib/executor/strand.hpp>
 #include <yaclib/executor/thread_pool.hpp>
 #include <yaclib/fault/thread.hpp>
@@ -18,12 +18,12 @@
 namespace {
 using namespace std::chrono_literals;
 
-TEST(Via, JustWorks) {
+TEST(On, JustWorks) {
   auto main_thread = yaclib_std::this_thread::get_id();
 
   auto tp = yaclib::MakeThreadPool();
   auto coro = [&]() -> yaclib::Future<void> {
-    co_await Via(*tp);
+    co_await On(*tp);
     auto other_thread = yaclib_std::this_thread::get_id();
     EXPECT_NE(other_thread, main_thread);
     co_return;
@@ -36,12 +36,12 @@ TEST(Via, JustWorks) {
 
 // TODO(mkornaukhov03)
 // Bad test, TSAN fails
-TEST(Via, ManyCoros) {
+TEST(On, ManyCoros) {
   auto main_thread = yaclib_std::this_thread::get_id();
   auto tp = yaclib::MakeThreadPool();
   yaclib_std::atomic_int32_t sum = 0;
   auto coro = [&](int a) -> yaclib::Future<void> {
-    co_await Via(*tp);
+    co_await On(*tp);
     auto other_thread = yaclib_std::this_thread::get_id();
     EXPECT_NE(other_thread, main_thread);
     sum.fetch_add(a, std::memory_order_acquire);
@@ -69,7 +69,7 @@ TEST(Via, ManyCoros) {
 }
 
 // TODO(mkornaukhov03) Bad test, tasks are not submitted in thread pool
-TEST(Via, Cancel) {
+TEST(On, Cancel) {
   using namespace std::chrono_literals;
   auto tp = yaclib::MakeThreadPool(1);
   tp->Stop();
@@ -79,7 +79,7 @@ TEST(Via, Cancel) {
 
   auto main_thread = yaclib_std::this_thread::get_id();
   auto coro = [&](std::size_t a) -> yaclib::Future<void> {
-    co_await Via(*tp);
+    co_await On(*tp);
     auto curr_thread = yaclib_std::this_thread::get_id();
     EXPECT_NE(curr_thread, main_thread);
     sum.fetch_add(a, std::memory_order_relaxed);
@@ -95,7 +95,7 @@ TEST(Via, Cancel) {
   ASSERT_EQ(0, sum.load());
 }
 
-TEST(Via, LockWithStrand) {
+TEST(On, LockWithStrand) {
   using namespace std::chrono_literals;
 
   constexpr std::size_t kIncrements = 100500;
@@ -107,13 +107,13 @@ TEST(Via, LockWithStrand) {
   std::size_t sum = 0;
   yaclib_std::atomic_bool end = true;
   auto inc = [&, st = strand]() -> yaclib::Future<void> {
-    co_await Via(*st);  // lock
+    co_await On(*st);  // lock
     end.store(true, std::memory_order_release);
     ++sum;
     co_return;  //  unlock
   };
   auto add_value = [&, t = tp](size_t increments) -> yaclib::Future<void> {
-    co_await Via(*t);  // schedule to thread pool
+    co_await On(*t);  // schedule to thread pool
     std::vector<yaclib::Future<void>> vec;
     vec.reserve(increments);
     for (size_t i = 0; i != increments; ++i) {

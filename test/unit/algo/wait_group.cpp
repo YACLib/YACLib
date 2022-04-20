@@ -232,7 +232,7 @@ TYPED_TEST(WaitGroupTests, CallbackWorks) {
 void TestMultiThreaded() {
   constexpr int kThreads = 4;
   auto tp = yaclib::MakeThreadPool(kThreads);
-  yaclib::Future<int> fs[kThreads];
+  yaclib::FutureOn<int> fs[kThreads];
 
   for (int i = 0; i < kThreads; ++i) {
     fs[i] = Run(*tp, [i] {

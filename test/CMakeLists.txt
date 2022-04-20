@@ -63,7 +63,7 @@ if (YACLIB_CORO)
     unit/coroutine/await
     unit/coroutine/future_coro_traits
     unit/coroutine/stress
-    unit/coroutine/via
+    unit/coroutine/on
     )
 endif ()
 

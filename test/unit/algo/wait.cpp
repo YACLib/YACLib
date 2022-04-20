@@ -93,7 +93,7 @@ template <WaitPolicy kPolicy>
 void TestMultiThreaded() {
   static constexpr int kThreads = 4;
   auto tp = yaclib::MakeThreadPool(kThreads);
-  yaclib::Future<int> fs[kThreads];
+  yaclib::FutureOn<int> fs[kThreads];
 
   for (int i = 0; i < kThreads; ++i) {
     fs[i] = yaclib::Run(*tp, [i] {
@@ -177,7 +177,7 @@ TEST(WaitUntil, HaveResults) {
 TEST(WaitFor, Diff) {
   static constexpr int kThreads = 4;
   auto tp = yaclib::MakeThreadPool(kThreads);
-  yaclib::Future<int> fs[kThreads];
+  yaclib::FutureOn<int> fs[kThreads];
 
   for (int i = 0; i < kThreads; ++i) {
     fs[i] = yaclib::Run(*tp, [i] {
@@ -207,7 +207,7 @@ TEST(WaitFor, Diff) {
 
 TEST(Wait, ResetWait) {
   auto tp = yaclib::MakeThreadPool();
-  std::vector<yaclib::Future<size_t>> fs;
+  std::vector<yaclib::FutureOn<size_t>> fs;
   fs.reserve(1000 * yaclib_std::thread::hardware_concurrency());
   for (size_t i = 0; i != 1000 * yaclib_std::thread::hardware_concurrency(); ++i) {
     fs.push_back(yaclib::Run(*tp, [i] {
@@ -222,7 +222,7 @@ TEST(Wait, ResetWait) {
 // silly test to pass codecov
 TEST(SillyTest, ForTouch) {
   auto tp = yaclib::MakeThreadPool();
-  yaclib::Future<int> fut = yaclib::Run(*tp, [] {
+  yaclib::FutureOn<int> fut = yaclib::Run(*tp, [] {
     yaclib_std::this_thread::sleep_for(1ms);
     return 42;
   });
