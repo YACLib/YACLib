@@ -13,30 +13,30 @@ namespace yaclib {
  * Future and \ref Promise are like a Single Producer/Single Consumer one-shot one-element channel.
  * Use the \ref Promise to fulfill the \ref Future.
  */
-template <typename V, typename E = StopError>
-class Future final {
+template <typename V, typename E>
+class FutureBase {
  public:
   static_assert(Check<V>(), "V should be valid");
   static_assert(Check<E>(), "E should be valid");
   static_assert(!std::is_same_v<V, E>, "Future cannot be instantiated with same V and E, because it's ambiguous");
 
-  Future(const Future&) = delete;
-  Future& operator=(const Future&) = delete;
+  FutureBase(const FutureBase&) = delete;
+  FutureBase& operator=(const FutureBase&) = delete;
 
-  Future(Future&& other) noexcept = default;
-  Future& operator=(Future&& other) noexcept = default;
+  FutureBase(FutureBase&& other) noexcept = default;
+  FutureBase& operator=(FutureBase&& other) noexcept = default;
 
   /**
    * The default constructor creates not a \ref Valid Future
    *
    * Needed only for usability, e.g. instead of std::optional<Future<T>> in containers.
    */
-  Future() = default;
+  FutureBase() noexcept = default;
 
   /**
    * If Future is \ref Valid then call \ref Stop
    */
-  ~Future();
+  ~FutureBase();
 
   /**
    * Check if this \ref Future has \ref Promise
@@ -75,7 +75,7 @@ class Future final {
   [[nodiscard]] Result<V, E> Get() && noexcept;
 
   /**
-   * Return const ref of \ref Result from \ref Future
+   * Assume \def Ready is true and return copy reference to \ref Result from Future
    *
    * Assume Ready is true. This method is NOT thread-safe and can be called multiple
    * \note The behavior is undefined if \ref Valid or Ready is false before the call to this function.
@@ -97,42 +97,16 @@ class Future final {
   void Stop() &&;
 
   /**
-   * Specify executor for continuation.
-   */
-  Future&& Via(IExecutor& executor) &&;
-
-  /**
    * Attach the continuation functor to *this
    *
-   * \note The behavior is undefined if \ref Valid is false before the call to this function.
-   * \param f A continuation to be attached
-   * \return New \ref Future object associated with the functor result
-   */
-  template <typename Functor>
-  [[nodiscard]] auto Then(Functor&& f) &&;
-
-  /**
-   * Attach the continuation functor to *this
-   *
-   * The functor will be executed via \ref Inline executor.
-   * \note The behavior is undefined if \ref Valid is false before the call to this function.
-   * \param f A continuation to be attached
-   * \return New \ref Future object associated with the functor result
-   */
-  template <typename Functor>
-  [[nodiscard]] auto ThenInline(Functor&& f) &&;
-
-  /**
-   * Attach the continuation functor to *this
-   *
-   * The functor will be executed via the specified executor.
+   * The functor will be executed on the specified executor.
    * \note The behavior is undefined if \ref Valid is false before the call to this function.
    * \param e Executor which will \ref Execute the continuation
    * \param f A continuation to be attached
-   * \return New \ref Future object associated with the functor result
+   * \return New \ref FutureOn object associated with the functor result
    */
-  template <typename Functor>
-  [[nodiscard]] auto Then(IExecutor& e, Functor&& f) &&;
+  template <typename Func>
+  [[nodiscard]] /*FutureOn*/ auto Then(IExecutor& e, Func&& f) &&;
 
   /**
    * Disable calling \ref Stop in destructor
@@ -142,40 +116,71 @@ class Future final {
   /**
    * Attach the final continuation functor to *this and \ref Detach *this
    *
-   * \note Functor must return void type.
-   * \param f A continuation to be attached
-   */
-  template <typename Functor>
-  void Detach(Functor&& f) &&;
-
-  /**
-   * Attach the final continuation functor to *this and \ref Detach *this
-   *
-   * The functor will be executed via \ref Inline executor.
+   * The functor will be executed on \ref Inline executor.
    * \note The behavior is undefined if \ref Valid is false before the call to this function.
    * \param f A continuation to be attached
    */
-  template <typename Functor>
-  void DetachInline(Functor&& f) &&;
+  template <typename Func>
+  void DetachInline(Func&& f) &&;
 
   /**
    * Attach the final continuation functor to *this and \ref Detach *this
    *
-   * The functor will be executed via the specified executor.
+   * The functor will be executed on the specified executor.
    * \note The behavior is undefined if \ref Valid is false before the call to this function.
    * \param e Executor which will \ref Execute the continuation
    * \param f A continuation to be attached
    */
-  template <typename Functor>
-  void Detach(IExecutor& e, Functor&& f) &&;
+  template <typename Func>
+  void Detach(IExecutor& e, Func&& f) &&;
 
-  /// DETAIL
-  Future(detail::ResultCorePtr<V, E> core) noexcept;
+  /**
+   * Method that get internal Core state
+   *
+   * \return internal Core state ptr
+   */
   [[nodiscard]] detail::ResultCorePtr<V, E>& GetCore() noexcept;
-  /// DETAIL
 
- private:
+ protected:
+  explicit FutureBase(detail::ResultCorePtr<V, E> core) noexcept;
+
   detail::ResultCorePtr<V, E> _core;
+};
+
+extern template class FutureBase<void, StopError>;
+
+/**
+ * Provides a mechanism to access the result of async operations
+ *
+ * Future and \ref Promise are like a Single Producer/Single Consumer one-shot one-element channel.
+ * Use the \ref Promise to fulfill the \ref Future.
+ */
+template <typename V, typename E = StopError>
+class Future final : public FutureBase<V, E> {
+  using Base = FutureBase<V, E>;
+
+ public:
+  using Base::Base;
+
+  Future(detail::ResultCorePtr<V, E> core) noexcept : Base{std::move(core)} {
+  }
+
+  /**
+   * Attach the continuation functor to *this
+   *
+   * The functor will be executed on \ref Inline executor.
+   * \note The behavior is undefined if \ref Valid is false before the call to this function.
+   * \param f A continuation to be attached
+   * \return New \ref Future object associated with the functor result
+   */
+  template <typename Func>
+  [[nodiscard]] /*Future*/ auto ThenInline(Func&& f) &&;
+
+  /**
+   * Specify executor for continuation.
+   * Make FutureOn -- Future with executor
+   */
+  [[nodiscard]] FutureOn<V, E> On(IExecutor& executor) &&;
 };
 
 extern template class Future<void, StopError>;
@@ -202,6 +207,69 @@ auto MakeFuture(Args&&... args) {
     return Future{MakeIntrusive<detail::ResultCore<V, E>>(std::forward<Args>(args)...)};
   }
 }
+
+/**
+ * Provides a mechanism to access the result of async operations
+ *
+ * Future and \ref Promise are like a Single Producer/Single Consumer one-shot one-element channel.
+ * Use the \ref Promise to fulfill the \ref Future.
+ */
+template <typename V, typename E = StopError>
+class FutureOn final : public FutureBase<V, E> {
+  using Base = FutureBase<V, E>;
+
+ public:
+  using Base::Base;
+  using Base::Detach;
+  using Base::Then;
+
+  FutureOn(detail::ResultCorePtr<V, E> core) noexcept : Base{std::move(core)} {
+  }
+
+  /**
+   * Specify executor for continuation.
+   * Make FutureOn -- Future with executor
+   */
+  FutureOn&& On(IExecutor& executor) &&;
+
+  /**
+   * Specify executor for continuation.
+   * Make FutureOn -- Future with executor
+   */
+  [[nodiscard]] Future<V, E> On(std::nullptr_t) &&;
+
+  /**
+   * Attach the continuation functor to *this
+   *
+   * The functor will be executed on \ref Inline executor.
+   * \note The behavior is undefined if \ref Valid is false before the call to this function.
+   * \param f A continuation to be attached
+   * \return New \ref FutureOn object associated with the functor result
+   */
+  template <typename Func>
+  [[nodiscard]] /*FutureOn*/ auto ThenInline(Func&& f) &&;
+
+  /**
+   * Attach the continuation functor to *this
+   *
+   * \note The behavior is undefined if \ref Valid is false before the call to this function.
+   * \param f A continuation to be attached
+   * \return New \ref FutureOn object associated with the functor result
+   */
+  template <typename Func>
+  [[nodiscard]] /*FutureOn*/ auto Then(Func&& f) &&;
+
+  /**
+   * Attach the final continuation functor to *this and \ref Detach *this
+   *
+   * \note Func must return void type.
+   * \param f A continuation to be attached
+   */
+  template <typename Func>
+  void Detach(Func&& f) &&;
+};
+
+extern template class FutureOn<void, StopError>;
 
 }  // namespace yaclib
 
