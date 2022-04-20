@@ -56,8 +56,8 @@ bool WaitCore(const Timeout& timeout, Cores&... cores) {
 
 template <typename Event, typename Timeout, typename Iterator>
 bool WaitIterator(const Timeout& timeout, Iterator it, std::size_t count) {
-  static_assert(is_future_v<typename std::iterator_traits<Iterator>::value_type>,
-                "Wait function Iterator must be point to some Future");
+  static_assert(is_future_base_v<typename std::iterator_traits<Iterator>::value_type>,
+                "Wait function Iterator must be point to some FutureBase");
   if (count == 0) {
     return true;
   }

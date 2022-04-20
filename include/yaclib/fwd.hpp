@@ -6,7 +6,13 @@ template <typename V, typename E>
 class Result;
 
 template <typename V, typename E>
+class FutureBase;
+
+template <typename V, typename E>
 class Future;
+
+template <typename V, typename E>
+class FutureOn;
 
 template <typename V, typename E>
 class Promise;

@@ -63,7 +63,7 @@ class BasePromiseType : public AtomicCounter<ResultCore<V, E>, PromiseTypeDelete
   /*
     TODO(MBkkt) Think about add zero-cost ability to return error
      now works only co_return MakeFuture(std::make_exception_ptr(...))
-     and co_await Via(stopped_executor) for StopTag{}
+     and co_await On(stopped_executor) for StopTag{}
     Maybe:
      co_await yaclib::Cancel();
      co_await yaclib::Cancel(StopError{});

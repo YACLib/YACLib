@@ -1,4 +1,3 @@
-
 #include <yaclib/util/detail/atomic_event.hpp>
 
 namespace yaclib::detail {

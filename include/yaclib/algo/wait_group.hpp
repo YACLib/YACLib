@@ -46,7 +46,7 @@ class WaitGroup {
    * \param futures to wait
    */
   template <bool NeedAdd = true, typename... V, typename... E>
-  YACLIB_INLINE void Add(Future<V, E>&... futures) {
+  YACLIB_INLINE void Add(FutureBase<V, E>&... futures) {
     AddCore<NeedAdd>(static_cast<detail::BaseCore&>(*futures.GetCore())...);
   }
 
@@ -60,7 +60,7 @@ class WaitGroup {
    * \param end iterator to futures to Add
    */
   template <bool NeedAdd = true, typename It>
-  YACLIB_INLINE std::enable_if_t<!is_future_v<It>, void> Add(It begin, It end) {
+  YACLIB_INLINE std::enable_if_t<!is_future_base_v<It>, void> Add(It begin, It end) {
     AddIterator<NeedAdd>(begin, end - begin);
   }
 

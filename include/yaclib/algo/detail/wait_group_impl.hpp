@@ -53,7 +53,7 @@ void WaitGroup<InitCount, Event>::AddCore(Cores&... cores) {
 template <std::size_t InitCount, typename Event>
 template <bool NeedAdd, typename Iterator>
 void WaitGroup<InitCount, Event>::AddIterator(Iterator it, std::size_t count) {
-  static_assert(is_future_v<typename std::iterator_traits<Iterator>::value_type>,
+  static_assert(is_future_base_v<typename std::iterator_traits<Iterator>::value_type>,
                 "WaitGroup::Add function Iterator must be point to some Future");
   if (count == 0) {
     return;

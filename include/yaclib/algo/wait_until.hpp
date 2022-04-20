@@ -20,7 +20,7 @@ namespace yaclib {
  * \return The result of \ref Ready upon exiting
  */
 template <typename Event = detail::MutexEvent, typename Clock, typename Duration, typename... V, typename... E>
-YACLIB_INLINE bool WaitUntil(const std::chrono::time_point<Clock, Duration>& timeout_time, Future<V, E>&... fs) {
+YACLIB_INLINE bool WaitUntil(const std::chrono::time_point<Clock, Duration>& timeout_time, FutureBase<V, E>&... fs) {
   return detail::WaitCore<Event>(timeout_time, static_cast<detail::BaseCore&>(*fs.GetCore())...);
 }
 
@@ -36,7 +36,7 @@ YACLIB_INLINE bool WaitUntil(const std::chrono::time_point<Clock, Duration>& tim
  * \return The result of \ref Ready upon exiting
  */
 template <typename Event = detail::MutexEvent, typename Clock, typename Duration, typename Iterator>
-YACLIB_INLINE std::enable_if_t<!is_future_v<Iterator>, bool> WaitUntil(
+YACLIB_INLINE std::enable_if_t<!is_future_base_v<Iterator>, bool> WaitUntil(
   const std::chrono::time_point<Clock, Duration>& timeout_time, Iterator begin, Iterator end) {
   // We don't use std::distance because we want to alert the user to the fact that it can be expensive.
   // Maybe the user has the size of the range, otherwise it is suggested to call Wait*(..., begin, distance(begin, end))

@@ -3,13 +3,13 @@
 #include <yaclib/coroutine/coroutine.hpp>
 #include <yaclib/coroutine/detail/promise_type.hpp>
 #include <yaclib/executor/executor.hpp>
-#include <yaclib/executor/task.hpp>
+#include <yaclib/executor/job.hpp>
 
 namespace yaclib::detail {
 
-class ViaAwaiter {
+class OnAwaiter {
  public:
-  explicit ViaAwaiter(IExecutor& e);
+  explicit OnAwaiter(IExecutor& e);
 
   static bool await_ready() noexcept {
     return false;

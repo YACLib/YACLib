@@ -1,7 +1,8 @@
 #include <util/intrusive_list.hpp>
 
 #include <yaclib/executor/executor.hpp>
-#include <yaclib/executor/task.hpp>
+#include <yaclib/executor/inline.hpp>
+#include <yaclib/executor/job.hpp>
 #include <yaclib/executor/thread_factory.hpp>
 #include <yaclib/executor/thread_pool.hpp>
 #include <yaclib/fault/condition_variable.hpp>
@@ -17,7 +18,7 @@
 namespace yaclib {
 namespace {
 
-thread_local IThreadPool* tlCurrentThreadPool;
+static thread_local IExecutor* tlCurrentThreadPool{&MakeInline()};
 
 class ThreadPool : public IThreadPool {
  public:
@@ -25,7 +26,7 @@ class ThreadPool : public IThreadPool {
     auto loop = MakeFunc([this] {
       tlCurrentThreadPool = this;
       Loop();
-      tlCurrentThreadPool = nullptr;
+      tlCurrentThreadPool = &MakeInline();
     });
     for (std::size_t i = 0; i != threads; ++i) {
       auto* thread = _factory->Acquire(loop);
@@ -59,7 +60,7 @@ class ThreadPool : public IThreadPool {
     _cv.notify_all();
   }
 
-  void Submit(ITask& task) noexcept final {
+  void Submit(Job& task) noexcept final {
     std::unique_lock lock{_m};
     if (WasStop()) {
       lock.unlock();
@@ -91,7 +92,7 @@ class ThreadPool : public IThreadPool {
     Stop(std::move(lock));
     while (!tasks.Empty()) {
       auto& task = tasks.PopFront();
-      static_cast<ITask&>(task).Cancel();
+      static_cast<Job&>(task).Cancel();
     }
   }
 
@@ -108,7 +109,7 @@ class ThreadPool : public IThreadPool {
       while (!_tasks.Empty()) {
         auto& task = _tasks.PopFront();
         lock.unlock();
-        static_cast<ITask&>(task).Call();
+        static_cast<Job&>(task).Call();
         lock.lock();
         _task_count -= 4;  // Pop Task
         if (NoTasks() && WantStop()) {
@@ -132,8 +133,8 @@ class ThreadPool : public IThreadPool {
 
 }  // namespace
 
-IThreadPool* CurrentThreadPool() noexcept {
-  return tlCurrentThreadPool;
+IExecutor& CurrentThreadPool() noexcept {
+  return *tlCurrentThreadPool;
 }
 
 IThreadPoolPtr MakeThreadPool(std::size_t threads, IThreadFactoryPtr tf) {

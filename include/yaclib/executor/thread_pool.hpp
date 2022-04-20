@@ -42,9 +42,14 @@ using IThreadPoolPtr = IntrusivePtr<IThreadPool>;
 
 /**
  * \return Thread local pointer to the ThreadPool that owns the current thread
- * nullptr if no ThreadPool owns the thread
+ *         Inline executor if no ThreadPool owns the thread
  */
-IThreadPool* CurrentThreadPool() noexcept;
+IExecutor& CurrentThreadPool() noexcept;
+
+/**
+ *
+ */
+void SetCurrentThreadPool(IExecutor& executor) noexcept;
 
 /**
  * Create new ThreadPool object

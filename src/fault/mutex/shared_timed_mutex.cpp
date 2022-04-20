@@ -1,4 +1,3 @@
-
 #include <yaclib/fault/detail/mutex/shared_timed_mutex.hpp>
 
 namespace yaclib::detail {

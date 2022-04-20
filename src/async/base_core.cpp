@@ -1,11 +1,9 @@
 #include <yaclib/async/detail/base_core.hpp>
 #include <yaclib/async/detail/inline_core.hpp>
 #include <yaclib/executor/executor.hpp>
-#include <yaclib/executor/task.hpp>
+#include <yaclib/executor/job.hpp>
 #include <yaclib/log.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
-
-#include <utility>
 
 namespace yaclib::detail {
 

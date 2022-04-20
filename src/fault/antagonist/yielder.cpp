@@ -1,4 +1,3 @@
-
 #include <yaclib/fault/detail/yielder.hpp>
 
 namespace yaclib::detail {

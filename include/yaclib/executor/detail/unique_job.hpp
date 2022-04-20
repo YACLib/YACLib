@@ -1,20 +1,20 @@
 #pragma once
 
-#include <yaclib/executor/task.hpp>
+#include <yaclib/executor/job.hpp>
 #include <yaclib/util/detail/safe_call.hpp>
 
 #include <utility>
 
 namespace yaclib::detail {
 
-template <typename Functor>
-class UniqueTask final : public ITask, public SafeCall<Functor> {
+template <typename Func>
+class UniqueJob final : public Job, public SafeCall<Func> {
  public:
-  using SafeCall<Functor>::SafeCall;
+  using SafeCall<Func>::SafeCall;
 
  private:
   void Call() noexcept final {
-    SafeCall<Functor>::Call();
+    SafeCall<Func>::Call();
     DecRef();
   }
   void Cancel() noexcept final {
@@ -29,9 +29,9 @@ class UniqueTask final : public ITask, public SafeCall<Functor> {
   }
 };
 
-template <typename Functor>
-ITask* MakeUniqueTask(Functor&& functor) {
-  return new UniqueTask<Functor>{std::forward<Functor>(functor)};
+template <typename Func>
+Job* MakeUniqueJob(Func&& functor) {
+  return new UniqueJob<Func>{std::forward<Func>(functor)};
 }
 
 }  // namespace yaclib::detail

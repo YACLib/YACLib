@@ -1,10 +1,10 @@
 #pragma once
 
-#include <yaclib/executor/task.hpp>
+#include <yaclib/executor/job.hpp>
 
 namespace yaclib::detail {
 
-class InlineCore : public ITask {
+class InlineCore : public Job {
  public:
   enum class State : char {
     Empty = 0,

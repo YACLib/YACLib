@@ -1,7 +1,6 @@
-
 #include <yaclib/executor/executor.hpp>
 #include <yaclib/executor/inline.hpp>
-#include <yaclib/executor/task.hpp>
+#include <yaclib/executor/job.hpp>
 
 namespace yaclib {
 
@@ -11,7 +10,7 @@ class Inline final : public IExecutor {
     return Type::Inline;
   }
 
-  void Submit(ITask& task) noexcept final {
+  void Submit(Job& task) noexcept final {
     task.Call();
   }
 

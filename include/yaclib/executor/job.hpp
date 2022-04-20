@@ -8,7 +8,7 @@ namespace yaclib {
 /**
  * Callable that can be executed in an IExecutor \see IExecutor
  */
-class ITask : public IFunc, public detail::Node {
+class Job : public detail::Node, public IFunc {
  public:
   virtual void Cancel() noexcept = 0;
 };

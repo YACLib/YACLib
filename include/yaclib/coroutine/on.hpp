@@ -1,6 +1,6 @@
 #pragma once
 
-#include <yaclib/coroutine/detail/via_awaiter.hpp>
+#include <yaclib/coroutine/detail/on_awaiter.hpp>
 #include <yaclib/executor/executor.hpp>
 
 namespace yaclib {
@@ -8,6 +8,6 @@ namespace yaclib {
 /**
  * TODO(mkornaukhov03) Add doxygen docs
  */
-detail::ViaAwaiter Via(IExecutor& e);
+detail::OnAwaiter On(IExecutor& e);
 
 }  // namespace yaclib
