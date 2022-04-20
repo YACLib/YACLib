@@ -1,6 +1,5 @@
 #pragma once
 
-#include <yaclib/config.hpp>
 #include <yaclib/fault/condition_variable.hpp>
 #include <yaclib/fault/mutex.hpp>
 #include <yaclib/util/ref.hpp>
@@ -31,9 +30,11 @@ class /*alignas(kCacheLineSize)*/ MutexEvent : public IRef {
     });
   }
 
-  void Reset(Token&) noexcept;
+  void SetOne();
 
-  void Set();
+  void SetAll();
+
+  void Reset() noexcept;
 
  private:
   bool _is_ready = false;

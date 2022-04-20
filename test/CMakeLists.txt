@@ -31,11 +31,6 @@ set(TEST_UTIL_SOURCES
   test.cpp
   )
 
-#TODO(myannyax) any ways this can be avoided?
-if (YACLIB_FAULT)
-  list(APPEND YACLIB_DEFINITIONS YACLIB_FAULT)
-endif ()
-
 set(YACLIB_EXAMPLE_SOURCES
   example/async/simple
   example/executor/thread_pool
@@ -60,26 +55,26 @@ set(YACLIB_UNIT_SOURCES
   unit/executor/thread_pool
   unit/async/stress
   unit/executor/strand
+  unit/not_implemented
   )
 
-if (YACLIB_LOG STREQUAL "ERROR")
-  list(APPEND YACLIB_DEFINITIONS YACLIB_LOG_ERROR)
-elseif (YACLIB_LOG STREQUAL "INFO")
-  list(APPEND YACLIB_DEFINITIONS YACLIB_LOG_ERROR)
-  list(APPEND YACLIB_DEFINITIONS YACLIB_LOG_INFO)
-endif ()
-
-if (CORO)
+if (YACLIB_CORO)
   list(APPEND YACLIB_UNIT_SOURCES
     unit/coroutine/await
-    unit/coroutine/dummy
     unit/coroutine/future_coro_traits
     unit/coroutine/stress
+    unit/coroutine/via
     )
 endif ()
 
 #TODO(MBkkt) Add options which shuffle tests list, maybe just use gtest options?
 set(YACLIB_TEST_SOURCES ${YACLIB_UNIT_SOURCES} ${YACLIB_EXAMPLE_SOURCES})
+
+set(OLD_YACLIB_DEFINITIONS YACLIB_DEFINITIONS)
+
+if (NOT YACLIB_DEFINITIONS MATCHES "YACLIB_CI_SLOWDOWN")
+  list(APPEND YACLIB_DEFINITIONS "YACLIB_CI_SLOWDOWN=1")
+endif ()
 
 function(yaclib_add_test TEST_NAME)
   target_compile_options(${TEST_NAME} PRIVATE ${YACLIB_WARN})
@@ -115,17 +110,21 @@ else ()
   endforeach ()
 endif ()
 
-add_executable(unit_util_logging test.cpp unit/util/logging.cpp)
+add_executable(unit_log
+  test.cpp
+  unit/log.cpp
+  )
 
-set(OLD_YACLIB_DEFINITIONS YACLIB_DEFINITIONS)
-
-if (YACLIB_LOG STREQUAL "ERROR")
-  list(APPEND YACLIB_DEFINITIONS YACLIB_LOG_INFO)
-elseif (NOT YACLIB_LOG STREQUAL "INFO")
-  list(APPEND YACLIB_DEFINITIONS YACLIB_LOG_ERROR)
-  list(APPEND YACLIB_DEFINITIONS YACLIB_LOG_INFO)
+if (NOT YACLIB_DEFINITIONS MATCHES "YACLIB_LOG_ERROR")
+  list(APPEND YACLIB_DEFINITIONS "YACLIB_LOG_ERROR")
+endif ()
+if (NOT YACLIB_DEFINITIONS MATCHES "YACLIB_LOG_INFO")
+  list(APPEND YACLIB_DEFINITIONS "YACLIB_LOG_INFO")
+endif ()
+if (NOT YACLIB_DEFINITIONS MATCHES "YACLIB_LOG_DEBUG")
+  list(APPEND YACLIB_DEFINITIONS "YACLIB_LOG_DEBUG")
 endif ()
 
-yaclib_add_test(unit_util_logging)
+yaclib_add_test(unit_log)
 
 set(YACLIB_DEFINITIONS OLD_YACLIB_DEFINITIONS)

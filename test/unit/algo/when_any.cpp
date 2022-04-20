@@ -3,7 +3,6 @@
 #include <yaclib/async/detail/result_core.hpp>
 #include <yaclib/async/promise.hpp>
 #include <yaclib/async/run.hpp>
-#include <yaclib/config.hpp>
 #include <yaclib/executor/thread_pool.hpp>
 #include <yaclib/fault/chrono.hpp>
 #include <yaclib/fault/thread.hpp>
@@ -27,9 +26,9 @@
 
 #include <gtest/gtest.h>
 
+namespace test {
 namespace {
 
-using namespace yaclib;
 using namespace std::chrono_literals;
 
 enum class Result {
@@ -49,8 +48,8 @@ enum class Value {
   Void,
 };
 
-template <Container C, WhenPolicy P, typename V, int kSize = 3, bool UseDefault = false>
-auto FillArrays(std::array<Promise<V>, kSize>& promises, std::array<Future<V>, kSize>& futures) {
+template <Container C, yaclib::WhenPolicy P, typename V, int kSize = 3, bool UseDefault = false>
+auto FillArrays(std::array<yaclib::Promise<V>, kSize>& promises, std::array<yaclib::Future<V>, kSize>& futures) {
   for (int i = 0; i < kSize; ++i) {
     std::tie(futures[i], promises[i]) = yaclib::MakeContract<V>();
   }
@@ -63,19 +62,19 @@ auto FillArrays(std::array<Promise<V>, kSize>& promises, std::array<Future<V>, k
       }
     } else {
       if constexpr (C == Container::Array) {
-        return WhenAny<P>(std::move(futures[0]), std::move(futures[1]), std::move(futures[2]));
+        return yaclib::WhenAny<P>(std::move(futures[0]), std::move(futures[1]), std::move(futures[2]));
       } else {
-        return WhenAny<P>(futures.begin(), futures.end());
+        return yaclib::WhenAny<P>(futures.begin(), futures.end());
       }
     }
   }();
 }
 
-template <Result R, Container C, WhenPolicy P, typename V>
+template <Result R, Container C, yaclib::WhenPolicy P, typename V>
 void JustWork() {
   constexpr int kSize = 3;
-  std::array<Promise<V>, kSize> promises;
-  std::array<Future<V>, kSize> futures;
+  std::array<yaclib::Promise<V>, kSize> promises;
+  std::array<yaclib::Future<V>, kSize> futures;
   auto any = FillArrays<C, P, V, kSize>(promises, futures);
 
   EXPECT_TRUE(any.Valid());
@@ -95,13 +94,13 @@ void JustWork() {
   }
 }
 
-template <Result R, Container C, WhenPolicy P, typename V, bool UseDefault = false>
+template <Result R, Container C, yaclib::WhenPolicy P, typename V, bool UseDefault = false>
 void Fail() {
-  auto f1 = StopError{StopTag{}};
+  auto f1 = yaclib::StopError{yaclib::StopTag{}};
   auto f2 = std::make_exception_ptr(std::runtime_error{""});
   constexpr int kSize = 3;
-  std::array<Promise<V>, kSize> promises;
-  std::array<Future<V>, kSize> futures;
+  std::array<yaclib::Promise<V>, kSize> promises;
+  std::array<yaclib::Future<V>, kSize> futures;
   auto any = FillArrays<C, P, V, kSize, UseDefault>(promises, futures);
   EXPECT_FALSE(any.Ready());
   if constexpr (R == Result::Error) {
@@ -109,7 +108,7 @@ void Fail() {
   } else {
     std::move(promises[1]).Set(f2);
   }
-  EXPECT_EQ(any.Ready(), P == WhenPolicy::None);
+  EXPECT_EQ(any.Ready(), P == yaclib::WhenPolicy::None);
   // Second and third error
   if constexpr (R == Result::Error) {
     std::move(promises[0]).Set(f2);
@@ -119,23 +118,23 @@ void Fail() {
     std::move(promises[2]).Set(f1);
   }
   EXPECT_TRUE(any.Ready());
-  if constexpr ((P == WhenPolicy::LastFail && R == Result::Exception) ||
-                ((P == WhenPolicy::None || P == WhenPolicy::FirstFail) && R == Result::Error)) {
-    EXPECT_THROW(std::move(any).Get().Ok(), yaclib::ResultError<StopError>);
+  if constexpr ((P == yaclib::WhenPolicy::LastFail && R == Result::Exception) ||
+                ((P == yaclib::WhenPolicy::None || P == yaclib::WhenPolicy::FirstFail) && R == Result::Error)) {
+    EXPECT_THROW(std::move(any).Get().Ok(), yaclib::ResultError<yaclib::StopError>);
   } else {
     EXPECT_THROW(std::move(any).Get().Ok(), std::runtime_error);
   }
 }
 
-template <Result R, Container C, WhenPolicy P, typename V>
+template <Result R, Container C, yaclib::WhenPolicy P, typename V>
 void Default() {
   Fail<R, C, P, V, true>();
 }
 
-template <Result R, Container C, WhenPolicy P, typename V>
+template <Result R, Container C, yaclib::WhenPolicy P, typename V>
 void EmptyInput() {
-  auto empty = std::vector<Future<V>>{};
-  auto any = WhenAny<P>(empty.begin(), empty.end());
+  auto empty = std::vector<yaclib::Future<V>>{};
+  auto any = yaclib::WhenAny<P>(empty.begin(), empty.end());
   EXPECT_FALSE(any.Valid());
   //  Return this code if we decide to return an empty ready future
   //  EXPECT_TRUE(any.Ready());
@@ -144,17 +143,17 @@ void EmptyInput() {
   //  EXPECT_THROW(std::move(result).Ok(), ResultEmpty);
 }
 
-template <Result R, Container C, WhenPolicy P, typename V>
+template <Result R, Container C, yaclib::WhenPolicy P, typename V>
 void MultiThreaded() {
   static constexpr bool kIsVoid = std::is_void_v<V>;
 
-  auto tp = MakeThreadPool();
+  auto tp = yaclib::MakeThreadPool();
 
   auto async_value = [tp](int value) {
-    return Run(tp, [value] {
+    return Run(*tp, [value] {
       yaclib_std::this_thread::sleep_for(20ms * YACLIB_CI_SLOWDOWN);
       if constexpr (kIsVoid) {
-        (void)value;
+        std::ignore = value;
       } else {
         return value;
       }
@@ -164,16 +163,16 @@ void MultiThreaded() {
   static const int kValues = 6;
   static const std::set<int> kOuts = {0, 1, 2, 3, 4, 5};
 
-  std::array<Future<V>, 6> fs;
+  std::array<yaclib::Future<V>, 6> fs;
   for (int i = 0; i < kValues; ++i) {
     fs[static_cast<size_t>(i)] = async_value(i);
   }
   auto gen_fs = [&fs] {
     if constexpr (C == Container::Vector) {
-      return WhenAny<P>(fs.begin(), fs.end());
+      return yaclib::WhenAny<P>(fs.begin(), fs.end());
     } else {
-      return WhenAny<P>(std::move(fs[0]), std::move(fs[1]), std::move(fs[2]), std::move(fs[3]), std::move(fs[4]),
-                        std::move(fs[5]));
+      return yaclib::WhenAny<P>(std::move(fs[0]), std::move(fs[1]), std::move(fs[2]), std::move(fs[3]),
+                                std::move(fs[4]), std::move(fs[5]));
     }
   };
 
@@ -194,36 +193,36 @@ void MultiThreaded() {
   tp->Wait();
 }
 
-template <Result R, Container C, WhenPolicy P, typename V>
+template <Result R, Container C, yaclib::WhenPolicy P, typename V>
 void TimeTest() {
   using Duration = std::chrono::nanoseconds;
   static constexpr bool is_void = std::is_void_v<V>;
 
-  auto tp = MakeThreadPool();
+  auto tp = yaclib::MakeThreadPool();
 
   auto async_value = [tp](int value, Duration d) {
-    return Run(tp, [value, d] {
+    return Run(*tp, [value, d] {
       yaclib_std::this_thread::sleep_for(d * YACLIB_CI_SLOWDOWN);
       if constexpr (!is_void) {
         return value;
       } else {
-        (void)value;
+        std::ignore = value;
       }
     });
   };
 
   static const int kValues = 2;
 
-  std::array<Future<V>, kValues> fs;
+  std::array<yaclib::Future<V>, kValues> fs;
 
   fs[0] = async_value(10, 100ms);
   fs[1] = async_value(5, 20ms);
 
   auto gen_fs = [&fs] {
     if constexpr (C == Container::Vector) {
-      return WhenAny<P>(fs.begin(), fs.end());
+      return yaclib::WhenAny<P>(fs.begin(), fs.end());
     } else {
-      return WhenAny<P>(std::move(fs[0]), std::move(fs[1]));
+      return yaclib::WhenAny<P>(std::move(fs[0]), std::move(fs[1]));
     }
   };
 
@@ -267,13 +266,13 @@ std::string ToString(Container c) {
   }
 }
 
-std::string ToString(WhenPolicy p) {
+std::string ToString(yaclib::WhenPolicy p) {
   switch (p) {
-    case WhenPolicy::None:
+    case yaclib::WhenPolicy::None:
       return "None";
-    case WhenPolicy::FirstFail:
+    case yaclib::WhenPolicy::FirstFail:
       return "FirstFail";
-    case WhenPolicy::LastFail:
+    case yaclib::WhenPolicy::LastFail:
       return "LastFail";
     default:
       return "Undefined";
@@ -290,7 +289,7 @@ std::string ToString(Value v) {
   }
 }
 
-using Param = std::tuple<Result, Container, WhenPolicy, Value>;
+using Param = std::tuple<Result, Container, yaclib::WhenPolicy, Value>;
 
 std::string ToString(const Param& param) {
   return ToString(std::get<0>(param)) + "_" + ToString(std::get<1>(param)) + "_" + ToString(std::get<2>(param)) + "_" +
@@ -300,21 +299,22 @@ std::string ToString(const Param& param) {
 class WhenAnyMatrix : public testing::TestWithParam<Param> {};
 
 using WhenAnyOK = WhenAnyMatrix;
-INSTANTIATE_TEST_SUITE_P(
-  WhenAnyOK, WhenAnyOK,
-  testing::Combine(testing::Values(Result::Ok), testing::Values(Container::Vector, Container::Array),
-                   testing::Values(WhenPolicy::None, WhenPolicy::FirstFail, WhenPolicy::LastFail),
-                   testing::Values(Value::Int, Value::Void)),
-  [](const testing::TestParamInfo<WhenAnyMatrix::ParamType>& info) {
-    return ToString(info.param);
-  });
+INSTANTIATE_TEST_SUITE_P(WhenAnyOK, WhenAnyOK,
+                         testing::Combine(testing::Values(Result::Ok),
+                                          testing::Values(Container::Vector, Container::Array),
+                                          testing::Values(yaclib::WhenPolicy::None, yaclib::WhenPolicy::FirstFail,
+                                                          yaclib::WhenPolicy::LastFail),
+                                          testing::Values(Value::Int, Value::Void)),
+                         [](const testing::TestParamInfo<WhenAnyMatrix::ParamType>& info) {
+                           return ToString(info.param);
+                         });
 
 using WhenAnyFail = WhenAnyMatrix;
 INSTANTIATE_TEST_SUITE_P(WhenAnyFail, WhenAnyFail,
                          testing::Combine(testing::Values(Result::Error, Result::Exception),
                                           testing::Values(Container::Vector, Container::Array),
-                                          testing::Values(WhenPolicy::None, WhenPolicy::FirstFail,
-                                                          WhenPolicy::LastFail),
+                                          testing::Values(yaclib::WhenPolicy::None, yaclib::WhenPolicy::FirstFail,
+                                                          yaclib::WhenPolicy::LastFail),
                                           testing::Values(Value::Int, Value::Void)),
                          [](const testing::TestParamInfo<WhenAnyMatrix::ParamType>& info) {
                            return ToString(info.param);
@@ -323,8 +323,8 @@ INSTANTIATE_TEST_SUITE_P(WhenAnyFail, WhenAnyFail,
 using WhenAnyEmpty = WhenAnyMatrix;
 INSTANTIATE_TEST_SUITE_P(WhenAnyEmpty, WhenAnyEmpty,
                          testing::Combine(testing::Values(Result::Ok), testing::Values(Container::Vector),
-                                          testing::Values(WhenPolicy::None, WhenPolicy::FirstFail,
-                                                          WhenPolicy::LastFail),
+                                          testing::Values(yaclib::WhenPolicy::None, yaclib::WhenPolicy::FirstFail,
+                                                          yaclib::WhenPolicy::LastFail),
                                           testing::Values(Value::Int, Value::Void)),
                          [](const testing::TestParamInfo<WhenAnyMatrix::ParamType>& info) {
                            return ToString(info.param);
@@ -334,7 +334,7 @@ using WhenAnyDefault = WhenAnyMatrix;
 INSTANTIATE_TEST_SUITE_P(WhenAnyDefault, WhenAnyDefault,
                          testing::Combine(testing::Values(Result::Error, Result::Exception),
                                           testing::Values(Container::Vector, Container::Array),
-                                          testing::Values(WhenPolicy::LastFail),
+                                          testing::Values(yaclib::WhenPolicy::LastFail),
                                           testing::Values(Value::Int, Value::Void)),
                          [](const testing::TestParamInfo<WhenAnyMatrix::ParamType>& info) {
                            return ToString(info.param);
@@ -353,12 +353,12 @@ INSTANTIATE_TEST_SUITE_P(WhenAnyDefault, WhenAnyDefault,
 
 #define CALL_F_R_C(Function, Result, Container)                                                                        \
   switch (p) {                                                                                                         \
-    case WhenPolicy::None:                                                                                             \
-      CALL_F_R_C_P(Function, Result, Container, WhenPolicy::None)                                                      \
-    case WhenPolicy::FirstFail:                                                                                        \
-      CALL_F_R_C_P(Function, Result, Container, WhenPolicy::FirstFail)                                                 \
-    case WhenPolicy::LastFail:                                                                                         \
-      CALL_F_R_C_P(Function, Result, Container, WhenPolicy::LastFail)                                                  \
+    case yaclib::WhenPolicy::None:                                                                                     \
+      CALL_F_R_C_P(Function, Result, Container, yaclib::WhenPolicy::None)                                              \
+    case yaclib::WhenPolicy::FirstFail:                                                                                \
+      CALL_F_R_C_P(Function, Result, Container, yaclib::WhenPolicy::FirstFail)                                         \
+    case yaclib::WhenPolicy::LastFail:                                                                                 \
+      CALL_F_R_C_P(Function, Result, Container, yaclib::WhenPolicy::LastFail)                                          \
     default:                                                                                                           \
       FAIL();                                                                                                          \
       return;                                                                                                          \
@@ -422,16 +422,17 @@ TEST_P(WhenAnyOK, TimeTest) {
 TEST_P(WhenAnyDefault, Default) {
   auto [r, c, p, v] = GetParam();
   EXPECT_NE(r, Result::Ok);
-  EXPECT_EQ(p, WhenPolicy::LastFail);
+  EXPECT_EQ(p, yaclib::WhenPolicy::LastFail);
   CALL_F(Default)
 }
 
 TEST(WhenAny, LengthOne) {
-  std::array<Future<int>, 1> fs;
-  const void* old_addr = fs[0].GetCore().Get();
-  auto new_future = WhenAny(std::begin(fs), 1);
+  auto [f, p] = yaclib::MakeContract();
+  const void* old_addr = p.GetCore().Get();
+  auto new_future = WhenAny(&f, 1);
   const void* new_addr = new_future.GetCore().Get();
   EXPECT_EQ(old_addr, new_addr);
 }
 
 }  // namespace
+}  // namespace test

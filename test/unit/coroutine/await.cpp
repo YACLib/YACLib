@@ -1,9 +1,8 @@
 #include <util/time.hpp>
 
 #include <yaclib/async/run.hpp>
-#include <yaclib/config.hpp>
 #include <yaclib/coroutine/await.hpp>
-#include <yaclib/coroutine/future_coro_traits.hpp>
+#include <yaclib/coroutine/future_traits.hpp>
 #include <yaclib/executor/thread_pool.hpp>
 #include <yaclib/fault/thread.hpp>
 
@@ -23,16 +22,16 @@ TEST(Await, JustWorksPack) {
 #endif
   auto tp = yaclib::MakeThreadPool();
   auto coro = [&](yaclib::IThreadPoolPtr tp) -> yaclib::Future<int> {
-    auto f1 = yaclib::Run(tp, [] {
+    auto f1 = yaclib::Run(*tp, [] {
       yaclib_std::this_thread::sleep_for(1ms * YACLIB_CI_SLOWDOWN);
       return 1;
     });
-    auto f2 = yaclib::Run(tp, [] {
+    auto f2 = yaclib::Run(*tp, [] {
       return 2;
     });
 
     co_await Await(f1, f2);
-    co_return std::move(f1).GetUnsafe().Ok() + std::move(f2).GetUnsafe().Ok();
+    co_return std::move(f1).Touch().Ok() + std::move(f2).Touch().Ok();
   };
   auto f = coro(tp);
   EXPECT_EQ(std::move(f).Get().Ok(), 3);
@@ -47,16 +46,17 @@ TEST(Await, JustWorksRange) {
   auto tp = yaclib::MakeThreadPool();
   auto coro = [&](yaclib::IThreadPoolPtr tp) -> yaclib::Future<int> {
     std::array<yaclib::Future<int>, 2> arr;
-    arr[0] = yaclib::Run(tp, [] {
+    arr[0] = yaclib::Run(*tp, [] {
       yaclib_std::this_thread::sleep_for(50ms * YACLIB_CI_SLOWDOWN);
       return 1;
     });
-    arr[1] = yaclib::Run(tp, [] {
+    arr[1] = yaclib::Run(*tp, [] {
       return 2;
     });
 
     co_await yaclib::Await(arr.begin(), 2);
-    co_return std::move(arr[0]).GetUnsafe().Ok() + std::move(arr[1]).GetUnsafe().Ok();
+    // co_return yaclib::StopTag{};
+    co_return std::move(arr[0]).Touch().Ok() + std::move(arr[1]).Touch().Ok();
   };
   auto future = coro(tp);
   EXPECT_EQ(std::move(future).Get().Ok(), 3);
@@ -76,10 +76,10 @@ TEST(Await, CheckSuspend) {
 
   auto coro = [&]() -> yaclib::Future<void> {
     counter = 1;
-    auto future1 = yaclib::Run(tp, [&] {
+    auto future1 = yaclib::Run(*tp, [&] {
       yaclib_std::this_thread::sleep_for(coro_sleep_time);
     });
-    auto future2 = yaclib::Run(tp, [&] {
+    auto future2 = yaclib::Run(*tp, [&] {
       yaclib_std::this_thread::sleep_for(coro_sleep_time);
     });
 

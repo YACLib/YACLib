@@ -171,11 +171,10 @@ jobs:
                 -DYACLIB_CXX_STANDARD="$standard"                                                                      \
                 -DYACLIB_TEST=SINGLE                                                                                   \
                 -DYACLIB_FLAGS="CORO"                                                                                  \
-                -DCMAKE_C_COMPILER="$c_compiler"                                                                       \
                 -DCMAKE_CXX_COMPILER="$cxx_compiler"                                                                   \
                 -G"Ninja"                                                                                              \
                 -DYACLIB_LINK_OPTIONS="$link_option"                                                                   \
-                -DYACLIB_LOG="ERROR"                                                                                   \
+                -DYACLIB_LOG="ERROR;DEBUG"                                                                             \
                 -DYACLIB_COMPILE_OPTIONS="$compile_option"
             done
           done

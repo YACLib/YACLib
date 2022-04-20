@@ -1,6 +1,5 @@
 #pragma once
 
-#include <yaclib/config.hpp>
 #include <yaclib/fault/detail/yielder.hpp>
 
 #define YACLIB_INJECT_FAULT(statement)                                                                                 \

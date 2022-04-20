@@ -17,11 +17,11 @@ auto InlineThen(yaclib::Future<V, E>&& future, Functor&& f) {
 }
 
 template <bool Inline, typename V, typename E, typename Functor>
-void InlineSubscribe(yaclib::Future<V, E>&& future, Functor&& f) {
+void InlineDetach(yaclib::Future<V, E>&& future, Functor&& f) {
   if constexpr (Inline) {
-    std::move(future).SubscribeInline(std::forward<Functor>(f));
+    std::move(future).DetachInline(std::forward<Functor>(f));
   } else {
-    std::move(future).Subscribe(yaclib::MakeInline(), std::forward<Functor>(f));
+    std::move(future).Detach(yaclib::MakeInline(), std::forward<Functor>(f));
   }
 }
 

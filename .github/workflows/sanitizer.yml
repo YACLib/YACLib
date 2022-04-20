@@ -214,13 +214,12 @@ jobs:
                   -DYACLIB_CXX_STANDARD=20                                                                             \
                   -DYACLIB_TEST=SINGLE                                                                                 \
                   -DYACLIB_FLAGS="CORO;$flags"                                                                         \
-                  -DCMAKE_C_COMPILER=${c_compilers[$i]}                                                                \
                   -DCMAKE_CXX_COMPILER=${cxx_compilers[$i]}                                                            \
                   -G"Ninja"                                                                                            \
                   -DYACLIB_LINK_OPTIONS="$link_option"                                                                 \
                   -DYACLIB_COMPILE_OPTIONS="$compile_option"                                                           \
                   -DYACLIB_FAULT=$yaclib_fault                                                                         \
-                  -DYACLIB_LOG="ERROR"                                                                                 \
+                  -DYACLIB_LOG="ERROR;DEBUG"                                                                           \
                   -DYACLIB_DEFINITIONS="YACLIB_CI_SLOWDOWN=$slowdown"
 
               done
@@ -239,10 +238,6 @@ jobs:
 
           for (( i=0; i<${#names[*]}; i+=1 )); do
             for yaclib_fault in ${YACLIB_FAULT[*]}; do
-              if [[ $yaclib_fault == "ON" ]]; then
-                continue  # TODO(myannyax)
-              fi
-
               if [[ $flags == ASAN && ${names[$i]} != MSVC ]]; then
                 continue  # TODO(MBkkt) I can't build with any other ASAN on Windows
                 # I think ClangCL with ASAN should be possible
@@ -255,6 +250,8 @@ jobs:
                 -DYACLIB_CXX_STANDARD=20                                                                               \
                 -DYACLIB_TEST=SINGLE                                                                                   \
                 -DYACLIB_FLAGS="$flags"                                                                                \
+                -DYACLIB_FAULT=$yaclib_fault                                                                           \
+                -DYACLIB_LOG="ERROR;DEBUG"                                                                             \
                 -G"${generators[$i]}"                                                                                  \
                 ${options[$i]}
 

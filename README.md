@@ -96,7 +96,7 @@ check <a href="https://yaclib.github.io/YACLib/examples.html">documentation</a>.
 
 ```C++
 auto tp = yaclib::MakeThreadPool(/*threads=*/4);
-yaclib::Run(tp, [] {
+yaclib::Run(*tp, [] {
     return 42;
   }).Then([](int r) {
     return r * 2;
@@ -104,7 +104,7 @@ yaclib::Run(tp, [] {
     return r + 1; 
   }).Then([](int r) {
     return std::to_string(r);
-  }).Subscribe([](std::string r) {
+  }).Detach([](std::string r) {
     std::cout << "Pipeline result: <"  << r << ">" << std::endl;
   });
 };
@@ -114,10 +114,10 @@ yaclib::Run(tp, [] {
 
 ```C++
 auto tp = yaclib::MakeThreadPool(/*threads=*/4);
-Submit(tp, [] {
+Submit(*tp, [] {
   // some computations...
 });
-Submit(tp, [] {
+Submit(*tp, [] {
   // some computations...
 });
 
@@ -136,8 +136,8 @@ size_t counter = 0;
 auto tp2 = yaclib::MakeThreadPool(4);
 
 for (std::size_t i = 0; i < 100; ++i) {
-  Submit(tp2, [&] {
-    Submit(strand, [&] {
+  Submit(*tp2, [&] {
+    Submit(*strand, [&] {
       ++counter; // no data race!
     });
   });
@@ -152,7 +152,7 @@ std::vector<yaclib::Future<int>> fs;
 
 // Run parallel computations
 for (std::size_t i = 0; i < 5; ++i) {
-  fs.push_back(yaclib::Run(tp, [i]() -> int {
+  fs.push_back(yaclib::Run(*tp, [i]() -> int {
     return random() * i;
   }));
 }
@@ -173,14 +173,14 @@ std::vector<yaclib::Future<int>> fs;
 
 // Run parallel computations
 for (std::size_t i = 0; i < 5; ++i) {
-  fs.push_back(yaclib::Run(tp, [i] {
+  fs.push_back(yaclib::Run(*tp, [i] {
     // connect with one of the database shard
     return i;
   }));
 }
 
 // Will be ready when any future is ready
-WhenAny(fs.begin(), fs.size()).Subscribe([](int i) {
+WhenAny(fs.begin(), fs.size()).Detach([](int i) {
   // some work with database
 });
 ```
@@ -198,12 +198,12 @@ complete when the inner Future finishes and will acquire the result of the inner
 auto tp_output = yaclib::MakeThreadPool(/*threads=*/1);
 auto tp_compute = yaclib::MakeThreadPool(/*threads=CPU cores*/);
 
-auto future = yaclib::Run(tp_output, [] {
+auto future = yaclib::Run(*tp_output, [] {
   std::cout << "Outer task" <<   std::endl;
-  return yaclib::Run(tp_compute, [] { return 42; });
+  return yaclib::Run(*tp_compute, [] { return 42; });
 }).Then(/*tp_compute*/ [](int result) {
   result *= 13;
-  return yaclib::Run(tp_output, [result] { 
+  return yaclib::Run(*tp_output, [result] { 
     return std::cout << "Result = " << result << std::endl; 
   });
 });
@@ -214,8 +214,8 @@ auto future = yaclib::Run(tp_output, [] {
 ```C++
 auto tp = yaclib:MakeThreadPool(/*threads=*/4);
 
-yaclib::Future<int> f1 = yaclib::Run(tp, [] { return 42; });
-yaclib::Future<double> f2 = yaclib::Run(tp, [] { return 15.0; });
+yaclib::Future<int> f1 = yaclib::Run(*tp, [] { return 42; });
+yaclib::Future<double> f2 = yaclib::Run(*tp, [] { return 15.0; });
 
 WaitFor(10ms, f1, f2);  // or Wait / WaitUntil
 
@@ -235,7 +235,7 @@ if (f2.Ready()) {
 
 ```C++
 auto tp = yaclib::MakeThreadPool(/*threads=*/4);
-auto f = yaclib::Run(tp, [] {
+auto f = yaclib::Run(*tp, [] {
     if (random() % 2) {
       throw std::runtime_error{"1"};
     }
@@ -285,7 +285,7 @@ int x = std::move(f).Get().Value();
 
 ```C++
 auto tp = yaclib::MakeThreadPool(/*threads=*/4);
-auto f = yaclib::Run(tp, [] {
+auto f = yaclib::Run(*tp, [] {
     if (random() % 2) {
       return std::make_error_code(1);
     }

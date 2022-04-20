@@ -25,14 +25,14 @@ void ValueSimple() {
   auto [f, p] = yaclib::MakeContract<int>();
   std::move(p).Set(17);
   bool called = false;
-  InlineSubscribe<Inline>(std::move(f), [&called](int r) {
+  InlineDetach<Inline>(std::move(f), [&called](int r) {
     EXPECT_EQ(r, 17);
     called = true;
   });
   EXPECT_TRUE(called);
 }
 
-TEST(SubscribeInline, ValueSimple) {
+TEST(DetachInline, ValueSimple) {
   ValueSimple<true>();
   ValueSimple<false>();
 }
@@ -42,14 +42,14 @@ void ResultSimple() {
   auto [f, p] = yaclib::MakeContract<int>();
   std::move(p).Set(17);
   bool called = false;
-  InlineSubscribe<Inline>(std::move(f), [&called](yaclib::Result<int> r) {
+  InlineDetach<Inline>(std::move(f), [&called](yaclib::Result<int> r) {
     EXPECT_EQ(std::move(r).Ok(), 17);
     called = true;
   });
   EXPECT_TRUE(called);
 }
 
-TEST(SubscribeInline, ResultSimple) {
+TEST(DetachInline, ResultSimple) {
   ResultSimple<true>();
   ResultSimple<false>();
 }
@@ -60,14 +60,14 @@ void ErrorSimple() {
   auto result = yaclib::Result<int>{std::make_exception_ptr(std::runtime_error{""})};
   std::move(p).Set(std::move(result));
   bool called = false;
-  InlineSubscribe<Inline>(std::move(f), [&called](yaclib::Result<int> r) {
+  InlineDetach<Inline>(std::move(f), [&called](yaclib::Result<int> r) {
     called = true;
     EXPECT_THROW(std::move(r).Ok(), std::runtime_error);
   });
   EXPECT_TRUE(called);
 }
 
-TEST(SubscribeInline, ErrorSimple) {
+TEST(DetachInline, ErrorSimple) {
   ErrorSimple<true>();
   ErrorSimple<false>();
 }
@@ -77,13 +77,13 @@ void AsyncSimple() {
   auto tp = yaclib::MakeThreadPool(1);
   auto [f, p] = yaclib::MakeContract<std::string>();
   bool called = false;
-  InlineSubscribe<Inline>(std::move(f), [&](yaclib::Result<std::string> r) {
+  InlineDetach<Inline>(std::move(f), [&](yaclib::Result<std::string> r) {
     EXPECT_EQ(yaclib::CurrentThreadPool(), tp);
     EXPECT_EQ(std::move(r).Ok(), "Hello!");
     called = true;
   });
   EXPECT_FALSE(called);
-  Submit(tp, [p = std::move(p)]() mutable {
+  Submit(*tp, [p = std::move(p)]() mutable {
     std::move(p).Set("Hello!");
   });
   tp->Stop();
@@ -91,7 +91,7 @@ void AsyncSimple() {
   EXPECT_TRUE(called);
 }
 
-TEST(SubscribeInline, AsyncSimple) {
+TEST(DetachInline, AsyncSimple) {
   AsyncSimple<true>();
   AsyncSimple<false>();
 }

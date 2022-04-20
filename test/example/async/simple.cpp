@@ -36,14 +36,14 @@ TEST(Example, HelloWorld) {
   EXPECT_EQ(std::move(result).Ok(), 42);
 }
 
-TEST(Example, Subscribe) {
+TEST(Example, Detach) {
   auto tp = yaclib::MakeThreadPool(4);
 
-  auto f = yaclib::Run(tp, [] {
+  auto f = yaclib::Run(*tp, [] {
     return 42;
   });
 
-  std::move(f).Subscribe([](yaclib::Result<int> result) {
+  std::move(f).Detach([](yaclib::Result<int> result) {
     std::cout << "Async result from thread pool: " << std::move(result).Ok() << std::endl;
   });
 
@@ -64,7 +64,7 @@ TEST(Example, Then) {
     return r + 1;
   };
 
-  yaclib::Future<int> f1 = yaclib::Run(tp, compute);
+  yaclib::Future<int> f1 = yaclib::Run(*tp, compute);
 
   yaclib::Future<int> f2 = std::move(f1).Then(process);
 
@@ -102,7 +102,7 @@ TEST(Example, Pipeline) {
   };
 
   // Chain pipeline stages and run them in thread pool
-  yaclib::Run(tp, first).Then(second).Then(third).Then(fourth).Subscribe(last);
+  yaclib::Run(*tp, first).Then(second).Then(third).Then(fourth).Detach(last);
 
   tp->SoftStop();
   tp->Wait();
@@ -114,13 +114,13 @@ class CalculatorService {
   }
 
   yaclib::Future<int> Increment(int value) {
-    return yaclib::Run(e_, [value]() {
+    return yaclib::Run(*e_, [value]() {
       return value + 1;
     });
   }
 
   yaclib::Future<int> Double(int value) {
-    return yaclib::Run(e_, [value]() {
+    return yaclib::Run(*e_, [value]() {
       return value * 2;
     });
   }
@@ -141,7 +141,7 @@ TEST(Example, AsyncPipeline) {
     .Then([&](int r) {
       return calculator.Increment(r);
     })
-    .Subscribe([](yaclib::Result<int> r) {
+    .Detach([](yaclib::Result<int> r) {
       std::cout << "Result: " << std::move(r).Ok() << std::endl;
     });
 
@@ -159,11 +159,11 @@ TEST(Example, Race) {
 
   auto [f, p] = yaclib::MakeContract<int>();
 
-  yaclib::Run(tp, [p = std::move(p)]() mutable {
+  yaclib::Run(*tp, [p = std::move(p)]() mutable {
     std::move(p).Set(42);
   });
 
-  std::move(f).Subscribe(tp2, [](yaclib::Result<int> /*r*/) {
+  std::move(f).Detach(*tp2, [](yaclib::Result<int> /*r*/) {
     std::cout << "Hello from the second thread pool!";
   });
 
@@ -189,10 +189,10 @@ TEST(Example, StrandAsync) {
     return r + 1;
   };
 
-  yaclib::Run(tp, first)
-    .Then(strand, second)  // Serialized
-    .Then(tp, third)
-    .Subscribe([](yaclib::Result<int> r) {
+  yaclib::Run(*tp, first)
+    .Then(*strand, second)  // Serialized
+    .Then(*tp, third)
+    .Detach([](yaclib::Result<int> r) {
       std::cout << "Final result: " << std::move(r).Value() << std::endl;
     });
 

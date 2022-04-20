@@ -1,18 +1,17 @@
 #pragma once
 
 #include <yaclib/async/detail/result_core.hpp>
-#include <yaclib/config.hpp>
 
 namespace yaclib::detail {
 
-enum class CoreType {
-  Run,
-  Then,
-  Subscribe,
+enum class CoreType : char {
+  Run = 0,
+  Then = 1,
+  Detach = 2,
 };
 
 template <CoreType Type, typename V, typename E>
-using ResultCoreT = std::conditional_t<Type == CoreType::Subscribe, ResultCore<void, void>, ResultCore<V, E>>;
+using ResultCoreT = std::conditional_t<Type == CoreType::Detach, ResultCore<void, void>, ResultCore<V, E>>;
 
 template <typename Ret, typename Arg, typename E, typename Wrapper, CoreType Type>
 class Core : public ResultCoreT<Type, Ret, E> {
@@ -25,25 +24,26 @@ class Core : public ResultCoreT<Type, Ret, E> {
 
  private:
   void Call() noexcept final {
-    if (!Base::Alive()) {
-      return Base::Cancel();
+    if (!this->Alive()) {
+      return this->Cancel();
     }
     if constexpr (Type == CoreType::Run) {
       _wrapper.Call(*this, Unit{});
     } else {
-      auto& core = static_cast<ResultCore<Arg, E>&>(*Base::_caller);
+      auto& core = static_cast<ResultCore<Arg, E>&>(*this->_caller);
       _wrapper.Call(*this, std::move(core.Get()));
     }
+    this->DecRef();
   }
 
   void CallInline(InlineCore& caller, [[maybe_unused]] InlineCore::State state) noexcept final {
-    if (!Base::Alive()) {
-      return;  // Don't need to call Cancel, because we call Clean after CallInline and our _caller is nullptr
+    if (!this->Alive()) {
+      return this->Set(StopTag{});
     }
     if constexpr (Wrapper::kIsAsync) {
       if (state == InlineCore::State::HasAsyncCallback) {
         auto& core = static_cast<ResultCore<Ret, E>&>(caller);
-        return Base::Set(std::move(core.Get()));
+        return this->Set(std::move(core.Get()));
       }
     }
     auto& core = static_cast<ResultCore<Arg, E>&>(caller);

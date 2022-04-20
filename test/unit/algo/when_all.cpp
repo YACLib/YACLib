@@ -204,12 +204,12 @@ void MultiThreaded() {
   auto tp = yaclib::MakeThreadPool(4);
 
   auto async_value = [tp](int value) {
-    return Run(tp, [value] {
+    return Run(*tp, [value] {
       yaclib_std::this_thread::sleep_for(10ms);
       if constexpr (!is_void) {
         return value;
       } else {
-        (void)value;
+        std::ignore = value;
       }
     });
   };
@@ -263,12 +263,12 @@ void FirstFail() {
   ints.reserve(count * 2);
   for (int j = 0; j != 200; ++j) {
     for (std::size_t i = 0; i != count; ++i) {
-      ints.push_back(yaclib::Run<Error>(tp, [] {
+      ints.push_back(yaclib::Run<Error>(*tp, [] {
         std::this_thread::sleep_for(4ms);
       }));
     }
     for (std::size_t i = 0; i != count; ++i) {
-      ints.push_back(yaclib::Run<Error>(tp, [] {
+      ints.push_back(yaclib::Run<Error>(*tp, [] {
         std::this_thread::sleep_for(2ms);
         return yaclib::Result<void, Error>{Error{yaclib::StopTag{}}};
       }));

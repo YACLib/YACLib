@@ -1,15 +1,17 @@
 #pragma once
 
 #include <yaclib/algo/when_policy.hpp>
+#include <yaclib/async/detail/inline_core.hpp>
 #include <yaclib/async/detail/result_core.hpp>
-#include <yaclib/async/future.hpp>
-#include <yaclib/config.hpp>
 #include <yaclib/fault/atomic.hpp>
+#include <yaclib/fwd.hpp>
 #include <yaclib/log.hpp>
+#include <yaclib/util/detail/atomic_counter.hpp>
+#include <yaclib/util/intrusive_ptr.hpp>
+#include <yaclib/util/result.hpp>
 
 #include <cstddef>
-#include <iterator>
-#include <type_traits>
+#include <exception>
 #include <utility>
 
 namespace yaclib::detail {
@@ -20,7 +22,7 @@ class AnyCombinatorBase {
   yaclib_std::atomic_bool _done;
   ResultCorePtr<V, E> _core;
 
-  explicit AnyCombinatorBase(std::size_t /*size*/, ResultCorePtr<V, E>&& core) : _done{false}, _core{std::move(core)} {
+  explicit AnyCombinatorBase(std::size_t /*count*/, ResultCorePtr<V, E>&& core) : _done{false}, _core{std::move(core)} {
   }
 
   bool Done() {
@@ -41,7 +43,8 @@ class AnyCombinatorBase<V, E, WhenPolicy::LastFail> {
  protected:
   ResultCorePtr<V, E> _core;
 
-  explicit AnyCombinatorBase(std::size_t size, ResultCorePtr<V, E>&& core) : _state{2 * size}, _core{std::move(core)} {
+  explicit AnyCombinatorBase(std::size_t count, ResultCorePtr<V, E>&& core)
+      : _state{2 * count}, _core{std::move(core)} {
   }
 
   bool Done() {
@@ -71,21 +74,21 @@ class AnyCombinatorBase<V, E, WhenPolicy::FirstFail> : public AnyCombinatorBase<
   };
 
  protected:
-  explicit AnyCombinatorBase(std::size_t size, ResultCorePtr<V, E>&& core)
-      : Base{size, std::move(core)}, _state{ResultState::Empty}, _unit{} {
+  explicit AnyCombinatorBase(std::size_t count, ResultCorePtr<V, E>&& core)
+      : Base{count, std::move(core)}, _state{ResultState::Empty}, _unit{} {
   }
 
   ~AnyCombinatorBase() {
-    auto done = Base::_done.load(std::memory_order_acquire);
+    auto done = this->_done.load(std::memory_order_acquire);
     auto state = _state.load(std::memory_order_acquire);
     if (state == ResultState::Error) {
       if (!done) {
-        Base::_core->Set(std::move(_error));
+        this->_core->Set(std::move(_error));
       }
       _error.~E();
     } else if (state == ResultState::Exception) {
       if (!done) {
-        Base::_core->Set(std::move(_exception));
+        this->_core->Set(std::move(_exception));
       }
       _exception.~exception_ptr();
     }
@@ -102,7 +105,7 @@ class AnyCombinatorBase<V, E, WhenPolicy::FirstFail> : public AnyCombinatorBase<
       if (state == ResultState::Exception) {
         new (&_exception) std::exception_ptr{std::move(result).Exception()};
       } else {
-        YACLIB_ERROR(state != ResultState::Error, "state should be Error, but here it's Empty");
+        YACLIB_DEBUG(state != ResultState::Error, "state should be Error, but here it's Empty");
         new (&_error) E{std::move(result).Error()};
       }
     }
@@ -112,25 +115,24 @@ class AnyCombinatorBase<V, E, WhenPolicy::FirstFail> : public AnyCombinatorBase<
 template <typename V, typename E, WhenPolicy P>
 class AnyCombinator : public AnyCombinatorBase<V, E, P>, public InlineCore {
   using Base = AnyCombinatorBase<V, E, P>;
-
-  void CallInline(InlineCore& caller, State) noexcept final {
-    if (Base::_core->Alive() && !Base::Done()) {
-      auto& core = static_cast<ResultCore<V, E>&>(caller);
-      Base::Combine(std::move(core.Get()));
-    }
-  }
-
- public:
   using Base::Base;
 
-  static auto Make(std::size_t size) {
-    assert(size >= 2);
-    // TODO(MBkkt) Should be single allocation
-    auto raw_core = new detail::AtomicCounter<detail::ResultCore<V, E>>{2};
-    IntrusivePtr combine_core{NoRefTag{}, raw_core};
-    IntrusivePtr future_core{NoRefTag{}, raw_core};
-    auto combinator = new detail::AtomicCounter<AnyCombinator<V, E, P>>{size, size, std::move(combine_core)};
-    return std::pair{Future<V, E>{std::move(future_core)}, combinator};
+ public:
+  static auto Make(std::size_t count) {
+    // TODO(MBkkt) Maybe single allocation instead of two?
+    auto raw_core = new AtomicCounter<ResultCore<V, E>>{2};
+    ResultCorePtr<V, E> combine_core{NoRefTag{}, raw_core};
+    ResultCorePtr<V, E> future_core{NoRefTag{}, raw_core};
+    auto combinator = new AtomicCounter<AnyCombinator<V, E, P>>{count, count, std::move(combine_core)};
+    return std::pair{std::move(future_core), combinator};
+  }
+
+ private:
+  void CallInline(InlineCore& caller, State) noexcept final {
+    if (this->_core->Alive() && !this->Done()) {
+      auto& core = static_cast<ResultCore<V, E>&>(caller);
+      this->Combine(std::move(core.Get()));
+    }
   }
 };
 

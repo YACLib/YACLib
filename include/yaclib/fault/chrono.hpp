@@ -16,8 +16,6 @@ using system_clock = yaclib::detail::SystemClock;
 }  // namespace yaclib_std::chrono
  */
 
-#include <yaclib/config.hpp>
-
 #include <chrono>
 
 namespace yaclib_std::chrono {

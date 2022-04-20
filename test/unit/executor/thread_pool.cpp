@@ -1,38 +1,33 @@
 #include <util/cpu_time.hpp>
 #include <util/time.hpp>
 
-#include <yaclib/config.hpp>
 #include <yaclib/executor/executor.hpp>
 #include <yaclib/executor/inline.hpp>
 #include <yaclib/executor/submit.hpp>
 #include <yaclib/executor/thread_factory.hpp>
 #include <yaclib/executor/thread_pool.hpp>
 #include <yaclib/fault/atomic.hpp>
-#include <yaclib/fault/thread.hpp>
-#include <yaclib/util/detail/node.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 
 #include <chrono>
 #include <cstddef>
 #include <initializer_list>
-#include <ratio>
 #include <stdexcept>
 #include <thread>
-#include <type_traits>
 #include <vector>
 
 #include <gtest/gtest.h>
 
+namespace test {
 namespace {
+
+using namespace std::chrono_literals;
 
 const auto kCoresCount = [] {
   auto const cores_count{std::thread::hardware_concurrency()};
   EXPECT_GT(cores_count, 1);
   return cores_count;
 }();
-
-using namespace yaclib;
-using namespace std::chrono_literals;
 
 enum class FactoryTag {
   Light = 0,
@@ -54,8 +49,8 @@ class Thread : public ::testing::Test {
     _tps.pop_back();
   }
 
-  std::vector<IThreadPoolPtr> _tps;
-  IThreadFactoryPtr _factory;
+  std::vector<yaclib::IThreadPoolPtr> _tps;
+  yaclib::IThreadFactoryPtr _factory;
   FactoryTag _factory_tag{};
   ThreadPoolTag _tp_tag{};
 };
@@ -79,7 +74,7 @@ class SingleLightThread : public SingleThread {
   void SetUp() override {
     _factory_tag = FactoryTag::Light;
     _tp_tag = ThreadPoolTag::Single;
-    _factory = MakeThreadFactory();
+    _factory = yaclib::MakeThreadFactory();
     PushTP();
   }
 };
@@ -89,7 +84,7 @@ class SingleHeavyThread : public SingleThread {
   void SetUp() override {
     _factory_tag = FactoryTag::Heavy;
     _tp_tag = ThreadPoolTag::Single;
-    _factory = MakeThreadFactory(1);
+    _factory = yaclib::MakeThreadFactory(1);
     PushTP();
   }
 };
@@ -99,7 +94,7 @@ class MultiLightThread : public MultiThread {
   void SetUp() override {
     _factory_tag = FactoryTag::Light;
     _tp_tag = ThreadPoolTag::Multi;
-    _factory = MakeThreadFactory();
+    _factory = yaclib::MakeThreadFactory();
     PushTP();
   }
 };
@@ -109,14 +104,14 @@ class MultiHeavyThread : public MultiThread {
   void SetUp() override {
     _factory_tag = FactoryTag::Heavy;
     _tp_tag = ThreadPoolTag::Multi;
-    _factory = MakeThreadFactory(kCoresCount);
+    _factory = yaclib::MakeThreadFactory(kCoresCount);
     PushTP();
   }
 };
 
-void JustWork(IThreadPoolPtr& tp) {
+void JustWork(yaclib::IThreadPoolPtr& tp) {
   bool ready = false;
-  Submit(tp, [&] {
+  Submit(*tp, [&] {
     ready = true;
   });
 
@@ -127,7 +122,7 @@ void JustWork(IThreadPoolPtr& tp) {
 }
 
 TEST_F(SingleLightThread, JustWork) {
-  EXPECT_EQ(MakeInline()->Tag(), yaclib::IExecutor::Type::Inline);
+  EXPECT_EQ(yaclib::MakeInline().Tag(), yaclib::IExecutor::Type::Inline);
   JustWork(_tps[0]);
 }
 TEST_F(SingleHeavyThread, JustWork) {
@@ -140,14 +135,14 @@ TEST_F(MultiHeavyThread, JustWork) {
   JustWork(_tps[0]);
 }
 
-void ExecuteFrom(IThreadPoolPtr& tp) {
+void ExecuteFrom(yaclib::IThreadPoolPtr& tp) {
   bool done{false};
   auto task = [&] {
-    Submit(CurrentThreadPool(), [&] {
+    Submit(*yaclib::CurrentThreadPool(), [&] {
       done = true;
     });
   };
-  Submit(tp, task);
+  Submit(*tp, task);
 
   tp->SoftStop();
   tp->Wait();
@@ -174,11 +169,11 @@ enum class StopType {
   HardStop,
 };
 
-void AfterStopImpl(IThreadPoolPtr& tp, StopType stop_type, bool need_wait) {
+void AfterStopImpl(yaclib::IThreadPoolPtr& tp, StopType stop_type, bool need_wait) {
   bool ready = false;
 
   if (need_wait || stop_type != StopType::SoftStop) {
-    Submit(tp, [&] {
+    Submit(*tp, [&] {
       ready = true;
       if (!need_wait) {
         yaclib_std::this_thread::sleep_for(1ms);
@@ -205,7 +200,7 @@ void AfterStopImpl(IThreadPoolPtr& tp, StopType stop_type, bool need_wait) {
     tp->Wait();
     EXPECT_TRUE(ready);
   }
-  Submit(tp, [] {
+  Submit(*tp, [] {
     FAIL();
   });
 
@@ -255,21 +250,21 @@ TEST_F(MultiHeavyThread, AfterStop) {
   }
 }
 
-void TwoThreadPool(IThreadPoolPtr& tp1, IThreadPoolPtr& tp2) {
+void TwoThreadPool(yaclib::IThreadPoolPtr& tp1, yaclib::IThreadPoolPtr& tp2) {
   bool done1{false};
   bool done2{false};
 
   test::util::StopWatch stop_watch;
 
-  Submit(tp1, [&] {
-    Submit(tp2, [&] {
+  Submit(*tp1, [&] {
+    Submit(*tp2, [&] {
       done1 = true;
     });
     yaclib_std::this_thread::sleep_for(200ms);
   });
 
-  Submit(tp2, [&] {
-    Submit(tp1, [&] {
+  Submit(*tp2, [&] {
+    Submit(*tp1, [&] {
       done2 = true;
     });
     yaclib_std::this_thread::sleep_for(200ms);
@@ -301,7 +296,7 @@ TEST_F(MultiHeavyThread, TwoThreadPool) {
   TwoThreadPool(_tps[0], _tps[1]);
 }
 
-void Join(IThreadPoolPtr& tp, StopType stop_type) {
+void Join(yaclib::IThreadPoolPtr& tp, StopType stop_type) {
   switch (stop_type) {
     case StopType::SoftStop:
       tp->SoftStop();
@@ -316,12 +311,12 @@ void Join(IThreadPoolPtr& tp, StopType stop_type) {
   tp->Wait();
 }
 
-void FIFO(IThreadPoolPtr& tp, StopType stop_type) {
+void FIFO(yaclib::IThreadPoolPtr& tp, StopType stop_type) {
   std::size_t next_task{0};
 
   constexpr std::size_t kTasks{256};
   for (std::size_t i = 0; i != kTasks; ++i) {
-    Submit(tp, [i, &next_task] {
+    Submit(*tp, [i, &next_task] {
       EXPECT_EQ(next_task, i);
       ++next_task;
     });
@@ -346,12 +341,12 @@ TEST_F(SingleHeavyThread, FIFO) {
   }
 }
 
-void Exception(IThreadPoolPtr& tp, StopType stop_type) {
+void Exception(yaclib::IThreadPoolPtr& tp, StopType stop_type) {
   int flag = 0;
-  Submit(tp, [&] {
+  Submit(*tp, [&] {
     flag += 1;
     std::this_thread::sleep_for(1ms);  // Wait stop
-    Submit(tp, [&] {
+    Submit(*tp, [&] {
       flag += 2;
     });
     throw std::runtime_error{"task failed"};
@@ -399,12 +394,12 @@ TEST_F(SingleHeavyThread, Exception) {
   }
 }
 
-void ManyTask(IThreadPoolPtr& tp, StopType stop_type, std::size_t threads_count) {
+void ManyTask(yaclib::IThreadPoolPtr& tp, StopType stop_type, std::size_t threads_count) {
   const std::size_t tasks{1024 * threads_count / 3};
 
   yaclib_std::atomic_size_t completed{0};
   for (std::size_t i = 0; i != tasks; ++i) {
-    Submit(tp, [&completed] {
+    Submit(*tp, [&completed] {
       completed.fetch_add(1, std::memory_order_relaxed);
     });
   }
@@ -443,7 +438,7 @@ TEST_F(MultiHeavyThread, ManyTask) {
   }
 }
 
-void UseAllThreads(IThreadPoolPtr& tp, StopType stop_type) {
+void UseAllThreads(yaclib::IThreadPoolPtr& tp, StopType stop_type) {
   yaclib_std::atomic_size_t counter{0};
 
   auto sleeper = [&counter] {
@@ -456,8 +451,8 @@ void UseAllThreads(IThreadPoolPtr& tp, StopType stop_type) {
 
   test::util::StopWatch stop_watch;
 
-  Submit(tp, sleeper);
-  Submit(tp, sleeper);
+  Submit(*tp, sleeper);
+  Submit(*tp, sleeper);
 
   Join(tp, stop_type);
 
@@ -471,28 +466,28 @@ void UseAllThreads(IThreadPoolPtr& tp, StopType stop_type) {
 TEST_F(MultiLightThread, UseAllThreads) {
   for (auto stop_type : {StopType::SoftStop, StopType::Stop}) {
     _tps[0] = nullptr;  // Release threads
-    _tps[0] = MakeThreadPool(2);
+    _tps[0] = yaclib::MakeThreadPool(2);
     UseAllThreads(_tps[0], stop_type);
   }
 }
 TEST_F(MultiHeavyThread, UseAllThreads) {
   for (auto stop_type : {StopType::SoftStop, StopType::Stop}) {
     _tps[0] = nullptr;  // Release threads
-    _tps[0] = MakeThreadPool(2);
+    _tps[0] = yaclib::MakeThreadPool(2);
     UseAllThreads(_tps[0], stop_type);
   }
 }
 
-void NotSequentialAndParallel(IThreadPoolPtr& tp, StopType stop_type) {
+void NotSequentialAndParallel(yaclib::IThreadPoolPtr& tp, StopType stop_type) {
   // Not sequential start and parallel running
   yaclib_std::atomic_int counter{0};
 
-  Submit(tp, [&] {
+  Submit(*tp, [&] {
     yaclib_std::this_thread::sleep_for(300ms);
     counter.store(2, std::memory_order_release);
   });
 
-  Submit(tp, [&] {
+  Submit(*tp, [&] {
     counter.store(1, std::memory_order_release);
   });
 
@@ -508,40 +503,40 @@ void NotSequentialAndParallel(IThreadPoolPtr& tp, StopType stop_type) {
 TEST_F(MultiLightThread, NotSequentialAndParallel) {
   for (auto stop_type : {StopType::SoftStop, StopType::Stop}) {
     _tps[0] = nullptr;  // Release threads
-    _tps[0] = MakeThreadPool(2);
+    _tps[0] = yaclib::MakeThreadPool(2);
     NotSequentialAndParallel(_tps[0], stop_type);
   }
 }
 TEST_F(MultiHeavyThread, NotSequentialAndParallel) {
   for (auto stop_type : {StopType::SoftStop, StopType::Stop}) {
     _tps[0] = nullptr;  // Release threads
-    _tps[0] = MakeThreadPool(2);
+    _tps[0] = yaclib::MakeThreadPool(2);
     NotSequentialAndParallel(_tps[0], stop_type);
   }
 }
 
-void Current(IThreadPoolPtr& tp) {
-  EXPECT_EQ(CurrentThreadPool(), nullptr);
+void Current(yaclib::IThreadPoolPtr& tp) {
+  EXPECT_EQ(yaclib::CurrentThreadPool(), nullptr);
 
-  Submit(tp, [&] {
-    EXPECT_EQ(CurrentThreadPool(), tp);
+  Submit(*tp, [&] {
+    EXPECT_EQ(yaclib::CurrentThreadPool(), tp);
     yaclib_std::this_thread::sleep_for(10ms);
-    EXPECT_EQ(CurrentThreadPool(), tp);
+    EXPECT_EQ(yaclib::CurrentThreadPool(), tp);
   });
 
-  EXPECT_EQ(CurrentThreadPool(), nullptr);
+  EXPECT_EQ(yaclib::CurrentThreadPool(), nullptr);
 
   yaclib_std::this_thread::sleep_for(1ms);
 
-  EXPECT_EQ(CurrentThreadPool(), nullptr);
+  EXPECT_EQ(yaclib::CurrentThreadPool(), nullptr);
 
   tp->Stop();
 
-  EXPECT_EQ(CurrentThreadPool(), nullptr);
+  EXPECT_EQ(yaclib::CurrentThreadPool(), nullptr);
 
   tp->Wait();
 
-  EXPECT_EQ(CurrentThreadPool(), nullptr);
+  EXPECT_EQ(yaclib::CurrentThreadPool(), nullptr);
 }
 
 TEST_F(SingleLightThread, Current) {
@@ -557,7 +552,7 @@ TEST_F(MultiHeavyThread, Current) {
   Current(_tps[0]);
 }
 
-void Lifetime(IThreadPoolPtr& tp, std::size_t threads) {
+void Lifetime(yaclib::IThreadPoolPtr& tp, std::size_t threads) {
   class Task final {
    public:
     Task(Task&&) = default;
@@ -587,7 +582,7 @@ void Lifetime(IThreadPoolPtr& tp, std::size_t threads) {
   yaclib_std::atomic_int dead{0};
 
   for (std::size_t i = 0; i != threads; ++i) {
-    Submit(tp, Task(dead));
+    Submit(*tp, Task(dead));
   }
 
   yaclib_std::this_thread::sleep_for(50ms * YACLIB_CI_SLOWDOWN * threads / 2);
@@ -601,16 +596,16 @@ void Lifetime(IThreadPoolPtr& tp, std::size_t threads) {
 
 TEST_F(MultiLightThread, Lifetime) {
   _tps[0] = nullptr;  // Release threads
-  _tps[0] = MakeThreadPool(4);
+  _tps[0] = yaclib::MakeThreadPool(4);
   Lifetime(_tps[0], 4);
 }
 TEST_F(MultiHeavyThread, Lifetime) {
   _tps[0] = nullptr;  // Release threads
-  _tps[0] = MakeThreadPool(4);
+  _tps[0] = yaclib::MakeThreadPool(4);
   Lifetime(_tps[0], 4);
 }
 
-void RacyCounter(IThreadFactoryPtr& factory) {
+void RacyCounter(yaclib::IThreadFactoryPtr& factory) {
   auto tp = MakeThreadPool(2 * kCoresCount, factory);
 
   yaclib_std::atomic<size_t> counter1{0};
@@ -618,7 +613,7 @@ void RacyCounter(IThreadFactoryPtr& factory) {
 
   static const std::size_t kIncrements = 123456;
   for (std::size_t i = 0; i < kIncrements; ++i) {
-    Submit(tp, [&] {
+    Submit(*tp, [&] {
       auto old = counter1.load(std::memory_order_relaxed);
       counter2.fetch_add(1, std::memory_order_relaxed);
       yaclib_std::this_thread::yield();
@@ -646,10 +641,10 @@ TEST_F(MultiHeavyThread, RacyCounter) {
 ///  https://stackoverflow.com/questions/12606033/computing-cpu-time-in-c-on-windows
 #if defined(__linux)
 
-void NotBurnCPU(IThreadPoolPtr& tp, std::size_t threads) {
+void NotBurnCPU(yaclib::IThreadPoolPtr& tp, std::size_t threads) {
   // Warmup
   for (std::size_t i = 0; i != threads; ++i) {
-    Submit(tp, [&] {
+    Submit(*tp, [&] {
       yaclib_std::this_thread::sleep_for(100ms);
     });
   }
@@ -678,3 +673,4 @@ TEST_F(MultiHeavyThread, NotBurnCPU) {
 #endif
 
 }  // namespace
+}  // namespace test

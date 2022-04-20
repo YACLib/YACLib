@@ -1,6 +1,5 @@
 #include <yaclib/async/future.hpp>
 #include <yaclib/async/promise.hpp>
-#include <yaclib/config.hpp>
 
 namespace yaclib {
 
@@ -16,7 +15,7 @@ using Contract = std::pair<Future<V, E>, Promise<V, E>>;
  *
  * \return a \see Contract object with new future and promise
  */
-template <typename V, typename E = StopError>
+template <typename V = void, typename E = StopError>
 [[nodiscard]] Contract<V, E> MakeContract() {
   auto core = new detail::AtomicCounter<detail::ResultCore<V, E>>{2};
   Future<V, E> future{detail::ResultCorePtr<V, E>{NoRefTag{}, core}};

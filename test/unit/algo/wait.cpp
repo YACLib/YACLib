@@ -7,7 +7,6 @@
 #include <yaclib/async/future.hpp>
 #include <yaclib/async/promise.hpp>
 #include <yaclib/async/run.hpp>
-#include <yaclib/config.hpp>
 #include <yaclib/executor/submit.hpp>
 #include <yaclib/executor/thread_pool.hpp>
 #include <yaclib/fault/chrono.hpp>
@@ -41,7 +40,7 @@ void TestJustWorks() {
 
   test::util::StopWatch timer;
 
-  Submit(tp, [p = std::move(p)]() mutable {
+  Submit(*tp, [p = std::move(p)]() mutable {
     yaclib_std::this_thread::sleep_for(150ms * YACLIB_CI_SLOWDOWN);
     std::move(p).Set();
   });
@@ -97,7 +96,7 @@ void TestMultiThreaded() {
   yaclib::Future<int> fs[kThreads];
 
   for (int i = 0; i < kThreads; ++i) {
-    fs[i] = yaclib::Run(tp, [i] {
+    fs[i] = yaclib::Run(*tp, [i] {
       yaclib_std::this_thread::sleep_for(50ms * YACLIB_CI_SLOWDOWN);
       return i;
     });
@@ -146,7 +145,7 @@ void TestHaveResults() {
   auto [f1, p1] = yaclib::MakeContract<void>();
   auto [f2, p2] = yaclib::MakeContract<void>();
   auto tp = yaclib::MakeThreadPool(1);
-  Submit(tp, [p1 = std::move(p1), p2 = std::move(p2)]() mutable {
+  Submit(*tp, [p1 = std::move(p1), p2 = std::move(p2)]() mutable {
     std::move(p1).Set();
     std::move(p2).Set();
   });
@@ -181,7 +180,7 @@ TEST(WaitFor, Diff) {
   yaclib::Future<int> fs[kThreads];
 
   for (int i = 0; i < kThreads; ++i) {
-    fs[i] = yaclib::Run(tp, [i] {
+    fs[i] = yaclib::Run(*tp, [i] {
       yaclib_std::this_thread::sleep_for(i * 50ms * YACLIB_CI_SLOWDOWN);
       return i;
     });
@@ -211,7 +210,7 @@ TEST(Wait, ResetWait) {
   std::vector<yaclib::Future<size_t>> fs;
   fs.reserve(1000 * yaclib_std::thread::hardware_concurrency());
   for (size_t i = 0; i != 1000 * yaclib_std::thread::hardware_concurrency(); ++i) {
-    fs.push_back(yaclib::Run(tp, [i] {
+    fs.push_back(yaclib::Run(*tp, [i] {
       yaclib_std::this_thread::sleep_for(1ns);
       return i;
     }));
@@ -221,22 +220,22 @@ TEST(Wait, ResetWait) {
   tp->Wait();
 }
 // silly test to pass codecov
-TEST(SillyTest, ForGetUnsafe) {
+TEST(SillyTest, ForTouch) {
   auto tp = yaclib::MakeThreadPool();
-  yaclib::Future<int> fut = yaclib::Run(tp, [] {
+  yaclib::Future<int> fut = yaclib::Run(*tp, [] {
     yaclib_std::this_thread::sleep_for(1ms);
     return 42;
   });
   yaclib::Wait(fut);
-  EXPECT_EQ(std::move(fut).GetUnsafe().Ok(), 42);
+  EXPECT_EQ(std::move(fut).Touch().Ok(), 42);
 
-  fut = yaclib::Run(tp, [] {
+  fut = yaclib::Run(*tp, [] {
     yaclib_std::this_thread::sleep_for(1ms);
     return 42;
   });
 
   yaclib::Wait(fut);
-  auto res = std::as_const(fut).GetUnsafe();
+  auto res = std::as_const(fut).Touch();
   EXPECT_EQ(std::move(res).Ok(), 42);
   tp->HardStop();
   tp->Wait();

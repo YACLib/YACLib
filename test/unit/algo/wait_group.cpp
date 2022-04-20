@@ -5,19 +5,14 @@
 #include <yaclib/async/future.hpp>
 #include <yaclib/async/promise.hpp>
 #include <yaclib/async/run.hpp>
-#include <yaclib/config.hpp>
 #include <yaclib/executor/submit.hpp>
 #include <yaclib/executor/thread_pool.hpp>
-#include <yaclib/fault/thread.hpp>
-#include <yaclib/util/intrusive_ptr.hpp>
-#include <yaclib/util/result.hpp>
 
 #include <algorithm>
 #include <array>
 #include <chrono>
 #include <iosfwd>
 #include <iterator>
-#include <ratio>
 #include <thread>
 #include <tuple>
 #include <type_traits>
@@ -25,12 +20,13 @@
 
 #include <gtest/gtest.h>
 
+namespace test {
 namespace {
 
 using namespace std::chrono_literals;
 
 template <typename T>
-class WaitGroupT : public testing::Test {
+class WaitGroupTests : public testing::Test {
  public:
   using Type = T;
 };
@@ -51,34 +47,39 @@ class TypesNames {
 };
 
 using MyTypes = ::testing::Types<void, int>;
-TYPED_TEST_SUITE(WaitGroupT, MyTypes, TypesNames);
+TYPED_TEST_SUITE(WaitGroupTests, MyTypes, TypesNames);
 
+template <typename T>
 void TestJustWorks() {
   auto tp = yaclib::MakeThreadPool(1);
-  auto [f, p] = yaclib::MakeContract<void>();
+  auto [f, p] = yaclib::MakeContract<T>();
 
-  yaclib::WaitGroup wg;
-  test::util::StopWatch timer;
+  test::util::StopWatch<> timer;
+  yaclib::WaitGroup<> wg;
 
-  Submit(tp, [p = std::move(p)]() mutable {
-    yaclib_std::this_thread::sleep_for(150ms * YACLIB_CI_SLOWDOWN);
-    std::move(p).Set();
+  Submit(*tp, [p = std::move(p)]() mutable {
+    yaclib_std::this_thread::sleep_for(50ms * YACLIB_CI_SLOWDOWN);
+    if constexpr (std::is_void_v<T>) {
+      std::move(p).Set();
+    } else {
+      std::move(p).Set(T{});
+    }
   });
 
   EXPECT_FALSE(f.Ready());
   wg.Add(f);
-  EXPECT_LE(timer.Elapsed(), 50ms * YACLIB_CI_SLOWDOWN);
+  EXPECT_LE(timer.Elapsed(), 10ms * YACLIB_CI_SLOWDOWN);
   wg.Wait();
   EXPECT_TRUE(f.Ready());
 
-  EXPECT_LE(timer.Elapsed(), 200ms * YACLIB_CI_SLOWDOWN);
+  EXPECT_LE(timer.Elapsed(), 100ms * YACLIB_CI_SLOWDOWN);
 
   tp->Stop();
   tp->Wait();
 }
 
-TEST(WaitGroup, JustWorks) {
-  TestJustWorks();
+TYPED_TEST(WaitGroupTests, JustWorks) {
+  TestJustWorks<typename TestFixture::Type>();
 }
 
 template <typename T>
@@ -92,11 +93,11 @@ void TestManyWorks() {
     std::tie(futures[i], promises[i]) = yaclib::MakeContract<T>();
   }
 
-  yaclib::WaitGroup wg;
-  test::util::StopWatch timer;
+  test::util::StopWatch<> timer;
+  yaclib::WaitGroup<> wg;
 
   for (int i = 0; i < kSize; ++i) {
-    Submit(tp, [p = std::move(promises[i])]() mutable {
+    Submit(*tp, [p = std::move(promises[i])]() mutable {
       yaclib_std::this_thread::sleep_for(150ms * YACLIB_CI_SLOWDOWN);
       if constexpr (std::is_void_v<T>) {
         std::move(p).Set();
@@ -109,9 +110,9 @@ void TestManyWorks() {
   for (int i = 0; i < kSize; ++i) {
     EXPECT_FALSE(futures[i].Ready());
   }
-  for (int i = 0; i < kSize / 2; ++i) {
-    wg.Add(futures[i]);
-  }
+
+  wg.Add(futures.data(), 0);  // check empty
+  wg.Add(futures.data(), kSize / 2);
   wg.Wait();
   for (int i = 0; i < kSize / 2; ++i) {
     EXPECT_TRUE(futures[i].Ready());
@@ -120,15 +121,18 @@ void TestManyWorks() {
     EXPECT_FALSE(futures[i].Ready());
   }
 
-  for (int i = kSize / 2; i < kSize; ++i) {
-    wg.Add(futures[i]);
-  }
-
+  wg.Reset();
+  wg.Add(futures.data() + kSize / 2, futures.data() + kSize);
   wg.Wait();
-
   for (int i = kSize / 2; i < kSize; ++i) {
     EXPECT_TRUE(futures[i].Ready());
   }
+
+  // check empty
+  wg.Reset();
+  wg.Add(futures.data(), futures.data() + kSize);
+  wg.Add(futures.data(), 0);
+  wg.Wait();
 
   EXPECT_LE(timer.Elapsed(), kSize * 200ms * YACLIB_CI_SLOWDOWN);
 
@@ -136,7 +140,7 @@ void TestManyWorks() {
   tp->Wait();
 }
 
-TYPED_TEST(WaitGroupT, ManyWorks) {
+TYPED_TEST(WaitGroupTests, ManyWorks) {
   TestManyWorks<typename TestFixture::Type>();
 }
 
@@ -145,10 +149,10 @@ void TestGetWorks() {
   auto tp = yaclib::MakeThreadPool(1);
   auto [f, p] = yaclib::MakeContract<T>();
 
-  yaclib::WaitGroup wg;
-  test::util::StopWatch timer;
+  test::util::StopWatch<> timer;
+  yaclib::WaitGroup<> wg;
 
-  Submit(tp, [p = std::move(p)]() mutable {
+  Submit(*tp, [p = std::move(p)]() mutable {
     yaclib_std::this_thread::sleep_for(150ms * YACLIB_CI_SLOWDOWN);
     if constexpr (std::is_void_v<T>) {
       std::move(p).Set();
@@ -173,7 +177,7 @@ void TestGetWorks() {
   tp->Wait();
 }
 
-TYPED_TEST(WaitGroupT, GetWorksVoid) {
+TYPED_TEST(WaitGroupTests, GetWorks) {
   TestGetWorks<typename TestFixture::Type>();
 }
 
@@ -182,10 +186,10 @@ void TestCallbackWorks() {
   auto tp = yaclib::MakeThreadPool(1);
   auto [f, p] = yaclib::MakeContract<T>();
 
-  yaclib::WaitGroup wg;
-  test::util::StopWatch timer;
+  test::util::StopWatch<> timer;
+  yaclib::WaitGroup<> wg;
 
-  Submit(tp, [p = std::move(p)]() mutable {
+  Submit(*tp, [p = std::move(p)]() mutable {
     yaclib_std::this_thread::sleep_for(150ms * YACLIB_CI_SLOWDOWN);
     if constexpr (std::is_void_v<T>) {
       std::move(p).Set();
@@ -203,11 +207,11 @@ void TestCallbackWorks() {
   bool called = false;
 
   if constexpr (std::is_void_v<T>) {
-    std::move(f).SubscribeInline([&called]() {
+    std::move(f).DetachInline([&called]() {
       called = true;
     });
   } else {
-    std::move(f).SubscribeInline([&called](int result) {
+    std::move(f).DetachInline([&called](int result) {
       EXPECT_EQ(result, 5);
       called = true;
     });
@@ -221,28 +225,25 @@ void TestCallbackWorks() {
   tp->Wait();
 }
 
-TYPED_TEST(WaitGroupT, CallbackWorksVoid) {
+TYPED_TEST(WaitGroupTests, CallbackWorks) {
   TestCallbackWorks<typename TestFixture::Type>();
 }
 
-void TestMultithreaded() {
+void TestMultiThreaded() {
   constexpr int kThreads = 4;
   auto tp = yaclib::MakeThreadPool(kThreads);
   yaclib::Future<int> fs[kThreads];
 
   for (int i = 0; i < kThreads; ++i) {
-    fs[i] = Run(tp, [i] {
+    fs[i] = Run(*tp, [i] {
       yaclib_std::this_thread::sleep_for(50ms * YACLIB_CI_SLOWDOWN);
       return i;
     });
   }
 
-  test::util::StopWatch timer;
-  yaclib::WaitGroup wg;
-
-  for (auto& f : fs) {
-    wg.Add(f);
-  }
+  test::util::StopWatch<> timer;
+  yaclib::WaitGroup<> wg;
+  wg.Add(fs, kThreads);
   wg.Wait();
 
   EXPECT_LE(timer.Elapsed(), 100ms * YACLIB_CI_SLOWDOWN);
@@ -257,13 +258,14 @@ void TestMultithreaded() {
   tp->Wait();
 }
 
-TEST(WaitGroup, Multithreaded) {
-  TestMultithreaded();
+TEST(WaitGroupTest, MultiThreaded) {
+  TestMultiThreaded();
 }
 
-TEST(WaitGroup, Empty) {
+TEST(WaitGroupTest, Empty) {
   yaclib::WaitGroup wg;
   wg.Wait();
 }
 
 }  // namespace
+}  // namespace test

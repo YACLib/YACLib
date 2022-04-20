@@ -18,28 +18,30 @@ namespace yaclib {
  *
  * \tparam It type of passed iterator
  * \tparam T type of all passed futures
- * \param begin , size the range of futures to combine
- * \return Future<std::vector<T>>
+ * \param begin , count the range of futures to combine
+ * \return Future<std::vector<future_value_t<T>>, future_error_t<T>>
  */
 template <WhenPolicy P = WhenPolicy::FirstFail, typename It, typename T = typename std::iterator_traits<It>::value_type>
-auto WhenAll(It begin, std::size_t size) {
-  static_assert(P == WhenPolicy::FirstFail, "TODO(Ri7ay) Add other policy for WhenAll");
+auto WhenAll(It begin, std::size_t count) {
+  static_assert(P == WhenPolicy::FirstFail, "TODO(Ri7ay, MBkkt) Add other policy for WhenAll");
   static_assert(is_future_v<T>, "WhenAll function Iterator must be point to some Future");
-  auto [future, combinator] = detail::AllCombinator<future_value_t<T>, future_error_t<T>>::Make(size);
-  detail::WhenImpl(combinator, begin, size);
-  return std::move(future);
+  YACLIB_INFO(count < 2, "Don't use combinators for one or zero futures");
+  auto [future_core, combinator] = detail::AllCombinator<future_value_t<T>, future_error_t<T>>::Make(count);
+  detail::WhenImpl(combinator, begin, count);
+  return Future{std::move(future_core)};
 }
 
 /**
  * Create \ref Future which will be ready when all futures are ready
  *
  * \tparam It type of passed iterator
+ * \tparam T type of all passed futures
  * \param begin , end the range of futures to combine
- * \return Future<std::vector<T>>
+ * \return Future<std::vector<future_value_t<T>>, future_error_t<T>>
  */
 template <WhenPolicy P = WhenPolicy::FirstFail, typename It, typename T = typename std::iterator_traits<It>::value_type>
-auto WhenAll(It begin, It end) {
-  static_assert(P == WhenPolicy::FirstFail, "TODO(Ri7ay) Add other policy for WhenAll");
+YACLIB_INLINE auto WhenAll(It begin, It end) {
+  static_assert(P == WhenPolicy::FirstFail, "TODO(Ri7ay, MBkkt) Add other policy for WhenAll");
   static_assert(is_future_v<T>, "WhenAll function Iterator must be point to some Future");
   // We don't use std::distance because we want to alert the user to the fact that it can be expensive.
   // Maybe the user has the size of the range, otherwise it is suggested to call WhenAll(begin, distance(begin, end))
@@ -51,17 +53,17 @@ auto WhenAll(It begin, It end) {
  *
  * \tparam V type of value all passed futures
  * \tparam E type of error all passed futures
- * \param head , tail one or more futures to combine
+ * \param futures two or more futures to combine
  * \return Future<std::array<T>>
  */
-template <WhenPolicy P = WhenPolicy::FirstFail, typename V, typename E, typename... Vs, typename... Es>
-auto WhenAll(Future<V, E>&& head, Future<Vs, Es>&&... tail) {
-  static_assert(P == WhenPolicy::FirstFail, "TODO(Ri7ay) Add other policy for WhenAll");
-  constexpr std::size_t kSize = 1 + sizeof...(Vs);
+template <WhenPolicy P = WhenPolicy::FirstFail, typename E, typename... V>
+auto WhenAll(Future<V, E>&&... futures) {
+  static_assert(P == WhenPolicy::FirstFail, "TODO(Ri7ay, MBkkt) Add other policy for WhenAll");
+  constexpr std::size_t kSize = sizeof...(V);
   static_assert(kSize >= 2, "WhenAll wants at least two futures");
-  auto [future, combinator] = detail::AllCombinator<V, E, kSize>::Make(kSize);
-  detail::WhenImpl(combinator, std::move(head), std::move(tail)...);
-  return std::move(future);
+  auto [future_core, combinator] = detail::AllCombinator<head_t<V...>, E, kSize>::Make(kSize);
+  detail::WhenImpl(combinator, std::move(futures)...);
+  return Future{std::move(future_core)};
 }
 
 }  // namespace yaclib

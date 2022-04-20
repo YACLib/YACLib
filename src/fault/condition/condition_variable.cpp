@@ -1,4 +1,4 @@
-#include <yaclib/config.hpp>
+
 #include <yaclib/fault/detail/condition/condition_variable.hpp>
 
 namespace yaclib::detail {

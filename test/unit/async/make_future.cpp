@@ -204,5 +204,6 @@ TEST(MakeStoppedFuture, NonTrivial) {
     EXPECT_THROW(std::move(f).Get().Ok(), yaclib::ResultError<LikeErrorCode>);
   }
 }
+
 }  // namespace
 }  // namespace test

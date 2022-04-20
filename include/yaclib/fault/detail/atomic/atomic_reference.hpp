@@ -1,6 +1,5 @@
 #pragma once
 
-#include <yaclib/config.hpp>
 #include <yaclib/fault/detail/atomic/atomic.hpp>
 
 namespace yaclib::detail {

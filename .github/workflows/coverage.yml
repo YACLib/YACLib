@@ -48,7 +48,8 @@ jobs:
 
       - name: Configure CMake
         run: |
-          wait_type=""
+          wait_type="ATOMIC_EVENT"
+          log=""
           compilers=(gcc g++)
           for (( i=0; i<${#compilers[*]}; i+=2 )); do
             for yaclib_fault in ${YACLIB_FAULT[*]}; do
@@ -58,20 +59,22 @@ jobs:
               cmake -S . -B $dir                                                                                       \
                 -G "Ninja"                                                                                             \
                 -DCMAKE_BUILD_TYPE=Debug                                                                               \
-                -DCMAKE_C_COMPILER="${compilers[$i]}"                                                                  \
                 -DCMAKE_CXX_COMPILER="${compilers[$i+1]}"                                                              \
                 -DYACLIB_FAULT=$yaclib_fault                                                                           \
                 -DYACLIB_TEST=SINGLE                                                                                   \
                 -DYACLIB_FLAGS="COVERAGE;CORO;$wait_type"                                                              \
                 -DYACLIB_CXX_STANDARD=20                                                                               \
-                -DYACLIB_COMPILE_OPTIONS="-Og;-fno-inline"
+                -DYACLIB_COMPILE_OPTIONS="-Og;-fno-inline"                                                             \
+                -DYACLIB_LOG="$log"
 
               lcov --zerocounters --directory .
 
               if [[ "$wait_type" == "" ]]; then
                 wait_type="ATOMIC_EVENT"
+                log=""
               else
                 wait_type=""
+                log="ERROR;INFO;DEBUG"
               fi
             done
           done

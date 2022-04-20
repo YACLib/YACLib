@@ -1,6 +1,5 @@
 #pragma once
 
-#include <yaclib/config.hpp>
 #include <yaclib/util/ref.hpp>
 
 #include <type_traits>
@@ -65,6 +64,7 @@ template <typename T, typename U>
 inline bool operator==(const IntrusivePtr<T>& lhs, const IntrusivePtr<U>& rhs) noexcept {
   return lhs.Get() == rhs.Get();
 }
+
 template <typename T, typename U>
 inline bool operator!=(const IntrusivePtr<T>& lhs, const IntrusivePtr<U>& rhs) noexcept {
   return lhs.Get() != rhs.Get();
@@ -89,6 +89,7 @@ template <typename T, typename U>
 inline bool operator!=(T* lhs, const IntrusivePtr<U>& rhs) noexcept {
   return lhs != rhs.Get();
 }
+
 template <typename T>
 inline bool operator==(const IntrusivePtr<T>& lhs, std::nullptr_t) noexcept {
   return lhs.Get() == nullptr;

@@ -1,4 +1,4 @@
-#include <yaclib/config.hpp>
+
 #include <yaclib/fault/detail/mutex/shared_mutex.hpp>
 
 // TODO(myannyax) avoid copypaste from shared_timed_mutex

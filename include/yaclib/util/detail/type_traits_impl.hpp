@@ -1,7 +1,5 @@
 #pragma once
 
-#include <yaclib/config.hpp>
-
 #include <type_traits>
 
 namespace yaclib::detail {

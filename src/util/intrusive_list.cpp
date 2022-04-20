@@ -1,54 +1,48 @@
 #include <util/intrusive_list.hpp>
 
-#include <yaclib/config.hpp>
+#include <yaclib/log.hpp>
 
 #include <utility>
 
 namespace yaclib::detail {
 
-template <typename T>
-List<T>::List(List&& other) noexcept {
+List::List(List&& other) noexcept {
   if (this == &other || other.Empty()) {
-    return;
+    return;  // TODO(MBkkt) Remove if
   }
   _head.next = std::exchange(other._head.next, nullptr);
   _tail = std::exchange(other._tail, &other._head);
 }
 
-template <typename T>
-void List<T>::PushFront(Node& node) noexcept {
+void List::PushFront(Node& node) noexcept {
   if (Empty()) {
     _tail = &node;
   }
   node.next = _head.next;
   _head.next = &node;
 }
-template <typename T>
-void List<T>::PushBack(Node& node) noexcept {
+
+void List::PushBack(Node& node) noexcept {
   // for circular should be node.next = _tail->next;
-  assert(_tail->next == nullptr);
+  YACLIB_DEBUG(_tail->next != nullptr, "try to push not single node");
   node.next = nullptr;
   _tail->next = &node;
   _tail = &node;
 }
 
-template <typename T>
-bool List<T>::Empty() const noexcept {
-  assert((_head.next == nullptr) == (_tail == &_head));
+bool List::Empty() const noexcept {
+  YACLIB_DEBUG((_head.next == nullptr) != (_tail == &_head), "list empty invariant is failed");
   return _head.next == nullptr;  // valid only for linear
 }
-template <typename T>
-T& List<T>::PopFront() noexcept {
-  assert(!Empty());
+
+Node& List::PopFront() noexcept {
+  YACLIB_DEBUG(Empty(), "");
   auto* node = _head.next;
   _head.next = node->next;
   if (node->next == nullptr) {  // valid only for linear
     _tail = &_head;
   }
-  return static_cast<T&>(*node);
+  return *node;
 }
-
-template class List<ITask>;
-template class List<IThread>;
 
 }  // namespace yaclib::detail

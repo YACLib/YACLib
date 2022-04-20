@@ -1,8 +1,8 @@
 #pragma once
 
-#include <yaclib/config.hpp>
 #include <yaclib/executor/task.hpp>
 #include <yaclib/util/detail/node.hpp>
+#include <yaclib/util/detail/shared_func.hpp>
 
 #include <cstddef>
 #include <string_view>
@@ -14,13 +14,10 @@ class IThread : public detail::Node {
   virtual ~IThread() = default;
 };
 
-using IThreadPtr = IThread*;
-
 class IThreadFactory : public IRef {
  public:
-  virtual IThreadPtr Acquire(IFuncPtr f) = 0;
-
-  virtual void Release(IThreadPtr t) = 0;
+  virtual IThread* Acquire(IFuncPtr f) = 0;
+  virtual void Release(IThread* t) = 0;
 };
 
 using IThreadFactoryPtr = IntrusivePtr<IThreadFactory>;

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <yaclib/config.hpp>
 #include <yaclib/fault/mutex.hpp>
 
 #include <condition_variable>

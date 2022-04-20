@@ -1,20 +1,19 @@
 #pragma once
 
-#include <yaclib/config.hpp>
 #include <yaclib/executor/task.hpp>
 
 namespace yaclib::detail {
 
 class InlineCore : public ITask {
  public:
-  enum class State {
+  enum class State : char {
     Empty = 0,
-    HasResult,
-    HasCallback,
-    HasCallbackInline,
-    HasAsyncCallback,
-    HasWait,
-    HasStop,
+    HasResult = 1,
+    HasCallback = 2,
+    HasCallbackInline = 3,
+    HasAsyncCallback = 4,
+    HasWait = 5,
+    HasStop = 6,
   };
 
   void Call() noexcept override;

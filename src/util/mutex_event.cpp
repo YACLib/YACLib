@@ -1,4 +1,4 @@
-#include <yaclib/config.hpp>
+
 #include <yaclib/util/detail/mutex_event.hpp>
 
 namespace yaclib::detail {
@@ -13,11 +13,17 @@ void MutexEvent::Wait(Token& token) {
   }
 }
 
-void MutexEvent::Reset(Token&) noexcept {
+void MutexEvent::Reset() noexcept {
   _is_ready = false;
 }
 
-void MutexEvent::Set() {
+void MutexEvent::SetOne() {
+  std::lock_guard lock{_m};
+  _is_ready = true;
+  _cv.notify_one();  // Notify under mutex, because cv located on stack memory of other thread
+}
+
+void MutexEvent::SetAll() {
   std::lock_guard lock{_m};
   _is_ready = true;
   _cv.notify_all();  // Notify under mutex, because cv located on stack memory of other thread

@@ -8,19 +8,20 @@ list(APPEND YACLIB_INCLUDES
   )
 list(APPEND YACLIB_HEADERS
   ${YACLIB_INCLUDE_DIR}/util/detail/atomic_counter.hpp
-  ${YACLIB_INCLUDE_DIR}/util/detail/event_deleter.hpp
+  ${YACLIB_INCLUDE_DIR}/util/detail/default_event.hpp
   ${YACLIB_INCLUDE_DIR}/util/detail/intrusive_ptr_impl.hpp
   ${YACLIB_INCLUDE_DIR}/util/detail/mutex_event.hpp
   ${YACLIB_INCLUDE_DIR}/util/detail/node.hpp
   ${YACLIB_INCLUDE_DIR}/util/detail/nope_counter.hpp
   ${YACLIB_INCLUDE_DIR}/util/detail/safe_call.hpp
+  ${YACLIB_INCLUDE_DIR}/util/detail/set_all_deleter.hpp
+  ${YACLIB_INCLUDE_DIR}/util/detail/set_one_deleter.hpp
+  ${YACLIB_INCLUDE_DIR}/util/detail/shared_func.hpp
   ${YACLIB_INCLUDE_DIR}/util/detail/type_traits_impl.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/intrusive_list.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/mpsc_stack.hpp
   )
 list(APPEND YACLIB_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/intrusive_list.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/mpsc_stack.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/mutex_event.cpp
   )
 

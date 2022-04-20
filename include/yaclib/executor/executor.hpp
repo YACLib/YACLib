@@ -1,6 +1,5 @@
 #pragma once
 
-#include <yaclib/config.hpp>
 #include <yaclib/executor/task.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 
@@ -13,12 +12,12 @@ class IExecutor : public IRef {
    *
    * \enum Custom, Inline, Strand, ThreadPool, SingleThread
    */
-  enum class Type {
+  enum class Type : char {
     Custom = 0,
-    Inline,
-    Strand,
-    ThreadPool,
-    SingleThread,
+    Inline = 1,
+    Strand = 2,
+    ThreadPool = 3,
+    SingleThread = 4,
   };
 
   /**
@@ -27,13 +26,12 @@ class IExecutor : public IRef {
   [[nodiscard]] virtual Type Tag() const = 0;
 
   /**
-   * Submit given task. This method may either submit or reject the task
+   * Submit given task. This method may either Call or Cancel the task
    *
    * This method increments reference counter if task is submitted.
    * \param task task to execute
-   * \return true if the task is submitted, false if the task is rejected
    */
-  virtual bool Submit(ITask& task) noexcept = 0;
+  virtual void Submit(ITask& task) noexcept = 0;
 };
 
 using IExecutorPtr = IntrusivePtr<IExecutor>;

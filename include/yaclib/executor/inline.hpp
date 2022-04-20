@@ -1,6 +1,5 @@
 #pragma once
 
-#include <yaclib/config.hpp>
 #include <yaclib/executor/executor.hpp>
 
 namespace yaclib {
@@ -27,13 +26,13 @@ namespace yaclib {
  * }
  *
  * // With inline executor:
- * IExecutorPtr executor = MakeInlineExecutor();
+ * IExecutorPtr executor = &MakeInline();
  * if (...) {
  *   executor = MakeThreadPool(4);
  * }
  * executor->Submit(task);
  * \endcode
  */
-IExecutorPtr MakeInline() noexcept;
+IExecutor& MakeInline() noexcept;
 
 }  // namespace yaclib

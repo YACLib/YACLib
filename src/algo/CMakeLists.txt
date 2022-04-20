@@ -8,6 +8,7 @@ list(APPEND YACLIB_INCLUDES
   ${YACLIB_INCLUDE_DIR}/algo/when_policy.hpp
   )
 list(APPEND YACLIB_HEADERS
+  ${YACLIB_INCLUDE_DIR}/algo/detail/wait_group_impl.hpp
   ${YACLIB_INCLUDE_DIR}/algo/detail/wait_impl.hpp
   ${YACLIB_INCLUDE_DIR}/algo/detail/when_all_impl.hpp
   ${YACLIB_INCLUDE_DIR}/algo/detail/when_any_impl.hpp

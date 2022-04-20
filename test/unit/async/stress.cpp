@@ -19,6 +19,9 @@
 
 #include <gtest/gtest.h>
 
+namespace test {
+namespace {
+
 static const uint32_t kNumThreads = std::thread::hardware_concurrency();
 static constexpr uint32_t kNumRounds = 100000;
 
@@ -54,7 +57,7 @@ struct StressTest : testing::Test {
   };
 
   template <typename C>
-  void Run(yaclib::IExecutorPtr e, C consumer) {
+  void Run(yaclib::IExecutor& e, C consumer) {
     EXPECT_GT(kNumThreads, 1);
     yaclib_std::atomic_uint32_t producer_idx{0};
     yaclib_std::atomic_uint32_t consumer_idx{0};
@@ -124,14 +127,14 @@ struct StressTest : testing::Test {
 
 TEST_F(StressTest, ThenInline) {
   Run(yaclib::MakeInline(),
-      [](yaclib::WaitGroup&, auto future, uint32_t idx, uint32_t slot_round, auto& num_resolved_futures) {
+      [](yaclib::WaitGroup<>&, auto future, uint32_t idx, uint32_t slot_round, auto& num_resolved_futures) {
         std::array<char, 64> data{};
         std::move(future)
           .ThenInline([slot_round](StressTest::Value&& x) noexcept {
             return x.v / slot_round;
           })
-          .SubscribeInline([data, &num_resolved_futures, idx](uint32_t x) noexcept {
-            (void)data;
+          .DetachInline([data, &num_resolved_futures, idx](uint32_t x) noexcept {
+            std::ignore = data;
             EXPECT_EQ(idx, x);
             num_resolved_futures.fetch_add(1, std::memory_order_relaxed);
           });
@@ -140,7 +143,7 @@ TEST_F(StressTest, ThenInline) {
 
 TEST_F(StressTest, Then) {
   auto tp = yaclib::MakeThreadPool();
-  Run(tp, [](yaclib::WaitGroup& wg, auto future, uint32_t idx, uint32_t slot_round, auto& num_resolved_futures) {
+  Run(*tp, [](yaclib::WaitGroup<>& wg, auto future, uint32_t idx, uint32_t slot_round, auto& num_resolved_futures) {
     auto f = std::move(future)
                .Then([slot_round](StressTest::Value&& x) noexcept {
                  return x.v / slot_round;
@@ -156,3 +159,6 @@ TEST_F(StressTest, Then) {
   tp->Stop();
   tp->Wait();
 }
+
+}  // namespace
+}  // namespace test

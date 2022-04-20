@@ -16,6 +16,7 @@ set(YACLIB_INCLUDES
 set(YACLIB_HEADERS
   )
 set(YACLIB_SOURCES
+  ${CMAKE_CURRENT_SOURCE_DIR}/log.cpp
   )
 
 add_subdirectory(algo)
@@ -24,28 +25,8 @@ add_subdirectory(executor)
 add_subdirectory(util)
 add_subdirectory(fault)
 
-if (CORO)
+if (YACLIB_CORO)
   add_subdirectory(coroutine)
-endif ()
-
-if (YACLIB_FAULT)
-  list(APPEND YACLIB_DEFINITIONS YACLIB_FAULT)
-endif ()
-
-if (YACLIB_LOG STREQUAL "INFO")
-  list(APPEND YACLIB_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/log_info.cpp)
-  list(APPEND YACLIB_DEFINITIONS YACLIB_LOG_INFO)
-  list(APPEND YACLIB_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/log_error.cpp)
-  list(APPEND YACLIB_DEFINITIONS YACLIB_LOG_ERROR)
-elseif (YACLIB_LOG STREQUAL "ERROR")
-  if (YACLIB_TEST)
-    list(APPEND YACLIB_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/log_info.cpp)
-  endif ()
-  list(APPEND YACLIB_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/log_error.cpp)
-  list(APPEND YACLIB_DEFINITIONS YACLIB_LOG_ERROR)
-elseif (YACLIB_TEST)
-  list(APPEND YACLIB_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/log_info.cpp)
-  list(APPEND YACLIB_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/log_error.cpp)
 endif ()
 
 add_library(yaclib STATIC)
