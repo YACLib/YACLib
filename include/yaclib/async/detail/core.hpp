@@ -7,9 +7,8 @@ namespace yaclib::detail {
 
 enum class CoreType : char {
   Run = 0,
-  ThenInline = 1,
-  ThenOn = 2,
-  Detach = 3,
+  Then = 1,
+  Detach = 2,
 };
 
 template <CoreType Type, typename V, typename E>
@@ -21,7 +20,7 @@ class Core : public ResultCoreT<Type, Ret, E> {
   using Base = ResultCoreT<Type, Ret, E>;
 
   template <typename Func>
-  explicit Core(Func&& functor) : _wrapper{std::forward<Func>(functor)} {
+  explicit Core(Func&& f) : _wrapper{std::forward<Func>(f)} {
   }
 
  private:
@@ -95,8 +94,8 @@ struct Return<V, E, Func, 8> {
 
 template <bool Detach, bool Async, typename Ret, typename Arg, typename E, typename Func>
 class FuncWrapper {
-  //  using FuncStore = std::remove_cv_t<std::remove_reference_t<Func>>;
-  //  using FuncInvoke = Func;
+  static_assert(!(Detach && Async), "Detach cannot be Async, should be void");
+
   using Store = std::decay_t<Func>;
   using Invoke = std::conditional_t<std::is_function_v<std::remove_reference_t<Func>>, Store, Func>;
   using Core = std::conditional_t<Detach, ResultCore<void, void>, ResultCore<Ret, E>>;
@@ -104,10 +103,10 @@ class FuncWrapper {
  public:
   static constexpr bool kIsAsync = Async;
 
-  explicit FuncWrapper(Store&& f) noexcept(std::is_nothrow_move_constructible_v<Store>) : _f{std::move(f)} {
+  explicit FuncWrapper(Store&& f) noexcept(std::is_nothrow_move_constructible_v<Store>) : _func{std::move(f)} {
   }
 
-  explicit FuncWrapper(const Store& f) noexcept(std::is_nothrow_copy_constructible_v<Store>) : _f{f} {
+  explicit FuncWrapper(const Store& f) noexcept(std::is_nothrow_copy_constructible_v<Store>) : _func{f} {
   }
 
   template <typename T>
@@ -180,19 +179,19 @@ class FuncWrapper {
     constexpr bool kRetVoid = std::is_void_v<invoke_t<Invoke, std::conditional_t<kArgVoid, void, T>>>;
     if constexpr (kRetVoid) {
       if constexpr (kArgVoid) {
-        std::forward<Invoke>(_f)();
+        std::forward<Invoke>(_func)();
       } else {
-        std::forward<Invoke>(_f)(std::forward<T>(value));
+        std::forward<Invoke>(_func)(std::forward<T>(value));
       }
       return Unit{};
     } else if constexpr (kArgVoid) {
-      return std::forward<Invoke>(_f)();
+      return std::forward<Invoke>(_func)();
     } else {
-      return std::forward<Invoke>(_f)(std::forward<T>(value));
+      return std::forward<Invoke>(_func)(std::forward<T>(value));
     }
   }
 
-  Store _f;
+  Store _func;
 };
 
 template <CoreType Type, typename Arg, typename E, typename Func>
@@ -210,22 +209,28 @@ auto* MakeCore(Func&& f) {
   return new detail::AtomicCounter<Core>{kRef, std::forward<Func>(f)};
 }
 
-template <CoreType Type, bool Inline, typename Arg, typename E, typename Func>
+enum class CallbackType : char {
+  Inline = 0,
+  InlineOn = 1,
+  On = 2,
+};
+
+template <CoreType CoreT, CallbackType CallbackT, typename Arg, typename E, typename Func>
 auto SetCallback(ResultCorePtr<Arg, E> caller, Func&& f) {
-  static_assert(Type != CoreType::Run);
-  auto* callback = MakeCore<Type, Arg, E>(std::forward<Func>(f));
+  static_assert(CoreT != CoreType::Run, "SetCallback don't works for Run");
+  auto* callback = MakeCore<CoreT, Arg, E>(std::forward<Func>(f));
   callback->SetExecutor(caller->GetExecutor());
-  if constexpr (Inline) {
+  if constexpr (CallbackT != CallbackType::On) {
     caller->SetCallbackInline(*callback);
   } else {
     caller->SetCallback(*callback);
   }
-  if constexpr (Type != CoreType::Detach) {  // TODO(MBkkt) exception safety?
+  if constexpr (CoreT == CoreType::Then) {
     using ResultCoreT = typename std::remove_reference_t<decltype(*callback)>::Base;
-    if constexpr (Type == CoreType::ThenOn) {
-      return FutureOn{IntrusivePtr<ResultCoreT>{NoRefTag{}, callback}};
-    } else {
+    if constexpr (CallbackT == CallbackType::Inline) {
       return Future{IntrusivePtr<ResultCoreT>{NoRefTag{}, callback}};
+    } else {
+      return FutureOn{IntrusivePtr<ResultCoreT>{NoRefTag{}, callback}};
     }
   }
 }

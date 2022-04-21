@@ -199,17 +199,17 @@ TEST(VoidVector, EmptyInput) {
 
 template <TestSuite suite, typename T = int>
 void MultiThreaded() {
-  static constexpr bool is_void = std::is_void_v<T>;
+  static constexpr bool kIsVoid = std::is_void_v<T>;
 
   auto tp = yaclib::MakeThreadPool(4);
 
   auto async_value = [tp](int value) {
     return Run(*tp, [value] {
       yaclib_std::this_thread::sleep_for(10ms);
-      if constexpr (!is_void) {
-        return value;
-      } else {
+      if constexpr (kIsVoid) {
         std::ignore = value;
+      } else {
+        return value;
       }
     });
   };
@@ -232,7 +232,7 @@ void MultiThreaded() {
     }()
       .Get();
 
-  if constexpr (is_void) {
+  if constexpr (kIsVoid) {
     EXPECT_NO_THROW(std::move(ints).Ok());
   } else {
     auto result = std::move(ints).Ok();

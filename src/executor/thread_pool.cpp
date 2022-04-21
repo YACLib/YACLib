@@ -8,6 +8,7 @@
 #include <yaclib/fault/condition_variable.hpp>
 #include <yaclib/fault/mutex.hpp>
 #include <yaclib/log.hpp>
+#include <yaclib/util/detail/nope_counter.hpp>
 #include <yaclib/util/func.hpp>
 #include <yaclib/util/helper.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
@@ -23,13 +24,8 @@ static thread_local IExecutor* tlCurrentThreadPool{&MakeInline()};
 class ThreadPool : public IThreadPool {
  public:
   explicit ThreadPool(IThreadFactoryPtr factory, std::size_t threads) : _factory{std::move(factory)}, _task_count{0} {
-    auto loop = MakeFunc([this] {
-      tlCurrentThreadPool = this;
-      Loop();
-      tlCurrentThreadPool = &MakeInline();
-    });
     for (std::size_t i = 0; i != threads; ++i) {
-      auto* thread = _factory->Acquire(loop);
+      auto* thread = _factory->Acquire(&_loop);
       YACLIB_ERROR(thread == nullptr, "Acquired from thread factory thread is null");
       _threads.PushBack(*thread);
     }
@@ -123,12 +119,28 @@ class ThreadPool : public IThreadPool {
     }
   }
 
+  class LoopFunc : public IFunc {
+   public:
+    LoopFunc(ThreadPool& tp) : _tp{tp} {
+    }
+
+   private:
+    void Call() noexcept final {
+      tlCurrentThreadPool = &_tp;
+      _tp.Loop();
+      tlCurrentThreadPool = &MakeInline();
+    }
+
+    ThreadPool& _tp;
+  };
+
   yaclib_std::mutex _m;
   yaclib_std::condition_variable _cv;
   IThreadFactoryPtr _factory;
   detail::List _threads;
   detail::List _tasks;
   std::size_t _task_count;
+  detail::NopeCounter<LoopFunc> _loop{*this};
 };
 
 }  // namespace

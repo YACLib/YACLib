@@ -14,12 +14,11 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL GNU)
 elseif (CMAKE_CXX_COMPILER_ID MATCHES Clang)
   if (NOT YACLIB_COMPILE_OPTIONS MATCHES "libc\\+\\+") # TODO(mkornaukhov03) how to rewrite better?
     message(WARNING "Clang + libstdc++ do not support support coroutines in a bundle")
-
   elseif (CMAKE_CXX_STANDARD VERSION_LESS 20)
     message(WARNING "Coroutines are supported in Clang with c++20 or later")
   elseif (CMAKE_CXX_COMPILER_VERSION VERSION_LESS "8.0")
     message(WARNING "Coroutines are only supported in clang-9 or later")
-  elseif (CMAKE_CXX_COMPILER_VERSION VERSION_LESS "15.0")
+  elseif (CMAKE_CXX_COMPILER_VERSION VERSION_LESS "14.0")
     set(YACLIB_CORO 1)
   else ()
     set(YACLIB_CORO 2)

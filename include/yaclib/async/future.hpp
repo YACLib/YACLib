@@ -97,13 +97,19 @@ class FutureBase {
   void Stop() &&;
 
   /**
-   * Attach the continuation functor to *this
+   * Specify executor for continuation.
+   * Make FutureOn -- Future with executor
+   */
+  [[nodiscard]] FutureOn<V, E> On(IExecutor& executor) &&;
+
+  /**
+   * Attach the continuation func to *this
    *
-   * The functor will be executed on the specified executor.
+   * The func will be executed on the specified executor.
    * \note The behavior is undefined if \ref Valid is false before the call to this function.
    * \param e Executor which will \ref Execute the continuation
    * \param f A continuation to be attached
-   * \return New \ref FutureOn object associated with the functor result
+   * \return New \ref FutureOn object associated with the func result
    */
   template <typename Func>
   [[nodiscard]] /*FutureOn*/ auto Then(IExecutor& e, Func&& f) &&;
@@ -114,9 +120,9 @@ class FutureBase {
   void Detach() &&;
 
   /**
-   * Attach the final continuation functor to *this and \ref Detach *this
+   * Attach the final continuation func to *this and \ref Detach *this
    *
-   * The functor will be executed on \ref Inline executor.
+   * The func will be executed on \ref Inline executor.
    * \note The behavior is undefined if \ref Valid is false before the call to this function.
    * \param f A continuation to be attached
    */
@@ -124,9 +130,9 @@ class FutureBase {
   void DetachInline(Func&& f) &&;
 
   /**
-   * Attach the final continuation functor to *this and \ref Detach *this
+   * Attach the final continuation func to *this and \ref Detach *this
    *
-   * The functor will be executed on the specified executor.
+   * The func will be executed on the specified executor.
    * \note The behavior is undefined if \ref Valid is false before the call to this function.
    * \param e Executor which will \ref Execute the continuation
    * \param f A continuation to be attached
@@ -166,21 +172,15 @@ class Future final : public FutureBase<V, E> {
   }
 
   /**
-   * Attach the continuation functor to *this
+   * Attach the continuation func to *this
    *
-   * The functor will be executed on \ref Inline executor.
+   * The func will be executed on \ref Inline executor.
    * \note The behavior is undefined if \ref Valid is false before the call to this function.
    * \param f A continuation to be attached
-   * \return New \ref Future object associated with the functor result
+   * \return New \ref Future object associated with the func result
    */
   template <typename Func>
   [[nodiscard]] /*Future*/ auto ThenInline(Func&& f) &&;
-
-  /**
-   * Specify executor for continuation.
-   * Make FutureOn -- Future with executor
-   */
-  [[nodiscard]] FutureOn<V, E> On(IExecutor& executor) &&;
 };
 
 extern template class Future<void, StopError>;
@@ -230,37 +230,31 @@ class FutureOn final : public FutureBase<V, E> {
    * Specify executor for continuation.
    * Make FutureOn -- Future with executor
    */
-  FutureOn&& On(IExecutor& executor) &&;
-
-  /**
-   * Specify executor for continuation.
-   * Make FutureOn -- Future with executor
-   */
   [[nodiscard]] Future<V, E> On(std::nullptr_t) &&;
 
   /**
-   * Attach the continuation functor to *this
+   * Attach the continuation func to *this
    *
-   * The functor will be executed on \ref Inline executor.
+   * The func will be executed on \ref Inline executor.
    * \note The behavior is undefined if \ref Valid is false before the call to this function.
    * \param f A continuation to be attached
-   * \return New \ref FutureOn object associated with the functor result
+   * \return New \ref FutureOn object associated with the func result
    */
   template <typename Func>
   [[nodiscard]] /*FutureOn*/ auto ThenInline(Func&& f) &&;
 
   /**
-   * Attach the continuation functor to *this
+   * Attach the continuation func to *this
    *
    * \note The behavior is undefined if \ref Valid is false before the call to this function.
    * \param f A continuation to be attached
-   * \return New \ref FutureOn object associated with the functor result
+   * \return New \ref FutureOn object associated with the func result
    */
   template <typename Func>
   [[nodiscard]] /*FutureOn*/ auto Then(Func&& f) &&;
 
   /**
-   * Attach the final continuation functor to *this and \ref Detach *this
+   * Attach the final continuation func to *this and \ref Detach *this
    *
    * \note Func must return void type.
    * \param f A continuation to be attached

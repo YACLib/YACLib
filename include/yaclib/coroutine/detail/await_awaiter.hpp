@@ -15,16 +15,16 @@ class AwaitAwaiter final {
   template <typename It>
   explicit AwaitAwaiter(It it, std::size_t count);
 
-  bool await_ready() const noexcept {
+  YACLIB_INLINE bool await_ready() const noexcept {
     return _await_core.GetRef() == 1;
   }
 
-  bool await_suspend(yaclib_std::coroutine_handle<> handle) noexcept {
+  YACLIB_INLINE bool await_suspend(yaclib_std::coroutine_handle<> handle) noexcept {
     _await_core.handle = std::move(handle);
     return !_await_core.SubEqual(1);
   }
 
-  static void await_resume() noexcept {
+  YACLIB_INLINE void await_resume() const noexcept {
   }
 
  private:

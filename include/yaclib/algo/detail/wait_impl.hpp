@@ -48,8 +48,8 @@ template <typename Event, typename Timeout, typename... Cores>
 bool WaitCore(const Timeout& timeout, Cores&... cores) {
   static_assert(sizeof...(cores) >= 1, "Number of futures must be at least one");
   static_assert((... && std::is_same_v<BaseCore, Cores>), "Futures must be Future in Wait function");
-  auto range = [&](auto&& functor) {
-    return (... + static_cast<std::size_t>(functor(cores)));
+  auto range = [&](auto&& func) {
+    return (... + static_cast<std::size_t>(func(cores)));
   };
   return WaitRange<Event>(timeout, range, sizeof...(cores));
 }
@@ -61,11 +61,11 @@ bool WaitIterator(const Timeout& timeout, Iterator it, std::size_t count) {
   if (count == 0) {
     return true;
   }
-  auto range = [&](auto&& functor) {
+  auto range = [&](auto&& func) {
     std::size_t wait_count = 0;
     std::conditional_t<std::is_same_v<Timeout, NoTimeoutTag>, Iterator&, Iterator> range_it = it;
     for (std::size_t i = 0; i != count; ++i) {
-      wait_count += static_cast<std::size_t>(functor(*range_it->GetCore()));
+      wait_count += static_cast<std::size_t>(func(*range_it->GetCore()));
       ++range_it;
     }
     return wait_count;

@@ -30,8 +30,8 @@ class UniqueJob final : public Job, public SafeCall<Func> {
 };
 
 template <typename Func>
-Job* MakeUniqueJob(Func&& functor) {
-  return new UniqueJob<Func>{std::forward<Func>(functor)};
+Job* MakeUniqueJob(Func&& f) {
+  return new UniqueJob<Func>{std::forward<Func>(f)};
 }
 
 }  // namespace yaclib::detail

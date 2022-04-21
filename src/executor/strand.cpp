@@ -11,7 +11,7 @@
 namespace yaclib {
 namespace {
 
-class /*alignas(kCacheLineSize)*/ Strand : public IExecutor, public Job {
+class /*alignas(kCacheLineSize)*/ Strand : public Job, public IExecutor {
   // Inheritance from two IRef's, but that's okay, because they are pure virtual
  public:
   explicit Strand(IExecutorPtr executor) : _executor{std::move(executor)} {
@@ -52,7 +52,7 @@ class /*alignas(kCacheLineSize)*/ Strand : public IExecutor, public Job {
       prev = next;
     } while (prev != nullptr);
     if (_tasks.load(std::memory_order_acquire) != node ||
-        !_tasks.compare_exchange_strong(node, Mark(), std::memory_order_release, std::memory_order_acquire)) {
+        !_tasks.compare_exchange_strong(node, Mark(), std::memory_order_acq_rel, std::memory_order_relaxed)) {
       _executor->Submit(*this);
     } else {
       static_cast<Job&>(*this).DecRef();

@@ -10,7 +10,8 @@ namespace yaclib::detail {
 
 // TODO(myannyax) is_always_lock_free
 template <typename T, typename Atomic, bool = std::is_integral<T>::value && !std::is_same<T, bool>::value>
-struct AtomicBase {
+class AtomicBase {
+ public:
   [[nodiscard]] bool is_lock_free() const volatile noexcept {
     return _impl.is_lock_free();
   }
@@ -113,7 +114,8 @@ struct AtomicBase {
 };
 
 template <typename T, typename Atomic>
-struct AtomicBase<T, Atomic, true> : public AtomicBase<T, Atomic, false> {
+class AtomicBase<T, Atomic, true> : public AtomicBase<T, Atomic, false> {
+ public:
   AtomicBase() noexcept = default;
 
   constexpr AtomicBase(T desired) noexcept : AtomicBase<T, Atomic, false>(desired) {

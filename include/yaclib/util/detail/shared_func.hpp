@@ -27,7 +27,7 @@ class SharedFunc : public IFunc, public SafeCall<Func> {
 
 using IFuncPtr = IntrusivePtr<IFunc>;
 /**
- * Create shared \ref IFunc object from any Callable functor
+ * Create shared \ref IFunc object from any Callable func
  *
  * \param f Callable object
  */

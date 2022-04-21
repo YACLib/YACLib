@@ -60,7 +60,8 @@ TEST(UniqueJob, IncRef) {
 
 TEST(CoroDummy, DestroyResume) {
 #if YACLIB_CORO
-  yaclib::detail::Destroy<void, yaclib::StopError>::await_resume();
+  yaclib::detail::Destroy<void, yaclib::StopError> d;
+  d.await_resume();
 #else
   GTEST_SKIP();
 #endif

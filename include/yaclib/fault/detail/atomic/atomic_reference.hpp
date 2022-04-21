@@ -5,7 +5,8 @@
 namespace yaclib::detail {
 
 template <typename T>
-struct Atomic<T*> : public AtomicBase<T*, std::atomic<T*>> {
+class Atomic<T*> : public AtomicBase<T*, std::atomic<T*>> {
+ public:
   Atomic() noexcept = default;
 
   constexpr Atomic(T* desired) noexcept : AtomicBase<T*, std::atomic<T*>>(desired) {

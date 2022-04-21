@@ -44,8 +44,8 @@ template <bool NeedAdd, typename... Cores>
 void WaitGroup<InitCount, Event>::AddCore(Cores&... cores) {
   static_assert(sizeof...(cores) >= 1, "Number of futures must be at least one");
   static_assert((... && std::is_same_v<detail::BaseCore, Cores>), "Futures must be Future in WaitGroup::Add function");
-  auto range = [&](auto&& functor) {
-    return (... + static_cast<std::size_t>(functor(cores)));
+  auto range = [&](auto&& func) {
+    return (... + static_cast<std::size_t>(func(cores)));
   };
   AddRange<NeedAdd>(range, sizeof...(cores));
 }
@@ -58,10 +58,10 @@ void WaitGroup<InitCount, Event>::AddIterator(Iterator it, std::size_t count) {
   if (count == 0) {
     return;
   }
-  auto range = [&](auto&& functor) {
+  auto range = [&](auto&& func) {
     std::size_t wait_count = 0;
     for (std::size_t i = 0; i != count; ++i) {
-      wait_count += static_cast<std::size_t>(functor(*it->GetCore()));
+      wait_count += static_cast<std::size_t>(func(*it->GetCore()));
       ++it;
     }
     return wait_count;

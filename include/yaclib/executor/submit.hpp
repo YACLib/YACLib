@@ -8,10 +8,10 @@
 namespace yaclib {
 
 /**
- * Submit given functor for details \see Submit
+ * Submit given func for details \see Submit
  *
  * This method creates Job with one allocation and call Submit(Job)
- * \param f functor to execute
+ * \param f func to execute
  */
 template <typename Func>
 void Submit(IExecutor& executor, Func&& f) {

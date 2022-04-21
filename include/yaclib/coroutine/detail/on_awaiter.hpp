@@ -11,16 +11,16 @@ class OnAwaiter {
  public:
   explicit OnAwaiter(IExecutor& e);
 
-  static bool await_ready() noexcept {
+  YACLIB_INLINE bool await_ready() const noexcept {
     return false;
   }
 
   template <typename V, typename E>
-  void await_suspend(yaclib_std::coroutine_handle<PromiseType<V, E>> handle) noexcept {
+  YACLIB_INLINE void await_suspend(yaclib_std::coroutine_handle<PromiseType<V, E>> handle) const noexcept {
     _executor.Submit(handle.promise());
   }
 
-  static void await_resume() noexcept {
+  YACLIB_INLINE void await_resume() const noexcept {
   }
 
  private:
