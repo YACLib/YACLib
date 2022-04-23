@@ -53,7 +53,7 @@ struct StressTest : testing::Test {
 
   struct alignas(64) Slot {
     yaclib_std::atomic_uint32_t round{0};
-    yaclib::Future<Value> future;
+    yaclib::FutureOn<Value> future;
   };
 
   template <typename C>
@@ -79,7 +79,7 @@ struct StressTest : testing::Test {
             yaclib_std::this_thread::yield();
           }
           EXPECT_FALSE(slots[idx].future.Valid());
-          slots[idx].future = std::move(f).Via(e);
+          slots[idx].future = std::move(f).On(e);
           slots[idx].round.store(slot_round + 1, std::memory_order_release);
           volatile auto work = rng() % 2048;
           for (uint32_t x = 0; x < work; ++x) {
@@ -126,24 +126,25 @@ struct StressTest : testing::Test {
 };
 
 TEST_F(StressTest, ThenInline) {
-  Run(yaclib::MakeInline(),
-      [](yaclib::WaitGroup<>&, auto future, uint32_t idx, uint32_t slot_round, auto& num_resolved_futures) {
-        std::array<char, 64> data{};
-        std::move(future)
-          .ThenInline([slot_round](StressTest::Value&& x) noexcept {
-            return x.v / slot_round;
-          })
-          .DetachInline([data, &num_resolved_futures, idx](uint32_t x) noexcept {
-            std::ignore = data;
-            EXPECT_EQ(idx, x);
-            num_resolved_futures.fetch_add(1, std::memory_order_relaxed);
-          });
+  Run(yaclib::MakeInline(), [](yaclib::WaitGroup<>&, yaclib::FutureOn<Value> future, uint32_t idx, uint32_t slot_round,
+                               auto& num_resolved_futures) {
+    std::array<char, 64> data{};
+    std::move(future)
+      .ThenInline([slot_round](StressTest::Value&& x) noexcept {
+        return x.v / slot_round;
+      })
+      .DetachInline([data, &num_resolved_futures, idx](uint32_t x) noexcept {
+        std::ignore = data;
+        EXPECT_EQ(idx, x);
+        num_resolved_futures.fetch_add(1, std::memory_order_relaxed);
       });
+  });
 }
 
 TEST_F(StressTest, Then) {
   auto tp = yaclib::MakeThreadPool();
-  Run(*tp, [](yaclib::WaitGroup<>& wg, auto future, uint32_t idx, uint32_t slot_round, auto& num_resolved_futures) {
+  Run(*tp, [](yaclib::WaitGroup<>& wg, yaclib::FutureOn<Value> future, uint32_t idx, uint32_t slot_round,
+              auto& num_resolved_futures) {
     auto f = std::move(future)
                .Then([slot_round](StressTest::Value&& x) noexcept {
                  return x.v / slot_round;

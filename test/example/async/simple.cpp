@@ -64,9 +64,9 @@ TEST(Example, Then) {
     return r + 1;
   };
 
-  yaclib::Future<int> f1 = yaclib::Run(*tp, compute);
+  yaclib::FutureOn<int> f1 = yaclib::Run(*tp, compute);
 
-  yaclib::Future<int> f2 = std::move(f1).Then(process);
+  yaclib::FutureOn<int> f2 = std::move(f1).Then(process);
 
   EXPECT_TRUE(!f1.Valid());
 
@@ -113,13 +113,13 @@ class CalculatorService {
   explicit CalculatorService(yaclib::IExecutorPtr e) : e_(e) {
   }
 
-  yaclib::Future<int> Increment(int value) {
+  yaclib::FutureOn<int> Increment(int value) {
     return yaclib::Run(*e_, [value]() {
       return value + 1;
     });
   }
 
-  yaclib::Future<int> Double(int value) {
+  yaclib::FutureOn<int> Double(int value) {
     return yaclib::Run(*e_, [value]() {
       return value * 2;
     });

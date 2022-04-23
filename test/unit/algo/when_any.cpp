@@ -163,7 +163,7 @@ void MultiThreaded() {
   static const int kValues = 6;
   static const std::set<int> kOuts = {0, 1, 2, 3, 4, 5};
 
-  std::array<yaclib::Future<V>, 6> fs;
+  std::array<yaclib::FutureOn<V>, 6> fs;
   for (int i = 0; i < kValues; ++i) {
     fs[static_cast<size_t>(i)] = async_value(i);
   }
@@ -213,7 +213,7 @@ void TimeTest() {
 
   static const int kValues = 2;
 
-  std::array<yaclib::Future<V>, kValues> fs;
+  std::array<yaclib::FutureOn<V>, kValues> fs;
 
   fs[0] = async_value(10, 100ms);
   fs[1] = async_value(5, 20ms);

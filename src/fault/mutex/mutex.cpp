@@ -1,4 +1,3 @@
-
 #include <yaclib/fault/detail/mutex/mutex.hpp>
 
 // TODO(myannyax) avoid copypaste from timed_mutex

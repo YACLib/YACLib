@@ -14,15 +14,15 @@ class PromiseType;
 
 template <typename V, typename E>
 struct Destroy {
-  static bool await_ready() noexcept {
+  YACLIB_INLINE bool await_ready() const noexcept {
     return false;
   }
 
-  static void await_suspend(yaclib_std::coroutine_handle<PromiseType<V, E>> handle) noexcept {
+  YACLIB_INLINE void await_suspend(yaclib_std::coroutine_handle<PromiseType<V, E>> handle) const noexcept {
     handle.promise().DecRef();
   }
 
-  static void await_resume() noexcept {
+  YACLIB_INLINE void await_resume() const noexcept {
   }
 };
 
@@ -63,7 +63,7 @@ class BasePromiseType : public AtomicCounter<ResultCore<V, E>, PromiseTypeDelete
   /*
     TODO(MBkkt) Think about add zero-cost ability to return error
      now works only co_return MakeFuture(std::make_exception_ptr(...))
-     and co_await Via(stopped_executor) for StopTag{}
+     and co_await On(stopped_executor) for StopTag{}
     Maybe:
      co_await yaclib::Cancel();
      co_await yaclib::Cancel(StopError{});

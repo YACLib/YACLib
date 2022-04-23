@@ -1,4 +1,3 @@
-
 #include <yaclib/fault/fault_config.hpp>
 
 #ifdef YACLIB_FAULT

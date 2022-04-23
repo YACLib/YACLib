@@ -199,24 +199,24 @@ TEST(VoidVector, EmptyInput) {
 
 template <TestSuite suite, typename T = int>
 void MultiThreaded() {
-  static constexpr bool is_void = std::is_void_v<T>;
+  static constexpr bool kIsVoid = std::is_void_v<T>;
 
   auto tp = yaclib::MakeThreadPool(4);
 
   auto async_value = [tp](int value) {
     return Run(*tp, [value] {
       yaclib_std::this_thread::sleep_for(10ms);
-      if constexpr (!is_void) {
-        return value;
-      } else {
+      if constexpr (kIsVoid) {
         std::ignore = value;
+      } else {
+        return value;
       }
     });
   };
 
   static const int kValues = 6;
 
-  std::array<yaclib::Future<T>, 6> fs;
+  std::array<yaclib::FutureOn<T>, 6> fs;
   for (int i = 0; i < kValues; ++i) {
     fs[i] = async_value(i);
   }
@@ -232,7 +232,7 @@ void MultiThreaded() {
     }()
       .Get();
 
-  if constexpr (is_void) {
+  if constexpr (kIsVoid) {
     EXPECT_NO_THROW(std::move(ints).Ok());
   } else {
     auto result = std::move(ints).Ok();
@@ -258,7 +258,7 @@ TYPED_TEST(WhenAllT, ArrayMultiThreaded) {
 template <typename Error = yaclib::StopError>
 void FirstFail() {
   auto tp = yaclib::MakeThreadPool();
-  std::vector<yaclib::Future<void, Error>> ints;
+  std::vector<yaclib::FutureOn<void, Error>> ints;
   std::size_t count = std::thread::hardware_concurrency() * 4;
   ints.reserve(count * 2);
   for (int j = 0; j != 200; ++j) {

@@ -36,7 +36,7 @@ bool List::Empty() const noexcept {
 }
 
 Node& List::PopFront() noexcept {
-  YACLIB_DEBUG(Empty(), "");
+  YACLIB_DEBUG(Empty(), "list is empty in pop");
   auto* node = _head.next;
   _head.next = node->next;
   if (node->next == nullptr) {  // valid only for linear

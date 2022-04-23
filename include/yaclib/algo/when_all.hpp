@@ -24,9 +24,9 @@ namespace yaclib {
 template <WhenPolicy P = WhenPolicy::FirstFail, typename It, typename T = typename std::iterator_traits<It>::value_type>
 auto WhenAll(It begin, std::size_t count) {
   static_assert(P == WhenPolicy::FirstFail, "TODO(Ri7ay, MBkkt) Add other policy for WhenAll");
-  static_assert(is_future_v<T>, "WhenAll function Iterator must be point to some Future");
+  static_assert(is_future_base_v<T>, "WhenAll function Iterator must be point to some Future");
   YACLIB_INFO(count < 2, "Don't use combinators for one or zero futures");
-  auto [future_core, combinator] = detail::AllCombinator<future_value_t<T>, future_error_t<T>>::Make(count);
+  auto [future_core, combinator] = detail::AllCombinator<future_base_value_t<T>, future_base_error_t<T>>::Make(count);
   detail::WhenImpl(combinator, begin, count);
   return Future{std::move(future_core)};
 }
@@ -42,7 +42,7 @@ auto WhenAll(It begin, std::size_t count) {
 template <WhenPolicy P = WhenPolicy::FirstFail, typename It, typename T = typename std::iterator_traits<It>::value_type>
 YACLIB_INLINE auto WhenAll(It begin, It end) {
   static_assert(P == WhenPolicy::FirstFail, "TODO(Ri7ay, MBkkt) Add other policy for WhenAll");
-  static_assert(is_future_v<T>, "WhenAll function Iterator must be point to some Future");
+  static_assert(is_future_base_v<T>, "WhenAll function Iterator must be point to some Future");
   // We don't use std::distance because we want to alert the user to the fact that it can be expensive.
   // Maybe the user has the size of the range, otherwise it is suggested to call WhenAll(begin, distance(begin, end))
   return WhenAll(begin, end - begin);
@@ -57,7 +57,7 @@ YACLIB_INLINE auto WhenAll(It begin, It end) {
  * \return Future<std::array<T>>
  */
 template <WhenPolicy P = WhenPolicy::FirstFail, typename E, typename... V>
-auto WhenAll(Future<V, E>&&... futures) {
+auto WhenAll(FutureBase<V, E>&&... futures) {
   static_assert(P == WhenPolicy::FirstFail, "TODO(Ri7ay, MBkkt) Add other policy for WhenAll");
   constexpr std::size_t kSize = sizeof...(V);
   static_assert(kSize >= 2, "WhenAll wants at least two futures");

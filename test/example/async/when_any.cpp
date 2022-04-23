@@ -27,7 +27,7 @@ using namespace std::chrono_literals;
 TEST(Example, WhenAny) {
   auto tp = yaclib::MakeThreadPool(4);
 
-  std::vector<yaclib::Future<int>> futs;
+  std::vector<yaclib::FutureOn<int>> futs;
 
   // Run sync computations in parallel
 

@@ -5,24 +5,25 @@
 
 namespace yaclib::detail {
 
-template <typename Invoke>
+template <typename Func>
 class SafeCall {
-  using Store = std::remove_cv_t<std::remove_reference_t<Invoke>>;
+  using Store = std::decay_t<Func>;
+  using Invoke = std::conditional_t<std::is_function_v<std::remove_reference_t<Func>>, Store, Func>;
 
  public:
-  explicit SafeCall(Store&& functor) : _functor{std::move(functor)} {
+  explicit SafeCall(Store&& f) : _func{std::move(f)} {
   }
 
-  explicit SafeCall(const Store& functor) : _functor{functor} {
+  explicit SafeCall(const Store& f) : _func{f} {
   }
 
  protected:
   void Call() noexcept {
     if constexpr (std::is_nothrow_invocable_v<Invoke>) {  // TODO(MBkkt) Is it really necessary?
-      std::forward<Invoke>(_functor)();
+      std::forward<Invoke>(_func)();
     } else {
       try {
-        std::forward<Invoke>(_functor)();
+        std::forward<Invoke>(_func)();
       } catch (...) {
         // TODO(MBkkt) Special macro for user callback function?
       }
@@ -30,7 +31,7 @@ class SafeCall {
   }
 
  private:
-  Store _functor;
+  Store _func;
 };
 
 }  // namespace yaclib::detail

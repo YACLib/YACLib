@@ -1,6 +1,6 @@
 #pragma once
 
-#include <yaclib/executor/task.hpp>
+#include <yaclib/executor/job.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 
 namespace yaclib {
@@ -31,7 +31,7 @@ class IExecutor : public IRef {
    * This method increments reference counter if task is submitted.
    * \param task task to execute
    */
-  virtual void Submit(ITask& task) noexcept = 0;
+  virtual void Submit(Job& task) noexcept = 0;
 };
 
 using IExecutorPtr = IntrusivePtr<IExecutor>;

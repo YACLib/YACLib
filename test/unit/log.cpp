@@ -22,7 +22,7 @@ class LoggingTest : public ::testing::Test {
 };
 
 std::string_view testFuncNameAbracadabra([[maybe_unused]] int kek) {
-  return YACLIB_FUNCTION_NAME;
+  return YACLIB_FUNC_NAME;
 }
 
 TEST_F(LoggingTest, Function) {
@@ -75,15 +75,15 @@ TEST_F(LoggingTest, SepareteCallbacks) {
   std::stringstream expected_output_debug;
   YACLIB_ERROR(kEverythingFine, "You use API incorrect");
   YACLIB_ERROR(kSomeError, "You use API incorrect");
-  expected_output_error << "[ " << __FILE__ << ":" << __LINE__ - 1 << " in " << YACLIB_FUNCTION_NAME
+  expected_output_error << "[ " << __FILE__ << ":" << __LINE__ - 1 << " in " << YACLIB_FUNC_NAME
                         << " ] Failed error condition: 'kSomeError' with message 'You use API incorrect'\n";
   YACLIB_INFO(kEverythingFine, "You use API incorrect");
   YACLIB_INFO(kSomeError, "You use API incorrect");
-  expected_output_info << "[ " << __FILE__ << ":" << __LINE__ - 1 << " in " << YACLIB_FUNCTION_NAME
+  expected_output_info << "[ " << __FILE__ << ":" << __LINE__ - 1 << " in " << YACLIB_FUNC_NAME
                        << " ] Failed info condition: 'kSomeError' with message 'You use API incorrect'\n";
   YACLIB_DEBUG(kEverythingFine, "You use API incorrect");
   YACLIB_DEBUG(kSomeError, "You use API incorrect");
-  expected_output_debug << "[ " << __FILE__ << ":" << __LINE__ - 1 << " in " << YACLIB_FUNCTION_NAME
+  expected_output_debug << "[ " << __FILE__ << ":" << __LINE__ - 1 << " in " << YACLIB_FUNC_NAME
                         << " ] Failed debug condition: 'kSomeError' with message 'You use API incorrect'\n";
   std::ifstream log_file_error{"log_file_error"};
   std::ifstream log_file_info{"log_file_info"};
@@ -111,15 +111,15 @@ TEST_F(LoggingTest, SharedCallbacks) {
   std::stringstream expected_output_shared;
   YACLIB_ERROR(kEverythingFine, "You use API incorrect");
   YACLIB_ERROR(kSomeError, "You use API incorrect");
-  expected_output_shared << "[ " << __FILE__ << ":" << __LINE__ - 1 << " in " << YACLIB_FUNCTION_NAME
+  expected_output_shared << "[ " << __FILE__ << ":" << __LINE__ - 1 << " in " << YACLIB_FUNC_NAME
                          << " ] Failed some condition: 'kSomeError' with message 'You use API incorrect'\n";
   YACLIB_INFO(kEverythingFine, "You use API incorrect");
   YACLIB_INFO(kSomeError, "You use API incorrect");
-  expected_output_shared << "[ " << __FILE__ << ":" << __LINE__ - 1 << " in " << YACLIB_FUNCTION_NAME
+  expected_output_shared << "[ " << __FILE__ << ":" << __LINE__ - 1 << " in " << YACLIB_FUNC_NAME
                          << " ] Failed some condition: 'kSomeError' with message 'You use API incorrect'\n";
   YACLIB_DEBUG(kEverythingFine, "You use API incorrect");
   YACLIB_DEBUG(kSomeError, "You use API incorrect");
-  expected_output_shared << "[ " << __FILE__ << ":" << __LINE__ - 1 << " in " << YACLIB_FUNCTION_NAME
+  expected_output_shared << "[ " << __FILE__ << ":" << __LINE__ - 1 << " in " << YACLIB_FUNC_NAME
                          << " ] Failed some condition: 'kSomeError' with message 'You use API incorrect'\n";
   std::ifstream log_file_shared{"log_file_shared"};
   auto check = [](std::stringstream& expected_output, std::ifstream& log_file) {

@@ -138,7 +138,7 @@ TEST_F(MultiHeavyThread, JustWork) {
 void ExecuteFrom(yaclib::IThreadPoolPtr& tp) {
   bool done{false};
   auto task = [&] {
-    Submit(*yaclib::CurrentThreadPool(), [&] {
+    Submit(yaclib::CurrentThreadPool(), [&] {
       done = true;
     });
   };
@@ -516,27 +516,27 @@ TEST_F(MultiHeavyThread, NotSequentialAndParallel) {
 }
 
 void Current(yaclib::IThreadPoolPtr& tp) {
-  EXPECT_EQ(yaclib::CurrentThreadPool(), nullptr);
+  EXPECT_EQ(&yaclib::CurrentThreadPool(), &yaclib::MakeInline());
 
   Submit(*tp, [&] {
-    EXPECT_EQ(yaclib::CurrentThreadPool(), tp);
+    EXPECT_EQ(&yaclib::CurrentThreadPool(), tp);
     yaclib_std::this_thread::sleep_for(10ms);
-    EXPECT_EQ(yaclib::CurrentThreadPool(), tp);
+    EXPECT_EQ(&yaclib::CurrentThreadPool(), tp);
   });
 
-  EXPECT_EQ(yaclib::CurrentThreadPool(), nullptr);
+  EXPECT_EQ(&yaclib::CurrentThreadPool(), &yaclib::MakeInline());
 
   yaclib_std::this_thread::sleep_for(1ms);
 
-  EXPECT_EQ(yaclib::CurrentThreadPool(), nullptr);
+  EXPECT_EQ(&yaclib::CurrentThreadPool(), &yaclib::MakeInline());
 
   tp->Stop();
 
-  EXPECT_EQ(yaclib::CurrentThreadPool(), nullptr);
+  EXPECT_EQ(&yaclib::CurrentThreadPool(), &yaclib::MakeInline());
 
   tp->Wait();
 
-  EXPECT_EQ(yaclib::CurrentThreadPool(), nullptr);
+  EXPECT_EQ(&yaclib::CurrentThreadPool(), &yaclib::MakeInline());
 }
 
 TEST_F(SingleLightThread, Current) {

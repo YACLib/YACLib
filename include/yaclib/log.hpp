@@ -20,26 +20,26 @@ enum class LogLevel : char {
 
 void SetCallback(LogLevel level, LogCallback callback) noexcept;
 
-void LogMessage(LogLevel level, std::string_view file, std::size_t line, std::string_view function,
+void LogMessage(LogLevel level, std::string_view file, std::size_t line, std::string_view func,
                 std::string_view condition, std::string_view message);
 
 }  // namespace detail
 }  // namespace yaclib
 
-#ifndef YACLIB_FUNCTION_NAME
+#ifndef YACLIB_FUNC_NAME
 #  if defined(__clang__) || defined(__GNUC__)
-#    define YACLIB_FUNCTION_NAME __PRETTY_FUNCTION__
+#    define YACLIB_FUNC_NAME __PRETTY_FUNCTION__
 #  elif defined(_MSC_VER)
-#    define YACLIB_FUNCTION_NAME __FUNCSIG__
+#    define YACLIB_FUNC_NAME __FUNCSIG__
 #  else
-#    define YACLIB_FUNCTION_NAME __func__
+#    define YACLIB_FUNC_NAME __func__
 #  endif
 #endif
 
 #define YACLIB_LOG_MESSAGE(level, cond, message)                                                                       \
   do {                                                                                                                 \
     if (!!(cond)) {                                                                                                    \
-      ::yaclib::detail::LogMessage(level, __FILE__, __LINE__, YACLIB_FUNCTION_NAME, #cond, (message));                 \
+      ::yaclib::detail::LogMessage(level, __FILE__, __LINE__, YACLIB_FUNC_NAME, #cond, (message));                     \
     }                                                                                                                  \
   } while (false)
 

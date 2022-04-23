@@ -1,12 +1,14 @@
 #include <util/intrusive_list.hpp>
 
 #include <yaclib/executor/executor.hpp>
-#include <yaclib/executor/task.hpp>
+#include <yaclib/executor/inline.hpp>
+#include <yaclib/executor/job.hpp>
 #include <yaclib/executor/thread_factory.hpp>
 #include <yaclib/executor/thread_pool.hpp>
 #include <yaclib/fault/condition_variable.hpp>
 #include <yaclib/fault/mutex.hpp>
 #include <yaclib/log.hpp>
+#include <yaclib/util/detail/nope_counter.hpp>
 #include <yaclib/util/func.hpp>
 #include <yaclib/util/helper.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
@@ -17,18 +19,13 @@
 namespace yaclib {
 namespace {
 
-thread_local IThreadPool* tlCurrentThreadPool;
+static thread_local IExecutor* tlCurrentThreadPool{&MakeInline()};
 
 class ThreadPool : public IThreadPool {
  public:
   explicit ThreadPool(IThreadFactoryPtr factory, std::size_t threads) : _factory{std::move(factory)}, _task_count{0} {
-    auto loop = MakeFunc([this] {
-      tlCurrentThreadPool = this;
-      Loop();
-      tlCurrentThreadPool = nullptr;
-    });
     for (std::size_t i = 0; i != threads; ++i) {
-      auto* thread = _factory->Acquire(loop);
+      auto* thread = _factory->Acquire(&_loop);
       YACLIB_ERROR(thread == nullptr, "Acquired from thread factory thread is null");
       _threads.PushBack(*thread);
     }
@@ -59,7 +56,7 @@ class ThreadPool : public IThreadPool {
     _cv.notify_all();
   }
 
-  void Submit(ITask& task) noexcept final {
+  void Submit(Job& task) noexcept final {
     std::unique_lock lock{_m};
     if (WasStop()) {
       lock.unlock();
@@ -91,7 +88,7 @@ class ThreadPool : public IThreadPool {
     Stop(std::move(lock));
     while (!tasks.Empty()) {
       auto& task = tasks.PopFront();
-      static_cast<ITask&>(task).Cancel();
+      static_cast<Job&>(task).Cancel();
     }
   }
 
@@ -108,7 +105,7 @@ class ThreadPool : public IThreadPool {
       while (!_tasks.Empty()) {
         auto& task = _tasks.PopFront();
         lock.unlock();
-        static_cast<ITask&>(task).Call();
+        static_cast<Job&>(task).Call();
         lock.lock();
         _task_count -= 4;  // Pop Task
         if (NoTasks() && WantStop()) {
@@ -122,18 +119,34 @@ class ThreadPool : public IThreadPool {
     }
   }
 
+  class LoopFunc : public IFunc {
+   public:
+    LoopFunc(ThreadPool& tp) : _tp{tp} {
+    }
+
+   private:
+    void Call() noexcept final {
+      tlCurrentThreadPool = &_tp;
+      _tp.Loop();
+      tlCurrentThreadPool = &MakeInline();
+    }
+
+    ThreadPool& _tp;
+  };
+
   yaclib_std::mutex _m;
   yaclib_std::condition_variable _cv;
   IThreadFactoryPtr _factory;
   detail::List _threads;
   detail::List _tasks;
   std::size_t _task_count;
+  detail::NopeCounter<LoopFunc> _loop{*this};
 };
 
 }  // namespace
 
-IThreadPool* CurrentThreadPool() noexcept {
-  return tlCurrentThreadPool;
+IExecutor& CurrentThreadPool() noexcept {
+  return *tlCurrentThreadPool;
 }
 
 IThreadPoolPtr MakeThreadPool(std::size_t threads, IThreadFactoryPtr tf) {

@@ -12,14 +12,14 @@
 namespace yaclib {
 namespace detail {
 
-template <typename Functor>
-class SharedFunc : public IFunc, public SafeCall<Functor> {
+template <typename Func>
+class SharedFunc : public IFunc, public SafeCall<Func> {
  public:
-  using SafeCall<Functor>::SafeCall;
+  using SafeCall<Func>::SafeCall;
 
  private:
   void Call() noexcept final {
-    SafeCall<Functor>::Call();
+    SafeCall<Func>::Call();
   }
 };
 
@@ -27,13 +27,13 @@ class SharedFunc : public IFunc, public SafeCall<Functor> {
 
 using IFuncPtr = IntrusivePtr<IFunc>;
 /**
- * Create shared \ref IFunc object from any Callable functor
+ * Create shared \ref IFunc object from any Callable func
  *
  * \param f Callable object
  */
-template <typename Functor>
-IFuncPtr MakeFunc(Functor&& f) {
-  return MakeIntrusive<detail::SharedFunc<Functor>>(std::forward<Functor>(f));
+template <typename Func>
+IFuncPtr MakeFunc(Func&& f) {
+  return MakeIntrusive<detail::SharedFunc<Func>>(std::forward<Func>(f));
 }
 
 }  // namespace yaclib

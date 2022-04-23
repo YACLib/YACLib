@@ -1,6 +1,6 @@
 #include <yaclib/executor/executor.hpp>
+#include <yaclib/executor/job.hpp>
 #include <yaclib/executor/strand.hpp>
-#include <yaclib/executor/task.hpp>
 #include <yaclib/fault/atomic.hpp>
 #include <yaclib/log.hpp>
 #include <yaclib/util/helper.hpp>
@@ -11,7 +11,7 @@
 namespace yaclib {
 namespace {
 
-class /*alignas(kCacheLineSize)*/ Strand : public IExecutor, public ITask {
+class /*alignas(kCacheLineSize)*/ Strand : public Job, public IExecutor {
   // Inheritance from two IRef's, but that's okay, because they are pure virtual
  public:
   explicit Strand(IExecutorPtr executor) : _executor{std::move(executor)} {
@@ -26,13 +26,13 @@ class /*alignas(kCacheLineSize)*/ Strand : public IExecutor, public ITask {
     return Type::Strand;
   }
 
-  void Submit(ITask& task) noexcept final {
+  void Submit(Job& task) noexcept final {
     auto* old = _tasks.load(std::memory_order_relaxed);
     do {
       task.next = old == Mark() ? nullptr : old;
     } while (!_tasks.compare_exchange_weak(old, &task, std::memory_order_acq_rel, std::memory_order_relaxed));
     if (old == Mark()) {
-      static_cast<ITask&>(*this).IncRef();
+      static_cast<Job&>(*this).IncRef();
       _executor->Submit(*this);
     }
   }
@@ -48,14 +48,14 @@ class /*alignas(kCacheLineSize)*/ Strand : public IExecutor, public ITask {
     } while (node != nullptr);
     do {
       auto* next = prev->next;
-      static_cast<ITask*>(prev)->Call();
+      static_cast<Job*>(prev)->Call();
       prev = next;
     } while (prev != nullptr);
     if (_tasks.load(std::memory_order_acquire) != node ||
-        !_tasks.compare_exchange_strong(node, Mark(), std::memory_order_release, std::memory_order_acquire)) {
+        !_tasks.compare_exchange_strong(node, Mark(), std::memory_order_acq_rel, std::memory_order_relaxed)) {
       _executor->Submit(*this);
     } else {
-      static_cast<ITask&>(*this).DecRef();
+      static_cast<Job&>(*this).DecRef();
     }
   }
 
@@ -63,10 +63,10 @@ class /*alignas(kCacheLineSize)*/ Strand : public IExecutor, public ITask {
     auto* node = _tasks.exchange(Mark(), std::memory_order_acq_rel);
     do {
       auto* next = node->next;
-      static_cast<ITask*>(node)->Cancel();
+      static_cast<Job*>(node)->Cancel();
       node = next;
     } while (node != nullptr);
-    static_cast<ITask&>(*this).DecRef();
+    static_cast<Job&>(*this).DecRef();
   }
 
   Node* Mark() noexcept {

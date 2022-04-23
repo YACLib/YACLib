@@ -12,7 +12,7 @@ namespace yaclib {
  * TODO(mkornaukhov03) Add doxygen docs
  */
 template <typename... V, typename... E>
-detail::AwaitAwaiter Await(Future<V, E>&... fs) {
+detail::AwaitAwaiter Await(FutureBase<V, E>&... fs) {
   return detail::AwaitAwaiter(static_cast<detail::BaseCore&>(*fs.GetCore())...);
 }
 
@@ -20,7 +20,7 @@ detail::AwaitAwaiter Await(Future<V, E>&... fs) {
  * TODO(mkornaukhov03) Add doxygen docs
  */
 template <typename Iterator>
-std::enable_if_t<!is_future_v<Iterator>, detail::AwaitAwaiter> Await(Iterator begin, Iterator end) {
+std::enable_if_t<!is_future_base_v<Iterator>, detail::AwaitAwaiter> Await(Iterator begin, Iterator end) {
   // We don't use std::distance because we want to alert the user to the fact that it can be expensive.
   // Maybe the user has the size of the range, otherwise it is suggested to call Await(begin, distance(begin, end))
   return detail::AwaitAwaiter(begin, end - begin);
@@ -30,7 +30,7 @@ std::enable_if_t<!is_future_v<Iterator>, detail::AwaitAwaiter> Await(Iterator be
  * TODO(mkornaukhov03) Add doxygen docs
  */
 template <typename Iterator>
-std::enable_if_t<!is_future_v<Iterator>, detail::AwaitAwaiter> Await(Iterator begin, std::size_t count) {
+std::enable_if_t<!is_future_base_v<Iterator>, detail::AwaitAwaiter> Await(Iterator begin, std::size_t count) {
   return detail::AwaitAwaiter(begin, count);
 }
 

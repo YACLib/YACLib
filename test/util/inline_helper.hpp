@@ -7,21 +7,21 @@
 
 namespace test {
 
-template <bool Inline, typename V, typename E, typename Functor>
-auto InlineThen(yaclib::Future<V, E>&& future, Functor&& f) {
+template <bool Inline, typename V, typename E, typename Func>
+auto InlineThen(yaclib::Future<V, E>&& future, Func&& f) {
   if constexpr (Inline) {
-    return std::move(future).ThenInline(std::forward<Functor>(f));
+    return std::move(future).ThenInline(std::forward<Func>(f));
   } else {
-    return std::move(future).Then(yaclib::MakeInline(), std::forward<Functor>(f));
+    return std::move(future).Then(yaclib::MakeInline(), std::forward<Func>(f)).On(nullptr);
   }
 }
 
-template <bool Inline, typename V, typename E, typename Functor>
-void InlineDetach(yaclib::Future<V, E>&& future, Functor&& f) {
+template <bool Inline, typename V, typename E, typename Func>
+void InlineDetach(yaclib::Future<V, E>&& future, Func&& f) {
   if constexpr (Inline) {
-    std::move(future).DetachInline(std::forward<Functor>(f));
+    std::move(future).DetachInline(std::forward<Func>(f));
   } else {
-    std::move(future).Detach(yaclib::MakeInline(), std::forward<Functor>(f));
+    std::move(future).Detach(yaclib::MakeInline(), std::forward<Func>(f));
   }
 }
 

@@ -10,8 +10,8 @@
 #include <yaclib/async/promise.hpp>
 #include <yaclib/async/run.hpp>
 #include <yaclib/executor/executor.hpp>
+#include <yaclib/executor/job.hpp>
 #include <yaclib/executor/submit.hpp>
-#include <yaclib/executor/task.hpp>
 #include <yaclib/executor/thread_pool.hpp>
 #include <yaclib/fault/thread.hpp>
 #include <yaclib/util/detail/nope_counter.hpp>
@@ -178,12 +178,12 @@ TEST(JustWorks, AsyncRun) {
   EXPECT_EQ(tp->Tag(), yaclib::IExecutor::Type::ThreadPool);
 
   auto good = [&] {
-    EXPECT_EQ(yaclib::CurrentThreadPool(), tp);
+    EXPECT_EQ(&yaclib::CurrentThreadPool(), tp);
     return std::string{"Hello!"};
   };
 
   auto bad = [&]() -> int {
-    EXPECT_EQ(yaclib::CurrentThreadPool(), tp);
+    EXPECT_EQ(&yaclib::CurrentThreadPool(), tp);
     throw std::logic_error("test");
   };
   auto f1 = yaclib::Run(*tp, good);
@@ -221,7 +221,7 @@ TEST(Detach, AsyncSimple) {
   bool called = false;
 
   std::move(f).Detach(*tp, [&](yaclib::Result<std::string> result) {
-    EXPECT_EQ(yaclib::CurrentThreadPool(), tp);
+    EXPECT_EQ(&yaclib::CurrentThreadPool(), tp);
     EXPECT_EQ(std::move(result).Ok(), "Hello!");
     called = true;
   });
@@ -238,7 +238,7 @@ TEST(Detach, AsyncSimple) {
   EXPECT_TRUE(called);
 }
 
-TEST(Detach, DetachVia) {
+TEST(Detach, DetachOn) {
   auto tp = yaclib::MakeThreadPool(1);
 
   auto [f, p] = yaclib::MakeContract<int>();
@@ -261,7 +261,7 @@ TEST(Detach, DetachVia) {
   EXPECT_TRUE(called);
 }
 
-TEST(Detach, DetachVia2) {
+TEST(Detach, DetachOn2) {
   auto tp1 = yaclib::MakeThreadPool(1);
   auto tp2 = yaclib::MakeThreadPool(1);
 
@@ -296,18 +296,18 @@ TEST(ThenThreadPool, Simple) {
   auto process = [](int v) -> int {
     return v + 1;
   };
-  yaclib::Future<int> f1 = yaclib::Run(*tp, compute);
-  yaclib::Future<int> f2 = std::move(f1).Then(process);
+  yaclib::FutureOn<int> f1 = yaclib::Run(*tp, compute);
+  yaclib::FutureOn<int> f2 = std::move(f1).Then(process);
   EXPECT_EQ(std::move(f2).Get().Ok(), 43);
   tp->Stop();
   tp->Wait();
 }
 
-TEST(Simple, ThenVia) {
+TEST(Simple, ThenOn) {
   auto tp = yaclib::MakeThreadPool(2);
   auto [f, p] = yaclib::MakeContract<void>();
   auto g = std::move(f).Then(*tp, [&] {
-    EXPECT_EQ(yaclib::CurrentThreadPool(), tp);
+    EXPECT_EQ(&yaclib::CurrentThreadPool(), tp);
     return 42;
   });
   // Launch
@@ -333,7 +333,7 @@ TEST(Simple, Stop) {
     }
   }
   {
-    yaclib::Future<int> g;
+    yaclib::FutureOn<int> g;
     {
       auto [f, p] = yaclib::MakeContract<void>();
       g = std::move(f).Then(*tp, [] {
@@ -376,13 +376,13 @@ class Calculator {
   Calculator(yaclib::IThreadPoolPtr tp) : _tp(tp) {
   }
 
-  yaclib::Future<int> Increment(int value) {
+  yaclib::FutureOn<int> Increment(int value) {
     return yaclib::Run(*_tp, [value] {
       return value + 1;
     });
   }
 
-  yaclib::Future<int> Double(int value) {
+  yaclib::FutureOn<int> Double(int value) {
     return yaclib::Run(*_tp, [value] {
       return value * 2;
     });
@@ -441,7 +441,7 @@ TYPED_TEST(Error, Simple1) {
     return 42;
   };
   auto last = [&](int v) -> int {
-    EXPECT_EQ(yaclib::CurrentThreadPool(), tp);
+    EXPECT_EQ(&yaclib::CurrentThreadPool(), tp);
     return v + 11;
   };
 
@@ -479,7 +479,7 @@ TYPED_TEST(Error, Simple2) {
     return 42;
   };
   auto last = [&](int v) {
-    EXPECT_EQ(yaclib::CurrentThreadPool(), tp);
+    EXPECT_EQ(&yaclib::CurrentThreadPool(), tp);
     return v + 11;
   };
   auto pipeline = yaclib::Run<ErrorType>(*tp, first).Then(second).Then(third).Then(error_handler).Then(last);
@@ -497,7 +497,7 @@ TEST(Pipeline, Simple2) {
 
   auto make_stage = [](int index, yaclib::IThreadPoolPtr current_executor) {
     return [index, current_executor](std::string path) {
-      EXPECT_EQ(yaclib::CurrentThreadPool(), current_executor);
+      EXPECT_EQ(&yaclib::CurrentThreadPool(), current_executor);
       std::cout << "At stage " << index << std::endl;
       return path + "->" + std::to_string(index);
     };
@@ -528,14 +528,14 @@ TEST(Simple, MakePromiseContract) {
       return yaclib::IExecutor::Type::Custom;
     }
 
-    void Submit(yaclib::ITask& f) noexcept final {
+    void Submit(yaclib::Job& f) noexcept final {
       _tasks.PushFront(f);
     }
 
     void Drain() {
       while (!_tasks.Empty()) {
         auto& task = _tasks.PopFront();
-        static_cast<yaclib::ITask&>(task).Call();
+        static_cast<yaclib::Job&>(task).Call();
       }
     }
 

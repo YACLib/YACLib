@@ -1,6 +1,6 @@
 #pragma once
 
-#include <yaclib/executor/detail/unique_task.hpp>
+#include <yaclib/executor/detail/unique_job.hpp>
 #include <yaclib/executor/executor.hpp>
 
 #include <utility>
@@ -8,15 +8,15 @@
 namespace yaclib {
 
 /**
- * Submit given functor for details \see Submit
+ * Submit given func for details \see Submit
  *
- * This method creates ITask with one allocation and call Submit(ITask)
- * \param f functor to execute
+ * This method creates Job with one allocation and call Submit(Job)
+ * \param f func to execute
  */
-template <typename Functor>
-void Submit(IExecutor& executor, Functor&& f) {
-  static_assert(!std::is_base_of_v<ITask, std::decay_t<Functor>>);
-  auto task = detail::MakeUniqueTask(std::forward<Functor>(f));
+template <typename Func>
+void Submit(IExecutor& executor, Func&& f) {
+  static_assert(!std::is_base_of_v<Job, std::decay_t<Func>>);
+  auto task = detail::MakeUniqueJob(std::forward<Func>(f));
   executor.Submit(*task);
 }
 
