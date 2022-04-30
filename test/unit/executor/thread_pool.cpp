@@ -8,13 +8,13 @@
 #include <yaclib/executor/thread_pool.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 
-#include <chrono>
 #include <cstddef>
 #include <initializer_list>
 #include <stdexcept>
 #include <thread>
 #include <vector>
 #include <yaclib_std/atomic>
+#include <yaclib_std/chrono>
 
 #include <gtest/gtest.h>
 
@@ -442,10 +442,10 @@ void UseAllThreads(yaclib::IThreadPoolPtr& tp, StopType stop_type) {
   yaclib_std::atomic_size_t counter{0};
 
   auto sleeper = [&counter] {
-    auto point = std::chrono::steady_clock::now() + 50ms * YACLIB_CI_SLOWDOWN;
+    auto point = yaclib_std::chrono::steady_clock::now() + 50ms * YACLIB_CI_SLOWDOWN;
     do {
       yaclib_std::this_thread::sleep_until(point);
-    } while (point > std::chrono::steady_clock::now());  // Workaround for MinGW
+    } while (point > yaclib_std::chrono::steady_clock::now());  // Workaround for MinGW
     counter.fetch_add(1, std::memory_order_relaxed);
   };
 
@@ -528,11 +528,15 @@ void Current(yaclib::IThreadPoolPtr& tp) {
 
   yaclib_std::this_thread::sleep_for(1ms);
 
+#if !defined(YACLIB_FIBER)
   EXPECT_EQ(&yaclib::CurrentThreadPool(), &yaclib::MakeInline());
+#endif
 
   tp->Stop();
 
+#if !defined(YACLIB_FIBER)
   EXPECT_EQ(&yaclib::CurrentThreadPool(), &yaclib::MakeInline());
+#endif
 
   tp->Wait();
 
@@ -545,12 +549,16 @@ TEST_F(SingleLightThread, Current) {
 TEST_F(SingleHeavyThread, Current) {
   Current(_tps[0]);
 }
+
+// TODO(myannyax) racey for fibers... maybe change hardware concurrency to 1 for fibers?
+#if !defined(YACLIB_FIBER)
 TEST_F(MultiLightThread, Current) {
   Current(_tps[0]);
 }
 TEST_F(MultiHeavyThread, Current) {
   Current(_tps[0]);
 }
+#endif
 
 void Lifetime(yaclib::IThreadPoolPtr& tp, std::size_t threads) {
   class Task final {

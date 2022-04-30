@@ -46,5 +46,14 @@ int main(int argc, char** argv) {
   test::InitLog();
   test::InitFault();
   testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
+  int result = 0;
+#ifdef YACLIB_FIBER
+  yaclib_std::thread tests([&]() {
+    result = RUN_ALL_TESTS();
+  });
+  tests.join();
+#else
+  result = RUN_ALL_TESTS();
+#endif
+  return result;
 }

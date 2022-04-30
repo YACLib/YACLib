@@ -17,3 +17,18 @@ void SetFaultFrequency(std::uint32_t freq);
 void SetFaultSleepTime(std::uint32_t ns);
 
 }  // namespace yaclib
+
+#ifdef YACLIB_FIBER
+#  include <yaclib/fault/thread.hpp>
+#  define TEST_WITH_FAULT(action)                                                                                      \
+    do {                                                                                                               \
+      yaclib_std::thread([&] {                                                                                         \
+        action;                                                                                                        \
+      });                                                                                                              \
+    } while (false)
+#else
+#  define TEST_WITH_FAULT(action)                                                                                      \
+    do {                                                                                                               \
+      action;                                                                                                          \
+    } while (false)
+#endif

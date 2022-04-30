@@ -64,11 +64,11 @@ struct StressTest : testing::Test {
     yaclib_std::atomic_uint32_t num_resolved_futures{0};
     uint32_t num_slots{64 * kNumThreads};
     std::vector<StressTest::Slot> slots{num_slots};
-    std::vector<std::thread> threads;
+    std::vector<yaclib_std::thread> threads;
 
     // producer
     for (uint32_t i = 0; i < kNumThreads / 2; ++i) {
-      threads.emplace_back(std::thread([&producer_idx, i, num_slots, &slots, &e] {
+      threads.emplace_back(yaclib_std::thread([&producer_idx, i, num_slots, &slots, &e] {
         std::mt19937 rng(i);
         for (uint32_t r = 0; r < kNumRounds; ++r) {
           auto [f, p] = yaclib::MakeContract<Value>();
@@ -94,26 +94,27 @@ struct StressTest : testing::Test {
 
     // consumer
     for (uint32_t i = 0; i < kNumThreads / 2; ++i) {
-      threads.emplace_back(std::thread([consumer, &wg, &consumer_idx, &slots, i, &num_resolved_futures, num_slots]() {
-        std::mt19937 rng(kNumThreads + i);
-        for (uint32_t r = 0; r < kNumRounds; ++r) {
-          auto idx = consumer_idx.fetch_add(1, std::memory_order_acq_rel);
-          auto slot_round = (idx / num_slots) * 2 + 1;
-          idx %= num_slots;
-          EXPECT_TRUE(slot_round % 2 != 0);
-          while (slots[idx].round.load(std::memory_order_acquire) != slot_round) {
-            yaclib_std::this_thread::yield();
+      threads.emplace_back(
+        yaclib_std::thread([consumer, &wg, &consumer_idx, &slots, i, &num_resolved_futures, num_slots]() {
+          std::mt19937 rng(kNumThreads + i);
+          for (uint32_t r = 0; r < kNumRounds; ++r) {
+            auto idx = consumer_idx.fetch_add(1, std::memory_order_acq_rel);
+            auto slot_round = (idx / num_slots) * 2 + 1;
+            idx %= num_slots;
+            EXPECT_TRUE(slot_round % 2 != 0);
+            while (slots[idx].round.load(std::memory_order_acquire) != slot_round) {
+              yaclib_std::this_thread::yield();
+            }
+            auto f = std::move(slots[idx].future);
+            EXPECT_TRUE(f.Valid());
+            slots[idx].round.store(slot_round + 1, std::memory_order_release);
+            volatile auto work = rng() % 2048;
+            for (unsigned x = 0; x < work; ++x) {
+              [[maybe_unused]] auto _ = work;
+            }
+            consumer(wg, std::move(f), idx, slot_round, num_resolved_futures);
           }
-          auto f = std::move(slots[idx].future);
-          EXPECT_TRUE(f.Valid());
-          slots[idx].round.store(slot_round + 1, std::memory_order_release);
-          volatile auto work = rng() % 2048;
-          for (unsigned x = 0; x < work; ++x) {
-            [[maybe_unused]] auto _ = work;
-          }
-          consumer(wg, std::move(f), idx, slot_round, num_resolved_futures);
-        }
-      }));
+        }));
     }
     for (auto& t : threads) {
       t.join();
