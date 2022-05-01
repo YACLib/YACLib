@@ -3,6 +3,8 @@
 
 namespace yaclib::detail {
 
+using namespace std::chrono_literals;
+
 FiberThreadlike::FiberThreadlike() noexcept = default;
 
 void FiberThreadlike::swap(FiberThreadlike& t) noexcept {
@@ -12,12 +14,15 @@ void FiberThreadlike::swap(FiberThreadlike& t) noexcept {
 }
 
 bool FiberThreadlike::joinable() const noexcept {
-  return Scheduler::Current() == nullptr || Scheduler::Current()->_id != this->_impl->_id;
+  return Scheduler::Current() == nullptr || Scheduler::Current()->GetId() != this->_impl->GetId();
 }
 
 void FiberThreadlike::join() {
-  while (!_impl->_impl.IsCompleted()) {
-    Scheduler::RescheduleCurrent();
+  while (_impl->GetState() != Completed) {
+    _join_queue->Wait();
+    if (_join_queue->IsEmpty()) {
+      delete _join_queue;
+    }
   }
 }
 

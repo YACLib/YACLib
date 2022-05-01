@@ -1,23 +1,24 @@
 #pragma once
 
-#include <yaclib/fault/detail/fiber/coroutine_base.hpp>
 #include <yaclib/fault/detail/fiber/default_allocator.hpp>
+#include <yaclib/fault/detail/fiber/execution_context.hpp>
 #include <yaclib/fault/detail/fiber/stack.hpp>
 #include <yaclib/fault/detail/fiber/stack_allocator.hpp>
+#include <yaclib/util/detail/shared_func.hpp>
 
 namespace yaclib::detail {
+
+using Routine = yaclib::IFuncPtr;
 
 enum FiberState {
   Running,
   Suspended,
+  Completed,
 };
 
 class Fiber : public IRef {
  public:
-  using Id = unsigned long;
-
-  friend class FiberThreadlike;
-  friend class Scheduler;
+  using Id = uint64_t;
 
   Fiber(Fiber&& other) noexcept = default;
 
@@ -27,23 +28,32 @@ class Fiber : public IRef {
 
   explicit Fiber(Routine routine);
 
-  Id GetId();
+  void SetCompleteCallback(Routine routine);
 
-  ~Fiber() override = default;
+  [[nodiscard]] Id GetId() const;
+
+  void Resume();
+
+  void Yield();
+
+  FiberState GetState();
 
   void IncRef() noexcept override;
   void DecRef() noexcept override;
 
  private:
-  void Resume();
+  [[noreturn]] static void Trampoline(void* arg);
 
-  void Yield();
+  void Complete();
 
-  static Id _next_id;
   Stack _stack;
+  ExecutionContext _context{};
+  ExecutionContext _caller_context{};
+  Routine _routine;
+  Routine _complete_callback{nullptr};
+  std::exception_ptr _exception;
   Id _id;
-  CoroutineBase _impl;
-  FiberState _state;
+  FiberState _state{Suspended};
 };
 
 }  // namespace yaclib::detail

@@ -11,11 +11,9 @@ static size_t PagesToBytes(size_t count) {
   return count * kPageSize;
 }
 
-static void ProtectPages(char* start, size_t offset, size_t count) {
-  mprotect(/*addr=*/static_cast<void*>(start + PagesToBytes(offset)),
-           /*len=*/PagesToBytes(count),
-           /*prot=*/PROT_NONE);
-  // TODO(myannyax) check returns not -1
+static void ProtectStackPages(char* start) {
+  auto status = mprotect(static_cast<void*>(start), PagesToBytes(1), PROT_NONE);
+  YACLIB_ERROR(status == -1, "mprotect for stack failed");
 }
 
 Allocation DefaultAllocator::Allocate() {
@@ -26,14 +24,10 @@ Allocation DefaultAllocator::Allocate() {
   }
   size_t size = PagesToBytes(_stack_size_pages);
 
-  void* start = mmap(/*addr=*/nullptr, /*length=*/size,
-                     /*prot=*/PROT_READ | PROT_WRITE,
-                     /*flags=*/MAP_PRIVATE | MAP_ANONYMOUS,
-                     /*fd=*/-1, /*offset=*/0);
-
-  // TODO(myannyax) check start != MAP_FAILED
-  auto allocation = Allocation{(char*)start, size};
-  ProtectPages(allocation.start, 0, 1);
+  void* start = mmap(nullptr, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+  YACLIB_ERROR(start == MAP_FAILED, "mmap for stack failed");
+  auto allocation = Allocation{static_cast<char*>(start), size};
+  ProtectStackPages(allocation.start);
   return allocation;
 }
 
@@ -45,8 +39,8 @@ void DefaultAllocator::Release(Allocation allocation) {
       return;
     }
 
-    munmap(static_cast<void*>(allocation.start), allocation.size);
-    // TODO(myannyax) check returns not -1
+    auto status = munmap(static_cast<void*>(allocation.start), allocation.size);
+    YACLIB_ERROR(status == -1, "munmap for stack failed");
   }
 }
 

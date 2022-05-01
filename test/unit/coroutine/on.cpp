@@ -144,6 +144,9 @@ TEST(On, LockWithStrand) {
     add_value(kIncrements);
   }
   while (!end.load(std::memory_order_acquire)) {
+#if defined(YACLIB_FIBER)
+    yaclib_std::this_thread::yield();
+#endif
   }
   tp->Stop();
   tp->Wait();

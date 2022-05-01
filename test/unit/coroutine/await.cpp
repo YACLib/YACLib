@@ -73,7 +73,7 @@ TEST(Await, CheckSuspend) {
   int counter = 0;
   auto tp = yaclib::MakeThreadPool(2);
   const auto coro_sleep_time = 50ms * YACLIB_CI_SLOWDOWN;
-  auto was = std::chrono::steady_clock::now();
+  auto was = yaclib_std::chrono::steady_clock::now();
   std::atomic_bool barrier = false;
 
   auto coro = [&]() -> yaclib::Future<void> {
@@ -100,12 +100,12 @@ TEST(Await, CheckSuspend) {
   EXPECT_EQ(1, counter);
   barrier.store(true, std::memory_order_release);
 
-  EXPECT_LT(std::chrono::steady_clock::now() - was, coro_sleep_time);
+  EXPECT_LT(yaclib_std::chrono::steady_clock::now() - was, coro_sleep_time);
 
   std::ignore = std::move(outer_future).Get();
 
   EXPECT_EQ(2, counter);
-  EXPECT_GE(std::chrono::steady_clock::now() - was, coro_sleep_time);
+  EXPECT_GE(yaclib_std::chrono::steady_clock::now() - was, coro_sleep_time);
   tp->HardStop();
   tp->Wait();
 }

@@ -8,7 +8,7 @@ void ExecutionContext::Setup(Allocation stack, Trampoline trampoline, void* arg)
   }
   _context.uc_stack.ss_sp = stack.start;
   _context.uc_stack.ss_size = stack.size;
-  makecontext(&_context, (void (*)())trampoline, 1, arg);
+  makecontext(&_context, reinterpret_cast<void (*)()>(trampoline), 1, arg);
 }
 
 void ExecutionContext::SwitchTo(ExecutionContext& other) {

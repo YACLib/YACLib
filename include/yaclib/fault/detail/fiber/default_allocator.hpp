@@ -1,6 +1,7 @@
 #pragma once
 
 #include <yaclib/fault/detail/fiber/stack_allocator.hpp>
+#include <yaclib/log.hpp>
 
 #include <vector>
 

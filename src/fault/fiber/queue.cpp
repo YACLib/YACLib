@@ -18,9 +18,14 @@ void FiberQueue::NotifyAll() {
 }
 
 void FiberQueue::NotifyOne() {
-  if (_queue.empty())
+  if (_queue.empty()) {
     return;
+  }
   auto fiber = PollRandomElementFromList(_queue);
   GetScheduler()->Run(fiber);
+}
+
+bool FiberQueue::IsEmpty() {
+  return _queue.empty();
 }
 }  // namespace yaclib::detail

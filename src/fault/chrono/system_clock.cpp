@@ -7,7 +7,8 @@ SystemClock::time_point SystemClock::now() {
 }
 
 time_t SystemClock::to_time_t(const SystemClock::time_point& time_point) noexcept {
-  return std::time_t(std::chrono::duration_cast<std::chrono::seconds>(time_point.time_since_epoch()).count());
+  return static_cast<std::time_t>(
+    std::chrono::duration_cast<std::chrono::seconds>(time_point.time_since_epoch()).count());
 }
 
 SystemClock::time_point SystemClock::from_time_t(time_t c_time_point) noexcept {
