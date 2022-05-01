@@ -31,4 +31,16 @@ void FiberMutex::unlock() noexcept {
 FiberMutex::native_handle_type FiberMutex::native_handle() {
   return nullptr;
 }
+
+void FiberMutex::LockNoInject() {
+  while (_occupied) {
+    _queue.Wait();
+  }
+  _occupied = true;
+}
+
+void FiberMutex::UnlockNoInject() noexcept {
+  _occupied = false;
+  _queue.NotifyOne();
+}
 }  // namespace yaclib::detail

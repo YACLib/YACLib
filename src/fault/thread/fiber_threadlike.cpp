@@ -8,7 +8,10 @@ using namespace std::chrono_literals;
 FiberThreadlike::FiberThreadlike() noexcept = default;
 
 void FiberThreadlike::swap(FiberThreadlike& t) noexcept {
-  auto other_impl = t._impl;
+  auto* other_impl = t._impl;
+  auto other_queue = std::move(t._join_queue);
+  t._join_queue = std::move(_join_queue);
+  _join_queue = std::move(other_queue);
   t._impl = _impl;
   _impl = other_impl;
 }
@@ -19,10 +22,7 @@ bool FiberThreadlike::joinable() const noexcept {
 
 void FiberThreadlike::join() {
   while (_impl->GetState() != Completed) {
-    _join_queue->Wait();
-    if (_join_queue->IsEmpty()) {
-      delete _join_queue;
-    }
+    _join_queue.Wait();
   }
 }
 
@@ -42,6 +42,31 @@ unsigned int FiberThreadlike::hardware_concurrency() noexcept {
   return std::thread::hardware_concurrency();
 }
 
-const Fiber::Id kInvalidThreadId = Fiber::Id{0};
+FiberThreadlike::~FiberThreadlike() {
+  if (_impl == nullptr) {
+    return;
+  }
+  _impl->SetThreadlikeInstanceDead();
+  if (_impl->GetState() == Completed) {
+    delete _impl;
+  }
+}
+
+FiberThreadlike& FiberThreadlike::operator=(FiberThreadlike&& t) noexcept {
+  _impl = t._impl;
+  _join_queue = std::move(t._join_queue);
+  _impl->SetCompleteCallback(yaclib::MakeFunc([&]() mutable {
+    _join_queue.NotifyAll();
+  }));
+  t._impl = nullptr;
+  return *this;
+}
+
+FiberThreadlike::FiberThreadlike(FiberThreadlike&& t) noexcept : _impl(t._impl), _join_queue(std::move(t._join_queue)) {
+  _impl->SetCompleteCallback(yaclib::MakeFunc([&]() mutable {
+    _join_queue.NotifyAll();
+  }));
+  t._impl = nullptr;
+}
 
 }  // namespace yaclib::detail

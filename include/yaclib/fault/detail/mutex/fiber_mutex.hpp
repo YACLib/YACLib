@@ -23,6 +23,9 @@ class FiberMutex {
 
   inline native_handle_type native_handle();
 
+  void LockNoInject();
+  void UnlockNoInject() noexcept;
+
  private:
   FiberQueue _queue;
   bool _occupied{false};

@@ -341,11 +341,12 @@ TEST_F(SingleHeavyThread, FIFO) {
   }
 }
 
+// TODO(MBkkt): might fail for fiber fault if sleep_for isn't enough for stop waiting
 void Exception(yaclib::IThreadPoolPtr& tp, StopType stop_type) {
   int flag = 0;
   Submit(*tp, [&] {
     flag += 1;
-    std::this_thread::sleep_for(1ms);  // Wait stop
+    yaclib_std::this_thread::sleep_for(1ms);  // Wait stop
     Submit(*tp, [&] {
       flag += 2;
     });
@@ -528,21 +529,19 @@ void Current(yaclib::IThreadPoolPtr& tp) {
 
   yaclib_std::this_thread::sleep_for(1ms);
 
-#if !defined(YACLIB_FIBER)
   EXPECT_EQ(&yaclib::CurrentThreadPool(), &yaclib::MakeInline());
-#endif
 
   tp->Stop();
 
-#if !defined(YACLIB_FIBER)
   EXPECT_EQ(&yaclib::CurrentThreadPool(), &yaclib::MakeInline());
-#endif
 
   tp->Wait();
 
   EXPECT_EQ(&yaclib::CurrentThreadPool(), &yaclib::MakeInline());
 }
 
+// TODO(myannyax) racey for fibers... do fiber thread local memory
+#if !defined(YACLIB_FIBER)
 TEST_F(SingleLightThread, Current) {
   Current(_tps[0]);
 }
@@ -550,8 +549,6 @@ TEST_F(SingleHeavyThread, Current) {
   Current(_tps[0]);
 }
 
-// TODO(myannyax) racey for fibers... maybe change hardware concurrency to 1 for fibers?
-#if !defined(YACLIB_FIBER)
 TEST_F(MultiLightThread, Current) {
   Current(_tps[0]);
 }

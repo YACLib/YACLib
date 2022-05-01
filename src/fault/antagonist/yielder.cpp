@@ -1,3 +1,5 @@
+#include "fault/util.hpp"
+
 #include <yaclib/fault/detail/yielder.hpp>
 
 namespace yaclib::detail {
@@ -9,7 +11,7 @@ std::atomic_uint32_t Yielder::yield_frequency = kFreq;
 std::atomic_uint32_t Yielder::sleep_time = kSleepTimeNs;
 
 // TODO(myannyax) maybe scheduler-wide random engine?
-Yielder::Yielder() : _eng(1142), _count(0) {
+Yielder::Yielder() : _count(0) {
 }
 
 void Yielder::MaybeYield() {
@@ -17,13 +19,13 @@ void Yielder::MaybeYield() {
 #ifdef YACLIB_FIBER
     yaclib_std::this_thread::yield();
 #else
-    yaclib_std::this_thread::sleep_for(std::chrono::nanoseconds(RandNumber(sleep_time)));
+    yaclib_std::this_thread::sleep_for(std::chrono::nanoseconds(1 + GetRandNumber(sleep_time - 1)));
 #endif
   }
 }
 
 bool Yielder::ShouldYield() {
-  if (_count += 1 >= yield_frequency) {
+  if (_count++ >= yield_frequency) {
     Reset();
     return true;
   }
@@ -31,11 +33,7 @@ bool Yielder::ShouldYield() {
 }
 
 void Yielder::Reset() {
-  _count = RandNumber(yield_frequency);
-}
-
-uint32_t Yielder::RandNumber(uint32_t max) {
-  return 1 + _eng() % (max - 1);
+  _count = 1 + GetRandNumber(yield_frequency - 1);
 }
 
 void Yielder::SetFrequency(uint32_t freq) {
@@ -44,6 +42,14 @@ void Yielder::SetFrequency(uint32_t freq) {
 
 void Yielder::SetSleepTime(uint32_t ns) {
   sleep_time.store(ns);
+}
+
+void Yielder::SetState(uint32_t state) {
+  _count = state;
+}
+
+uint32_t Yielder::GetState() {
+  return _count;
 }
 
 }  // namespace yaclib::detail

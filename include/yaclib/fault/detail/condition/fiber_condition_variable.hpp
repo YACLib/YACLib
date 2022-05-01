@@ -23,45 +23,55 @@ class FiberConditionVariable {
   template <typename Predicate>
   void wait(std::unique_lock<yaclib::detail::FiberMutex>& lock, Predicate predicate) {
     while (!predicate()) {
-      lock.unlock();
+      auto* m = lock.release();
+      m->UnlockNoInject();
       _queue.Wait();
-      lock.lock();
+      m->LockNoInject();
+      lock = std::unique_lock{*m, std::adopt_lock};
     }
   }
 
   template <typename Clock, typename Duration>
   std::cv_status wait_until(std::unique_lock<yaclib::detail::FiberMutex>& lock,
                             const std::chrono::time_point<Clock, Duration>& time_point) {
-    lock.unlock();
-    _queue.Wait(time_point);
-    lock.lock();
-    return std::cv_status::no_timeout;
+    auto* m = lock.release();
+    m->UnlockNoInject();
+    bool timeout = _queue.Wait(time_point);
+    m->LockNoInject();
+    lock = std::unique_lock{*m, std::adopt_lock};
+    return timeout ? std::cv_status::timeout : std::cv_status::no_timeout;
   }
 
   template <typename Clock, typename Duration, typename Predicate>
   bool wait_until(std::unique_lock<yaclib::detail::FiberMutex>& lock,
                   const std::chrono::time_point<Clock, Duration>& time_point, Predicate predicate) {
-    lock.unlock();
+    auto* m = lock.release();
+    m->UnlockNoInject();
     _queue.Wait(time_point);
-    lock.lock();
+    m->LockNoInject();
+    lock = std::unique_lock{*m, std::adopt_lock};
     return predicate();
   }
 
   template <typename Rep, typename Period>
   std::cv_status wait_for(std::unique_lock<yaclib::detail::FiberMutex>& lock,
                           const std::chrono::duration<Rep, Period>& duration) {
-    lock.unlock();
-    _queue.Wait(duration);
-    lock.lock();
-    return std::cv_status::no_timeout;
+    auto* m = lock.release();
+    m->UnlockNoInject();
+    bool timeout = _queue.Wait(duration);
+    m->LockNoInject();
+    lock = std::unique_lock{*m, std::adopt_lock};
+    return timeout ? std::cv_status::timeout : std::cv_status::no_timeout;
   }
 
   template <typename Rep, typename Period, typename Predicate>
   bool wait_for(std::unique_lock<yaclib::detail::FiberMutex>& lock, const std::chrono::duration<Rep, Period>& duration,
                 Predicate predicate) {
-    lock.unlock();
+    auto* m = lock.release();
+    m->UnlockNoInject();
     _queue.Wait(duration);
-    lock.lock();
+    m->LockNoInject();
+    lock = std::unique_lock{*m, std::adopt_lock};
     return predicate();
   }
 

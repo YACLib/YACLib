@@ -39,7 +39,7 @@ void Fiber::Yield() {
 
 void Fiber::Complete() {
   _state = Completed;
-  if (_complete_callback != nullptr) {
+  if (_complete_callback != nullptr && _threadlike_instance_alive) {
     _complete_callback->Call();
   }
   _context.SwitchTo(_caller_context);
@@ -55,6 +55,7 @@ void Fiber::Trampoline(void* arg) {
   }
 
   coroutine->Complete();
+  abort();
 }
 
 FiberState Fiber::GetState() {
@@ -76,6 +77,14 @@ void Fiber::SetCompleteCallback(Routine routine) {
     _complete_callback.Release();
   }
   _complete_callback = std::move(routine);
+}
+
+void Fiber::SetThreadlikeInstanceDead() {
+  _threadlike_instance_alive = false;
+}
+
+bool Fiber::IsThreadlikeInstanceAlive() const {
+  return _threadlike_instance_alive;
 }
 
 }  // namespace yaclib::detail

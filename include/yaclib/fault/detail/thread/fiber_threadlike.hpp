@@ -19,20 +19,21 @@ class FiberThreadlike {
   using native_handle_type = std::thread::native_handle_type;
 
   template <class Fp, class... Args>
-  inline explicit FiberThreadlike(Fp&& f, Args&&... args) : _join_queue(new FiberQueue()) {
+  inline explicit FiberThreadlike(Fp&& f, Args&&... args) {
     yaclib::IFuncPtr func = yaclib::MakeFunc([&, f = std::forward<Fp>(f)]() mutable {
       f(std::forward(args)...);
     });
-    _impl = MakeIntrusive<Fiber>(func);
-    _impl->SetCompleteCallback(yaclib::MakeFunc([queue = _join_queue]() mutable {
-      queue->NotifyAll();
+    _impl = new Fiber(func);
+    _impl->SetCompleteCallback(yaclib::MakeFunc([&]() mutable {
+      _join_queue.NotifyAll();
     }));
     GetScheduler()->Run(_impl);
   }
 
   FiberThreadlike() noexcept;
-  FiberThreadlike(FiberThreadlike&& t) noexcept = default;
-  FiberThreadlike& operator=(FiberThreadlike&& t) noexcept = default;
+  FiberThreadlike(FiberThreadlike&& t) noexcept;
+  FiberThreadlike& operator=(FiberThreadlike&& t) noexcept;
+  ~FiberThreadlike();
 
   void swap(FiberThreadlike& t) noexcept;
   [[nodiscard]] bool joinable() const noexcept;
@@ -47,10 +48,8 @@ class FiberThreadlike {
   static unsigned int hardware_concurrency() noexcept;
 
  private:
-  IntrusivePtr<Fiber> _impl;
-  FiberQueue* _join_queue;
+  Fiber* _impl;
+  FiberQueue _join_queue;
 };
-
-extern const Fiber::Id kInvalidThreadId;
 
 }  // namespace yaclib::detail

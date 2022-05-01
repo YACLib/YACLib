@@ -3,29 +3,26 @@
 namespace yaclib::detail {
 
 void FiberQueue::Wait() {
-  auto fiber = Scheduler::Current();
-  _queue.push_back(fiber);
+  auto* fiber = Scheduler::Current();
+  _queue.PushBack(static_cast<BiNodeWaitQueue*>(fiber));
   Scheduler::Suspend();
 }
 
 void FiberQueue::NotifyAll() {
-  std::vector<IntrusivePtr<Fiber>> all;
-  all = _queue;
-  _queue.clear();
+  std::vector<Fiber*> all;
+  while (!_queue.Empty()) {
+    all.push_back(static_cast<Fiber*>(static_cast<BiNodeWaitQueue*>(_queue.PopBack())));
+  }
   for (const auto& elem : all) {
     GetScheduler()->Run(elem);
   }
 }
 
 void FiberQueue::NotifyOne() {
-  if (_queue.empty()) {
+  if (_queue.Empty()) {
     return;
   }
-  auto fiber = PollRandomElementFromList(_queue);
-  GetScheduler()->Run(fiber);
-}
-
-bool FiberQueue::IsEmpty() {
-  return _queue.empty();
+  auto* fiber = PollRandomElementFromList(_queue);
+  GetScheduler()->Run(static_cast<Fiber*>(static_cast<BiNodeWaitQueue*>(fiber)));
 }
 }  // namespace yaclib::detail

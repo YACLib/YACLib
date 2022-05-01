@@ -1,8 +1,10 @@
+#include "fault/util.hpp"
+
 #include <yaclib/fault/detail/thread/random_device.hpp>
 
 namespace yaclib::detail::thread {
 
-RandomDevice::RandomDevice() : _eng{kSeed} {
+RandomDevice::RandomDevice() : _eng{GetSeed()} {
 }
 
 RandomDevice::result_type RandomDevice::operator()() noexcept {
@@ -23,7 +25,7 @@ constexpr RandomDevice::result_type RandomDevice::max() {
 
 void RandomDevice::reset() {
   // not thread safe
-  _eng.seed(kSeed);
+  _eng.seed(GetSeed());
 }
 
 }  // namespace yaclib::detail::thread

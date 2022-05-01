@@ -37,7 +37,6 @@ class RandomDevice {
   RandomDevice& operator=(const RandomDevice&) = delete;
 
  private:
-  static constexpr const unsigned kSeed = 1337;
   std::mt19937 _eng;
 };
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <yaclib/fault/detail/fiber/bidirectional_intrusive_list.hpp>
 #include <yaclib/fault/detail/fiber/default_allocator.hpp>
 #include <yaclib/fault/detail/fiber/execution_context.hpp>
 #include <yaclib/fault/detail/fiber/stack.hpp>
@@ -10,13 +11,17 @@ namespace yaclib::detail {
 
 using Routine = yaclib::IFuncPtr;
 
+class BiNodeSleep : public BiNode {};
+
+class BiNodeWaitQueue : public BiNode {};
+
 enum FiberState {
   Running,
   Suspended,
   Completed,
 };
 
-class Fiber : public IRef {
+class Fiber : public IRef, public BiNodeSleep, public BiNodeWaitQueue {
  public:
   using Id = uint64_t;
 
@@ -38,6 +43,10 @@ class Fiber : public IRef {
 
   FiberState GetState();
 
+  void SetThreadlikeInstanceDead();
+
+  [[nodiscard]] bool IsThreadlikeInstanceAlive() const;
+
   void IncRef() noexcept override;
   void DecRef() noexcept override;
 
@@ -54,6 +63,7 @@ class Fiber : public IRef {
   std::exception_ptr _exception;
   Id _id;
   FiberState _state{Suspended};
+  bool _threadlike_instance_alive{true};
 };
 
 }  // namespace yaclib::detail

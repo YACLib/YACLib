@@ -11,9 +11,11 @@ void detail::FiberConditionVariable::notify_all() noexcept {
 }
 
 void detail::FiberConditionVariable::wait(std::unique_lock<yaclib::detail::FiberMutex>& lock) noexcept {
-  lock.unlock();
+  auto* m = lock.release();
+  m->UnlockNoInject();
   _queue.Wait();
-  lock.lock();
+  m->LockNoInject();
+  lock = std::unique_lock{*m, std::adopt_lock};
 }
 
 detail::FiberConditionVariable::native_handle_type detail::FiberConditionVariable::native_handle() {

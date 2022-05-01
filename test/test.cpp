@@ -1,6 +1,7 @@
 #include <util/helpers.hpp>
 
 #include <yaclib/fault/config.hpp>
+#include <yaclib/fault/detail/inject_fault.hpp>
 #include <yaclib/log.hpp>
 
 #include <cstdio>
@@ -8,6 +9,16 @@
 #include <gtest/gtest.h>
 
 namespace test {
+
+const int seed = 1239;
+
+class MyTestListener : public ::testing::EmptyTestEventListener {
+ public:
+  void OnTestStart(const testing::TestInfo& /*info*/) override {
+    yaclib::SetSeed(seed);
+    std::cout << "\n-------------- state" << yaclib::detail::GetYielder()->GetState() << "--------------\n";
+  }
+};
 
 void InitLog() noexcept {
   auto assert_callback = [](std::string_view file, std::size_t line, std::string_view /*function*/,
@@ -48,6 +59,7 @@ int main(int argc, char** argv) {
   testing::InitGoogleTest(&argc, argv);
   int result = 0;
 #ifdef YACLIB_FIBER
+  ::testing::UnitTest::GetInstance()->listeners().Append(new test::MyTestListener());
   yaclib_std::thread tests([&]() {
     result = RUN_ALL_TESTS();
   });

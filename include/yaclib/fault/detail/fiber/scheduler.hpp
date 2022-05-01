@@ -18,8 +18,7 @@ class Scheduler {
  public:
   friend class FiberQueue;
 
-  Scheduler() : _running(false), _time(0), _rand(228) {
-  }
+  Scheduler();
 
   [[nodiscard]] bool IsRunning() const;
 
@@ -36,49 +35,46 @@ class Scheduler {
   auto SleepFor(const std::chrono::duration<Rep, Period>& sleep_duration) {
     uint64_t us = std::chrono::duration_cast<std::chrono::microseconds>(sleep_duration).count();
     if (us <= 0) {
-      return std::pair{us, std::list<IntrusivePtr<Fiber>>::iterator()};
+      return us;
     }
     auto time = GetTimeUs() + us;
-    auto current_fiber = Current();
-    std::list<IntrusivePtr<Fiber>>& sleep_list = _sleep_list[GetTimeUs() + us];
-    sleep_list.push_back(current_fiber);
-    auto iter = sleep_list.end();
-    iter--;
+    auto* current_fiber = Current();
+    BiList& sleep_list = _sleep_list[GetTimeUs() + us];
+    sleep_list.PushBack(dynamic_cast<BiNodeSleep*>(current_fiber));
     Suspend();
-    return std::pair{time, iter};
+    return time;
   }
 
   [[nodiscard]] uint64_t GetTimeUs() const;
 
-  static IntrusivePtr<Fiber> Current();
+  static Fiber* Current();
 
   static Fiber::Id GetId();
 
-  [[nodiscard]] uint64_t GetRandNumber();
-
   static void RescheduleCurrent();
 
-  void Run(const IntrusivePtr<Fiber>& fiber);
+  void Run(Fiber* fiber);
 
  private:
   void AdvanceTime();
 
   void TickTime();
 
-  IntrusivePtr<Fiber> GetNext();
+  Fiber* GetNext();
 
   void RunLoop();
 
   void WakeUpNeeded();
-  std::mt19937 _rand;
   uint64_t _time;
-  std::vector<IntrusivePtr<Fiber>> _queue;
-  std::map<uint64_t, std::list<IntrusivePtr<Fiber>>> _sleep_list;
+  std::vector<Fiber*> _queue;
+  std::map<uint64_t, BiList> _sleep_list;
   bool _running;
 };
 
 Scheduler* GetScheduler();
 
-IntrusivePtr<Fiber> PollRandomElementFromList(std::vector<IntrusivePtr<Fiber>>& list);
+Fiber* PollRandomElementFromList(std::vector<Fiber*>& list);
+
+BiNode* PollRandomElementFromList(BiList& list);
 
 }  // namespace yaclib::detail
