@@ -1,0 +1,22 @@
+#pragma once
+
+#include <yaclib/config.hpp>
+
+// Generic mutex management
+// Generic locking algorithms
+#include <mutex>
+
+#define YACLIB_FAULT_CALL_ONCE 0  // TODO(myannyax) Implement
+#include <yaclib_std/detail/call_once.hpp>
+
+#define YACLIB_FAULT_MUTEX YACLIB_FAULT
+#include <yaclib_std/detail/mutex.hpp>
+
+#define YACLIB_FAULT_RECURSIVE_MUTEX YACLIB_FAULT
+#include <yaclib_std/detail/recursive_mutex.hpp>
+
+#define YACLIB_FAULT_RECURSIVE_TIMED_MUTEX YACLIB_FAULT
+#include <yaclib_std/detail/recursive_timed_mutex.hpp>
+
+#define YACLIB_FAULT_TIMED_MUTEX YACLIB_FAULT
+#include <yaclib_std/detail/timed_mutex.hpp>

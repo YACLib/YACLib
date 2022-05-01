@@ -1,93 +1,37 @@
+if (YACLIB_FAULT STREQUAL "FIBER")
+  set(YACLIB_FAULT 2 PARENT_SCOPE)
+elseif (YACLIB_FAULT STREQUAL "THREAD")
+  set(YACLIB_FAULT 1 PARENT_SCOPE)
+else ()
+  set(YACLIB_FAULT 0 PARENT_SCOPE)
+endif ()
+
 list(APPEND YACLIB_INCLUDES
-  # chrono
-  ${YACLIB_INCLUDE_DIR}/fault/chrono.hpp
-
-  # random
-  ${YACLIB_INCLUDE_DIR}/fault/random.hpp
-
-  # thread
-  ${YACLIB_INCLUDE_DIR}/fault/thread.hpp
-
-  # mutexes
-  ${YACLIB_INCLUDE_DIR}/fault/mutex.hpp
-  ${YACLIB_INCLUDE_DIR}/fault/shared_mutex.hpp
-
-  # atomics
-  ${YACLIB_INCLUDE_DIR}/fault/atomic.hpp
-
-  # condition
-  ${YACLIB_INCLUDE_DIR}/fault/condition_variable.hpp
-
-  # log
-  ${YACLIB_INCLUDE_DIR}/fault/fault_config.hpp
-  )
-
-list(APPEND YACLIB_SOURCES
-  # log
-  ${CMAKE_CURRENT_SOURCE_DIR}/fault_config.cpp
+  ${YACLIB_INCLUDE_DIR}/fault/config.hpp
+  ${YACLIB_INCLUDE_DIR}/fault/inject.hpp
+  ${YACLIB_INCLUDE_DIR}/fault/injector.hpp
   )
 
 if (YACLIB_FAULT)
-  list(APPEND YACLIB_INCLUDES
-    # chrono
-    ${YACLIB_INCLUDE_DIR}/fault/detail/chrono/steady_clock.hpp
-    ${YACLIB_INCLUDE_DIR}/fault/detail/chrono/system_clock.hpp
-
-    # random
-    ${YACLIB_INCLUDE_DIR}/fault/detail/random/random_device.hpp
-
-    # thread
-    ${YACLIB_INCLUDE_DIR}/fault/detail/thread/thread.hpp
-
-    # mutexes
-    ${YACLIB_INCLUDE_DIR}/fault/detail/mutex/mutex.hpp
-    ${YACLIB_INCLUDE_DIR}/fault/detail/mutex/recursive_mutex.hpp
-    ${YACLIB_INCLUDE_DIR}/fault/detail/mutex/recursive_timed_mutex.hpp
-    ${YACLIB_INCLUDE_DIR}/fault/detail/mutex/shared_mutex.hpp
-    ${YACLIB_INCLUDE_DIR}/fault/detail/mutex/shared_timed_mutex.hpp
-    ${YACLIB_INCLUDE_DIR}/fault/detail/mutex/timed_mutex.hpp
-
-    # antagonist
-    ${YACLIB_INCLUDE_DIR}/fault/detail/yielder.hpp
-    ${YACLIB_INCLUDE_DIR}/fault/detail/inject_fault.hpp
-
-    # atomics
-    ${YACLIB_INCLUDE_DIR}/fault/detail/atomic/atomic.hpp
-    ${YACLIB_INCLUDE_DIR}/fault/detail/atomic/atomic_base.hpp
-    ${YACLIB_INCLUDE_DIR}/fault/detail/atomic/atomic_reference.hpp
-    ${YACLIB_INCLUDE_DIR}/fault/detail/atomic/atomic_flag.hpp
-
-    # condition
-    ${YACLIB_INCLUDE_DIR}/fault/detail/condition/condition_variable.hpp
-    )
-
-  list(APPEND YACLIB_SOURCES
-    # chrono
-    # TODO(myannyax) create implementation for fibers and pick based on flag
-    ${CMAKE_CURRENT_SOURCE_DIR}/chrono/steady_clock.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/chrono/system_clock.cpp
-
-    # random
-    ${CMAKE_CURRENT_SOURCE_DIR}/random/random_device.cpp
-
-    # thread
-    ${CMAKE_CURRENT_SOURCE_DIR}/thread/thread.cpp
-
-    # mutex
-    ${CMAKE_CURRENT_SOURCE_DIR}/mutex/mutex.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/mutex/recursive_mutex.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/mutex/recursive_timed_mutex.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/mutex/shared_mutex.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/mutex/shared_timed_mutex.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/mutex/timed_mutex.cpp
-
-    # antagonist
-    ${CMAKE_CURRENT_SOURCE_DIR}/antagonist/yielder.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/antagonist/inject_fault.cpp
-
-    # condition
-    ${CMAKE_CURRENT_SOURCE_DIR}/condition/condition_variable.cpp
+  list(APPEND YACLIB_HEADERS
+    ${YACLIB_INCLUDE_DIR}/fault/detail/atomic.hpp
+    ${YACLIB_INCLUDE_DIR}/fault/detail/atomic_flag.hpp
+    ${YACLIB_INCLUDE_DIR}/fault/detail/conditional_variable.hpp
+    ${YACLIB_INCLUDE_DIR}/fault/detail/conditional_variable_any.hpp
+    ${YACLIB_INCLUDE_DIR}/fault/detail/mutex.hpp
+    ${YACLIB_INCLUDE_DIR}/fault/detail/random_device.hpp
+    ${YACLIB_INCLUDE_DIR}/fault/detail/recursive_mutex.hpp
+    ${YACLIB_INCLUDE_DIR}/fault/detail/recursive_timed_mutex.hpp
+    ${YACLIB_INCLUDE_DIR}/fault/detail/shared_mutex.hpp
+    ${YACLIB_INCLUDE_DIR}/fault/detail/shared_timed_mutex.hpp
+    ${YACLIB_INCLUDE_DIR}/fault/detail/timed_mutex.hpp
     )
 endif ()
+
+list(APPEND YACLIB_SOURCES
+  ${CMAKE_CURRENT_SOURCE_DIR}/config.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/inject.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/injector.cpp
+  )
 
 add_files()

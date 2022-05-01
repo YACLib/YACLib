@@ -4,12 +4,12 @@
 #include <yaclib/coroutine/await.hpp>
 #include <yaclib/coroutine/future_traits.hpp>
 #include <yaclib/executor/thread_pool.hpp>
-#include <yaclib/fault/thread.hpp>
 
 #include <array>
 #include <exception>
 #include <stack>
 #include <utility>
+#include <yaclib_std/thread>
 
 #include <gtest/gtest.h>
 

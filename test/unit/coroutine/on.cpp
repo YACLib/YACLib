@@ -6,12 +6,12 @@
 #include <yaclib/coroutine/on.hpp>
 #include <yaclib/executor/strand.hpp>
 #include <yaclib/executor/thread_pool.hpp>
-#include <yaclib/fault/thread.hpp>
 
 #include <array>
 #include <exception>
 #include <utility>
 #include <vector>
+#include <yaclib_std/thread>
 
 #include <gtest/gtest.h>
 

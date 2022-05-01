@@ -2,7 +2,6 @@
 
 #include <yaclib/async/detail/inline_core.hpp>
 #include <yaclib/async/detail/result_core.hpp>
-#include <yaclib/fault/atomic.hpp>
 #include <yaclib/fwd.hpp>
 #include <yaclib/util/detail/atomic_counter.hpp>
 
@@ -11,6 +10,7 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
+#include <yaclib_std/atomic>
 
 namespace yaclib::detail {
 

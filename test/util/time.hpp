@@ -1,5 +1,5 @@
 #pragma once
-#include <yaclib/fault/chrono.hpp>
+#include <yaclib_std/chrono>
 
 namespace test::util {
 

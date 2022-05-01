@@ -1,0 +1,26 @@
+#pragma once
+
+#include <yaclib/config.hpp>
+
+// Memory synchronization ordering:
+// std::memory_order
+// std::kill_dependency
+#include <atomic>
+
+#define YACLIB_FAULT_ATOMIC YACLIB_FAULT
+#include <yaclib_std/detail/atomic.hpp>
+
+#define YACLIB_FAULT_ATOMIC_FENCE YACLIB_FAULT
+#include <yaclib_std/detail/atomic_fence.hpp>
+
+#define YACLIB_FAULT_ATOMIC_FLAG YACLIB_FAULT
+#include <yaclib_std/detail/atomic_flag.hpp>
+
+#define YACLIB_FAULT_ATOMIC_FLAG_OP 0  // TODO(myannyax) Implement
+#include <yaclib_std/detail/atomic_flag_op.hpp>
+
+#define YACLIB_FAULT_ATOMIC_OP 0  // TODO(myannyax) Implement
+#include <yaclib_std/detail/atomic_op.hpp>
+
+#define YACLIB_FAULT_ATOMIC_REF 0  // TODO(myannyax) Implement
+#include <yaclib_std/detail/atomic_ref.hpp>

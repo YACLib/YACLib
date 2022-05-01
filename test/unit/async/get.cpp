@@ -2,13 +2,13 @@
 #include <yaclib/async/contract.hpp>
 #include <yaclib/async/future.hpp>
 #include <yaclib/async/promise.hpp>
-#include <yaclib/fault/thread.hpp>
 #include <yaclib/util/result.hpp>
 
 #include <chrono>
 #include <thread>
 #include <type_traits>
 #include <utility>
+#include <yaclib_std/thread>
 
 #include <gtest/gtest.h>
 

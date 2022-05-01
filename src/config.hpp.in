@@ -58,6 +58,8 @@
 
 #define YACLIB_CORO ${YACLIB_CORO}
 
+#define YACLIB_FAULT ${YACLIB_FAULT}
+
 // TODO(MBkkt) Maybe make all single line not virtual functions are YACLIB_INLINE?
 // Now I use YACLIB_INLINE for
 // * AtomicCounter::SubEqual

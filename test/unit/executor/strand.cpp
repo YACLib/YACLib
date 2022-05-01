@@ -4,7 +4,6 @@
 #include <yaclib/executor/strand.hpp>
 #include <yaclib/executor/submit.hpp>
 #include <yaclib/executor/thread_pool.hpp>
-#include <yaclib/fault/thread.hpp>
 #include <yaclib/util/detail/node.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 
@@ -15,6 +14,7 @@
 #include <thread>
 #include <type_traits>
 #include <vector>
+#include <yaclib_std/thread>
 
 #include <gtest/gtest.h>
 

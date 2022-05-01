@@ -1,8 +1,9 @@
 #pragma once
 
-#include <yaclib/fault/atomic.hpp>
 #include <yaclib/fwd.hpp>
 #include <yaclib/util/ref.hpp>
+
+#include <yaclib_std/atomic>
 
 namespace yaclib::detail {
 

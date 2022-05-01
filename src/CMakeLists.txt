@@ -4,9 +4,8 @@ macro(add_files)
   set(YACLIB_SOURCES ${YACLIB_SOURCES} PARENT_SCOPE)
 endmacro()
 
-configure_file(config.hpp.in ${YACLIB_BINARY_DIR}/include/yaclib/config.hpp)
-
 set(YACLIB_INCLUDE_DIR ${YACLIB_SOURCE_DIR}/include/yaclib)
+set(YACLIB_STD_INCLUDE_DIR ${YACLIB_SOURCE_DIR}/include/yaclib_std)
 
 set(YACLIB_INCLUDES
   ${YACLIB_BINARY_DIR}/include/yaclib/config.hpp
@@ -24,10 +23,13 @@ add_subdirectory(async)
 add_subdirectory(executor)
 add_subdirectory(util)
 add_subdirectory(fault)
+add_subdirectory(std)
 
 if (YACLIB_CORO)
   add_subdirectory(coroutine)
 endif ()
+
+configure_file(config.hpp.in ${YACLIB_BINARY_DIR}/include/yaclib/config.hpp)
 
 add_library(yaclib STATIC)
 

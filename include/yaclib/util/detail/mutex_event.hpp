@@ -1,10 +1,10 @@
 #pragma once
 
-#include <yaclib/fault/condition_variable.hpp>
-#include <yaclib/fault/mutex.hpp>
 #include <yaclib/util/ref.hpp>
 
 #include <chrono>
+#include <yaclib_std/condition_variable>
+#include <yaclib_std/mutex>
 
 namespace yaclib::detail {
 

@@ -1,0 +1,14 @@
+#pragma once
+
+#include <yaclib/config.hpp>
+
+#include <thread>
+
+#define YACLIB_FAULT_JTHREAD 0  // TODO(myannyax) Implement
+#include <yaclib_std/detail/jthread.hpp>
+
+#define YACLIB_FAULT_THIS_THREAD 0  // TODO(myannyax) Implement
+#include <yaclib_std/detail/this_thread.hpp>
+
+#define YACLIB_FAULT_THREAD 0  // TODO(myannyax) Implement
+#include <yaclib_std/detail/thread.hpp>

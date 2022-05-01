@@ -111,6 +111,7 @@ jobs:
 
               cd $dir
               lcov --rc lcov_branch_coverage=1 --gcov-tool "$gcov_tool" -d . -c -o lcov.info
+              # TODO(myannyax) '-r lcov.info "*/yaclib_std/*"' instead of '-r lcov.info "*/fault/*"'
               lcov --rc lcov_branch_coverage=1                                                                         \
                 -r lcov.info "/usr/*"                                                                                  \
                 -r lcov.info "*/_deps/*"                                                                               \

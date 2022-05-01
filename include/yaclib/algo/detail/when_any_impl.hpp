@@ -3,7 +3,6 @@
 #include <yaclib/algo/when_policy.hpp>
 #include <yaclib/async/detail/inline_core.hpp>
 #include <yaclib/async/detail/result_core.hpp>
-#include <yaclib/fault/atomic.hpp>
 #include <yaclib/fwd.hpp>
 #include <yaclib/log.hpp>
 #include <yaclib/util/detail/atomic_counter.hpp>
@@ -13,6 +12,7 @@
 #include <cstddef>
 #include <exception>
 #include <utility>
+#include <yaclib_std/atomic>
 
 namespace yaclib::detail {
 

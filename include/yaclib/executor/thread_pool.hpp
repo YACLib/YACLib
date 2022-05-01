@@ -2,9 +2,9 @@
 
 #include <yaclib/executor/executor.hpp>
 #include <yaclib/executor/thread_factory.hpp>
-#include <yaclib/fault/thread.hpp>
 
 #include <cstddef>
+#include <yaclib_std/thread>
 
 namespace yaclib {
 

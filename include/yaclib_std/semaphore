@@ -1,0 +1,9 @@
+#pragma once
+
+#include <yaclib/config.hpp>
+
+#define YACLIB_FAULT_BINARY_SEMAPHORE 0  // TODO(myannyax) Implement
+#include <yaclib_std/detail/binary_semaphore.hpp>
+
+#define YACLIB_FAULT_COUNTING_SEMAPHORE 0  // TODO(myannyax) Implement
+#include <yaclib_std/detail/counting_semaphore.hpp>

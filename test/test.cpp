@@ -1,6 +1,6 @@
 #include <util/helpers.hpp>
 
-#include <yaclib/fault/fault_config.hpp>
+#include <yaclib/fault/config.hpp>
 #include <yaclib/log.hpp>
 
 #include <cstdio>
@@ -20,8 +20,8 @@ void InitLog() noexcept {
 }
 
 void InitFault() {
-  yaclib::SetFrequency(8);
-  yaclib::SetSleepTime(200);
+  yaclib::SetFaultFrequency(8);
+  yaclib::SetFaultSleepTime(200);
 }
 
 namespace {
