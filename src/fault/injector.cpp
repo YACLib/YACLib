@@ -11,7 +11,7 @@ std::atomic_uint32_t Injector::yield_frequency = kFreq;
 std::atomic_uint32_t Injector::sleep_time = kSleepTimeNs;
 
 // TODO(myannyax) maybe scheduler-wide random engine?
-Injector::Injector() : _eng(1142), _count(0) {
+Injector::Injector() : _eng{1142}, _count{0} {
 }
 
 void Injector::MaybeInject() {
@@ -21,7 +21,7 @@ void Injector::MaybeInject() {
 }
 
 bool Injector::NeedInject() {
-  if (_count += 1 >= yield_frequency) {
+  if (++_count >= yield_frequency) {
     Reset();
     return true;
   }

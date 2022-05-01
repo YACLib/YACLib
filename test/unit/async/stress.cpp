@@ -9,12 +9,12 @@
 #include <array>
 #include <cstdint>
 #include <iostream>
-#include <random>
 #include <thread>
 #include <type_traits>
 #include <utility>
 #include <vector>
 #include <yaclib_std/atomic>
+#include <yaclib_std/random>
 #include <yaclib_std/thread>
 
 #include <gtest/gtest.h>

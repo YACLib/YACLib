@@ -1,12 +1,16 @@
 #pragma once
 
+#include <yaclib/fault/detail/timed_mutex.hpp>
+
 namespace yaclib::detail {
 
+// Not using because maybe in future we will want different types
 template <typename Impl>
-class RecursiveTimedMutex {
+class RecursiveTimedMutex : public TimedMutex<Impl> {
+  using Base = Mutex<Impl>;
+
  public:
- private:
-  Impl _impl;
+  using Base::Base;
 };
 
 }  // namespace yaclib::detail

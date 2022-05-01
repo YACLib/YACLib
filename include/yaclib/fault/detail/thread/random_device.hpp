@@ -3,7 +3,9 @@
 #include <random>
 #include <string>
 
-namespace yaclib::detail {
+namespace yaclib::detail::thread {
+
+// TODO(myannyax) Refactor this shit
 
 class RandomDevice {
  public:
@@ -39,4 +41,4 @@ class RandomDevice {
   std::mt19937 _eng;
 };
 
-}  // namespace yaclib::detail
+}  // namespace yaclib::detail::thread

@@ -4,5 +4,5 @@
 
 #include <random>
 
-#define YACLIB_FAULT_DEVICE YACLIB_FAULT
+#define YACLIB_FAULT_RANDOM_DEVICE YACLIB_FAULT
 #include <yaclib_std/detail/random_device.hpp>

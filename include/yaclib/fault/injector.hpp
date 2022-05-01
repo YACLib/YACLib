@@ -3,10 +3,9 @@
 #include <atomic>
 #include <random>
 
-namespace yaclib {
-namespace detail {
+namespace yaclib::detail {
 
-// TODO(myannyax) Add metrics
+// TODO(myannyax) Add metrics, refactor this shit
 class Injector {
  public:
   explicit Injector();
@@ -27,8 +26,4 @@ class Injector {
   std::mt19937 _eng;
 };
 
-}  // namespace detail
-
-detail::Injector* GetInjector();
-
-}  // namespace yaclib
+}  // namespace yaclib::detail

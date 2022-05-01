@@ -5,9 +5,9 @@
 #include <yaclib/coroutine/future_traits.hpp>
 
 #include <array>
-#include <random>
 #include <stack>
 #include <utility>
+#include <yaclib_std/random>
 
 #include <gtest/gtest.h>
 

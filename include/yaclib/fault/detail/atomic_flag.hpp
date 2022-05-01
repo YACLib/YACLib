@@ -1,34 +1,44 @@
 #pragma once
 
 #include <yaclib/config.hpp>
+#include <yaclib/fault/detail/atomic_wait.hpp>
+#include <yaclib/fault/inject.hpp>
 
 namespace yaclib::detail {
 
 template <typename Impl>
-class AtomicFlag {
+class AtomicFlag : public AtomicWait<Impl, bool> {
+  using Base = AtomicWait<Impl, bool>;
+
  public:
+  using Base::Base;
+
+  void clear(std::memory_order order = std::memory_order_seq_cst) volatile noexcept {
+    YACLIB_INJECT_FAULT(Impl::clear());
+  }
+  void clear(std::memory_order order = std::memory_order_seq_cst) noexcept {
+    YACLIB_INJECT_FAULT(Impl::clear());
+  }
+
+  bool test_and_set(std::memory_order order = std::memory_order_seq_cst) volatile noexcept {
+    YACLIB_INJECT_FAULT(auto r = Impl::test_and_set(order));
+    return r;
+  }
+  bool test_and_set(std::memory_order order = std::memory_order_seq_cst) noexcept {
+    YACLIB_INJECT_FAULT(auto r = Impl::test_and_set(order));
+    return r;
+  }
+
 #ifdef YACLIB_ATOMIC_EVENT
-  void wait(T value, std::memory_order order = std::memory_order_seq_cst) const volatile noexcept {
-    YACLIB_INJECT_FAULT(_impl.wait(value, mo));
+  bool test(std::memory_order order = std::memory_order::seq_cst) const volatile noexcept {
+    YACLIB_INJECT_FAULT(auto r = Impl::test(order));
+    return r;
   }
-  void wait(T value, std::memory_order order = std::memory_order_seq_cst) const noexcept {
-    YACLIB_INJECT_FAULT(_impl.wait(value, mo));
-  }
-  void notify_one() volatile noexcept {
-    YACLIB_INJECT_FAULT(_impl.notify_one());
-  }
-  void notify_one() noexcept {
-    YACLIB_INJECT_FAULT(_impl.notify_one());
-  }
-  void notify_all() volatile noexcept {
-    YACLIB_INJECT_FAULT(_impl.notify_all());
-  }
-  void notify_all() noexcept {
-    YACLIB_INJECT_FAULT(_impl.notify_all());
+  bool test(std::memory_order order = std::memory_order::seq_cst) const noexcept {
+    YACLIB_INJECT_FAULT(auto r = Impl::test(order));
+    return r;
   }
 #endif
- private:
-  Impl _impl;
 };
 
 }  // namespace yaclib::detail

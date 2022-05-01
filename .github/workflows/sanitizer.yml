@@ -91,7 +91,7 @@ jobs:
             build_type: RelWithDebInfo
 
     env:
-      YACLIB_FAULT: 'OFF ON'
+      YACLIB_FAULT: 'OFF THREAD'
 
     steps:
       - uses: actions/checkout@v3

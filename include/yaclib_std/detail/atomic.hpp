@@ -11,7 +11,7 @@
 namespace yaclib_std {
 
 template <typename T>
-using atomic = yaclib::detail::Atomic<T, yaclib::detail::fiber::Atomic<T>>;
+using atomic = yaclib::detail::Atomic<yaclib::detail::fiber::Atomic<T>, T>;
 
 }  // namespace yaclib_std
 #elif YACLIB_FAULT_ATOMIC == 1
@@ -22,7 +22,7 @@ using atomic = yaclib::detail::Atomic<T, yaclib::detail::fiber::Atomic<T>>;
 namespace yaclib_std {
 
 template <typename T>
-using atomic = yaclib::detail::Atomic<T, std::atomic<T>>;
+using atomic = yaclib::detail::Atomic<std::atomic<T>, T>;
 
 }  // namespace yaclib_std
 #else
