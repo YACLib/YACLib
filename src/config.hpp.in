@@ -27,6 +27,9 @@
 #  endif
 #endif
 
+#define YACLIB_FAULT ${YACLIB_FAULT}
+// TODO(myannyax) YACLIB_SLOWDOWN with fault
+
 // Maybe we should increase some of this
 #ifndef YACLIB_SLOWDOWN
 #  if defined(YACLIB_ASAN)
@@ -57,8 +60,6 @@
 #endif
 
 #define YACLIB_CORO ${YACLIB_CORO}
-
-#define YACLIB_FAULT ${YACLIB_FAULT}
 
 // TODO(MBkkt) Maybe make all single line not virtual functions are YACLIB_INLINE?
 // Now I use YACLIB_INLINE for

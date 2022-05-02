@@ -24,6 +24,9 @@ yaclib::Future<uint64_t> incr(uint64_t delta) {
 }
 
 TEST(StressCoro, IncAtomicSingleThread) {
+#if YACLIB_FAULT != 0
+  GTEST_SKIP();  // Too long, also we not interested to run single threaded test under fault injection
+#endif
   static constexpr uint64_t kTestCases = 100'000;
   static constexpr uint64_t kAwaitedFutures = 20;
   static constexpr uint64_t kMaxDelta = 10;
@@ -41,7 +44,7 @@ TEST(StressCoro, IncAtomicSingleThread) {
       co_await Await(futures.begin(), 2);
       uint64_t loc_accum = 0;
       for (auto&& future : futures) {
-        loc_accum += std::move(future).Get().Ok();
+        loc_accum += std::move(future).Touch().Ok();
       }
       co_return loc_accum;
     };

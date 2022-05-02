@@ -98,7 +98,11 @@ TEST(On, Cancel) {
 TEST(On, LockWithStrand) {
   using namespace std::chrono_literals;
 
+#if YACLIB_FAULT == 1
+  constexpr std::size_t kIncrements = 1000;
+#else
   constexpr std::size_t kIncrements = 100500;
+#endif
   const std::size_t kThreads = std::max(3U, std::thread::hardware_concurrency() / 2) - 1;
 
   auto tp = yaclib::MakeThreadPool(kThreads);
@@ -106,18 +110,19 @@ TEST(On, LockWithStrand) {
 
   std::size_t sum = 0;
   yaclib_std::atomic_bool end = true;
-  auto inc = [&, st = strand]() -> yaclib::Future<void> {
-    co_await On(*st);  // lock
+  auto inc = [&, mutex = strand](yaclib::IExecutor& thread) -> yaclib::Future<void> {
+    co_await On(*mutex);  // lock
     end.store(true, std::memory_order_release);
     ++sum;
-    co_return;  //  unlock
+    co_await On(thread);  //  unlock
+    co_return;
   };
   auto add_value = [&, t = tp](size_t increments) -> yaclib::Future<void> {
     co_await On(*t);  // schedule to thread pool
     std::vector<yaclib::Future<void>> vec;
     vec.reserve(increments);
     for (size_t i = 0; i != increments; ++i) {
-      vec.push_back(inc());
+      vec.push_back(inc(*t));
     }
     co_await Await(vec.begin(), vec.size());
     co_return;
@@ -141,8 +146,8 @@ TEST(On, LockWithStrand) {
   tp->Stop();
   tp->Wait();
   fprintf(stderr, "min: %lu | sum: %lu | max %lu", kThreads * kIncrements, sum, 2 * kThreads * kIncrements);
-  ASSERT_GE(sum, kThreads * kIncrements);
-  ASSERT_LE(sum, 2 * kThreads * kIncrements);
+  ASSERT_GT(sum, kThreads * kIncrements);
+  ASSERT_LT(sum, 2 * kThreads * kIncrements);
 }
 
 }  // namespace

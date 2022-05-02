@@ -22,7 +22,11 @@ TEST(Example, ThreadPool) {
 
   std::atomic<size_t> counter{0};
 
-  static constexpr std::size_t kIncrements = 100500;
+#if YACLIB_FAULT == 1
+  constexpr std::size_t kIncrements = 1000;
+#else
+  constexpr std::size_t kIncrements = 100500;
+#endif
 
   for (std::size_t i = 0; i < kIncrements; ++i) {
     Submit(*tp, [&counter] {
