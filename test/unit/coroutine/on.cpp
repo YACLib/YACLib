@@ -147,7 +147,7 @@ TEST(On, LockWithStrand) {
   tp->Wait();
   fprintf(stderr, "min: %lu | sum: %lu | max %lu", kThreads * kIncrements, sum, 2 * kThreads * kIncrements);
   ASSERT_GT(sum, kThreads * kIncrements);
-  ASSERT_LT(sum, 2 * kThreads * kIncrements);
+  ASSERT_LE(sum, 2 * kThreads * kIncrements);
 }
 
 }  // namespace
