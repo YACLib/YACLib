@@ -1,20 +1,19 @@
 #include <yaclib/fault/detail/fiber/queue.hpp>
 
-namespace yaclib::detail {
+namespace yaclib::detail::fiber {
 
-void FiberQueue::Wait() {
-  auto* fiber = Scheduler::Current();
+bool FiberQueue::Wait(NoTimeoutTag) {
+  auto* fiber = fault::Scheduler::Current();
   _queue.PushBack(static_cast<BiNodeWaitQueue*>(fiber));
-  Scheduler::Suspend();
+  fault::Scheduler::Suspend();
+  return true;
 }
 
 void FiberQueue::NotifyAll() {
-  std::vector<Fiber*> all;
-  while (!_queue.Empty()) {
-    all.push_back(static_cast<Fiber*>(static_cast<BiNodeWaitQueue*>(_queue.PopBack())));
-  }
-  for (const auto& elem : all) {
-    GetScheduler()->Run(elem);
+  auto all = std::move(_queue);
+  _queue = BiList();
+  while (!all.Empty()) {
+    fault::Scheduler::GetScheduler()->Schedule(static_cast<FiberBase*>(static_cast<BiNodeWaitQueue*>(all.PopBack())));
   }
 }
 
@@ -23,6 +22,20 @@ void FiberQueue::NotifyOne() {
     return;
   }
   auto* fiber = PollRandomElementFromList(_queue);
-  GetScheduler()->Run(static_cast<Fiber*>(static_cast<BiNodeWaitQueue*>(fiber)));
+  fault::Scheduler::GetScheduler()->Schedule(static_cast<FiberBase*>(static_cast<BiNodeWaitQueue*>(fiber)));
 }
-}  // namespace yaclib::detail
+
+FiberQueue::~FiberQueue() {
+  YACLIB_ERROR(!_queue.Empty(), "queue must be empty on destruction - potentially deadlock");
+}
+
+FiberQueue& FiberQueue::operator=(FiberQueue&& other) noexcept {
+  _queue = std::move(other._queue);
+  other._queue = BiList();
+  return *this;
+}
+
+bool FiberQueue::Empty() const {
+  return _queue.Empty();
+}
+}  // namespace yaclib::detail::fiber

@@ -1,9 +1,9 @@
-#include <yaclib/fault/detail/chrono/fiber_system_clock.hpp>
+#include <yaclib/fault/detail/fiber/system_clock.hpp>
 
-namespace yaclib::detail {
+namespace yaclib::detail::fiber {
 
 SystemClock::time_point SystemClock::now() {
-  return time_point{duration{GetScheduler()->GetTimeUs()}};
+  return time_point{duration{fault::Scheduler::GetScheduler()->GetTimeNs()}};
 }
 
 time_t SystemClock::to_time_t(const SystemClock::time_point& time_point) noexcept {
@@ -16,4 +16,4 @@ SystemClock::time_point SystemClock::from_time_t(time_t c_time_point) noexcept {
     std::chrono::time_point<SystemClock, std::chrono::seconds>(std::chrono::seconds(c_time_point)));
 }
 
-}  // namespace yaclib::detail
+}  // namespace yaclib::detail::fiber

@@ -2,7 +2,7 @@
 
 #include <cstddef>
 
-namespace yaclib::detail {
+namespace yaclib::detail::fiber {
 
 struct Allocation {
   char* start = nullptr;
@@ -27,4 +27,4 @@ class IStackAllocator {
   virtual ~IStackAllocator() = default;
 };
 
-}  // namespace yaclib::detail
+}  // namespace yaclib::detail::fiber

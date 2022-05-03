@@ -11,7 +11,7 @@ namespace yaclib::detail {
 //  private Impl, public SharedMutex<Impl>, public TimedMutex<Impl>
 template <typename Impl>
 class SharedTimedMutex : public SharedMutex<Impl> {
-  using Base = SharedTimedMutex<Impl>;
+  using Base = SharedMutex<Impl>;
 
  public:
   using Base::Base;

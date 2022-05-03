@@ -1,69 +1,42 @@
 #pragma once
 
-#include <yaclib/fault/detail/fiber/bidirectional_intrusive_list.hpp>
-#include <yaclib/fault/detail/fiber/default_allocator.hpp>
-#include <yaclib/fault/detail/fiber/execution_context.hpp>
-#include <yaclib/fault/detail/fiber/stack.hpp>
-#include <yaclib/fault/detail/fiber/stack_allocator.hpp>
-#include <yaclib/util/detail/shared_func.hpp>
+#include <yaclib/fault/detail/fiber/fiber_base.hpp>
 
-namespace yaclib::detail {
+#include <unordered_map>
 
-using Routine = yaclib::IFuncPtr;
+namespace yaclib::detail::fiber {
 
-class BiNodeSleep : public BiNode {};
+template <typename... Args>
+using FuncState = std::tuple<typename std::decay_t<Args>...>;
 
-class BiNodeWaitQueue : public BiNode {};
-
-enum FiberState {
-  Running,
-  Suspended,
-  Completed,
-};
-
-class Fiber : public IRef, public BiNodeSleep, public BiNodeWaitQueue {
+template <typename... Args>
+class Fiber final : public FiberBase {
  public:
-  using Id = uint64_t;
+  // TODO(myannyax): add tests
+  Fiber(Args&&... args) : _func_state(std::forward<Args>(args)...) {
+    _context.Setup(_stack.GetAllocation(), Trampoline, this);
+  }
 
-  Fiber(Fiber&& other) noexcept = default;
+  [[noreturn]] static void Trampoline(void* arg) noexcept {
+    auto* coroutine = reinterpret_cast<Fiber*>(arg);
+    try {
+      Helper(coroutine->_func_state, std::index_sequence_for<FuncState<Args...>>{});
+    } catch (...) {
+      coroutine->_exception = std::current_exception();
+    }
 
-  Fiber& operator=(Fiber&& other) noexcept = default;
+    coroutine->Complete();
+  }
 
-  Fiber(IStackAllocator& allocator, Routine routine);
-
-  explicit Fiber(Routine routine);
-
-  void SetCompleteCallback(Routine routine);
-
-  [[nodiscard]] Id GetId() const;
-
-  void Resume();
-
-  void Yield();
-
-  FiberState GetState();
-
-  void SetThreadlikeInstanceDead();
-
-  [[nodiscard]] bool IsThreadlikeInstanceAlive() const;
-
-  void IncRef() noexcept override;
-  void DecRef() noexcept override;
+  ~Fiber() final = default;
 
  private:
-  [[noreturn]] static void Trampoline(void* arg);
+  template <typename Tuple, std::size_t... I>
+  static auto Helper(Tuple& a, std::index_sequence<I...>) {
+    std::__invoke(std::move(std::get<I>(a))...);
+  }
 
-  void Complete();
-
-  Stack _stack;
-  ExecutionContext _context{};
-  ExecutionContext _caller_context{};
-  Routine _routine;
-  Routine _complete_callback{nullptr};
-  std::exception_ptr _exception;
-  Id _id;
-  FiberState _state{Suspended};
-  bool _threadlike_instance_alive{true};
+  FuncState<Args...> _func_state;
 };
 
-}  // namespace yaclib::detail
+}  // namespace yaclib::detail::fiber

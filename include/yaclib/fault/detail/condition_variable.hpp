@@ -75,7 +75,9 @@ class ConditionVariable : private Impl {
   static auto From(std::unique_lock<yaclib_std::mutex>& lock) {
     YACLIB_ERROR(!lock.owns_lock(), "Trying to call wait on not owned lock");
     auto* mutex = lock.release();
-    return std::tuple{mutex, std::unique_lock{mutex->GetImpl(), std::adopt_lock}};
+    // type is specified since some old compilers like clang 8 aren't able to calculate it
+    return std::tuple<yaclib_std::mutex*, std::unique_lock<yaclib_std::mutex::impl_t>>{
+      mutex, std::unique_lock{mutex->GetImpl(), std::adopt_lock}};
   }
   static auto From(yaclib_std::mutex* mutex, std::unique_lock<yaclib_std::mutex::impl_t>& lock_impl) {
     YACLIB_ERROR(!lock_impl.owns_lock(), "After call wait on not owned lock");

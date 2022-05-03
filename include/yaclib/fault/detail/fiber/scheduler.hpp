@@ -1,80 +1,71 @@
 #pragma once
 
 #include <yaclib/fault/detail/fiber/default_allocator.hpp>
-#include <yaclib/fault/detail/fiber/fiber.hpp>
+#include <yaclib/fault/detail/fiber/fiber_base.hpp>
 #include <yaclib/fault/detail/fiber/stack.hpp>
 #include <yaclib/fault/detail/fiber/stack_allocator.hpp>
+#include <yaclib/fault/inject.hpp>
 #include <yaclib/log.hpp>
+#include <yaclib/util/func.hpp>
 
 #include <chrono>
-#include <list>
 #include <map>
-#include <random>
-#include <vector>
 
-namespace yaclib::detail {
+namespace yaclib::detail::fiber {
+class FiberQueue;
+}  // namespace yaclib::detail::fiber
+
+namespace yaclib::fault {
 
 class Scheduler {
  public:
-  friend class FiberQueue;
-
   Scheduler();
+
+  void Schedule(detail::fiber::FiberBase* fiber);
 
   [[nodiscard]] bool IsRunning() const;
 
-  static void Suspend();
+  void Sleep(uint64_t ns);
 
-  template <class Clock, class Duration>
-  auto SleepUntil(const std::chrono::time_point<Clock, Duration>& sleep_time) {
-    std::chrono::time_point<Clock, Duration> now = Clock::now();
-    Duration duration = sleep_time - now;
-    return SleepFor(duration);
-  }
+  [[nodiscard]] uint64_t GetTimeNs() const;
 
-  template <class Rep, class Period>
-  auto SleepFor(const std::chrono::duration<Rep, Period>& sleep_duration) {
-    uint64_t us = std::chrono::duration_cast<std::chrono::microseconds>(sleep_duration).count();
-    if (us <= 0) {
-      return us;
-    }
-    auto time = GetTimeUs() + us;
-    auto* current_fiber = Current();
-    BiList& sleep_list = _sleep_list[GetTimeUs() + us];
-    sleep_list.PushBack(dynamic_cast<BiNodeSleep*>(current_fiber));
-    Suspend();
-    return time;
-  }
+  static detail::fiber::FiberBase* Current();
 
-  [[nodiscard]] uint64_t GetTimeUs() const;
-
-  static Fiber* Current();
-
-  static Fiber::Id GetId();
+  static detail::fiber::FiberBase::Id GetId();
 
   static void RescheduleCurrent();
 
-  void Run(Fiber* fiber);
+  static void SetTickLength(uint32_t tick);
+
+  static void SetRandomListPick(uint32_t k);
+
+  void Stop();
+
+  static Scheduler* GetScheduler();
+
+  static void Set(Scheduler* scheduler);
+
+  static void Suspend();
 
  private:
   void AdvanceTime();
 
   void TickTime();
 
-  Fiber* GetNext();
+  detail::fiber::FiberBase* GetNext();
 
   void RunLoop();
 
   void WakeUpNeeded();
+
   uint64_t _time;
-  std::vector<Fiber*> _queue;
-  std::map<uint64_t, BiList> _sleep_list;
+  detail::fiber::BiList _queue;
+  std::map<uint64_t, detail::fiber::BiList> _sleep_list;
   bool _running;
 };
 
-Scheduler* GetScheduler();
+}  // namespace yaclib::fault
 
-Fiber* PollRandomElementFromList(std::vector<Fiber*>& list);
-
+namespace yaclib::detail::fiber {
 BiNode* PollRandomElementFromList(BiList& list);
-
-}  // namespace yaclib::detail
+}  // namespace yaclib::detail::fiber

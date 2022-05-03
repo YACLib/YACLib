@@ -1,6 +1,6 @@
-#include "fault/util.hpp"
+#include <fault/util.hpp>
 
-#include <yaclib/fault/detail/thread/random_device.hpp>
+#include <yaclib/fault/detail/random_device.hpp>
 
 namespace yaclib::detail::thread {
 
@@ -12,20 +12,22 @@ RandomDevice::result_type RandomDevice::operator()() noexcept {
 }
 
 double RandomDevice::entropy() const noexcept {
-  return kEntropy;
+  return 0;
 }
 
 constexpr RandomDevice::result_type RandomDevice::min() {
-  return kMin;
+  return std::mt19937_64::min();
 }
 
 constexpr RandomDevice::result_type RandomDevice::max() {
-  return kMax;
+  return std::mt19937_64::max();
 }
 
 void RandomDevice::reset() {
-  // not thread safe
   _eng.seed(GetSeed());
+}
+
+RandomDevice::RandomDevice(const std::string&) : RandomDevice() {
 }
 
 }  // namespace yaclib::detail::thread

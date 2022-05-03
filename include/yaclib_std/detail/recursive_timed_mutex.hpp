@@ -1,8 +1,6 @@
 #pragma once
 
-#if YACLIB_FAULT_RECURSIVE_TIMED_MUTEX == 2  // TODO(myannyax) Implement
-#  error "YACLIB_FAULT=FIBER not implemented yet"
-
+#if YACLIB_FAULT_RECURSIVE_TIMED_MUTEX == 2
 #  include <yaclib/fault/detail/fiber/recursive_timed_mutex.hpp>
 #  include <yaclib/fault/detail/recursive_timed_mutex.hpp>
 

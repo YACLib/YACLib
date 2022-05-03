@@ -229,7 +229,6 @@ TEST(keep_strong_ref, simple) {
   EXPECT_TRUE(done);
 }
 
-#ifndef YACLIB_FIBER
 TEST(do_not_occupy_thread, simple) {
   auto tp = yaclib::MakeThreadPool(1);
 
@@ -264,7 +263,6 @@ TEST(do_not_occupy_thread, simple) {
   tp->HardStop();
   tp->Wait();
 }
-#endif
 
 TEST(exceptions, simple) {
   auto tp = yaclib::MakeThreadPool(1);

@@ -1,8 +1,6 @@
 #pragma once
 
-#if YACLIB_FAULT_CONDITION_VARIABLE == 2  // TODO(myannyax) Implement
-#  error "YACLIB_FAULT=FIBER not implemented yet"
-
+#if YACLIB_FAULT_CONDITION_VARIABLE == 2
 #  include <yaclib/fault/detail/condition_variable.hpp>
 #  include <yaclib/fault/detail/fiber/condition_variable.hpp>
 

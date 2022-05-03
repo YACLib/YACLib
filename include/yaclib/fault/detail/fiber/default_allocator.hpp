@@ -5,7 +5,7 @@
 
 #include <vector>
 
-namespace yaclib::detail {
+namespace yaclib::detail::fiber {
 
 /**
  * Allocator used by default
@@ -16,15 +16,15 @@ class DefaultAllocator final : public IStackAllocator {
 
   void Release(Allocation allocation) final;
 
-  void SetMinStackSize(size_t bytes) final;
+  void SetMinStackSize(size_t pages) final;
 
   size_t GetMinStackSize() final;
 
+  static void SetCacheSize(uint32_t size);
+
  private:
-  size_t _stack_size_pages = 6;
+  size_t _stack_size_pages{4};
   std::vector<Allocation> _pool;
 };
 
-extern thread_local DefaultAllocator gDefaultAllocator;
-
-}  // namespace yaclib::detail
+}  // namespace yaclib::detail::fiber

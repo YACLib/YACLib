@@ -540,8 +540,6 @@ void Current(yaclib::IThreadPoolPtr& tp) {
   EXPECT_EQ(&yaclib::CurrentThreadPool(), &yaclib::MakeInline());
 }
 
-// TODO(myannyax) racey for fibers... do fiber thread local memory
-#if !defined(YACLIB_FIBER)
 TEST_F(SingleLightThread, Current) {
   Current(_tps[0]);
 }
@@ -555,7 +553,6 @@ TEST_F(MultiLightThread, Current) {
 TEST_F(MultiHeavyThread, Current) {
   Current(_tps[0]);
 }
-#endif
 
 void Lifetime(yaclib::IThreadPoolPtr& tp, std::size_t threads) {
   class Task final {

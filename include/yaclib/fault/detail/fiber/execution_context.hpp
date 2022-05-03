@@ -6,7 +6,7 @@
 
 #include <ucontext.h>
 
-namespace yaclib::detail {
+namespace yaclib::detail::fiber {
 
 using Trampoline = void (*)(void* arg);
 
@@ -20,4 +20,4 @@ class ExecutionContext {
   ucontext_t _context;
 };
 
-}  // namespace yaclib::detail
+}  // namespace yaclib::detail::fiber

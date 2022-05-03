@@ -9,5 +9,5 @@
 #define YACLIB_FAULT_CONDITION_VARIABLE YACLIB_FAULT
 #include <yaclib_std/detail/condition_variable.hpp>
 
-#define YACLIB_FAULT_CONDITION_VARIABLE_ANY YACLIB_FAULT
+#define YACLIB_FAULT_CONDITION_VARIABLE_ANY 0
 #include <yaclib_std/detail/condition_variable_any.hpp>

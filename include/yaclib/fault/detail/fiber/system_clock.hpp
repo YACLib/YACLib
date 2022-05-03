@@ -4,15 +4,15 @@
 
 #include <chrono>
 
-namespace yaclib::detail {
+namespace yaclib::detail::fiber {
 
 struct SystemClock {
-  using duration = std::chrono::microseconds;
+  using duration = std::chrono::nanoseconds;
   using rep = duration::rep;
   using period = duration::period;
   using time_point = std::chrono::time_point<SystemClock>;
 
-  static constexpr bool is_steady = true;
+  static constexpr bool is_steady = false;
 
   static time_point now();
 
@@ -21,4 +21,4 @@ struct SystemClock {
   static time_point from_time_t(time_t c_time_point) noexcept;
 };
 
-}  // namespace yaclib::detail
+}  // namespace yaclib::detail::fiber

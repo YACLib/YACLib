@@ -3,7 +3,7 @@
 
 #include <cstdint>
 
-namespace yaclib::detail {
+namespace yaclib::detail::fiber {
 
 struct BiNode {
   BiNode* prev = this;
@@ -21,6 +21,8 @@ class BiList final {
 
   void PushBack(BiNode* node) noexcept;
 
+  void PushAll(BiList& other) noexcept;
+
   BiNode* PopBack();
 
   [[nodiscard]] bool Empty() const noexcept;
@@ -29,12 +31,13 @@ class BiList final {
 
   [[nodiscard]] std::size_t GetSize() const noexcept;
 
+  void DecSize() noexcept;
+
   [[nodiscard]] BiNode* GetNth(std::size_t ind) const noexcept;
 
  private:
   BiNode _head;
-  BiNode* _tail = &_head;  // need for PushBack
   std::size_t _size{0};
 };
 
-}  // namespace yaclib::detail
+}  // namespace yaclib::detail::fiber

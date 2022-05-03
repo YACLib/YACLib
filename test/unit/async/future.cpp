@@ -490,9 +490,6 @@ TYPED_TEST(Error, Simple2) {
   tp->Wait();
 }
 
-// race condition on CurrentThreadPool for fibers
-#if !defined(YACLIB_FIBER)
-
 TEST(Pipeline, Simple2) {
   auto tp1 = yaclib::MakeThreadPool(2);
   auto tp2 = yaclib::MakeThreadPool(3);
@@ -521,8 +518,6 @@ TEST(Pipeline, Simple2) {
   tp2->Stop();
   tp2->Wait();
 }
-
-#endif
 
 TEST(Simple, MakePromiseContract) {
   yaclib::detail::NopeCounter<yaclib::ManualExecutor> e;

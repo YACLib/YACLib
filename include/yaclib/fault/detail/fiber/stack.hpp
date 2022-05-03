@@ -4,7 +4,7 @@
 
 #include <cstddef>
 
-namespace yaclib::detail {
+namespace yaclib::detail::fiber {
 /**
  * Manages stack memory
  */
@@ -42,4 +42,4 @@ class Stack {
   IStackAllocator& _allocator;
 };
 
-}  // namespace yaclib::detail
+}  // namespace yaclib::detail::fiber

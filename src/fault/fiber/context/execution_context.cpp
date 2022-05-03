@@ -1,6 +1,6 @@
 #include <yaclib/fault/detail/fiber/execution_context.hpp>
 
-namespace yaclib::detail {
+namespace yaclib::detail::fiber {
 
 void ExecutionContext::Setup(Allocation stack, Trampoline trampoline, void* arg) {
   if (getcontext(&_context) == -1) {
@@ -15,4 +15,4 @@ void ExecutionContext::SwitchTo(ExecutionContext& other) {
   swapcontext(&_context, &other._context);
 }
 
-}  // namespace yaclib::detail
+}  // namespace yaclib::detail::fiber

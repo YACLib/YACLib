@@ -1,22 +1,27 @@
 #include <util/helpers.hpp>
 
 #include <yaclib/fault/config.hpp>
-#include <yaclib/fault/detail/inject_fault.hpp>
+#include <yaclib/fault/inject.hpp>
 #include <yaclib/log.hpp>
 
+#if YACLIB_FAULT == 2
+#  include <yaclib/fault/detail/fiber/scheduler.hpp>
+#endif
+
 #include <cstdio>
+#include <random>
+#include <yaclib_std/thread>
 
 #include <gtest/gtest.h>
 
 namespace test {
 
-const int seed = 1239;
+const unsigned int seed = 2245685369;
 
 class MyTestListener : public ::testing::EmptyTestEventListener {
  public:
   void OnTestStart(const testing::TestInfo& /*info*/) override {
-    yaclib::SetSeed(seed);
-    std::cout << "\n-------------- state" << yaclib::detail::GetYielder()->GetState() << "--------------\n";
+    std::cerr << "current random count" << yaclib::GetFaultRandomCount() << "\n";
   }
 };
 
@@ -31,8 +36,11 @@ void InitLog() noexcept {
 }
 
 void InitFault() {
-  yaclib::SetFaultFrequency(8);
+  yaclib::SetFaultFrequency(2 + std::random_device().operator()() % 4);
   yaclib::SetFaultSleepTime(200);
+  yaclib::SetFaultRandomListPick(10);
+  yaclib::SetFaultTickLength(10);
+  yaclib::SetFaultFiberStackSize(24);
 }
 
 namespace {
@@ -58,14 +66,21 @@ int main(int argc, char** argv) {
   test::InitFault();
   testing::InitGoogleTest(&argc, argv);
   int result = 0;
-#ifdef YACLIB_FIBER
+#if YACLIB_FAULT == 2
   ::testing::UnitTest::GetInstance()->listeners().Append(new test::MyTestListener());
+  std::cerr << "seed: " << test::seed << "\n";
+  yaclib::fault::Scheduler scheduler;
+  yaclib::fault::Scheduler::Set(&scheduler);
   yaclib_std::thread tests([&]() {
     result = RUN_ALL_TESTS();
   });
   tests.join();
+  YACLIB_ERROR(scheduler.IsRunning(), "scheduler is still running when tests are finished");
 #else
   result = RUN_ALL_TESTS();
+#endif
+#if YACLIB_FAULT != 0
+  std::cerr << "injected count: " << yaclib::GetInjectedCount() << std::endl;
 #endif
   return result;
 }

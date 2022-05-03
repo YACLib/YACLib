@@ -15,11 +15,12 @@
 #include <utility>
 #include <yaclib_std/condition_variable>
 #include <yaclib_std/mutex>
+#include <yaclib_std/thread_local>
 
 namespace yaclib {
 namespace {
 
-static thread_local IExecutor* tlCurrentThreadPool{&MakeInline()};
+static YACLIB_THREAD_LOCAL_PTR(IExecutor) tlCurrentThreadPool{&MakeInline()};
 
 class ThreadPool : public IThreadPool {
  public:

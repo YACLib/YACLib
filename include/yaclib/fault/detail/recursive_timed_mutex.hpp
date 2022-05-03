@@ -7,7 +7,7 @@ namespace yaclib::detail {
 // Not using because maybe in future we will want different types
 template <typename Impl>
 class RecursiveTimedMutex : public TimedMutex<Impl> {
-  using Base = Mutex<Impl>;
+  using Base = TimedMutex<Impl>;
 
  public:
   using Base::Base;
