@@ -4,18 +4,18 @@
 #include <yaclib/executor/executor.hpp>
 #include <yaclib/executor/inline.hpp>
 #include <yaclib/executor/thread_pool.hpp>
-#include <yaclib/fault/atomic.hpp>
-#include <yaclib/fault/thread.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 
 #include <array>
 #include <cstdint>
 #include <iostream>
-#include <random>
 #include <thread>
 #include <type_traits>
 #include <utility>
 #include <vector>
+#include <yaclib_std/atomic>
+#include <yaclib_std/random>
+#include <yaclib_std/thread>
 
 #include <gtest/gtest.h>
 

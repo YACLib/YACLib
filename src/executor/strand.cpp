@@ -1,12 +1,12 @@
 #include <yaclib/executor/executor.hpp>
 #include <yaclib/executor/job.hpp>
 #include <yaclib/executor/strand.hpp>
-#include <yaclib/fault/atomic.hpp>
 #include <yaclib/log.hpp>
 #include <yaclib/util/helper.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 
 #include <utility>
+#include <yaclib_std/atomic>
 
 namespace yaclib {
 namespace {

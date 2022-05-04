@@ -2,9 +2,10 @@
 
 #include <yaclib/async/detail/inline_core.hpp>
 #include <yaclib/executor/executor.hpp>
-#include <yaclib/fault/atomic.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 #include <yaclib/util/ref.hpp>
+
+#include <yaclib_std/atomic>
 
 namespace yaclib::detail {
 

@@ -6,7 +6,6 @@
 #include <yaclib/executor/submit.hpp>
 #include <yaclib/executor/thread_factory.hpp>
 #include <yaclib/executor/thread_pool.hpp>
-#include <yaclib/fault/atomic.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 
 #include <chrono>
@@ -15,6 +14,7 @@
 #include <stdexcept>
 #include <thread>
 #include <vector>
+#include <yaclib_std/atomic>
 
 #include <gtest/gtest.h>
 

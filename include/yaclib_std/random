@@ -1,0 +1,8 @@
+#pragma once
+
+#include <yaclib/config.hpp>
+
+#include <random>
+
+#define YACLIB_FAULT_RANDOM_DEVICE YACLIB_FAULT
+#include <yaclib_std/detail/random_device.hpp>

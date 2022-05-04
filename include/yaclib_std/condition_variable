@@ -1,0 +1,13 @@
+#pragma once
+
+#include <yaclib/config.hpp>
+
+// std::notify_all_at_thread_exit
+// std::cv_status
+#include <condition_variable>
+
+#define YACLIB_FAULT_CONDITION_VARIABLE YACLIB_FAULT
+#include <yaclib_std/detail/condition_variable.hpp>
+
+#define YACLIB_FAULT_CONDITION_VARIABLE_ANY YACLIB_FAULT
+#include <yaclib_std/detail/condition_variable_any.hpp>

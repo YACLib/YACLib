@@ -1,10 +1,10 @@
 #pragma once
 
 #include <yaclib/config.hpp>
-#include <yaclib/fault/atomic.hpp>
 
 #include <cstddef>
 #include <utility>
+#include <yaclib_std/atomic>
 
 namespace yaclib::detail {
 

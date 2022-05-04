@@ -13,7 +13,6 @@
 #include <yaclib/executor/job.hpp>
 #include <yaclib/executor/submit.hpp>
 #include <yaclib/executor/thread_pool.hpp>
-#include <yaclib/fault/thread.hpp>
 #include <yaclib/util/detail/nope_counter.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 #include <yaclib/util/result.hpp>
@@ -29,6 +28,7 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
+#include <yaclib_std/thread>
 
 #include <gtest/gtest.h>
 

@@ -5,8 +5,6 @@
 #include <yaclib/executor/job.hpp>
 #include <yaclib/executor/thread_factory.hpp>
 #include <yaclib/executor/thread_pool.hpp>
-#include <yaclib/fault/condition_variable.hpp>
-#include <yaclib/fault/mutex.hpp>
 #include <yaclib/log.hpp>
 #include <yaclib/util/detail/nope_counter.hpp>
 #include <yaclib/util/func.hpp>
@@ -15,6 +13,8 @@
 
 #include <cstddef>
 #include <utility>
+#include <yaclib_std/condition_variable>
+#include <yaclib_std/mutex>
 
 namespace yaclib {
 namespace {
