@@ -1,6 +1,6 @@
 #include <util/intrusive_list.hpp>
 
-#include <yaclib/executor/thread_factory.hpp>
+#include <yaclib/exe/thread_factory.hpp>
 
 #include <algorithm>
 #include <cstdlib>

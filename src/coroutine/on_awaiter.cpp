@@ -1,6 +1,6 @@
 #include <yaclib/coroutine/detail/on_awaiter.hpp>
-#include <yaclib/executor/executor.hpp>
-#include <yaclib/executor/job.hpp>
+#include <yaclib/exe/executor.hpp>
+#include <yaclib/exe/job.hpp>
 
 namespace yaclib::detail {
 

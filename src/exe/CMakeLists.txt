@@ -1,14 +1,14 @@
 list(APPEND YACLIB_INCLUDES
-  ${YACLIB_INCLUDE_DIR}/executor/executor.hpp
-  ${YACLIB_INCLUDE_DIR}/executor/inline.hpp
-  ${YACLIB_INCLUDE_DIR}/executor/strand.hpp
-  ${YACLIB_INCLUDE_DIR}/executor/submit.hpp
-  ${YACLIB_INCLUDE_DIR}/executor/job.hpp
-  ${YACLIB_INCLUDE_DIR}/executor/thread_factory.hpp
-  ${YACLIB_INCLUDE_DIR}/executor/thread_pool.hpp
+  ${YACLIB_INCLUDE_DIR}/exe/executor.hpp
+  ${YACLIB_INCLUDE_DIR}/exe/inline.hpp
+  ${YACLIB_INCLUDE_DIR}/exe/strand.hpp
+  ${YACLIB_INCLUDE_DIR}/exe/submit.hpp
+  ${YACLIB_INCLUDE_DIR}/exe/job.hpp
+  ${YACLIB_INCLUDE_DIR}/exe/thread_factory.hpp
+  ${YACLIB_INCLUDE_DIR}/exe/thread_pool.hpp
   )
 list(APPEND YACLIB_HEADERS
-  ${YACLIB_INCLUDE_DIR}/executor/detail/unique_job.hpp
+  ${YACLIB_INCLUDE_DIR}/exe/detail/unique_job.hpp
   )
 list(APPEND YACLIB_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/inline.cpp

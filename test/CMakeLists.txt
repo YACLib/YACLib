@@ -33,15 +33,15 @@ set(TEST_UTIL_SOURCES
 
 set(YACLIB_EXAMPLE_SOURCES
   example/async/simple
-  example/executor/thread_pool
-  example/executor/strand
+  example/exe/thread_pool
+  example/exe/strand
   example/async/when_all
   example/async/when_any
   )
 set(YACLIB_UNIT_SOURCES
   unit/util/intrusive_ptr
   unit/util/result
-  unit/executor/task
+  unit/exe/task
   unit/async/make_future
   unit/async/get
   unit/async/future
@@ -49,12 +49,12 @@ set(YACLIB_UNIT_SOURCES
   unit/async/future_functor
   unit/algo/when_all
   unit/algo/wait
-  unit/executor/thread_factory
+  unit/exe/thread_factory
   unit/algo/when_any
   unit/algo/wait_group
-  unit/executor/thread_pool
+  unit/exe/thread_pool
   unit/async/stress
-  unit/executor/strand
+  unit/exe/strand
   unit/not_implemented
   )
 

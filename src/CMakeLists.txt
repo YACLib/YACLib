@@ -20,7 +20,7 @@ set(YACLIB_SOURCES
 
 add_subdirectory(algo)
 add_subdirectory(async)
-add_subdirectory(executor)
+add_subdirectory(exe)
 add_subdirectory(util)
 add_subdirectory(fault)
 add_subdirectory(std)

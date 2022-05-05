@@ -1,6 +1,6 @@
 #pragma once
 
-#include <yaclib/executor/job.hpp>
+#include <yaclib/exe/job.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 
 namespace yaclib {

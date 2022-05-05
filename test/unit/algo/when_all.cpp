@@ -5,7 +5,7 @@
 #include <yaclib/async/future.hpp>
 #include <yaclib/async/promise.hpp>
 #include <yaclib/async/run.hpp>
-#include <yaclib/executor/thread_pool.hpp>
+#include <yaclib/exe/thread_pool.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 #include <yaclib/util/result.hpp>
 

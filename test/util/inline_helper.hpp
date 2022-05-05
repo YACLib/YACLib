@@ -1,7 +1,7 @@
 #pragma once
 
 #include <yaclib/async/future.hpp>
-#include <yaclib/executor/inline.hpp>
+#include <yaclib/exe/inline.hpp>
 
 #include <utility>
 

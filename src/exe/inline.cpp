@@ -1,6 +1,6 @@
-#include <yaclib/executor/executor.hpp>
-#include <yaclib/executor/inline.hpp>
-#include <yaclib/executor/job.hpp>
+#include <yaclib/exe/executor.hpp>
+#include <yaclib/exe/inline.hpp>
+#include <yaclib/exe/job.hpp>
 #include <yaclib/util/detail/nope_counter.hpp>
 
 namespace yaclib {

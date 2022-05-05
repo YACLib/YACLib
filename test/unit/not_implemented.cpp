@@ -1,6 +1,6 @@
 #include <yaclib/async/contract.hpp>
 #include <yaclib/config.hpp>
-#include <yaclib/executor/detail/unique_job.hpp>
+#include <yaclib/exe/detail/unique_job.hpp>
 
 #if YACLIB_CORO
 #  include <yaclib/coroutine/detail/promise_type.hpp>

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <yaclib/executor/detail/unique_job.hpp>
-#include <yaclib/executor/executor.hpp>
+#include <yaclib/exe/detail/unique_job.hpp>
+#include <yaclib/exe/executor.hpp>
 
 #include <utility>
 

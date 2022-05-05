@@ -5,8 +5,8 @@
 #include <yaclib/async/future.hpp>
 #include <yaclib/async/promise.hpp>
 #include <yaclib/async/run.hpp>
-#include <yaclib/executor/submit.hpp>
-#include <yaclib/executor/thread_pool.hpp>
+#include <yaclib/exe/submit.hpp>
+#include <yaclib/exe/thread_pool.hpp>
 
 #include <algorithm>
 #include <array>

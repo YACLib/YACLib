@@ -3,9 +3,9 @@
  * Simple \ref Strand examples
  */
 
-#include <yaclib/executor/strand.hpp>
-#include <yaclib/executor/submit.hpp>
-#include <yaclib/executor/thread_pool.hpp>
+#include <yaclib/exe/strand.hpp>
+#include <yaclib/exe/submit.hpp>
+#include <yaclib/exe/thread_pool.hpp>
 #include <yaclib/util/detail/node.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 
