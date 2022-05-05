@@ -1,4 +1,4 @@
-#include <yaclib/coroutine/on.hpp>
+#include <yaclib/coro/on.hpp>
 
 namespace yaclib {
 

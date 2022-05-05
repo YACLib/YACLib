@@ -3,7 +3,7 @@
 #include <yaclib/exe/detail/unique_job.hpp>
 
 #if YACLIB_CORO
-#  include <yaclib/coroutine/detail/promise_type.hpp>
+#  include <yaclib/coro/detail/promise_type.hpp>
 #endif
 
 #include <gtest/gtest-spi.h>

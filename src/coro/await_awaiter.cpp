@@ -1,4 +1,4 @@
-#include <yaclib/coroutine/detail/await_awaiter.hpp>
+#include <yaclib/coro/detail/await_awaiter.hpp>
 
 namespace yaclib::detail {
 

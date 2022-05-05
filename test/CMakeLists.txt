@@ -60,10 +60,10 @@ set(YACLIB_UNIT_SOURCES
 
 if (YACLIB_CORO)
   list(APPEND YACLIB_UNIT_SOURCES
-    unit/coroutine/await
-    unit/coroutine/future_coro_traits
-    unit/coroutine/stress
-    unit/coroutine/on
+    unit/coro/await
+    unit/coro/future_coro_traits
+    unit/coro/stress
+    unit/coro/on
     )
 endif ()
 

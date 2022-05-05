@@ -1,4 +1,4 @@
-#include <yaclib/coroutine/detail/on_awaiter.hpp>
+#include <yaclib/coro/detail/on_awaiter.hpp>
 #include <yaclib/exe/executor.hpp>
 #include <yaclib/exe/job.hpp>
 

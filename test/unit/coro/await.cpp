@@ -1,8 +1,8 @@
 #include <util/time.hpp>
 
 #include <yaclib/async/run.hpp>
-#include <yaclib/coroutine/await.hpp>
-#include <yaclib/coroutine/future_traits.hpp>
+#include <yaclib/coro/await.hpp>
+#include <yaclib/coro/future_traits.hpp>
 #include <yaclib/exe/thread_pool.hpp>
 
 #include <array>
