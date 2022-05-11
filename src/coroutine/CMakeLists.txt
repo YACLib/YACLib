@@ -13,7 +13,6 @@ list(APPEND YACLIB_HEADERS
   )
 
 list(APPEND YACLIB_SOURCES
-  ${CMAKE_CURRENT_SOURCE_DIR}/async_mutex.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/await_awaiter.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/on.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/on_awaiter.cpp
