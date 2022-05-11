@@ -12,9 +12,9 @@
 #include <yaclib/executor/thread_pool.hpp>
 #include <yaclib/util/detail/nope_counter.hpp>
 
+#include <array>
 #include <exception>
 #include <utility>
-#include <vector>
 #include <yaclib_std/thread>
 
 #include <gtest/gtest.h>
@@ -295,7 +295,7 @@ TEST(AsyncMutex, GuardRelease) {
   auto coro1 = [&]() -> yaclib::Future<void> {
     for (std::size_t j = 0; j < kCSperCoro; ++j) {
       auto g = co_await m.Guard();
-      auto а = yaclib::AsyncMutex<>::LockGuard(*g.Release(), std::adopt_lock_t{});
+      auto abobus = yaclib::AsyncMutex<>::LockGuard(*g.Release(), std::adopt_lock_t{});
       cs++;
     }
   };
