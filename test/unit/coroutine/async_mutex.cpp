@@ -92,41 +92,6 @@ TEST(AsyncMutex, Counter) {
   tp->Wait();
 }
 
-TEST(AsyncMutex, Blocking) {
-  using namespace std::chrono_literals;
-
-  yaclib::AsyncMutex m;
-  auto tp = yaclib::MakeThreadPool();
-  test::util::StopWatch<> timer;
-  yaclib::WaitGroup<> wg;
-  yaclib::Future<void> f1, f2;
-
-  yaclib::Submit(*tp, [&]() {
-    auto coro = [&]() -> yaclib::Future<void> {
-      co_await m.Lock();
-      yaclib_std::this_thread::sleep_for(1s * YACLIB_CI_SLOWDOWN);
-      co_await m.Unlock(*tp);
-    };
-    f1 = coro();
-    wg.Add(f1);
-  });
-
-  yaclib::Submit(*tp, [&]() {
-    auto coro = [&]() -> yaclib::Future<void> {
-      co_await m.Lock();
-      co_await m.Unlock(*tp);
-    };
-    f2 = coro();
-    wg.Add(f2);
-  });
-
-  wg.Wait();
-
-  EXPECT_LT(timer.Elapsed(), 100ms * YACLIB_CI_SLOWDOWN);
-  tp->HardStop();
-  tp->Wait();
-}
-
 TEST(AsyncMutex, TryLock) {
   yaclib::AsyncMutex mutex;
   EXPECT_TRUE(mutex.TryLock());
