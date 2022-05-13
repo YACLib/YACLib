@@ -20,7 +20,6 @@
 #include <gtest/gtest.h>
 
 namespace {
-
 TEST(AsyncMutex, JustWorks) {
   yaclib::AsyncMutex m;
   auto tp = yaclib::MakeThreadPool();
@@ -245,11 +244,11 @@ TEST(AsyncMutex, ScopedLockAsync) {
 }
 
 TEST(AsyncMutex, GuardRelease) {
-  yaclib::AsyncMutex<> m;
-  auto tp = yaclib::MakeThreadPool();
+  yaclib::AsyncMutex m;
+  auto tp = yaclib::MakeThreadPool(2);
 
   const std::size_t kCoros = 20;
-  const std::size_t kCSperCoro = 2000;
+  const std::size_t kCSperCoro = 200;
 
   std::array<yaclib::Future<int>, kCoros> futures;
   yaclib::WaitGroup wg;
@@ -259,12 +258,10 @@ TEST(AsyncMutex, GuardRelease) {
 
   auto coro1 = [&]() -> yaclib::Future<int> {
     for (std::size_t j = 0; j < kCSperCoro; ++j) {
-      co_await m.Lock();
-      // auto g = co_await m.Guard();
-      // auto abobus = yaclib::AsyncMutex<>::LockGuard(*g.Release(), std::adopt_lock_t{});
+      auto g = co_await m.Guard();
+      auto abobus = yaclib::AsyncMutex<>::LockGuard(*g.Release(), std::adopt_lock_t{});
       cs++;
-      // co_await g.Unlock<yaclib::AsyncMutex<>::UnlockType::On>();
-      co_await m.Unlock<yaclib::AsyncMutex<>::UnlockType::On>();
+      co_await abobus.Unlock<yaclib::AsyncMutex<>::UnlockType::On>(*tp);
     }
     co_return 42;
   };
@@ -284,5 +281,4 @@ TEST(AsyncMutex, GuardRelease) {
   tp->HardStop();
   tp->Wait();
 }
-
 }  // namespace

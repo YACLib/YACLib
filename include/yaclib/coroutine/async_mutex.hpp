@@ -196,10 +196,9 @@ class AsyncMutex {
         next = _mutex._waiters;
       } else {
         next = _mutex.TryUnlock<FIFO>();
-        if (next == _mutex.LockedNoWaiters()) {
+        if (next == nullptr) {
           _executor.Submit(handle.promise());
           YACLIB_SUSPEND();
-          // YACLIB_RESUME(handle);
         }
       }
       _mutex._waiters = static_cast<detail::BaseCore*>(next->next);
@@ -214,7 +213,6 @@ class AsyncMutex {
       } else {
         _executor.Submit(handle.promise());
         YACLIB_SUSPEND();
-        // YACLIB_RESUME(handle);
       }
     }
 
@@ -236,6 +234,7 @@ class AsyncMutex {
     if (_state.compare_exchange_strong(old_state, NotLocked(), std::memory_order_release, std::memory_order_relaxed)) {
       return nullptr;
     }
+
     old_state = _state.exchange(LockedNoWaiters(), std::memory_order_acquire);
     _next_cs_here = !old_next_cs_here;
     if constexpr (UNLOCK_FIFO) {
