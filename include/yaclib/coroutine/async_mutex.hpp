@@ -190,15 +190,16 @@ class AsyncMutex {
     }
 
     template <typename V, typename E>
-    yaclib_std::suspend_type await_suspend(yaclib_std::coroutine_handle<detail::PromiseType<V, E>> handle) {
+    auto await_suspend(yaclib_std::coroutine_handle<detail::PromiseType<V, E>> handle) {
       detail::BaseCore* next;
       if constexpr (Type == UnlockType::Auto) {
         next = _mutex._waiters;
       } else {
         next = _mutex.TryUnlock<FIFO>();
-        if (next == nullptr) {
+        if (next == _mutex.LockedNoWaiters()) {
           _executor.Submit(handle.promise());
           YACLIB_SUSPEND();
+          // YACLIB_RESUME(handle);
         }
       }
       _mutex._waiters = static_cast<detail::BaseCore*>(next->next);
@@ -213,6 +214,7 @@ class AsyncMutex {
       } else {
         _executor.Submit(handle.promise());
         YACLIB_SUSPEND();
+        // YACLIB_RESUME(handle);
       }
     }
 

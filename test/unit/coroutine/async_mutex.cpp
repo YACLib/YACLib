@@ -251,18 +251,22 @@ TEST(AsyncMutex, GuardRelease) {
   const std::size_t kCoros = 20;
   const std::size_t kCSperCoro = 2000;
 
-  std::array<yaclib::Future<void>, kCoros> futures;
+  std::array<yaclib::Future<int>, kCoros> futures;
   yaclib::WaitGroup wg;
   std::size_t cs = 0;
 
   yaclib_std::atomic<int> done = 0;
 
-  auto coro1 = [&]() -> yaclib::Future<void> {
+  auto coro1 = [&]() -> yaclib::Future<int> {
     for (std::size_t j = 0; j < kCSperCoro; ++j) {
-      auto g = co_await m.Guard();
-      auto abobus = yaclib::AsyncMutex<>::LockGuard(*g.Release(), std::adopt_lock_t{});
+      co_await m.Lock();
+      // auto g = co_await m.Guard();
+      // auto abobus = yaclib::AsyncMutex<>::LockGuard(*g.Release(), std::adopt_lock_t{});
       cs++;
+      // co_await g.Unlock<yaclib::AsyncMutex<>::UnlockType::On>();
+      co_await m.Unlock<yaclib::AsyncMutex<>::UnlockType::On>();
     }
+    co_return 42;
   };
 
   for (std::size_t i = 0; i < kCoros; ++i) {
