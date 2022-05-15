@@ -153,7 +153,7 @@ TEST(AsyncMutex, LockAsync) {
     value++;
     co_await Await(future);
     value++;
-    co_await m.Unlock<yaclib::AsyncMutex<>::UnlockType::On>(*tp);
+    co_await m.UnlockOn(*tp);
   };
 
   auto c1 = coro(f1);
@@ -261,7 +261,7 @@ TEST(AsyncMutex, GuardRelease) {
       auto g = co_await m.Guard();
       auto abobus = yaclib::AsyncMutex<>::LockGuard(*g.Release(), std::adopt_lock_t{});
       cs++;
-      co_await abobus.Unlock<yaclib::AsyncMutex<>::UnlockType::On>(*tp);
+      co_await abobus.UnlockOn(*tp);
     }
     co_return 42;
   };

@@ -47,9 +47,12 @@ class AsyncMutex {
     On,
   };
 
-  template <UnlockType Type = UnlockType::Auto>
   auto Unlock(IExecutor& executor = CurrentThreadPool()) noexcept {
-    return UnlockAwaiter<Type>{*this, executor};
+    return UnlockAwaiter<UnlockType::Auto>{*this, executor};
+  }
+
+  auto UnlockOn(IExecutor& executor = CurrentThreadPool()) noexcept {
+    return UnlockAwaiter<UnlockType::On>{*this, executor};
   }
 
   void UnlockHere(IExecutor& executor = CurrentThreadPool()) noexcept {
@@ -58,7 +61,7 @@ class AsyncMutex {
     if (next == nullptr) {
       return;
     }
-    _next_cs_here = true;
+    _next_cs_here = 0;
     _waiters = static_cast<detail::BaseCore*>(next->next);
     executor.Submit(*next);
   }
@@ -90,11 +93,16 @@ class AsyncMutex {
       return _mutex->Lock();
     }
 
-    template <UnlockType Type = UnlockType::Auto>
     auto Unlock(IExecutor& executor = CurrentThreadPool()) {
       YACLIB_ERROR(!_owns, "Cannot unlock not locked mutex");
       _owns = false;
-      return _mutex->Unlock<Type>(executor);
+      return _mutex->Unlock(executor);
+    }
+
+    auto UnlockOn(IExecutor& executor = CurrentThreadPool()) {
+      YACLIB_ERROR(!_owns, "Cannot unlock not locked mutex");
+      _owns = false;
+      return _mutex->UnlockOn(executor);
     }
 
     void UnlockHere(IExecutor& executor = CurrentThreadPool()/*default value should exist only if we don't have co_await Unlock, so don't have symmetric transfer*/) noexcept {
@@ -202,11 +210,11 @@ class AsyncMutex {
         }
       }
       _mutex._waiters = static_cast<detail::BaseCore*>(next->next);
-      if (_mutex._next_cs_here) {
+      if (_mutex._next_cs_here <= 1) {
         _executor.Submit(handle.promise());
         YACLIB_TRANSFER(next->GetHandle());
       }
-      _mutex._next_cs_here = true;
+      _mutex._next_cs_here = 0;
       _executor.Submit(*next);
       if constexpr (Type == UnlockType::Auto) {
         YACLIB_RESUME(handle);
@@ -236,7 +244,7 @@ class AsyncMutex {
     }
 
     old_state = _state.exchange(LockedNoWaiters(), std::memory_order_acquire);
-    _next_cs_here = !old_next_cs_here;
+    _next_cs_here = old_next_cs_here + 1;
     if constexpr (UNLOCK_FIFO) {
       detail::Node* node = static_cast<detail::BaseCore*>(old_state);
       detail::Node* prev = nullptr;
@@ -263,7 +271,7 @@ class AsyncMutex {
   yaclib_std::atomic<void*> _state =
     NotLocked();  // locked without waiters, not locked, otherwise - head of the awaiters list
   detail::BaseCore* _waiters = nullptr;
-  bool _next_cs_here = false;  // TODO add as _waiters bit (suppose it won't give significant effect)
+  std::size_t _next_cs_here = 0;
 };
 
 }  // namespace yaclib
