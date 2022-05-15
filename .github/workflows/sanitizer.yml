@@ -242,6 +242,9 @@ jobs:
                 continue  # TODO(MBkkt) I can't build with any other ASAN on Windows
                 # I think ClangCL with ASAN should be possible
               fi
+              if [[ $flags == WARN && ${names[$i]} == ClangCL ]]; then
+                continue  # TODO CI stopped compiling due to updates
+              fi
 
               dir="build_${names[$i]}_fault_${yaclib_fault}"
               echo $dir

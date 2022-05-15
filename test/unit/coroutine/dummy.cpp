@@ -12,8 +12,4 @@ TEST(CoroDummy, BaseCoroGetHandle) {
   std::ignore = core.GetHandle();
 }
 
-// TEST(CoroDummy, PromiseTypeGetHandle) {
-//   yaclib::detail::PromiseType<int, yaclib::StopError> core{};
-//   std::ignore = core.GetHandle();
-// }
 }  // namespace
