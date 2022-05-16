@@ -242,7 +242,7 @@ jobs:
                 continue  # TODO(MBkkt) I can't build with any other ASAN on Windows
                 # I think ClangCL with ASAN should be possible
               fi
-              if [[ $flags == WARN && ${names[$i]} == ClangCL ]]; then
+              if [[ $flags == WARN && ( ${names[$i]} == ClangCL || ${names[$i]} == MSVC ) ]]; then
                 continue  # TODO CI stopped compiling due to updates
               fi
 
