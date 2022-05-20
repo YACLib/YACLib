@@ -14,12 +14,15 @@
 
 #include <array>
 #include <exception>
+#include <mutex>
 #include <utility>
 #include <yaclib_std/thread>
 
 #include <gtest/gtest.h>
 
+namespace test {
 namespace {
+
 TEST(AsyncMutex, JustWorks) {
   yaclib::AsyncMutex m;
   auto tp = yaclib::MakeThreadPool();
@@ -27,27 +30,20 @@ TEST(AsyncMutex, JustWorks) {
   const std::size_t kCoros = 10'000;
 
   std::array<yaclib::Future<void>, kCoros> futures;
-  yaclib::WaitGroup wg;
   std::size_t cs = 0;
 
-  yaclib_std::atomic<int> done = 0;
-
   auto coro1 = [&]() -> yaclib::Future<void> {
+    co_await On(*tp);
     co_await m.Lock();
-    cs++;
+    ++cs;
     m.UnlockHere();
   };
 
   for (std::size_t i = 0; i < kCoros; ++i) {
-    yaclib::Submit(*tp, [&, i]() {
-      wg.Add(futures[i] = coro1());
-      done.fetch_add(1, std::memory_order_seq_cst);
-    });
+    futures[i] = coro1();
   }
 
-  while (!(done.load(std::memory_order_seq_cst) == kCoros)) {
-  }
-  wg.Wait();
+  yaclib::Wait(futures.begin(), futures.size());
 
   EXPECT_EQ(kCoros, cs);
   tp->HardStop();
@@ -70,21 +66,22 @@ TEST(AsyncMutex, Counter) {
   auto coro1 = [&]() -> yaclib::Future<void> {
     for (std::size_t j = 0; j < kCSperCoro; ++j) {
       co_await m.Lock();
-      cs++;
+      ++cs;
       co_await m.Unlock();
     }
   };
 
   for (std::size_t i = 0; i < kCoros; ++i) {
     yaclib::Submit(*tp, [&, i]() {
-      wg.Add(futures[i] = coro1());
+      futures[i] = coro1();
       done.fetch_add(1, std::memory_order_seq_cst);
     });
   }
 
   while (!(done.load(std::memory_order_seq_cst) == kCoros)) {
   }
-  wg.Wait();
+
+  yaclib::Wait(futures.begin(), futures.end());
 
   EXPECT_EQ(kCoros * kCSperCoro, cs);
   tp->HardStop();
@@ -260,7 +257,7 @@ TEST(AsyncMutex, GuardRelease) {
     for (std::size_t j = 0; j < kCSperCoro; ++j) {
       auto g = co_await m.Guard();
       auto abobus = yaclib::AsyncMutex<>::LockGuard(*g.Release(), std::adopt_lock_t{});
-      cs++;
+      ++cs;
       co_await abobus.UnlockOn(*tp);
     }
     co_return 42;
@@ -281,4 +278,8 @@ TEST(AsyncMutex, GuardRelease) {
   tp->HardStop();
   tp->Wait();
 }
+
+// TODO deadlock test
+
 }  // namespace
+}  // namespace test

@@ -34,18 +34,13 @@ class AsyncMutex {
   }
 
   [[nodiscard]] bool TryLock() noexcept {
-    void* old_state = _state.load(std::memory_order_acquire);
+    auto old_state = _state.load(std::memory_order_acquire);
     if (old_state != NotLocked()) {
       return false;
     }
     return _state.compare_exchange_strong(old_state, LockedNoWaiters(), std::memory_order_acquire,
                                           std::memory_order_relaxed);
   }
-
-  enum class UnlockType {
-    Auto,
-    On,
-  };
 
   auto Unlock(IExecutor& executor = CurrentThreadPool()) noexcept {
     return UnlockAwaiter<UnlockType::Auto>{*this, executor};
@@ -61,7 +56,7 @@ class AsyncMutex {
     if (next == nullptr) {
       return;
     }
-    _next_cs_here = 0;
+    _count_batch_here = 0;
     _waiters = static_cast<detail::BaseCore*>(next->next);
     executor.Submit(*next);
   }
@@ -93,13 +88,13 @@ class AsyncMutex {
       return _mutex->Lock();
     }
 
-    auto Unlock(IExecutor& executor = CurrentThreadPool()) {
+    auto Unlock(IExecutor& executor = CurrentThreadPool()) noexcept {
       YACLIB_ERROR(!_owns, "Cannot unlock not locked mutex");
       _owns = false;
       return _mutex->Unlock(executor);
     }
 
-    auto UnlockOn(IExecutor& executor = CurrentThreadPool()) {
+    auto UnlockOn(IExecutor& executor = CurrentThreadPool()) noexcept {
       YACLIB_ERROR(!_owns, "Cannot unlock not locked mutex");
       _owns = false;
       return _mutex->UnlockOn(executor);
@@ -134,9 +129,14 @@ class AsyncMutex {
   };
 
  private:
+  enum class UnlockType {
+    Auto,
+    On,
+  };
+
   class [[nodiscard]] LockAwaiter {
    public:
-    explicit LockAwaiter(AsyncMutex& mutex) : _mutex{mutex} {
+    explicit LockAwaiter(AsyncMutex& mutex) noexcept : _mutex{mutex} {
     }
 
     YACLIB_INLINE bool await_ready() noexcept {
@@ -144,9 +144,9 @@ class AsyncMutex {
     }
 
     template <typename V, typename E>
-    bool await_suspend(yaclib_std::coroutine_handle<detail::PromiseType<V, E>> handle) {
+    bool await_suspend(yaclib_std::coroutine_handle<detail::PromiseType<V, E>> handle) noexcept {
       detail::BaseCore& base_core = handle.promise();
-      void* old_state = _mutex._state.load(std::memory_order_acquire);
+      auto old_state = _mutex._state.load(std::memory_order_relaxed);
       while (true) {
         if (old_state == _mutex.NotLocked()) {
           if (_mutex._state.compare_exchange_weak(old_state, _mutex.LockedNoWaiters(), std::memory_order_acquire,
@@ -154,9 +154,9 @@ class AsyncMutex {
             return false;
           }
         } else {
-          base_core.next = static_cast<detail::BaseCore*>(old_state);
-          if (_mutex._state.compare_exchange_weak(old_state, &base_core, std::memory_order_release,
-                                                  std::memory_order_relaxed)) {
+          base_core.next = reinterpret_cast<detail::BaseCore*>(old_state);
+          if (_mutex._state.compare_exchange_weak(old_state, reinterpret_cast<std::uintptr_t>(&base_core),
+                                                  std::memory_order_release, std::memory_order_relaxed)) {
             return true;
           }
         }
@@ -170,9 +170,9 @@ class AsyncMutex {
     AsyncMutex& _mutex;
   };
 
-  class [[nodiscard]] GuardAwaiter : public LockAwaiter {
+  class [[nodiscard]] GuardAwaiter final : public LockAwaiter {
    public:
-    explicit GuardAwaiter(AsyncMutex& mutex) : LockAwaiter{mutex} {
+    explicit GuardAwaiter(AsyncMutex& mutex) noexcept : LockAwaiter{mutex} {
     }
 
     YACLIB_INLINE LockGuard await_resume() noexcept {
@@ -181,9 +181,9 @@ class AsyncMutex {
   };
 
   template <UnlockType Type>
-  class [[nodiscard]] UnlockAwaiter {
+  class [[nodiscard]] UnlockAwaiter final {
    public:
-    explicit UnlockAwaiter(AsyncMutex& m, IExecutor& e) : _mutex{m}, _executor{e} {
+    explicit UnlockAwaiter(AsyncMutex& m, IExecutor& e) noexcept : _mutex{m}, _executor{e} {
     }
 
     bool await_ready() noexcept {
@@ -198,7 +198,7 @@ class AsyncMutex {
     }
 
     template <typename V, typename E>
-    auto await_suspend(yaclib_std::coroutine_handle<detail::PromiseType<V, E>> handle) {
+    auto await_suspend(yaclib_std::coroutine_handle<detail::PromiseType<V, E>> handle) YACLIB_SUSPEND_NOEXCEPT {
       detail::BaseCore* next;
       if constexpr (Type == UnlockType::Auto) {
         next = _mutex._waiters;
@@ -210,11 +210,11 @@ class AsyncMutex {
         }
       }
       _mutex._waiters = static_cast<detail::BaseCore*>(next->next);
-      if (_mutex._next_cs_here <= 1) {
+      if (_mutex._count_batch_here <= 1) {
         _executor.Submit(handle.promise());
         YACLIB_TRANSFER(next->GetHandle());
       }
-      _mutex._next_cs_here = 0;
+      _mutex._count_batch_here = 0;
       _executor.Submit(*next);
       if constexpr (Type == UnlockType::Auto) {
         YACLIB_RESUME(handle);
@@ -232,21 +232,21 @@ class AsyncMutex {
     IExecutor& _executor;
   };
 
-  template <bool UNLOCK_FIFO = FIFO>
+  template <bool UnlockFIFO = FIFO>
   detail::BaseCore* TryUnlock() noexcept {
     if (_waiters != nullptr) {
       return _waiters;
     }
-    const bool old_next_cs_here = std::exchange(_next_cs_here, false);
-    void* old_state = LockedNoWaiters();
+    const auto old_count_batch_here = std::exchange(_count_batch_here, 0);
+    auto old_state = LockedNoWaiters();
     if (_state.compare_exchange_strong(old_state, NotLocked(), std::memory_order_release, std::memory_order_relaxed)) {
       return nullptr;
     }
 
     old_state = _state.exchange(LockedNoWaiters(), std::memory_order_acquire);
-    _next_cs_here = old_next_cs_here + 1;
-    if constexpr (UNLOCK_FIFO) {
-      detail::Node* node = static_cast<detail::BaseCore*>(old_state);
+    _count_batch_here = old_count_batch_here + 1;
+    if constexpr (UnlockFIFO) {
+      detail::Node* node = reinterpret_cast<detail::BaseCore*>(old_state);
       detail::Node* prev = nullptr;
       do {
         auto* next = node->next;
@@ -256,22 +256,22 @@ class AsyncMutex {
       } while (node != nullptr);
       return static_cast<detail::BaseCore*>(prev);
     } else {
-      return static_cast<detail::BaseCore*>(old_state);
+      return reinterpret_cast<detail::BaseCore*>(old_state);
     }
   }
 
-  YACLIB_INLINE void* NotLocked() noexcept {
-    return this;
+  YACLIB_INLINE std::uintptr_t NotLocked() noexcept {
+    return reinterpret_cast<std::uintptr_t>(this);
   }
 
-  constexpr void* LockedNoWaiters() noexcept {
-    return nullptr;
+  constexpr std::uintptr_t LockedNoWaiters() noexcept {
+    return {};
   }
 
-  yaclib_std::atomic<void*> _state =
-    NotLocked();  // locked without waiters, not locked, otherwise - head of the awaiters list
+  // locked without waiters, not locked, otherwise - head of the awaiters list
+  yaclib_std::atomic<std::uintptr_t> _state = NotLocked();  // TODO(mkornaukhov03) -- uintptr_t
   detail::BaseCore* _waiters = nullptr;
-  std::size_t _next_cs_here = 0;
+  std::size_t _count_batch_here = 0;
 };
 
 }  // namespace yaclib

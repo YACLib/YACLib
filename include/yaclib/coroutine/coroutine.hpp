@@ -2,6 +2,8 @@
 
 #include <yaclib/config.hpp>
 
+// TODO(mkornaukhov03) figure out more convinient way how to check the possibility of Symmetric Transfer
+// Now it has a problem: doesn't use Symmetric Transfer even if possible
 #ifdef __clang_major__
 #  if __clang_major__ < 7
 #    define YACLIB_SYMMETRIC_TRANSFER 0
@@ -39,8 +41,6 @@ using std::experimental::coroutine_traits;
 using std::experimental::suspend_always;
 using std::experimental::suspend_never;
 
-// TODO(mkornaukhov03) figure out more convinient way how to check the possibility of Symmetric Transfer
-// Now it has a problem: doesn't use Symmetric Transfer even if possible
 #  if YACLIB_SYMMETRIC_TRANSFER == 1
 using std::experimental::noop_coroutine;
 #  endif
@@ -50,26 +50,19 @@ using std::experimental::noop_coroutine;
 #endif
 
 #if YACLIB_SYMMETRIC_TRANSFER == 1
+#  define YACLIB_SUSPEND_NOEXCEPT noexcept
 namespace yaclib_std {
 
 using suspend_type = yaclib_std::coroutine_handle<>;
 
 }  // namespace yaclib_std
 
-#  define YACLIB_TRANSFER(handle)                                                                                      \
-    return yaclib_std::suspend_type {                                                                                  \
-      handle                                                                                                           \
-    }
-#  define YACLIB_RESUME(handle)                                                                                        \
-    return yaclib_std::suspend_type {                                                                                  \
-      handle                                                                                                           \
-    }
-#  define YACLIB_SUSPEND()                                                                                             \
-    return yaclib_std::suspend_type {                                                                                  \
-      yaclib_std::noop_coroutine()                                                                                     \
-    }
+#  define YACLIB_TRANSFER(handle) return yaclib_std::suspend_type(handle)
+#  define YACLIB_RESUME(handle) YACLIB_TRANSFER(handle)
+#  define YACLIB_SUSPEND() YACLIB_TRANSFER(yaclib_std::noop_coroutine())
 
 #else
+#  define YACLIB_SUSPEND_NOEXCEPT
 namespace yaclib_std {
 
 using suspend_type = bool;

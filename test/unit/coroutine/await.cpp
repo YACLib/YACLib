@@ -13,7 +13,9 @@
 
 #include <gtest/gtest.h>
 
+namespace test {
 namespace {
+
 using namespace std::chrono_literals;
 
 TEST(Await, JustWorksPack) {
@@ -126,3 +128,4 @@ TEST(Await, NoSuspend) {
 }
 
 }  // namespace
+}  // namespace test

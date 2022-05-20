@@ -13,6 +13,7 @@
 
 namespace test {
 namespace {
+
 using namespace std::chrono_literals;
 
 uint64_t state = 0;
