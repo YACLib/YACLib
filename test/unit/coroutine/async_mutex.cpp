@@ -23,6 +23,31 @@
 namespace test {
 namespace {
 
+class ManualExecutor : public yaclib::IExecutor {
+ private:
+  yaclib::detail::List _tasks;
+
+ public:
+  [[nodiscard]] Type Tag() const final {
+    return yaclib::IExecutor::Type::Custom;
+  }
+
+  void Submit(yaclib::Job& f) noexcept final {
+    _tasks.PushFront(f);
+  }
+
+  void Drain() {
+    while (!_tasks.Empty()) {
+      auto& task = _tasks.PopFront();
+      static_cast<yaclib::Job&>(task).Call();
+    }
+  }
+
+  ~ManualExecutor() override {
+    EXPECT_TRUE(_tasks.Empty());
+  }
+};
+
 TEST(AsyncMutex, JustWorks) {
   yaclib::AsyncMutex m;
   auto tp = yaclib::MakeThreadPool();
@@ -112,30 +137,6 @@ TEST(AsyncMutex, ScopedLock) {
 }
 
 TEST(AsyncMutex, LockAsync) {
-  class ManualExecutor : public yaclib::IExecutor {
-   private:
-    yaclib::detail::List _tasks;
-
-   public:
-    [[nodiscard]] Type Tag() const final {
-      return yaclib::IExecutor::Type::Custom;
-    }
-
-    void Submit(yaclib::Job& f) noexcept final {
-      _tasks.PushFront(f);
-    }
-
-    void Drain() {
-      while (!_tasks.Empty()) {
-        auto& task = _tasks.PopFront();
-        static_cast<yaclib::Job&>(task).Call();
-      }
-    }
-
-    ~ManualExecutor() override {
-      EXPECT_TRUE(_tasks.Empty());
-    }
-  };
   yaclib::AsyncMutex m;
   yaclib::detail::NopeCounter<ManualExecutor> executor;
   auto tp = yaclib::MakeThreadPool();
@@ -177,30 +178,6 @@ TEST(AsyncMutex, LockAsync) {
 }
 
 TEST(AsyncMutex, ScopedLockAsync) {
-  class ManualExecutor : public yaclib::IExecutor {
-   private:
-    yaclib::detail::List _tasks;
-
-   public:
-    [[nodiscard]] Type Tag() const final {
-      return yaclib::IExecutor::Type::Custom;
-    }
-
-    void Submit(yaclib::Job& f) noexcept final {
-      _tasks.PushFront(f);
-    }
-
-    void Drain() {
-      while (!_tasks.Empty()) {
-        auto& task = _tasks.PopFront();
-        static_cast<yaclib::Job&>(task).Call();
-      }
-    }
-
-    ~ManualExecutor() override {
-      EXPECT_TRUE(_tasks.Empty());
-    }
-  };
   yaclib::AsyncMutex m;
   yaclib::detail::NopeCounter<ManualExecutor> executor;
   auto tp = yaclib::MakeThreadPool();

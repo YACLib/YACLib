@@ -4,16 +4,22 @@
 
 // TODO(mkornaukhov03) figure out more convinient way how to check the possibility of Symmetric Transfer
 // Now it has a problem: doesn't use Symmetric Transfer even if possible
-#ifdef __clang_major__
-#  if __clang_major__ < 7
-#    define YACLIB_SYMMETRIC_TRANSFER 0
-#  else
-#    define YACLIB_SYMMETRIC_TRANSFER 1
-#  endif
-#elif defined(_MSC_VER) && YACLIB_CORO == 1
+
+#if defined(__NVCC__)
+#  define YACLIB_CORO 0
+#  define YACLIB_SYMMETRIC_TRANSFER 0
+#elif (__cpp_coroutines >= 201703L || __cpp_impl_coroutine >= 201902L) && __has_include(<coroutine>)
+#  define YACLIB_CORO 2
+#  define YACLIB_SYMMETRIC_TRANSFER 1
+#elif (__cpp_coroutines >= 201703L || __cpp_impl_coroutine >= 201902L) && __has_include(<experimental/coroutine>)
+#  define YACLIB_CORO 1
+#  define YACLIB_SYMMETRIC_TRANSFER 1
+#elif _MSC_VER && _RESUMABLE_FUNCTIONS_SUPPORTED
+#  define YACLIB_CORO 1
 #  define YACLIB_SYMMETRIC_TRANSFER 0
 #else
-#  define YACLIB_SYMMETRIC_TRANSFER 1
+#  define YACLIB_CORO 0
+#  define YACLIB_SYMMETRIC_TRANSFER 0
 #endif
 
 #if YACLIB_CORO == 2
