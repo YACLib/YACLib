@@ -7,7 +7,7 @@
 #include <yaclib/util/ref.hpp>
 
 #include <yaclib_std/atomic>
-#if YACLIB_CORO != 0
+#if YACLIB_CORO_NEED != 0
 #  include <yaclib/coroutine/coroutine.hpp>
 #endif
 
@@ -29,7 +29,7 @@ class BaseCore : public InlineCore {
   [[nodiscard]] bool Empty() const noexcept;
   [[nodiscard]] bool Alive() const noexcept;
 
-#if YACLIB_CORO != 0
+#if YACLIB_CORO_NEED != 0
   virtual yaclib_std::coroutine_handle<> GetHandle() noexcept {
     return yaclib_std::coroutine_handle<>{};  // plug, see coroutine/detail/promise_type.hpp
   }

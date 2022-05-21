@@ -5,21 +5,31 @@
 // TODO(mkornaukhov03) figure out more convinient way how to check the possibility of Symmetric Transfer
 // Now it has a problem: doesn't use Symmetric Transfer even if possible
 
-#if defined(__NVCC__)
-#  define YACLIB_CORO 0
-#  define YACLIB_SYMMETRIC_TRANSFER 0
-#elif (__cpp_coroutines >= 201703L || __cpp_impl_coroutine >= 201902L) && __has_include(<coroutine>)
+#if defined(__clang__)
+#  define YACLIB_SYMMETRIC_TRANSFER 1
+#  if __has_include(<coroutine>)
+#    define YACLIB_CORO 2
+#  else
+#    define YACLIB_CORO 1
+#  endif
+#elif defined(__GNUG__)
+#  define YACLIB_SYMMETRIC_TRANSFER 1
 #  define YACLIB_CORO 2
-#  define YACLIB_SYMMETRIC_TRANSFER 1
-#elif (__cpp_coroutines >= 201703L || __cpp_impl_coroutine >= 201902L) && __has_include(<experimental/coroutine>)
-#  define YACLIB_CORO 1
-#  define YACLIB_SYMMETRIC_TRANSFER 1
-#elif _MSC_VER && _RESUMABLE_FUNCTIONS_SUPPORTED
-#  define YACLIB_CORO 1
-#  define YACLIB_SYMMETRIC_TRANSFER 0
+#elif defined(_MSC_VER)
+#  if _MSC_VER >= 1929
+#    define YACLIB_CORO 2
+#    define YACLIB_TRANSFER_1
+#  else
+#    define YACLIB_CORO 1
+#    define YACLIB_TRANSFER_0
+#  endif
 #else
-#  define YACLIB_CORO 0
-#  define YACLIB_SYMMETRIC_TRANSFER 0
+#  define YACLIB_SYMMETRIC_TRANSFER 1
+#  if __has_include(<coroutine>)
+#    define YACLIB_CORO 2
+#  else
+#    define YACLIB_CORO 1
+#  endif
 #endif
 
 #if YACLIB_CORO == 2
