@@ -83,6 +83,11 @@ jobs:
                 link_option=${link_options[$j]}; compile_option=${compile_options[$j]}
               fi
 
+              coroutine_option="CORO"
+              if [[ ${compilers_name[$i]} == "clang" || ${compilers_name[$i]} == "gnu-9" ]]; then
+                coroutine_option=""
+              fi
+
               dir="build_${compilers_name[$i]}_${stdlibs_name[$j]}"
               echo $dir
 
@@ -92,7 +97,7 @@ jobs:
                 -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}                                                            \
                 -DYACLIB_CXX_STANDARD=17                                                                               \
                 -DYACLIB_TEST=SINGLE                                                                                   \
-                -DYACLIB_FLAGS="CORO"                                                                                  \
+                -DYACLIB_FLAGS="$coroutine_option"                                                                                  \
                 -DCMAKE_CXX_COMPILER=${cxx_compilers[$i]}                                                              \
                 -G"Ninja"                                                                                              \
                 -DYACLIB_LINK_OPTIONS="$link_option"                                                                   \
