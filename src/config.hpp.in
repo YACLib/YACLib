@@ -114,13 +114,7 @@
 #    endif
 #  else
 #    define YACLIB_SYMMETRIC_TRANSFER 1
-#    if defined __has_include
-#		   if __has_include(<coroutine>)
-#        define YACLIB_CORO 2
-#      else
-#        define YACLIB_CORO 1
-#      endif
-# 	 endif 		
+#    define YACLIB_CORO 2
 #  endif
 #endif
 namespace yaclib {
