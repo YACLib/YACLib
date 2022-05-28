@@ -85,10 +85,10 @@ jobs:
           options=("-A $arch -T ClangCL" "-DCMAKE_BUILD_TYPE=${{ matrix.build_type }}" "-A $arch")
 
           for (( i=0; i<${#names[*]}; i+=1 )); do
-            if [[ "${names[$i]}" == "ClangCL" ]]; then
-              coroutine_option=""
-            else
+            if [[ "${names[$i]}" == "MSVC" ]]; then
               coroutine_option="CORO"
+            else
+              coroutine_option=""
             fi
             dir="build_${names[$i]}_fault_${yaclib_fault}"
             echo $dir
