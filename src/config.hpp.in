@@ -104,7 +104,7 @@
 #    define YACLIB_CORO 2
 #  elif defined(_MSC_VER)
 #    if _MSC_VER >= 1700 // 1929
-#      define YACLIB_CORO 2
+#      define YACLIB_CORO 1
 #      define YACLIB_TRANSFER 1
 #    else
 #      define YACLIB_CORO 1
