@@ -84,7 +84,7 @@ jobs:
               fi
 
               coroutine_option="CORO"
-              if [[ ${compilers_name[$i]} == "apple_clang" || ${compilers_name[$i]} == "gnu-9" ]]; then
+              if [[ "${compilers_name[$i]}" != "gcc*" ]]; then
                 coroutine_option=""
               fi
 
