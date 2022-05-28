@@ -38,7 +38,7 @@ class IntrusivePtr {
   template <typename U>
   IntrusivePtr& operator=(const IntrusivePtr<U>& other) noexcept;
 
-  ~IntrusivePtr();
+  ~IntrusivePtr() noexcept;
 
   T* Get() const noexcept;
   T* Release() noexcept;

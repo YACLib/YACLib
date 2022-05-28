@@ -89,6 +89,22 @@
 #  endif
 #endif
 
+#if !defined(YACLIB_NO_UNIQUE_ADDRESS) && defined(__has_cpp_attribute)
+#  if __has_cpp_attribute(no_unique_address)
+#    define YACLIB_NO_UNIQUE_ADDRESS [[no_unique_address]]
+#  endif
+#endif
+
+#if !defined(YACLIB_NO_UNIQUE_ADDRESS) && defined(__has_attribute)
+#  if __has_attribute(no_unique_address)
+#    define YACLIB_NO_UNIQUE_ADDRESS [[no_unique_address]]
+#  endif
+#endif
+
+#ifndef YACLIB_NO_UNIQUE_ADDRESS
+#  define YACLIB_NO_UNIQUE_ADDRESS
+#endif
+
 namespace yaclib {
 
 inline constexpr std::size_t kCacheLineSize = 64;  // TODO(MBkkt) Make better

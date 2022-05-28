@@ -42,8 +42,8 @@ class AwaitAwaiter final {
 template <typename... Cores>
 AwaitAwaiter::AwaitAwaiter(Cores&... cores) : _await_core{sizeof...(cores) + 1} {
   static_assert(sizeof...(cores) >= 1, "Number of futures must be at least one");
-  static_assert((... && std::is_same_v<BaseCore, Cores>), "Futures must be Future in Wait function");
-  const auto wait_count = (... + static_cast<std::size_t>(cores.SetWait(_await_core)));
+  static_assert((... && std::is_same_v<CCore, Cores>), "Futures must be Future in Wait function");
+  const auto wait_count = (... + static_cast<std::size_t>(cores.SetWait(_await_core, PCore::kWaitNope)));
   _await_core.count.fetch_sub(sizeof...(cores) - wait_count, std::memory_order_relaxed);
 }
 
@@ -51,7 +51,7 @@ template <typename It>
 AwaitAwaiter::AwaitAwaiter(It it, std::size_t count) : _await_core{count + 1} {
   std::size_t wait_count = 0;
   for (std::size_t i = 0; i != count; ++i) {
-    wait_count += static_cast<std::size_t>(it->GetCore()->SetWait(_await_core));
+    wait_count += static_cast<std::size_t>(it->GetCore()->SetWait(_await_core, PCore::kWaitNope));
     ++it;
   }
   _await_core.count.fetch_sub(count - wait_count, std::memory_order_relaxed);

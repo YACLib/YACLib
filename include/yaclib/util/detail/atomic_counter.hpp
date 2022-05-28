@@ -1,6 +1,7 @@
 #pragma once
 
 #include <yaclib/config.hpp>
+#include <yaclib/util/detail/default_deleter.hpp>
 
 #include <cstddef>
 #include <utility>
@@ -8,19 +9,11 @@
 
 namespace yaclib::detail {
 
-struct [[maybe_unused]] DefaultDeleter {
-  template <typename Type>
-  static void Delete(Type& self) {
-    delete &self;
-  }
-};
-
 template <typename CounterBase, typename Deleter = DefaultDeleter>
 struct AtomicCounter : CounterBase {
-  using DeleterType = Deleter;
-
   template <typename... Args>
-  AtomicCounter(std::size_t n, Args&&... args) : CounterBase{std::forward<Args>(args)...}, count{n} {
+  AtomicCounter(std::size_t n, Args&&... args) noexcept(std::is_nothrow_constructible_v<CounterBase, Args...>)
+      : CounterBase{std::forward<Args>(args)...}, count{n} {
   }
 
   void IncRef() noexcept final {

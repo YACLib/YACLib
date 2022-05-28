@@ -72,10 +72,11 @@ struct ResultEmpty : std::exception {};
  * \tparam E type of error that stored in Result
  */
 template <typename V, typename E = StopError>
-class Result {
+class [[nodiscard]] Result {
   static_assert(Check<V>(), "V should be valid");
   static_assert(Check<E>(), "E should be valid");
   static_assert(!std::is_same_v<V, E>, "Result cannot be instantiated with same V and E, because it's ambiguous");
+  static_assert(std::is_constructible_v<E, StopTag>, "Error should be constructable from StopError");
 
   using ValueT = std::conditional_t<std::is_void_v<V>, Unit, V>;
   using LetValue = std::conditional_t<std::is_void_v<V>, void, const ValueT&>;
@@ -89,7 +90,7 @@ class Result {
   Result& operator=(const Result& other) noexcept(std::is_nothrow_copy_assignable_v<Variant>) = default;
 
   template <typename... Args>
-  Result(Args&&... args) noexcept(std::is_nothrow_constructible_v<Variant, Args...>)
+  Result(Args&&... args) noexcept(std::is_nothrow_constructible_v<Variant, std::in_place_type_t<ValueT>, Args...>)
       : _result{std::in_place_type_t<ValueT>{}, std::forward<Args>(args)...} {
   }
 
@@ -100,10 +101,10 @@ class Result {
   Result(E error) noexcept : _result{std::in_place_type_t<E>{}, std::move(error)} {
   }
 
-  Result() noexcept : _result{std::monostate{}} {
+  Result(StopTag tag) noexcept : _result{std::in_place_type_t<E>{}, tag} {
   }
 
-  Result(StopTag tag) noexcept : _result{std::in_place_type_t<E>{}, tag} {
+  Result() noexcept : _result{std::monostate{}} {
   }
 
   template <typename Arg>

@@ -36,12 +36,12 @@ jobs:
       - name: Update deps on macOS
         run: |
           brew update
-          brew install ninja llvm@8
+          brew install ninja llvm@8 gcc@7 gcc@12
 
       - name: Configure CMake
         run: |
           stdlibs_name=(libcxx libstdcxx apple_libcxx)
-          compilers_name=(clang gnu-9 apple_clang gnu-10 gnu-11)
+          compilers_name=(clang gnu-7 apple_clang gnu-12)
 
           llvm=/usr/local/opt/llvm
 
@@ -57,11 +57,11 @@ jobs:
           )
 
           if [[ "${{ github.event_name }}" != "pull_request" ]]; then
-            c_compilers=("$llvm/bin/clang" gcc-9 clang gcc-10 gcc-11)
-            cxx_compilers=("$llvm/bin/clang++" g++-9 clang++ g++-10 g++-11)
+            c_compilers=("$llvm/bin/clang" gcc-7 clang gcc-12)
+            cxx_compilers=("$llvm/bin/clang++" g++-7 clang++ g++-12)
           else
-            c_compilers=("$llvm/bin/clang" gcc-9 clang)
-            cxx_compilers=("$llvm/bin/clang++" g++-9 clang++)
+            c_compilers=("$llvm/bin/clang" gcc-7 clang)
+            cxx_compilers=("$llvm/bin/clang++" g++-7 clang++)
           fi
 
           for (( i=0; i<${#c_compilers[*]}; i+=1 )); do

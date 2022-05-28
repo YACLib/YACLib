@@ -60,7 +60,7 @@ class ThreadPool : public IThreadPool {
     std::unique_lock lock{_m};
     if (WasStop()) {
       lock.unlock();
-      task.Cancel();
+      task.Drop();
       return;
     }
     _tasks.PushBack(task);
@@ -88,7 +88,7 @@ class ThreadPool : public IThreadPool {
     Stop(std::move(lock));
     while (!tasks.Empty()) {
       auto& task = tasks.PopFront();
-      static_cast<Job&>(task).Cancel();
+      static_cast<Job&>(task).Drop();
     }
   }
 

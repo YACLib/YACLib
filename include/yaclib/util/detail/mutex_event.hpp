@@ -12,27 +12,27 @@ class /*alignas(kCacheLineSize)*/ MutexEvent : public IRef {
  public:
   using Token = std::unique_lock<yaclib_std::mutex>;
 
-  Token Make();
+  Token Make() noexcept;
 
-  void Wait(Token& token);
+  void Wait(Token& token) noexcept;
 
   template <typename Rep, typename Period>
-  bool Wait(Token& token, const std::chrono::duration<Rep, Period>& timeout_duration) {
+  bool Wait(Token& token, const std::chrono::duration<Rep, Period>& timeout_duration) noexcept {
     return _cv.wait_for(token, timeout_duration, [&] {
       return _is_ready;
     });
   }
 
   template <typename Clock, typename Duration>
-  bool Wait(Token& token, const std::chrono::time_point<Clock, Duration>& timeout_time) {
+  bool Wait(Token& token, const std::chrono::time_point<Clock, Duration>& timeout_time) noexcept {
     return _cv.wait_until(token, timeout_time, [&] {
       return _is_ready;
     });
   }
 
-  void SetOne();
+  void SetOne() noexcept;
 
-  void SetAll();
+  void SetAll() noexcept;
 
   void Reset() noexcept;
 

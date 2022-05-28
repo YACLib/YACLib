@@ -15,11 +15,11 @@ namespace yaclib::detail {
 struct NoTimeoutTag {};
 
 template <typename Event, typename Timeout, typename Range>
-bool WaitRange(const Timeout& timeout, const Range& range, std::size_t count) {
+bool WaitRange(const Timeout& timeout, const Range& range, std::size_t count) noexcept {
   AtomicCounter<Event, SetOneDeleter> event{count + 1};
   // event ref counter = n + 1, it is optimization: we don't want to notify when return true immediately
-  auto const wait_count = range([&](BaseCore& core) {
-    return core.Empty() && core.SetWait(event);
+  auto const wait_count = range([&](CCore& core) {
+    return core.SetWait(event, PCore::kWaitNope);
   });
   if (wait_count == 0 || event.SubEqual(count - wait_count + 1)) {
     return true;
@@ -32,7 +32,7 @@ bool WaitRange(const Timeout& timeout, const Range& range, std::size_t count) {
     if (event.Wait(token, timeout)) {
       return true;
     }
-    reset_count = range([](BaseCore& core) {
+    reset_count = range([](CCore& core) {
       return core.ResetWait();
     });
     if (reset_count != 0 && (reset_count == wait_count || event.SubEqual(reset_count))) {
@@ -45,9 +45,9 @@ bool WaitRange(const Timeout& timeout, const Range& range, std::size_t count) {
 }
 
 template <typename Event, typename Timeout, typename... Cores>
-bool WaitCore(const Timeout& timeout, Cores&... cores) {
+bool WaitCore(const Timeout& timeout, Cores&... cores) noexcept {
   static_assert(sizeof...(cores) >= 1, "Number of futures must be at least one");
-  static_assert((... && std::is_same_v<BaseCore, Cores>), "Futures must be Future in Wait function");
+  static_assert((... && std::is_same_v<CCore, Cores>), "Futures must be Future in Wait function");
   auto range = [&](auto&& func) {
     return (... + static_cast<std::size_t>(func(cores)));
   };
@@ -55,7 +55,7 @@ bool WaitCore(const Timeout& timeout, Cores&... cores) {
 }
 
 template <typename Event, typename Timeout, typename Iterator>
-bool WaitIterator(const Timeout& timeout, Iterator it, std::size_t count) {
+bool WaitIterator(const Timeout& timeout, Iterator it, std::size_t count) noexcept {
   static_assert(is_future_base_v<typename std::iterator_traits<Iterator>::value_type>,
                 "Wait function Iterator must be point to some FutureBase");
   if (count == 0) {
@@ -73,6 +73,6 @@ bool WaitIterator(const Timeout& timeout, Iterator it, std::size_t count) {
   return WaitRange<Event>(timeout, range, count);
 }
 
-extern template bool WaitCore<DefaultEvent, NoTimeoutTag, BaseCore>(const NoTimeoutTag&, BaseCore&);
+extern template bool WaitCore<DefaultEvent, NoTimeoutTag, CCore>(const NoTimeoutTag&, CCore&);
 
 }  // namespace yaclib::detail

@@ -120,14 +120,14 @@ jobs:
           sudo update-alternatives --auto gcc
 
           sudo update-alternatives                                                                                     \
-            --install /usr/bin/cpp        cpp        /usr/bin/cpp-11        200
+            --install /usr/bin/cpp        cpp        /usr/bin/cpp-12        200
           sudo update-alternatives --auto cpp
 
       - name: Update deps on macOS
         if: ${{ matrix.os == 'macos-11' }}
         run: |
           brew update
-          brew install ninja llvm@13
+          brew install ninja llvm@13 gcc@12
 
       - name: Set up MinGW x64
         if: ${{ matrix.os == 'windows-2022' }}
@@ -144,8 +144,8 @@ jobs:
           stdlibs_name=(libcxx libstdcxx apple_libcxx)
           if [[ ${{ matrix.os }} == "macos-11" ]]; then
             llvm=/usr/local/opt/llvm
-            c_compilers=("$llvm/bin/clang" gcc-11 clang)
-            cxx_compilers=("$llvm/bin/clang++" g++-11 clang++)
+            c_compilers=("$llvm/bin/clang" gcc-12 clang)
+            cxx_compilers=("$llvm/bin/clang++" g++-12 clang++)
             link_options=(
               "-L$llvm/lib;-Wl,-rpath,$llvm/lib"
               "-stdlib=libstdc++"

@@ -10,64 +10,66 @@
 namespace yaclib::detail {
 
 template <typename V, typename E>
-class ResultCore : public BaseCore {
+class ResultCore : public CCore {
  public:
-  ResultCore() noexcept : BaseCore{State::Empty} {
+  ResultCore() noexcept : CCore{kEmpty} {
   }
 
   template <typename... Args>
-  explicit ResultCore(Args&&... args) : BaseCore{State::HasResult}, _result{std::forward<Args>(args)...} {
+  explicit ResultCore(Args&&... args) noexcept(std::is_nothrow_constructible_v<Result<V, E>, Args...>)
+      : CCore{kResult}, _result{std::forward<Args>(args)...} {
+  }
+
+  ~ResultCore() noexcept override {
+    _result.~Result<V, E>();
   }
 
   template <typename T>
-  void Set(T&& value) noexcept {
-    _result = std::forward<T>(value);
-    _caller = nullptr;  // Order is matter, because we want move value before destroy object that owned value
-    const auto state = _state.exchange(State::HasResult, std::memory_order_acq_rel);
-    switch (state) {  //  TODO(MBkkt) rel + fence(acquire) instead of acq_rel
-      case State::HasCallback:
-        return Submit();
-      case State::HasCallbackInline:
-        [[fallthrough]];
-      case State::HasAsyncCallback:
-        static_cast<InlineCore&>(*_callback).CallInline(*this, state);
-        [[fallthrough]];
-      case State::HasStop:
-        _executor = nullptr;
-        [[fallthrough]];
-      case State::HasWait:
-        _callback = nullptr;
-        [[fallthrough]];
-      default:
-        return;
-    }
+  void Store(T&& object) noexcept(std::is_nothrow_constructible_v<Result<V, E>, T>) {
+    new (&_result) Result<V, E>{std::forward<T>(object)};
   }
 
   [[nodiscard]] Result<V, E>& Get() noexcept {
     return _result;
   }
 
-  void Cancel() noexcept final {
-    Set(StopTag{});
-    DecRef();
+  template <typename T, typename Func>
+  void Done(T&& object, Func&& f) noexcept(std::is_nothrow_constructible_v<Result<V, E>, T>) {
+    Store(std::forward<T>(object));
+    std::forward<Func>(f)();
+    SetResult();
+  }
+
+  void Drop() noexcept final {
+    Done(StopTag{}, [] {
+    });
   }
 
  private:
-  Result<V, E> _result;
+  union {
+    Result<V, E> _result;
+  };
 };
 
 template <>
-class ResultCore<void, void> : public BaseCore {
+class ResultCore<void, void> : public CCore {
  public:
-  ResultCore() noexcept : BaseCore{State::Empty} {
+  ResultCore() noexcept : CCore{kEmpty} {
   }
 
-  template <typename T>
-  void Set(T&&) noexcept {
+  template <typename T, typename Func>
+  void Done(T&&, Func&& f) noexcept {
+    std::forward<Func>(f)();
+    Drop();
   }
 
-  void Cancel() noexcept final {
+  void Drop() noexcept final {
+#ifdef YACLIB_LOG_DEBUG
+    SetResult();
+#else
+    _caller->DecRef();
     DecRef();
+#endif
   }
 };
 

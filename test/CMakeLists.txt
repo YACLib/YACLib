@@ -39,6 +39,7 @@ set(YACLIB_EXAMPLE_SOURCES
   example/async/when_any
   )
 set(YACLIB_UNIT_SOURCES
+  unit/async/core_size
   unit/util/intrusive_ptr
   unit/util/result
   unit/exe/task

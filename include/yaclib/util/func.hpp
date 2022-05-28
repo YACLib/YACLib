@@ -10,7 +10,7 @@ namespace yaclib {
 /**
  * Callable interface
  */
-class IFunc : public IRef {  // TODO(MBkkt) Remove inheritance from IRef
+class IFunc : public IRef {  // TODO(MBkkt) Maybe remove inheritance from IRef
  public:
   virtual void Call() noexcept = 0;
 };

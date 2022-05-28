@@ -645,7 +645,7 @@ TEST(Future, StopInFlight) {
   tp->Wait();
 }
 
-TEST(Detach, Cancel) {
+TEST(Detach, Drop) {
   auto tp = yaclib::MakeThreadPool(1);
   auto f = yaclib::Run(*tp, [&] {
     tp->Stop();

@@ -6,6 +6,7 @@
 #include <yaclib/fwd.hpp>
 #include <yaclib/log.hpp>
 #include <yaclib/util/detail/atomic_counter.hpp>
+#include <yaclib/util/detail/unique_counter.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 #include <yaclib/util/result.hpp>
 
@@ -22,16 +23,18 @@ class AnyCombinatorBase {
   yaclib_std::atomic_bool _done;
   ResultCorePtr<V, E> _core;
 
-  explicit AnyCombinatorBase(std::size_t /*count*/, ResultCorePtr<V, E>&& core) : _done{false}, _core{std::move(core)} {
+  explicit AnyCombinatorBase(std::size_t /*count*/, ResultCorePtr<V, E>&& core) noexcept
+      : _done{false}, _core{std::move(core)} {
   }
 
-  bool Done() {
+  bool Done() noexcept {
     return _done.load(std::memory_order_acquire);
   }
 
-  void Combine(Result<V, E>&& result) {
+  void Combine(Result<V, E>&& result) noexcept {
     if (!_done.exchange(true, std::memory_order_acq_rel)) {
-      _core->Set(std::move(result));
+      _core.Release()->Done(std::move(result), [] {
+      });
     }
   }
 };
@@ -43,21 +46,23 @@ class AnyCombinatorBase<V, E, WhenPolicy::LastFail> {
  protected:
   ResultCorePtr<V, E> _core;
 
-  explicit AnyCombinatorBase(std::size_t count, ResultCorePtr<V, E>&& core)
+  explicit AnyCombinatorBase(std::size_t count, ResultCorePtr<V, E>&& core) noexcept
       : _state{2 * count}, _core{std::move(core)} {
   }
 
-  bool Done() {
+  bool Done() noexcept {
     return (_state.load(std::memory_order_acquire) & 1U) != 0;
   }
 
-  void Combine(Result<V, E>&& result) {
+  void Combine(Result<V, E>&& result) noexcept {
     if (result) {
       if ((_state.exchange(1, std::memory_order_acq_rel) & 1U) == 0) {
-        _core->Set(std::move(result));
+        _core.Release()->Done(std::move(result), [] {
+        });
       }
     } else if (_state.fetch_sub(2, std::memory_order_acq_rel) == 2) {
-      _core->Set(std::move(result));
+      _core.Release()->Done(std::move(result), [] {
+      });
     }
   }
 };
@@ -78,23 +83,25 @@ class AnyCombinatorBase<V, E, WhenPolicy::FirstFail> : public AnyCombinatorBase<
       : Base{count, std::move(core)}, _state{ResultState::Empty}, _unit{} {
   }
 
-  ~AnyCombinatorBase() {
+  ~AnyCombinatorBase() noexcept {
     auto done = this->_done.load(std::memory_order_acquire);
     auto state = _state.load(std::memory_order_acquire);
     if (state == ResultState::Error) {
       if (!done) {
-        this->_core->Set(std::move(_error));
+        this->_core.Release()->Done(std::move(_error), [] {
+        });
       }
       _error.~E();
     } else if (state == ResultState::Exception) {
       if (!done) {
-        this->_core->Set(std::move(_exception));
+        this->_core.Release()->Done(std::move(_exception), [] {
+        });
       }
       _exception.~exception_ptr();
     }
   }
 
-  void Combine(Result<V, E>&& result) {
+  void Combine(Result<V, E>&& result) noexcept {
     auto state = result.State();
     if (state == ResultState::Value) {
       return Base::Combine(std::move(result));
@@ -113,14 +120,14 @@ class AnyCombinatorBase<V, E, WhenPolicy::FirstFail> : public AnyCombinatorBase<
 };
 
 template <typename V, typename E, WhenPolicy P>
-class AnyCombinator : public AnyCombinatorBase<V, E, P>, public InlineCore {
+class AnyCombinator : public AnyCombinatorBase<V, E, P>, public PCore {
   using Base = AnyCombinatorBase<V, E, P>;
   using Base::Base;
 
  public:
   static auto Make(std::size_t count) {
     // TODO(MBkkt) Maybe single allocation instead of two?
-    auto raw_core = new AtomicCounter<ResultCore<V, E>>{2};
+    auto raw_core = new UniqueCounter<ResultCore<V, E>>{};
     ResultCorePtr<V, E> combine_core{NoRefTag{}, raw_core};
     ResultCorePtr<V, E> future_core{NoRefTag{}, raw_core};
     auto combinator = new AtomicCounter<AnyCombinator<V, E, P>>{count, count, std::move(combine_core)};
@@ -128,11 +135,12 @@ class AnyCombinator : public AnyCombinatorBase<V, E, P>, public InlineCore {
   }
 
  private:
-  void CallInline(InlineCore& caller, State) noexcept final {
-    if (this->_core->Alive() && !this->Done()) {
+  void Here(PCore& caller, State) noexcept final {
+    if (!this->Done()) {
       auto& core = static_cast<ResultCore<V, E>&>(caller);
       this->Combine(std::move(core.Get()));
     }
+    DecRef();
   }
 };
 

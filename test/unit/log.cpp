@@ -50,19 +50,19 @@ TEST_F(LoggingTest, NullCallbacks) {
 
 TEST_F(LoggingTest, SepareteCallbacks) {
   auto error_callback = [](std::string_view file, std::size_t line, std::string_view function,
-                           std::string_view condition, std::string_view message) {
+                           std::string_view condition, std::string_view message) noexcept {
     std::ofstream log_file{"log_file_error", std::ios_base::out | std::ios_base::app};
     log_file << "[ " << file << ":" << line << " in " << function << " ] Failed error condition: '" << condition
              << "' with message '" << message << "'\n";
   };
   auto info_callback = [](std::string_view file, std::size_t line, std::string_view function,
-                          std::string_view condition, std::string_view message) {
+                          std::string_view condition, std::string_view message) noexcept {
     std::ofstream log_file{"log_file_info", std::ios_base::out | std::ios_base::app};
     log_file << "[ " << file << ":" << line << " in " << function << " ] Failed info condition: '" << condition
              << "' with message '" << message << "'\n";
   };
   auto debug_callback = [](std::string_view file, std::size_t line, std::string_view function,
-                           std::string_view condition, std::string_view message) {
+                           std::string_view condition, std::string_view message) noexcept {
     std::ofstream log_file{"log_file_debug", std::ios_base::out | std::ios_base::app};
     log_file << "[ " << file << ":" << line << " in " << function << " ] Failed debug condition: '" << condition
              << "' with message '" << message << "'\n";
@@ -100,7 +100,7 @@ TEST_F(LoggingTest, SepareteCallbacks) {
 
 TEST_F(LoggingTest, SharedCallbacks) {
   yaclib::LogCallback callback = [](std::string_view file, std::size_t line, std::string_view function,
-                                    std::string_view condition, std::string_view message) {
+                                    std::string_view condition, std::string_view message) noexcept {
     std::ofstream log_file{"log_file_shared", std::ios_base::out | std::ios_base::app};
     log_file << "[ " << file << ":" << line << " in " << function << " ] Failed some condition: '" << condition
              << "' with message '" << message << "'\n";

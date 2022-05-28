@@ -26,7 +26,7 @@ class IExecutor : public IRef {
   [[nodiscard]] virtual Type Tag() const = 0;
 
   /**
-   * Submit given task. This method may either Call or Cancel the task
+   * Submit given task. This method may either Call or Drop the task
    *
    * This method increments reference counter if task is submitted.
    * \param task task to execute

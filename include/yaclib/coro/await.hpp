@@ -13,7 +13,7 @@ namespace yaclib {
  */
 template <typename... V, typename... E>
 detail::AwaitAwaiter Await(FutureBase<V, E>&... fs) {
-  return detail::AwaitAwaiter(static_cast<detail::BaseCore&>(*fs.GetCore())...);
+  return detail::AwaitAwaiter(static_cast<detail::CCore&>(*fs.GetCore())...);
 }
 
 /**

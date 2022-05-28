@@ -11,7 +11,7 @@ namespace test {
 
 void InitLog() noexcept {
   auto assert_callback = [](std::string_view file, std::size_t line, std::string_view /*function*/,
-                            std::string_view /*condition*/, std::string_view message) {
+                            std::string_view /*condition*/, std::string_view message) noexcept {
     GTEST_MESSAGE_AT_(file.data(), line, message.data(), ::testing::TestPartResult::kFatalFailure);
   };
   YACLIB_INIT_ERROR(assert_callback);

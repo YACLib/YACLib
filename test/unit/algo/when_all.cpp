@@ -112,9 +112,7 @@ void AllFails() {
   std::array<yaclib::Promise<T, E>, kSize> promises;
   std::array<yaclib::Future<T, E>, kSize> futures;
   for (int i = 0; i < kSize; ++i) {
-    auto [f, p] = yaclib::MakeContract<T, E>();
-    futures[i] = std::move(f);
-    promises[i] = std::move(p);
+    std::tie(futures[i], promises[i]) = yaclib::MakeContract<T, E>();
   }
 
   auto all = [&futures] {
@@ -270,7 +268,7 @@ void FirstFail() {
     for (std::size_t i = 0; i != count; ++i) {
       ints.push_back(yaclib::Run<Error>(*tp, [] {
         std::this_thread::sleep_for(2ms);
-        return yaclib::Result<void, Error>{Error{yaclib::StopTag{}}};
+        return yaclib::Result<void, Error>{yaclib::StopTag{}};
       }));
     }
     EXPECT_THROW(WhenAll(ints.begin(), ints.end()).Get().Ok(), yaclib::ResultError<Error>);

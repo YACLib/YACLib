@@ -24,7 +24,7 @@ class IThreadPool : public IExecutor {
   virtual void Stop() = 0;
 
   /**
-   * Call Stop() and cancel waiting tasks
+   * Call Stop() and Drop() waiting tasks
    */
   virtual void HardStop() = 0;
 

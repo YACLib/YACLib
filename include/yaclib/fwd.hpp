@@ -6,6 +6,9 @@ template <typename V, typename E>
 class Result;
 
 template <typename V, typename E>
+class Task;
+
+template <typename V, typename E>
 class FutureBase;
 
 template <typename V, typename E>

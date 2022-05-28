@@ -15,10 +15,10 @@ namespace {
 void CallInlineState() {
   auto [f, p] = yaclib::MakeContract();
   auto& core = *p.GetCore();
-  core.InlineCore::CallInline(core, yaclib::detail::InlineCore::State::Empty);
+  core.PCore::Here(core, yaclib::detail::PCore::State::kEmpty);
 }
 
-TEST(InlineCore, CallInline) {
+TEST(PCore, CallInline) {
 #ifndef YACLIB_LOG_ERROR
   GTEST_SKIP();
 #endif
@@ -28,34 +28,35 @@ TEST(InlineCore, CallInline) {
 void CallState() {
   auto [f, p] = yaclib::MakeContract();
   auto& core = *p.GetCore();
-  core.InlineCore::Call();
+  core.PCore::Call();
 }
 
-TEST(InlineCore, Call) {
+TEST(PCore, Call) {
 #ifndef YACLIB_LOG_ERROR
   GTEST_SKIP();
 #endif
   EXPECT_FATAL_FAILURE(CallState(), "");
 }
 
-void CancelState() {
+void DropState() {
   auto [f, p] = yaclib::MakeContract();
   auto& core = *p.GetCore();
-  core.InlineCore::Cancel();
+  core.PCore::Drop();
 }
 
-TEST(InlineCore, Cancel) {
+TEST(PCore, Drop) {
 #ifndef YACLIB_LOG_ERROR
   GTEST_SKIP();
 #endif
-  EXPECT_FATAL_FAILURE(CancelState(), "");
+  EXPECT_FATAL_FAILURE(DropState(), "");
 }
 
-TEST(UniqueJob, IncRef) {
+TEST(UniqueJob, Ref) {
   auto task = yaclib::detail::MakeUniqueJob([] {
   });
   task->IncRef();
   task->DecRef();
+  task->Drop();
 }
 
 TEST(CoroDummy, DestroyResume) {
