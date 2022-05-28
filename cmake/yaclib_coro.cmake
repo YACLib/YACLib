@@ -4,7 +4,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL GNU)
 elseif (CMAKE_CXX_COMPILER_ID MATCHES MSVC)
   # TODO(MBkkt) /await:heapelide experimental but maybe useful for performance
   #  But I hear it works only for generators
-  if ((MSVC_VERSION GREATER 1929) OR (MSVC_VERSION EQUAL 1929))
+  if (MSVC_VERSION GREATER 1928)
     set(YACLIB_CORO_FLAGS "/await:strict")
   else ()
     set(YACLIB_CORO_FLAGS "/await")
