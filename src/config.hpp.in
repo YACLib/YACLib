@@ -93,7 +93,7 @@
 #  if defined(__clang__)
 #    define YACLIB_SYMMETRIC_TRANSFER 1
 #    if defined __has_include
-#    if __has_include(<coroutine>)
+#      if __has_include(<coroutine>)
 #      define YACLIB_CORO 2
 #       else
 #         define YACLIB_CORO 1
@@ -103,7 +103,7 @@
 #    define YACLIB_SYMMETRIC_TRANSFER 1
 #    define YACLIB_CORO 2
 #  elif defined(_MSC_VER)
-#    if _MSC_VER >= 1929
+#    if _MSC_VER >= 1700 // 1929
 #      define YACLIB_CORO 2
 #      define YACLIB_TRANSFER 1
 #    else
@@ -113,11 +113,11 @@
 #  else
 #    define YACLIB_SYMMETRIC_TRANSFER 1
 #    if defined __has_include
-#				if __has_include(<coroutine>)
-#         define YACLIB_CORO 2
-#       else
-#         define YACLIB_CORO 1
-#       endif
+#		   if __has_include(<coroutine>)
+#        define YACLIB_CORO 2
+#      else
+#        define YACLIB_CORO 1
+#      endif
 # 	 endif 		
 #  endif
 #endif
