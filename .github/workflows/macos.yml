@@ -84,9 +84,9 @@ jobs:
               fi
 
               coroutine_option="CORO"
-              # if [[ "${compilers_name[$i]}" != "gcc*" ]]; then
-              #  coroutine_option=""
-              # fi
+              if [[ "${compilers_name[$i]}" == "gnu-9" ]]; then
+                coroutine_option=""
+              fi
 
               dir="build_${compilers_name[$i]}_${stdlibs_name[$j]}"
               echo $dir
