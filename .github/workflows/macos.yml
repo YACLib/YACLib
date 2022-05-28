@@ -84,9 +84,9 @@ jobs:
               fi
 
               coroutine_option="CORO"
-              if [[ "${compilers_name[$i]}" != "gcc*" ]]; then
-                coroutine_option=""
-              fi
+              # if [[ "${compilers_name[$i]}" != "gcc*" ]]; then
+              #  coroutine_option=""
+              # fi
 
               dir="build_${compilers_name[$i]}_${stdlibs_name[$j]}"
               echo $dir
@@ -95,7 +95,7 @@ jobs:
           
               cmake -S . -B $dir                                                                                       \
                 -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}                                                            \
-                -DYACLIB_CXX_STANDARD=17                                                                               \
+                -DYACLIB_CXX_STANDARD=20                                                                               \
                 -DYACLIB_TEST=SINGLE                                                                                   \
                 -DYACLIB_FLAGS="$coroutine_option"                                                                     \
                 -DCMAKE_CXX_COMPILER=${cxx_compilers[$i]}                                                              \
