@@ -83,8 +83,9 @@ jobs:
                 link_option=${link_options[$j]}; compile_option=${compile_options[$j]}
               fi
 
-              coroutine_option="CORO"
-              if [[ "${compilers_name[$i]}" == "gnu-9" ]]; then
+              if [[ "${compilers_name[$i]}" == "gnu-1*" ]]; then #TODO(mkornaukhov03) Idk why coros does not compile with (apple|)clang
+                coroutine_option="CORO"
+              else 
                 coroutine_option=""
               fi
 
