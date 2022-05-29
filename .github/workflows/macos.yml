@@ -83,7 +83,8 @@ jobs:
                 link_option=${link_options[$j]}; compile_option=${compile_options[$j]}
               fi
 
-              if [[ "${compilers_name[$i]}" == "gnu-1*" ]]; then #TODO(mkornaukhov03) Idk why coros does not compile with (apple|)clang
+              if [[ "${compilers_name[$i]}" == "gnu-1*" ]]; then 
+                #TODO(mkornaukhov03) (apple|)clang + c++17 - CE, + c++20 - RelWithDebInfo - illegal IR instruction
                 coroutine_option="CORO"
               else 
                 coroutine_option=""
@@ -96,7 +97,7 @@ jobs:
           
               cmake -S . -B $dir                                                                                       \
                 -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}                                                            \
-                -DYACLIB_CXX_STANDARD=20                                                                               \
+                -DYACLIB_CXX_STANDARD=17                                                                               \
                 -DYACLIB_TEST=SINGLE                                                                                   \
                 -DYACLIB_FLAGS="$coroutine_option"                                                                     \
                 -DCMAKE_CXX_COMPILER=${cxx_compilers[$i]}                                                              \
