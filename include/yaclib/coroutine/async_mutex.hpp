@@ -198,7 +198,7 @@ class AsyncMutex {
     }
 
     template <typename V, typename E>
-    auto await_suspend(yaclib_std::coroutine_handle<detail::PromiseType<V, E>> handle) YACLIB_SUSPEND_NOEXCEPT {
+    auto await_suspend(yaclib_std::coroutine_handle<detail::PromiseType<V, E>> handle) noexcept {
       detail::BaseCore* next;
       if constexpr (Type == UnlockType::Auto) {
         next = _mutex._waiters;

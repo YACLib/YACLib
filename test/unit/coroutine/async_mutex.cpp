@@ -10,7 +10,7 @@
 #include <yaclib/coroutine/on.hpp>
 #include <yaclib/executor/submit.hpp>
 #include <yaclib/executor/thread_pool.hpp>
-#include <yaclib/util/detail/nope_counter.hpp>
+#include <yaclib/executor/manual.hpp>
 
 #include <array>
 #include <exception>
@@ -22,31 +22,6 @@
 
 namespace test {
 namespace {
-
-class ManualExecutor : public yaclib::IExecutor {
- private:
-  yaclib::detail::List _tasks;
-
- public:
-  [[nodiscard]] Type Tag() const final {
-    return yaclib::IExecutor::Type::Custom;
-  }
-
-  void Submit(yaclib::Job& f) noexcept final {
-    _tasks.PushFront(f);
-  }
-
-  void Drain() {
-    while (!_tasks.Empty()) {
-      auto& task = _tasks.PopFront();
-      static_cast<yaclib::Job&>(task).Call();
-    }
-  }
-
-  ~ManualExecutor() override {
-    EXPECT_TRUE(_tasks.Empty());
-  }
-};
 
 TEST(AsyncMutex, JustWorks) {
   yaclib::AsyncMutex m;
@@ -132,7 +107,7 @@ TEST(AsyncMutex, ScopedLock) {
 
 TEST(AsyncMutex, LockAsync) {
   yaclib::AsyncMutex m;
-  yaclib::detail::NopeCounter<ManualExecutor> executor;
+  auto executor = yaclib::MakeManual();
   auto tp = yaclib::MakeThreadPool();
   auto [f1, p1] = yaclib::MakeContract<bool>();
   auto [f2, p2] = yaclib::MakeContract<bool>();
@@ -140,7 +115,7 @@ TEST(AsyncMutex, LockAsync) {
   std::size_t value = 0;
 
   auto coro = [&](yaclib::Future<bool>& future) -> yaclib::Future<void> {
-    co_await On(executor);
+    co_await On(*executor);
     co_await m.Lock();
     value++;
     co_await Await(future);
@@ -149,22 +124,22 @@ TEST(AsyncMutex, LockAsync) {
   };
 
   auto c1 = coro(f1);
-  executor.Drain();
+  executor->Drain();
   EXPECT_EQ(1, value);
   EXPECT_FALSE(m.TryLock());
 
   auto c2 = coro(f2);
-  executor.Drain();
+  executor->Drain();
   EXPECT_EQ(1, value);
   EXPECT_FALSE(m.TryLock());
 
   std::move(p1).Set(true);
-  executor.Drain();
+  executor->Drain();
   EXPECT_EQ(3, value);
   EXPECT_FALSE(m.TryLock());
 
   std::move(p2).Set(true);
-  executor.Drain();
+  executor->Drain();
 
   EXPECT_EQ(4, value);
   EXPECT_TRUE(m.TryLock());
@@ -173,7 +148,7 @@ TEST(AsyncMutex, LockAsync) {
 
 TEST(AsyncMutex, ScopedLockAsync) {
   yaclib::AsyncMutex m;
-  yaclib::detail::NopeCounter<ManualExecutor> executor;
+  auto executor = yaclib::MakeManual();
   auto tp = yaclib::MakeThreadPool();
   auto [f1, p1] = yaclib::MakeContract<bool>();
   auto [f2, p2] = yaclib::MakeContract<bool>();
@@ -181,7 +156,7 @@ TEST(AsyncMutex, ScopedLockAsync) {
   std::size_t value = 0;
 
   auto coro = [&](yaclib::Future<bool>& future) -> yaclib::Future<void> {
-    co_await On(executor);
+    co_await On(*executor);
     auto g = co_await m.Guard();
     value++;
     co_await Await(future);
@@ -189,22 +164,22 @@ TEST(AsyncMutex, ScopedLockAsync) {
   };
 
   auto c1 = coro(f1);
-  executor.Drain();
+  executor->Drain();
   EXPECT_EQ(1, value);
   EXPECT_FALSE(m.TryLock());
 
   auto c2 = coro(f2);
-  executor.Drain();
+  executor->Drain();
   EXPECT_EQ(1, value);
   EXPECT_FALSE(m.TryLock());
 
   std::move(p1).Set(true);
-  executor.Drain();
+  executor->Drain();
   EXPECT_EQ(3, value);
   EXPECT_FALSE(m.TryLock());
 
   std::move(p2).Set(true);
-  executor.Drain();
+  executor->Drain();
 
   EXPECT_EQ(4, value);
   EXPECT_TRUE(m.TryLock());

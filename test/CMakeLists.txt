@@ -62,7 +62,6 @@ if (YACLIB_CORO_NEED)
   list(APPEND YACLIB_UNIT_SOURCES
     unit/coroutine/await
     unit/coroutine/async_mutex
-    unit/coroutine/dummy
     unit/coroutine/future_coro_traits
     unit/coroutine/stress
     unit/coroutine/on

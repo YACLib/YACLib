@@ -36,7 +36,6 @@ using std::experimental::noop_coroutine;
 #endif
 
 #if YACLIB_SYMMETRIC_TRANSFER == 1
-#  define YACLIB_SUSPEND_NOEXCEPT noexcept
 namespace yaclib_std {
 
 using suspend_type = yaclib_std::coroutine_handle<>;
@@ -48,7 +47,6 @@ using suspend_type = yaclib_std::coroutine_handle<>;
 #  define YACLIB_SUSPEND() YACLIB_TRANSFER(yaclib_std::noop_coroutine())
 
 #else
-#  define YACLIB_SUSPEND_NOEXCEPT
 namespace yaclib_std {
 
 using suspend_type = bool;

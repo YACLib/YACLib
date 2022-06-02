@@ -4,6 +4,7 @@
 
 #if YACLIB_CORO
 #  include <yaclib/coroutine/detail/promise_type.hpp>
+#  include <yaclib/util/detail/nope_counter.hpp>
 #endif
 
 #include <gtest/gtest-spi.h>
@@ -66,6 +67,16 @@ TEST(CoroDummy, DestroyResume) {
   GTEST_SKIP();
 #endif
 }
+
+TEST(CoroDummy, BaseCoroGetHandle) {
+#if YACLIB_CORO
+  yaclib::detail::NopeCounter<yaclib::detail::BaseCore> core{yaclib::detail::InlineCore::State::Empty};
+  std::ignore = core.GetHandle();
+#else 
+  GTEST_SKIP();
+#endif
+}
+
 
 }  // namespace
 }  // namespace test
