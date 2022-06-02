@@ -35,10 +35,10 @@ class AsyncMutex {
 
   [[nodiscard]] bool TryLock() noexcept {
     auto old_state = _state.load(std::memory_order_acquire);
-    if (old_state != NotLocked()) {
+    if (old_state != kNotLocked) {
       return false;
     }
-    return _state.compare_exchange_strong(old_state, LockedNoWaiters(), std::memory_order_acquire,
+    return _state.compare_exchange_strong(old_state, kLockedNoWaiters, std::memory_order_acquire,
                                           std::memory_order_relaxed);
   }
 
@@ -51,7 +51,7 @@ class AsyncMutex {
   }
 
   void UnlockHere(IExecutor& executor = CurrentThreadPool()) noexcept {
-    YACLIB_DEBUG(_state.load(std::memory_order_relaxed) == NotLocked(), "UnlockHere must be called after Lock!");
+    YACLIB_DEBUG(_state.load(std::memory_order_relaxed) == kNotLocked, "UnlockHere must be called after Lock!");
     auto* next = TryUnlock<FIFO>();
     if (next == nullptr) {
       return;
@@ -148,8 +148,8 @@ class AsyncMutex {
       detail::BaseCore& base_core = handle.promise();
       auto old_state = _mutex._state.load(std::memory_order_relaxed);
       while (true) {
-        if (old_state == _mutex.NotLocked()) {
-          if (_mutex._state.compare_exchange_weak(old_state, _mutex.LockedNoWaiters(), std::memory_order_acquire,
+        if (old_state == _mutex.kNotLocked) {
+          if (_mutex._state.compare_exchange_weak(old_state, _mutex.kLockedNoWaiters, std::memory_order_acquire,
                                                   std::memory_order_relaxed)) {
             return false;
           }
@@ -238,12 +238,12 @@ class AsyncMutex {
       return _waiters;
     }
     const auto old_count_batch_here = std::exchange(_count_batch_here, 0);
-    auto old_state = LockedNoWaiters();
-    if (_state.compare_exchange_strong(old_state, NotLocked(), std::memory_order_release, std::memory_order_relaxed)) {
+    auto old_state = kLockedNoWaiters;
+    if (_state.compare_exchange_strong(old_state, kNotLocked, std::memory_order_release, std::memory_order_relaxed)) {
       return nullptr;
     }
 
-    old_state = _state.exchange(LockedNoWaiters(), std::memory_order_acquire);
+    old_state = _state.exchange(kLockedNoWaiters, std::memory_order_acquire);
     _count_batch_here = old_count_batch_here + 1;
     if constexpr (UnlockFIFO) {
       detail::Node* node = reinterpret_cast<detail::BaseCore*>(old_state);
@@ -260,16 +260,11 @@ class AsyncMutex {
     }
   }
 
-  YACLIB_INLINE std::uintptr_t NotLocked() noexcept {
-    return reinterpret_cast<std::uintptr_t>(this);
-  }
 
-  constexpr std::uintptr_t LockedNoWaiters() noexcept {
-    return {};
-  }
-
+	static constexpr std::uintptr_t kNotLocked = 1;
+	static constexpr std::uintptr_t kLockedNoWaiters = 0;
   // locked without waiters, not locked, otherwise - head of the awaiters list
-  yaclib_std::atomic<std::uintptr_t> _state = NotLocked();  // TODO(mkornaukhov03) -- uintptr_t
+  yaclib_std::atomic<std::uintptr_t> _state = kNotLocked;  // TODO(mkornaukhov03)
   detail::BaseCore* _waiters = nullptr;
   std::size_t _count_batch_here = 0;
 };

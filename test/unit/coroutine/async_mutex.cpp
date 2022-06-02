@@ -81,32 +81,26 @@ TEST(AsyncMutex, Counter) {
 
   const std::size_t kCoros = 20;
   const std::size_t kCSperCoro = 2000;
-
+	yaclib::WaitGroup wg;
   std::array<yaclib::Future<void>, kCoros> futures;
-  yaclib::WaitGroup wg;
   std::size_t cs = 0;
 
   yaclib_std::atomic<int> done = 0;
-
   auto coro1 = [&]() -> yaclib::Future<void> {
     for (std::size_t j = 0; j < kCSperCoro; ++j) {
+			co_await On(*tp);
       co_await m.Lock();
       ++cs;
       co_await m.Unlock();
     }
   };
 
+	wg.Add(kCoros);
   for (std::size_t i = 0; i < kCoros; ++i) {
-    yaclib::Submit(*tp, [&, i]() {
       futures[i] = coro1();
-      done.fetch_add(1, std::memory_order_seq_cst);
-    });
+			wg.Add<false>(futures[i]);
   }
-
-  while (!(done.load(std::memory_order_seq_cst) == kCoros)) {
-  }
-
-  yaclib::Wait(futures.begin(), futures.end());
+	wg.Wait();
 
   EXPECT_EQ(kCoros * kCSperCoro, cs);
   tp->HardStop();
@@ -228,35 +222,29 @@ TEST(AsyncMutex, GuardRelease) {
   yaclib::WaitGroup wg;
   std::size_t cs = 0;
 
-  yaclib_std::atomic<int> done = 0;
-
   auto coro1 = [&]() -> yaclib::Future<int> {
     for (std::size_t j = 0; j < kCSperCoro; ++j) {
+			co_await On(*tp);
       auto g = co_await m.Guard();
-      auto abobus = yaclib::AsyncMutex<>::LockGuard(*g.Release(), std::adopt_lock_t{});
+      auto another = yaclib::AsyncMutex<>::LockGuard(*g.Release(), std::adopt_lock_t{});
       ++cs;
-      co_await abobus.UnlockOn(*tp);
+      co_await another.UnlockOn(*tp);
     }
     co_return 42;
   };
 
+	wg.Add(kCoros);
   for (std::size_t i = 0; i < kCoros; ++i) {
-    yaclib::Submit(*tp, [&, i]() {
-      wg.Add(futures[i] = coro1());
-      done.fetch_add(1, std::memory_order_seq_cst);
-    });
+			futures[i] = coro1();
+      wg.Add<false>(futures[i]);
   }
 
-  while (!(done.load(std::memory_order_seq_cst) == kCoros)) {
-  }
   wg.Wait();
 
   EXPECT_EQ(kCoros * kCSperCoro, cs);
   tp->HardStop();
   tp->Wait();
 }
-
-// TODO deadlock test
 
 }  // namespace
 }  // namespace test
