@@ -60,7 +60,6 @@ TEST(AsyncMutex, Counter) {
   std::array<yaclib::Future<void>, kCoros> futures;
   std::size_t cs = 0;
 
-  yaclib_std::atomic<int> done = 0;
   auto coro1 = [&]() -> yaclib::Future<void> {
     for (std::size_t j = 0; j < kCSperCoro; ++j) {
       co_await On(*tp);
@@ -207,7 +206,6 @@ TEST(AsyncMutex, GuardRelease) {
     }
     co_return 42;
   };
-
   wg.Add(kCoros);
   for (std::size_t i = 0; i < kCoros; ++i) {
     futures[i] = coro1();
@@ -217,6 +215,86 @@ TEST(AsyncMutex, GuardRelease) {
   wg.Wait();
 
   EXPECT_EQ(kCoros * kCSperCoro, cs);
+  tp->HardStop();
+  tp->Wait();
+}
+
+TEST(AsyncMutex, UnlockHereBehaviour) {
+  using namespace std::chrono_literals;
+  yaclib::AsyncMutex mutex;
+  constexpr std::size_t kThreads = 4;
+  auto tp = yaclib::MakeThreadPool(kThreads);
+  auto& inln = yaclib::MakeInline();
+  constexpr std::size_t kCoros = 4;
+
+  std::array<yaclib::Future<void>, kCoros> futures;
+
+  util::StopWatch sw;
+  futures[0] = [&]() -> yaclib::Future<void> {
+    co_await On(*tp);
+    co_await mutex.Lock();
+    yaclib_std::this_thread::sleep_for(1s);
+    mutex.UnlockHere();
+  }();
+
+  yaclib_std::this_thread::sleep_for(128ms);
+
+  auto coro2 = [&]() -> yaclib::Future<void> {
+    co_await On(*tp);
+    co_await mutex.Lock();
+    mutex.UnlockHere();
+    yaclib_std::this_thread::sleep_for(5s);
+  };
+
+  for (std::size_t i = 1; i < kCoros; ++i) {
+    futures[i] = coro2();
+  }
+
+  Wait(futures.begin(), futures.end());
+
+  EXPECT_LE(sw.Elapsed(), 6.5s);
+
+  tp->HardStop();
+  tp->Wait();
+}
+
+TEST(AsyncMutex, UnlockOnBehaviour) {
+  using namespace std::chrono_literals;
+  yaclib::AsyncMutex mutex;
+  constexpr std::size_t kThreads = 4;
+  auto tp = yaclib::MakeThreadPool(kThreads);
+  auto& inln = yaclib::MakeInline();
+  constexpr std::size_t kCoros = 4;
+
+  auto tp2 = yaclib::MakeThreadPool(1);
+
+  std::array<yaclib::Future<void>, kCoros> futures;
+
+  util::StopWatch sw;
+  futures[0] = [&]() -> yaclib::Future<void> {
+    co_await On(*tp);
+    co_await mutex.Lock();
+    yaclib_std::this_thread::sleep_for(1s);
+    co_await mutex.UnlockOn(*tp2);
+  }();
+
+  yaclib_std::this_thread::sleep_for(128ms);
+
+  auto coro2 = [&]() -> yaclib::Future<void> {
+    co_await On(*tp);
+    co_await mutex.Lock();
+    co_await mutex.UnlockOn(*tp2);
+    yaclib_std::this_thread::sleep_for(2s);
+  };
+
+  for (std::size_t i = 1; i < kCoros; ++i) {
+    futures[i] = coro2();
+  }
+
+  Wait(futures.begin(), futures.end());
+
+  EXPECT_GE(sw.Elapsed(), 7s);
+
   tp->HardStop();
   tp->Wait();
 }

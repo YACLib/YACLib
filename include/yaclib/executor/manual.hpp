@@ -6,7 +6,6 @@
 #include <yaclib/util/helper.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 
-
 namespace yaclib {
 /**
  * TODO(mkornaukhov03) Doxygen
@@ -24,7 +23,6 @@ class ManualExecutor : public yaclib::IExecutor {
 
   ~ManualExecutor() override;
 };
-
 
 IntrusivePtr<ManualExecutor> MakeManual();
 

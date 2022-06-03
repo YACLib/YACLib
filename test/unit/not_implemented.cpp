@@ -72,11 +72,10 @@ TEST(CoroDummy, BaseCoroGetHandle) {
 #if YACLIB_CORO
   yaclib::detail::NopeCounter<yaclib::detail::BaseCore> core{yaclib::detail::InlineCore::State::Empty};
   std::ignore = core.GetHandle();
-#else 
+#else
   GTEST_SKIP();
 #endif
 }
-
 
 }  // namespace
 }  // namespace test

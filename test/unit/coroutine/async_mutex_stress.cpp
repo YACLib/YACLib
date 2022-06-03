@@ -25,11 +25,13 @@ void Stress1(const std::size_t kCoros, test::util::Duration dur) {
   auto coro = [&]() -> yaclib::Future<void> {
     co_await On(*tp);
     while (sw.Elapsed() < dur) {
-      co_await mutex.Lock();
+      auto guard = co_await mutex.Guard();
       if (std::numeric_limits<std::size_t>::max() != cs) {
         cs++;
       }
-      co_await mutex.Unlock(*tp);
+      if (cs == 7) {
+        co_await On(*tp);
+      }
     }
   };
 
