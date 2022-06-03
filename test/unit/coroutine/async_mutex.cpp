@@ -233,17 +233,17 @@ TEST(AsyncMutex, UnlockHereBehaviour) {
   futures[0] = [&]() -> yaclib::Future<void> {
     co_await On(*tp);
     co_await mutex.Lock();
-    yaclib_std::this_thread::sleep_for(1s);
+    yaclib_std::this_thread::sleep_for(1s * YACLIB_CI_SLOWDOWN);
     mutex.UnlockHere();
   }();
 
-  yaclib_std::this_thread::sleep_for(128ms);
+  yaclib_std::this_thread::sleep_for(128ms * YACLIB_CI_SLOWDOWN);
 
   auto coro2 = [&]() -> yaclib::Future<void> {
     co_await On(*tp);
     co_await mutex.Lock();
     mutex.UnlockHere();
-    yaclib_std::this_thread::sleep_for(5s);
+    yaclib_std::this_thread::sleep_for(1s * YACLIB_CI_SLOWDOWN);
   };
 
   for (std::size_t i = 1; i < kCoros; ++i) {
@@ -252,7 +252,7 @@ TEST(AsyncMutex, UnlockHereBehaviour) {
 
   Wait(futures.begin(), futures.end());
 
-  EXPECT_LE(sw.Elapsed(), 6.5s);
+  EXPECT_LE(sw.Elapsed(), 2.5s * YACLIB_CI_SLOWDOWN);
 
   tp->HardStop();
   tp->Wait();
@@ -274,17 +274,17 @@ TEST(AsyncMutex, UnlockOnBehaviour) {
   futures[0] = [&]() -> yaclib::Future<void> {
     co_await On(*tp);
     co_await mutex.Lock();
-    yaclib_std::this_thread::sleep_for(1s);
+    yaclib_std::this_thread::sleep_for(1s * YACLIB_CI_SLOWDOWN);
     co_await mutex.UnlockOn(*tp2);
   }();
 
-  yaclib_std::this_thread::sleep_for(128ms);
+  yaclib_std::this_thread::sleep_for(128ms * YACLIB_CI_SLOWDOWN);
 
   auto coro2 = [&]() -> yaclib::Future<void> {
     co_await On(*tp);
     co_await mutex.Lock();
     co_await mutex.UnlockOn(*tp2);
-    yaclib_std::this_thread::sleep_for(2s);
+    yaclib_std::this_thread::sleep_for(0.5s * YACLIB_CI_SLOWDOWN);
   };
 
   for (std::size_t i = 1; i < kCoros; ++i) {
@@ -293,8 +293,9 @@ TEST(AsyncMutex, UnlockOnBehaviour) {
 
   Wait(futures.begin(), futures.end());
 
-  EXPECT_GE(sw.Elapsed(), 7s);
-
+  EXPECT_GE(sw.Elapsed(), 2.5s * YACLIB_CI_SLOWDOWN);
+  tp2->HardStop();
+  tp2->Wait();
   tp->HardStop();
   tp->Wait();
 }
