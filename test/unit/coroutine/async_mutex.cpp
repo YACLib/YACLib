@@ -230,12 +230,15 @@ TEST(AsyncMutex, UnlockHereBehaviour) {
   std::array<yaclib::Future<void>, kCoros> futures;
 
   util::StopWatch sw;
-  futures[0] = [&]() -> yaclib::Future<void> {
+
+  auto coro1 = [&]() -> yaclib::Future<void> {
     co_await On(*tp);
     co_await mutex.Lock();
     yaclib_std::this_thread::sleep_for(1s * YACLIB_CI_SLOWDOWN);
     mutex.UnlockHere();
-  }();
+  };
+
+  futures[0] = coro1();
 
   yaclib_std::this_thread::sleep_for(128ms * YACLIB_CI_SLOWDOWN);
 
@@ -271,12 +274,14 @@ TEST(AsyncMutex, UnlockOnBehaviour) {
   std::array<yaclib::Future<void>, kCoros> futures;
 
   util::StopWatch sw;
-  futures[0] = [&]() -> yaclib::Future<void> {
+  auto coro1 = [&]() -> yaclib::Future<void> {
     co_await On(*tp);
     co_await mutex.Lock();
     yaclib_std::this_thread::sleep_for(1s * YACLIB_CI_SLOWDOWN);
     co_await mutex.UnlockOn(*tp2);
-  }();
+  };
+
+  futures[0] = coro1();
 
   yaclib_std::this_thread::sleep_for(128ms * YACLIB_CI_SLOWDOWN);
 
