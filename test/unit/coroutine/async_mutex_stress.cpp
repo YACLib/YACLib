@@ -40,7 +40,7 @@ void Stress1(const std::size_t kCoros, test::util::Duration dur) {
   }
 
   Wait(futures.begin(), futures.end());
-  ASSERT_GE(cs, 12345);
+  ASSERT_GE(cs, 1234);
   tp->HardStop();
   tp->Wait();
 }

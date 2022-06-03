@@ -42,7 +42,10 @@ using suspend_type = yaclib_std::coroutine_handle<>;
 
 }  // namespace yaclib_std
 
-#  define YACLIB_TRANSFER(handle) return yaclib_std::suspend_type(handle)
+#  define YACLIB_TRANSFER(handle)                                                                                      \
+    return yaclib_std::suspend_type {                                                                                  \
+      handle                                                                                                           \
+    }
 #  define YACLIB_RESUME(handle) YACLIB_TRANSFER(handle)
 #  define YACLIB_SUSPEND() YACLIB_TRANSFER(yaclib_std::noop_coroutine())
 

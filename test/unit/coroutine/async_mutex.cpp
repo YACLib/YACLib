@@ -56,7 +56,6 @@ TEST(AsyncMutex, Counter) {
 
   const std::size_t kCoros = 20;
   const std::size_t kCSperCoro = 2000;
-  yaclib::WaitGroup wg;
   std::array<yaclib::Future<void>, kCoros> futures;
   std::size_t cs = 0;
 
@@ -69,12 +68,10 @@ TEST(AsyncMutex, Counter) {
     }
   };
 
-  wg.Add(kCoros);
   for (std::size_t i = 0; i < kCoros; ++i) {
     futures[i] = coro1();
-    wg.Add<false>(futures[i]);
   }
-  wg.Wait();
+  Wait(futures.begin(), futures.end());
 
   EXPECT_EQ(kCoros * kCSperCoro, cs);
   tp->HardStop();
@@ -193,7 +190,6 @@ TEST(AsyncMutex, GuardRelease) {
   const std::size_t kCSperCoro = 200;
 
   std::array<yaclib::Future<int>, kCoros> futures;
-  yaclib::WaitGroup wg;
   std::size_t cs = 0;
 
   auto coro1 = [&]() -> yaclib::Future<int> {
@@ -206,13 +202,11 @@ TEST(AsyncMutex, GuardRelease) {
     }
     co_return 42;
   };
-  wg.Add(kCoros);
   for (std::size_t i = 0; i < kCoros; ++i) {
     futures[i] = coro1();
-    wg.Add<false>(futures[i]);
   }
 
-  wg.Wait();
+  Wait(futures.begin(), futures.end());
 
   EXPECT_EQ(kCoros * kCSperCoro, cs);
   tp->HardStop();

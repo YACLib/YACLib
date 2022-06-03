@@ -103,7 +103,7 @@
 #    define YACLIB_SYMMETRIC_TRANSFER 1
 #    define YACLIB_CORO 2
 #  elif defined(_MSC_VER)
-#    if _MSC_VER >= 1929 // 1929
+#    if _MSC_VER > 1928
 #      define YACLIB_CORO 2
 #      define YACLIB_TRANSFER 1
 #    else

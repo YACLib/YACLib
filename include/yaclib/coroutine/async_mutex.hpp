@@ -239,7 +239,8 @@ class AsyncMutex {
     }
     const auto old_count_batch_here = std::exchange(_count_batch_here, 0);
     auto old_state = kLockedNoWaiters;
-    if (_state.compare_exchange_strong(old_state, kNotLocked, std::memory_order_release, std::memory_order_relaxed)) {
+    if (_state.load(std::memory_order_relaxed) == old_state &&
+        _state.compare_exchange_strong(old_state, kNotLocked, std::memory_order_release, std::memory_order_relaxed)) {
       return nullptr;
     }
 
