@@ -260,9 +260,8 @@ class AsyncMutex {
     }
   }
 
-
-	static constexpr std::uintptr_t kNotLocked = 1;
-	static constexpr std::uintptr_t kLockedNoWaiters = 0;
+  static constexpr std::uintptr_t kNotLocked = 1;
+  static constexpr std::uintptr_t kLockedNoWaiters = 0;
   // locked without waiters, not locked, otherwise - head of the awaiters list
   yaclib_std::atomic<std::uintptr_t> _state = kNotLocked;  // TODO(mkornaukhov03)
   detail::BaseCore* _waiters = nullptr;
