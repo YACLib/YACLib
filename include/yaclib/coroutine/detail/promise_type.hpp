@@ -60,6 +60,10 @@ class BasePromiseType : public AtomicCounter<ResultCore<V, E>, PromiseTypeDelete
     this->Set(std::current_exception());
   }
 
+  yaclib_std::coroutine_handle<> GetHandle() noexcept final {
+    return yaclib_std::coroutine_handle<PromiseType<V, E>>::from_promise(static_cast<PromiseType<V, E>&>(*this));
+  }
+
   /*
     TODO(MBkkt) Think about add zero-cost ability to return error
      now works only co_return MakeFuture(std::make_exception_ptr(...))
@@ -89,10 +93,6 @@ class PromiseType : public BasePromiseType<V, E> {
   void return_value(V&& value) noexcept(std::is_nothrow_move_constructible_v<V>) {
     this->Set(std::move(value));
   }
-
-  yaclib_std::coroutine_handle<> GetHandle() noexcept final {
-    return yaclib_std::coroutine_handle<PromiseType<V, E>>::from_promise(*this);
-  }
 };
 
 template <typename E>
@@ -100,10 +100,6 @@ class PromiseType<void, E> : public BasePromiseType<void, E> {
  public:
   void return_void() noexcept {
     this->Set(Unit{});
-  }
-
-  yaclib_std::coroutine_handle<> GetHandle() noexcept final {
-    return yaclib_std::coroutine_handle<PromiseType<void, E>>::from_promise(*this);
   }
 };
 
