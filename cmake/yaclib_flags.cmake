@@ -42,7 +42,7 @@ if (COVERAGE IN_LIST YACLIB_FLAGS)
   list(APPEND YACLIB_DEFINITIONS NDEBUG)
 endif ()
 
-set(YACLIB_CORO 0)
+set(YACLIB_CORO_NEED 0)
 if (CORO IN_LIST YACLIB_FLAGS)
   include(yaclib_coro)
 endif ()

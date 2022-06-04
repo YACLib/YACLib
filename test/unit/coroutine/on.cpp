@@ -15,7 +15,9 @@
 
 #include <gtest/gtest.h>
 
+namespace test {
 namespace {
+
 using namespace std::chrono_literals;
 
 TEST(On, JustWorks) {
@@ -151,3 +153,4 @@ TEST(On, LockWithStrand) {
 }
 
 }  // namespace
+}  // namespace test

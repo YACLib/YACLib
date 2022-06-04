@@ -11,6 +11,7 @@
 #include <yaclib/async/run.hpp>
 #include <yaclib/executor/executor.hpp>
 #include <yaclib/executor/job.hpp>
+#include <yaclib/executor/manual.hpp>
 #include <yaclib/executor/submit.hpp>
 #include <yaclib/executor/thread_pool.hpp>
 #include <yaclib/util/detail/nope_counter.hpp>
@@ -519,32 +520,7 @@ TEST(Pipeline, Simple2) {
 }
 
 TEST(Simple, MakePromiseContract) {
-  class ManualExecutor : public yaclib::IExecutor {
-   private:
-    yaclib::detail::List _tasks;
-
-   public:
-    [[nodiscard]] Type Tag() const final {
-      return yaclib::IExecutor::Type::Custom;
-    }
-
-    void Submit(yaclib::Job& f) noexcept final {
-      _tasks.PushFront(f);
-    }
-
-    void Drain() {
-      while (!_tasks.Empty()) {
-        auto& task = _tasks.PopFront();
-        static_cast<yaclib::Job&>(task).Call();
-      }
-    }
-
-    ~ManualExecutor() override {
-      EXPECT_TRUE(_tasks.Empty());
-    }
-  };
-
-  yaclib::detail::NopeCounter<ManualExecutor> e;
+  yaclib::detail::NopeCounter<yaclib::ManualExecutor> e;
   EXPECT_EQ(e.Tag(), yaclib::IExecutor::Type::Custom);
   auto [f, p] = yaclib::MakeContract<int>();
   auto g = std::move(f).Then(e, [](int x) {

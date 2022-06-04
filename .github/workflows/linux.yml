@@ -122,12 +122,14 @@ jobs:
       - name: Configure CMake
         run: |
           compiler=${{ matrix.compiler }}
+          coroutine_option="CORO"
           if [[ "$compiler" == gcc* ]]; then
             version=${compiler:4}
             c_compiler="gcc"
             cxx_compiler="g++"
             if [[ $version -lt 10 ]]; then
               standard=17
+              coroutine_option=""
             else
               standard=20
             fi
@@ -156,10 +158,16 @@ jobs:
                 fi
               else
                 link_option=${link_options[$j]}; compile_option=${compile_options[$j]}
-                if [[ "${stdlibs_name[$j]}" == "libstdcxx" || "$compiler" == "clang-8" ]]; then
+                if [[ "${stdlibs_name[$j]}" == "libstdcxx" ]]; then
+                  coroutine_option=""
                   standard=17
                 else
-                  standard=20
+                  if [[ "$compiler" == "clang-8"  ]]; then
+                    standard=17
+                    coroutine_option=""
+                  else
+                    standard=20
+                  fi
                 fi
               fi
 
@@ -170,7 +178,7 @@ jobs:
                 -DCMAKE_BUILD_TYPE="$build_type"                                                                       \
                 -DYACLIB_CXX_STANDARD="$standard"                                                                      \
                 -DYACLIB_TEST=SINGLE                                                                                   \
-                -DYACLIB_FLAGS="CORO"                                                                                  \
+                -DYACLIB_FLAGS="$coroutine_option"                                                                             \
                 -DCMAKE_CXX_COMPILER="$cxx_compiler"                                                                   \
                 -G"Ninja"                                                                                              \
                 -DYACLIB_LINK_OPTIONS="$link_option"                                                                   \

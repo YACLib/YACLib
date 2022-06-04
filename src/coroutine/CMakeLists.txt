@@ -1,4 +1,5 @@
 list(APPEND YACLIB_INCLUDES
+  ${YACLIB_INCLUDE_DIR}/coroutine/async_mutex.hpp
   ${YACLIB_INCLUDE_DIR}/coroutine/await.hpp
   ${YACLIB_INCLUDE_DIR}/coroutine/coroutine.hpp
   ${YACLIB_INCLUDE_DIR}/coroutine/future_traits.hpp

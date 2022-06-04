@@ -25,7 +25,7 @@ add_subdirectory(util)
 add_subdirectory(fault)
 add_subdirectory(std)
 
-if (YACLIB_CORO)
+if (YACLIB_CORO_NEED)
   add_subdirectory(coroutine)
 endif ()
 
