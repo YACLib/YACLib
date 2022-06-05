@@ -23,14 +23,14 @@ class AtomicWait {
   }
 
   [[nodiscard]] bool is_lock_free() const volatile noexcept {
-    return false;
+    return true;
   }
 
   [[nodiscard]] bool is_lock_free() const noexcept {
-    return false;
+    return true;
   }
 
-  static constexpr bool is_always_lock_free = false;
+  static constexpr bool is_always_lock_free = true;
 
 #ifdef YACLIB_ATOMIC_EVENT
   void wait(T old, std::memory_order) const noexcept {
@@ -61,7 +61,9 @@ class AtomicWait {
 
  protected:
   T _value;
+#ifdef YACLIB_ATOMIC_EVENT
   FiberQueue _queue;
+#endif
 };
 
 }  // namespace yaclib::detail::fiber

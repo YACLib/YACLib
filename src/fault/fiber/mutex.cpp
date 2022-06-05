@@ -25,4 +25,5 @@ void Mutex::unlock() noexcept {
 Mutex::native_handle_type Mutex::native_handle() {
   return nullptr;
 }
+
 }  // namespace yaclib::detail::fiber

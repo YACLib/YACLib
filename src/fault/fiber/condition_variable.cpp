@@ -17,4 +17,5 @@ void ConditionVariable::wait(std::unique_lock<yaclib::detail::fiber::Mutex>& loc
 ConditionVariable::native_handle_type ConditionVariable::native_handle() {
   return nullptr;
 }
+
 }  // namespace yaclib::detail::fiber

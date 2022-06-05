@@ -12,7 +12,7 @@ struct SystemClock {
   using period = duration::period;
   using time_point = std::chrono::time_point<SystemClock>;
 
-  static constexpr bool is_steady = false;
+  static constexpr bool is_steady = true;
 
   static time_point now();
 

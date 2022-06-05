@@ -2,36 +2,33 @@
 
 namespace yaclib::detail {
 
-inline constexpr int kSeed = 1239;
-
-static std::atomic_uint32_t seed = kSeed;
+static std::atomic_uint32_t sSeed{1239};
 
 #if YACLIB_FAULT == 2
-static int rand_count;
+static int sRandCount{0};
 #endif
 
-// TODO(myannyax): make not thread_static
-thread_local static std::mt19937_64 eng(seed.load());
+static thread_local std::mt19937_64 eng{sSeed.load(std::memory_order_relaxed)};
 
 void SetSeed(uint32_t new_seed) {
-  seed = new_seed;
+  sSeed.store(new_seed);
   eng.seed(new_seed);
 }
 
 uint32_t GetSeed() {
-  return seed;
+  return sSeed.load(std::memory_order_relaxed);
 }
 
 uint64_t GetRandNumber(uint64_t max) {
 #if YACLIB_FAULT == 2
-  rand_count++;
+  sRandCount++;
 #endif
   return eng() % max;
 }
 
 uint64_t GetRandCount() {
 #if YACLIB_FAULT == 2
-  return rand_count;
+  return sRandCount;
 #else
   return 0;
 #endif
@@ -39,7 +36,7 @@ uint64_t GetRandCount() {
 
 void ForwardToRandCount(uint64_t random_count) {
 #if YACLIB_FAULT == 2
-  for (int i = 0; i < rand_count; ++i) {
+  for (int i = 0; i < random_count; ++i) {
     GetRandNumber(1);
   }
 #endif

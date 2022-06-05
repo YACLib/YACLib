@@ -1,5 +1,7 @@
 #include <yaclib/fault/detail/fiber/execution_context.hpp>
 
+#include <cstdlib>
+
 namespace yaclib::detail::fiber {
 
 void ExecutionContext::Setup(Allocation stack, Trampoline trampoline, void* arg) {

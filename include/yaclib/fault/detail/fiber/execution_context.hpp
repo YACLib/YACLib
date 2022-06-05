@@ -2,8 +2,6 @@
 
 #include <yaclib/fault/detail/fiber/stack_allocator.hpp>
 
-#include <algorithm>
-
 #include <ucontext.h>
 
 namespace yaclib::detail::fiber {

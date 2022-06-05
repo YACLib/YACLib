@@ -47,7 +47,6 @@ if (YACLIB_FAULT STREQUAL "FIBER")
   list(APPEND YACLIB_HEADERS
     # chrono
     ${YACLIB_INCLUDE_DIR}/fault/detail/fiber/system_clock.hpp
-    ${YACLIB_INCLUDE_DIR}/fault/detail/fiber/steady_clock.hpp
 
     # mutexes
     ${YACLIB_INCLUDE_DIR}/fault/detail/fiber/mutex.hpp
@@ -80,7 +79,6 @@ if (YACLIB_FAULT STREQUAL "FIBER")
   list(APPEND YACLIB_SOURCES
     # chrono
     ${CMAKE_CURRENT_SOURCE_DIR}/fiber/system_clock.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/fiber/steady_clock.cpp
 
     # thread
     ${CMAKE_CURRENT_SOURCE_DIR}/fiber/thread.cpp

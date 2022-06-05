@@ -1,17 +1,16 @@
 #include <fault/util.hpp>
 
+#include <yaclib/fault/config.hpp>
 #include <yaclib/fault/detail/fiber/scheduler.hpp>
-
-#include <iostream>
 
 namespace yaclib::fault {
 
-Scheduler* current_scheduler = nullptr;
+Scheduler* sCurrentScheduler = nullptr;
 
-static thread_local detail::fiber::FiberBase* current;
+static thread_local detail::fiber::FiberBase* sCurrent;
 
-static uint32_t _tick_length = 10;
-static uint32_t _random_list_pick = 0;
+static uint32_t sTickLength = 10;
+static uint32_t sRandomListPick = 10;
 
 detail::fiber::FiberBase* Scheduler::GetNext() {
   YACLIB_DEBUG(_queue.Empty(), "Queue can't be empty");
@@ -19,12 +18,12 @@ detail::fiber::FiberBase* Scheduler::GetNext() {
   return static_cast<detail::fiber::FiberBase*>(static_cast<detail::fiber::BiNodeScheduler*>(next));
 }
 
-bool Scheduler::IsRunning() const {
+bool Scheduler::IsRunning() const noexcept {
   return _running;
 }
 
 void Scheduler::Suspend() {
-  auto* fiber = current;
+  auto* fiber = sCurrent;
   fiber->Yield();
 }
 
@@ -33,16 +32,16 @@ void Scheduler::Stop() {
   YACLIB_DEBUG(_running, "scheduler still running on stop");
 }
 
-Scheduler* Scheduler::GetScheduler() {
-  return current_scheduler;
+Scheduler* Scheduler::GetScheduler() noexcept {
+  return sCurrentScheduler;
 }
 
-void Scheduler::Set(Scheduler* scheduler) {
-  current_scheduler = scheduler;
+void Scheduler::Set(Scheduler* scheduler) noexcept {
+  sCurrentScheduler = scheduler;
 }
 
 void Scheduler::Schedule(detail::fiber::FiberBase* fiber) {
-  InjectFault();
+  fiber->SetState(detail::fiber::Waiting);
   _queue.PushBack(static_cast<detail::fiber::BiNodeScheduler*>(fiber));
   if (!IsRunning()) {
     _running = true;
@@ -51,38 +50,38 @@ void Scheduler::Schedule(detail::fiber::FiberBase* fiber) {
   }
 }
 
-detail::fiber::FiberBase* Scheduler::Current() {
-  return current;
+detail::fiber::FiberBase* Scheduler::Current() noexcept {
+  return sCurrent;
 }
 
 detail::fiber::FiberBase::Id Scheduler::GetId() {
-  YACLIB_DEBUG(current == nullptr, "Current can't be null");
-  return current->GetId();
+  YACLIB_DEBUG(sCurrent == nullptr, "Current can't be null");
+  return sCurrent->GetId();
 }
 
-void Scheduler::TickTime() {
-  _time += _tick_length;
+void Scheduler::TickTime() noexcept {
+  _time += sTickLength;
 }
 
-void Scheduler::AdvanceTime() {
+void Scheduler::AdvanceTime() noexcept {
   if (_sleep_list.begin()->first >= _time) {
     auto min_sleep_time = _sleep_list.begin()->first - _time;
     _time += min_sleep_time;
   }
 }
 
-uint64_t Scheduler::GetTimeNs() const {
+uint64_t Scheduler::GetTimeNs() const noexcept {
   return _time;
 }
 
-void Scheduler::WakeUpNeeded() {
+void Scheduler::WakeUpNeeded() noexcept {
   auto iter_to_remove = _sleep_list.end();
-  for (auto& elem : _sleep_list) {
-    if (elem.first > _time) {
-      iter_to_remove = _sleep_list.find(elem.first);
+  for (auto it = _sleep_list.begin(); it != _sleep_list.end(); it++) {
+    if (it->first > _time) {
+      iter_to_remove = it;
       break;
     }
-    _queue.PushAll(elem.second);
+    _queue.PushAll(std::move(it->second));
   }
   if (iter_to_remove != _sleep_list.begin()) {
     _sleep_list.erase(_sleep_list.begin(), iter_to_remove);
@@ -96,34 +95,31 @@ void Scheduler::RunLoop() {
     }
     WakeUpNeeded();
     auto* next = GetNext();
-    current = next;
+    sCurrent = next;
     TickTime();
     next->Resume();
     if (next->GetState() == detail::fiber::Completed && !next->IsThreadlikeInstanceAlive()) {
       delete next;
     }
   }
-  current = nullptr;
+  sCurrent = nullptr;
 }
 
 void Scheduler::RescheduleCurrent() {
-  if (current == nullptr) {
+  if (sCurrent == nullptr) {
     return;
   }
-  auto* fiber = current;
+  auto* fiber = sCurrent;
   GetScheduler()->_queue.PushBack(static_cast<detail::fiber::BiNodeScheduler*>(fiber));
   fiber->Yield();
 }
 
-Scheduler::Scheduler() : _running(false), _time(0) {
+void Scheduler::SetTickLength(uint32_t tick) noexcept {
+  sTickLength = tick;
 }
 
-void Scheduler::SetTickLength(uint32_t tick) {
-  _tick_length = tick;
-}
-
-void Scheduler::SetRandomListPick(uint32_t k) {
-  _random_list_pick = k;
+void Scheduler::SetRandomListPick(uint32_t k) noexcept {
+  sRandomListPick = k;
 }
 
 void Scheduler::Sleep(uint64_t ns) {
@@ -131,24 +127,38 @@ void Scheduler::Sleep(uint64_t ns) {
     return;
   }
   detail::fiber::BiList& sleep_list = _sleep_list[ns];
-  auto* fiber = current;
+  auto* fiber = sCurrent;
   sleep_list.PushBack(static_cast<detail::fiber::BiNodeScheduler*>(fiber));
   Suspend();
-  if (_sleep_list.find(ns) != _sleep_list.end()) {
-    _sleep_list[ns].DecSize();
-    if (_sleep_list[ns].Empty()) {
+}
+
+void Scheduler::SleepPreemptive(uint64_t ns) {
+  ns += detail::GetRandNumber(GetFaultSleepTime());
+  Sleep(ns);
+  // <= because wakeup called before time adjustment
+  if (_time <= ns) {
+    auto it = _sleep_list.find(ns);
+    YACLIB_DEBUG(it == _sleep_list.end(), "sleep_list for time that is not passed yet isn't found");
+    if (it->second.Empty()) {
       _sleep_list.erase(ns);
     }
   }
 }
+
 }  // namespace yaclib::fault
 
 namespace yaclib::detail::fiber {
 
-BiNode* PollRandomElementFromList(BiList& list) {
-  auto rand_pos = detail::GetRandNumber(fault::_random_list_pick == 0 ? list.GetSize() : fault::_random_list_pick * 2);
-  auto* next = list.GetNth(list.GetSize() - fault::_random_list_pick + rand_pos);
-  list.Erase(next);
+Node* PollRandomElementFromList(BiList& list) {
+  auto rand_pos = detail::GetRandNumber(2 * fault::sRandomListPick);
+  auto reversed = false;
+  if (rand_pos >= fault::sRandomListPick) {
+    reversed = true;
+    rand_pos -= fault::sRandomListPick;
+  }
+  auto* next = list.GetElement(rand_pos, reversed);
+  next->Erase();
   return next;
 }
+
 }  // namespace yaclib::detail::fiber

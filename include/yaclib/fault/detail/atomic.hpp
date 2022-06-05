@@ -64,6 +64,7 @@ class AtomicBase : public AtomicWait<Impl, T> {
 
   bool compare_exchange_weak(T& expected, T desired, std::memory_order success, std::memory_order failure) noexcept {
     if (ShouldFailAtomicWeak()) {
+      expected = load(failure);
       return false;
     }
     YACLIB_INJECT_FAULT(auto r = Impl::compare_exchange_weak(expected, desired, success, failure));
@@ -72,6 +73,7 @@ class AtomicBase : public AtomicWait<Impl, T> {
   bool compare_exchange_weak(T& expected, T desired, std::memory_order success,
                              std::memory_order failure) volatile noexcept {
     if (ShouldFailAtomicWeak()) {
+      expected = load(failure);
       return false;
     }
     YACLIB_INJECT_FAULT(auto r = Impl::compare_exchange_weak(expected, desired, success, failure));
@@ -79,6 +81,7 @@ class AtomicBase : public AtomicWait<Impl, T> {
   }
   bool compare_exchange_weak(T& expected, T desired, std::memory_order order = std::memory_order_seq_cst) noexcept {
     if (ShouldFailAtomicWeak()) {
+      expected = load(order);
       return false;
     }
     YACLIB_INJECT_FAULT(auto r = Impl::compare_exchange_weak(expected, desired, order));
@@ -87,6 +90,7 @@ class AtomicBase : public AtomicWait<Impl, T> {
   bool compare_exchange_weak(T& expected, T desired,
                              std::memory_order order = std::memory_order_seq_cst) volatile noexcept {
     if (ShouldFailAtomicWeak()) {
+      expected = load(order);
       return false;
     }
     YACLIB_INJECT_FAULT(auto r = Impl::compare_exchange_weak(expected, desired, order));

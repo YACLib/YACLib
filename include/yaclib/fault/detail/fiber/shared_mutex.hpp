@@ -3,6 +3,7 @@
 #include <yaclib/fault/detail/fiber/queue.hpp>
 
 namespace yaclib::detail::fiber {
+
 class SharedMutex {
  public:
   SharedMutex() = default;
@@ -36,4 +37,5 @@ class SharedMutex {
   bool _occupied{false};
   bool _exclusive_mode{false};
 };
+
 }  // namespace yaclib::detail::fiber

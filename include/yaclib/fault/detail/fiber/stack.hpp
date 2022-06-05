@@ -5,6 +5,7 @@
 #include <cstddef>
 
 namespace yaclib::detail::fiber {
+
 /**
  * Manages stack memory
  */
@@ -13,7 +14,7 @@ class Stack {
   explicit Stack(IStackAllocator& allocator) : _allocation(allocator.Allocate()), _allocator(allocator) {
   }
 
-  Stack(Stack&& that) = default;
+  Stack(Stack&& that) noexcept = default;
 
   Stack& operator=(Stack&& other) noexcept {
     auto& new_allocation = other.GetAllocation();
@@ -25,11 +26,11 @@ class Stack {
     return *this;
   }
 
-  [[nodiscard]] Allocation& GetAllocation() {
+  [[nodiscard]] Allocation& GetAllocation() noexcept {
     return _allocation;
   }
 
-  [[nodiscard]] IStackAllocator& GetAllocator() const {
+  [[nodiscard]] IStackAllocator& GetAllocator() const noexcept {
     return _allocator;
   }
 

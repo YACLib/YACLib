@@ -6,14 +6,14 @@
 
 namespace yaclib::detail::fiber {
 
-static FiberBase::Id next_id{1L};
+static FiberBase::Id sNextId{1L};
 
-DefaultAllocator FiberBase::allocator{};
+DefaultAllocator FiberBase::sAllocator{};
 
-FiberBase::FiberBase() : _id(next_id++), _stack(allocator) {
+FiberBase::FiberBase() : _id(sNextId++), _stack(sAllocator) {
 }
 
-FiberBase::Id FiberBase::GetId() const {
+FiberBase::Id FiberBase::GetId() const noexcept {
   return _id;
 }
 
@@ -39,39 +39,44 @@ void FiberBase::Yield() {
 void FiberBase::Complete() {
   _state = Completed;
   if (_joining_fiber != nullptr && _threadlike_instance_alive) {
-    GetInjector()->SetPauseInject(true);
     ScheduleFiber(_joining_fiber);
-    GetInjector()->SetPauseInject(false);
   }
   _context.SwitchTo(_caller_context);
 }
 
-FiberState FiberBase::GetState() {
+FiberState FiberBase::GetState() noexcept {
   return _state;
 }
 
-void FiberBase::SetJoiningFiber(FiberBase* joining_fiber) {
+void FiberBase::SetJoiningFiber(FiberBase* joining_fiber) noexcept {
   _joining_fiber = joining_fiber;
 }
 
-void FiberBase::SetThreadlikeInstanceDead() {
+void FiberBase::SetThreadlikeInstanceDead() noexcept {
   _threadlike_instance_alive = false;
 }
 
-bool FiberBase::IsThreadlikeInstanceAlive() const {
+bool FiberBase::IsThreadlikeInstanceAlive() const noexcept {
   return _threadlike_instance_alive;
 }
 
-void* FiberBase::GetTls(uint64_t name, void* _default) {
-  return _tls[name] == nullptr ? _default : _tls[name];
+void FiberBase::GetTls(uint64_t name, void** _default) {
+  auto* result = _tls[name];
+  if (result != nullptr) {
+    *_default = result;
+  }
 }
 
 void FiberBase::SetTls(uint64_t name, void* value) {
   _tls[name] = value;
 }
 
-IStackAllocator& FiberBase::GetAllocator() {
-  return allocator;
+IStackAllocator& FiberBase::GetAllocator() noexcept {
+  return sAllocator;
+}
+
+void FiberBase::SetState(FiberState state) noexcept {
+  _state = state;
 }
 
 }  // namespace yaclib::detail::fiber

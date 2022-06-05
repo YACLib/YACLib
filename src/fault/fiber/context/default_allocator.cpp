@@ -39,7 +39,7 @@ void DefaultAllocator::Release(Allocation allocation) {
   }
 }
 
-void DefaultAllocator::SetMinStackSize(size_t pages) {
+void DefaultAllocator::SetMinStackSize(size_t pages) noexcept {
   if (pages > _stack_size_pages) {
     for (auto& allocation : _pool) {
       Release(allocation);
@@ -49,11 +49,11 @@ void DefaultAllocator::SetMinStackSize(size_t pages) {
   }
 }
 
-size_t DefaultAllocator::GetMinStackSize() {
+size_t DefaultAllocator::GetMinStackSize() noexcept {
   return _stack_size_pages;
 }
 
-void DefaultAllocator::SetCacheSize(uint32_t size) {
+void DefaultAllocator::SetCacheSize(uint32_t size) noexcept {
   cache_size = size;
 }
 

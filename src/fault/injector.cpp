@@ -6,64 +6,67 @@
 
 namespace yaclib::detail {
 
-inline constexpr int kFreq = 16;
-inline constexpr int kSleepTimeNs = 200;
+std::atomic_uint32_t Injector::sYieldFrequency = 16;
+std::atomic_uint32_t Injector::sSleepTime = 100;
+std::atomic_uint64_t Injector::sInjectedCount = 0;
 
-std::atomic_uint32_t Injector::yield_frequency = kFreq;
-std::atomic_uint32_t Injector::sleep_time = kSleepTimeNs;
-std::atomic_uint64_t Injector::injected_count = 0;
-
-Injector::Injector() : _count{0} {
-}
-
-void Injector::MaybeInject() {
+void Injector::MaybeInject() noexcept {
   if (NeedInject()) {
 #if YACLIB_FAULT == 2
     yaclib_std::this_thread::yield();
+    sInjectedCount.fetch_add(1);
 #else
-    yaclib_std::this_thread::sleep_for(std::chrono::nanoseconds(1 + GetRandNumber(sleep_time)));
+    yaclib_std::this_thread::sleep_for(
+      std::chrono::nanoseconds(1 + GetRandNumber(sSleepTime.load(std::memory_order_relaxed))));
 #endif
-    injected_count.fetch_add(1);
   }
 }
 
-bool Injector::NeedInject() {
+bool Injector::NeedInject() noexcept {
   if (_pause) {
     return false;
   }
-  if (++_count >= yield_frequency) {
+  if (++_count >= sYieldFrequency.load(std::memory_order_relaxed)) {
     Reset();
     return true;
   }
   return false;
 }
 
-void Injector::Reset() {
-  _count = GetRandNumber(yield_frequency);
+void Injector::Reset() noexcept {
+  _count = GetRandNumber(sYieldFrequency.load(std::memory_order_relaxed));
 }
 
-void Injector::SetFrequency(uint32_t freq) {
-  yield_frequency.store(freq);
+void Injector::SetFrequency(uint32_t freq) noexcept {
+  sYieldFrequency.store(freq);
 }
 
-void Injector::SetSleepTime(uint32_t ns) {
-  sleep_time.store(ns);
+void Injector::SetSleepTime(uint32_t ns) noexcept {
+  sSleepTime.store(ns);
 }
 
-uint64_t Injector::GetInjectedCount() {
-  return injected_count.load();
+uint32_t Injector::GetSleepTime() noexcept {
+  return sSleepTime.load(std::memory_order_relaxed);
 }
 
-uint32_t Injector::GetState() const {
+uint64_t Injector::GetInjectedCount() noexcept {
+  return sInjectedCount.load();
+}
+
+uint32_t Injector::GetState() const noexcept {
   return _count;
 }
 
-void Injector::SetState(uint32_t state) {
+void Injector::SetState(uint32_t state) noexcept {
   _count = state;
 }
 
-void Injector::SetPauseInject(bool pause) {
-  _pause = pause;
+void Injector::Disable() noexcept {
+  _pause = true;
+}
+
+void Injector::Enable() noexcept {
+  _pause = false;
 }
 
 }  // namespace yaclib::detail

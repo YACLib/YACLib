@@ -20,7 +20,7 @@ class Thread {
   using native_handle_type = std::thread::native_handle_type;
 
   template <typename... Args>
-  inline explicit Thread(Args&&... args) : _impl(new Fiber<Args...>(std::forward<Args>(args)...)) {
+  explicit Thread(Args&&... args) : _impl(new Fiber<Args...>(std::forward<Args>(args)...)) {
     fault::Scheduler::GetScheduler()->Schedule(_impl);
   }
 

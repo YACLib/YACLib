@@ -1,7 +1,8 @@
 #pragma once
+
 #include <yaclib/fault/detail/fiber/fiber_base.hpp>
 #include <yaclib/fault/detail/fiber/scheduler.hpp>
-#include <yaclib/fault/detail/fiber/steady_clock.hpp>
+#include <yaclib/fault/detail/fiber/system_clock.hpp>
 
 #include <vector>
 
@@ -11,7 +12,7 @@ struct NoTimeoutTag {};
 
 class FiberQueue {
  public:
-  FiberQueue() = default;
+  FiberQueue() noexcept = default;
   FiberQueue(FiberQueue&& other) = default;
   FiberQueue& operator=(FiberQueue&& other) noexcept;
 
@@ -19,7 +20,7 @@ class FiberQueue {
 
   template <typename Rep, typename Period>
   bool Wait(const std::chrono::duration<Rep, Period>& duration) {
-    return Wait(duration + SteadyClock::now());
+    return Wait(duration + SystemClock::now());
   }
 
   template <typename Clock, typename Duration>
@@ -28,8 +29,9 @@ class FiberQueue {
     auto* queue_node = static_cast<BiNodeWaitQueue*>(fiber);
     _queue.PushBack(queue_node);
     auto* scheduler = fault::Scheduler::GetScheduler();
-    scheduler->Sleep(time_point.time_since_epoch().count());
-    bool res = _queue.Erase(queue_node);
+    scheduler->SleepPreemptive(
+      std::chrono::duration_cast<std::chrono::nanoseconds>(time_point.time_since_epoch()).count());
+    bool res = queue_node->Erase();
     return res;
   }
 
@@ -37,11 +39,14 @@ class FiberQueue {
 
   void NotifyOne();
 
-  bool Empty() const;
+  [[nodiscard]] bool Empty() const noexcept;
 
   ~FiberQueue();
 
  private:
+  static void ScheduleAndRemove(FiberBase* node);
+
   BiList _queue;
 };
+
 }  // namespace yaclib::detail::fiber

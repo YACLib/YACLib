@@ -1,13 +1,16 @@
 #pragma once
+
 #include <yaclib/log.hpp>
 
 #include <cstdint>
 
 namespace yaclib::detail::fiber {
 
-struct BiNode {
-  BiNode* prev = this;
-  BiNode* next = this;
+struct Node {
+  Node* prev{this};
+  Node* next{this};
+
+  bool Erase();
 };
 
 class BiList final {
@@ -19,25 +22,18 @@ class BiList final {
   BiList() noexcept = default;
   BiList(BiList&&) noexcept;
 
-  void PushBack(BiNode* node) noexcept;
+  void PushBack(Node* node) noexcept;
 
-  void PushAll(BiList& other) noexcept;
+  void PushAll(BiList&& other) noexcept;
 
-  BiNode* PopBack();
+  Node* PopBack() noexcept;
 
   [[nodiscard]] bool Empty() const noexcept;
 
-  bool Erase(BiNode* node) noexcept;
-
-  [[nodiscard]] std::size_t GetSize() const noexcept;
-
-  void DecSize() noexcept;
-
-  [[nodiscard]] BiNode* GetNth(std::size_t ind) const noexcept;
+  [[nodiscard]] Node* GetElement(std::size_t ind, bool reversed) const noexcept;
 
  private:
-  BiNode _head;
-  std::size_t _size{0};
+  Node _head;
 };
 
 }  // namespace yaclib::detail::fiber

@@ -16,14 +16,14 @@ class DefaultAllocator final : public IStackAllocator {
 
   void Release(Allocation allocation) final;
 
-  void SetMinStackSize(size_t pages) final;
+  void SetMinStackSize(size_t pages) noexcept final;
 
-  size_t GetMinStackSize() final;
+  size_t GetMinStackSize() noexcept final;
 
-  static void SetCacheSize(uint32_t size);
+  static void SetCacheSize(uint32_t size) noexcept;
 
  private:
-  size_t _stack_size_pages{4};
+  size_t _stack_size_pages{8};
   std::vector<Allocation> _pool;
 };
 

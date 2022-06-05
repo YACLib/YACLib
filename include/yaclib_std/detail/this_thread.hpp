@@ -7,13 +7,13 @@
 
 namespace yaclib_std::this_thread {
 
-template <class Clock, class Duration>
+template <typename Clock, typename Duration>
 inline void sleep_until(const std::chrono::time_point<Clock, Duration>& sleep_time) {
-  uint64_t time = sleep_time.time_since_epoch().count();
+  uint64_t time = std::chrono::duration_cast<std::chrono::nanoseconds>(sleep_time.time_since_epoch()).count();
   yaclib::fault::Scheduler::GetScheduler()->Sleep(time);
 }
 
-template <class Rep, class Period>
+template <typename Rep, typename Period>
 void sleep_for(const std::chrono::duration<Rep, Period>& sleep_duration) {
   sleep_until(yaclib_std::chrono::steady_clock::now() + sleep_duration);
 }
@@ -23,8 +23,8 @@ inline constexpr auto* yield = &yaclib::fault::Scheduler::RescheduleCurrent;
 inline constexpr auto* get_id = &yaclib::fault::Scheduler::GetId;
 
 }  // namespace yaclib_std::this_thread
-//#elif YACLIB_FAULT_THIS_THREAD == 1  // TODO(myannyax) Maybe implement
-//#  error "YACLIB_FAULT=THREAD not implemented yet"
+// #elif YACLIB_FAULT_THIS_THREAD == 1  // TODO(myannyax) Maybe implement
+// #  error "YACLIB_FAULT=THREAD not implemented yet"
 #else
 #  include <thread>
 

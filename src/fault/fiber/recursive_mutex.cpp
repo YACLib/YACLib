@@ -2,7 +2,8 @@
 #include <yaclib/fault/detail/fiber/recursive_mutex.hpp>
 
 namespace yaclib::detail::fiber {
-void fiber::RecursiveMutex::lock() {
+
+void RecursiveMutex::lock() {
   if (_occupied_count != 0 && _owner_id != fault::Scheduler::GetId()) {
     _queue.Wait(NoTimeoutTag{});
   }
@@ -18,8 +19,8 @@ bool RecursiveMutex::try_lock() noexcept {
 }
 
 void RecursiveMutex::unlock() noexcept {
+  YACLIB_ERROR(_occupied_count == 0, "unlock on not locked recursive mutex");
   _occupied_count--;
-  YACLIB_ERROR(_occupied_count < 0, "unlock on not locked recursive mutex");
   if (_occupied_count == 0) {
     _owner_id = 0;
   }
@@ -32,4 +33,5 @@ void RecursiveMutex::LockHelper() {
 RecursiveMutex::native_handle_type RecursiveMutex::native_handle() {
   return nullptr;
 }
+
 }  // namespace yaclib::detail::fiber

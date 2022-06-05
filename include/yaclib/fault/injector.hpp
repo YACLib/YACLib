@@ -1,37 +1,40 @@
 #pragma once
 
 #include <atomic>
-#include <yaclib_std/thread>
 
 namespace yaclib::detail {
 
 // TODO(myannyax) Add metrics, refactor this shit
 class Injector {
  public:
-  explicit Injector();
+  explicit Injector() noexcept = default;
 
-  void MaybeInject();
+  void MaybeInject() noexcept;
 
-  uint32_t GetState() const;
+  uint32_t GetState() const noexcept;
 
-  void SetState(uint32_t state);
+  void SetState(uint32_t state) noexcept;
 
-  void SetPauseInject(bool pause);
+  void Disable() noexcept;
 
-  static void SetFrequency(uint32_t freq);
-  static void SetSleepTime(uint32_t ns);
+  void Enable() noexcept;
 
-  static uint64_t GetInjectedCount();
+  static void SetFrequency(uint32_t freq) noexcept;
+  static void SetSleepTime(uint32_t ns) noexcept;
+
+  static uint32_t GetSleepTime() noexcept;
+
+  static uint64_t GetInjectedCount() noexcept;
 
  private:
-  bool NeedInject();
-  void Reset();
+  bool NeedInject() noexcept;
+  void Reset() noexcept;
 
-  static std::atomic_uint32_t yield_frequency;
-  static std::atomic_uint32_t sleep_time;
-  static std::atomic_uint64_t injected_count;
+  static std::atomic_uint32_t sYieldFrequency;
+  static std::atomic_uint32_t sSleepTime;
+  static std::atomic_uint64_t sInjectedCount;
 
-  std::atomic_uint32_t _count;
+  std::atomic_uint32_t _count{0};
   bool _pause{false};
 };
 

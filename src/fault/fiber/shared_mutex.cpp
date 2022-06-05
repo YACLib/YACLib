@@ -20,9 +20,9 @@ bool SharedMutex::try_lock() noexcept {
 }
 
 void SharedMutex::unlock() noexcept {
-  bool unlock_shared = (GetRandNumber(2) != 0u) && !_shared_queue.Empty();
+  const bool unlock_shared = !_shared_queue.Empty() && (_exclusive_queue.Empty() || GetRandNumber(2) == 0);
   _occupied = false;
-  if (unlock_shared || _exclusive_queue.Empty()) {
+  if (unlock_shared) {
     _shared_queue.NotifyAll();
   } else {
     _exclusive_queue.NotifyOne();
@@ -66,4 +66,5 @@ void SharedMutex::SharedLockHelper() {
 SharedMutex::native_handle_type SharedMutex::native_handle() {
   return nullptr;
 }
+
 }  // namespace yaclib::detail::fiber

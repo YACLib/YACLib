@@ -13,7 +13,8 @@ void FiberQueue::NotifyAll() {
   auto all = std::move(_queue);
   _queue = BiList();
   while (!all.Empty()) {
-    fault::Scheduler::GetScheduler()->Schedule(static_cast<FiberBase*>(static_cast<BiNodeWaitQueue*>(all.PopBack())));
+    auto* fiber = static_cast<FiberBase*>(static_cast<BiNodeWaitQueue*>(all.PopBack()));
+    ScheduleAndRemove(fiber);
   }
 }
 
@@ -21,8 +22,8 @@ void FiberQueue::NotifyOne() {
   if (_queue.Empty()) {
     return;
   }
-  auto* fiber = PollRandomElementFromList(_queue);
-  fault::Scheduler::GetScheduler()->Schedule(static_cast<FiberBase*>(static_cast<BiNodeWaitQueue*>(fiber)));
+  auto* fiber = static_cast<FiberBase*>(static_cast<BiNodeWaitQueue*>(PollRandomElementFromList(_queue)));
+  ScheduleAndRemove(fiber);
 }
 
 FiberQueue::~FiberQueue() {
@@ -35,7 +36,15 @@ FiberQueue& FiberQueue::operator=(FiberQueue&& other) noexcept {
   return *this;
 }
 
-bool FiberQueue::Empty() const {
+bool FiberQueue::Empty() const noexcept {
   return _queue.Empty();
 }
+
+void FiberQueue::ScheduleAndRemove(FiberBase* node) {
+  if (node->GetState() != Waiting) {
+    static_cast<BiNodeScheduler*>(node)->Erase();
+    fault::Scheduler::GetScheduler()->Schedule(node);
+  }
+}
+
 }  // namespace yaclib::detail::fiber

@@ -9,17 +9,19 @@
 #include <yaclib/util/func.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 
+#include <exception>
 #include <unordered_map>
 
 namespace yaclib::detail::fiber {
 
-class BiNodeScheduler : public BiNode {};
+class BiNodeScheduler : public Node {};
 
-class BiNodeWaitQueue : public BiNode {};
+class BiNodeWaitQueue : public Node {};
 
 enum FiberState {
   Running,
   Suspended,
+  Waiting,
   Completed,
 };
 
@@ -29,25 +31,27 @@ class FiberBase : public BiNodeScheduler, public BiNodeWaitQueue {
 
   FiberBase();
 
-  void SetJoiningFiber(FiberBase* joining_fiber);
+  void SetJoiningFiber(FiberBase* joining_fiber) noexcept;
 
-  [[nodiscard]] Id GetId() const;
+  [[nodiscard]] Id GetId() const noexcept;
 
   void Resume();
 
   void Yield();
 
-  FiberState GetState();
+  FiberState GetState() noexcept;
 
-  void SetThreadlikeInstanceDead();
+  void SetState(FiberState state) noexcept;
 
-  [[nodiscard]] bool IsThreadlikeInstanceAlive() const;
+  void SetThreadlikeInstanceDead() noexcept;
 
-  void* GetTls(uint64_t name, void* _default);
+  [[nodiscard]] bool IsThreadlikeInstanceAlive() const noexcept;
+
+  void GetTls(uint64_t name, void** _default);
 
   void SetTls(uint64_t name, void* value);
 
-  static IStackAllocator& GetAllocator();
+  static IStackAllocator& GetAllocator() noexcept;
 
   virtual ~FiberBase() = default;
 
@@ -59,7 +63,7 @@ class FiberBase : public BiNodeScheduler, public BiNodeWaitQueue {
   std::exception_ptr _exception;
 
  private:
-  static DefaultAllocator allocator;
+  static DefaultAllocator sAllocator;
   ExecutionContext _caller_context{};
   FiberBase* _joining_fiber{nullptr};
   Id _id;

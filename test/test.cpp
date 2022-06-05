@@ -16,12 +16,18 @@
 
 namespace test {
 
-const unsigned int seed = 2245685369;
+auto rand = std::random_device();
+
+auto seed = rand();
 
 class MyTestListener : public ::testing::EmptyTestEventListener {
  public:
   void OnTestStart(const testing::TestInfo& /*info*/) override {
-    std::cerr << "current random count" << yaclib::GetFaultRandomCount() << "\n";
+    std::cerr << "current random count" << yaclib::fiber::GetFaultRandomCount() << "\n";
+  }
+  void OnTestIterationStart(const testing::UnitTest& unitTest, int i) override {
+    seed = rand();
+    std::cerr << "seed: " << test::seed << "\n";
   }
 };
 
@@ -40,7 +46,7 @@ void InitFault() {
   yaclib::SetFaultSleepTime(200);
   yaclib::SetFaultRandomListPick(10);
   yaclib::SetFaultTickLength(10);
-  yaclib::SetFaultFiberStackSize(24);
+  yaclib::fiber::SetStackSize(24);
 }
 
 namespace {

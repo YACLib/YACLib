@@ -2,7 +2,7 @@
 
 #include <yaclib/fault/detail/fiber/fiber_base.hpp>
 
-#include <unordered_map>
+#include <functional>
 
 namespace yaclib::detail::fiber {
 
@@ -33,7 +33,7 @@ class Fiber final : public FiberBase {
  private:
   template <typename Tuple, std::size_t... I>
   static auto Helper(Tuple& a, std::index_sequence<I...>) {
-    std::__invoke(std::move(std::get<I>(a))...);
+    std::invoke(std::move(std::get<I>(a))...);
   }
 
   FuncState<Args...> _func_state;

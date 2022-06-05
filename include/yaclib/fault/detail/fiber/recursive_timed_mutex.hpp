@@ -24,7 +24,7 @@ class RecursiveTimedMutex : public RecursiveMutex {
   }
 
   template <typename Clock, typename Duration>
-  bool try_lock_until(const std::chrono::duration<Clock, Duration>& timeout_time) {
+  bool try_lock_until(const std::chrono::time_point<Clock, Duration>& timeout_time) {
     bool r = true;
     if (_occupied_count != 0 && _owner_id != fault::Scheduler::GetId()) {
       r = !_queue.Wait(timeout_time);

@@ -21,7 +21,7 @@ class TimedMutex : public Mutex<Impl> {
   }
 
   template <typename Clock, typename Duration>
-  bool try_lock_until(const std::chrono::duration<Clock, Duration>& timeout_time) {
+  bool try_lock_until(const std::chrono::time_point<Clock, Duration>& timeout_time) {
     YACLIB_INJECT_FAULT(auto r = Impl::try_lock_until(timeout_time));
     return r;
   }
