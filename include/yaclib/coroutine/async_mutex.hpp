@@ -143,8 +143,8 @@ class AsyncMutex {
       return _mutex.TryLock();
     }
 
-    template <typename Promise>
-    bool await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
+    template <typename V, typename E>
+    bool await_suspend(yaclib_std::coroutine_handle<detail::PromiseType<V, E>> handle) noexcept {
       detail::BaseCore& base_core = handle.promise();
       auto old_state = _mutex._state.load(std::memory_order_relaxed);
       while (true) {
@@ -197,8 +197,8 @@ class AsyncMutex {
       return false;
     }
 
-    template <typename Promise>
-    auto await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
+    template <typename V, typename E>
+    auto await_suspend(yaclib_std::coroutine_handle<detail::PromiseType<V, E>> handle) noexcept {
       detail::BaseCore* next;
       if constexpr (Type == UnlockType::Auto) {
         next = _mutex._waiters;

@@ -33,6 +33,16 @@ struct AtomicCounter : CounterBase {
     }
   }
 
+  void IncRef(std::size_t cnt) noexcept {
+    count.fetch_add(cnt, std::memory_order_relaxed);
+  }
+
+  void DecRef(std::size_t cnt) noexcept {
+    if (SubEqual(cnt)) {
+      Deleter::Delete(*this);
+    }
+  }
+
   [[nodiscard]] std::size_t GetRef() const noexcept {
     // Dangerous! Use only to sync with release or if synchronization is not needed
     return count.load(std::memory_order_acquire);

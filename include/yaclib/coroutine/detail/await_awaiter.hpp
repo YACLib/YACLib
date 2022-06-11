@@ -2,6 +2,7 @@
 
 #include <yaclib/async/future.hpp>
 #include <yaclib/coroutine/coroutine.hpp>
+#include <yaclib/coroutine/detail/handle_wrapper.hpp>
 #include <yaclib/util/detail/atomic_counter.hpp>
 #include <yaclib/util/type_traits.hpp>
 
@@ -28,14 +29,6 @@ class AwaitAwaiter final {
   }
 
  private:
-  struct Handle : IRef {
-    yaclib_std::coroutine_handle<> handle;
-  };
-
-  struct HandleDeleter {
-    static void Delete(Handle& handle) noexcept;
-  };
-
   AtomicCounter<Handle, HandleDeleter> _await_core;
 };
 
