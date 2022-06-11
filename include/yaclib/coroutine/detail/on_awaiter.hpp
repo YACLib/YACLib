@@ -15,8 +15,8 @@ class OnAwaiter {
     return false;
   }
 
-  template <typename V, typename E>
-  YACLIB_INLINE void await_suspend(yaclib_std::coroutine_handle<PromiseType<V, E>> handle) const noexcept {
+  template <typename PromiseTy>
+  YACLIB_INLINE void await_suspend(yaclib_std::coroutine_handle<PromiseTy> handle) const noexcept {
     _executor.Submit(handle.promise());
   }
 

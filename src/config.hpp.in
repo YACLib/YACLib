@@ -99,6 +99,11 @@
 #        define YACLIB_CORO 1
 #      endif
 # 	 endif
+#    if defined(__apple_build_version)
+#      if __apple_build_version < 13100000
+#        define YACLIB_SYMMETRIC_TRANSFER 0 // because of TSAN problems
+#      endif
+#    endif
 #  elif defined(__GNUG__)
 #    define YACLIB_SYMMETRIC_TRANSFER 1
 #    define YACLIB_CORO 2
