@@ -18,8 +18,8 @@ struct Destroy {
     return false;
   }
 
-  template <typename PromiseTy>
-  YACLIB_INLINE void await_suspend(yaclib_std::coroutine_handle<PromiseTy> handle) const noexcept {
+  template <typename Promise>
+  YACLIB_INLINE void await_suspend(yaclib_std::coroutine_handle<Promise> handle) const noexcept {
     handle.promise().DecRef();
   }
 
