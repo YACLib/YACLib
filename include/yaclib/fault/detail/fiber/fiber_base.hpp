@@ -58,18 +58,18 @@ class FiberBase : public BiNodeScheduler, public BiNodeWaitQueue {
  protected:
   void Complete();
 
-  Stack _stack;
   ExecutionContext _context{};
+  Stack _stack;
   std::exception_ptr _exception;
 
  private:
   static DefaultAllocator sAllocator;
   ExecutionContext _caller_context{};
+  std::unordered_map<uint64_t, void*> _tls;
   FiberBase* _joining_fiber{nullptr};
   Id _id;
   FiberState _state{Suspended};
   bool _threadlike_instance_alive{true};
-  std::unordered_map<uint64_t, void*> _tls;
 };
 
 }  // namespace yaclib::detail::fiber

@@ -38,6 +38,9 @@ class ThreadLocalPtrProxy {
     return *this;
   }
   ThreadLocalPtrProxy& operator=(const ThreadLocalPtrProxy& other) noexcept {
+    if (this->Get() == other.Get()) {
+      return *this;
+    }
     sDefaults[_i] = other.Get();
     return *this;
   }

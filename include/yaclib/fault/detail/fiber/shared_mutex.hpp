@@ -31,9 +31,8 @@ class SharedMutex {
   void SharedLockHelper();
 
   FiberQueue _shared_queue;
-
-  uint32_t _shared_owners_count{0};
   FiberQueue _exclusive_queue;
+  uint32_t _shared_owners_count{0};
   bool _occupied{false};
   bool _exclusive_mode{false};
 };

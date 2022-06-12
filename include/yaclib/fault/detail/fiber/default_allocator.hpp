@@ -23,8 +23,8 @@ class DefaultAllocator final : public IStackAllocator {
   static void SetCacheSize(uint32_t size) noexcept;
 
  private:
-  size_t _stack_size_pages{8};
   std::vector<Allocation> _pool;
+  size_t _stack_size_pages{8};
 };
 
 }  // namespace yaclib::detail::fiber
