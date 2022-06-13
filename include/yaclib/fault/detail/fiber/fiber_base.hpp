@@ -1,5 +1,6 @@
 #pragma once
 
+#include <yaclib/config.hpp>
 #include <yaclib/fault/detail/fiber/bidirectional_intrusive_list.hpp>
 #include <yaclib/fault/detail/fiber/default_allocator.hpp>
 #include <yaclib/fault/detail/fiber/execution_context.hpp>
@@ -11,6 +12,10 @@
 
 #include <exception>
 #include <unordered_map>
+
+#ifdef YACLIB_ASAN
+#  include <sanitizer/asan_interface.h>
+#endif
 
 namespace yaclib::detail::fiber {
 

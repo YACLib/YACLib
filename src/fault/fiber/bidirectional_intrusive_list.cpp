@@ -25,7 +25,7 @@ BiList::BiList(BiList&& other) noexcept {
 
 Node* BiList::PopBack() noexcept {
   auto* elem = _head.prev;
-  _head.prev->Erase();
+  elem->Erase();
   return elem;
 }
 
@@ -55,7 +55,7 @@ Node* BiList::GetElement(std::size_t ind, bool reversed) const noexcept {
   if (size == 0) {
     return nullptr;
   }
-  i = ind % size;
+  i = reversed ? (size - ind % size) % size : ind % size;
   if (i < size / 2) {
     std::size_t current_i = 0;
     node = _head.next;
@@ -66,7 +66,7 @@ Node* BiList::GetElement(std::size_t ind, bool reversed) const noexcept {
   } else {
     std::size_t current_i = size - 1;
     node = _head.prev;
-    while (current_i > 0) {
+    while (current_i > i) {
       node = node->prev;
       current_i--;
     }

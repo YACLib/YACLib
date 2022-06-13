@@ -1,6 +1,4 @@
 #include <yaclib/fault/detail/fiber/fiber_base.hpp>
-#include <yaclib/fault/inject.hpp>
-#include <yaclib/fault/injector.hpp>
 
 #include <utility>
 
@@ -24,7 +22,17 @@ void FiberBase::Resume() {
 
   _state = Running;
 
+#ifdef YACLIB_ASAN
+  void* _fake_stack{nullptr};
+  const void* _bottom_old{nullptr};
+  std::size_t _size_old{0};
+
+  __sanitizer_start_switch_fiber(&_fake_stack, _stack.GetAllocation().start, _stack.GetAllocation().size);
+#endif
   _caller_context.SwitchTo(_context);
+#ifdef YACLIB_ASAN
+  __sanitizer_finish_switch_fiber(_fake_stack, &_bottom_old, &_size_old);
+#endif
 
   if (_exception != nullptr) {
     rethrow_exception(_exception);
