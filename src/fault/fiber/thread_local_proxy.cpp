@@ -15,7 +15,6 @@ std::unordered_map<uint64_t, void*>& GetMap() {
 
 void* GetImpl(uint64_t i) {
   auto* fiber = fault::Scheduler::Current();
-  auto* result = GetMap()[i];
   return fiber->GetTls(i, GetMap());
 }
 

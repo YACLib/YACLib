@@ -26,8 +26,8 @@ class ConditionVariable {
   }
 
   template <typename Clock, typename Duration>
-  std::cv_status wait_until(std::unique_lock<yaclib::detail::fiber::Mutex>& lock,
-                            const std::chrono::time_point<Clock, Duration>& time_point) {
+  WaitStatus wait_until(std::unique_lock<yaclib::detail::fiber::Mutex>& lock,
+                        const std::chrono::time_point<Clock, Duration>& time_point) {
     return WaitImpl(lock, time_point);
   }
 
@@ -38,8 +38,8 @@ class ConditionVariable {
   }
 
   template <typename Rep, typename Period>
-  std::cv_status wait_for(std::unique_lock<yaclib::detail::fiber::Mutex>& lock,
-                          const std::chrono::duration<Rep, Period>& duration) {
+  WaitStatus wait_for(std::unique_lock<yaclib::detail::fiber::Mutex>& lock,
+                      const std::chrono::duration<Rep, Period>& duration) {
     return WaitImpl(lock, duration);
   }
 
@@ -58,7 +58,7 @@ class ConditionVariable {
   bool WaitImplWithPredicate(std::unique_lock<yaclib::detail::fiber::Mutex>& lock, const Time& time,
                              const Predicate& predicate) {
     while (!predicate()) {
-      if (WaitImpl(lock, time) == std::cv_status::timeout) {
+      if (WaitImpl(lock, time) == WaitStatus::Timeout) {
         break;
       }
     }
@@ -71,13 +71,13 @@ class ConditionVariable {
   }
 
   template <typename Time>
-  std::cv_status WaitImpl(std::unique_lock<yaclib::detail::fiber::Mutex>& lock, const Time& time) {
+  WaitStatus WaitImpl(std::unique_lock<yaclib::detail::fiber::Mutex>& lock, const Time& time) {
     InjectFault();
     lock.unlock();
-    auto timeout = _queue.Wait(time) ? std::cv_status::timeout : std::cv_status::no_timeout;
+    auto status = _queue.Wait(time);
     lock.lock();
     InjectFault();
-    return timeout;
+    return status;
   }
 
   FiberQueue _queue;

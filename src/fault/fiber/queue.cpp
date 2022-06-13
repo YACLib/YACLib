@@ -2,11 +2,11 @@
 
 namespace yaclib::detail::fiber {
 
-bool FiberQueue::Wait(NoTimeoutTag) {
+WaitStatus FiberQueue::Wait(NoTimeoutTag) {
   auto* fiber = fault::Scheduler::Current();
   _queue.PushBack(static_cast<BiNodeWaitQueue*>(fiber));
   fault::Scheduler::Suspend();
-  return true;
+  return WaitStatus::Ready;
 }
 
 void FiberQueue::NotifyAll() {

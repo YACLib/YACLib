@@ -40,6 +40,7 @@ if (YACLIB_FAULT)
   list(APPEND YACLIB_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/random_device.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/atomic.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/condition_variable.cpp
     )
 endif ()
 
