@@ -99,6 +99,7 @@ if (YACLIB_FAULT STREQUAL "FIBER")
     ${CMAKE_CURRENT_SOURCE_DIR}/fiber/scheduler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/fiber/bidirectional_intrusive_list.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/fiber/wakeup_helper.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/fiber/thread_local_proxy.cpp
     )
 endif ()
 

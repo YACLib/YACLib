@@ -47,9 +47,9 @@ class FiberBase : public BiNodeScheduler, public BiNodeWaitQueue {
 
   [[nodiscard]] bool IsThreadlikeInstanceAlive() const noexcept;
 
-  void GetTls(uint64_t name, void** _default);
+  void* GetTls(uint64_t id, std::unordered_map<uint64_t, void*>& defaults);
 
-  void SetTls(uint64_t name, void* value);
+  void SetTls(uint64_t id, void* value);
 
   static IStackAllocator& GetAllocator() noexcept;
 

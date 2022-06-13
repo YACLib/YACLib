@@ -1,15 +1,14 @@
 #pragma once
 
-#include <yaclib/fault/detail/fiber/fiber_base.hpp>
-#include <yaclib/fault/detail/fiber/scheduler.hpp>
-
-#include <string_view>
-#include <unordered_map>
-
 namespace yaclib::detail::fiber {
 
-static std::unordered_map<uint64_t, void*> sDefaults{};
-static uint64_t sNextFreeIndex{0};
+extern uint64_t sNextFreeIndex;
+
+void* GetImpl(uint64_t i);
+
+void Set(void* new_value, uint64_t i);
+
+void SetDefault(void* new_value, uint64_t i);
 
 template <typename Type>
 class ThreadLocalPtrProxy {
@@ -19,18 +18,17 @@ class ThreadLocalPtrProxy {
 
   ThreadLocalPtrProxy(Type* value) noexcept : _i(sNextFreeIndex++) {
     if (value != nullptr) {
-      sDefaults[_i] = value;
+      SetDefault(value, _i);
     }
   }
   ThreadLocalPtrProxy(ThreadLocalPtrProxy&& other) noexcept : _i(other._i) {
   }
   ThreadLocalPtrProxy(const ThreadLocalPtrProxy& other) noexcept : _i(sNextFreeIndex++) {
-    sDefaults[_i] = other.Get();
+    SetDefault(GetImpl(other._i), _i);
   }
 
   ThreadLocalPtrProxy& operator=(Type* value) noexcept {
-    auto* fiber = fault::Scheduler::Current();
-    fiber->SetTls(_i, value);
+    Set(value, this->_i);
     return *this;
   }
   ThreadLocalPtrProxy& operator=(ThreadLocalPtrProxy&& other) noexcept {
@@ -41,7 +39,7 @@ class ThreadLocalPtrProxy {
     if (this->Get() == other.Get()) {
       return *this;
     }
-    sDefaults[_i] = other.Get();
+    SetDefault(GetImpl(other._i), _i);
     return *this;
   }
 
@@ -50,7 +48,7 @@ class ThreadLocalPtrProxy {
   }
   template <typename U>
   ThreadLocalPtrProxy(const ThreadLocalPtrProxy<U>& other) noexcept : _i(sNextFreeIndex++) {
-    sDefaults[_i] = other.Get();
+    SetDefault(GetImpl(other._i), _i);
   }
 
   template <typename U>
@@ -60,7 +58,7 @@ class ThreadLocalPtrProxy {
   }
   template <typename U>
   ThreadLocalPtrProxy& operator=(const ThreadLocalPtrProxy<U>& other) noexcept {
-    sDefaults[_i] = other.Get();
+    SetDefault(GetImpl(other._i), _i);
     return *this;
   }
 
@@ -74,10 +72,7 @@ class ThreadLocalPtrProxy {
   }
 
   Type* Get() const noexcept {
-    auto* fiber = fault::Scheduler::Current();
-    auto* result = sDefaults[_i];
-    fiber->GetTls(_i, &result);
-    return static_cast<Type*>(result);
+    return static_cast<Type*>(GetImpl(this->_i));
   }
 
   explicit operator bool() const noexcept {

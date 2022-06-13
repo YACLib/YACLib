@@ -60,15 +60,16 @@ bool FiberBase::IsThreadlikeInstanceAlive() const noexcept {
   return _threadlike_instance_alive;
 }
 
-void FiberBase::GetTls(uint64_t name, void** _default) {
-  auto* result = _tls[name];
-  if (result != nullptr) {
-    *_default = result;
+void* FiberBase::GetTls(uint64_t id, std::unordered_map<uint64_t, void*>& defaults) {
+  auto* result = _tls[id];
+  if (result == nullptr) {
+    result = defaults[id];
   }
+  return result;
 }
 
-void FiberBase::SetTls(uint64_t name, void* value) {
-  _tls[name] = value;
+void FiberBase::SetTls(uint64_t id, void* value) {
+  _tls[id] = value;
 }
 
 IStackAllocator& FiberBase::GetAllocator() noexcept {
