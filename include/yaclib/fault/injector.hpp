@@ -30,9 +30,9 @@ class Injector {
   bool NeedInject() noexcept;
   void Reset() noexcept;
 
-  static std::atomic_uint32_t sYieldFrequency;
-  static std::atomic_uint32_t sSleepTime;
-  static std::atomic_uint64_t sInjectedCount;
+  static uint32_t sYieldFrequency;
+  static uint32_t sSleepTime;
+  static uint64_t sInjectedCount;
 
   std::atomic_uint32_t _count{0};
   bool _pause{false};

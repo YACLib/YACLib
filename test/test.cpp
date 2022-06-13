@@ -44,8 +44,8 @@ void InitLog() noexcept {
 void InitFault() {
   yaclib::SetFaultFrequency(2 + std::random_device().operator()() % 4);
   yaclib::SetFaultSleepTime(200);
-  yaclib::SetFaultRandomListPick(10);
-  yaclib::SetFaultTickLength(10);
+  yaclib::fiber::SetFaultRandomListPick(10);
+  yaclib::fiber::SetFaultTickLength(10);
   yaclib::fiber::SetStackSize(24);
 }
 

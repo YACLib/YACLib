@@ -30,6 +30,8 @@ std::uint32_t GetFaultSleepTime() noexcept;
  */
 void SetAtomicFailFrequency(std::uint32_t k) noexcept;
 
+namespace fiber {
+
 /**
  * Sets the amount of time to be added to fiber's scheduler time after each schedule cycle.
  * Default is 10
@@ -41,8 +43,6 @@ void SetFaultTickLength(std::uint32_t ns) noexcept;
  * Default is 10.
  */
 void SetFaultRandomListPick(std::uint32_t k) noexcept;
-
-namespace fiber {
 
 /**
  * Sets fiber stack size for fault injection in pages.

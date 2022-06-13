@@ -6,10 +6,10 @@
 
 namespace yaclib::detail {
 
-static std::atomic_uint32_t sAtomicFailFrequency = 13;
+static uint32_t sAtomicFailFrequency = 13;
 
 bool ShouldFailAtomicWeak() {
-  auto freq = sAtomicFailFrequency.load(std::memory_order_relaxed);
+  auto freq = sAtomicFailFrequency;
   return freq != 0 && GetRandNumber(freq) == 0;
 }
 

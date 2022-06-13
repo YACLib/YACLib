@@ -6,18 +6,17 @@
 
 namespace yaclib::detail {
 
-std::atomic_uint32_t Injector::sYieldFrequency = 16;
-std::atomic_uint32_t Injector::sSleepTime = 100;
-std::atomic_uint64_t Injector::sInjectedCount = 0;
+uint32_t Injector::sYieldFrequency = 16;
+uint32_t Injector::sSleepTime = 100;
+uint64_t Injector::sInjectedCount = 0;
 
 void Injector::MaybeInject() noexcept {
   if (NeedInject()) {
 #if YACLIB_FAULT == 2
     yaclib_std::this_thread::yield();
-    sInjectedCount.fetch_add(1);
+    sInjectedCount += 1;
 #else
-    yaclib_std::this_thread::sleep_for(
-      std::chrono::nanoseconds(1 + GetRandNumber(sSleepTime.load(std::memory_order_relaxed))));
+    yaclib_std::this_thread::sleep_for(std::chrono::nanoseconds(1 + GetRandNumber(sSleepTime)));
 #endif
   }
 }
@@ -26,7 +25,7 @@ bool Injector::NeedInject() noexcept {
   if (_pause) {
     return false;
   }
-  if (++_count >= sYieldFrequency.load(std::memory_order_relaxed)) {
+  if (++_count >= sYieldFrequency) {
     Reset();
     return true;
   }
@@ -34,23 +33,23 @@ bool Injector::NeedInject() noexcept {
 }
 
 void Injector::Reset() noexcept {
-  _count = GetRandNumber(sYieldFrequency.load(std::memory_order_relaxed));
+  _count = GetRandNumber(sYieldFrequency);
 }
 
 void Injector::SetFrequency(uint32_t freq) noexcept {
-  sYieldFrequency.store(freq);
+  sYieldFrequency = freq;
 }
 
 void Injector::SetSleepTime(uint32_t ns) noexcept {
-  sSleepTime.store(ns);
+  sSleepTime = ns;
 }
 
 uint32_t Injector::GetSleepTime() noexcept {
-  return sSleepTime.load(std::memory_order_relaxed);
+  return sSleepTime;
 }
 
 uint64_t Injector::GetInjectedCount() noexcept {
-  return sInjectedCount.load();
+  return sInjectedCount;
 }
 
 uint32_t Injector::GetState() const noexcept {

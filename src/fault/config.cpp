@@ -34,6 +34,8 @@ void SetSeed(std::uint32_t seed) noexcept {
   detail::SetSeed(seed);
 }
 
+namespace fiber {
+
 void SetFaultTickLength(std::uint32_t ns) noexcept {
 #if YACLIB_FAULT == 2
   fault::Scheduler::SetTickLength(ns);
@@ -45,8 +47,6 @@ void SetFaultRandomListPick(std::uint32_t k) noexcept {
   fault::Scheduler::SetRandomListPick(k);
 #endif
 }
-
-namespace fiber {
 
 void SetStackSize(std::uint32_t pages) noexcept {
 #if YACLIB_FAULT == 2

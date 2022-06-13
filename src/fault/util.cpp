@@ -2,21 +2,21 @@
 
 namespace yaclib::detail {
 
-static std::atomic_uint32_t sSeed{1239};
+static uint32_t sSeed{1239};
 
 #if YACLIB_FAULT == 2
 static int sRandCount{0};
 #endif
 
-static thread_local std::mt19937_64 eng{sSeed.load(std::memory_order_relaxed)};
+static thread_local std::mt19937_64 eng{sSeed};
 
 void SetSeed(uint32_t new_seed) {
-  sSeed.store(new_seed);
+  sSeed = new_seed;
   eng.seed(new_seed);
 }
 
 uint32_t GetSeed() {
-  return sSeed.load(std::memory_order_relaxed);
+  return sSeed;
 }
 
 uint64_t GetRandNumber(uint64_t max) {
