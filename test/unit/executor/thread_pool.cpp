@@ -8,13 +8,13 @@
 #include <yaclib/executor/thread_pool.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 
-#include <chrono>
 #include <cstddef>
 #include <initializer_list>
 #include <stdexcept>
 #include <thread>
 #include <vector>
 #include <yaclib_std/atomic>
+#include <yaclib_std/chrono>
 
 #include <gtest/gtest.h>
 
@@ -341,11 +341,12 @@ TEST_F(SingleHeavyThread, FIFO) {
   }
 }
 
+// TODO(MBkkt): might fail for fiber fault if sleep_for isn't enough for stop waiting
 void Exception(yaclib::IThreadPoolPtr& tp, StopType stop_type) {
   int flag = 0;
   Submit(*tp, [&] {
     flag += 1;
-    std::this_thread::sleep_for(1ms);  // Wait stop
+    yaclib_std::this_thread::sleep_for(1ms);  // Wait stop
     Submit(*tp, [&] {
       flag += 2;
     });
@@ -442,10 +443,10 @@ void UseAllThreads(yaclib::IThreadPoolPtr& tp, StopType stop_type) {
   yaclib_std::atomic_size_t counter{0};
 
   auto sleeper = [&counter] {
-    auto point = std::chrono::steady_clock::now() + 50ms * YACLIB_CI_SLOWDOWN;
+    auto point = yaclib_std::chrono::steady_clock::now() + 50ms * YACLIB_CI_SLOWDOWN;
     do {
       yaclib_std::this_thread::sleep_until(point);
-    } while (point > std::chrono::steady_clock::now());  // Workaround for MinGW
+    } while (point > yaclib_std::chrono::steady_clock::now());  // Workaround for MinGW
     counter.fetch_add(1, std::memory_order_relaxed);
   };
 
@@ -545,6 +546,7 @@ TEST_F(SingleLightThread, Current) {
 TEST_F(SingleHeavyThread, Current) {
   Current(_tps[0]);
 }
+
 TEST_F(MultiLightThread, Current) {
   Current(_tps[0]);
 }

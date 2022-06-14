@@ -4,5 +4,5 @@
 
 #include <chrono>
 
-#define YACLIB_FAULT_CLOCK 0  // TODO(myannyax) Implement
+#define YACLIB_FAULT_CLOCK YACLIB_FAULT
 #include <yaclib_std/detail/clock.hpp>

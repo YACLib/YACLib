@@ -52,11 +52,6 @@ if (ATOMIC_EVENT IN_LIST YACLIB_FLAGS)
   set(YACLIB_ATOMIC_EVENT 1)
 endif ()
 
-#TODO(myannyax) any ways this can be avoided?
-if (YACLIB_FAULT)
-  list(APPEND YACLIB_DEFINITIONS YACLIB_FAULT)
-endif ()
-
 if (ERROR IN_LIST YACLIB_LOG)
   list(APPEND YACLIB_DEFINITIONS YACLIB_LOG_ERROR)
 endif ()

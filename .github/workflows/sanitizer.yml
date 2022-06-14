@@ -91,7 +91,7 @@ jobs:
             build_type: RelWithDebInfo
 
     env:
-      YACLIB_FAULT: 'OFF THREAD'
+      YACLIB_FAULT: 'OFF THREAD FIBER'
 
     steps:
       - uses: actions/checkout@v3
@@ -145,6 +145,7 @@ jobs:
           if [[ ${{ matrix.os }} == "macos-11" ]]; then
             llvm=/usr/local/opt/llvm
             c_compilers=("$llvm/bin/clang" gcc-11 clang)
+            YACLIB_FAULT=(OFF THREAD)
             cxx_compilers=("$llvm/bin/clang++" g++-11 clang++)
             link_options=(
               "-L$llvm/lib;-Wl,-rpath,$llvm/lib"
@@ -235,6 +236,7 @@ jobs:
           names=(ClangCL MinGW MSVC)
           generators=("Visual Studio 17 2022" "MinGW Makefiles" "Visual Studio 17 2022")
           options=("-A x64 -T ClangCL" "-DCMAKE_BUILD_TYPE=${{ matrix.build_type }}" "-A x64")
+          YACLIB_FAULT=(OFF THREAD)
 
           for (( i=0; i<${#names[*]}; i+=1 )); do
             for yaclib_fault in ${YACLIB_FAULT[*]}; do
@@ -275,7 +277,7 @@ jobs:
         run: |
           flags=${{ matrix.flags }}
           default="help=0 verbosity=0 halt_on_error=0"
-          export ASAN_OPTIONS="$default debug=1 detect_leaks=0 check_initialization_order=1 detect_stack_use_after_return=1 strict_init_order=1 strict_string_checks=1 detect_invalid_pointer_pairs=2"
+          export ASAN_OPTIONS="$default debug=1 detect_leaks=0 check_initialization_order=1 detect_stack_use_after_return=1 strict_init_order=1 strict_string_checks=1 detect_invalid_pointer_pairs=0"
           export TSAN_OPTIONS="$default history_size=2 io_sync=0 detect_deadlocks=1 second_deadlock_stack=1"  
           export UBSAN_OPTIONS="$default print_stacktrace=1"
           if [[ $flags == "LSAN" ]]; then  # This is necessary for the schizo macOS ASAN, who for some reason reads LSAN_OPTIONS

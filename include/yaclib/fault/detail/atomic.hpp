@@ -7,6 +7,10 @@
 
 namespace yaclib::detail {
 
+bool ShouldFailAtomicWeak();
+
+void SetAtomicWeakFailFrequency(uint32_t k);
+
 template <typename Impl, typename T>
 class AtomicBase : public AtomicWait<Impl, T> {
   using Base = AtomicWait<Impl, T>;
@@ -58,41 +62,56 @@ class AtomicBase : public AtomicWait<Impl, T> {
     return r;
   }
 
-  // TODO(myannyax) Add probability of random fail for compare_exchange_weak
   bool compare_exchange_weak(T& expected, T desired, std::memory_order success, std::memory_order failure) noexcept {
+    if (ShouldFailAtomicWeak()) {
+      expected = load(failure);
+      return false;
+    }
     YACLIB_INJECT_FAULT(auto r = Impl::compare_exchange_weak(expected, desired, success, failure));
     return r;
   }
   bool compare_exchange_weak(T& expected, T desired, std::memory_order success,
                              std::memory_order failure) volatile noexcept {
+    if (ShouldFailAtomicWeak()) {
+      expected = load(failure);
+      return false;
+    }
     YACLIB_INJECT_FAULT(auto r = Impl::compare_exchange_weak(expected, desired, success, failure));
     return r;
   }
   bool compare_exchange_weak(T& expected, T desired, std::memory_order order = std::memory_order_seq_cst) noexcept {
+    if (ShouldFailAtomicWeak()) {
+      expected = load(order);
+      return false;
+    }
     YACLIB_INJECT_FAULT(auto r = Impl::compare_exchange_weak(expected, desired, order));
     return r;
   }
   bool compare_exchange_weak(T& expected, T desired,
                              std::memory_order order = std::memory_order_seq_cst) volatile noexcept {
+    if (ShouldFailAtomicWeak()) {
+      expected = load(order);
+      return false;
+    }
     YACLIB_INJECT_FAULT(auto r = Impl::compare_exchange_weak(expected, desired, order));
     return r;
   }
   bool compare_exchange_strong(T& expected, T desired, std::memory_order success, std::memory_order failure) noexcept {
-    YACLIB_INJECT_FAULT(auto r = Impl::compare_exchange_weak(expected, desired, success, failure));
+    YACLIB_INJECT_FAULT(auto r = Impl::compare_exchange_strong(expected, desired, success, failure));
     return r;
   }
   bool compare_exchange_strong(T& expected, T desired, std::memory_order success,
                                std::memory_order failure) volatile noexcept {
-    YACLIB_INJECT_FAULT(auto r = Impl::compare_exchange_weak(expected, desired, success, failure));
+    YACLIB_INJECT_FAULT(auto r = Impl::compare_exchange_strong(expected, desired, success, failure));
     return r;
   }
   bool compare_exchange_strong(T& expected, T desired, std::memory_order order = std::memory_order_seq_cst) noexcept {
-    YACLIB_INJECT_FAULT(auto r = Impl::compare_exchange_weak(expected, desired, order));
+    YACLIB_INJECT_FAULT(auto r = Impl::compare_exchange_strong(expected, desired, order));
     return r;
   }
   bool compare_exchange_strong(T& expected, T desired,
                                std::memory_order order = std::memory_order_seq_cst) volatile noexcept {
-    YACLIB_INJECT_FAULT(auto r = Impl::compare_exchange_weak(expected, desired, order));
+    YACLIB_INJECT_FAULT(auto r = Impl::compare_exchange_strong(expected, desired, order));
     return r;
   }
 };

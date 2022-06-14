@@ -74,12 +74,18 @@ void Stress2(const std::size_t kCoros, test::util::Duration dur) {
 }
 
 TEST(AsyncMutexStress, TimerPerCoro) {
+#if YACLIB_FAULT == 2
+  GTEST_SKIP();  // TODO(myannyax): make time run forward even without switches
+#endif
   using namespace std::chrono_literals;
   Stress1(4, 1s * YACLIB_CI_SLOWDOWN);
   Stress1(100, 1s * YACLIB_CI_SLOWDOWN);
 }
 
 TEST(AsyncMutexStress, CommonTimer) {
+#if YACLIB_FAULT == 2
+  GTEST_SKIP();  // TODO(myannyax): make time run forward even without switches
+#endif
   using namespace std::chrono_literals;
   Stress2(4, 1s * YACLIB_CI_SLOWDOWN);
   Stress2(100, 1s * YACLIB_CI_SLOWDOWN);

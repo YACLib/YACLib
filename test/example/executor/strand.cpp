@@ -31,7 +31,7 @@ TEST(Example, Strand) {
   static constexpr std::size_t kThreads = 5;
   static constexpr std::size_t kIncrementsPerThread = 12345;
 
-  std::vector<std::thread> threads;
+  std::vector<yaclib_std::thread> threads;
 
   for (std::size_t i = 0; i < kThreads; ++i) {
     threads.emplace_back([&]() {

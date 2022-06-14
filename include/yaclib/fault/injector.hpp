@@ -1,29 +1,41 @@
 #pragma once
 
 #include <atomic>
-#include <random>
 
 namespace yaclib::detail {
 
 // TODO(myannyax) Add metrics, refactor this shit
 class Injector {
  public:
-  explicit Injector();
-  void MaybeInject();
+  explicit Injector() noexcept = default;
 
-  static void SetFrequency(uint32_t freq);
-  static void SetSleepTime(uint32_t ns);
+  void MaybeInject() noexcept;
+
+  uint32_t GetState() const noexcept;
+
+  void SetState(uint32_t state) noexcept;
+
+  void Disable() noexcept;
+
+  void Enable() noexcept;
+
+  static void SetFrequency(uint32_t freq) noexcept;
+  static void SetSleepTime(uint32_t ns) noexcept;
+
+  static uint32_t GetSleepTime() noexcept;
+
+  static uint64_t GetInjectedCount() noexcept;
 
  private:
-  bool NeedInject();
-  void Reset();
-  uint32_t RandNumber(uint32_t max);
+  bool NeedInject() noexcept;
+  void Reset() noexcept;
 
-  static std::atomic_uint32_t yield_frequency;
-  static std::atomic_uint32_t sleep_time;
+  static uint32_t sYieldFrequency;
+  static uint32_t sSleepTime;
+  static uint64_t sInjectedCount;
 
-  uint32_t _count;
-  std::mt19937 _eng;
+  std::atomic_uint32_t _count{0};
+  bool _pause{false};
 };
 
 }  // namespace yaclib::detail

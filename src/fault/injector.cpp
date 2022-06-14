@@ -1,47 +1,71 @@
+#include <fault/util.hpp>
+
 #include <yaclib/fault/injector.hpp>
 
 #include <yaclib_std/thread>
 
 namespace yaclib::detail {
 
-inline constexpr int kFreq = 16;
-inline constexpr int kSleepTimeNs = 200;
+uint32_t Injector::sYieldFrequency = 16;
+uint32_t Injector::sSleepTime = 100;
+uint64_t Injector::sInjectedCount = 0;
 
-std::atomic_uint32_t Injector::yield_frequency = kFreq;
-std::atomic_uint32_t Injector::sleep_time = kSleepTimeNs;
-
-// TODO(myannyax) maybe scheduler-wide random engine?
-Injector::Injector() : _eng{1142}, _count{0} {
-}
-
-void Injector::MaybeInject() {
+void Injector::MaybeInject() noexcept {
   if (NeedInject()) {
-    yaclib_std::this_thread::sleep_for(std::chrono::nanoseconds(RandNumber(sleep_time)));
+#if YACLIB_FAULT == 2
+    yaclib_std::this_thread::yield();
+    sInjectedCount += 1;
+#else
+    yaclib_std::this_thread::sleep_for(std::chrono::nanoseconds(1 + GetRandNumber(sSleepTime)));
+#endif
   }
 }
 
-bool Injector::NeedInject() {
-  if (++_count >= yield_frequency) {
+bool Injector::NeedInject() noexcept {
+  if (_pause) {
+    return false;
+  }
+  if (++_count >= sYieldFrequency) {
     Reset();
     return true;
   }
   return false;
 }
 
-void Injector::Reset() {
-  _count = RandNumber(yield_frequency);
+void Injector::Reset() noexcept {
+  _count = GetRandNumber(sYieldFrequency);
 }
 
-uint32_t Injector::RandNumber(uint32_t max) {
-  return 1 + _eng() % (max - 1);
+void Injector::SetFrequency(uint32_t freq) noexcept {
+  sYieldFrequency = freq;
 }
 
-void Injector::SetFrequency(uint32_t freq) {
-  yield_frequency.store(freq);
+void Injector::SetSleepTime(uint32_t ns) noexcept {
+  sSleepTime = ns;
 }
 
-void Injector::SetSleepTime(uint32_t ns) {
-  sleep_time.store(ns);
+uint32_t Injector::GetSleepTime() noexcept {
+  return sSleepTime;
+}
+
+uint64_t Injector::GetInjectedCount() noexcept {
+  return sInjectedCount;
+}
+
+uint32_t Injector::GetState() const noexcept {
+  return _count;
+}
+
+void Injector::SetState(uint32_t state) noexcept {
+  _count = state;
+}
+
+void Injector::Disable() noexcept {
+  _pause = true;
+}
+
+void Injector::Enable() noexcept {
+  _pause = false;
 }
 
 }  // namespace yaclib::detail

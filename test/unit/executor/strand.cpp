@@ -14,6 +14,7 @@
 #include <thread>
 #include <type_traits>
 #include <vector>
+#include <yaclib_std/atomic>
 #include <yaclib_std/thread>
 
 #include <gtest/gtest.h>

@@ -1,0 +1,6 @@
+#pragma once
+
+#include <yaclib/config.hpp>
+
+#define YACLIB_FAULT_THREAD_LOCAL YACLIB_FAULT
+#include <yaclib_std/detail/thread_local.hpp>
