@@ -38,7 +38,7 @@ class FiberBase : public BiNodeScheduler, public BiNodeWaitQueue {
 
   void Resume();
 
-  void Yield();
+  void Yield();  // TODO Should be named Suspend
 
   FiberState GetState() noexcept;
 
@@ -57,7 +57,8 @@ class FiberBase : public BiNodeScheduler, public BiNodeWaitQueue {
   virtual ~FiberBase() = default;
 
  protected:
-  void Complete();
+  void Start();
+  void Exit();
 
   ExecutionContext _context{};
   Stack _stack;

@@ -17,6 +17,8 @@ class ExecutionContext {
  public:
   void Setup(Allocation stack, Trampoline trampoline, void* arg);
 
+  void Start();
+
   void SwitchTo(ExecutionContext& other);
 
   void Exit(ExecutionContext& other);
@@ -24,6 +26,11 @@ class ExecutionContext {
  private:
   Allocation _stack;
   ucontext_t _context;
+
+#ifdef YACLIB_ASAN
+  const void* _old_stack_bottom{nullptr};
+  size_t _old_stack_size{0};
+#endif
 };
 
 }  // namespace yaclib::detail::fiber

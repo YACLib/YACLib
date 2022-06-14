@@ -4,11 +4,11 @@
 
 namespace yaclib::detail::fiber {
 
-static FiberBase::Id sNextId{1L};
+static FiberBase::Id sNextId = 0;
 
-DefaultAllocator FiberBase::sAllocator{};
+DefaultAllocator FiberBase::sAllocator;
 
-FiberBase::FiberBase() : _id(sNextId++), _stack(sAllocator) {
+FiberBase::FiberBase() : _stack{sAllocator}, _id{++sNextId} {
 }
 
 FiberBase::Id FiberBase::GetId() const noexcept {
@@ -34,7 +34,11 @@ void FiberBase::Yield() {
   _context.SwitchTo(_caller_context);
 }
 
-void FiberBase::Complete() {
+void FiberBase::Start() {
+  _context.Start();
+}
+
+void FiberBase::Exit() {
   _state = Completed;
   if (_joining_fiber != nullptr && _threadlike_instance_alive) {
     ScheduleFiber(_joining_fiber);
