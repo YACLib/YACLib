@@ -13,10 +13,6 @@
 #include <exception>
 #include <unordered_map>
 
-#ifdef YACLIB_ASAN
-#  include <sanitizer/asan_interface.h>
-#endif
-
 namespace yaclib::detail::fiber {
 
 class BiNodeScheduler : public Node {};
