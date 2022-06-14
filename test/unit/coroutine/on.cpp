@@ -144,6 +144,7 @@ TEST(On, LockWithStrand) {
     add_value(kIncrements);
   }
   while (!end.load(std::memory_order_acquire)) {
+    yaclib_std::this_thread::yield();
   }
   tp->Stop();
   tp->Wait();

@@ -14,10 +14,10 @@ class AtomicFlag : public AtomicWait<Impl, bool> {
   using Base::Base;
 
   void clear(std::memory_order order = std::memory_order_seq_cst) volatile noexcept {
-    YACLIB_INJECT_FAULT(Impl::clear());
+    YACLIB_INJECT_FAULT(Impl::clear(order));
   }
   void clear(std::memory_order order = std::memory_order_seq_cst) noexcept {
-    YACLIB_INJECT_FAULT(Impl::clear());
+    YACLIB_INJECT_FAULT(Impl::clear(order));
   }
 
   bool test_and_set(std::memory_order order = std::memory_order_seq_cst) volatile noexcept {

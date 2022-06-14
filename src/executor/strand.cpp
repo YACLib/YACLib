@@ -74,7 +74,7 @@ class /*alignas(kCacheLineSize)*/ Strand : public Job, public IExecutor {
   }
 
   IExecutorPtr _executor;
-  std::atomic<Node*> _tasks{Mark()};
+  yaclib_std::atomic<Node*> _tasks{Mark()};
 };
 
 }  // namespace

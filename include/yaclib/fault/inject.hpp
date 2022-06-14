@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 namespace yaclib {
 namespace detail {
 
@@ -10,6 +12,8 @@ class Injector;
 detail::Injector* GetInjector() noexcept;
 
 void InjectFault() noexcept;
+
+uint64_t GetInjectedCount() noexcept;
 
 }  // namespace yaclib
 

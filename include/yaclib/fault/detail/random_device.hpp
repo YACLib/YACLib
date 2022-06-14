@@ -9,16 +9,11 @@ namespace yaclib::detail::thread {
 
 class RandomDevice {
  public:
-  using result_type = std::mt19937::result_type;
-
-  static constexpr const result_type kMin = 0;
-  static constexpr const result_type kMax = 0xFFFFFFFFU;
-  static constexpr const result_type kEntropy = 0;
+  using result_type = std::mt19937_64::result_type;
 
   RandomDevice();
 
-  explicit RandomDevice(const std::string& /*token*/) : RandomDevice() {
-  }
+  explicit RandomDevice(const std::string& /*token*/);
 
   result_type operator()() noexcept;
 
@@ -37,8 +32,7 @@ class RandomDevice {
   RandomDevice& operator=(const RandomDevice&) = delete;
 
  private:
-  static constexpr const unsigned kSeed = 1337;
-  std::mt19937 _eng;
+  std::mt19937_64 _eng;
 };
 
 }  // namespace yaclib::detail::thread

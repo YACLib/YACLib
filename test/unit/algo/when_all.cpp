@@ -259,7 +259,7 @@ template <typename Error = yaclib::StopError>
 void FirstFail() {
   auto tp = yaclib::MakeThreadPool();
   std::vector<yaclib::FutureOn<void, Error>> ints;
-  std::size_t count = std::thread::hardware_concurrency() * 4;
+  std::size_t count = yaclib_std::thread::hardware_concurrency() * 4;
   ints.reserve(count * 2);
   for (int j = 0; j != 200; ++j) {
     for (std::size_t i = 0; i != count; ++i) {

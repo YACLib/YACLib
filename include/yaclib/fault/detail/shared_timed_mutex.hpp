@@ -11,7 +11,7 @@ namespace yaclib::detail {
 //  private Impl, public SharedMutex<Impl>, public TimedMutex<Impl>
 template <typename Impl>
 class SharedTimedMutex : public SharedMutex<Impl> {
-  using Base = SharedTimedMutex<Impl>;
+  using Base = SharedMutex<Impl>;
 
  public:
   using Base::Base;
@@ -23,7 +23,7 @@ class SharedTimedMutex : public SharedMutex<Impl> {
   }
 
   template <typename Clock, typename Duration>
-  bool try_lock_until(const std::chrono::duration<Clock, Duration>& timeout_time) {
+  bool try_lock_until(const std::chrono::time_point<Clock, Duration>& timeout_time) {
     YACLIB_INJECT_FAULT(auto r = Impl::try_lock_until(timeout_time));
     return r;
   }
@@ -35,7 +35,7 @@ class SharedTimedMutex : public SharedMutex<Impl> {
   }
 
   template <typename Clock, typename Duration>
-  bool try_lock_shared_until(const std::chrono::duration<Clock, Duration>& timeout_time) {
+  bool try_lock_shared_until(const std::chrono::time_point<Clock, Duration>& timeout_time) {
     YACLIB_INJECT_FAULT(auto r = Impl::try_lock_shared_until(timeout_time));
     return r;
   }

@@ -1,7 +1,6 @@
 #pragma once
 
-#if YACLIB_FAULT_SHARED_TIMED_MUTEX == 2  // TODO(myannyax) Implement
-#  error "YACLIB_FAULT=FIBER not implemented yet"
+#if YACLIB_FAULT_SHARED_TIMED_MUTEX == 2
 
 #  include <yaclib/fault/detail/fiber/shared_timed_mutex.hpp>
 #  include <yaclib/fault/detail/shared_timed_mutex.hpp>

@@ -70,6 +70,13 @@ if (YACLIB_CORO_NEED)
     )
 endif ()
 
+if (YACLIB_FAULT STREQUAL "FIBER")
+  list(APPEND YACLIB_UNIT_SOURCES
+    unit/fault/mutexes
+    unit/fault/thread_local
+    )
+endif ()
+
 #TODO(MBkkt) Add options which shuffle tests list, maybe just use gtest options?
 set(YACLIB_TEST_SOURCES ${YACLIB_UNIT_SOURCES} ${YACLIB_EXAMPLE_SOURCES})
 

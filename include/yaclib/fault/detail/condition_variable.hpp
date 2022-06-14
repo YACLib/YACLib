@@ -1,13 +1,18 @@
 #pragma once
 
+#include <yaclib/fault/detail/wait_status.hpp>
 #include <yaclib/fault/inject.hpp>
 #include <yaclib/log.hpp>
 
+#include <condition_variable>
 #include <tuple>
 #include <yaclib_std/chrono>
 #include <yaclib_std/mutex>
 
 namespace yaclib::detail {
+
+constexpr std::cv_status CVStatusFrom(WaitStatus);
+constexpr std::cv_status CVStatusFrom(std::cv_status);
 
 // TODO(myannyax) unite with ConditionVariableAny
 
@@ -43,7 +48,7 @@ class ConditionVariable : private Impl {
     auto [mutex, impl_lock] = From(lock);
     YACLIB_INJECT_FAULT(auto r = Impl::wait_for(impl_lock, rel_time));
     lock = From(mutex, impl_lock);
-    return r;
+    return CVStatusFrom(r);
   }
   template <typename Rep, typename Period, typename Predicate>
   bool wait_for(std::unique_lock<yaclib_std::mutex>& lock, const std::chrono::duration<Rep, Period>& rel_time,
@@ -60,7 +65,7 @@ class ConditionVariable : private Impl {
     auto [mutex, impl_lock] = From(lock);
     YACLIB_INJECT_FAULT(auto r = Impl::wait_until(impl_lock, timeout_time));
     lock = From(mutex, impl_lock);
-    return r;
+    return CVStatusFrom(r);
   }
   template <typename Clock, typename Duration, typename Predicate>
   bool wait_until(std::unique_lock<yaclib_std::mutex>& lock,
@@ -75,7 +80,9 @@ class ConditionVariable : private Impl {
   static auto From(std::unique_lock<yaclib_std::mutex>& lock) {
     YACLIB_ERROR(!lock.owns_lock(), "Trying to call wait on not owned lock");
     auto* mutex = lock.release();
-    return std::tuple{mutex, std::unique_lock{mutex->GetImpl(), std::adopt_lock}};
+    // type is specified since some old compilers like clang 8 aren't able to calculate it
+    return std::tuple<yaclib_std::mutex*, std::unique_lock<yaclib_std::mutex::impl_t>>{
+      mutex, std::unique_lock{mutex->GetImpl(), std::adopt_lock}};
   }
   static auto From(yaclib_std::mutex* mutex, std::unique_lock<yaclib_std::mutex::impl_t>& lock_impl) {
     YACLIB_ERROR(!lock_impl.owns_lock(), "After call wait on not owned lock");
