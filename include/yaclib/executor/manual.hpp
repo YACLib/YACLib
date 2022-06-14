@@ -19,7 +19,7 @@ class ManualExecutor : public yaclib::IExecutor {
 
   void Submit(yaclib::Job& f) noexcept final;
 
-  void Drain();
+  std::size_t Drain();
 
   ~ManualExecutor() override;
 };
