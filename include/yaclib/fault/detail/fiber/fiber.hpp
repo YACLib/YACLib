@@ -13,19 +13,19 @@ template <typename... Args>
 class Fiber final : public FiberBase {
  public:
   // TODO(myannyax): add tests
-  Fiber(Args&&... args) : _func_state(std::forward<Args>(args)...) {
+  Fiber(Args&&... args) : _func(std::forward<Args>(args)...) {
     _context.Setup(_stack.GetAllocation(), Trampoline, this);
   }
 
-  [[noreturn]] static void Trampoline(void* arg) noexcept {
-    auto* coroutine = reinterpret_cast<Fiber*>(arg);
+  static void Trampoline(void* arg) noexcept {
+    auto& fiber = *reinterpret_cast<Fiber*>(arg);
+    fiber.Start();
     try {
-      Helper(coroutine->_func_state, std::index_sequence_for<FuncState<Args...>>{});
+      Helper(fiber._func, std::index_sequence_for<FuncState<Args...>>{});
     } catch (...) {
-      coroutine->_exception = std::current_exception();
+      fiber._exception = std::current_exception();
     }
-
-    coroutine->Complete();
+    fiber.Exit();
   }
 
   ~Fiber() final = default;
@@ -36,7 +36,7 @@ class Fiber final : public FiberBase {
     std::invoke(std::move(std::get<I>(a))...);
   }
 
-  FuncState<Args...> _func_state;
+  FuncState<Args...> _func;
 };
 
 }  // namespace yaclib::detail::fiber

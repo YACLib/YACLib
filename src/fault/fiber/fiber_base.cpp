@@ -4,11 +4,11 @@
 
 namespace yaclib::detail::fiber {
 
-static FiberBase::Id sNextId{1L};
+static FiberBase::Id sNextId{0L};
 
 DefaultAllocator FiberBase::sAllocator{};
 
-FiberBase::FiberBase() : _id(sNextId++), _stack(sAllocator) {
+FiberBase::FiberBase() : _stack{sAllocator}, _id{++sNextId} {
 }
 
 FiberBase::Id FiberBase::GetId() const noexcept {
@@ -22,34 +22,28 @@ void FiberBase::Resume() {
 
   _state = Running;
 
-#ifdef YACLIB_ASAN
-  void* _fake_stack{nullptr};
-  const void* _bottom_old{nullptr};
-  std::size_t _size_old{0};
-
-  __sanitizer_start_switch_fiber(&_fake_stack, _stack.GetAllocation().start, _stack.GetAllocation().size);
-#endif
   _caller_context.SwitchTo(_context);
-#ifdef YACLIB_ASAN
-  __sanitizer_finish_switch_fiber(_fake_stack, &_bottom_old, &_size_old);
-#endif
 
   if (_exception != nullptr) {
     rethrow_exception(_exception);
   }
 }
 
-void FiberBase::Yield() {
+void FiberBase::Suspend() {
   _state = Suspended;
   _context.SwitchTo(_caller_context);
 }
 
-void FiberBase::Complete() {
+void FiberBase::Start() {
+  _context.Start();
+}
+
+void FiberBase::Exit() {
   _state = Completed;
   if (_joining_fiber != nullptr && _threadlike_instance_alive) {
     ScheduleFiber(_joining_fiber);
   }
-  _context.SwitchTo(_caller_context);
+  _context.Exit(_caller_context);
 }
 
 FiberState FiberBase::GetState() noexcept {

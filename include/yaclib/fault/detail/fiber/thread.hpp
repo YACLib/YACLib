@@ -17,7 +17,7 @@ class Thread {
   Thread& operator=(const Thread&) = delete;
 
   using id = FiberBase::Id;
-  using native_handle_type = std::thread::native_handle_type;
+  using native_handle_type = void*;
 
   template <typename... Args>
   explicit Thread(Args&&... args) : _impl(new Fiber<Args...>(std::forward<Args>(args)...)) {

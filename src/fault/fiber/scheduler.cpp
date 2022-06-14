@@ -24,7 +24,7 @@ bool Scheduler::IsRunning() const noexcept {
 
 void Scheduler::Suspend() {
   auto* fiber = sCurrent;
-  fiber->Yield();
+  fiber->Suspend();
 }
 
 void Scheduler::Stop() {
@@ -111,7 +111,7 @@ void Scheduler::RescheduleCurrent() {
   }
   auto* fiber = sCurrent;
   GetScheduler()->_queue.PushBack(static_cast<detail::fiber::BiNodeScheduler*>(fiber));
-  fiber->Yield();
+  fiber->Suspend();
 }
 
 void Scheduler::SetTickLength(uint32_t tick) noexcept {

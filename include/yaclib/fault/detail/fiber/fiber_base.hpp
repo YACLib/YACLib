@@ -13,10 +13,6 @@
 #include <exception>
 #include <unordered_map>
 
-#ifdef YACLIB_ASAN
-#  include <sanitizer/asan_interface.h>
-#endif
-
 namespace yaclib::detail::fiber {
 
 class BiNodeScheduler : public Node {};
@@ -42,7 +38,7 @@ class FiberBase : public BiNodeScheduler, public BiNodeWaitQueue {
 
   void Resume();
 
-  void Yield();
+  void Suspend();
 
   FiberState GetState() noexcept;
 
@@ -61,7 +57,8 @@ class FiberBase : public BiNodeScheduler, public BiNodeWaitQueue {
   virtual ~FiberBase() = default;
 
  protected:
-  void Complete();
+  void Start();
+  void Exit();
 
   ExecutionContext _context{};
   Stack _stack;

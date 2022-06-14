@@ -43,6 +43,7 @@ FiberBase::Id Thread::get_id() const noexcept {
 
 Thread::native_handle_type Thread::native_handle() noexcept {
   YACLIB_ERROR(true, "native_hande is not supported for fibers");
+  return nullptr;
 }
 
 unsigned int Thread::hardware_concurrency() noexcept {
