@@ -2,7 +2,7 @@
 
 #include <yaclib/async/future.hpp>
 #include <yaclib/coroutine/coroutine.hpp>
-#include <yaclib/coroutine/detail/handle_wrapper.hpp>
+#include <yaclib/coroutine/detail/awaiter_deleters.hpp>
 #include <yaclib/util/detail/atomic_counter.hpp>
 #include <yaclib/util/type_traits.hpp>
 

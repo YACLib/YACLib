@@ -49,6 +49,9 @@ TEST(AwaitGroup, JustWorks) {
 }
 
 TEST(AwaitGroup, OneWaiter) {
+#if defined(YACLIB_UBSAN) && (defined(__GLIBCPP__) || defined(__GLIBCXX__))
+  GTEST_SKIP();
+#endif
   auto scheduler = yaclib::MakeManual();
 
   yaclib::AwaitGroup wg;
@@ -89,6 +92,9 @@ TEST(AwaitGroup, OneWaiter) {
 }
 
 TEST(AwaitGroup, Workers) {
+#if defined(YACLIB_UBSAN) && (defined(__GLIBCPP__) || defined(__GLIBCXX__))
+  GTEST_SKIP();
+#endif
   auto scheduler = yaclib::MakeManual();
 
   yaclib::AwaitGroup wg;
@@ -136,7 +142,11 @@ TEST(AwaitGroup, Workers) {
 
   EXPECT_GE(steps, kWaiters + kWorkers * kYields);
 }
+
 TEST(AwaitGroup, BlockingWait) {
+#if defined(YACLIB_UBSAN) && (defined(__GLIBCPP__) || defined(__GLIBCXX__))
+  GTEST_SKIP();
+#endif
   const static std::size_t HW_CONC = std::max(2u, yaclib_std::thread::hardware_concurrency());
   auto scheduler = yaclib::MakeThreadPool(HW_CONC);
 
@@ -175,6 +185,76 @@ TEST(AwaitGroup, BlockingWait) {
   Wait(worker_futures.begin(), worker_futures.end());
   Wait(waiter_future);
   EXPECT_TRUE(sw.Elapsed() < .6s * YACLIB_CI_SLOWDOWN);
+  scheduler->HardStop();
+  scheduler->Wait();
+}
+TEST(AwaitGroup, WithFutures) {
+#if defined(YACLIB_UBSAN) && (defined(__GLIBCPP__) || defined(__GLIBCXX__))
+  GTEST_SKIP();
+#endif
+  auto scheduler = yaclib::MakeThreadPool(4);
+
+  yaclib::AwaitGroup wg;
+
+  yaclib_std::atomic_size_t done = 0;
+  yaclib_std::atomic_bool flag = false;
+
+  auto squarer = [&](int x) -> yaclib::Future<int> {
+    co_await On(*scheduler);
+    yaclib_std::this_thread::sleep_for(YACLIB_CI_SLOWDOWN * 1ms);
+    done.fetch_add(1);
+    while (!flag.load()) {
+    }
+    co_return x* x;
+  };
+
+  auto waiter = [&]() -> yaclib::Future<int> {
+    auto one = squarer(1);
+    auto four = squarer(2);
+    auto nine = squarer(3);
+    wg.Add(one, four, nine);
+    EXPECT_FALSE(flag.load());
+    co_await wg.Wait(*scheduler);
+    EXPECT_TRUE(flag.load());
+    co_return std::move(one).Get().Value() + std::move(four).Get().Value() + std::move(nine).Get().Value();
+  };
+
+  auto res = waiter();
+  EXPECT_FALSE(res.Ready());
+  flag.store(true);
+
+  EXPECT_EQ(1 + 2 * 2 + 3 * 3, std::move(res).Get().Value());
+
+  scheduler->HardStop();
+  scheduler->Wait();
+}
+
+TEST(AwaitGroup, SwichThread) {
+#if defined(YACLIB_UBSAN) && (defined(__GLIBCPP__) || defined(__GLIBCXX__))
+  GTEST_SKIP();
+#endif
+  auto scheduler = yaclib::MakeThreadPool(4);
+
+  yaclib::AwaitGroup wg;
+
+  auto squarer = [&](int x) -> yaclib::Future<int> {
+    co_await On(*scheduler);
+    yaclib_std::this_thread::sleep_for(YACLIB_CI_SLOWDOWN * 1ms);
+    co_return x* x;
+  };
+
+  auto main_thread = yaclib_std::this_thread::get_id();
+
+  auto waiter = [&]() -> yaclib::Future<int> {
+    auto one = squarer(1);
+    wg.Add(one);
+    co_await wg.Wait(*scheduler);
+    EXPECT_NE(main_thread, yaclib_std::this_thread::get_id());
+    co_return std::move(one).Get().Value();
+  };
+
+  EXPECT_EQ(1, waiter().Get().Value());
+
   scheduler->HardStop();
   scheduler->Wait();
 }

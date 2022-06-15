@@ -61,7 +61,7 @@ void Stress1(const std::size_t kWaiters, const std::size_t kWorkers, test::util:
   tp->HardStop();
   tp->Wait();
 }
-/*
+
 TEST(AwaitGroup, Stress1) {
 #if defined(YACLIB_UBSAN) && (defined(__GLIBCPP__) || defined(__GLIBCXX__))
   GTEST_SKIP();
@@ -73,7 +73,6 @@ TEST(AwaitGroup, Stress1) {
     }
   }
 }
-*/
 class Goer {
  public:
   explicit Goer(yaclib::IExecutor& scheduler, yaclib::AwaitGroup& wg) : scheduler_(scheduler), wg_(wg) {

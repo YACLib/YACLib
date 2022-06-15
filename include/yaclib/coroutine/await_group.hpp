@@ -1,48 +1,11 @@
-#pragma once
-
 #include <yaclib/async/future.hpp>
 #include <yaclib/config.hpp>
-#include <yaclib/coroutine/detail/handle_wrapper.hpp>
+#include <yaclib/coroutine/detail/awaiter_deleters.hpp>
+#include <yaclib/executor/thread_pool.hpp>
 #include <yaclib/util/detail/atomic_counter.hpp>
 #include <yaclib/util/type_traits.hpp>
 
-#include <iostream>  // for debug
-
 namespace yaclib {
-
-namespace detail {
-// TODO(mkornaukhov03) memory models
-struct LFStack : public IRef {
-  yaclib_std::atomic<std::uintptr_t> head{kEmpty};
-  bool AddWaiter(BaseCore* core_ptr) {  // TODO noexcept?
-    std::uintptr_t old_head = head.load(std::memory_order_seq_cst);
-    std::uintptr_t core = reinterpret_cast<std::uintptr_t>(core_ptr);
-    while (old_head != kAllDone) {
-      core_ptr->next = reinterpret_cast<BaseCore*>(old_head);
-      if (head.compare_exchange_weak(old_head, core)) {
-        return true;
-      }
-    }
-    return false;
-  }
-  constexpr static std::uintptr_t kEmpty = 0;
-  constexpr static std::uintptr_t kAllDone = 1;
-};
-struct AwaitersResumer {
-  static void Delete(LFStack& awaiters) {
-    // std::cout << "Resumer Delete" << std::endl;
-    std::uintptr_t old_head = awaiters.head.exchange(LFStack::kAllDone, std::memory_order_seq_cst);  // TODO noexcept?
-    int i = 0;
-    while (old_head != LFStack::kEmpty) {
-      BaseCore* core = reinterpret_cast<BaseCore*>(old_head);
-      yaclib_std::coroutine_handle<> handle = core->GetHandle();
-      old_head = reinterpret_cast<std::uintptr_t>(static_cast<BaseCore*>(core->next));
-      handle.resume();  // TODO(mkornaukhov03, MBkkt) run in custom executor
-    }
-  }
-};
-
-}  // namespace detail
 
 class AwaitGroup {
  public:
@@ -67,22 +30,37 @@ class AwaitGroup {
     AddIterator<NeedAdd>(begin, count);
   }
 
-  // Awaitable traits
-
-  YACLIB_INLINE bool await_ready() const noexcept {
-    return _await_core.head.load(std::memory_order_seq_cst) == detail::LFStack::kAllDone;
+  auto Wait(IExecutor& exec = CurrentThreadPool()) {
+    return awaiter(*this, exec);
   }
 
-  template <typename Promise>
-  YACLIB_INLINE bool await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
-    detail::BaseCore& core = handle.promise();
-    return _await_core.AddWaiter(&core);
-  }
-
-  YACLIB_INLINE void await_resume() const noexcept {
+  auto operator co_await() {
+    YACLIB_INFO(true, "Better use AwaitGroup::Wait(executor)");
+    return Wait();
   }
 
  private:
+  struct awaiter {
+    awaiter(AwaitGroup& self, IExecutor& executor) : _self(self), _executor(&executor) {
+    }
+    YACLIB_INLINE bool await_ready() const noexcept {
+      return _self._await_core.head.load(std::memory_order_seq_cst) == detail::LFStack::kAllDone;
+    }
+
+    template <typename Promise>
+    YACLIB_INLINE bool await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
+      detail::BaseCore& core = handle.promise();
+      core.SetExecutor(_executor);
+      return _self._await_core.AddWaiter(&core);
+    }
+
+    YACLIB_INLINE void await_resume() const noexcept {
+    }
+
+   private:
+    AwaitGroup& _self;
+    IExecutor* _executor;
+  };
   template <bool NeedAdd, typename... Cores>
   void AddCore(Cores&... cores) {
     static_assert(sizeof...(cores) >= 1, "Number of futures must be at least one");
