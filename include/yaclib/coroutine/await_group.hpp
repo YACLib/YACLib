@@ -6,46 +6,47 @@
 #include <yaclib/util/detail/atomic_counter.hpp>
 #include <yaclib/util/type_traits.hpp>
 
-#include <iostream> // for debug
+#include <iostream>  // for debug
 
 namespace yaclib {
 
 namespace detail {
-  // TODO(mkornaukhov03) memory models 
+// TODO(mkornaukhov03) memory models
 struct LFStack : public IRef {
   yaclib_std::atomic<std::uintptr_t> head{kEmpty};
-  void AddWaiter(BaseCore* core) {  // TODO noexcept?
+  bool AddWaiter(BaseCore* core_ptr) {  // TODO noexcept?
     std::uintptr_t old_head = head.load(std::memory_order_seq_cst);
-    for(;;) {
-      core->next = reinterpret_cast<BaseCore*>(old_head);
-      if (head.compare_exchange_weak(old_head, reinterpret_cast<std::uintptr_t>(core))) {
-        return;
+    std::uintptr_t core = reinterpret_cast<std::uintptr_t>(core_ptr);
+    while (old_head != kAllDone) {
+      core_ptr->next = reinterpret_cast<BaseCore*>(old_head);
+      if (head.compare_exchange_weak(old_head, core)) {
+        return true;
       }
     }
+    return false;
   }
   constexpr static std::uintptr_t kEmpty = 0;
   constexpr static std::uintptr_t kAllDone = 1;
 };
 struct AwaitersResumer {
   static void Delete(LFStack& awaiters) {
-    std::cout << "Begin of AwaitersResumer::Delete" << std::endl;
+    // std::cout << "Resumer Delete" << std::endl;
     std::uintptr_t old_head = awaiters.head.exchange(LFStack::kAllDone, std::memory_order_seq_cst);  // TODO noexcept?
+    int i = 0;
     while (old_head != LFStack::kEmpty) {
       BaseCore* core = reinterpret_cast<BaseCore*>(old_head);
       yaclib_std::coroutine_handle<> handle = core->GetHandle();
+      old_head = reinterpret_cast<std::uintptr_t>(static_cast<BaseCore*>(core->next));
       handle.resume();  // TODO(mkornaukhov03, MBkkt) run in custom executor
-      old_head = reinterpret_cast<std::uintptr_t>(core->next);
     }
   }
 };
 
 }  // namespace detail
 
-template <std::size_t InitCount = 1>
 class AwaitGroup {
  public:
   void Add(std::size_t count = 1) noexcept {
-    std::cout << "Adding " << count << std::endl;
     _await_core.IncRef(count);
   }
   void Done(std::size_t count = 1) noexcept {
@@ -74,10 +75,7 @@ class AwaitGroup {
   template <typename Promise>
   YACLIB_INLINE bool await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
     detail::BaseCore& core = handle.promise();
-    _await_core.AddWaiter(&core);
-    bool resp = !_await_core.SubEqual(1);
-    std::cout << "await suspend resp = " << std::boolalpha << resp << std::endl;
-    return resp;
+    return _await_core.AddWaiter(&core);
   }
 
   YACLIB_INLINE void await_resume() const noexcept {
@@ -124,21 +122,7 @@ class AwaitGroup {
     Done(count - wait_count);  // TODO(MBkkt) Maybe add if about wait_count == count?
   }
 
-  detail::AtomicCounter<detail::LFStack, detail::AwaitersResumer> _await_core{InitCount};
+  detail::AtomicCounter<detail::LFStack, detail::AwaitersResumer> _await_core{0};
 };
 
 }  // namespace yaclib
-
-/*
-
-coro {
-  AwaitGroup ag;
-  for (auto && f : fs) {
-    if (pred) ag.add(f);
-  }
-
-  ...
-  co_await ag()
-}
-
- */
