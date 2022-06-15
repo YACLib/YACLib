@@ -46,6 +46,7 @@ struct AwaitersResumer {
 
 class AwaitGroup {
  public:
+  AwaitGroup() = default;
   void Add(std::size_t count = 1) noexcept {
     _await_core.IncRef(count);
   }
