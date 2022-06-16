@@ -22,7 +22,6 @@ bool LFStack::AddWaiter(BaseCore* core_ptr) noexcept {
 }
 void AwaitersResumer::Delete(LFStack& awaiters) noexcept {
   std::uintptr_t old_head = awaiters.head.exchange(LFStack::kAllDone, std::memory_order_acq_rel);  // TODO noexcept?
-  int i = 0;
   while (old_head != LFStack::kEmpty) {
     BaseCore* core = reinterpret_cast<BaseCore*>(old_head);
     old_head = reinterpret_cast<std::uintptr_t>(static_cast<BaseCore*>(core->next));
