@@ -1,6 +1,7 @@
 #include <yaclib/async/future.hpp>
 #include <yaclib/config.hpp>
 #include <yaclib/coroutine/detail/awaiter_deleters.hpp>
+#include <yaclib/coroutine/oneshot_event.hpp>
 #include <yaclib/executor/thread_pool.hpp>
 #include <yaclib/util/detail/atomic_counter.hpp>
 #include <yaclib/util/type_traits.hpp>
@@ -31,7 +32,7 @@ class AwaitGroup {
   }
 
   auto Wait(IExecutor& exec = CurrentThreadPool()) {
-    return awaiter(*this, exec);
+    return _await_core.Wait(exec);
   }
 
   auto operator co_await() {
@@ -40,28 +41,7 @@ class AwaitGroup {
   }
 
  private:
-  struct awaiter {
-    awaiter(AwaitGroup& self, IExecutor& executor) : _self(self), _executor(&executor) {
-    }
-    YACLIB_INLINE bool await_ready() const noexcept {
-      return _self._await_core.head.load(std::memory_order_seq_cst) == detail::LFStack::kAllDone;
-    }
-
-    template <typename Promise>
-    YACLIB_INLINE bool await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
-      detail::BaseCore& core = handle.promise();
-      core.SetExecutor(_executor);
-      return _self._await_core.AddWaiter(&core);
-    }
-
-    YACLIB_INLINE void await_resume() const noexcept {
-    }
-
-   private:
-    AwaitGroup& _self;
-    IExecutor* _executor;
-  };
-  template <bool NeedAdd, typename... Cores>
+   template <bool NeedAdd, typename... Cores>
   void AddCore(Cores&... cores) {
     static_assert(sizeof...(cores) >= 1, "Number of futures must be at least one");
     static_assert((... && std::is_same_v<detail::BaseCore, Cores>),
@@ -101,7 +81,13 @@ class AwaitGroup {
     Done(count - wait_count);  // TODO(MBkkt) Maybe add if about wait_count == count?
   }
 
-  detail::AtomicCounter<detail::LFStack, detail::AwaitersResumer> _await_core{0};
+  struct OneShotEventShoter {
+    static void Delete(OneShotEvent& event) {
+      event.Set();
+    }
+  };
+
+  detail::AtomicCounter<OneShotEvent, OneShotEventShoter> _await_core{0};
 };
 
 }  // namespace yaclib
