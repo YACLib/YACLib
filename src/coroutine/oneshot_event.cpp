@@ -1,11 +1,14 @@
 #include "yaclib/coroutine/oneshot_event.hpp"
 
-namespace {}  // namespace
+#include <iostream>  // for debug
 
 namespace yaclib {
 
+OneShotEventNode::OneShotEventNode(OneShotEventNode* next) : _next{next} {
+}
+
 OneShotEventOperation::OneShotEventOperation(IExecutor& executor, OneShotEvent& event) noexcept
-    : _event{event}, _next{nullptr}, _core{nullptr}, _executor{executor} {
+    : OneShotEventNode{nullptr}, _event{event}, _core{nullptr}, _executor{executor} {
 }
 
 bool OneShotEventOperation::await_ready() const noexcept {
@@ -15,15 +18,40 @@ bool OneShotEventOperation::await_ready() const noexcept {
 void OneShotEventOperation::await_resume() const noexcept {
 }
 
-OneShotEvent::OneShotEvent() noexcept : _head(OneShotEvent::kEmpty) {
+void OneShotEventOperation::Process() {
+  _executor.Submit(*_core);
+}
+
+OneShotEventWait::OneShotEventWait(OneShotEvent& event) : OneShotEventNode{nullptr}, _event{event} {
+}
+
+void OneShotEventWait::Process() {
+  {
+    std::lock_guard lk(_mutex);
+    _done = true;
+  }
+  _cv.notify_all();
+}
+
+OneShotEvent::OneShotEvent() noexcept : _head{OneShotEvent::kEmpty} {
 }
 
 void OneShotEvent::Set() noexcept {
   std::uintptr_t old_head = _head.exchange(OneShotEvent::kAllDone, std::memory_order_acq_rel);
+  OneShotEventNode* waiters = nullptr;
   while (old_head != OneShotEvent::kEmpty) {
-    OneShotEventOperation* node = reinterpret_cast<OneShotEventOperation*>(old_head);
+    OneShotEventNode* node = reinterpret_cast<OneShotEventOperation*>(old_head);
     old_head = reinterpret_cast<std::uintptr_t>(node->_next);
-    node->_executor.Submit(*node->_core);
+    if (auto* waiter = static_cast<OneShotEventWait*>(node)) {
+      waiter->_next = waiters;
+      waiters = waiter;
+    } else {
+      node->Process();
+    }
+  }
+  while (waiters != nullptr) {
+    waiters->Process();
+    waiters = waiters->_next;
   }
 }
 
@@ -35,11 +63,11 @@ bool OneShotEvent::Ready() noexcept {
   return _head.load(std::memory_order_relaxed) == OneShotEvent::kAllDone;
 }
 
-bool OneShotEvent::TryAdd(OneShotEventOperation* node) noexcept {
+bool OneShotEvent::TryAdd(OneShotEventNode* node) noexcept {
   std::uintptr_t old_head = _head.load(std::memory_order_acquire);
   std::uintptr_t core = reinterpret_cast<std::uintptr_t>(node);
   while (old_head != OneShotEvent::kAllDone) {
-    node->_next = reinterpret_cast<OneShotEventOperation*>(old_head);
+    node->_next = reinterpret_cast<OneShotEventNode*>(old_head);
     if (_head.compare_exchange_weak(old_head, core, std::memory_order_release, std::memory_order_acquire)) {
       return true;
     }
@@ -47,8 +75,21 @@ bool OneShotEvent::TryAdd(OneShotEventOperation* node) noexcept {
   return false;
 }
 
-OneShotEventOperation OneShotEvent::Wait(IExecutor& executor) {
+OneShotEventOperation OneShotEvent::Await(IExecutor& executor) {
   return OneShotEventOperation{executor, *this};
 }
 
+void OneShotEvent::Wait() {
+  OneShotEventWait waiter{*this};
+  if (TryAdd(&waiter)) {
+    std::unique_lock lk{waiter._mutex};
+    waiter._cv.wait(lk, [&]() {
+      return waiter._done;
+    });
+  }
+}
+
+YACLIB_INLINE void Wait(OneShotEvent& event) {
+  event.Wait();
+}
 }  // namespace yaclib

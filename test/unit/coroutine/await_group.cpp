@@ -20,7 +20,6 @@ namespace test {
 namespace {
 
 using namespace std::chrono_literals;
-
 TEST(AwaitGroup, JustWorks) {
 #if defined(YACLIB_UBSAN) && (defined(__GLIBCPP__) || defined(__GLIBCXX__))
   GTEST_SKIP();
@@ -214,7 +213,7 @@ TEST(AwaitGroup, WithFutures) {
     auto nine = squarer(3);
     wg.Add(one, four, nine);
     EXPECT_FALSE(flag.load());
-    co_await wg.Wait(*scheduler);
+    co_await wg.Await(*scheduler);
     EXPECT_TRUE(flag.load());
     co_return std::move(one).Get().Value() + std::move(four).Get().Value() + std::move(nine).Get().Value();
   };
@@ -248,12 +247,47 @@ TEST(AwaitGroup, SwichThread) {
   auto waiter = [&]() -> yaclib::Future<int> {
     auto one = squarer(1);
     wg.Add(one);
-    co_await wg.Wait(*scheduler);
+    co_await wg.Await(*scheduler);
     EXPECT_NE(main_thread, yaclib_std::this_thread::get_id());
     co_return std::move(one).Get().Value();
   };
 
   EXPECT_EQ(1, waiter().Get().Value());
+
+  scheduler->HardStop();
+  scheduler->Wait();
+}
+TEST(AwaitGroup, NonCoroWait) {
+#if defined(YACLIB_UBSAN) && (defined(__GLIBCPP__) || defined(__GLIBCXX__))
+  GTEST_SKIP();
+#endif
+  auto scheduler = yaclib::MakeThreadPool(4);
+
+  yaclib::AwaitGroup wg;
+  yaclib_std::atomic_int cnt{0};
+
+  auto coro = [&](int x) -> yaclib::Future<void> {
+    co_await On(*scheduler);
+    yaclib_std::this_thread::sleep_for(YACLIB_CI_SLOWDOWN * 5ms);
+    cnt.fetch_add(1);
+    co_return;
+  };
+  yaclib::Future<void> f1, f2, f3;
+  auto waiter = [&]() -> yaclib::Future<void> {
+    co_await On(*scheduler);
+    f1 = coro(1);
+    f2 = coro(2);
+    f3 = coro(3);
+    wg.Add(f1);
+    wg.Add(f2);
+    wg.Add(f3);
+    co_return;
+  };
+
+  std::ignore = waiter().Get();
+  Wait(wg);
+
+  EXPECT_EQ(3, cnt.load());
 
   scheduler->HardStop();
   scheduler->Wait();

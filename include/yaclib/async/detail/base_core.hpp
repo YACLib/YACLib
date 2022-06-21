@@ -33,9 +33,6 @@ class BaseCore : public InlineCore {
   virtual yaclib_std::coroutine_handle<> GetHandle() noexcept {
     return yaclib_std::coroutine_handle<>{};  // plug, see coroutine/detail/promise_type.hpp
   }
-  IExecutorPtr& GetExecutorForResume() noexcept {  // need to support executor for AwaitGroup
-    return _executor;
-  }
 
 #endif
 

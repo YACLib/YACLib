@@ -1,33 +1,44 @@
 #pragma once
 
+#include <yaclib_std/detail/condition_variable.hpp>
+#include <yaclib_std/detail/mutex.hpp>
+
 #include <yaclib/async/detail/base_core.hpp>
 #include <yaclib/coroutine/coroutine.hpp>
 #include <yaclib/executor/executor.hpp>
 #include <yaclib/util/ref.hpp>
-
 namespace yaclib {
 
-struct OneShotEventOperation;
+struct OneShotEventNode {
+  virtual void Process() = 0;
+  OneShotEventNode(OneShotEventNode*);
+  OneShotEventNode* _next;
+};
 
-struct OneShotEvent : public IRef {
+class OneShotEventOperation;
+
+class OneShotEvent : public IRef {
+ public:
   OneShotEvent() noexcept;
   void Set() noexcept;
   void Reset() noexcept;
   bool Ready() noexcept;
 
-  OneShotEventOperation Wait(IExecutor&);
+  OneShotEventOperation Await(IExecutor&);
+  void Wait();
 
  private:
   static constexpr std::uintptr_t kEmpty = 0;
   static constexpr std::uintptr_t kAllDone = 1;
   friend class OneShotEventOperation;
-  bool TryAdd(OneShotEventOperation*) noexcept;
+  bool TryAdd(OneShotEventNode*) noexcept;
   yaclib_std::atomic_uintptr_t _head;
 };
 
 // TODO(mkornaukhov03)
 // Non optimal, should store executor inside BaseCore
-struct OneShotEventOperation {
+class OneShotEventOperation : public OneShotEventNode {
+ public:
   OneShotEventOperation(IExecutor&, OneShotEvent&) noexcept;
 
   bool await_ready() const noexcept;
@@ -38,11 +49,29 @@ struct OneShotEventOperation {
   }
   void await_resume() const noexcept;
 
+  void Process() final;
+
  private:
   friend class OneShotEvent;
   OneShotEvent& _event;
-  OneShotEventOperation* _next;
   detail::BaseCore* _core;
   IExecutor& _executor;
 };
+
+class OneShotEventWait : public OneShotEventNode {
+ public:
+  OneShotEventWait(OneShotEvent&);
+
+  void Process() final;
+
+ private:
+  friend class OneShotEvent;
+  OneShotEvent& _event;
+  yaclib_std::mutex _mutex;
+  yaclib_std::condition_variable _cv;
+  bool _done = false;
+};
+
+YACLIB_INLINE void Wait(OneShotEvent& event);
+
 }  // namespace yaclib

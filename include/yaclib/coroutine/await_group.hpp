@@ -1,6 +1,5 @@
 #include <yaclib/async/future.hpp>
 #include <yaclib/config.hpp>
-#include <yaclib/coroutine/detail/awaiter_deleters.hpp>
 #include <yaclib/coroutine/oneshot_event.hpp>
 #include <yaclib/executor/thread_pool.hpp>
 #include <yaclib/util/detail/atomic_counter.hpp>
@@ -31,55 +30,33 @@ class AwaitGroup {
     AddIterator<NeedAdd>(begin, count);
   }
 
-  auto Wait(IExecutor& exec = CurrentThreadPool()) {
-    return _await_core.Wait(exec);
+  auto Await(IExecutor& exec = CurrentThreadPool()) {  // TODO rename Await
+    return _await_core.Await(exec);
+  }
+
+  void Wait() {
+    _await_core.Wait();
   }
 
   auto operator co_await() {
     YACLIB_INFO(true, "Better use AwaitGroup::Wait(executor)");
-    return Wait();
+    return Await();
+  }
+
+  void Reset() noexcept {
+    std::ignore = _await_core.SubEqual(_await_core.GetRef());
+    _await_core.Reset();
   }
 
  private:
-   template <bool NeedAdd, typename... Cores>
-  void AddCore(Cores&... cores) {
-    static_assert(sizeof...(cores) >= 1, "Number of futures must be at least one");
-    static_assert((... && std::is_same_v<detail::BaseCore, Cores>),
-                  "Futures must be Future in WaitGroup::Add function");
-    auto range = [&](auto&& func) {
-      return (... + static_cast<std::size_t>(func(cores)));
-    };
-    AddRange<NeedAdd>(range, sizeof...(cores));
-  }
+  template <bool NeedAdd, typename... Cores>
+  void AddCore(Cores&... cores);
 
   template <bool NeedAdd, typename Iterator>
-  void AddIterator(Iterator it, std::size_t count) {
-    static_assert(is_future_base_v<typename std::iterator_traits<Iterator>::value_type>,
-                  "WaitGroup::Add function Iterator must be point to some Future");
-    if (count == 0) {
-      return;
-    }
-    auto range = [&](auto&& func) {
-      std::size_t wait_count = 0;
-      for (std::size_t i = 0; i != count; ++i) {
-        wait_count += static_cast<std::size_t>(func(*it->GetCore()));
-        ++it;
-      }
-      return wait_count;
-    };
-    AddRange<NeedAdd>(range, count);
-  }
+  void AddIterator(Iterator it, std::size_t count);
 
   template <bool NeedAdd, typename Range>
-  void AddRange(const Range& range, std::size_t count) {
-    if constexpr (NeedAdd) {
-      Add(count);
-    }
-    const auto wait_count = range([&](detail::BaseCore& core) {
-      return core.Empty() && core.SetWait(_await_core);
-    });
-    Done(count - wait_count);  // TODO(MBkkt) Maybe add if about wait_count == count?
-  }
+  void AddRange(const Range& range, std::size_t count);
 
   struct OneShotEventShoter {
     static void Delete(OneShotEvent& event) {
@@ -90,4 +67,8 @@ class AwaitGroup {
   detail::AtomicCounter<OneShotEvent, OneShotEventShoter> _await_core{0};
 };
 
+YACLIB_INLINE void Wait(AwaitGroup&);
+
 }  // namespace yaclib
+
+#include <yaclib/coroutine/detail/await_group_impl.hpp>
