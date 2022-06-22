@@ -10,7 +10,7 @@
 namespace yaclib {
 
 struct OneShotEventNode {
-  virtual void Process() = 0;
+  virtual void Process() noexcept = 0;
   OneShotEventNode(OneShotEventNode*);
   OneShotEventNode* _next;
 };
@@ -49,7 +49,7 @@ class OneShotEventOperation : public OneShotEventNode {
   }
   void await_resume() const noexcept;
 
-  void Process() final;
+  void Process() noexcept final;
 
  private:
   friend class OneShotEvent;
@@ -60,9 +60,9 @@ class OneShotEventOperation : public OneShotEventNode {
 
 class OneShotEventWait : public OneShotEventNode {
  public:
-  OneShotEventWait(OneShotEvent&);
+  OneShotEventWait(OneShotEvent&) noexcept;
 
-  void Process() final;
+  void Process() noexcept final;
 
  private:
   friend class OneShotEvent;

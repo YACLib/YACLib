@@ -90,8 +90,6 @@ class Goer {
  private:
   yaclib::Future<void> NextStep() {
     co_await On(scheduler_);
-    static int kkk = 0;
-    kkk++;
     Step();
     wg_.Done();
     co_return;
@@ -145,7 +143,7 @@ void Stress2(util::Duration duration) {
 
     std::ignore = tester().Get();
 
-    ASSERT_TRUE(done);
+    EXPECT_TRUE(done);
   }
   scheduler->HardStop();
   scheduler->Wait();

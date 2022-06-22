@@ -43,6 +43,10 @@ struct AtomicCounter : CounterBase {
     }
   }
 
+  void Store(std::size_t cnt, std::memory_order order = std::memory_order_release) noexcept {
+    count.store(cnt, order);
+  }
+
   [[nodiscard]] std::size_t GetRef() const noexcept {
     // Dangerous! Use only to sync with release or if synchronization is not needed
     return count.load(std::memory_order_acquire);

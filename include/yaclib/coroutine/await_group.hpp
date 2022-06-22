@@ -30,7 +30,7 @@ class AwaitGroup {
     AddIterator<NeedAdd>(begin, count);
   }
 
-  auto Await(IExecutor& exec = CurrentThreadPool()) {  // TODO rename Await
+  auto Await(IExecutor& exec = CurrentThreadPool()) {
     return _await_core.Await(exec);
   }
 
@@ -39,12 +39,12 @@ class AwaitGroup {
   }
 
   auto operator co_await() {
-    YACLIB_INFO(true, "Better use AwaitGroup::Wait(executor)");
+    YACLIB_INFO(true, "Better use AwaitGroup::Await(executor)");
     return Await();
   }
 
   void Reset() noexcept {
-    std::ignore = _await_core.SubEqual(_await_core.GetRef());
+    _await_core.Store(0);
     _await_core.Reset();
   }
 

@@ -1,7 +1,5 @@
 #include "yaclib/coroutine/oneshot_event.hpp"
 
-#include <iostream>  // for debug
-
 namespace yaclib {
 
 OneShotEventNode::OneShotEventNode(OneShotEventNode* next) : _next{next} {
@@ -18,14 +16,14 @@ bool OneShotEventOperation::await_ready() const noexcept {
 void OneShotEventOperation::await_resume() const noexcept {
 }
 
-void OneShotEventOperation::Process() {
+void OneShotEventOperation::Process() noexcept {
   _executor.Submit(*_core);
 }
 
-OneShotEventWait::OneShotEventWait(OneShotEvent& event) : OneShotEventNode{nullptr}, _event{event} {
+OneShotEventWait::OneShotEventWait(OneShotEvent& event) noexcept : OneShotEventNode{nullptr}, _event{event} {
 }
 
-void OneShotEventWait::Process() {
+void OneShotEventWait::Process() noexcept {
   {
     std::lock_guard lk(_mutex);
     _done = true;
@@ -38,20 +36,10 @@ OneShotEvent::OneShotEvent() noexcept : _head{OneShotEvent::kEmpty} {
 
 void OneShotEvent::Set() noexcept {
   std::uintptr_t old_head = _head.exchange(OneShotEvent::kAllDone, std::memory_order_acq_rel);
-  OneShotEventNode* waiters = nullptr;
   while (old_head != OneShotEvent::kEmpty) {
     OneShotEventNode* node = reinterpret_cast<OneShotEventOperation*>(old_head);
     old_head = reinterpret_cast<std::uintptr_t>(node->_next);
-    if (auto* waiter = static_cast<OneShotEventWait*>(node)) {
-      waiter->_next = waiters;
-      waiters = waiter;
-    } else {
-      node->Process();
-    }
-  }
-  while (waiters != nullptr) {
-    waiters->Process();
-    waiters = waiters->_next;
+    node->Process();
   }
 }
 
