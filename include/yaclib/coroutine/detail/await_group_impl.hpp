@@ -3,7 +3,7 @@ namespace yaclib {
 template <bool NeedAdd, typename... Cores>
 void AwaitGroup::AddCore(Cores&... cores) {
   static_assert(sizeof...(cores) >= 1, "Number of futures must be at least one");
-  static_assert((... && std::is_same_v<detail::BaseCore, Cores>), "Futures must be Future in WaitGroup::Add function");
+  static_assert((... && std::is_same_v<detail::BaseCore, Cores>), "Futures must be Future in AwaitGroup::Add function");
   auto range = [&](auto&& func) {
     return (... + static_cast<std::size_t>(func(cores)));
   };
@@ -13,7 +13,7 @@ void AwaitGroup::AddCore(Cores&... cores) {
 template <bool NeedAdd, typename Iterator>
 void AwaitGroup::AddIterator(Iterator it, std::size_t count) {
   static_assert(is_future_base_v<typename std::iterator_traits<Iterator>::value_type>,
-                "WaitGroup::Add function Iterator must be point to some Future");
+                "AwaitGroup::Add function Iterator must be point to some Future");
   if (count == 0) {
     return;
   }
