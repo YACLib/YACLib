@@ -44,7 +44,7 @@ void OneShotEvent::Set() noexcept {
 }
 
 void OneShotEvent::Reset() noexcept {
-  _head = OneShotEvent::kEmpty;
+  _head.store(OneShotEvent::kEmpty, std::memory_order_release);
 }
 
 bool OneShotEvent::Ready() noexcept {
