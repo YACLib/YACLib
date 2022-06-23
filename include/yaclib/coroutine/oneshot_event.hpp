@@ -45,7 +45,7 @@ class OneShotEventAwaiter final : public detail::NopeCounter<Job> {
   template <typename Promise>
   bool await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
     _core = &handle.promise();
-    return _event.TryAdd(this);
+    return _event.TryAdd(static_cast<Job*>(this));
   }
   void await_resume() const noexcept {
   }

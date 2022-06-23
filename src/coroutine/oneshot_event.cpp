@@ -8,9 +8,10 @@ OneShotEvent::OneShotEvent() noexcept : _head{OneShotEvent::kEmpty} {
 void OneShotEvent::Set() noexcept {
   auto node = _head.exchange(OneShotEvent::kAllDone, std::memory_order_acq_rel);
   while (node != OneShotEvent::kEmpty) {
-    auto* job = reinterpret_cast<Job*>(node);
-    job->Call();
+    Job* job = static_cast<Job*>(reinterpret_cast<detail::Node*>(node));
     node = reinterpret_cast<std::uintptr_t>(job->next);
+
+    job->Call();
   }
 }
 
@@ -19,14 +20,14 @@ void OneShotEvent::Reset() noexcept {
 }
 
 bool OneShotEvent::Ready() noexcept {
-  return _head.load(std::memory_order_relaxed) == OneShotEvent::kAllDone;
+  return _head.load(std::memory_order_seq_cst) == OneShotEvent::kAllDone;
 }
 
 bool OneShotEvent::TryAdd(Job* job) noexcept {
   std::uintptr_t head = _head.load(std::memory_order_acquire);
-  std::uintptr_t node = reinterpret_cast<std::uintptr_t>(job);
+  std::uintptr_t node = reinterpret_cast<std::uintptr_t>(static_cast<detail::Node*>(job));
   while (head != OneShotEvent::kAllDone) {
-    job->next = reinterpret_cast<Job*>(head);
+    job->next = reinterpret_cast<detail::Node*>(head);
     if (_head.compare_exchange_weak(head, node, std::memory_order_release, std::memory_order_acquire)) {
       return true;
     }
@@ -39,13 +40,12 @@ OneShotEventAwaiter OneShotEvent::Await(IExecutor& executor) {
 }
 
 void OneShotEvent::Wait() {
-  if (Ready()) {
-    return;
-  }
-  detail::NopeCounter<OneShotEventWait> wait;
-  if (TryAdd(&wait)) {
-    auto token = wait.Make();
-    wait.Wait(token);
+  detail::NopeCounter<OneShotEventWait> waiter;
+  if (TryAdd(static_cast<Job*>(&waiter))) {
+    auto token = waiter.Make();
+    if (_head.load(std::memory_order_acquire) != OneShotEvent::kAllDone) {
+      waiter.Wait(token);
+    }
   }
 }
 
