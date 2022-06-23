@@ -71,9 +71,11 @@ void OneShotEvent::Wait() {
   OneShotEventWait waiter{*this};
   if (TryAdd(&waiter)) {
     std::unique_lock lk{waiter._mutex};
-    waiter._cv.wait(lk, [&]() {
-      return waiter._done;
-    });
+    if (_head.load(std::memory_order_acquire) != OneShotEvent::kAllDone) {
+      waiter._cv.wait(lk, [&]() {
+        return waiter._done;
+      });
+    }
   }
 }
 
