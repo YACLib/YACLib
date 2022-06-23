@@ -56,6 +56,7 @@ set(YACLIB_UNIT_SOURCES
   unit/async/stress
   unit/executor/strand
   unit/not_implemented
+  unit/async/shared_promise
   )
 
 if (YACLIB_CORO_NEED)

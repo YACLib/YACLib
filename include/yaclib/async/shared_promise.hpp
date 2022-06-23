@@ -25,7 +25,8 @@ class SharedPromise final {
    *
    * Needed only for usability, e.g. instead of std::optional<SharedPromise<T>> in containers.
    */
-  SharedPromise() = default;
+  SharedPromise() : _head{nullptr}, _result{}, _is_set{false} {
+  }
 
   /**
    * If SharedPromise is \ref Valid then set \ref StopTag
@@ -45,13 +46,14 @@ class SharedPromise final {
    * \tparam Type \ref Result<T> should be constructable from this type
    * \param value value
    */
+
   template <typename Type>
-  void Set(Type&& value) &&;
+  void Set(Type&& value);
 
   /**
    * Set \ref SharedPromise<void> result
    */
-  void Set() &&;
+  void Set();
 
   Future<V, E> GetFuture();
 
@@ -62,8 +64,11 @@ class SharedPromise final {
    **/
 
  private:
-  using ResultCorePtrType = detail::ResultCorePtr<V, E>;
-  detail::ResultCorePtr<V, E> _core;  // using like lock-free list
+  using ResultCoreType = detail::ResultCore<V, E>;
+
+  yaclib_std::atomic<ResultCoreType*> _head;
+  Result<V, E> _result;
+  yaclib_std::atomic_bool _is_set;
 };
 
 extern template class SharedPromise<void, StopError>;
