@@ -268,23 +268,18 @@ TEST(AwaitGroup, NonCoroWait) {
 
   auto coro = [&](int x) -> yaclib::Future<void> {
     co_await On(*scheduler);
-    yaclib_std::this_thread::sleep_for(YACLIB_CI_SLOWDOWN * 5ms);
+    yaclib_std::this_thread::sleep_for(YACLIB_CI_SLOWDOWN * 25ms);
     cnt.fetch_add(1);
     co_return;
   };
   yaclib::Future<void> f1, f2, f3;
-  auto waiter = [&]() -> yaclib::Future<void> {
-    co_await On(*scheduler);
-    f1 = coro(1);
-    f2 = coro(2);
-    f3 = coro(3);
-    wg.Add(f1);
-    wg.Add(f2);
-    wg.Add(f3);
-    co_return;
-  };
+  f1 = coro(1);
+  f2 = coro(2);
+  f3 = coro(3);
+  wg.Add(f1);
+  wg.Add(f2);
+  wg.Add(f3);
 
-  std::ignore = waiter().Get();
   Wait(wg);
 
   EXPECT_EQ(3, cnt.load());
