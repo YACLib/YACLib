@@ -67,11 +67,11 @@ class OneShotEventAwaiter final : public detail::NopeCounter<Job> {
 class OneShotEventWait : public Job, public detail::DefaultEvent {
  public:
   void Call() noexcept final {
-    SetOne();
+    SetAll();
   }
 
   void Cancel() noexcept final {
-    SetOne();
+    SetAll();
   }
 };
 
