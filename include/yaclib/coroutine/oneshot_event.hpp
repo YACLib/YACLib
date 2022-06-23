@@ -6,6 +6,8 @@
 #include <yaclib/async/detail/base_core.hpp>
 #include <yaclib/coroutine/coroutine.hpp>
 #include <yaclib/executor/executor.hpp>
+#include <yaclib/util/detail/mutex_event.hpp>
+#include <yaclib/util/detail/nope_counter.hpp>
 #include <yaclib/util/ref.hpp>
 namespace yaclib {
 
@@ -67,9 +69,7 @@ class OneShotEventWait : public OneShotEventNode {
  private:
   friend class OneShotEvent;
   OneShotEvent& _event;
-  yaclib_std::mutex _mutex;
-  yaclib_std::condition_variable _cv;
-  bool _done = false;
+  detail::NopeCounter<detail::MutexEvent> _core;
 };
 
 YACLIB_INLINE void Wait(OneShotEvent& event);

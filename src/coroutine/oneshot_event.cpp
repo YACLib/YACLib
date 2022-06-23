@@ -24,11 +24,7 @@ OneShotEventWait::OneShotEventWait(OneShotEvent& event) noexcept : OneShotEventN
 }
 
 void OneShotEventWait::Process() noexcept {
-  {
-    std::lock_guard lk(_mutex);
-    _done = true;
-  }
-  _cv.notify_all();
+  _core.SetAll();
 }
 
 OneShotEvent::OneShotEvent() noexcept : _head{OneShotEvent::kEmpty} {
@@ -70,11 +66,9 @@ OneShotEventOperation OneShotEvent::Await(IExecutor& executor) {
 void OneShotEvent::Wait() {
   OneShotEventWait waiter{*this};
   if (TryAdd(&waiter)) {
-    std::unique_lock lk{waiter._mutex};
+    auto token = waiter._core.Make();
     if (_head.load(std::memory_order_acquire) != OneShotEvent::kAllDone) {
-      waiter._cv.wait(lk, [&]() {
-        return waiter._done;
-      });
+      waiter._core.Wait(token);
     }
   }
 }
