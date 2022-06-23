@@ -1,77 +1,80 @@
 #pragma once
 
-#include <yaclib_std/detail/condition_variable.hpp>
-#include <yaclib_std/detail/mutex.hpp>
-
 #include <yaclib/async/detail/base_core.hpp>
 #include <yaclib/coroutine/coroutine.hpp>
 #include <yaclib/executor/executor.hpp>
 #include <yaclib/util/detail/default_event.hpp>
 #include <yaclib/util/detail/nope_counter.hpp>
 #include <yaclib/util/ref.hpp>
+
 namespace yaclib {
 
-struct OneShotEventNode {
-  virtual void Process() noexcept = 0;
-  OneShotEventNode(OneShotEventNode*);
-  OneShotEventNode* _next;
-};
-
-class OneShotEventOperation;
+class OneShotEventAwaiter;
 
 class OneShotEvent : public IRef {
  public:
   OneShotEvent() noexcept;
+
   void Set() noexcept;
   void Reset() noexcept;
+
   bool Ready() noexcept;
 
-  OneShotEventOperation Await(IExecutor&);
+  OneShotEventAwaiter Await(IExecutor& executor);
   void Wait();
 
  private:
   static constexpr std::uintptr_t kEmpty = 0;
   static constexpr std::uintptr_t kAllDone = 1;
-  friend class OneShotEventOperation;
-  bool TryAdd(OneShotEventNode*) noexcept;
+  friend OneShotEventAwaiter;
+
+  bool TryAdd(Job* job) noexcept;
   yaclib_std::atomic_uintptr_t _head;
 };
 
 // TODO(mkornaukhov03)
 // Non optimal, should store executor inside BaseCore
-class OneShotEventOperation : public OneShotEventNode {
+class OneShotEventAwaiter final : public detail::NopeCounter<Job> {
  public:
-  OneShotEventOperation(IExecutor&, OneShotEvent&) noexcept;
+  OneShotEventAwaiter(IExecutor& executor, OneShotEvent& event) noexcept : _event{event}, _executor{executor} {
+  }
 
-  bool await_ready() const noexcept;
+  bool await_ready() const noexcept {
+    return _event.Ready();
+  }
   template <typename Promise>
   bool await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
     _core = &handle.promise();
     return _event.TryAdd(this);
   }
-  void await_resume() const noexcept;
+  void await_resume() const noexcept {
+  }
 
-  void Process() noexcept final;
+  void Call() noexcept final {
+    _executor.Submit(*_core);
+  }
+  void Cancel() noexcept final {
+    _core->Cancel();
+  }
 
  private:
   friend class OneShotEvent;
   OneShotEvent& _event;
-  detail::BaseCore* _core;
   IExecutor& _executor;
+  detail::BaseCore* _core = nullptr;
 };
 
-class OneShotEventWait : public OneShotEventNode {
+class OneShotEventWait : public Job, public detail::DefaultEvent {
  public:
-  OneShotEventWait(OneShotEvent&) noexcept;
+  void Call() noexcept final {
+    SetOne();
+  }
 
-  void Process() noexcept final;
-
- private:
-  friend class OneShotEvent;
-  OneShotEvent& _event;
-  detail::NopeCounter<detail::DefaultEvent> _core;
+  void Cancel() noexcept final {
+    SetOne();
+  }
 };
 
-YACLIB_INLINE void Wait(OneShotEvent& event);
+void Wait(OneShotEvent& event);
 
 }  // namespace yaclib

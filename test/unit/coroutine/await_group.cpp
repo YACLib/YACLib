@@ -114,7 +114,7 @@ TEST(AwaitGroup, Workers) {
   };
 
   for (std::size_t i = 0; i < kWaiters; ++i) {
-    std::move(waiter());
+    std::ignore = std::move(waiter());
   }
 
   auto worker = [&]() -> yaclib::Future<void> {
@@ -131,7 +131,7 @@ TEST(AwaitGroup, Workers) {
 
   wg.Add(kWorkers);
   for (std::size_t j = 0; j < kWorkers; ++j) {
-    std::move(worker());
+    std::ignore = std::move(worker());
   }
 
   std::size_t steps = scheduler->Drain();

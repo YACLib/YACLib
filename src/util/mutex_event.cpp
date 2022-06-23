@@ -1,4 +1,3 @@
-
 #include <yaclib/util/detail/mutex_event.hpp>
 
 namespace yaclib::detail {
@@ -7,7 +6,7 @@ MutexEvent::Token MutexEvent::Make() {
   return Token{_m};
 }
 
-void MutexEvent::Wait(Token& token) {
+void MutexEvent::Wait(std::unique_lock<yaclib_std::mutex>& token) {
   while (!_is_ready) {
     _cv.wait(token);
   }

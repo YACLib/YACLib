@@ -44,7 +44,7 @@ class AwaitGroup {
   }
 
   void Reset() noexcept {
-    _await_core.Store(0);
+    _await_core.Store(0);  // Don't necessary?
     _await_core.Reset();
   }
 
