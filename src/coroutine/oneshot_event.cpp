@@ -29,7 +29,9 @@ bool OneShotEvent::TryAdd(Job* job) noexcept {
   std::uintptr_t node = reinterpret_cast<std::uintptr_t>(static_cast<detail::Node*>(job));
   while (head != OneShotEvent::kAllDone) {
     job->next = reinterpret_cast<detail::Node*>(head);
-    if (_head.compare_exchange_weak(head, node, std::memory_order_release, std::memory_order_acquire)) {
+    if (_head.compare_exchange_weak(head, node, std::memory_order_seq_cst,
+                                    std::memory_order_seq_cst)) {  // TSAN warning in case of non-seq_cst, see later
+
       return true;
     }
   }
