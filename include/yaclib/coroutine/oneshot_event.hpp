@@ -7,6 +7,8 @@
 #include <yaclib/util/detail/nope_counter.hpp>
 #include <yaclib/util/ref.hpp>
 
+#include <tuple>
+
 namespace yaclib {
 
 class OneShotEventAwaiter;
