@@ -66,6 +66,9 @@ TEST(AwaitGroup, Stress1) {
 #if defined(YACLIB_UBSAN) && (defined(__GLIBCPP__) || defined(__GLIBCXX__))
   GTEST_SKIP();
 #endif
+#if YACLIB_FAULT == 2
+  GTEST_SKIP();  // Too long
+#endif
   const std::size_t COROS[] = {1, 8};
   for (const auto waiters : COROS) {
     for (const auto workers : COROS) {
@@ -152,6 +155,9 @@ void Stress2(util::Duration duration) {
 TEST(AwaitGroup, Stress2) {
 #if defined(YACLIB_UBSAN) && (defined(__GLIBCPP__) || defined(__GLIBCXX__))
   GTEST_SKIP();
+#endif
+#if YACLIB_FAULT == 2
+  GTEST_SKIP();  // Too long
 #endif
   Stress2(1s);
 }

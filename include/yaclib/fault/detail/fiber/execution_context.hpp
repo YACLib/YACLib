@@ -3,6 +3,7 @@
 #include <yaclib/config.hpp>
 #include <yaclib/fault/detail/fiber/stack_allocator.hpp>
 
+#define _XOPEN_SOURCE
 #include <ucontext.h>
 
 #ifdef YACLIB_ASAN
