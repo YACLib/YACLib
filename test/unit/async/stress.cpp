@@ -127,6 +127,10 @@ struct StressTest : testing::Test {
 };
 
 TEST_F(StressTest, ThenInline) {
+#if YACLIB_FAULT == 2
+  GTEST_SKIP();  // Too long
+#endif
+
   Run(yaclib::MakeInline(), [](yaclib::WaitGroup<>&, yaclib::FutureOn<Value> future, uint32_t idx, uint32_t slot_round,
                                auto& num_resolved_futures) {
     std::array<char, 64> data{};
@@ -143,6 +147,9 @@ TEST_F(StressTest, ThenInline) {
 }
 
 TEST_F(StressTest, Then) {
+#if YACLIB_FAULT == 2
+  GTEST_SKIP();  // Too long
+#endif
   auto tp = yaclib::MakeThreadPool();
   Run(*tp, [](yaclib::WaitGroup<>& wg, yaclib::FutureOn<Value> future, uint32_t idx, uint32_t slot_round,
               auto& num_resolved_futures) {
