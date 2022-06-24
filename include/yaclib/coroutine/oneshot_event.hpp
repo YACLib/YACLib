@@ -54,6 +54,7 @@ class OneShotEventAwaiter final : public detail::NopeCounter<Job> {
     _executor.Submit(*_core);
   }
   void Cancel() noexcept final {
+    std::ignore = _executor.Tag();  // for coverage
   }
 
  private:
