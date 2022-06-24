@@ -257,6 +257,7 @@ TEST(AwaitGroup, SwichThread) {
   scheduler->HardStop();
   scheduler->Wait();
 }
+
 TEST(AwaitGroup, NonCoroWait) {
 #if defined(YACLIB_UBSAN) && (defined(__GLIBCPP__) || defined(__GLIBCXX__))
   GTEST_SKIP();
@@ -288,5 +289,37 @@ TEST(AwaitGroup, NonCoroWait) {
   scheduler->Wait();
 }
 
+TEST(AwaitGroup, Reset) {
+#if defined(YACLIB_UBSAN) && (defined(__GLIBCPP__) || defined(__GLIBCXX__))
+  GTEST_SKIP();
+#endif
+  auto scheduler = yaclib::MakeThreadPool(4);
+
+  yaclib::AwaitGroup wg;
+
+  auto squarer = [&](int x) -> yaclib::Future<int> {
+    co_await On(*scheduler);
+    yaclib_std::this_thread::sleep_for(YACLIB_CI_SLOWDOWN * 1ms);
+    co_return x* x;
+  };
+
+  auto main_thread = yaclib_std::this_thread::get_id();
+
+  auto waiter = [&](int x) -> yaclib::Future<int> {
+    auto one = squarer(x);
+    wg.Add(one);
+    co_await wg.Await(*scheduler);
+    EXPECT_NE(main_thread, yaclib_std::this_thread::get_id());
+    co_return std::move(one).Get().Value();
+  };
+
+  EXPECT_EQ(5 * 5, waiter(5).Get().Value());
+  wg.Reset();
+
+  EXPECT_EQ(6 * 6, waiter(6).Get().Value());
+
+  scheduler->HardStop();
+  scheduler->Wait();
+}
 }  // namespace
 }  // namespace test

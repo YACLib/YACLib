@@ -54,7 +54,6 @@ class OneShotEventAwaiter final : public detail::NopeCounter<Job> {
     _executor.Submit(*_core);
   }
   void Cancel() noexcept final {
-    _core->Cancel();
   }
 
  private:

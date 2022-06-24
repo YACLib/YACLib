@@ -20,7 +20,7 @@ void OneShotEvent::Reset() noexcept {
 }
 
 bool OneShotEvent::Ready() noexcept {
-  return _head.load(std::memory_order_seq_cst) == OneShotEvent::kAllDone;
+  return _head.load(std::memory_order_acquire) == OneShotEvent::kAllDone;
 }
 
 bool OneShotEvent::TryAdd(Job* job) noexcept {
@@ -43,7 +43,7 @@ void OneShotEvent::Wait() {
   detail::NopeCounter<OneShotEventWait> waiter;
   if (TryAdd(static_cast<Job*>(&waiter))) {
     auto token = waiter.Make();
-    if (_head.load(std::memory_order_acquire) != OneShotEvent::kAllDone) {
+    if (!Ready()) {
       waiter.Wait(token);
     }
   }

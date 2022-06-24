@@ -35,7 +35,7 @@ class AwaitGroup {
   }
 
   void Wait() {
-    _await_core.Wait();
+    ::yaclib::Wait(_await_core);
   }
 
   auto operator co_await() {
