@@ -131,12 +131,12 @@ void Stress2(util::Duration duration) {
     auto tester = [&scheduler, &done, iter]() -> yaclib::Future<void> {
       const size_t steps = 1 + iter % 3;
 
-      auto wg = std::make_unique<yaclib::AwaitGroup>();
+      auto wg = yaclib::AwaitGroup();
 
-      Goer goer{*scheduler, *wg};
+      Goer goer{*scheduler, wg};
       goer.Start(steps);
 
-      co_await* wg;
+      co_await wg;
 
       EXPECT_EQ(goer.Steps(), steps);
       EXPECT_TRUE(steps > 0);
