@@ -12,8 +12,9 @@ void OneShotEvent::Set() noexcept {
   auto job = static_cast<Job*>(reinterpret_cast<detail::Node*>(head));
   static const Job* kEnd = reinterpret_cast<Job*>(OneShotEvent::kEmpty);
   while (job != kEnd) {
+    auto next = static_cast<Job*>(job->next);
     job->Call();
-    job = static_cast<Job*>(job->next);
+    job = next;
   }
 }
 
