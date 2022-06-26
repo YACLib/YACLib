@@ -18,15 +18,15 @@ void OneShotEvent::Set() noexcept {
 }
 
 void OneShotEvent::Reset() noexcept {
-  _head.store(OneShotEvent::kEmpty, std::memory_order_release);
+  _head.store(OneShotEvent::kEmpty /*, std::memory_order_release*/);
 }
 
 bool OneShotEvent::Ready() noexcept {
-  return _head.load(std::memory_order_acquire) == OneShotEvent::kAllDone;
+  return _head.load(/* std::memory_order_acquire*/) == OneShotEvent::kAllDone;
 }
 
 bool OneShotEvent::TryAdd(Job* job) noexcept {
-  std::uintptr_t head = _head.load(std::memory_order_acquire);
+  std::uintptr_t head = _head.load(/* std::memory_order_acquire */);
   std::uintptr_t node = reinterpret_cast<std::uintptr_t>(static_cast<detail::Node*>(job));
   while (head != OneShotEvent::kAllDone) {
     job->next = reinterpret_cast<detail::Node*>(head);
