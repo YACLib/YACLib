@@ -7,12 +7,22 @@ OneShotEvent::OneShotEvent() noexcept : _head{OneShotEvent::kEmpty} {
 
 void OneShotEvent::Set() noexcept {
   // TSAN warning
+#if 0
   auto node = static_cast<Job*>(reinterpret_cast<detail::Node*>(_head.exchange(OneShotEvent::kAllDone
                                                                                /*, std::memory_order_acq_rel*/)));
   static const Job* kEnd = reinterpret_cast<Job*>(OneShotEvent::kEmpty);
   while (node != kEnd) {
     node->Call();
     node = static_cast<Job*>(node->next);
+  }
+#endif
+  auto node =
+    _head.exchange(OneShotEvent::kAllDone, std::memory_order_seq_cst);  // TSAN warning in case of acq_rel, see later
+  while (node != OneShotEvent::kEmpty) {
+    Job* job = static_cast<Job*>(reinterpret_cast<detail::Node*>(node));
+    node = reinterpret_cast<std::uintptr_t>(job->next);
+
+    job->Call();
   }
 }
 
