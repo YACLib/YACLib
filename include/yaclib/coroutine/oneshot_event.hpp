@@ -56,7 +56,8 @@ class OneShotEventAwaiter : public Job {
     _executor.Submit(*_core);
   }
   void Cancel() noexcept final {
-    // Should be _core->Cancel()
+    if (_core)
+      _core->Cancel();
   }
 
  private:
