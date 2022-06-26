@@ -173,6 +173,10 @@ jobs:
             slowdown=1
           fi
 
+          if [[ ${{ matrix.flags }} == "TSAN" ]]; then
+            YACLIB_FAULT=(OFF THREAD)
+          fi
+
           for (( i=0; i<${#c_compilers[*]}; i+=1 )); do
             for (( j=0; j<${#link_options[*]}; j+=1 )); do
               for yaclib_fault in ${YACLIB_FAULT[*]}; do

@@ -10,14 +10,17 @@ IExecutor::Type ManualExecutor::Tag() const {
 }
 
 void ManualExecutor::Submit(yaclib::Job& f) noexcept {
-  _tasks.PushFront(f);
+  _tasks.PushBack(f);
 }
 
-void ManualExecutor::Drain() {
+std::size_t ManualExecutor::Drain() {
+  std::size_t done = 0;
   while (!_tasks.Empty()) {
+    ++done;
     auto& task = _tasks.PopFront();
     static_cast<yaclib::Job&>(task).Call();
   }
+  return done;
 }
 
 ManualExecutor::~ManualExecutor() {

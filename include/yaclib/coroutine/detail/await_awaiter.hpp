@@ -28,12 +28,16 @@ class AwaitAwaiter final {
   }
 
  private:
-  struct Handle : IRef {
+  struct Handle : public IRef {
     yaclib_std::coroutine_handle<> handle;
   };
 
   struct HandleDeleter {
-    static void Delete(Handle& handle) noexcept;
+    static void Delete(Handle& handle) noexcept {
+      YACLIB_DEBUG(!handle.handle, "saved to resume handle is null");
+      YACLIB_DEBUG(handle.handle.done(), "handle for resume is done");
+      handle.handle.resume();  // TODO(mkornaukhov03) resume on custom IExecutor
+    }
   };
 
   AtomicCounter<Handle, HandleDeleter> _await_core;

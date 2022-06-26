@@ -24,11 +24,19 @@ struct AtomicCounter : CounterBase {
   }
 
   void IncRef() noexcept final {
-    count.fetch_add(1, std::memory_order_relaxed);
+    IncRef(1);
   }
 
   void DecRef() noexcept final {
-    if (SubEqual(1)) {
+    DecRef(1);
+  }
+
+  YACLIB_INLINE void IncRef(std::size_t delta) noexcept {
+    count.fetch_add(delta, std::memory_order_relaxed);
+  }
+
+  YACLIB_INLINE void DecRef(std::size_t delta) noexcept {
+    if (SubEqual(delta)) {
       Deleter::Delete(*this);
     }
   }

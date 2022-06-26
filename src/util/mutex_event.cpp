@@ -1,4 +1,3 @@
-
 #include <yaclib/util/detail/mutex_event.hpp>
 
 namespace yaclib::detail {

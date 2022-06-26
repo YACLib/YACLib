@@ -3,7 +3,9 @@
 #include <yaclib/executor/detail/unique_job.hpp>
 
 #if YACLIB_CORO
+#  include <yaclib/coroutine/await_group.hpp>
 #  include <yaclib/coroutine/detail/promise_type.hpp>
+#  include <yaclib/executor/inline.hpp>
 #  include <yaclib/util/detail/nope_counter.hpp>
 #endif
 
@@ -72,6 +74,20 @@ TEST(CoroDummy, BaseCoroGetHandle) {
 #if YACLIB_CORO
   yaclib::detail::NopeCounter<yaclib::detail::BaseCore> core{yaclib::detail::InlineCore::State::Empty};
   std::ignore = core.GetHandle();
+#else
+  GTEST_SKIP();
+#endif
+}
+
+TEST(AwaitGroupDummy, Cancel) {
+#if YACLIB_CORO
+  yaclib::detail::NopeCounter<yaclib::OneShotEventWait> tmp;
+  tmp.Cancel();
+
+  yaclib::detail::NopeCounter<yaclib::OneShotEvent> event;
+
+  yaclib::detail::NopeCounter<yaclib::OneShotEventAwaiter> tmp2(yaclib::MakeInline(), event);
+  tmp2.Cancel();
 #else
   GTEST_SKIP();
 #endif

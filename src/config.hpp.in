@@ -91,7 +91,6 @@
 // Now it has a problem: doesn't use Symmetric Transfer even if possible
 #if ${YACLIB_CORO_NEED}
 #  if defined(__clang__)
-#    define YACLIB_SYMMETRIC_TRANSFER 1
 #    if defined __has_include
 #      if __has_include(<coroutine>)
 #        define YACLIB_CORO 2
@@ -102,7 +101,11 @@
 #    if defined(__apple_build_version) && defined(YACLIB_TSAN)
 #      if __apple_build_version < 13100000
 #        define YACLIB_SYMMETRIC_TRANSFER 0 // because of TSAN problems
+#      else 
+#        define YACLIB_SYMMETRIC_TRANSFER 1
 #      endif
+#    else 
+#      define YACLIB_SYMMETRIC_TRANSFER 1
 #    endif
 #  elif defined(__GNUG__)
 #    define YACLIB_SYMMETRIC_TRANSFER 1
