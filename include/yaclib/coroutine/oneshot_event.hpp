@@ -56,7 +56,7 @@ class OneShotEventAwaiter : public Job {
     _executor.Submit(*_core);
   }
   void Cancel() noexcept final {
-    std::ignore = _executor.Tag();  // for coverage
+    // Should be _core->Cancel()
   }
 
  private:

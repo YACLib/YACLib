@@ -10,8 +10,7 @@ void OneShotEvent::Set() noexcept {
   auto head = _head.exchange(OneShotEvent::kAllDone
                              /*, std::memory_order_acq_rel*/);
   auto job = static_cast<Job*>(reinterpret_cast<detail::Node*>(head));
-  static const Job* kEnd = reinterpret_cast<Job*>(OneShotEvent::kEmpty);
-  while (job != kEnd) {
+  while (job != nullptr) {
     auto next = static_cast<Job*>(job->next);
     job->Call();
     job = next;
@@ -23,16 +22,16 @@ void OneShotEvent::Reset() noexcept {
 }
 
 bool OneShotEvent::Ready() noexcept {
-  return _head.load(/* std::memory_order_acquire*/) == OneShotEvent::kAllDone;
+  return _head.load(/*std::memory_order_acquire*/) == OneShotEvent::kAllDone;
 }
 
 bool OneShotEvent::TryAdd(Job* job) noexcept {
-  std::uintptr_t head = _head.load(/* std::memory_order_acquire */);
+  std::uintptr_t head = _head.load(/*std::memory_order_acquire */);
   std::uintptr_t node = reinterpret_cast<std::uintptr_t>(static_cast<detail::Node*>(job));
   while (head != OneShotEvent::kAllDone) {
     job->next = reinterpret_cast<detail::Node*>(head);
     // TSAN warning
-    if (_head.compare_exchange_weak(head, node /*std::memory_order_release, std::memory_order_acquire*/)) {
+    if (_head.compare_exchange_weak(head, node /*, std::memory_order_release, std::memory_order_acquire*/)) {
       return true;
     }
   }
@@ -47,9 +46,7 @@ void OneShotEvent::Wait() {
   detail::NopeCounter<OneShotEventWait> waiter;
   if (TryAdd(static_cast<Job*>(&waiter))) {
     auto token = waiter.Make();
-    if (!Ready()) {
-      waiter.Wait(token);
-    }
+    waiter.Wait(token);
   }
 }
 
