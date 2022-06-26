@@ -22,7 +22,7 @@ class OneShotEvent : public IRef {
 
   bool Ready() noexcept;
 
-  OneShotEventAwaiter Await(IExecutor& executor);
+  detail::NopeCounter<OneShotEventAwaiter> Await(IExecutor& executor) noexcept;
   void Wait();
 
  private:
@@ -36,7 +36,7 @@ class OneShotEvent : public IRef {
 
 // TODO(mkornaukhov03)
 // Non optimal, should store executor inside BaseCore
-class OneShotEventAwaiter final : public detail::NopeCounter<Job> {
+class OneShotEventAwaiter : public Job {
  public:
   OneShotEventAwaiter(IExecutor& executor, OneShotEvent& event) noexcept : _event{event}, _executor{executor} {
   }
@@ -66,6 +66,7 @@ class OneShotEventAwaiter final : public detail::NopeCounter<Job> {
   detail::BaseCore* _core = nullptr;
 };
 
+// TODO(mkornaukhov03) both Job and DefaultEvent inherited from IRef
 class OneShotEventWait : public Job, public detail::DefaultEvent {
  public:
   void Call() noexcept final {

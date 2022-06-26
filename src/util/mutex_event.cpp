@@ -6,7 +6,7 @@ MutexEvent::Token MutexEvent::Make() {
   return Token{_m};
 }
 
-void MutexEvent::Wait(std::unique_lock<yaclib_std::mutex>& token) {
+void MutexEvent::Wait(Token& token) {
   while (!_is_ready) {
     _cv.wait(token);
   }

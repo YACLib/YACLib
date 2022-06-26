@@ -6,13 +6,13 @@ OneShotEvent::OneShotEvent() noexcept : _head{OneShotEvent::kEmpty} {
 }
 
 void OneShotEvent::Set() noexcept {
-  auto node =
-    _head.exchange(OneShotEvent::kAllDone, std::memory_order_seq_cst);  // TSAN warning in case of acq_rel, see later
-  while (node != OneShotEvent::kEmpty) {
-    Job* job = static_cast<Job*>(reinterpret_cast<detail::Node*>(node));
-    node = reinterpret_cast<std::uintptr_t>(job->next);
-
-    job->Call();
+  // TSAN warning
+  auto node = static_cast<Job*>(reinterpret_cast<detail::Node*>(_head.exchange(OneShotEvent::kAllDone
+                                                                               /*, std::memory_order_acq_rel*/)));
+  static const Job* kEnd = reinterpret_cast<Job*>(OneShotEvent::kEmpty);
+  while (node != kEnd) {
+    node->Call();
+    node = static_cast<Job*>(node->next);
   }
 }
 
@@ -29,17 +29,16 @@ bool OneShotEvent::TryAdd(Job* job) noexcept {
   std::uintptr_t node = reinterpret_cast<std::uintptr_t>(static_cast<detail::Node*>(job));
   while (head != OneShotEvent::kAllDone) {
     job->next = reinterpret_cast<detail::Node*>(head);
-    if (_head.compare_exchange_weak(head, node, std::memory_order_seq_cst,
-                                    std::memory_order_seq_cst)) {  // TSAN warning in case of non-seq_cst, see later
-
+    // TSAN warning
+    if (_head.compare_exchange_weak(head, node /*std::memory_order_release, std::memory_order_acquire*/)) {
       return true;
     }
   }
   return false;
 }
 
-OneShotEventAwaiter OneShotEvent::Await(IExecutor& executor) {
-  return OneShotEventAwaiter{executor, *this};
+detail::NopeCounter<OneShotEventAwaiter> OneShotEvent::Await(IExecutor& executor) noexcept {
+  return detail::NopeCounter<OneShotEventAwaiter>{executor, *this};
 }
 
 void OneShotEvent::Wait() {
@@ -55,4 +54,5 @@ void OneShotEvent::Wait() {
 void Wait(OneShotEvent& event) {
   event.Wait();
 }
+
 }  // namespace yaclib

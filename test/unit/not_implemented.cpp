@@ -86,7 +86,7 @@ TEST(AwaitGroupDummy, Cancel) {
 
   yaclib::detail::NopeCounter<yaclib::OneShotEvent> event;
 
-  yaclib::OneShotEventAwaiter tmp2(yaclib::MakeInline(), event);
+  yaclib::detail::NopeCounter<yaclib::OneShotEventAwaiter> tmp2(yaclib::MakeInline(), event);
   tmp2.Cancel();
 #else
   GTEST_SKIP();

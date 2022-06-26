@@ -14,13 +14,13 @@ void ManualExecutor::Submit(yaclib::Job& f) noexcept {
 }
 
 std::size_t ManualExecutor::Drain() {
-  std::size_t response = 0;
+  std::size_t done = 0;
   while (!_tasks.Empty()) {
-    response++;
+    ++done;
     auto& task = _tasks.PopFront();
     static_cast<yaclib::Job&>(task).Call();
   }
-  return response;
+  return done;
 }
 
 ManualExecutor::~ManualExecutor() {

@@ -3,7 +3,7 @@
 namespace yaclib::detail {
 
 template <typename CounterBase>
-struct NopeCounter : CounterBase {
+struct NopeCounter final : CounterBase {
   using CounterBase::CounterBase;
 
   void IncRef() noexcept final {

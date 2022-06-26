@@ -17,18 +17,13 @@ class AwaitGroup {
     _await_core.DecRef(count);
   }
   template <bool NeedAdd = true, typename... V, typename... E>
-  YACLIB_INLINE void Add(FutureBase<V, E>&... futures) {
-    AddCore<NeedAdd>(static_cast<detail::BaseCore&>(*futures.GetCore())...);
-  }
-  template <bool NeedAdd = true, typename It>
-  YACLIB_INLINE std::enable_if_t<!is_future_base_v<It>, void> Add(It begin, It end) {
-    AddIterator<NeedAdd>(begin, end - begin);
-  }
+  YACLIB_INLINE void Add(FutureBase<V, E>&... futures);
 
   template <bool NeedAdd = true, typename It>
-  YACLIB_INLINE void Add(It begin, std::size_t count) {
-    AddIterator<NeedAdd>(begin, count);
-  }
+  YACLIB_INLINE std::enable_if_t<!is_future_base_v<It>, void> Add(It begin, It end);
+
+  template <bool NeedAdd = true, typename It>
+  YACLIB_INLINE void Add(It begin, std::size_t count);
 
   auto Await(IExecutor& exec = CurrentThreadPool()) {
     return _await_core.Await(exec);
@@ -44,16 +39,12 @@ class AwaitGroup {
   }
 
   void Reset() noexcept {
-    _await_core.Store(0);  // Don't necessary?
     _await_core.Reset();
   }
 
  private:
   template <bool NeedAdd, typename... Cores>
   void AddCore(Cores&... cores);
-
-  template <bool NeedAdd, typename Iterator>
-  void AddIterator(Iterator it, std::size_t count);
 
   template <bool NeedAdd, typename Range>
   void AddRange(const Range& range, std::size_t count);
