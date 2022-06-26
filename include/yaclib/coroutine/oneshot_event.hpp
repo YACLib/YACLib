@@ -56,8 +56,9 @@ class OneShotEventAwaiter : public Job {
     _executor.Submit(*_core);
   }
   void Cancel() noexcept final {
-    if (_core)
-      _core->Cancel();
+    if (_core) {
+      _core->Cancel();  // LCOV_EXCL_LINE
+    }
   }
 
  private:
