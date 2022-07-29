@@ -1,0 +1,25 @@
+name: Check include what you use
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        path:
+          - '.'
+    steps:
+      - name: Run Include What You Use
+        uses: EmilGedda/include-what-you-use-action@v1.0
+        with:
+          compilation-database-path: '.'
+          output-format: 'iwyu' # Or 'clang'
+          no-error: 'false'
