@@ -21,42 +21,44 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-20.04, macos-11, windows-2022 ]
+        os: [ ubuntu-22.04, macos-12, windows-2022 ]
         flags: [ WARN, UBSAN, ASAN, TSAN, LSAN ]
         build_type: [ Debug, RelWithDebInfo ]
         isPR:
           - ${{ github.event_name == 'pull_request' }}
         exclude:
+          # GitHub Actions provides a maximum of 5 parallel macOS machines for free.
+          # So in pr we don't run all configurations.
           - isPR: true
-            os: macos-11
+            os: macos-12
             flags: UBSAN
             build_type: Debug
           - isPR: true
-            os: macos-11
+            os: macos-12
             flags: UBSAN
             build_type: RelWithDebInfo
           - isPR: true
-            os: macos-11
+            os: macos-12
             flags: ASAN
             build_type: Debug
           - isPR: true
-            os: macos-11
+            os: macos-12
             flags: ASAN
             build_type: RelWithDebInfo
           - isPR: true
-            os: macos-11
+            os: macos-12
             flags: TSAN
             build_type: Debug
           - isPR: true
-            os: macos-11
+            os: macos-12
             flags: TSAN
             build_type: RelWithDebInfo
           - isPR: true
-            os: macos-11
+            os: macos-12
             flags: LSAN
             build_type: Debug
           - isPR: true
-            os: macos-11
+            os: macos-12
             flags: LSAN
             build_type: RelWithDebInfo
           #  Doesn't build with ClanCL ASAN. Random crash on start before main() with MSVC ASAN. THANKS TO THE BEST OS.
@@ -97,70 +99,64 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Update deps on Linux
-        if: ${{ matrix.os == 'ubuntu-20.04' }}
+        if: ${{ matrix.os == 'ubuntu-22.04' }}
         run: |
           sudo apt-get update
           sudo wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-          sudo add-apt-repository "deb http://apt.llvm.org/focal/     llvm-toolchain-focal-14   main"
+          sudo add-apt-repository "deb http://apt.llvm.org/jammy/     llvm-toolchain-jammy-14   main"
           sudo apt-get update
           sudo apt-get install ninja-build googletest                                                                  \
-                               gcc-11 g++-11 libstdc++-11-dev                                                          \
+                               gcc-12 g++-12 libstdc++-12-dev                                                          \
                                clang-14 lld-14 libc++-14-dev libc++abi-14-dev
+          # We use lld because it faster than ld and gold and don't have strange issues like mold
           sudo ln -sf /usr/bin/lld-14 /usr/local/bin/ld
 
           sudo update-alternatives                                                                                     \
-            --install /usr/bin/gcc        gcc        /usr/bin/gcc-11        200                                        \
-            --slave   /usr/bin/g++        g++        /usr/bin/g++-11                                                   \
-            --slave   /usr/bin/gcc-ar     gcc-ar     /usr/bin/gcc-ar-11                                                \
-            --slave   /usr/bin/gcc-nm     gcc-nm     /usr/bin/gcc-nm-11                                                \
-            --slave   /usr/bin/gcc-ranlib gcc-ranlib /usr/bin/gcc-ranlib-11                                            \
-            --slave   /usr/bin/gcov       gcov       /usr/bin/gcov-11                                                  \
-            --slave   /usr/bin/gcov-tool  gcov-tool  /usr/bin/gcov-tool-11                                             \
-            --slave   /usr/bin/gcov-dump  gcov-dump  /usr/bin/gcov-dump-11
+            --install /usr/bin/gcc        gcc        /usr/bin/gcc-12        200                                        \
+            --slave   /usr/bin/g++        g++        /usr/bin/g++-12                                                   \
+            --slave   /usr/bin/gcc-ar     gcc-ar     /usr/bin/gcc-ar-12                                                \
+            --slave   /usr/bin/gcc-nm     gcc-nm     /usr/bin/gcc-nm-12                                                \
+            --slave   /usr/bin/gcc-ranlib gcc-ranlib /usr/bin/gcc-ranlib-12                                            \
+            --slave   /usr/bin/gcov       gcov       /usr/bin/gcov-12                                                  \
+            --slave   /usr/bin/gcov-tool  gcov-tool  /usr/bin/gcov-tool-12                                             \
+            --slave   /usr/bin/gcov-dump  gcov-dump  /usr/bin/gcov-dump-12
           sudo update-alternatives --auto gcc
 
           sudo update-alternatives                                                                                     \
-            --install /usr/bin/cpp        cpp        /usr/bin/cpp-11        200
+            --install /usr/bin/cpp        cpp        /usr/bin/cpp-12        200
           sudo update-alternatives --auto cpp
 
       - name: Update deps on macOS
-        if: ${{ matrix.os == 'macos-11' }}
+        if: ${{ matrix.os == 'macos-12' }}
         run: |
           brew update
-          brew install ninja llvm@13
-
-      - name: Set up MinGW x64
-        if: ${{ matrix.os == 'windows-2022' }}
-        uses: egor-tensin/setup-mingw@v2
-        with:
-          platform: x64
+          brew install ninja llvm@14 gcc@12
 
       - name: Configure CMake Posix
         if: ${{ matrix.os != 'windows-2022' }}
         run: |
           flags=${{ matrix.flags }}
           build_type=${{ matrix.build_type }}
-          compilers_name=(clang gnu apple_clang)
-          stdlibs_name=(libcxx libstdcxx apple_libcxx)
-          if [[ ${{ matrix.os }} == "macos-11" ]]; then
-            llvm=/usr/local/opt/llvm
-            c_compilers=("$llvm/bin/clang" gcc-11 clang)
+          compiler_names=(clang gnu apple_clang)
+          stdlib_names=(libcxx libstdcxx default)
+          if [[ ${{ matrix.os }} == "macos-12" ]]; then
+            llvm=/usr/local/opt/llvm@14
+            # TODO(myannyax?) FIBER
             YACLIB_FAULT=(OFF THREAD)
-            cxx_compilers=("$llvm/bin/clang++" g++-11 clang++)
+            cxx_compilers=("$llvm/bin/clang++" g++-12 clang++)
             link_options=(
               "-L$llvm/lib;-Wl,-rpath,$llvm/lib"
               "-stdlib=libstdc++"
-              "" # Apple
+              ""
             )
             compile_options=(
               "-I$llvm/include;-I$llvm/include/c++/v1/"
               "-stdlib=libstdc++"
-              "" # Apple
+              ""
             )
             slowdown=8
           else
             flags="$flags;ATOMIC_EVENT"
-            c_compilers=(clang-14 gcc)
             cxx_compilers=(clang++-14 g++)
             link_options=(
               "-stdlib=libc++;-lc++abi"
@@ -177,11 +173,11 @@ jobs:
             YACLIB_FAULT=(OFF THREAD)
           fi
 
-          for (( i=0; i<${#c_compilers[*]}; i+=1 )); do
+          for (( i=0; i<${#cxx_compilers[*]}; i+=1 )); do
             for (( j=0; j<${#link_options[*]}; j+=1 )); do
               for yaclib_fault in ${YACLIB_FAULT[*]}; do
-                if [[ ${{ matrix.os }} == "macos-11" ]]; then # macOS workarounds
-                  if [[ ${compilers_name[$i]} != "gnu" && $flags == "LSAN" ]]; then
+                if [[ ${{ matrix.os }} == "macos-12" ]]; then # macOS workarounds
+                  if [[ "${compiler_names[$i]}" != "gnu" && "$flags" == "LSAN" ]]; then
                     # AppleClang doesn't support LSAN.
                     # But also random crash with LLVM CLang LSAN. TODO(myannyax) Try to debug and create issue to LLVM CLang LSAN.
                     # >CHECK failed: sanitizer_thread_registry.cpp:58 "((ThreadStatusFinished)) == ((status))" (0x3, 0x4) (tid=47505)
@@ -189,30 +185,27 @@ jobs:
                     # After all, if your application crashed from lack of memory, why fix it? Better buy a new mac!
                     continue
                   fi
-                  if [[ ${compilers_name[$i]} == "clang" && ${stdlibs_name[$j]} == "libstdcxx" ]]; then
-                    continue  # TODO(MBkkt) I think we should specify path to libstdcxx
+                fi
+                if [[ "${compiler_names[$i]}" != "clang" && "${stdlib_names[$j]}" != "default" ]]; then
+                  # TODO(MBkkt) I think we should specify path to libstdcxx
+                  # TODO(MBkkt) I dunno how to get GNU GCC to work with other stdlibs
+                  # TODO(MBkkt) I dunno how to get AppleClang to work with other stdlibs
+                  # Btw I dunno what stdlib would be using libstdcxx or apple_libcxx, just some default
+                  continue
+                fi
+                link_option=${link_options[$j]}; compile_option=${compile_options[$j]}                
+                if [[ "${compiler_names[$i]}" == "clang" ]]; then
+                  if [[ ${{ matrix.os }} == "macos-12" && "${stdlib_names[$j]}" == "libstdcxx" ]]; then
+                    continue  # TODO(MBkkt) Specify path to libstdcxx
                   fi
-                  if [[ ${compilers_name[$i]} == "gnu" && ${stdlibs_name[$j]} == "libstdcxx" && $flags == "TSAN" ]]; then
-                    continue  # TODO(MBkkt) Couldn't link against stdlib
+                  if [[ "${stdlib_names[$j]}" == "default" ]]; then
+                    link_option=""; compile_option="-stdlib=libc++"
                   fi
                 fi
 
-                link_option=""; compile_option=""
-                if [[ ${compilers_name[$i]} == "apple_clang" ]]; then
-                  if [[ ${stdlibs_name[$j]} != "apple_libcxx" ]]; then
-                    continue  # TODO(MBkkt) I dunno how to get AppleClang to work with other stdlibs
-                  fi
-                elif [[ ${compilers_name[$i]} == "gnu" ]]; then
-                  if [[ ${stdlibs_name[$j]} != "libstdcxx" ]]; then
-                    continue  # TODO(MBkkt) I dunno how to get GNU GCC to work with other stdlibs
-                    # Btw I dunno what stdlib would be using libstdcxx or apple_libcxx, just some default
-                  fi
-                else
-                  link_option=${link_options[$j]}; compile_option=${compile_options[$j]}
-                fi
-
-                dir="build_${compilers_name[$i]}_${stdlibs_name[$j]}_fault_${yaclib_fault}"
+                dir="build_${compiler_names[$i]}_${stdlib_names[$j]}_fault_${yaclib_fault}"
                 echo $dir
+                ${cxx_compilers[$i]} --version
 
                 cmake -S . -B $dir                                                                                     \
                   -DCMAKE_BUILD_TYPE=$build_type                                                                       \
@@ -237,9 +230,10 @@ jobs:
         run: |
           flags=${{ matrix.flags }}
 
-          names=(ClangCL MinGW MSVC)
-          generators=("Visual Studio 17 2022" "MinGW Makefiles" "Visual Studio 17 2022")
-          options=("-A x64 -T ClangCL" "-DCMAKE_BUILD_TYPE=${{ matrix.build_type }}" "-A x64")
+          names=(MSVC ClangCL) # TODO MinGW
+          generators=("Visual Studio 17 2022" "Visual Studio 17 2022" "MinGW Makefiles")
+          options=("-A x64" "-A x64 -T ClangCL" "-DCMAKE_BUILD_TYPE=${{ matrix.build_type }}")
+          # TODO(myannyax?) FIBER
           YACLIB_FAULT=(OFF THREAD)
 
           for (( i=0; i<${#names[*]}; i+=1 )); do
@@ -247,9 +241,6 @@ jobs:
               if [[ $flags == ASAN && ${names[$i]} != MSVC ]]; then
                 continue  # TODO(MBkkt) I can't build with any other ASAN on Windows
                 # I think ClangCL with ASAN should be possible
-              fi
-              if [[ $flags == WARN && ( ${names[$i]} == ClangCL || ${names[$i]} == MSVC ) ]]; then
-                continue  # TODO CI stopped compiling due to updates
               fi
 
               dir="build_${names[$i]}_fault_${yaclib_fault}"
@@ -281,6 +272,7 @@ jobs:
         run: |
           flags=${{ matrix.flags }}
           default="help=0 verbosity=0 halt_on_error=0"
+          # 'detect_invalid_pointer_pairs' Doesn't work well for most compilers so '=0'
           export ASAN_OPTIONS="$default debug=1 detect_leaks=0 check_initialization_order=1 detect_stack_use_after_return=1 strict_init_order=1 strict_string_checks=1 detect_invalid_pointer_pairs=0"
           export TSAN_OPTIONS="$default history_size=2 io_sync=0 detect_deadlocks=1 second_deadlock_stack=1"  
           export UBSAN_OPTIONS="$default print_stacktrace=1"

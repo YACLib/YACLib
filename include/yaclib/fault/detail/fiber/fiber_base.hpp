@@ -7,8 +7,6 @@
 #include <yaclib/fault/detail/fiber/stack.hpp>
 #include <yaclib/fault/detail/fiber/stack_allocator.hpp>
 #include <yaclib/fault/detail/fiber/wakeup_helper.hpp>
-#include <yaclib/util/func.hpp>
-#include <yaclib/util/intrusive_ptr.hpp>
 
 #include <exception>
 #include <unordered_map>

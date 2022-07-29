@@ -24,7 +24,7 @@ class IThreadPool : public IExecutor {
   virtual void Stop() = 0;
 
   /**
-   * Call Stop() and cancel waiting tasks
+   * Call Stop() and Drop() waiting tasks
    */
   virtual void HardStop() = 0;
 
@@ -58,7 +58,7 @@ void SetCurrentThreadPool(IExecutor& executor) noexcept;
  * \param tf thread factory to use for thread creation. \see IThreadFactory
  * \return intrusive pointer to the new ThreadPool
  */
-IThreadPoolPtr MakeThreadPool(std::size_t threads = std::thread::hardware_concurrency(),
+IThreadPoolPtr MakeThreadPool(std::size_t threads = yaclib_std::thread::hardware_concurrency(),
                               IThreadFactoryPtr tf = MakeThreadFactory());
 
 }  // namespace yaclib

@@ -33,7 +33,7 @@ bool Injector::NeedInject() noexcept {
 }
 
 void Injector::Reset() noexcept {
-  _count = GetRandNumber(sYieldFrequency);
+  _count = static_cast<uint32_t>(GetRandNumber(sYieldFrequency));
 }
 
 void Injector::SetFrequency(uint32_t freq) noexcept {

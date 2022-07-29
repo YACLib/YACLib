@@ -63,9 +63,6 @@ void Stress1(const std::size_t kWaiters, const std::size_t kWorkers, test::util:
 }
 
 TEST(AwaitGroup, Stress1) {
-#if defined(YACLIB_UBSAN) && (defined(__GLIBCPP__) || defined(__GLIBCXX__))
-  GTEST_SKIP();
-#endif
 #if YACLIB_FAULT == 2
   GTEST_SKIP();  // Too long
 #endif
@@ -107,7 +104,7 @@ class Goer {
     --steps_left_;
 
     wg_.Add(1);
-    NextStep();
+    NextStep().Detach();
   }
 
  private:
@@ -153,9 +150,6 @@ void Stress2(util::Duration duration) {
 }
 
 TEST(AwaitGroup, Stress2) {
-#if defined(YACLIB_UBSAN) && (defined(__GLIBCPP__) || defined(__GLIBCXX__))
-  GTEST_SKIP();
-#endif
 #if YACLIB_FAULT == 2
   GTEST_SKIP();  // Too long
 #endif

@@ -4,7 +4,7 @@
 
 namespace yaclib::detail::fiber {
 
-struct Allocation {
+struct Allocation final {
   char* start = nullptr;
   size_t size = 0;
 };

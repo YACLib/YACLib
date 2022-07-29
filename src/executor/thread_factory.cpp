@@ -2,12 +2,12 @@
 
 #include <yaclib/executor/thread_factory.hpp>
 #include <yaclib/log.hpp>
+#include <yaclib/util/detail/nope_counter.hpp>
 #include <yaclib/util/func.hpp>
 #include <yaclib/util/helper.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 
 #include <cstddef>
-#include <iosfwd>
 #include <string>
 #include <string_view>
 #include <thread>
@@ -173,7 +173,7 @@ class ThreadFactory : public BaseFactory {
   }
 };
 
-class LightThreadFactory final : public ThreadFactory {
+class LightThreadFactory final : public detail::NopeCounter<ThreadFactory> {
  private:
   IThread* Acquire(IFuncPtr func, std::size_t priority, std::string_view name, IFuncPtr acquire,
                    IFuncPtr release) final {
@@ -182,11 +182,6 @@ class LightThreadFactory final : public ThreadFactory {
 
   void Release(IThread* thread) final {
     delete thread;
-  }
-
-  void IncRef() noexcept final {
-  }
-  void DecRef() noexcept final {
   }
 };
 

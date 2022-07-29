@@ -9,7 +9,7 @@ namespace yaclib::detail::fiber {
 /**
  * Manages stack memory
  */
-class Stack {
+class Stack final {
  public:
   explicit Stack(IStackAllocator& allocator) : _allocation(allocator.Allocate()), _allocator(allocator) {
   }

@@ -74,7 +74,7 @@ IntrusivePtr<T>& IntrusivePtr<T>::operator=(const IntrusivePtr<U>& other) noexce
 }
 
 template <typename T>
-IntrusivePtr<T>::~IntrusivePtr() {
+IntrusivePtr<T>::~IntrusivePtr() noexcept {
   if (_ptr) {
     _ptr->DecRef();
   }

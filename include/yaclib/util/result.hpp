@@ -18,30 +18,30 @@ enum class ResultState : char {
   Empty = 3,
 };
 
-struct StopTag {};
+struct StopTag final {};
 
 /**
  * Default error
  */
-struct StopError {
+struct StopError final {
   constexpr StopError(StopTag) noexcept {
   }
   constexpr StopError(StopError&&) noexcept = default;
   constexpr StopError(const StopError&) noexcept = default;
   constexpr StopError& operator=(StopError&&) noexcept = default;
   constexpr StopError& operator=(const StopError&) noexcept = default;
-
-  constexpr bool operator==(const StopError& /*other*/) const noexcept {
-    return true;
-  }
 };
+
+constexpr bool operator==(const StopError&, const StopError&) noexcept {
+  return true;
+}
 
 /**
  * \class Exception for Error
  * \see Result
  */
 template <typename Error>
-class ResultError : public std::exception {
+class ResultError final : public std::exception {
  public:
   ResultError(ResultError&&) noexcept(std::is_nothrow_move_constructible_v<Error>) = default;
   ResultError(const ResultError&) noexcept(std::is_nothrow_copy_constructible_v<Error>) = default;
@@ -63,7 +63,7 @@ class ResultError : public std::exception {
  * \class Exception for Empty, invalid state
  * \see Result
  */
-struct ResultEmpty : std::exception {};
+struct ResultEmpty final : std::exception {};
 
 /**
  * Encapsulated return value from caller
@@ -72,14 +72,13 @@ struct ResultEmpty : std::exception {};
  * \tparam E type of error that stored in Result
  */
 template <typename V, typename E = StopError>
-class Result {
+class [[nodiscard]] Result final {
   static_assert(Check<V>(), "V should be valid");
   static_assert(Check<E>(), "E should be valid");
   static_assert(!std::is_same_v<V, E>, "Result cannot be instantiated with same V and E, because it's ambiguous");
+  static_assert(std::is_constructible_v<E, StopTag>, "Error should be constructable from StopError");
 
   using ValueT = std::conditional_t<std::is_void_v<V>, Unit, V>;
-  using LetValue = std::conditional_t<std::is_void_v<V>, void, const ValueT&>;
-  using MutValue = std::conditional_t<std::is_void_v<V>, void, ValueT&&>;
   using Variant = std::variant<ValueT, std::exception_ptr, E, std::monostate>;
 
  public:
@@ -89,7 +88,7 @@ class Result {
   Result& operator=(const Result& other) noexcept(std::is_nothrow_copy_assignable_v<Variant>) = default;
 
   template <typename... Args>
-  Result(Args&&... args) noexcept(std::is_nothrow_constructible_v<Variant, Args...>)
+  Result(Args&&... args) noexcept(std::is_nothrow_constructible_v<Variant, std::in_place_type_t<ValueT>, Args...>)
       : _result{std::in_place_type_t<ValueT>{}, std::forward<Args>(args)...} {
   }
 
@@ -100,10 +99,10 @@ class Result {
   Result(E error) noexcept : _result{std::in_place_type_t<E>{}, std::move(error)} {
   }
 
-  Result() noexcept : _result{std::monostate{}} {
+  Result(StopTag tag) noexcept : _result{std::in_place_type_t<E>{}, tag} {
   }
 
-  Result(StopTag tag) noexcept : _result{std::in_place_type_t<E>{}, tag} {
+  Result() noexcept : _result{std::monostate{}} {
   }
 
   template <typename Arg>
@@ -116,14 +115,10 @@ class Result {
     return State() == ResultState::Value;
   }
 
-  /*[[nodiscard]]*/ MutValue Ok() && {
+  /*[[nodiscard]]*/ ValueT&& Ok() && {
     switch (State()) {
       case ResultState::Value:
-        if constexpr (std::is_void_v<V>) {
-          return;
-        } else {
-          return std::move(*this).Value();
-        }
+        return std::move(*this).Value();
       case ResultState::Exception:
         std::rethrow_exception(std::move(*this).Exception());
       case ResultState::Error:
@@ -133,14 +128,10 @@ class Result {
     }
   }
 
-  /*[[nodiscard]]*/ LetValue Ok() const& {
+  /*[[nodiscard]]*/ const ValueT& Ok() const& {
     switch (State()) {
       case ResultState::Value:
-        if constexpr (std::is_void_v<V>) {
-          return;
-        } else {
-          return Value();
-        }
+        return Value();
       case ResultState::Exception:
         std::rethrow_exception(Exception());
       case ResultState::Error:

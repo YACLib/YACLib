@@ -25,7 +25,7 @@ template <WhenPolicy P = WhenPolicy::FirstFail, typename It, typename T = typena
 auto WhenAll(It begin, std::size_t count) {
   static_assert(P == WhenPolicy::FirstFail, "TODO(Ri7ay, MBkkt) Add other policy for WhenAll");
   static_assert(is_future_base_v<T>, "WhenAll function Iterator must be point to some Future");
-  YACLIB_INFO(count < 2, "Don't use combinators for one or zero futures");
+  YACLIB_WARN(count < 2, "Don't use combinators for one or zero futures");
   auto [future_core, combinator] = detail::AllCombinator<future_base_value_t<T>, future_base_error_t<T>>::Make(count);
   detail::WhenImpl(combinator, begin, count);
   return Future{std::move(future_core)};

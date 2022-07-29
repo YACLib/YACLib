@@ -68,6 +68,9 @@ void ErrorSimple() {
 }
 
 TEST(DetachInline, ErrorSimple) {
+#if defined(GTEST_OS_WINDOWS) && !defined(_WIN64)
+  GTEST_SKIP();  // Random crash because of EXPECT THROW macro with RelWithDebInfo
+#endif
   ErrorSimple<true>();
   ErrorSimple<false>();
 }
@@ -168,7 +171,7 @@ void ThenInlineError() {
                  flag();
                });
     EXPECT_TRUE(std::exchange(the_flag, false));
-    EXPECT_NO_THROW(std::move(f).Get().Ok());
+    EXPECT_EQ(std::move(f).Get().Ok(), yaclib::Unit{});
   }
 
   {
@@ -181,7 +184,7 @@ void ThenInlineError() {
                  return yaclib::MakeFuture<int>(6);
                });
     EXPECT_TRUE(std::exchange(the_flag, false));
-    EXPECT_NO_THROW(std::move(f).Get().Ok());
+    EXPECT_EQ(std::move(f).Get().Ok(), 6);
   }
 
   // By value
@@ -194,7 +197,7 @@ void ThenInlineError() {
                  flag();
                });
     EXPECT_TRUE(std::exchange(the_flag, false));
-    EXPECT_NO_THROW(std::move(f).Get().Ok());
+    EXPECT_EQ(std::move(f).Get().Ok(), yaclib::Unit{});
   }
 
   {
@@ -204,10 +207,10 @@ void ThenInlineError() {
                })
                .ThenInline([&](auto) {
                  flag();
-                 return yaclib::MakeFuture<int>(5);
+                 return yaclib::MakeFuture<int>(6);
                });
     EXPECT_TRUE(std::exchange(the_flag, false));
-    EXPECT_NO_THROW(std::move(f).Get().Ok());
+    EXPECT_EQ(std::move(f).Get().Ok(), 6);
   }
 
   // Mutable lambda
@@ -220,7 +223,7 @@ void ThenInlineError() {
                  flag();
                });
     EXPECT_TRUE(std::exchange(the_flag, false));
-    EXPECT_NO_THROW(std::move(f).Get().Ok());
+    EXPECT_EQ(std::move(f).Get().Ok(), yaclib::Unit{});
   }
 
   {
@@ -230,10 +233,10 @@ void ThenInlineError() {
                })
                .ThenInline([&](auto&&) mutable {
                  flag();
-                 return yaclib::MakeFuture<int>(5);
+                 return yaclib::MakeFuture<int>(6);
                });
     EXPECT_TRUE(std::exchange(the_flag, false));
-    EXPECT_NO_THROW(std::move(f).Get().Ok());
+    EXPECT_EQ(std::move(f).Get().Ok(), 6);
   }
 }
 

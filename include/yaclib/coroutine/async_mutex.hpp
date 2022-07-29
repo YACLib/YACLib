@@ -13,7 +13,7 @@ namespace yaclib {
 // TODO(mkornaukhov03) Doxygen docs
 
 template <bool FIFO = false>
-class AsyncMutex {
+class AsyncMutex final {
  public:
   AsyncMutex() noexcept = default;
   AsyncMutex(const AsyncMutex&) = delete;
@@ -61,7 +61,7 @@ class AsyncMutex {
     executor.Submit(*next);
   }
 
-  class [[nodiscard]] LockGuard {
+  class [[nodiscard]] LockGuard final {
    public:
     explicit LockGuard(AsyncMutex& m, std::defer_lock_t) noexcept : _mutex{&m}, _owns{false} {
     }
@@ -118,7 +118,7 @@ class AsyncMutex {
 
     ~LockGuard() noexcept {
       if (_owns) {
-        YACLIB_INFO(true, "Better use co_await Guard::Unlock<UnlockType>(executor)");
+        YACLIB_WARN(true, "Better use co_await Guard::Unlock<UnlockType>(executor)");
         _mutex->UnlockHere(CurrentThreadPool());
       }
     }
@@ -155,7 +155,7 @@ class AsyncMutex {
           }
         } else {
           base_core.next = reinterpret_cast<detail::BaseCore*>(old_state);
-          if (_mutex._state.compare_exchange_weak(old_state, reinterpret_cast<std::uintptr_t>(&base_core),
+          if (_mutex._state.compare_exchange_weak(old_state, reinterpret_cast<std::uint64_t>(&base_core),
                                                   std::memory_order_release, std::memory_order_relaxed)) {
             return true;
           }
@@ -261,10 +261,10 @@ class AsyncMutex {
     }
   }
 
-  static constexpr std::uintptr_t kNotLocked = 1;
-  static constexpr std::uintptr_t kLockedNoWaiters = 0;
+  static constexpr std::uint64_t kNotLocked = 1;
+  static constexpr std::uint64_t kLockedNoWaiters = 0;
   // locked without waiters, not locked, otherwise - head of the awaiters list
-  yaclib_std::atomic<std::uintptr_t> _state = kNotLocked;  // TODO(mkornaukhov03)
+  yaclib_std::atomic_uint64_t _state = kNotLocked;  // TODO(mkornaukhov03)
   detail::BaseCore* _waiters = nullptr;
   std::size_t _count_batch_here = 0;
 };

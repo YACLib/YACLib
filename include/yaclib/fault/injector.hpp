@@ -5,7 +5,7 @@
 namespace yaclib::detail {
 
 // TODO(myannyax) Add metrics, refactor this shit
-class Injector {
+class Injector final {
  public:
   explicit Injector() noexcept = default;
 

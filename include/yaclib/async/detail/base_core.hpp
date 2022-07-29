@@ -15,17 +15,6 @@ namespace yaclib::detail {
 
 class BaseCore : public InlineCore {
  public:
-  explicit BaseCore(State s) noexcept;
-
-  void SetExecutor(IExecutor* executor) noexcept;
-  [[nodiscard]] IExecutor* GetExecutor() const noexcept;
-
-  void SetCallback(BaseCore& callback) noexcept;
-  void SetCallbackInline(InlineCore& callback, bool async = false) noexcept;
-  [[nodiscard]] bool SetWait(IRef& callback) noexcept;
-  [[nodiscard]] bool ResetWait() noexcept;
-
-  void Stop() noexcept;
   [[nodiscard]] bool Empty() const noexcept;
   [[nodiscard]] bool Alive() const noexcept;
 
@@ -35,13 +24,33 @@ class BaseCore : public InlineCore {
   }
 #endif
 
- protected:
-  yaclib_std::atomic<State> _state;
-  IExecutorPtr _executor;
-  IntrusivePtr<IRef> _callback;
-  IntrusivePtr<IRef> _caller;
+  void SetCall(BaseCore& callback) noexcept;
+  void SetHere(InlineCore& callback, State state) noexcept;
+  void SetWait(State state) noexcept;
+  [[nodiscard]] bool SetWait(IRef& callback, State state) noexcept;
+  [[nodiscard]] bool ResetWait() noexcept;
 
-  void Submit() noexcept;
+  [[nodiscard]] IExecutorPtr& GetExecutor() noexcept;
+  void SetExecutor(IExecutorPtr executor) noexcept;
+
+  void SetResult() noexcept;
+
+ protected:
+  explicit BaseCore(State callback) noexcept;
+
+#ifdef YACLIB_LOG_DEBUG
+  ~BaseCore() noexcept override;
+#endif
+
+  yaclib_std::atomic_uint64_t _callback;
+  IRef* _caller{nullptr};
+  IExecutorPtr _executor;
+
+ private:
+  [[nodiscard]] bool SetCallback(IRef& callback, State state) noexcept;
+
+  void Submit(BaseCore& callback) noexcept;
+  void Submit(InlineCore& callback, State state) noexcept;
 };
 
 }  // namespace yaclib::detail

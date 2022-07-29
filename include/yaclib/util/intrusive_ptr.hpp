@@ -6,7 +6,7 @@
 
 namespace yaclib {
 
-struct NoRefTag {};
+struct NoRefTag final {};
 
 /**
  * A intrusive pointer to objects with an embedded reference count
@@ -14,7 +14,7 @@ struct NoRefTag {};
  * https://www.boost.org/doc/libs/1_77_0/libs/smart_ptr/doc/html/smart_ptr.html#intrusive_ptr
  */
 template <typename T>
-class IntrusivePtr {
+class IntrusivePtr final {
   static_assert(std::is_base_of_v<IRef, T>, "T must be derived class of IRef");
 
  public:
@@ -38,7 +38,7 @@ class IntrusivePtr {
   template <typename U>
   IntrusivePtr& operator=(const IntrusivePtr<U>& other) noexcept;
 
-  ~IntrusivePtr();
+  ~IntrusivePtr() noexcept;
 
   T* Get() const noexcept;
   T* Release() noexcept;

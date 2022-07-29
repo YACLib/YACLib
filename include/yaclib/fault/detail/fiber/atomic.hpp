@@ -2,6 +2,8 @@
 
 #include <yaclib/fault/detail/fiber/atomic_wait.hpp>
 
+#include <utility>
+
 namespace yaclib::detail::fiber {
 
 template <typename T>

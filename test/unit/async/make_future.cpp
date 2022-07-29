@@ -25,17 +25,17 @@ TEST(MakeReadyFuture, Void) {
   {
     yaclib::Future<void> f = yaclib::MakeFuture();
     EXPECT_EQ(f.GetCore()->GetExecutor(), nullptr);
-    EXPECT_NO_THROW(std::move(f).Get().Ok());
+    EXPECT_EQ(std::move(f).Get().Ok(), yaclib::Unit{});
   }
   {
     yaclib::Future<void> f = yaclib::MakeFuture<void>();
     EXPECT_EQ(f.GetCore()->GetExecutor(), nullptr);
-    EXPECT_NO_THROW(std::move(f).Get().Ok());
+    EXPECT_EQ(std::move(f).Get().Ok(), yaclib::Unit{});
   }
   {
     yaclib::Future<void, LikeErrorCode> f = yaclib::MakeFuture<void, LikeErrorCode>();
     EXPECT_EQ(f.GetCore()->GetExecutor(), nullptr);
-    EXPECT_NO_THROW(std::move(f).Get().Ok());
+    EXPECT_EQ(std::move(f).Get().Ok(), yaclib::Unit{});
   }
 }
 

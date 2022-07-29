@@ -34,7 +34,7 @@ TEST(StressCoro, IncAtomicSingleThread) {
 
   uint64_t control_value = 0;
   for (uint64_t tc = 0; tc != kTestCases; ++tc) {
-    std::mt19937 rng(tc);
+    std::mt19937_64 rng(tc);
     auto coro = [&]() -> yaclib::Future<uint64_t> {
       std::array<yaclib::Future<uint64_t>, kAwaitedFutures> futures;
       for (uint64_t i = 0; i != kAwaitedFutures; ++i) {

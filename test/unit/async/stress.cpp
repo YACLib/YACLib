@@ -22,18 +22,13 @@
 namespace test {
 namespace {
 
-static const uint32_t kNumThreads = std::thread::hardware_concurrency();
+static const uint32_t kNumThreads = yaclib_std::thread::hardware_concurrency();
 static constexpr uint32_t kNumRounds = 100000;
 
 struct StressTest : testing::Test {
   struct Value {
     inline static yaclib_std::atomic_uint32_t created{0};
     inline static yaclib_std::atomic_uint32_t destroyed{0};
-
-    Value(const Value&) noexcept = default;
-    Value(Value&&) noexcept = default;
-    Value& operator=(Value&&) noexcept = default;
-    Value& operator=(const Value&) noexcept = default;
 
     Value(uint32_t value) noexcept : v{value} {
       created.fetch_add(1, std::memory_order_relaxed);
@@ -78,7 +73,7 @@ struct StressTest : testing::Test {
           while (slots[idx].round.load(std::memory_order_acquire) != slot_round) {
             yaclib_std::this_thread::yield();
           }
-          EXPECT_FALSE(slots[idx].future.Valid());
+          ASSERT_FALSE(slots[idx].future.Valid());
           slots[idx].future = std::move(f).On(e);
           slots[idx].round.store(slot_round + 1, std::memory_order_release);
           volatile auto work = rng() % 2048;
@@ -90,7 +85,7 @@ struct StressTest : testing::Test {
       }));
     }
 
-    yaclib::WaitGroup wg;
+    yaclib::WaitGroup<> wg;
 
     // consumer
     for (uint32_t i = 0; i < kNumThreads / 2; ++i) {
@@ -106,7 +101,7 @@ struct StressTest : testing::Test {
               yaclib_std::this_thread::yield();
             }
             auto f = std::move(slots[idx].future);
-            EXPECT_TRUE(f.Valid());
+            ASSERT_TRUE(f.Valid());
             slots[idx].round.store(slot_round + 1, std::memory_order_release);
             volatile auto work = rng() % 2048;
             for (unsigned x = 0; x < work; ++x) {
@@ -130,16 +125,16 @@ TEST_F(StressTest, ThenInline) {
 #if YACLIB_FAULT == 2
   GTEST_SKIP();  // Too long
 #endif
-
+#if defined(GTEST_OS_WINDOWS) && YACLIB_FAULT == 1
+  GTEST_SKIP();  // Too long
+#endif
   Run(yaclib::MakeInline(), [](yaclib::WaitGroup<>&, yaclib::FutureOn<Value> future, uint32_t idx, uint32_t slot_round,
                                auto& num_resolved_futures) {
-    std::array<char, 64> data{};
     std::move(future)
       .ThenInline([slot_round](StressTest::Value&& x) noexcept {
         return x.v / slot_round;
       })
-      .DetachInline([data, &num_resolved_futures, idx](uint32_t x) noexcept {
-        std::ignore = data;
+      .DetachInline([&num_resolved_futures, idx](uint32_t x) noexcept {
         EXPECT_EQ(idx, x);
         num_resolved_futures.fetch_add(1, std::memory_order_relaxed);
       });
@@ -150,6 +145,9 @@ TEST_F(StressTest, Then) {
 #if YACLIB_FAULT == 2
   GTEST_SKIP();  // Too long
 #endif
+#if defined(GTEST_OS_WINDOWS) && YACLIB_FAULT == 1
+  GTEST_SKIP();  // Too long
+#endif
   auto tp = yaclib::MakeThreadPool();
   Run(*tp, [](yaclib::WaitGroup<>& wg, yaclib::FutureOn<Value> future, uint32_t idx, uint32_t slot_round,
               auto& num_resolved_futures) {
@@ -157,13 +155,12 @@ TEST_F(StressTest, Then) {
                .Then([slot_round](StressTest::Value&& x) noexcept {
                  return x.v / slot_round;
                })
-               .Then([idx, &num_resolved_futures](uint32_t x) noexcept {
+               .Then([&num_resolved_futures, idx](uint32_t x) noexcept {
                  EXPECT_EQ(idx, x);
                  num_resolved_futures.fetch_add(1, std::memory_order_relaxed);
                  return x;
                });
-    wg.Add(f);
-    std::move(f).Detach();
+    wg.Move(std::move(f));
   });
   tp->Stop();
   tp->Wait();

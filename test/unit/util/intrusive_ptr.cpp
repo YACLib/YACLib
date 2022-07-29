@@ -144,7 +144,7 @@ TEST(assign, copy) {
 
   {
     yaclib::IntrusivePtr<X> p1;
-    p1 = p1;
+    p1.operator=(p1);
     EXPECT_EQ(p1, p1);
     EXPECT_TRUE(p1 ? false : true);
     EXPECT_FALSE(p1);

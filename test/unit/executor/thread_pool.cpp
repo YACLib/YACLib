@@ -24,7 +24,7 @@ namespace {
 using namespace std::chrono_literals;
 
 const auto kCoresCount = [] {
-  auto const cores_count{std::thread::hardware_concurrency()};
+  auto const cores_count{yaclib_std::thread::hardware_concurrency()};
   EXPECT_GT(cores_count, 1);
   return cores_count;
 }();
@@ -341,12 +341,13 @@ TEST_F(SingleHeavyThread, FIFO) {
   }
 }
 
-// TODO(MBkkt): might fail for fiber fault if sleep_for isn't enough for stop waiting
 void Exception(yaclib::IThreadPoolPtr& tp, StopType stop_type) {
   int flag = 0;
+  yaclib_std::atomic_bool check{false};
   Submit(*tp, [&] {
     flag += 1;
-    yaclib_std::this_thread::sleep_for(1ms);  // Wait stop
+    while (stop_type == StopType::Stop && !check.load()) {
+    }
     Submit(*tp, [&] {
       flag += 2;
     });
@@ -359,6 +360,7 @@ void Exception(yaclib::IThreadPoolPtr& tp, StopType stop_type) {
       break;
     case StopType::Stop:
       tp->Stop();
+      check.store(true);
       break;
     case StopType::HardStop:
       EXPECT_NE(stop_type, StopType::HardStop);
@@ -372,6 +374,7 @@ void Exception(yaclib::IThreadPoolPtr& tp, StopType stop_type) {
       EXPECT_EQ(flag, 3);
       break;
     case StopType::Stop:
+      // might fail if sleep_for isn't enough for stop waiting
       EXPECT_EQ(flag, 1);
       break;
     case StopType::HardStop:
@@ -608,6 +611,9 @@ TEST_F(MultiHeavyThread, Lifetime) {
 }
 
 void RacyCounter(yaclib::IThreadFactoryPtr& factory) {
+#if defined(GTEST_OS_WINDOWS) && YACLIB_FAULT == 1
+  GTEST_SKIP();  // Too long
+#endif
   auto tp = MakeThreadPool(2 * kCoresCount, factory);
 
   yaclib_std::atomic<size_t> counter1{0};
@@ -641,7 +647,7 @@ TEST_F(MultiHeavyThread, RacyCounter) {
 
 /// TODO(Ri7ay): Don't work on windows, check this:
 ///  https://stackoverflow.com/questions/12606033/computing-cpu-time-in-c-on-windows
-#if defined(__linux)
+#ifdef GTEST_OS_LINUX
 
 void NotBurnCPU(yaclib::IThreadPoolPtr& tp, std::size_t threads) {
   // Warmup

@@ -7,7 +7,7 @@
 
 namespace yaclib {
 
-class AwaitGroup {
+class AwaitGroup final {
  public:
   AwaitGroup() = default;
   void Add(std::size_t count = 1) noexcept {
@@ -34,7 +34,7 @@ class AwaitGroup {
   }
 
   auto operator co_await() {
-    YACLIB_INFO(true, "Better use AwaitGroup::Await(executor)");
+    YACLIB_WARN(true, "Better use AwaitGroup::Await(executor)");
     return Await();
   }
 
@@ -49,13 +49,13 @@ class AwaitGroup {
   template <bool NeedAdd, typename Range>
   void AddRange(const Range& range, std::size_t count);
 
-  struct OneShotEventShoter {
+  struct OneShotEventShooter final {
     static void Delete(OneShotEvent& event) {
       event.Set();
     }
   };
 
-  detail::AtomicCounter<OneShotEvent, OneShotEventShoter> _await_core{0};
+  detail::AtomicCounter<OneShotEvent, OneShotEventShooter> _await_core{0};
 };
 
 YACLIB_INLINE void Wait(AwaitGroup&);

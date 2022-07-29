@@ -118,12 +118,11 @@ void Fail() {
     std::move(promises[2]).Set(f1);
   }
   EXPECT_TRUE(any.Ready());
-  if constexpr ((P == yaclib::WhenPolicy::LastFail && R == Result::Exception) ||
-                ((P == yaclib::WhenPolicy::None || P == yaclib::WhenPolicy::FirstFail) && R == Result::Error)) {
-    EXPECT_THROW(std::move(any).Get().Ok(), yaclib::ResultError<yaclib::StopError>);
-  } else {
-    EXPECT_THROW(std::move(any).Get().Ok(), std::runtime_error);
-  }
+  using ExceptionType =
+    std::conditional_t<(P == yaclib::WhenPolicy::LastFail && R == Result::Exception) ||
+                         ((P == yaclib::WhenPolicy::None || P == yaclib::WhenPolicy::FirstFail) && R == Result::Error),
+                       yaclib::ResultError<yaclib::StopError>, std::runtime_error>;
+  EXPECT_THROW(std::move(any).Get().Ok(), ExceptionType);
 }
 
 template <Result R, Container C, yaclib::WhenPolicy P, typename V>
@@ -181,11 +180,8 @@ void MultiThreaded() {
   auto time = yaclib_std::chrono::steady_clock::now() - begin;
   EXPECT_LT(time, 40ms * YACLIB_CI_SLOWDOWN);
 
-  if constexpr (kIsVoid) {
-    EXPECT_NO_THROW(std::move(ints).Ok());
-  } else {
-    std::remove_reference_t<decltype(std::move(ints).Ok())> result;
-    EXPECT_NO_THROW(result = std::move(ints).Ok());
+  auto result = std::move(ints).Ok();
+  if constexpr (!kIsVoid) {
     EXPECT_TRUE(kOuts.find(result) != kOuts.end());
   }
 
@@ -231,10 +227,8 @@ void TimeTest() {
   auto time = yaclib_std::chrono::steady_clock::now() - begin;
   EXPECT_LT(time, 90ms * YACLIB_CI_SLOWDOWN);
 
-  if constexpr (is_void) {
-    EXPECT_NO_THROW(std::move(ints).Ok());
-  } else {
-    auto result = std::move(ints).Ok();
+  auto result = std::move(ints).Ok();
+  if constexpr (!is_void) {
     EXPECT_EQ(result, 5);
   }
 
