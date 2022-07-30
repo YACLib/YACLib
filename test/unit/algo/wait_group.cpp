@@ -68,7 +68,7 @@ void TestJustWorks() {
 
   EXPECT_FALSE(f.Ready());
   wg.Add(f);
-  EXPECT_LE(timer.Elapsed(), 10ms * YACLIB_CI_SLOWDOWN);
+  EXPECT_LE(timer.Elapsed(), 20ms * YACLIB_CI_SLOWDOWN);
   wg.Wait();
   EXPECT_TRUE(f.Ready());
 
