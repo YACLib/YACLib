@@ -1,0 +1,8 @@
+<map id="yaclib::Future&lt; V, E &gt;" name="yaclib::Future&lt; V, E &gt;">
+<area shape="rect" id="node1" title="Provides a mechanism to access the result of async operations." alt="" coords="27,420,171,447"/>
+<area shape="rect" id="node2" href="$classyaclib_1_1FutureBase.html" title=" " alt="" coords="35,329,164,371"/>
+<area shape="rect" id="node3" href="$classyaclib_1_1IntrusivePtr.html" title=" " alt="" coords="5,160,135,201"/>
+<area shape="rect" id="node4" href="$classyaclib_1_1IntrusivePtr.html" title="A intrusive pointer to objects with an embedded reference count." alt="" coords="57,5,216,32"/>
+<area shape="rect" id="node6" href="$classyaclib_1_1IntrusivePtr.html" title=" " alt="" coords="142,95,270,136"/>
+<area shape="rect" id="node5" href="$classyaclib_1_1FutureBase.html" title="Provides a mechanism to access the result of async operations." alt="" coords="139,225,267,267"/>
+</map>

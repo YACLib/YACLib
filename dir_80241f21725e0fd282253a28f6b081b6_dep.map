@@ -1,0 +1,10 @@
+<map id="include/yaclib/coroutine/detail" name="include/yaclib/coroutine/detail">
+<area shape="rect" id="node1" href="dir_80241f21725e0fd282253a28f6b081b6.html" title="detail" alt="" coords="101,52,173,100"/>
+<area shape="rect" id="node2" href="dir_4063a9e34a1302ac947dfe60cb383789.html" title="async" alt="" coords="5,148,77,196"/>
+<area shape="rect" id="edge1-headlabel" href="dir_000010_000002.html" title="2" alt="" coords="80,134,88,149"/>
+<area shape="rect" id="node3" href="dir_9463e03d191b6d61661112ff0fb64dc7.html" title="util" alt="" coords="101,148,173,196"/>
+<area shape="rect" id="edge2-headlabel" href="dir_000010_000027.html" title="4" alt="" coords="142,122,150,137"/>
+<area shape="rect" id="node4" href="dir_f6a9384b5ccd990c15687caf98c8deaa.html" title="executor" alt="" coords="197,148,269,196"/>
+<area shape="rect" id="edge3-headlabel" href="dir_000010_000017.html" title="2" alt="" coords="199,122,207,136"/>
+<area shape="rect" id="clust1" href="dir_5492c40dfbc6782579416f5b6b340e12.html" title="coroutine" alt="" coords="91,16,184,111"/>
+</map>

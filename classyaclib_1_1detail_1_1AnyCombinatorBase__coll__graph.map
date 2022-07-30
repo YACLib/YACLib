@@ -1,0 +1,7 @@
+<map id="yaclib::detail::AnyCombinatorBase&lt; V, E, P &gt;" name="yaclib::detail::AnyCombinatorBase&lt; V, E, P &gt;">
+<area shape="rect" id="node1" title=" " alt="" coords="36,199,223,240"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,102,112,129"/>
+<area shape="rect" id="node3" title=" " alt="" coords="28,5,89,32"/>
+<area shape="rect" id="node4" href="$classyaclib_1_1IntrusivePtr.html" title=" " alt="" coords="136,95,264,136"/>
+<area shape="rect" id="node5" href="$classyaclib_1_1IntrusivePtr.html" title="A intrusive pointer to objects with an embedded reference count." alt="" coords="121,5,279,32"/>
+</map>

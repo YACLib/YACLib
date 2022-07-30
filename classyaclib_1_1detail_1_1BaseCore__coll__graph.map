@@ -1,0 +1,11 @@
+<map id="yaclib::detail::BaseCore" name="yaclib::detail::BaseCore">
+<area shape="rect" id="node1" title=" " alt="" coords="819,85,973,112"/>
+<area shape="rect" id="node2" href="$classyaclib_1_1detail_1_1InlineCore.html" title=" " alt="" coords="550,68,706,95"/>
+<area shape="rect" id="node3" href="$classyaclib_1_1Job.html" title="Callable that can be executed in an IExecutor." alt="" coords="319,68,401,95"/>
+<area shape="rect" id="node4" href="$classyaclib_1_1IFunc.html" title="Callable interface." alt="" coords="157,57,252,84"/>
+<area shape="rect" id="node5" href="$classyaclib_1_1IRef.html" title="Reference counting interface." alt="" coords="5,28,91,55"/>
+<area shape="rect" id="node6" href="$structyaclib_1_1detail_1_1Node.html" title="Node class, used in intrusive data structure." alt="" coords="140,147,269,173"/>
+<area shape="rect" id="node7" title=" " alt="" coords="551,119,705,145"/>
+<area shape="rect" id="node8" title=" " alt="" coords="329,119,391,145"/>
+<area shape="rect" id="node9" title=" " alt="" coords="545,169,711,196"/>
+</map>
