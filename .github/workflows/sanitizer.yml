@@ -3,10 +3,10 @@ name: Sanitizer
 on:
   push:
     branches: [ main ]
-    paths-ignore: [ 'doc/**', '**.md' ]
+    paths: [ '**.cpp', '**.hpp*', '**.cmake', 'include/yaclib_std/**', '**/CMakeLists.txt' ]
   pull_request:
     branches: [ main ]
-    paths-ignore: [ 'doc/**', '**.md' ]
+    paths: [ '**.cpp', '**.hpp*', '**.cmake', 'include/yaclib_std/**', '**/CMakeLists.txt' ]
     types: [ assigned ]
   schedule:
     - cron: '0 12 * * 1-5'
@@ -185,6 +185,9 @@ jobs:
                     # After all, if your application crashed from lack of memory, why fix it? Better buy a new mac!
                     continue
                   fi
+                  if [[ "${compiler_names[$i]}" == "gnu" && "$flags" == "TSAN" ]]; then
+                    continue  # Link error
+                  fi
                 fi
                 if [[ "${compiler_names[$i]}" != "clang" && "${stdlib_names[$j]}" != "default" ]]; then
                   # TODO(MBkkt) I think we should specify path to libstdcxx
@@ -193,7 +196,7 @@ jobs:
                   # Btw I dunno what stdlib would be using libstdcxx or apple_libcxx, just some default
                   continue
                 fi
-                link_option=${link_options[$j]}; compile_option=${compile_options[$j]}                
+                link_option=${link_options[$j]}; compile_option=${compile_options[$j]}
                 if [[ "${compiler_names[$i]}" == "clang" ]]; then
                   if [[ ${{ matrix.os }} == "macos-12" && "${stdlib_names[$j]}" == "libstdcxx" ]]; then
                     continue  # TODO(MBkkt) Specify path to libstdcxx
