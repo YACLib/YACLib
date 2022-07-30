@@ -13,7 +13,7 @@ namespace yaclib::detail::fiber {
 
 using Trampoline = void (*)(void* arg);
 
-class ExecutionContext {
+class ExecutionContext final {
  public:
   void Setup(Allocation stack, Trampoline trampoline, void* arg);
 

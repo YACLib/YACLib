@@ -19,9 +19,6 @@ namespace {
 using namespace std::chrono_literals;
 
 TEST(Await, JustWorksPack) {
-#if defined(YACLIB_UBSAN) && (defined(__GLIBCPP__) || defined(__GLIBCXX__))
-  GTEST_SKIP();
-#endif
   auto tp = yaclib::MakeThreadPool();
   auto coro = [&](yaclib::IThreadPoolPtr tp) -> yaclib::Future<int> {
     auto f1 = yaclib::Run(*tp, [] {
@@ -42,9 +39,6 @@ TEST(Await, JustWorksPack) {
 }
 
 TEST(Await, JustWorksRange) {
-#if defined(YACLIB_UBSAN) && (defined(__GLIBCPP__) || defined(__GLIBCXX__))
-  GTEST_SKIP();
-#endif
   auto tp = yaclib::MakeThreadPool();
   auto coro = [&](yaclib::IThreadPoolPtr tp) -> yaclib::Future<int> {
     std::array<yaclib::FutureOn<int>, 2> arr;
@@ -67,9 +61,6 @@ TEST(Await, JustWorksRange) {
 }
 
 TEST(Await, CheckSuspend) {
-#if defined(YACLIB_UBSAN) && (defined(__GLIBCPP__) || defined(__GLIBCXX__))
-  GTEST_SKIP();
-#endif
   int counter = 0;
   auto tp = yaclib::MakeThreadPool(2);
   const auto coro_sleep_time = 50ms * YACLIB_CI_SLOWDOWN;

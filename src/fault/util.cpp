@@ -34,7 +34,7 @@ uint64_t GetRandCount() {
 #endif
 }
 
-void ForwardToRandCount(uint64_t random_count) {
+void ForwardToRandCount([[maybe_unused]] uint64_t random_count) {
 #if YACLIB_FAULT == 2
   for (int i = 0; i < random_count; ++i) {
     GetRandNumber(1);

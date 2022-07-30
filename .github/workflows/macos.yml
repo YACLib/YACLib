@@ -11,23 +11,25 @@ on:
     - cron: '0 12 * * 1-5'
 
 jobs:
-  # TODO(MBkkt) Add 20, 23 standard
-  # TODO(mkornaukhov03) Add CORO flag
+  # TODO(mkornaukhov03) Maybe add CORO flag? But we test only oldest compiler them doesn't support it
   main:
     runs-on: 'macos-${{ matrix.os }}'
     strategy:
       fail-fast: false
       matrix:
-        os: [ 10.15, 11 ]
+        os: [ 10.15, 11, 12 ]
         build_type: [ Debug, RelWithDebInfo ]
         isPR:
           - ${{ github.event_name == 'pull_request' }}
         exclude:
           - isPR: true
-            os: 11
-            build_type: Debug
+            os: 10.15
+            build_type: RelWithDebInfo
           - isPR: true
             os: 11
+            build_type: RelWithDebInfo
+          - isPR: true
+            os: 12
             build_type: RelWithDebInfo
 
     steps:
@@ -36,64 +38,59 @@ jobs:
       - name: Update deps on macOS
         run: |
           brew update
-          brew install ninja llvm@8
+          # Install oldest compiler that possible
+          if [[ "${{ matrix.os }}" == "12" ]]; then
+            brew install ninja llvm@8 gcc@7
+          else
+            brew install ninja
+          fi
 
       - name: Configure CMake
         run: |
-          stdlibs_name=(libcxx libstdcxx apple_libcxx)
-          compilers_name=(clang gnu-9 apple_clang gnu-10 gnu-11)
-
-          llvm=/usr/local/opt/llvm
-
-          link_options=(
-            "-L$llvm/lib;-Wl,-rpath,$llvm/lib"
-            "-stdlib=libstdc++"
-            "" # Apple
-          )
-          compile_options=(
-            "-I$llvm/include;-I$llvm/include/c++/v1/"
-            "-stdlib=libstdc++"
-            "" # Apple
-          )
-
-          if [[ "${{ github.event_name }}" != "pull_request" ]]; then
-            c_compilers=("$llvm/bin/clang" gcc-9 clang gcc-10 gcc-11)
-            cxx_compilers=("$llvm/bin/clang++" g++-9 clang++ g++-10 g++-11)
+          if [[ "${{ matrix.os }}" == "12" ]]; then
+            compiler_names=(clang gnu)
+            llvm=/usr/local/opt/llvm@8
+            cxx_compilers=("$llvm/bin/clang++" g++-7)
+            stdlib_names=(libcxx libstdcxx default)
+            link_options=(
+              "-L$llvm/lib;-Wl,-rpath,$llvm/lib"
+              "-stdlib=libstdc++"
+              ""
+            )
+            compile_options=(
+              "-I$llvm/include;-I$llvm/include/c++/v1/"
+              "-stdlib=libstdc++"
+              ""
+            )
           else
-            c_compilers=("$llvm/bin/clang" gcc-9 clang)
-            cxx_compilers=("$llvm/bin/clang++" g++-9 clang++)
+            compiler_names=(apple_clang)
+            cxx_compilers=(clang++)
+            stdlib_names=(default)
+            link_options=("")
+            compile_options=("")
           fi
 
-          for (( i=0; i<${#c_compilers[*]}; i+=1 )); do
-            for (( j=0; j<${#link_options[*]}; j+=1 )); do
-              if [[ ${compilers_name[$i]} == "clang" && ${stdlibs_name[$j]} == "libstdcxx" ]]; then
-                continue  # TODO(MBkkt) I think we should specify path to libstdcxx
+          for (( i=0; i<${#compiler_names[*]}; i+=1 )); do
+            for (( j=0; j<${#stdlib_names[*]}; j+=1 )); do
+              if [[ "${compiler_names[$i]}" != "clang" && "${stdlib_names[$j]}" != "default" ]]; then
+                # TODO(MBkkt) I think we should specify path to libstdcxx
+                # TODO(MBkkt) I dunno how to get GNU GCC to work with other stdlibs
+                # TODO(MBkkt) I dunno how to get AppleClang to work with other stdlibs
+                # Btw I dunno what stdlib would be using libstdcxx or apple_libcxx, just some default
+                continue
               fi
-              link_option=""; compile_option=""
-              if [[ ${compilers_name[$i]} == "apple_clang" ]]; then
-                if [[ ${stdlibs_name[$j]} != "apple_libcxx" ]]; then
-                  continue  # TODO(MBkkt) I dunno how to get AppleClang to work with other stdlibs
+              link_option=${link_options[$j]}; compile_option=${compile_options[$j]}                
+              if [[ "${compiler_names[$i]}" == "clang" ]]; then
+                if [[ "${stdlib_names[$j]}" == "libstdcxx" ]]; then
+                  continue  # TODO(MBkkt) Specify path to libstdcxx
                 fi
-              elif [[ ${compilers_name[$i]} == gnu-* ]]; then
-                if [[ ${stdlibs_name[$j]} != "libstdcxx" ]]; then
-                  continue  # TODO(MBkkt) I dunno how to get GNU GCC to work with other stdlibs
-                  # Btw I dunno what stdlib would be using libstdcxx or apple_libcxx, just some default
+                if [[ "${stdlib_names[$j]}" == "default" ]]; then
+                  link_option=""; compile_option="-stdlib=libc++"
                 fi
-              else
-                link_option=${link_options[$j]}; compile_option=${compile_options[$j]}
               fi
 
-              if [[ "${compilers_name[$i]}" == "gnu-1*" ]]; then 
-                #TODO(mkornaukhov03) (apple|)clang + c++17 - CE, + c++20 - RelWithDebInfo - illegal IR instruction
-                coroutine_option="CORO"
-              else 
-                coroutine_option=""
-              fi
-
-              dir="build_${compilers_name[$i]}_${stdlibs_name[$j]}"
+              dir="build_${compiler_names[$i]}_${stdlib_names[$j]}"
               echo $dir
-
-              pwd
           
               cmake -S . -B $dir                                                                                       \
                 -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}                                                            \

@@ -11,7 +11,7 @@ void Set(void* new_value, uint64_t i);
 void SetDefault(void* new_value, uint64_t i);
 
 template <typename Type>
-class ThreadLocalPtrProxy {
+class ThreadLocalPtrProxy final {
  public:
   ThreadLocalPtrProxy() noexcept : _i(sNextFreeIndex++) {
   }

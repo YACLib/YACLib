@@ -6,7 +6,7 @@
 namespace yaclib {
 
 template <typename V, typename E = StopError>
-class Promise final {
+class [[nodiscard]] Promise final {
   static_assert(Check<V>(), "V should be valid");
   static_assert(Check<E>(), "E should be valid");
   static_assert(!std::is_same_v<V, E>, "Promise cannot be instantiated with same V and E, because it's ambiguous");
@@ -23,12 +23,12 @@ class Promise final {
    *
    * Needed only for usability, e.g. instead of std::optional<Promise<T>> in containers.
    */
-  Promise() = default;
+  Promise() noexcept = default;
 
   /**
    * If Promise is \ref Valid then set \ref StopTag
    */
-  ~Promise();
+  ~Promise() noexcept;
 
   /**
    * Check if this \ref Promise has \ref Future
@@ -40,16 +40,16 @@ class Promise final {
   /**
    * Set \ref Promise result
    *
-   * \tparam Type \ref Result<T> should be constructable from this type
+   * \tparam T \ref Result<T> should be constructable from this type
    * \param value value
    */
-  template <typename Type>
-  void Set(Type&& value) &&;
+  template <typename T>
+  void Set(T&& value) && /*TODO noexcept*/;
 
   /**
    * Set \ref Promise<void> result
    */
-  void Set() &&;
+  void Set() && noexcept;
 
   /**
    * Part of unsafe but internal API

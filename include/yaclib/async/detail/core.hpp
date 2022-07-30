@@ -1,6 +1,9 @@
 #pragma once
 
+#include "yaclib/util/detail/unique_counter.hpp"
+
 #include <yaclib/async/detail/result_core.hpp>
+#include <yaclib/config.hpp>
 #include <yaclib/util/detail/atomic_counter.hpp>
 
 namespace yaclib::detail {
@@ -20,13 +23,13 @@ class Core : public ResultCoreT<Type, Ret, E> {
   using Base = ResultCoreT<Type, Ret, E>;
 
   template <typename Func>
-  explicit Core(Func&& f) : _wrapper{std::forward<Func>(f)} {
+  explicit Core(Func&& f) noexcept(std::is_nothrow_constructible_v<Wrapper, Func>) : _wrapper{std::forward<Func>(f)} {
   }
 
  private:
   void Call() noexcept final {
     if (!this->Alive()) {
-      return this->Cancel();
+      return this->Drop();
     }
     if constexpr (Type == CoreType::Run) {
       _wrapper.Call(*this, Unit{});
@@ -34,24 +37,26 @@ class Core : public ResultCoreT<Type, Ret, E> {
       auto& core = static_cast<ResultCore<Arg, E>&>(*this->_caller);
       _wrapper.Call(*this, std::move(core.Get()));
     }
-    this->DecRef();
   }
 
-  void CallInline(InlineCore& caller, [[maybe_unused]] InlineCore::State state) noexcept final {
+  void Here(InlineCore& caller, [[maybe_unused]] InlineCore::State state) noexcept final {
     if (!this->Alive()) {
-      return this->Set(StopTag{});
+      return this->Drop();
     }
     if constexpr (Wrapper::kIsAsync) {
-      if (state == InlineCore::State::HasAsyncCallback) {
+      if (state == InlineCore::kHereWrap) {
         auto& core = static_cast<ResultCore<Ret, E>&>(caller);
-        return this->Set(std::move(core.Get()));
+        return this->Done(std::move(core.Get()), [] {
+        });
       }
+    } else {
+      YACLIB_DEBUG(state != InlineCore::kHereCall, "");
     }
     auto& core = static_cast<ResultCore<Arg, E>&>(caller);
     _wrapper.Call(*this, std::move(core.Get()));
   }
 
-  Wrapper _wrapper;
+  [[no_unique_address]] Wrapper _wrapper;
 };
 
 template <typename V, typename E, typename Func>
@@ -73,27 +78,27 @@ template <typename V, typename E, typename Func, char Tag = Tag<V, E, Func>()>
 struct Return;
 
 template <typename V, typename E, typename Func>
-struct Return<V, E, Func, 1> {
+struct Return<V, E, Func, 1> final {
   using Type = invoke_t<Func, Result<V, E>>;
 };
 
 template <typename V, typename E, typename Func>
-struct Return<V, E, Func, 2> {
+struct Return<V, E, Func, 2> final {
   using Type = invoke_t<Func, V>;
 };
 
 template <typename V, typename E, typename Func>
-struct Return<V, E, Func, 4> {
+struct Return<V, E, Func, 4> final {
   using Type = invoke_t<Func, E>;
 };
 
 template <typename V, typename E, typename Func>
-struct Return<V, E, Func, 8> {
+struct Return<V, E, Func, 8> final {
   using Type = invoke_t<Func, std::exception_ptr>;
 };
 
 template <bool Detach, bool Async, typename Ret, typename Arg, typename E, typename Func>
-class FuncWrapper {
+class FuncWrapper final {
   static_assert(!(Detach && Async), "Detach cannot be Async, should be void");
 
   using Store = std::decay_t<Func>;
@@ -120,7 +125,8 @@ class FuncWrapper {
         CallResolveState(self, std::forward<T>(r));
       }
     } catch (...) {
-      self.Set(std::current_exception());
+      self.Done(std::current_exception(), [] {
+      });
     }
   }
 
@@ -131,10 +137,12 @@ class FuncWrapper {
       if (state == ResultState::Value) {
         CallResolveAsync(self, std::move(r).Value());
       } else if (state == ResultState::Exception) {
-        self.Set(std::move(r).Exception());
+        self.Done(std::move(r).Exception(), [] {
+        });
       } else {
         YACLIB_DEBUG(state != ResultState::Error, "state should be Error, but here it's Empty");
-        self.Set(std::move(r).Error());
+        self.Done(std::move(r).Error(), [] {
+        });
       }
     } else {
       /**
@@ -156,7 +164,8 @@ class FuncWrapper {
         using T = std::conditional_t<kIsException, std::exception_ptr, E>;
         CallResolveAsync(self, std::move(r).template Extract<T>());
       } else {
-        self.Set(std::move(r));
+        self.Done(std::move(r), [] {
+        });
       }
     }
   }
@@ -165,11 +174,10 @@ class FuncWrapper {
   void CallResolveAsync(Core& self, T&& value) {
     if constexpr (Async) {
       auto future = CallResolveVoid(std::forward<T>(value));
-      auto core = std::exchange(future.GetCore(), nullptr);
-      self.IncRef();
-      core->SetCallbackInline(self, true);
+      future.GetCore().Release()->SetHere(self, InlineCore::kHereWrap);
     } else {
-      self.Set(CallResolveVoid(std::forward<T>(value)));
+      self.Done(CallResolveVoid(std::forward<T>(value)), [] {
+      });
     }
   }
 
@@ -191,7 +199,7 @@ class FuncWrapper {
     }
   }
 
-  Store _func;
+  [[no_unique_address]] Store _func;
 };
 
 template <CoreType Type, typename Arg, typename E, typename Func>
@@ -205,8 +213,7 @@ auto* MakeCore(Func&& f) {
   using Wrapper = detail::FuncWrapper<Type == CoreType::Detach, kIsAsync, Ret, Arg, E, decltype(std::forward<Func>(f))>;
   // TODO(MBkkt) Think about inline/detach optimization
   using Core = detail::Core<Ret, Arg, E, Wrapper, Type>;
-  constexpr std::size_t kRef = 1 + static_cast<std::size_t>(Type != CoreType::Detach);
-  return new detail::AtomicCounter<Core>{kRef, std::forward<Func>(f)};
+  return new detail::UniqueCounter<Core>{std::forward<Func>(f)};
 }
 
 enum class CallbackType : char {
@@ -216,14 +223,16 @@ enum class CallbackType : char {
 };
 
 template <CoreType CoreT, CallbackType CallbackT, typename Arg, typename E, typename Func>
-auto SetCallback(ResultCorePtr<Arg, E> caller, Func&& f) {
+auto SetCallback(ResultCorePtr<Arg, E>& caller, Func&& f) {
   static_assert(CoreT != CoreType::Run, "SetCallback don't works for Run");
   auto* callback = MakeCore<CoreT, Arg, E>(std::forward<Func>(f));
-  callback->SetExecutor(caller->GetExecutor());
+  if constexpr (CoreT != CoreType::Detach) {
+    callback->SetExecutor(caller->GetExecutor());
+  }
   if constexpr (CallbackT != CallbackType::On) {
-    caller->SetCallbackInline(*callback);
+    caller.Release()->SetHere(*callback, InlineCore::kHereCall);
   } else {
-    caller->SetCallback(*callback);
+    caller.Release()->SetCall(*callback);
   }
   if constexpr (CoreT == CoreType::Then) {
     using ResultCoreT = typename std::remove_reference_t<decltype(*callback)>::Base;
@@ -232,6 +241,8 @@ auto SetCallback(ResultCorePtr<Arg, E> caller, Func&& f) {
     } else {
       return FutureOn{IntrusivePtr<ResultCoreT>{NoRefTag{}, callback}};
     }
+  } else if constexpr (CoreT == CoreType::Detach) {
+    callback->SetWait(InlineCore::kWaitDrop);
   }
 }
 

@@ -20,10 +20,8 @@ namespace test {
 namespace {
 
 using namespace std::chrono_literals;
+
 TEST(AwaitGroup, JustWorks) {
-#if defined(YACLIB_UBSAN) && (defined(__GLIBCPP__) || defined(__GLIBCXX__))
-  GTEST_SKIP();
-#endif
   auto tp = yaclib::MakeThreadPool();
   auto coro = [&](yaclib::IThreadPoolPtr tp) -> yaclib::Future<int> {
     auto f1 = yaclib::Run(*tp, [] {
@@ -48,9 +46,6 @@ TEST(AwaitGroup, JustWorks) {
 }
 
 TEST(AwaitGroup, OneWaiter) {
-#if defined(YACLIB_UBSAN) && (defined(__GLIBCPP__) || defined(__GLIBCXX__))
-  GTEST_SKIP();
-#endif
   auto scheduler = yaclib::MakeManual();
 
   yaclib::AwaitGroup wg;
@@ -91,9 +86,6 @@ TEST(AwaitGroup, OneWaiter) {
 }
 
 TEST(AwaitGroup, Workers) {
-#if defined(YACLIB_UBSAN) && (defined(__GLIBCPP__) || defined(__GLIBCXX__))
-  GTEST_SKIP();
-#endif
   auto scheduler = yaclib::MakeManual();
 
   yaclib::AwaitGroup wg;
@@ -114,7 +106,7 @@ TEST(AwaitGroup, Workers) {
   };
 
   for (std::size_t i = 0; i < kWaiters; ++i) {
-    std::ignore = std::move(waiter());
+    std::ignore = waiter();
   }
 
   auto worker = [&]() -> yaclib::Future<void> {
@@ -131,7 +123,7 @@ TEST(AwaitGroup, Workers) {
 
   wg.Add(kWorkers);
   for (std::size_t j = 0; j < kWorkers; ++j) {
-    std::ignore = std::move(worker());
+    std::ignore = worker();
   }
 
   std::size_t steps = scheduler->Drain();
@@ -143,9 +135,6 @@ TEST(AwaitGroup, Workers) {
 }
 
 TEST(AwaitGroup, BlockingWait) {
-#if defined(YACLIB_UBSAN) && (defined(__GLIBCPP__) || defined(__GLIBCXX__))
-  GTEST_SKIP();
-#endif
   const static std::size_t HW_CONC = std::max(2u, yaclib_std::thread::hardware_concurrency());
   auto scheduler = yaclib::MakeThreadPool(HW_CONC);
 
@@ -188,9 +177,6 @@ TEST(AwaitGroup, BlockingWait) {
   scheduler->Wait();
 }
 TEST(AwaitGroup, WithFutures) {
-#if defined(YACLIB_UBSAN) && (defined(__GLIBCPP__) || defined(__GLIBCXX__))
-  GTEST_SKIP();
-#endif
   auto scheduler = yaclib::MakeThreadPool(4);
 
   yaclib::AwaitGroup wg;
@@ -229,9 +215,6 @@ TEST(AwaitGroup, WithFutures) {
 }
 
 TEST(AwaitGroup, SwichThread) {
-#if defined(YACLIB_UBSAN) && (defined(__GLIBCPP__) || defined(__GLIBCXX__))
-  GTEST_SKIP();
-#endif
   auto scheduler = yaclib::MakeThreadPool(4);
 
   yaclib::AwaitGroup wg;
@@ -259,9 +242,6 @@ TEST(AwaitGroup, SwichThread) {
 }
 
 TEST(AwaitGroup, NonCoroWait) {
-#if defined(YACLIB_UBSAN) && (defined(__GLIBCPP__) || defined(__GLIBCXX__))
-  GTEST_SKIP();
-#endif
   auto scheduler = yaclib::MakeThreadPool(4);
 
   yaclib::AwaitGroup wg;
@@ -290,9 +270,6 @@ TEST(AwaitGroup, NonCoroWait) {
 }
 
 TEST(AwaitGroup, Reset) {
-#if defined(YACLIB_UBSAN) && (defined(__GLIBCPP__) || defined(__GLIBCXX__))
-  GTEST_SKIP();
-#endif
   auto scheduler = yaclib::MakeThreadPool(4);
 
   yaclib::AwaitGroup wg;

@@ -17,7 +17,7 @@ namespace yaclib {
  */
 template <typename E = StopError, typename Func>
 auto Run(IExecutor& e, Func&& f) {
-  YACLIB_INFO(e.Tag() == IExecutor::Type::Inline,
+  YACLIB_WARN(e.Tag() == IExecutor::Type::Inline,
               "better way is call func explicit, and use MakeFuture to create Future with func result");
   auto* core = detail::MakeCore<detail::CoreType::Run, void, E>(std::forward<Func>(f));
   core->SetExecutor(&e);

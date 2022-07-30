@@ -97,14 +97,14 @@
 #      else
 #        define YACLIB_CORO 1
 #      endif
-# 	 endif
+#    endif
 #    if defined(__apple_build_version) && defined(YACLIB_TSAN)
 #      if __apple_build_version < 13100000
-#        define YACLIB_SYMMETRIC_TRANSFER 0 // because of TSAN problems
-#      else 
+#        define YACLIB_SYMMETRIC_TRANSFER 0  // because of TSAN problems
+#      else
 #        define YACLIB_SYMMETRIC_TRANSFER 1
 #      endif
-#    else 
+#    else
 #      define YACLIB_SYMMETRIC_TRANSFER 1
 #    endif
 #  elif defined(__GNUG__)
@@ -113,16 +113,17 @@
 #  elif defined(_MSC_VER)
 #    if _MSC_VER > 1928
 #      define YACLIB_CORO 2
-#      define YACLIB_TRANSFER 1
+#      define YACLIB_SYMMETRIC_TRANSFER 1
 #    else
 #      define YACLIB_CORO 1
-#      define YACLIB_TRANSFER 0
+#      define YACLIB_SYMMETRIC_TRANSFER 0
 #    endif
 #  else
 #    define YACLIB_SYMMETRIC_TRANSFER 1
 #    define YACLIB_CORO 2
 #  endif
 #endif
+
 namespace yaclib {
 
 inline constexpr std::size_t kCacheLineSize = 64;  // TODO(MBkkt) Make better

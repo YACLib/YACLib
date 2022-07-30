@@ -72,7 +72,7 @@ void TestOk(yaclib::ResultState state) {
   switch (state) {
     case yaclib::ResultState::Value: {
       result = 1;
-      EXPECT_NO_THROW(std::move(result).Ok());
+      EXPECT_EQ(std::move(result).Ok(), 1);
     } break;
     case yaclib::ResultState::Error: {
       result = yaclib::StopTag{};

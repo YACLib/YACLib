@@ -71,7 +71,7 @@ TEST(On, ManyCoros) {
 }
 
 // TODO(mkornaukhov03) Bad test, tasks are not submitted in thread pool
-TEST(On, Cancel) {
+TEST(On, Drop) {
   using namespace std::chrono_literals;
   auto tp = yaclib::MakeThreadPool(1);
   tp->Stop();
@@ -103,9 +103,9 @@ TEST(On, LockWithStrand) {
 #if YACLIB_FAULT == 1
   constexpr std::size_t kIncrements = 1000;
 #else
-  constexpr std::size_t kIncrements = 100500;
+  constexpr std::size_t kIncrements = 10;
 #endif
-  const std::size_t kThreads = std::max(3U, std::thread::hardware_concurrency() / 2) - 1;
+  const std::size_t kThreads = std::max(3U, yaclib_std::thread::hardware_concurrency() / 2) - 1;
 
   auto tp = yaclib::MakeThreadPool(kThreads);
   auto strand = yaclib::MakeStrand(tp);
@@ -141,7 +141,7 @@ TEST(On, LockWithStrand) {
 
   end.store(false, std::memory_order_release);
   for (size_t i = 0; i != kThreads; ++i) {
-    add_value(kIncrements);
+    add_value(kIncrements).Detach();
   }
   while (!end.load(std::memory_order_acquire)) {
     yaclib_std::this_thread::yield();

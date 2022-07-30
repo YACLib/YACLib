@@ -9,9 +9,9 @@
 
 namespace yaclib::detail::fiber {
 
-struct NoTimeoutTag {};
+struct NoTimeoutTag final {};
 
-class FiberQueue {
+class FiberQueue final {
  public:
   FiberQueue() noexcept = default;
   FiberQueue(FiberQueue&& other) = default;

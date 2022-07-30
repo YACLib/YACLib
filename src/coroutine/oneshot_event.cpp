@@ -26,8 +26,8 @@ bool OneShotEvent::Ready() noexcept {
 }
 
 bool OneShotEvent::TryAdd(Job* job) noexcept {
-  std::uintptr_t head = _head.load(/*std::memory_order_acquire */);
-  std::uintptr_t node = reinterpret_cast<std::uintptr_t>(static_cast<detail::Node*>(job));
+  std::uint64_t head = _head.load(/*std::memory_order_acquire */);
+  std::uint64_t node = reinterpret_cast<std::uint64_t>(static_cast<detail::Node*>(job));
   while (head != OneShotEvent::kAllDone) {
     job->next = reinterpret_cast<detail::Node*>(head);
     // TSAN warning
@@ -38,12 +38,12 @@ bool OneShotEvent::TryAdd(Job* job) noexcept {
   return false;
 }
 
-detail::NopeCounter<OneShotEventAwaiter> OneShotEvent::Await(IExecutor& executor) noexcept {
-  return detail::NopeCounter<OneShotEventAwaiter>{executor, *this};
+OneShotEventAwaiter OneShotEvent::Await(IExecutor& executor) noexcept {
+  return OneShotEventAwaiter{executor, *this};
 }
 
 void OneShotEvent::Wait() {
-  detail::NopeCounter<OneShotEventWait> waiter;
+  OneShotEventWait waiter;
   if (TryAdd(static_cast<Job*>(&waiter))) {
     auto token = waiter.Make();
     waiter.Wait(token);

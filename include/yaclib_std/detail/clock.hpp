@@ -14,8 +14,8 @@ using system_clock = yaclib::detail::fiber::SystemClock;
 
 }  // namespace yaclib_std::chrono
 
-//#elif YACLIB_FAULT_CLOCK == 1  // TODO(myannyax) Implement model time for thread
-//#  error "YACLIB_FAULT=THREAD not implemented yet"
+// #elif YACLIB_FAULT_CLOCK == 1  // TODO(myannyax) Implement model time for thread
+// #  error "YACLIB_FAULT=THREAD not implemented yet"
 #else
 #  include <chrono>
 

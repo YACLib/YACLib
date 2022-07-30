@@ -22,21 +22,21 @@ class OneShotEvent : public IRef {
 
   bool Ready() noexcept;
 
-  detail::NopeCounter<OneShotEventAwaiter> Await(IExecutor& executor) noexcept;
+  OneShotEventAwaiter Await(IExecutor& executor) noexcept;
   void Wait();
 
  private:
-  static constexpr std::uintptr_t kEmpty = 0;
-  static constexpr std::uintptr_t kAllDone = 1;
+  static constexpr std::uint64_t kEmpty = 0;
+  static constexpr std::uint64_t kAllDone = 1;
   friend OneShotEventAwaiter;
 
   bool TryAdd(Job* job) noexcept;
-  yaclib_std::atomic_uintptr_t _head;
+  yaclib_std::atomic_uint64_t _head;
 };
 
 // TODO(mkornaukhov03)
 // Non optimal, should store executor inside BaseCore
-class OneShotEventAwaiter : public Job {
+class OneShotEventAwaiter final : public detail::NopeCounter<Job> {
  public:
   OneShotEventAwaiter(IExecutor& executor, OneShotEvent& event) noexcept : _event{event}, _executor{executor} {
   }
@@ -55,11 +55,10 @@ class OneShotEventAwaiter : public Job {
   void Call() noexcept final {
     _executor.Submit(*_core);
   }
-  void Cancel() noexcept final {
-    if (_core) {
-      _core->Cancel();  // LCOV_EXCL_LINE
-    }
-  }
+
+  void Drop() noexcept final {  // LCOV_EXCL_LINE Never called
+    _core->Drop();              // LCOV_EXCL_LINE
+  }                             // LCOV_EXCL_LINE
 
  private:
   friend class OneShotEvent;
@@ -69,13 +68,13 @@ class OneShotEventAwaiter : public Job {
 };
 
 // TODO(mkornaukhov03) both Job and DefaultEvent inherited from IRef
-class OneShotEventWait : public Job, public detail::DefaultEvent {
+class OneShotEventWait final : public detail::NopeCounter<Job, detail::DefaultEvent> {
  public:
   void Call() noexcept final {
     SetAll();
   }
 
-  void Cancel() noexcept final {
+  void Drop() noexcept final {
     SetAll();
   }
 };

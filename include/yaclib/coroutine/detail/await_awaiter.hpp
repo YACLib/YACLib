@@ -28,11 +28,11 @@ class AwaitAwaiter final {
   }
 
  private:
-  struct Handle : public IRef {
+  struct Handle : IRef {
     yaclib_std::coroutine_handle<> handle;
   };
 
-  struct HandleDeleter {
+  struct HandleDeleter final {
     static void Delete(Handle& handle) noexcept {
       YACLIB_DEBUG(!handle.handle, "saved to resume handle is null");
       YACLIB_DEBUG(handle.handle.done(), "handle for resume is done");
@@ -47,7 +47,7 @@ template <typename... Cores>
 AwaitAwaiter::AwaitAwaiter(Cores&... cores) : _await_core{sizeof...(cores) + 1} {
   static_assert(sizeof...(cores) >= 1, "Number of futures must be at least one");
   static_assert((... && std::is_same_v<BaseCore, Cores>), "Futures must be Future in Wait function");
-  const auto wait_count = (... + static_cast<std::size_t>(cores.SetWait(_await_core)));
+  const auto wait_count = (... + static_cast<std::size_t>(cores.SetWait(_await_core, InlineCore::kWaitNope)));
   _await_core.count.fetch_sub(sizeof...(cores) - wait_count, std::memory_order_relaxed);
 }
 
@@ -55,7 +55,7 @@ template <typename It>
 AwaitAwaiter::AwaitAwaiter(It it, std::size_t count) : _await_core{count + 1} {
   std::size_t wait_count = 0;
   for (std::size_t i = 0; i != count; ++i) {
-    wait_count += static_cast<std::size_t>(it->GetCore()->SetWait(_await_core));
+    wait_count += static_cast<std::size_t>(it->GetCore()->SetWait(_await_core, InlineCore::kWaitNope));
     ++it;
   }
   _await_core.count.fetch_sub(count - wait_count, std::memory_order_relaxed);

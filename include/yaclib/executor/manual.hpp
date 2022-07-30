@@ -10,7 +10,7 @@ namespace yaclib {
 /**
  * TODO(mkornaukhov03) Doxygen
  */
-class ManualExecutor : public yaclib::IExecutor {
+class ManualExecutor : public IExecutor {
  private:
   yaclib::detail::List _tasks;
 
@@ -20,8 +20,6 @@ class ManualExecutor : public yaclib::IExecutor {
   void Submit(yaclib::Job& f) noexcept final;
 
   std::size_t Drain();
-
-  ~ManualExecutor() override;
 };
 
 IntrusivePtr<ManualExecutor> MakeManual();

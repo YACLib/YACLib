@@ -60,21 +60,13 @@ void ErrorsCheck(ErrorType expected) {
 template <typename FutureType>
 void ValueCheck() {
   auto [f, p] = yaclib::MakeContract<FutureType>();
+  using Value = std::conditional_t<std::is_void_v<FutureType>, yaclib::Unit, FutureType>;
   EXPECT_FALSE(f.Ready());
-  if constexpr (std::is_void_v<FutureType>) {
-    std::move(p).Set();
-  } else {
-    std::move(p).Set(FutureType{});
-  }
+  std::move(p).Set(Value{});
   EXPECT_TRUE(f.Ready());
   auto result = std::move(f).Get();
   EXPECT_EQ(result.State(), yaclib::ResultState::Value);
-  if constexpr (!std::is_void_v<FutureType>) {
-    EXPECT_EQ(std::move(result).Ok(), FutureType{});
-  } else {
-    static_assert(std::is_void_v<decltype(std::move(result).Ok())>);
-    EXPECT_NO_THROW(std::move(result).Ok());
-  }
+  EXPECT_EQ(std::move(result).Ok(), Value{});
 }
 
 void AsyncGetResult(int num_threads) {
@@ -621,7 +613,7 @@ TEST(Future, StopInFlight) {
   tp->Wait();
 }
 
-TEST(Detach, Cancel) {
+TEST(Detach, Drop) {
   auto tp = yaclib::MakeThreadPool(1);
   auto f = yaclib::Run(*tp, [&] {
     tp->Stop();

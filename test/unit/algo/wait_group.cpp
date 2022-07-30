@@ -263,7 +263,7 @@ TEST(WaitGroupTest, MultiThreaded) {
 }
 
 TEST(WaitGroupTest, Empty) {
-  yaclib::WaitGroup wg;
+  yaclib::WaitGroup<> wg;
   wg.Wait();
 }
 

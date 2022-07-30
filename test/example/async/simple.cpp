@@ -161,7 +161,7 @@ TEST(Example, Race) {
 
   yaclib::Run(*tp, [p = std::move(p)]() mutable {
     std::move(p).Set(42);
-  });
+  }).Detach();
 
   std::move(f).Detach(*tp2, [](yaclib::Result<int> /*r*/) {
     std::cout << "Hello from the second thread pool!";

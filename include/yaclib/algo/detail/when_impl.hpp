@@ -8,18 +8,17 @@
 namespace yaclib::detail {
 
 template <typename Combinator, typename It>
-void WhenImpl(Combinator* combinator, It it, std::size_t count) {
+void WhenImpl(Combinator* combinator, It it, std::size_t count) noexcept {
   for (std::size_t i = 0; i != count; ++i) {
-    auto core = std::exchange(it->GetCore(), nullptr);
-    core->SetCallbackInline(*combinator);
+    it->GetCore().Release()->SetHere(*combinator, InlineCore::kHereCall);
     ++it;
   }
 }
 
 template <typename Combinator, typename E, typename... V>
-void WhenImpl(Combinator* combinator, FutureBase<V, E>&&... futures) {
+void WhenImpl(Combinator* combinator, FutureBase<V, E>&&... futures) noexcept {
   // TODO(MBkkt) Make Impl for BaseCore's instead of futures
-  (..., std::exchange(futures.GetCore(), nullptr)->SetCallbackInline(*combinator));
+  (..., futures.GetCore().Release()->SetHere(*combinator, InlineCore::kHereCall));
 }
 
 }  // namespace yaclib::detail

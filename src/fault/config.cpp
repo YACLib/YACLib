@@ -24,7 +24,7 @@ std::uint32_t GetFaultSleepTime() noexcept {
   return yaclib::detail::Injector::GetSleepTime();
 }
 
-void SetAtomicFailFrequency(std::uint32_t k) noexcept {
+void SetAtomicFailFrequency([[maybe_unused]] std::uint32_t k) noexcept {
 #if YACLIB_FAULT != 0
   yaclib::detail::SetAtomicWeakFailFrequency(k);
 #endif
@@ -36,31 +36,31 @@ void SetSeed(std::uint32_t seed) noexcept {
 
 namespace fiber {
 
-void SetFaultTickLength(std::uint32_t ns) noexcept {
+void SetFaultTickLength([[maybe_unused]] std::uint32_t ns) noexcept {
 #if YACLIB_FAULT == 2
   fault::Scheduler::SetTickLength(ns);
 #endif
 }
 
-void SetFaultRandomListPick(std::uint32_t k) noexcept {
+void SetFaultRandomListPick([[maybe_unused]] std::uint32_t k) noexcept {
 #if YACLIB_FAULT == 2
   fault::Scheduler::SetRandomListPick(k);
 #endif
 }
 
-void SetStackSize(std::uint32_t pages) noexcept {
+void SetStackSize([[maybe_unused]] std::uint32_t pages) noexcept {
 #if YACLIB_FAULT == 2
   yaclib::detail::fiber::FiberBase::GetAllocator().SetMinStackSize(pages);
 #endif
 }
 
-void SetStackCacheSize(std::uint32_t c) noexcept {
+void SetStackCacheSize([[maybe_unused]] std::uint32_t c) noexcept {
 #if YACLIB_FAULT == 2
   yaclib::detail::fiber::DefaultAllocator::SetCacheSize(c);
 #endif
 }
 
-void SetHardwareConcurrency(std::uint32_t c) noexcept {
+void SetHardwareConcurrency([[maybe_unused]] std::uint32_t c) noexcept {
 #if YACLIB_FAULT == 2
   yaclib::detail::fiber::Thread::SetHardwareConcurrency(c);
 #endif
@@ -82,7 +82,7 @@ uint32_t GetInjectorState() noexcept {
 #endif
 }
 
-void SetInjectorState(uint32_t state) noexcept {
+void SetInjectorState([[maybe_unused]] uint32_t state) noexcept {
 #if YACLIB_FAULT != 0
   yaclib::GetInjector()->SetState(state);
 #endif

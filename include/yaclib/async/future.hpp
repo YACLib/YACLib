@@ -36,7 +36,7 @@ class FutureBase {
   /**
    * If Future is \ref Valid then call \ref Stop
    */
-  ~FutureBase();
+  ~FutureBase() noexcept;
 
   /**
    * Check if this \ref Future has \ref Promise
@@ -94,13 +94,13 @@ class FutureBase {
   /**
    * Stop pipeline before current step, if possible.
    */
-  void Stop() &&;
+  void Stop() && noexcept;
 
   /**
    * Specify executor for continuation.
    * Make FutureOn -- Future with executor
    */
-  [[nodiscard]] FutureOn<V, E> On(IExecutor& executor) &&;
+  [[nodiscard]] FutureOn<V, E> On(IExecutor& executor) && noexcept;
 
   /**
    * Attach the continuation func to *this
@@ -117,7 +117,7 @@ class FutureBase {
   /**
    * Disable calling \ref Stop in destructor
    */
-  void Detach() &&;
+  void Detach() && noexcept;
 
   /**
    * Attach the final continuation func to *this and \ref Detach *this
@@ -161,8 +161,8 @@ extern template class FutureBase<void, StopError>;
  * Future and \ref Promise are like a Single Producer/Single Consumer one-shot one-element channel.
  * Use the \ref Promise to fulfill the \ref Future.
  */
-template <typename V, typename E = StopError>
-class Future final : public FutureBase<V, E> {
+template <typename V = void, typename E = StopError>
+class [[nodiscard]] Future final : public FutureBase<V, E> {
   using Base = FutureBase<V, E>;
 
  public:
@@ -197,14 +197,14 @@ extern template class Future<void, StopError>;
 template <typename V = Unit, typename E = StopError, typename... Args>
 auto MakeFuture(Args&&... args) {
   if constexpr (sizeof...(Args) == 0) {
-    return Future{MakeIntrusive<detail::ResultCore<void, E>>(Unit{})};
+    return Future{MakeUnique<detail::ResultCore<void, E>>(Unit{})};
   } else if constexpr (sizeof...(Args) == 1) {
     using T = std::conditional_t<std::is_same_v<V, Unit>, head_t<Args...>, V>;
     static_assert(!std::is_same_v<T, Unit>);
-    return Future{MakeIntrusive<detail::ResultCore<T, E>>(std::forward<Args>(args)...)};
+    return Future{MakeUnique<detail::ResultCore<T, E>>(std::forward<Args>(args)...)};
   } else {
     static_assert(!std::is_same_v<V, Unit>);
-    return Future{MakeIntrusive<detail::ResultCore<V, E>>(std::forward<Args>(args)...)};
+    return Future{MakeUnique<detail::ResultCore<V, E>>(std::forward<Args>(args)...)};
   }
 }
 
@@ -214,8 +214,8 @@ auto MakeFuture(Args&&... args) {
  * Future and \ref Promise are like a Single Producer/Single Consumer one-shot one-element channel.
  * Use the \ref Promise to fulfill the \ref Future.
  */
-template <typename V, typename E = StopError>
-class FutureOn final : public FutureBase<V, E> {
+template <typename V = void, typename E = StopError>
+class [[nodiscard]] FutureOn final : public FutureBase<V, E> {
   using Base = FutureBase<V, E>;
 
  public:
@@ -230,7 +230,7 @@ class FutureOn final : public FutureBase<V, E> {
    * Specify executor for continuation.
    * Make FutureOn -- Future with executor
    */
-  [[nodiscard]] Future<V, E> On(std::nullptr_t) &&;
+  [[nodiscard]] Future<V, E> On(std::nullptr_t) && noexcept;
 
   /**
    * Attach the continuation func to *this

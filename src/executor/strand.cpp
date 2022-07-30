@@ -59,11 +59,11 @@ class /*alignas(kCacheLineSize)*/ Strand : public Job, public IExecutor {
     }
   }
 
-  void Cancel() noexcept final {
+  void Drop() noexcept final {
     auto* node = _tasks.exchange(Mark(), std::memory_order_acq_rel);
     do {
       auto* next = node->next;
-      static_cast<Job*>(node)->Cancel();
+      static_cast<Job*>(node)->Drop();
       node = next;
     } while (node != nullptr);
     static_cast<Job&>(*this).DecRef();

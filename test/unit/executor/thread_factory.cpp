@@ -6,7 +6,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <initializer_list>
-#include <thread>
+#include <yaclib_std/thread>
 
 #include <gtest/gtest.h>
 
@@ -73,7 +73,7 @@ TEST(SingleThreaded, Simple) {
 }
 
 TEST(SingleThreaded, Complex) {
-  static const std::size_t kMaxThreadCount = (kSanitizer ? 1 : 4) * std::thread::hardware_concurrency();
+  static const std::size_t kMaxThreadCount = (kSanitizer ? 1 : 4) * yaclib_std::thread::hardware_concurrency();
   static const std::size_t kIterCount = kSanitizer ? 10 : (100 + rand() % 100);
   for (std::size_t cached_threads : {size_t{0}, kMaxThreadCount / 2, kMaxThreadCount}) {
     auto factory = MakeThreadFactory(yaclib::MakeThreadFactory(cached_threads), nullptr, nullptr);
@@ -83,9 +83,10 @@ TEST(SingleThreaded, Complex) {
 }
 
 TEST(MultiThreaded, Simple) {
-  EXPECT_GE(std::thread::hardware_concurrency(), 2);
-  static const std::size_t kThreadsCount = kSanitizer ? 2 : (2 + rand() % (std::thread::hardware_concurrency() - 1));
-  static const std::size_t kMaxThreadCount = kThreadsCount * std::thread::hardware_concurrency();
+  EXPECT_GE(yaclib_std::thread::hardware_concurrency(), 2);
+  static const std::size_t kThreadsCount =
+    kSanitizer ? 2 : (2 + rand() % (yaclib_std::thread::hardware_concurrency() - 1));
+  static const std::size_t kMaxThreadCount = kThreadsCount * yaclib_std::thread::hardware_concurrency();
   static const std::size_t kIterCount = kSanitizer ? 10 : (100 + rand() % 100);
 
   auto stub = yaclib::MakeFunc([] {
@@ -104,7 +105,7 @@ TEST(MultiThreaded, Simple) {
     std::size_t remaining_threads = kMaxThreadCount;
 
     for (std::size_t i = 0; i != kThreadsCount; ++i) {
-      max_threads = 1 + rand() % (std::thread::hardware_concurrency() * 2);
+      max_threads = 1 + rand() % (yaclib_std::thread::hardware_concurrency() * 2);
       auto todo_threads = kThreadsCount - (i + 1);
       max_threads = std::min(max_threads, remaining_threads - todo_threads);
       ASSERT_TRUE(max_threads != 0);

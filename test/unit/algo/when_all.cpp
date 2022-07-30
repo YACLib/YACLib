@@ -112,9 +112,7 @@ void AllFails() {
   std::array<yaclib::Promise<T, E>, kSize> promises;
   std::array<yaclib::Future<T, E>, kSize> futures;
   for (int i = 0; i < kSize; ++i) {
-    auto [f, p] = yaclib::MakeContract<T, E>();
-    futures[i] = std::move(f);
-    promises[i] = std::move(p);
+    std::tie(futures[i], promises[i]) = yaclib::MakeContract<T, E>();
   }
 
   auto all = [&futures] {
@@ -232,10 +230,8 @@ void MultiThreaded() {
     }()
       .Get();
 
-  if constexpr (kIsVoid) {
-    EXPECT_NO_THROW(std::move(ints).Ok());
-  } else {
-    auto result = std::move(ints).Ok();
+  auto result = std::move(ints).Ok();
+  if constexpr (!kIsVoid) {
     std::sort(result.begin(), result.end());
     EXPECT_EQ(result.size(), kValues);
     for (int i = 0; i < kValues; ++i) {
@@ -270,7 +266,7 @@ void FirstFail() {
     for (std::size_t i = 0; i != count; ++i) {
       ints.push_back(yaclib::Run<Error>(*tp, [] {
         std::this_thread::sleep_for(2ms);
-        return yaclib::Result<void, Error>{Error{yaclib::StopTag{}}};
+        return yaclib::Result<void, Error>{yaclib::StopTag{}};
       }));
     }
     EXPECT_THROW(WhenAll(ints.begin(), ints.end()).Get().Ok(), yaclib::ResultError<Error>);
@@ -281,6 +277,9 @@ void FirstFail() {
 }
 
 TEST(WhenAll, FirstFail) {
+#if YACLIB_FAULT == 2
+  GTEST_SKIP();  // Too long
+#endif
   FirstFail();
   FirstFail<LikeErrorCode>();
 }

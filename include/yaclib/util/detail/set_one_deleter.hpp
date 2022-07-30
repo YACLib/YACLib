@@ -2,9 +2,9 @@
 
 namespace yaclib::detail {
 
-struct SetOneDeleter {
+struct SetOneDeleter final {
   template <typename Event>
-  static void Delete(Event& event) {
+  static void Delete(Event& event) noexcept {
     event.SetOne();
   }
 };

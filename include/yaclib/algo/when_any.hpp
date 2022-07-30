@@ -27,7 +27,7 @@ auto WhenAny(It begin, std::size_t count) {
   static_assert(is_future_base_v<T>, "WhenAny function Iterator must be point to some Future");
   using V = future_base_value_t<T>;
   using E = future_base_error_t<T>;
-  YACLIB_INFO(count < 2, "Don't use combinators for zero or one futures");
+  YACLIB_WARN(count < 2, "Don't use combinators for zero or one futures");
   if (count == 0) {
     return Future<V, E>{};
   }

@@ -7,7 +7,7 @@
 
 namespace yaclib::detail {
 
-class OnAwaiter {
+class OnAwaiter final {
  public:
   explicit OnAwaiter(IExecutor& e);
 

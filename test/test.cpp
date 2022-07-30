@@ -1,11 +1,13 @@
 #include <util/helpers.hpp>
 
+#include <yaclib/config.hpp>
 #include <yaclib/fault/config.hpp>
 #include <yaclib/fault/inject.hpp>
 #include <yaclib/log.hpp>
 
 #if YACLIB_FAULT == 2
 #  include <yaclib/fault/detail/fiber/scheduler.hpp>
+#  include <yaclib/fault/detail/fiber/thread.hpp>
 #endif
 
 #include <cstdio>
@@ -16,16 +18,16 @@
 
 namespace test {
 
-auto rand = std::random_device();
+static std::random_device rand;
 
-auto seed = rand();
+static std::size_t seed = rand();
 
 class MyTestListener : public ::testing::EmptyTestEventListener {
  public:
   void OnTestStart(const testing::TestInfo& /*info*/) override {
-    std::cerr << "current random count" << yaclib::fiber::GetFaultRandomCount() << "\n";
+    std::cerr << "current random count: " << yaclib::fiber::GetFaultRandomCount() << "\n";
   }
-  void OnTestIterationStart(const testing::UnitTest& unitTest, int i) override {
+  void OnTestIterationStart(const testing::UnitTest& /*unitTest*/, int /*i*/) override {
     seed = rand();
     std::cerr << "seed: " << test::seed << "\n";
   }
@@ -33,11 +35,11 @@ class MyTestListener : public ::testing::EmptyTestEventListener {
 
 void InitLog() noexcept {
   auto assert_callback = [](std::string_view file, std::size_t line, std::string_view /*function*/,
-                            std::string_view /*condition*/, std::string_view message) {
+                            std::string_view /*condition*/, std::string_view message) noexcept {
     GTEST_MESSAGE_AT_(file.data(), line, message.data(), ::testing::TestPartResult::kFatalFailure);
   };
   YACLIB_INIT_ERROR(assert_callback);
-  YACLIB_INIT_INFO(nullptr);
+  YACLIB_INIT_WARN(nullptr);
   YACLIB_INIT_DEBUG(assert_callback);
 }
 

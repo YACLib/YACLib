@@ -8,19 +8,19 @@ jobs:
   # TODO(MBkkt) Use our own script instead of github action, same as in /.githooks
 
   main:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
       - uses: actions/checkout@v3
 
       - name: Build
-        uses: mattnotmitt/doxygen-action@v1.9.3
+        uses: mattnotmitt/doxygen-action@v1.9.4
         with:
           doxyfile-path: ./doc/doxygen/Doxyfile
           working-directory: .
 
       - name: Deploy to gh-pages
-        uses: peaceiris/actions-gh-pages@v3.7.3
+        uses: peaceiris/actions-gh-pages@v3.8.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./doc/html/

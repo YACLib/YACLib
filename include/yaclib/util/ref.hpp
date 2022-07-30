@@ -17,7 +17,7 @@ class IRef {
    */
   virtual void DecRef() noexcept = 0;
 
-  virtual ~IRef() = default;
+  virtual ~IRef() noexcept = default;
 };
 
 }  // namespace yaclib

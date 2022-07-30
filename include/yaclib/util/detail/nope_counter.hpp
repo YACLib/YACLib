@@ -2,10 +2,8 @@
 
 namespace yaclib::detail {
 
-template <typename CounterBase>
-struct NopeCounter final : CounterBase {
-  using CounterBase::CounterBase;
-
+template <typename... Bases>
+struct NopeCounter : Bases... {
   void IncRef() noexcept final {
   }
 

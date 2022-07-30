@@ -6,7 +6,6 @@
 #include <yaclib/fault/detail/fiber/stack_allocator.hpp>
 #include <yaclib/fault/inject.hpp>
 #include <yaclib/log.hpp>
-#include <yaclib/util/func.hpp>
 
 #include <chrono>
 #include <map>
@@ -18,7 +17,7 @@ class FiberQueue;
 }  // namespace yaclib::detail::fiber
 namespace yaclib::fault {
 
-class Scheduler {
+class Scheduler final {
  public:
   Scheduler() noexcept = default;
 

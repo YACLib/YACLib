@@ -6,7 +6,7 @@
 namespace yaclib {
 namespace detail {
 
-class Inline : public IExecutor {
+class Inline final : public NopeCounter<IExecutor> {
  private:
   [[nodiscard]] Type Tag() const final {
     return Type::Inline;
@@ -17,7 +17,8 @@ class Inline : public IExecutor {
   }
 };
 
-static NopeCounter<Inline> sInline;  // TODO(MBkkt) Make file with depended globals
+// TODO(MBkkt) Make file with depended globals
+static Inline sInline;
 
 }  // namespace detail
 

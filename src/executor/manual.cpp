@@ -5,6 +5,7 @@
 #include <yaclib/util/intrusive_ptr.hpp>
 
 namespace yaclib {
+
 IExecutor::Type ManualExecutor::Tag() const {
   return yaclib::IExecutor::Type::Custom;
 }
@@ -21,9 +22,6 @@ std::size_t ManualExecutor::Drain() {
     static_cast<yaclib::Job&>(task).Call();
   }
   return done;
-}
-
-ManualExecutor::~ManualExecutor() {
 }
 
 IntrusivePtr<ManualExecutor> MakeManual() {

@@ -14,7 +14,7 @@ jobs:
   # TODO(MBkkt) Add clang-5.0, clang-6.0, clang-7
   #             Fucking cppreference liars, clang doesn't support simple variant usage, before clang-8!
   #             We can only support this when we remove the variant from the Result
-  # TODO(MBkkt) Add gcc-12, clang-15 when it release
+  # TODO(MBkkt) Add clang-15 when it release
   # TODO(MBkkt) Add other compilers, like Intel C++?
   # TODO(MBkkt) libstdc++-7-dev, libc++ old version
 
@@ -23,12 +23,20 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ 18.04, 20.04 ]
+        os: [ 18.04, 20.04, 22.04 ]
         compiler: [ clang-8, clang-9, clang-10, clang-11, clang-12, clang-13, clang-14,
-                    gcc-7, gcc-8, gcc-9, gcc-10, gcc-11 ]
+                    gcc-7, gcc-8, gcc-9, gcc-10, gcc-11, gcc-12 ]
         isPR:
           - ${{ github.event_name == 'pull_request' }}
         exclude:
+          - isPR: true
+            os: 18.04
+            compiler: gcc-12
+
+          - isPR: false
+            os: 18.04
+            compiler: gcc-12
+
           - isPR: true
             os: 20.04
             compiler: clang-8
@@ -50,6 +58,7 @@ jobs:
           - isPR: true
             os: 20.04
             compiler: clang-14
+
           - isPR: true
             os: 20.04
             compiler: gcc-7
@@ -65,6 +74,71 @@ jobs:
           - isPR: true
             os: 20.04
             compiler: gcc-11
+          - isPR: true
+            os: 20.04
+            compiler: gcc-12
+
+          - isPR: false
+            os: 20.04
+            compiler: gcc-12
+
+          - isPR: true
+            os: 22.04
+            compiler: clang-8
+          - isPR: true
+            os: 22.04
+            compiler: clang-9
+          - isPR: true
+            os: 22.04
+            compiler: clang-10
+          - isPR: true
+            os: 22.04
+            compiler: clang-11
+          - isPR: true
+            os: 22.04
+            compiler: clang-12
+          - isPR: true
+            os: 22.04
+            compiler: clang-13
+          - isPR: true
+            os: 22.04
+            compiler: clang-14
+
+          - isPR: true
+            os: 22.04
+            compiler: gcc-7
+          - isPR: true
+            os: 22.04
+            compiler: gcc-8
+          - isPR: true
+            os: 22.04
+            compiler: gcc-9
+          - isPR: true
+            os: 22.04
+            compiler: gcc-10
+          - isPR: true
+            os: 22.04
+            compiler: gcc-11
+          - isPR: true
+            os: 22.04
+            compiler: gcc-12
+
+          - isPR: false
+            os: 22.04
+            compiler: clang-8
+          - isPR: false
+            os: 22.04
+            compiler: clang-9
+          - isPR: false
+            os: 22.04
+            compiler: clang-10
+
+          - isPR: false
+            os: 22.04
+            compiler: gcc-7
+          - isPR: false
+            os: 22.04
+            compiler: gcc-8
 
 
     env:
@@ -79,24 +153,45 @@ jobs:
           sudo apt-get install ninja-build googletest libunwind-dev
 
       - name: Install dependencies clang
-        if: ${{ matrix.compiler == 'clang-8' }}
-        run: |
-          sudo apt-get install clang-8 libc++-8-dev libc++abi-8-dev libstdc++-7-dev
-
-      - name: Install dependencies clang
-        if: matrix.compiler != 'clang-8' && !startsWith(matrix.compiler, 'gcc')
+        if: 1 && !startsWith(matrix.compiler, 'gcc')
         run: |
           sudo wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
           if [[ ${{ matrix.os }} == "18.04" ]]; then
             ubuntu="bionic"
-          else
+            gcc_version=7
+            llvm_version=9          
+          elif [[ ${{ matrix.os }} == "20.04" ]]; then
             ubuntu="focal"
+            gcc_version=7
+            llvm_version=9
+          else
+            ubuntu="jammy"
+            gcc_version=9
+            llvm_version=13
           fi
           compiler=${{ matrix.compiler }}
-          version=${compiler:6}
-          sudo add-apt-repository "deb http://apt.llvm.org/$ubuntu/ llvm-toolchain-$ubuntu-$version main"
+          clang_version=${compiler:6}
+          if [[ $clang_version -ge $llvm_version ]]; then
+            sudo add-apt-repository "deb http://apt.llvm.org/$ubuntu/ llvm-toolchain-$ubuntu-${clang_version} main"
+          fi
           sudo apt-get update
-          sudo apt-get install clang-$version libc++-$version-dev libc++abi-$version-dev libstdc++-7-dev
+          sudo apt-get install clang-${clang_version} libc++-${clang_version}-dev libc++abi-${clang_version}-dev       \
+                               gcc-${gcc_version} g++-${gcc_version} libstdc++-${gcc_version}-dev
+
+          sudo update-alternatives                                                                                     \
+            --install /usr/bin/gcc        gcc        /usr/bin/gcc-${gcc_version}        200                            \
+            --slave   /usr/bin/g++        g++        /usr/bin/g++-${gcc_version}                                       \
+            --slave   /usr/bin/gcc-ar     gcc-ar     /usr/bin/gcc-ar-${gcc_version}                                    \
+            --slave   /usr/bin/gcc-nm     gcc-nm     /usr/bin/gcc-nm-${gcc_version}                                    \
+            --slave   /usr/bin/gcc-ranlib gcc-ranlib /usr/bin/gcc-ranlib-${gcc_version}                                \
+            --slave   /usr/bin/gcov       gcov       /usr/bin/gcov-${gcc_version}                                      \
+            --slave   /usr/bin/gcov-tool  gcov-tool  /usr/bin/gcov-tool-${gcc_version}                                 \
+            --slave   /usr/bin/gcov-dump  gcov-dump  /usr/bin/gcov-dump-${gcc_version}
+          sudo update-alternatives --auto gcc
+
+          sudo update-alternatives                                                                                     \
+            --install /usr/bin/cpp        cpp        /usr/bin/cpp-${gcc_version}        200
+          sudo update-alternatives --auto cpp
 
       - name: Install dependencies gcc
         if: startsWith(matrix.compiler, 'gcc')
@@ -122,24 +217,19 @@ jobs:
       - name: Configure CMake
         run: |
           compiler=${{ matrix.compiler }}
-          coroutine_option="CORO"
           if [[ "$compiler" == gcc* ]]; then
             version=${compiler:4}
-            c_compiler="gcc"
-            cxx_compiler="g++"
-            if [[ $version -lt 10 ]]; then
-              standard=17
-              coroutine_option=""
-            else
-              standard=20
+            compiler="g++"
+            standard=17; flags=""
+            if [[ $version -ge 10 ]]; then
+              standard=20; flags="CORO"
             fi
           else
             version=${compiler:6}
-            c_compiler="clang-$version"
-            cxx_compiler="clang++-$version"
+            compiler="clang++-$version"
           fi
 
-          stdlibs_name=(libcxx libstdcxx)
+          stdlib_names=(libcxx libstdcxx)
           link_options=(
             "-stdlib=libc++;-lc++abi"
             "-stdlib=libstdc++"
@@ -149,37 +239,34 @@ jobs:
             "-stdlib=libstdc++"
           )
 
-          for (( j=0; j<${#link_options[*]}; j+=1 )); do
+          for (( j=0; j<${#stdlib_names[*]}; j+=1 )); do
             for build_type in ${BUILD_TYPE[*]}; do
               link_option=""; compile_option=""
-              if [[ "$c_compiler" == "gcc" ]]; then
-                if [[ "${stdlibs_name[$j]}" != "libstdcxx" ]]; then
+              if [[ "$compiler" == "g++" ]]; then
+                if [[ "${stdlib_names[$j]}" != "libstdcxx" ]]; then
                   continue  # TODO(MBkkt) I dunno how to get GNU GCC to work with other stdlibs
                 fi
               else
                 link_option=${link_options[$j]}; compile_option=${compile_options[$j]}
-                if [[ "${stdlibs_name[$j]}" == "libstdcxx" ]]; then
-                  coroutine_option=""
-                  standard=17
+                if [[ "${stdlib_names[$j]}" == "libstdcxx" ]]; then
+                  # TODO(MBkkt) I know how to enable CORO here, but it's a dirty hack, do we want to check it in CI?
+                  standard=17; flags=""
+                elif [[ $version -ge 9 ]]; then
+                  standard=20; flags="CORO"
                 else
-                  if [[ "$compiler" == "clang-8"  ]]; then
-                    standard=17
-                    coroutine_option=""
-                  else
-                    standard=20
-                  fi
+                  standard=17; flags=""
                 fi
               fi
 
-              dir="build_${compiler}_${stdlibs_name[$j]}_${build_type}"
+              dir="build_${compiler}_${stdlib_names[$j]}_${build_type}"
               echo $dir
 
               cmake -S . -B $dir                                                                                       \
                 -DCMAKE_BUILD_TYPE="$build_type"                                                                       \
                 -DYACLIB_CXX_STANDARD="$standard"                                                                      \
                 -DYACLIB_TEST=SINGLE                                                                                   \
-                -DYACLIB_FLAGS="$coroutine_option"                                                                             \
-                -DCMAKE_CXX_COMPILER="$cxx_compiler"                                                                   \
+                -DYACLIB_FLAGS="$flags"                                                                                \
+                -DCMAKE_CXX_COMPILER="$compiler"                                                                   \
                 -G"Ninja"                                                                                              \
                 -DYACLIB_LINK_OPTIONS="$link_option"                                                                   \
                 -DYACLIB_LOG="ERROR;DEBUG"                                                                             \

@@ -1,11 +1,11 @@
 #include <yaclib/fault/detail/fiber/thread.hpp>
 #include <yaclib/log.hpp>
 
+#include <utility>
+
 namespace yaclib::detail::fiber {
 
-static unsigned int sFiberHardwareConcurrency{std::thread::hardware_concurrency()};
-
-using namespace std::chrono_literals;
+static unsigned int gHardwareConcurrency{0};
 
 Thread::Thread() noexcept = default;
 
@@ -47,7 +47,7 @@ Thread::native_handle_type Thread::native_handle() noexcept {
 }
 
 unsigned int Thread::hardware_concurrency() noexcept {
-  return sFiberHardwareConcurrency;
+  return gHardwareConcurrency ? gHardwareConcurrency : std::thread::hardware_concurrency();
 }
 
 Thread::~Thread() {
@@ -80,8 +80,8 @@ void Thread::AfterJoinOrDetach() {
   _impl = nullptr;
 }
 
-void Thread::SetHardwareConcurrency(unsigned int h_c) noexcept {
-  sFiberHardwareConcurrency = h_c;
+void Thread::SetHardwareConcurrency(unsigned int hardware_concurrency) noexcept {
+  gHardwareConcurrency = hardware_concurrency;
 }
 
 }  // namespace yaclib::detail::fiber

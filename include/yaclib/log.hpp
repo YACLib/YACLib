@@ -7,13 +7,13 @@ namespace yaclib {
 // TODO(MBkkt) Maybe add callbacks overload for source_location, stacktrace arguments?
 
 using LogCallback = void (*)(std::string_view file, std::size_t line, std::string_view function,
-                             std::string_view condition, std::string_view message);
+                             std::string_view condition, std::string_view message) noexcept;
 
 namespace detail {
 
 enum class LogLevel : char {
   Debug = 0,
-  Info = 1,
+  Warn = 1,
   Error = 2,
   Count = 3,
 };
@@ -21,7 +21,7 @@ enum class LogLevel : char {
 void SetCallback(LogLevel level, LogCallback callback) noexcept;
 
 void LogMessage(LogLevel level, std::string_view file, std::size_t line, std::string_view func,
-                std::string_view condition, std::string_view message);
+                std::string_view condition, std::string_view message) noexcept;
 
 }  // namespace detail
 }  // namespace yaclib
@@ -49,17 +49,21 @@ void LogMessage(LogLevel level, std::string_view file, std::size_t line, std::st
   } while (false)
 
 #ifdef NDEBUG
-#  define YACLIB_STUB1(first) ((void)0)
-#  define YACLIB_STUB2(first, second) ((void)0)
+#  define YACLIB_STUB1(first) ((void)1)
+#  define YACLIB_STUB2(first, second) ((void)1)
 #else
 #  define YACLIB_STUB1(first)                                                                                          \
     do {                                                                                                               \
-      (void)(first);                                                                                                   \
+      if (false) {                                                                                                     \
+        (void)(first);                                                                                                 \
+      }                                                                                                                \
     } while (false)
 #  define YACLIB_STUB2(first, second)                                                                                  \
     do {                                                                                                               \
-      (void)(first);                                                                                                   \
-      (void)(second);                                                                                                  \
+      if (false) {                                                                                                     \
+        (void)(first);                                                                                                 \
+        (void)(second);                                                                                                \
+      }                                                                                                                \
     } while (false)
 #endif
 
@@ -71,18 +75,20 @@ void LogMessage(LogLevel level, std::string_view file, std::size_t line, std::st
 #  define YACLIB_ERROR(cond, message) YACLIB_STUB2(cond, message)
 #endif
 
-#ifdef YACLIB_LOG_INFO
-#  define YACLIB_INIT_INFO(callback) YACLIB_SET_CALLBACK(::yaclib::detail::LogLevel::Info, callback)
-#  define YACLIB_INFO(cond, message) YACLIB_LOG_MESSAGE(::yaclib::detail::LogLevel::Info, cond, message)
+#ifdef YACLIB_LOG_WARN
+#  define YACLIB_INIT_WARN(callback) YACLIB_SET_CALLBACK(::yaclib::detail::LogLevel::Warn, callback)
+#  define YACLIB_WARN(cond, message) YACLIB_LOG_MESSAGE(::yaclib::detail::LogLevel::Warn, cond, message)
 #else
-#  define YACLIB_INIT_INFO(callback) YACLIB_STUB1(callback)
-#  define YACLIB_INFO(cond, message) YACLIB_STUB2(cond, message)
+#  define YACLIB_INIT_WARN(callback) YACLIB_STUB1(callback)
+#  define YACLIB_WARN(cond, message) YACLIB_STUB2(cond, message)
 #endif
 
 #ifdef YACLIB_LOG_DEBUG
 #  define YACLIB_INIT_DEBUG(callback) YACLIB_SET_CALLBACK(::yaclib::detail::LogLevel::Debug, callback)
 #  define YACLIB_DEBUG(cond, message) YACLIB_LOG_MESSAGE(::yaclib::detail::LogLevel::Debug, cond, message)
+#  define YACLIB_ASSERT(cond) YACLIB_LOG_MESSAGE(::yaclib::detail::LogLevel::Debug, !(cond), "")
 #else
 #  define YACLIB_INIT_DEBUG(callback) YACLIB_STUB1(callback)
 #  define YACLIB_DEBUG(cond, message) YACLIB_STUB2(cond, message)
+#  define YACLIB_ASSERT(cond) YACLIB_STUB1(!(cond))
 #endif

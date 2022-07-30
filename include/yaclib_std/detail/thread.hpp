@@ -9,8 +9,8 @@ using thread = yaclib::detail::fiber::Thread;
 
 }  // namespace yaclib_std
 
-//#elif YACLIB_FAULT_THREAD == 1  // TODO(myannyax) Maybe implement
-//#  error "YACLIB_FAULT=THREAD not implemented yet"
+// #elif YACLIB_FAULT_THREAD == 1  // TODO(myannyax) Maybe implement
+// #  error "YACLIB_FAULT=THREAD not implemented yet"
 #else
 #  include <thread>
 

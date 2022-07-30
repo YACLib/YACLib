@@ -11,10 +11,6 @@ on:
     - cron: '0 12 * * 1-5'
 
 jobs:
-  # TODO(MBkkt) Add windows-2016?
-  # TODO(MBkkt) Add Cygwin?
-  # TODO(MBkkt) Run tests with MinGW
-
   main:
     runs-on: 'windows-${{ matrix.os }}'
     strategy:
@@ -26,14 +22,6 @@ jobs:
         isPR:
           - ${{ github.event_name == 'pull_request' }}
         exclude:
-          - isPR: true
-            arch: Win32
-            os: 2019
-            build_type: Debug
-          - isPR: true
-            arch: Win32
-            os: 2019
-            build_type: RelWithDebInfo
           - isPR: true
             arch: Win32
             os: 2022
@@ -54,17 +42,19 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set up MinGW x86
-        if: ${{ matrix.arch == 'Win32' }}
-        uses: egor-tensin/setup-mingw@v2
-        with:
-          platform: x86
-
-      - name: Set up MinGW x64
-        if: ${{ matrix.arch == 'x64' }}
-        uses: egor-tensin/setup-mingw@v2
-        with:
-          platform: x64
+      # TODO(MBkkt) https://github.com/msys2/setup-msys2?
+      # TODO(MBkkt) Run tests with MinGW
+      # - name: Set up MinGW x86
+      #   if: ${{ matrix.arch == 'Win32' }}
+      #   uses: egor-tensin/setup-mingw@v2
+      #   with:
+      #     platform: x86
+      #
+      # - name: Set up MinGW x64
+      #   if: ${{ matrix.arch == 'x64' }}
+      #   uses: egor-tensin/setup-mingw@v2
+      #   with:
+      #     platform: x64
 
       - name: Configure CMake
         shell: bash
@@ -80,9 +70,9 @@ jobs:
           else
             slowdown=1
           fi
-          names=(ClangCL MinGW MSVC)
-          generators=("Visual Studio $msvc" "MinGW Makefiles" "Visual Studio $msvc")
-          options=("-A $arch -T ClangCL" "-DCMAKE_BUILD_TYPE=${{ matrix.build_type }}" "-A $arch")
+          names=(MSVC ClangCL)  # TODO MinGW
+          generators=("Visual Studio $msvc" "Visual Studio $msvc" "MinGW Makefiles")
+          options=("-A $arch" "-A $arch -T ClangCL" "-DCMAKE_BUILD_TYPE=${{ matrix.build_type }}")
 
           for (( i=0; i<${#names[*]}; i+=1 )); do
             if [[ "${names[$i]}" == "MSVC" ]]; then
@@ -90,9 +80,9 @@ jobs:
             else
               coroutine_option=""
             fi
-            dir="build_${names[$i]}_fault_${yaclib_fault}"
+            dir="build_${names[$i]}"
             echo $dir
-          
+
             cmake -S . -B $dir                                                                                         \
               -DYACLIB_CXX_STANDARD=17                                                                                 \
               -DYACLIB_FLAGS="$coroutine_option"                                                                       \
@@ -115,19 +105,8 @@ jobs:
       - name: Test
         shell: bash
         run: |
-          names=(ClangCL MinGW MSVC)
-          build_type=${{ matrix.build_type }}
-          arch=${{ matrix.arch }}
-
-          for (( i=0; i<${#names[*]}; i+=1 )); do
-            for yaclib_fault in ${YACLIB_FAULT[*]}; do
-              if [[ ${names[$i]} == "MinGW" || 
-                    ( $arch == "Win32" && $build_type == "RelWithDebInfo" && "${names[$i]}" == "ClangCL" ) ]]; then
-                continue; # second condition about some seh error in gtest code. BEST OS FOREVER
-              fi
-              dir="build_${names[$i]}_fault_${yaclib_fault}"
-              cd $dir
-              ctest --output-on-failure -C ${{ matrix.build_type }} -V
-              cd ..
-            done
+          for dir in build*/; do
+            cd $dir
+            ctest --output-on-failure -C ${{ matrix.build_type }} -V
+            cd ..
           done
