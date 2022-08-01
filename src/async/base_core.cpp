@@ -23,26 +23,26 @@ static NopeCounter<IRef> kEmptyRef;
 
 void BaseCore::SetCall(BaseCore& callback) noexcept {
   callback._caller = this;  // move ownership
-  if (!SetCallback(callback, kCall)) {
+  if (!SetCallback(&callback, kCall)) {
     Submit(callback);
   }
 }
 
 void BaseCore::SetHere(InlineCore& callback, State state) noexcept {
   YACLIB_ASSERT(state == kHereCall || state == kHereWrap);
-  if (!SetCallback(callback, state)) {
+  if (!SetCallback(&callback, state)) {
     Submit(callback, state);
   }
 }
 
 bool BaseCore::SetWait(IRef& callback, State state) noexcept {
   // YACLIB_ASSERT(state == kWaitNope);
-  return SetCallback(callback, state);
+  return SetCallback(&callback, state);
 }
 
 void BaseCore::SetWait(State state) noexcept {
   YACLIB_ASSERT(state == kWaitDrop || state == kWaitStop);
-  if (!SetCallback(const_cast<NopeCounter<IRef>&>(kEmptyRef), state)) {
+  if (!SetCallback(&static_cast<IRef&>(kEmptyRef), state)) {
     DecRef();
   }
 }
@@ -87,16 +87,16 @@ void BaseCore::SetResult() noexcept {
   const State state{expected & kMask};
   switch (state) {
     case kCall: {
-      auto* callback = reinterpret_cast<IRef*>(expected & ~kMask);
+      auto* callback = reinterpret_cast<BaseCore*>(expected & ~kMask);
       YACLIB_ASSERT(callback != nullptr);
-      Submit(static_cast<BaseCore&>(*callback));
+      Submit(*callback);
     } break;
     case kHereWrap:
       [[fallthrough]];
     case kHereCall: {
-      auto* callback = reinterpret_cast<IRef*>(expected & ~kMask);
+      auto* callback = reinterpret_cast<InlineCore*>(expected & ~kMask);
       YACLIB_ASSERT(callback != nullptr);
-      Submit(static_cast<BaseCore&>(*callback), state);
+      Submit(*callback, state);
     } break;
     case kWaitStop:
       [[fallthrough]];
@@ -114,10 +114,10 @@ void BaseCore::SetResult() noexcept {
   }
 }
 
-bool BaseCore::SetCallback(IRef& callback, State state) noexcept {
+bool BaseCore::SetCallback(void* callback, State state) noexcept {
   std::uint64_t expected = kEmpty;
   return _callback.load(std::memory_order_acquire) == expected &&
-         _callback.compare_exchange_strong(expected, state | reinterpret_cast<std::uint64_t>(&callback),
+         _callback.compare_exchange_strong(expected, state | reinterpret_cast<std::uint64_t>(callback),
                                            std::memory_order_release, std::memory_order_acquire);
 }
 

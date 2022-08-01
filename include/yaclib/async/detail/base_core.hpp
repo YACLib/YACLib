@@ -20,7 +20,7 @@ class BaseCore : public InlineCore {
 
 #if YACLIB_CORO != 0
   virtual yaclib_std::coroutine_handle<> GetHandle() noexcept {
-    return yaclib_std::coroutine_handle<>{};  // plug, see coroutine/detail/promise_type.hpp
+    return {};  // plug, see coroutine/detail/promise_type.hpp
   }
 #endif
 
@@ -47,7 +47,7 @@ class BaseCore : public InlineCore {
   IExecutorPtr _executor;
 
  private:
-  [[nodiscard]] bool SetCallback(IRef& callback, State state) noexcept;
+  [[nodiscard]] bool SetCallback(void* callback, State state) noexcept;
 
   void Submit(BaseCore& callback) noexcept;
   void Submit(InlineCore& callback, State state) noexcept;
