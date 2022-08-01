@@ -18,11 +18,11 @@ namespace {
 void Stress1(const std::size_t kCoros, test::util::Duration dur) {
   auto tp = yaclib::MakeThreadPool();
   auto mutex = yaclib::AsyncMutex();
-  std::vector<yaclib::Future<void>> futures(kCoros);
+  std::vector<yaclib::Future<>> futures(kCoros);
   std::size_t cs = 0;
   test::util::StopWatch sw;
 
-  auto coro = [&]() -> yaclib::Future<void> {
+  auto coro = [&]() -> yaclib::Future<> {
     co_await On(*tp);
     while (sw.Elapsed() < dur) {
       auto guard = co_await mutex.Guard();
@@ -33,6 +33,7 @@ void Stress1(const std::size_t kCoros, test::util::Duration dur) {
         co_await On(*tp);
       }
     }
+    co_return{};
   };
 
   for (std::size_t i = 0; i < kCoros; ++i) {
@@ -48,17 +49,18 @@ void Stress1(const std::size_t kCoros, test::util::Duration dur) {
 void Stress2(const std::size_t kCoros, test::util::Duration dur) {
   auto tp = yaclib::MakeThreadPool();
   auto mutex = yaclib::AsyncMutex();
-  std::vector<yaclib::Future<void>> futures(kCoros);
+  std::vector<yaclib::Future<>> futures(kCoros);
   std::size_t cs;
   test::util::StopWatch sw;
 
-  auto coro = [&]() -> yaclib::Future<void> {
+  auto coro = [&]() -> yaclib::Future<> {
     co_await On(*tp);
     co_await mutex.Lock();
     if (std::numeric_limits<std::size_t>::max() != cs) {
       cs++;
     }
     co_await mutex.Unlock(*tp);
+    co_return{};
   };
 
   while (sw.Elapsed() < dur) {

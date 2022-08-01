@@ -67,7 +67,7 @@ TEST(Await, CheckSuspend) {
   auto was = yaclib_std::chrono::steady_clock::now();
   std::atomic_bool barrier = false;
 
-  auto coro = [&]() -> yaclib::Future<void> {
+  auto coro = [&]() -> yaclib::Future<> {
     counter = 1;
     auto future1 = yaclib::Run(*tp, [&] {
       yaclib_std::this_thread::sleep_for(coro_sleep_time);
@@ -83,7 +83,7 @@ TEST(Await, CheckSuspend) {
     }
 
     counter = 2;
-    co_return;
+    co_return{};
   };
 
   auto outer_future = coro();
@@ -104,13 +104,13 @@ TEST(Await, CheckSuspend) {
 TEST(Await, NoSuspend) {
   int counter = 0;
 
-  auto coro = [&]() -> yaclib::Future<void> {
+  auto coro = [&]() -> yaclib::Future<> {
     counter = 1;
     auto future = yaclib::MakeFuture();
 
     co_await Await(future);
     counter = 2;
-    co_return;
+    co_return{};
   };
 
   auto outer_future = coro();

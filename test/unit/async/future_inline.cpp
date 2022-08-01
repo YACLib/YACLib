@@ -247,7 +247,7 @@ TEST(ThenInline, Error) {
 
 template <bool Inline>
 void ThenInlineCallback() {
-  auto [f, p] = yaclib::MakeContract<void>();
+  auto [f, p] = yaclib::MakeContract<>();
   auto f1 = InlineThen<Inline>(std::move(f), [] {
   });
   std::move(std::move(p)).Set();
@@ -260,7 +260,7 @@ TEST(ThenInline, Callback) {
 }
 template <bool Inline>
 void ThenInlineStopped() {
-  auto [f, p] = yaclib::MakeContract<void>();
+  auto [f, p] = yaclib::MakeContract<>();
   bool ready = false;
   auto f1 = InlineThen<Inline>(std::move(f), [&] {
     ready = true;

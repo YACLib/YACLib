@@ -71,7 +71,7 @@ struct ResultEmpty final : std::exception {};
  * \tparam V type of value that stored in Result
  * \tparam E type of error that stored in Result
  */
-template <typename V, typename E = StopError>
+template <typename V = void, typename E = StopError>
 class [[nodiscard]] Result final {
   static_assert(Check<V>(), "V should be valid");
   static_assert(Check<E>(), "E should be valid");

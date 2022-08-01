@@ -148,7 +148,7 @@ class FuncWrapper final {
       /**
        * We can't use this strategy for other Func::Invoke,
        * because in that case user will not have compile error for that case:
-       * MakeFuture<void>() // state == ResultState::Value
+       * MakeFuture<>() // state == ResultState::Value
        *   .ThenInline([](E/std::exception_ptr) -> yaclib::Result/Future<double> {
        *     throw std::runtime_error{""};
        *   }).ThenInline([](yaclib::Result<double>) { // need double value, we only have void

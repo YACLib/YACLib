@@ -63,15 +63,21 @@ class BasePromiseType : public UniqueCounter<ResultCore<V, E>, PromiseTypeDelete
     return yaclib_std::coroutine_handle<PromiseType<V, E>>::from_promise(static_cast<PromiseType<V, E>&>(*this));
   }
 
-  /*
-    TODO(MBkkt) Think about add zero-cost ability to return error
-     now works only co_return MakeFuture(std::make_exception_ptr(...))
-     and co_await On(stopped_executor) for StopTag{}
-    Maybe:
-     co_await yaclib::Stop();
-     co_await yaclib::Stop(StopError{});
-     co_await yaclib::Stop(std::make_exception_ptr(...));
-  */
+  void return_value(std::exception_ptr exception) noexcept {
+    this->Store(std::move(exception));
+  }
+
+  void return_value(E error) noexcept {
+    this->Store(std::move(error));
+  }
+
+  void return_value(StopTag) noexcept {
+    this->Store(StopTag{});
+  }
+
+  void return_value(FutureBase<V, E>&& future) noexcept {
+    future.GetCore().Release()->SetHere(*this, InlineCore::kHereWrap);
+  }
 
  private:
   void Call() noexcept final {
@@ -79,6 +85,15 @@ class BasePromiseType : public UniqueCounter<ResultCore<V, E>, PromiseTypeDelete
     YACLIB_DEBUG(!handle, "handle from promise is null");
     YACLIB_DEBUG(handle.done(), "handle for resume is done");
     handle.resume();
+  }
+
+  void Here(InlineCore& caller, [[maybe_unused]] InlineCore::State state) noexcept final {
+    YACLIB_ASSERT(state == InlineCore::kHereCall);
+    if (!this->Alive()) {
+      return this->Store(StopTag{});
+    }
+    auto& core = static_cast<ResultCore<V, E>&>(caller);
+    this->Store(std::move(core.Get()));
   }
 };
 
@@ -97,7 +112,7 @@ class PromiseType final : public BasePromiseType<V, E> {
 template <typename E>
 class PromiseType<void, E> final : public BasePromiseType<void, E> {
  public:
-  void return_void() noexcept {
+  void return_value(Unit) noexcept {
     this->Store(Unit{});
   }
 };

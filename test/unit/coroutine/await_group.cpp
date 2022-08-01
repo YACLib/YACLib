@@ -53,18 +53,19 @@ TEST(AwaitGroup, OneWaiter) {
   bool waiter_done = false;
   bool worker_done = false;
 
-  auto waiter = [&]() -> yaclib::Future<void> {
+  auto waiter = [&]() -> yaclib::Future<> {
     co_await On(*scheduler);
 
     co_await wg;
 
     EXPECT_TRUE(worker_done);
     waiter_done = true;
+    co_return{};
   };
 
   auto future_waiter = waiter();
 
-  auto worker = [&]() -> yaclib::Future<void> {
+  auto worker = [&]() -> yaclib::Future<> {
     co_await On(*scheduler);
 
     for (size_t i = 0; i < 10; ++i) {
@@ -74,6 +75,7 @@ TEST(AwaitGroup, OneWaiter) {
     worker_done = true;
 
     wg.Done();
+    co_return{};
   };
 
   wg.Add(1);
@@ -97,19 +99,20 @@ TEST(AwaitGroup, Workers) {
   std::size_t waiters_done = 0;
   std::size_t workers_done = 0;
 
-  auto waiter = [&]() -> yaclib::Future<void> {
+  auto waiter = [&]() -> yaclib::Future<> {
     co_await On(*scheduler);
 
     co_await wg;
     EXPECT_EQ(workers_done, kWorkers);
     ++waiters_done;
+    co_return{};
   };
 
   for (std::size_t i = 0; i < kWaiters; ++i) {
     std::ignore = waiter();
   }
 
-  auto worker = [&]() -> yaclib::Future<void> {
+  auto worker = [&]() -> yaclib::Future<> {
     co_await On(*scheduler);
 
     for (std::size_t i = 0; i < kYields; ++i) {
@@ -119,6 +122,7 @@ TEST(AwaitGroup, Workers) {
     ++workers_done;
 
     wg.Done();
+    co_return{};
   };
 
   wg.Add(kWorkers);
@@ -146,26 +150,27 @@ TEST(AwaitGroup, BlockingWait) {
 
   wg.Add(kWorkers);
 
-  auto waiter = [&]() -> yaclib::Future<void> {
+  auto waiter = [&]() -> yaclib::Future<> {
     co_await On(*scheduler);
 
     co_await wg;
     EXPECT_EQ(workers.load(), kWorkers);
-    co_return;
+    co_return{};
   };
 
-  auto worker = [&]() -> yaclib::Future<void> {
+  auto worker = [&]() -> yaclib::Future<> {
     co_await On(*scheduler);
 
     std::this_thread::sleep_for(.5s * YACLIB_CI_SLOWDOWN);
     ++workers;
     wg.Done();
+    co_return{};
   };
 
   util::StopWatch sw;
 
   auto waiter_future = waiter();
-  std::vector<yaclib::Future<void>> worker_futures(kWorkers);
+  std::vector<yaclib::Future<>> worker_futures(kWorkers);
   for (size_t i = 0; i < kWorkers; ++i) {
     worker_futures[i] = worker();
   }
@@ -247,13 +252,13 @@ TEST(AwaitGroup, NonCoroWait) {
   yaclib::AwaitGroup wg;
   yaclib_std::atomic_int cnt{0};
 
-  auto coro = [&](int x) -> yaclib::Future<void> {
+  auto coro = [&](int x) -> yaclib::Future<> {
     co_await On(*scheduler);
     yaclib_std::this_thread::sleep_for(YACLIB_CI_SLOWDOWN * 25ms);
     cnt.fetch_add(1);
-    co_return;
+    co_return{};
   };
-  yaclib::Future<void> f1, f2, f3;
+  yaclib::Future<> f1, f2, f3;
   f1 = coro(1);
   f2 = coro(2);
   f3 = coro(3);

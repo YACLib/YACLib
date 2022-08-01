@@ -5,7 +5,7 @@
 
 namespace yaclib {
 
-template <typename V, typename E = StopError>
+template <typename V = void, typename E = StopError>
 class [[nodiscard]] Promise final {
   static_assert(Check<V>(), "V should be valid");
   static_assert(Check<E>(), "E should be valid");
@@ -47,7 +47,7 @@ class [[nodiscard]] Promise final {
   void Set(T&& value) && /*TODO noexcept*/;
 
   /**
-   * Set \ref Promise<void> result
+   * Set \ref Promise<> result
    */
   void Set() && noexcept;
 
