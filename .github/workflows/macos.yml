@@ -17,14 +17,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ 10.15, 11, 12 ]
+        os: [ 11, 12 ]
         build_type: [ Debug, RelWithDebInfo ]
         isPR:
           - ${{ github.event_name == 'pull_request' }}
         exclude:
-          - isPR: true
-            os: 10.15
-            build_type: RelWithDebInfo
           - isPR: true
             os: 11
             build_type: RelWithDebInfo
