@@ -63,7 +63,7 @@ class AllCombinator : public InlineCore, public AllCombinatorBase<FutureValue> {
         });
       }
     }
-    YACLIB_DEBUG(_promise != nullptr, "");
+    YACLIB_ASSERT(_promise == nullptr);
   }
 
  protected:

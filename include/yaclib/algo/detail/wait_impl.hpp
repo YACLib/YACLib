@@ -47,7 +47,7 @@ bool WaitRange(const Timeout& timeout, Range&& range, std::size_t count) noexcep
 
 template <typename Event>
 struct OneShotCounter final : UniqueCounter<Event, SetDeleter> {
-  YACLIB_INLINE explicit OneShotCounter(size_t) {
+  YACLIB_INLINE explicit OneShotCounter(size_t) noexcept {
   }
 
   constexpr bool SubEqual(size_t) const {

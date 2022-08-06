@@ -8,6 +8,8 @@ namespace yaclib {
 /**
  * TODO(mkornaukhov03) Add doxygen docs
  */
-detail::OnAwaiter On(IExecutor& e);
+YACLIB_INLINE detail::OnAwaiter On(IExecutor& e) noexcept {
+  return detail::OnAwaiter{e};
+}
 
 }  // namespace yaclib

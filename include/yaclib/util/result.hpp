@@ -88,7 +88,7 @@ class [[nodiscard]] Result final {
   Result& operator=(const Result& other) noexcept(std::is_nothrow_copy_assignable_v<Variant>) = default;
 
   template <typename... Args>
-  Result(Args&&... args) noexcept(std::is_nothrow_constructible_v<Variant, std::in_place_type_t<ValueT>, Args...>)
+  Result(Args&&... args) noexcept(std::is_nothrow_constructible_v<Variant, std::in_place_type_t<ValueT>, Args&&...>)
       : _result{std::in_place_type_t<ValueT>{}, std::forward<Args>(args)...} {
   }
 

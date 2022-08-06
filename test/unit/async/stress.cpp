@@ -85,7 +85,7 @@ struct StressTest : testing::Test {
       }));
     }
 
-    yaclib::WaitGroup<> wg;
+    yaclib::WaitGroup<> wg{1};
 
     // consumer
     for (uint32_t i = 0; i < kNumThreads / 2; ++i) {
@@ -114,6 +114,7 @@ struct StressTest : testing::Test {
     for (auto& t : threads) {
       t.join();
     }
+    wg.Done();
     wg.Wait();
     EXPECT_EQ(kNumRounds * (kNumThreads / 2), num_resolved_futures.load());
     EXPECT_EQ(kNumRounds * (kNumThreads / 2), Value::created.load());

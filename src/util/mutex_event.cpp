@@ -15,7 +15,7 @@ void MutexEvent::Wait(Token& token) noexcept {
 void MutexEvent::Set() noexcept {
   std::lock_guard lock{_m};
   _is_ready = true;
-  _cv.notify_all();  // Notify under mutex, because cv located on stack memory of other thread
+  _cv.notify_one();  // Notify under mutex, because cv located on stack memory of other thread
 }
 
 void MutexEvent::Reset() noexcept {

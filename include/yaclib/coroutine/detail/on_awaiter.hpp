@@ -7,9 +7,10 @@
 
 namespace yaclib::detail {
 
-class OnAwaiter final {
+class [[nodiscard]] OnAwaiter final {
  public:
-  explicit OnAwaiter(IExecutor& e);
+  YACLIB_INLINE explicit OnAwaiter(IExecutor& e) noexcept : _executor{e} {
+  }
 
   constexpr bool await_ready() const noexcept {
     return false;

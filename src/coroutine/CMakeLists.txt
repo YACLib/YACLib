@@ -12,9 +12,4 @@ list(APPEND YACLIB_HEADERS
   ${YACLIB_INCLUDE_DIR}/coroutine/detail/on_awaiter.hpp
   )
 
-list(APPEND YACLIB_SOURCES
-  ${CMAKE_CURRENT_SOURCE_DIR}/on.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/on_awaiter.cpp
-  )
-
 add_files()

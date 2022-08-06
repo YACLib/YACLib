@@ -21,7 +21,7 @@ namespace {
 
 using namespace std::chrono_literals;
 
-TEST(WaitGroup, JustWorks) {
+TEST(AwaitGroup, JustWorks) {
   auto tp = yaclib::MakeThreadPool();
   auto coro = [&](yaclib::IThreadPoolPtr tp) -> yaclib::Future<int> {
     auto f1 = yaclib::Run(*tp, [] {
@@ -44,7 +44,7 @@ TEST(WaitGroup, JustWorks) {
   tp->Wait();
 }
 
-TEST(WaitGroup, OneWaiter) {
+TEST(AwaitGroup, OneWaiter) {
   auto scheduler = yaclib::MakeManual();
 
   yaclib::WaitGroup<> wg;
@@ -86,7 +86,7 @@ TEST(WaitGroup, OneWaiter) {
   EXPECT_TRUE(worker_done);
 }
 
-TEST(WaitGroup, Workers) {
+TEST(AwaitGroup, Workers) {
   auto scheduler = yaclib::MakeManual();
 
   yaclib::WaitGroup<> wg{0};
@@ -137,7 +137,7 @@ TEST(WaitGroup, Workers) {
   EXPECT_GE(steps, kWaiters + kWorkers * kYields);
 }
 
-TEST(WaitGroup, BlockingWait) {
+TEST(AwaitGroup, BlockingWait) {
   const static std::size_t HW_CONC = std::max(2u, yaclib_std::thread::hardware_concurrency());
   auto scheduler = yaclib::MakeThreadPool(HW_CONC);
 
@@ -180,7 +180,7 @@ TEST(WaitGroup, BlockingWait) {
   scheduler->HardStop();
   scheduler->Wait();
 }
-TEST(WaitGroup, WithFutures) {
+TEST(AwaitGroup, WithFutures) {
   auto scheduler = yaclib::MakeThreadPool(4);
 
   yaclib::WaitGroup<> wg;
@@ -218,7 +218,7 @@ TEST(WaitGroup, WithFutures) {
   scheduler->Wait();
 }
 
-TEST(WaitGroup, SwichThread) {
+TEST(AwaitGroup, SwichThread) {
   auto scheduler = yaclib::MakeThreadPool(4);
 
   yaclib::WaitGroup<> wg;
@@ -245,7 +245,7 @@ TEST(WaitGroup, SwichThread) {
   scheduler->Wait();
 }
 
-TEST(WaitGroup, NonCoroWait) {
+TEST(AwaitGroup, NonCoroWait) {
   auto scheduler = yaclib::MakeThreadPool(4);
 
   yaclib::WaitGroup<> wg;
@@ -271,7 +271,7 @@ TEST(WaitGroup, NonCoroWait) {
   scheduler->Wait();
 }
 
-TEST(WaitGroup, Reset) {
+TEST(AwaitGroup, Reset) {
   auto scheduler = yaclib::MakeThreadPool(4);
 
   yaclib::WaitGroup<> wg;

@@ -16,7 +16,7 @@ class ResultCore : public BaseCore {
   }
 
   template <typename... Args>
-  explicit ResultCore(Args&&... args) noexcept(std::is_nothrow_constructible_v<Result<V, E>, Args...>)
+  explicit ResultCore(Args&&... args) noexcept(std::is_nothrow_constructible_v<Result<V, E>, Args&&...>)
       : BaseCore{kResult}, _result{std::forward<Args>(args)...} {
   }
 
@@ -25,7 +25,7 @@ class ResultCore : public BaseCore {
   }
 
   template <typename T>
-  void Store(T&& object) noexcept(std::is_nothrow_constructible_v<Result<V, E>, T>) {
+  void Store(T&& object) noexcept(std::is_nothrow_constructible_v<Result<V, E>, T&&>) {
     new (&_result) Result<V, E>{std::forward<T>(object)};
   }
 
@@ -34,7 +34,7 @@ class ResultCore : public BaseCore {
   }
 
   template <typename T, typename Func>
-  void Done(T&& object, Func&& f) noexcept(std::is_nothrow_constructible_v<Result<V, E>, T>) {
+  void Done(T&& object, Func&& f) noexcept(std::is_nothrow_constructible_v<Result<V, E>, T&&>) {
     Store(std::forward<T>(object));
     std::forward<Func>(f)();
     SetResult();

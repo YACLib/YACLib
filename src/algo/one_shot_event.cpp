@@ -10,7 +10,6 @@ bool OneShotEvent::TryAdd(Job* job) noexcept {
   std::uint64_t node = reinterpret_cast<std::uint64_t>(job);
   while (head != OneShotEvent::kAllDone) {
     job->next = reinterpret_cast<Job*>(head);
-    // TSAN warning
     if (_head.compare_exchange_weak(head, node /*, std::memory_order_release, std::memory_order_acquire*/)) {
       return true;
     }
@@ -29,21 +28,17 @@ class OneShotEventWaiter final : public detail::NopeCounter<Job, detail::Default
     Set();
   }
 
-  void Drop() noexcept final {
-    Set();
-  }
+  void Drop() noexcept final {  // LCOV_EXCL_LINE Never called
+    Set();                      // LCOV_EXCL_LINE
+  }                             // LCOV_EXCL_LINE
 };
 
-void OneShotEvent::Wait() {
+void OneShotEvent::Wait() noexcept {
   OneShotEventWaiter waiter;
   if (TryAdd(static_cast<Job*>(&waiter))) {
     auto token = waiter.Make();
     waiter.Wait(token);
   }
-}
-
-OneShotEventAwaiter OneShotEvent::Await(IExecutor& executor) noexcept {
-  return {executor, *this};
 }
 
 void OneShotEvent::Set() noexcept {

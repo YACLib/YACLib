@@ -22,7 +22,7 @@ class Core : public ResultCoreT<Type, Ret, E> {
   using Base = ResultCoreT<Type, Ret, E>;
 
   template <typename Func>
-  explicit Core(Func&& f) noexcept(std::is_nothrow_constructible_v<Wrapper, Func>) : _wrapper{std::forward<Func>(f)} {
+  explicit Core(Func&& f) noexcept(std::is_nothrow_constructible_v<Wrapper, Func&&>) : _wrapper{std::forward<Func>(f)} {
   }
 
  private:
@@ -42,14 +42,13 @@ class Core : public ResultCoreT<Type, Ret, E> {
     if (!this->Alive()) {
       return this->Drop();
     }
+    YACLIB_ASSERT(Wrapper::kIsAsync || state == InlineCore::kHereCall);
     if constexpr (Wrapper::kIsAsync) {
       if (state == InlineCore::kHereWrap) {
         auto& core = static_cast<ResultCore<Ret, E>&>(caller);
         return this->Done(std::move(core.Get()), [] {
         });
       }
-    } else {
-      YACLIB_DEBUG(state != InlineCore::kHereCall, "");
     }
     auto& core = static_cast<ResultCore<Arg, E>&>(caller);
     _wrapper.Call(*this, std::move(core.Get()));
