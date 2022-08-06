@@ -12,20 +12,14 @@ void MutexEvent::Wait(Token& token) noexcept {
   }
 }
 
-void MutexEvent::Reset() noexcept {
-  _is_ready = false;
-}
-
-void MutexEvent::SetOne() noexcept {
-  std::lock_guard lock{_m};
-  _is_ready = true;
-  _cv.notify_one();  // Notify under mutex, because cv located on stack memory of other thread
-}
-
-void MutexEvent::SetAll() noexcept {
+void MutexEvent::Set() noexcept {
   std::lock_guard lock{_m};
   _is_ready = true;
   _cv.notify_all();  // Notify under mutex, because cv located on stack memory of other thread
+}
+
+void MutexEvent::Reset() noexcept {
+  _is_ready = false;
 }
 
 }  // namespace yaclib::detail

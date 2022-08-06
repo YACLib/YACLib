@@ -67,7 +67,7 @@ void TestJustWorks() {
   });
 
   EXPECT_FALSE(f.Ready());
-  wg.Add(f);
+  wg.Attach(f);
   EXPECT_LE(timer.Elapsed(), 20ms * YACLIB_CI_SLOWDOWN);
   wg.Wait();
   EXPECT_TRUE(f.Ready());
@@ -94,7 +94,7 @@ void TestManyWorks() {
   }
 
   test::util::StopWatch<> timer;
-  yaclib::WaitGroup<> wg;
+  yaclib::WaitGroup<> wg{1};
 
   for (int i = 0; i < kSize; ++i) {
     Submit(*tp, [p = std::move(promises[i])]() mutable {
@@ -111,8 +111,9 @@ void TestManyWorks() {
     EXPECT_FALSE(futures[i].Ready());
   }
 
-  wg.Add(futures.data(), 0);  // check empty
-  wg.Add(futures.data(), kSize / 2);
+  wg.Attach(futures.data(), 0);  // check empty
+  wg.Attach(futures.data(), kSize / 2);
+  wg.Done();
   wg.Wait();
   for (int i = 0; i < kSize / 2; ++i) {
     EXPECT_TRUE(futures[i].Ready());
@@ -122,16 +123,17 @@ void TestManyWorks() {
   }
 
   wg.Reset();
-  wg.Add(futures.data() + kSize / 2, futures.data() + kSize);
+  wg.Attach(futures.data() + kSize / 2, futures.data() + kSize);
   wg.Wait();
   for (int i = kSize / 2; i < kSize; ++i) {
     EXPECT_TRUE(futures[i].Ready());
   }
 
   // check empty
-  wg.Reset();
-  wg.Add(futures.data(), futures.data() + kSize);
-  wg.Add(futures.data(), 0);
+  wg.Reset(1);
+  wg.Attach(futures.data(), futures.data() + kSize);
+  wg.Attach(futures.data(), 0);
+  wg.Done();
   wg.Wait();
 
   EXPECT_LE(timer.Elapsed(), kSize * 200ms * YACLIB_CI_SLOWDOWN);
@@ -162,7 +164,7 @@ void TestGetWorks() {
   });
 
   EXPECT_FALSE(f.Ready());
-  wg.Add(f);
+  wg.Attach(f);
   EXPECT_LE(timer.Elapsed(), 50ms * YACLIB_CI_SLOWDOWN);
   wg.Wait();
   EXPECT_TRUE(f.Ready());
@@ -199,7 +201,7 @@ void TestCallbackWorks() {
   });
 
   EXPECT_FALSE(f.Ready());
-  wg.Add(f);
+  wg.Attach(f);
   EXPECT_LE(timer.Elapsed(), 50ms * YACLIB_CI_SLOWDOWN);
   wg.Wait();
   EXPECT_TRUE(f.Ready());
@@ -243,7 +245,7 @@ void TestMultiThreaded() {
 
   test::util::StopWatch<> timer;
   yaclib::WaitGroup<> wg;
-  wg.Add(fs, kThreads);
+  wg.Attach(fs, kThreads);
   wg.Wait();
 
   EXPECT_LE(timer.Elapsed(), 100ms * YACLIB_CI_SLOWDOWN);
@@ -252,7 +254,7 @@ void TestMultiThreaded() {
   }));
 
   for (int i = 0; i < kThreads; ++i) {
-    EXPECT_EQ(std::move(fs[i]).Get().Value(), i);
+    EXPECT_EQ(std::move(fs[i]).Touch().Value(), i);
   }
   tp->Stop();
   tp->Wait();
@@ -263,7 +265,8 @@ TEST(WaitGroupTest, MultiThreaded) {
 }
 
 TEST(WaitGroupTest, Empty) {
-  yaclib::WaitGroup<> wg;
+  yaclib::WaitGroup<> wg{1};
+  wg.Done();
   wg.Wait();
 }
 

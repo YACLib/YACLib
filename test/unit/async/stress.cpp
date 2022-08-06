@@ -160,7 +160,7 @@ TEST_F(StressTest, Then) {
                  num_resolved_futures.fetch_add(1, std::memory_order_relaxed);
                  return x;
                });
-    wg.Move(std::move(f));
+    wg.Consume(std::move(f));
   });
   tp->Stop();
   tp->Wait();

@@ -13,7 +13,7 @@ template <typename V, typename E>
 class PromiseType;
 
 struct Destroy final {
-  YACLIB_INLINE bool await_ready() const noexcept {
+  constexpr bool await_ready() const noexcept {
     return false;
   }
 
@@ -22,7 +22,7 @@ struct Destroy final {
     handle.promise().SetResult();
   }
 
-  YACLIB_INLINE void await_resume() const noexcept {
+  constexpr void await_resume() const noexcept {
   }
 };
 

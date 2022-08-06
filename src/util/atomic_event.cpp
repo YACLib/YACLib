@@ -12,15 +12,9 @@ void AtomicEvent::Wait(Token) noexcept {
   }
 }
 
-void AtomicEvent::SetOne() noexcept {
+void AtomicEvent::Set() noexcept {
   _state.store(1, std::memory_order_relaxed);
   _state.notify_one();
-  _state.store(2, std::memory_order_release);
-}
-
-void AtomicEvent::SetAll() noexcept {
-  _state.store(1, std::memory_order_relaxed);
-  _state.notify_all();
   _state.store(2, std::memory_order_release);
 }
 

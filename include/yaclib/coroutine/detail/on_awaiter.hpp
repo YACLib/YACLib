@@ -11,7 +11,7 @@ class OnAwaiter final {
  public:
   explicit OnAwaiter(IExecutor& e);
 
-  YACLIB_INLINE bool await_ready() const noexcept {
+  constexpr bool await_ready() const noexcept {
     return false;
   }
 
@@ -20,7 +20,7 @@ class OnAwaiter final {
     _executor.Submit(handle.promise());
   }
 
-  YACLIB_INLINE void await_resume() const noexcept {
+  constexpr void await_resume() const noexcept {
   }
 
  private:

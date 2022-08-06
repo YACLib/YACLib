@@ -1,8 +1,8 @@
 #include <util/time.hpp>
 
+#include <yaclib/algo/wait_group.hpp>
 #include <yaclib/async/run.hpp>
 #include <yaclib/coroutine/await.hpp>
-#include <yaclib/coroutine/await_group.hpp>
 #include <yaclib/coroutine/future_traits.hpp>
 #include <yaclib/coroutine/on.hpp>
 #include <yaclib/executor/manual.hpp>
@@ -24,7 +24,7 @@ void Stress1(const std::size_t kWaiters, const std::size_t kWorkers, test::util:
   auto tp = yaclib::MakeThreadPool();
   util::StopWatch sw;
   while (sw.Elapsed() < dur) {
-    yaclib::AwaitGroup wg;
+    yaclib::WaitGroup<> wg;
 
     yaclib_std::atomic_size_t waiters_done{0};
     yaclib_std::atomic_size_t workers_done{0};
@@ -78,7 +78,7 @@ TEST(AwaitGroup, Stress1) {
 
 class Goer {
  public:
-  explicit Goer(yaclib::IExecutor& scheduler, yaclib::AwaitGroup& wg) : scheduler_(scheduler), wg_(wg) {
+  explicit Goer(yaclib::IExecutor& scheduler, yaclib::WaitGroup<>& wg) : scheduler_(scheduler), wg_(wg) {
   }
 
   void Start(size_t steps) {
@@ -112,8 +112,8 @@ class Goer {
 
  private:
   yaclib::IExecutor& scheduler_;
-  yaclib::AwaitGroup& wg_;
-  std::size_t steps_left_;
+  yaclib::WaitGroup<>& wg_;
+  std::size_t steps_left_ = 0;
   std::size_t steps_made_ = 0;
 };
 
@@ -131,7 +131,7 @@ void Stress2(util::Duration duration) {
     auto tester = [&scheduler, &done, iter]() -> yaclib::Future<> {
       const size_t steps = 1 + iter % 3;
 
-      auto wg = yaclib::AwaitGroup();
+      yaclib::WaitGroup<> wg;
 
       Goer goer{*scheduler, wg};
       goer.Start(steps);

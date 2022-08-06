@@ -24,7 +24,7 @@ class AwaitAwaiter final {
     return !_await_core.SubEqual(1);
   }
 
-  YACLIB_INLINE void await_resume() const noexcept {
+  constexpr void await_resume() const noexcept {
   }
 
  private:

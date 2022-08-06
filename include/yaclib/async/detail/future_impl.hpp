@@ -34,10 +34,7 @@ const Result<V, E>* FutureBase<V, E>::Get() const& noexcept {
 
 template <typename V, typename E>
 Result<V, E> FutureBase<V, E>::Get() && noexcept {
-  if (!Ready()) {
-    Wait(*this);
-  }
-  _core->SetExecutor(nullptr);
+  Wait(*this);
   auto core = std::exchange(_core, nullptr);
   return std::move(core->Get());
 }
@@ -51,7 +48,6 @@ const Result<V, E>& FutureBase<V, E>::Touch() const& noexcept {
 template <typename V, typename E>
 Result<V, E> FutureBase<V, E>::Touch() && noexcept {
   YACLIB_ERROR(!Ready(), "Try to touch result of not ready Future");
-  _core->SetExecutor(nullptr);
   auto core = std::exchange(_core, nullptr);
   return std::move(core->Get());
 }

@@ -30,9 +30,7 @@ class /*alignas(kCacheLineSize)*/ MutexEvent : public IRef {
     });
   }
 
-  void SetOne() noexcept;
-
-  void SetAll() noexcept;
+  void Set() noexcept;
 
   void Reset() noexcept;
 

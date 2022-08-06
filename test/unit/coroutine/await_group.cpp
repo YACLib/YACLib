@@ -1,8 +1,8 @@
 #include <util/time.hpp>
 
+#include <yaclib/algo/wait_group.hpp>
 #include <yaclib/async/run.hpp>
 #include <yaclib/coroutine/await.hpp>
-#include <yaclib/coroutine/await_group.hpp>
 #include <yaclib/coroutine/future_traits.hpp>
 #include <yaclib/coroutine/on.hpp>
 #include <yaclib/executor/manual.hpp>
@@ -21,7 +21,7 @@ namespace {
 
 using namespace std::chrono_literals;
 
-TEST(AwaitGroup, JustWorks) {
+TEST(WaitGroup, JustWorks) {
   auto tp = yaclib::MakeThreadPool();
   auto coro = [&](yaclib::IThreadPoolPtr tp) -> yaclib::Future<int> {
     auto f1 = yaclib::Run(*tp, [] {
@@ -32,11 +32,10 @@ TEST(AwaitGroup, JustWorks) {
       return 2;
     });
 
-    yaclib::AwaitGroup await_group;
-    await_group.Add(f1);
-    await_group.Add(f2);
+    yaclib::WaitGroup<> wg;
+    wg.Attach(f1, f2);
 
-    co_await await_group;
+    co_await wg;
     co_return std::move(f1).Touch().Ok() + std::move(f2).Touch().Ok();
   };
   auto f = coro(tp);
@@ -45,10 +44,10 @@ TEST(AwaitGroup, JustWorks) {
   tp->Wait();
 }
 
-TEST(AwaitGroup, OneWaiter) {
+TEST(WaitGroup, OneWaiter) {
   auto scheduler = yaclib::MakeManual();
 
-  yaclib::AwaitGroup wg;
+  yaclib::WaitGroup<> wg;
 
   bool waiter_done = false;
   bool worker_done = false;
@@ -87,10 +86,10 @@ TEST(AwaitGroup, OneWaiter) {
   EXPECT_TRUE(worker_done);
 }
 
-TEST(AwaitGroup, Workers) {
+TEST(WaitGroup, Workers) {
   auto scheduler = yaclib::MakeManual();
 
-  yaclib::AwaitGroup wg;
+  yaclib::WaitGroup<> wg{0};
 
   static constexpr std::size_t kWorkers = 3;
   static constexpr std::size_t kWaiters = 4;
@@ -138,11 +137,11 @@ TEST(AwaitGroup, Workers) {
   EXPECT_GE(steps, kWaiters + kWorkers * kYields);
 }
 
-TEST(AwaitGroup, BlockingWait) {
+TEST(WaitGroup, BlockingWait) {
   const static std::size_t HW_CONC = std::max(2u, yaclib_std::thread::hardware_concurrency());
   auto scheduler = yaclib::MakeThreadPool(HW_CONC);
 
-  yaclib::AwaitGroup wg;
+  yaclib::WaitGroup<> wg;
 
   std::atomic<std::size_t> workers = 0;
 
@@ -161,7 +160,7 @@ TEST(AwaitGroup, BlockingWait) {
   auto worker = [&]() -> yaclib::Future<> {
     co_await On(*scheduler);
 
-    std::this_thread::sleep_for(.5s * YACLIB_CI_SLOWDOWN);
+    std::this_thread::sleep_for(0.5s * YACLIB_CI_SLOWDOWN);
     ++workers;
     wg.Done();
     co_return{};
@@ -181,10 +180,10 @@ TEST(AwaitGroup, BlockingWait) {
   scheduler->HardStop();
   scheduler->Wait();
 }
-TEST(AwaitGroup, WithFutures) {
+TEST(WaitGroup, WithFutures) {
   auto scheduler = yaclib::MakeThreadPool(4);
 
-  yaclib::AwaitGroup wg;
+  yaclib::WaitGroup<> wg;
 
   yaclib_std::atomic_size_t done = 0;
   yaclib_std::atomic_bool flag = false;
@@ -202,7 +201,7 @@ TEST(AwaitGroup, WithFutures) {
     auto one = squarer(1);
     auto four = squarer(2);
     auto nine = squarer(3);
-    wg.Add(one, four, nine);
+    wg.Attach(one, four, nine);
     EXPECT_FALSE(flag.load());
     co_await wg.Await(*scheduler);
     EXPECT_TRUE(flag.load());
@@ -219,10 +218,10 @@ TEST(AwaitGroup, WithFutures) {
   scheduler->Wait();
 }
 
-TEST(AwaitGroup, SwichThread) {
+TEST(WaitGroup, SwichThread) {
   auto scheduler = yaclib::MakeThreadPool(4);
 
-  yaclib::AwaitGroup wg;
+  yaclib::WaitGroup<> wg;
 
   auto squarer = [&](int x) -> yaclib::Future<int> {
     co_await On(*scheduler);
@@ -234,7 +233,7 @@ TEST(AwaitGroup, SwichThread) {
 
   auto waiter = [&]() -> yaclib::Future<int> {
     auto one = squarer(1);
-    wg.Add(one);
+    wg.Attach(one);
     co_await wg.Await(*scheduler);
     EXPECT_NE(main_thread, yaclib_std::this_thread::get_id());
     co_return std::move(one).Get().Value();
@@ -246,10 +245,10 @@ TEST(AwaitGroup, SwichThread) {
   scheduler->Wait();
 }
 
-TEST(AwaitGroup, NonCoroWait) {
+TEST(WaitGroup, NonCoroWait) {
   auto scheduler = yaclib::MakeThreadPool(4);
 
-  yaclib::AwaitGroup wg;
+  yaclib::WaitGroup<> wg;
   yaclib_std::atomic_int cnt{0};
 
   auto coro = [&](int x) -> yaclib::Future<> {
@@ -262,11 +261,9 @@ TEST(AwaitGroup, NonCoroWait) {
   f1 = coro(1);
   f2 = coro(2);
   f3 = coro(3);
-  wg.Add(f1);
-  wg.Add(f2);
-  wg.Add(f3);
+  wg.Attach(f1, f2, f3);
 
-  Wait(wg);
+  wg.Wait();
 
   EXPECT_EQ(3, cnt.load());
 
@@ -274,10 +271,10 @@ TEST(AwaitGroup, NonCoroWait) {
   scheduler->Wait();
 }
 
-TEST(AwaitGroup, Reset) {
+TEST(WaitGroup, Reset) {
   auto scheduler = yaclib::MakeThreadPool(4);
 
-  yaclib::AwaitGroup wg;
+  yaclib::WaitGroup<> wg;
 
   auto squarer = [&](int x) -> yaclib::Future<int> {
     co_await On(*scheduler);
@@ -289,7 +286,7 @@ TEST(AwaitGroup, Reset) {
 
   auto waiter = [&](int x) -> yaclib::Future<int> {
     auto one = squarer(x);
-    wg.Add(one);
+    wg.Attach(one);
     co_await wg.Await(*scheduler);
     EXPECT_NE(main_thread, yaclib_std::this_thread::get_id());
     co_return std::move(one).Get().Value();

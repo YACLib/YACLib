@@ -1,9 +1,9 @@
+#include <yaclib/algo/wait_group.hpp>
 #include <yaclib/async/contract.hpp>
 #include <yaclib/config.hpp>
 #include <yaclib/executor/detail/unique_job.hpp>
 
 #if YACLIB_CORO
-#  include <yaclib/coroutine/await_group.hpp>
 #  include <yaclib/coroutine/detail/promise_type.hpp>
 #  include <yaclib/executor/inline.hpp>
 #  include <yaclib/util/detail/nope_counter.hpp>
@@ -85,10 +85,12 @@ TEST(CoroDummy, BaseCoroGetHandle) {
 #endif
 }
 
-TEST(AwaitGroupDummy, Cancel) {
+TEST(WaitGroupDummy, Cancel) {
 #if YACLIB_CORO
-  yaclib::OneShotEventWait tmp;
-  tmp.Drop();
+  /*
+    yaclib::OneShotEventWait tmp;
+    tmp.Drop();
+  */
 
   yaclib::detail::NopeCounter<yaclib::OneShotEvent> event;
 
