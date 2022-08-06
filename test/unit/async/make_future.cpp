@@ -23,12 +23,17 @@ struct Kek {
 
 TEST(MakeReadyFuture, Void) {
   {
-    yaclib::Future<void> f = yaclib::MakeFuture();
+    yaclib::Future<> f = yaclib::MakeFuture();
     EXPECT_EQ(f.GetCore()->GetExecutor(), nullptr);
     EXPECT_EQ(std::move(f).Get().Ok(), yaclib::Unit{});
   }
   {
-    yaclib::Future<void> f = yaclib::MakeFuture<void>();
+    yaclib::Future<> f = yaclib::MakeFuture<>();
+    EXPECT_EQ(f.GetCore()->GetExecutor(), nullptr);
+    EXPECT_EQ(std::move(f).Get().Ok(), yaclib::Unit{});
+  }
+  {
+    yaclib::Future<> f = yaclib::MakeFuture<void>();
     EXPECT_EQ(f.GetCore()->GetExecutor(), nullptr);
     EXPECT_EQ(std::move(f).Get().Ok(), yaclib::Unit{});
   }
@@ -87,7 +92,7 @@ TEST(MakeReadyFuture, Args2) {
 
 TEST(MakeExceptionFuture, Void) {
   {
-    yaclib::Future<void> f = yaclib::MakeFuture<void>(std::make_exception_ptr(std::runtime_error{""}));
+    yaclib::Future<> f = yaclib::MakeFuture<void>(std::make_exception_ptr(std::runtime_error{""}));
     EXPECT_EQ(f.GetCore()->GetExecutor(), nullptr);
     EXPECT_THROW(std::move(f).Get().Ok(), std::runtime_error);
   }
@@ -129,7 +134,7 @@ TEST(MakeExceptionFuture, NonTrivial) {
 
 TEST(MakeErrorFuture, Void) {
   {
-    yaclib::Future<void> f = yaclib::MakeFuture<void>(yaclib::StopError{yaclib::StopTag{}});
+    yaclib::Future<> f = yaclib::MakeFuture<void>(yaclib::StopError{yaclib::StopTag{}});
     EXPECT_EQ(f.GetCore()->GetExecutor(), nullptr);
     EXPECT_THROW(std::move(f).Get().Ok(), yaclib::ResultError<yaclib::StopError>);
   }
@@ -168,7 +173,7 @@ TEST(MakeErrorFuture, NonTrivial) {
 
 TEST(MakeStoppedFuture, Void) {
   {
-    yaclib::Future<void> f = yaclib::MakeFuture<void>(yaclib::StopTag{});
+    yaclib::Future<> f = yaclib::MakeFuture<void>(yaclib::StopTag{});
     EXPECT_EQ(f.GetCore()->GetExecutor(), nullptr);
     EXPECT_THROW(std::move(f).Get().Ok(), yaclib::ResultError<yaclib::StopError>);
   }

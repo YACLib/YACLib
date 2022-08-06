@@ -36,7 +36,7 @@ enum class WaitPolicy {
 template <WaitPolicy policy>
 void TestJustWorks() {
   auto tp = yaclib::MakeThreadPool(1);
-  auto [f, p] = yaclib::MakeContract<void>();
+  auto [f, p] = yaclib::MakeContract<>();
 
   test::util::StopWatch timer;
 
@@ -142,8 +142,8 @@ TEST(WaitUntil, Multithreaded) {
 
 template <WaitPolicy kPolicy>
 void TestHaveResults() {
-  auto [f1, p1] = yaclib::MakeContract<void>();
-  auto [f2, p2] = yaclib::MakeContract<void>();
+  auto [f1, p1] = yaclib::MakeContract<>();
+  auto [f2, p2] = yaclib::MakeContract<>();
   auto tp = yaclib::MakeThreadPool(1);
   Submit(*tp, [p1 = std::move(p1), p2 = std::move(p2)]() mutable {
     std::move(p1).Set();

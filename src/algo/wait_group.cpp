@@ -2,6 +2,6 @@
 
 namespace yaclib {
 
-template class WaitGroup<1, detail::DefaultEvent>;
+template class WaitGroup<OneShotEvent>;
 
 }  // namespace yaclib

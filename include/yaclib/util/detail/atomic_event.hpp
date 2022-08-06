@@ -15,9 +15,7 @@ class /*alignas(kCacheLineSize)*/ AtomicEvent : public IRef {
 
   void Wait(Token) noexcept;
 
-  void SetOne() noexcept;
-
-  void SetAll() noexcept;
+  void Set() noexcept;
 
   void Reset() noexcept;
 

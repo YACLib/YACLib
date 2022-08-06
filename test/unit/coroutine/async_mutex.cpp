@@ -29,14 +29,15 @@ TEST(AsyncMutex, JustWorks) {
 
   const std::size_t kCoros = 10'000;
 
-  std::array<yaclib::Future<void>, kCoros> futures;
+  std::array<yaclib::Future<>, kCoros> futures;
   std::size_t cs = 0;
 
-  auto coro1 = [&]() -> yaclib::Future<void> {
+  auto coro1 = [&]() -> yaclib::Future<> {
     co_await On(*tp);
     co_await m.Lock();
     ++cs;
     m.UnlockHere();
+    co_return{};
   };
 
   for (std::size_t i = 0; i < kCoros; ++i) {
@@ -60,16 +61,17 @@ TEST(AsyncMutex, Counter) {
 
   const std::size_t kCoros = 20;
   const std::size_t kCSperCoro = 2000;
-  std::array<yaclib::Future<void>, kCoros> futures;
+  std::array<yaclib::Future<>, kCoros> futures;
   std::size_t cs = 0;
 
-  auto coro1 = [&]() -> yaclib::Future<void> {
+  auto coro1 = [&]() -> yaclib::Future<> {
     for (std::size_t j = 0; j < kCSperCoro; ++j) {
       co_await On(*tp);
       co_await m.Lock();
       ++cs;
       co_await m.Unlock();
     }
+    co_return{};
   };
 
   for (std::size_t i = 0; i < kCoros; ++i) {
@@ -118,13 +120,14 @@ TEST(AsyncMutex, LockAsync) {
 
   std::size_t value = 0;
 
-  auto coro = [&](yaclib::Future<bool>& future) -> yaclib::Future<void> {
+  auto coro = [&](yaclib::Future<bool>& future) -> yaclib::Future<> {
     co_await On(*executor);
     co_await m.Lock();
     value++;
     co_await Await(future);
     value++;
     co_await m.UnlockOn(*tp);
+    co_return{};
   };
 
   auto c1 = coro(f1);
@@ -159,12 +162,13 @@ TEST(AsyncMutex, ScopedLockAsync) {
 
   std::size_t value = 0;
 
-  auto coro = [&](yaclib::Future<bool>& future) -> yaclib::Future<void> {
+  auto coro = [&](yaclib::Future<bool>& future) -> yaclib::Future<> {
     co_await On(*executor);
     auto g = co_await m.Guard();
     value++;
     co_await Await(future);
     value++;
+    co_return{};
   };
 
   auto c1 = coro(f1);
@@ -232,10 +236,10 @@ TEST(AsyncMutex, UnlockHereBehaviour) {
 
   auto tp = yaclib::MakeThreadPool(kThreads);
   yaclib::AsyncMutex mutex;
-  std::array<yaclib::Future<void>, kCoros> futures;
+  std::array<yaclib::Future<>, kCoros> futures;
   yaclib_std::atomic_bool start{false};
 
-  auto coro1 = [&]() -> yaclib::Future<void> {
+  auto coro1 = [&]() -> yaclib::Future<> {
     co_await On(*tp);
     co_await mutex.Lock();
     start.store(true, std::memory_order_release);
@@ -243,14 +247,16 @@ TEST(AsyncMutex, UnlockHereBehaviour) {
     yaclib_std::this_thread::sleep_for(1s);
     mutex.UnlockHere();
     EXPECT_EQ(id, yaclib_std::this_thread::get_id());
+    co_return{};
   };
-  auto coro2 = [&]() -> yaclib::Future<void> {
+  auto coro2 = [&]() -> yaclib::Future<> {
     co_await On(*tp);
     co_await mutex.Lock();
     auto id = yaclib_std::this_thread::get_id();
     mutex.UnlockHere();
     yaclib_std::this_thread::sleep_for(1s);
     EXPECT_EQ(id, yaclib_std::this_thread::get_id());
+    co_return{};
   };
 
   util::StopWatch sw;
@@ -281,20 +287,21 @@ TEST(AsyncMutex, UnlockOnBehaviour) {
 
   auto tp = yaclib::MakeThreadPool(kThreads);
   yaclib::AsyncMutex mutex;
-  std::array<yaclib::Future<void>, kCoros> futures;
+  std::array<yaclib::Future<>, kCoros> futures;
 
   yaclib_std::atomic_bool start{false};
   yaclib_std::thread::id locked_id{};
 
-  auto coro1 = [&]() -> yaclib::Future<void> {
+  auto coro1 = [&]() -> yaclib::Future<> {
     co_await On(*tp);
     co_await mutex.Lock();
     start.store(true, std::memory_order_release);
     locked_id = yaclib_std::this_thread::get_id();
     yaclib_std::this_thread::sleep_for(1s);
     co_await mutex.UnlockOn(*tp);
+    co_return{};
   };
-  auto coro2 = [&]() -> yaclib::Future<void> {
+  auto coro2 = [&]() -> yaclib::Future<> {
     co_await On(*tp);
     co_await mutex.Lock();
 #ifdef GTEST_OS_LINUX
@@ -302,6 +309,7 @@ TEST(AsyncMutex, UnlockOnBehaviour) {
 #endif
     co_await mutex.UnlockOn(*tp);
     yaclib_std::this_thread::sleep_for(1s);
+    co_return{};
   };
 
   util::StopWatch sw;

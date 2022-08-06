@@ -12,7 +12,7 @@ namespace yaclib::detail {
 template <typename CounterBase, typename Deleter = DefaultDeleter>
 struct AtomicCounter final : CounterBase {
   template <typename... Args>
-  AtomicCounter(std::size_t n, Args&&... args) noexcept(std::is_nothrow_constructible_v<CounterBase, Args...>)
+  AtomicCounter(std::size_t n, Args&&... args) noexcept(std::is_nothrow_constructible_v<CounterBase, Args&&...>)
       : CounterBase{std::forward<Args>(args)...}, count{n} {
   }
 

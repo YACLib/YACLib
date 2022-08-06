@@ -71,7 +71,7 @@ struct ResultEmpty final : std::exception {};
  * \tparam V type of value that stored in Result
  * \tparam E type of error that stored in Result
  */
-template <typename V, typename E = StopError>
+template <typename V = void, typename E = StopError>
 class [[nodiscard]] Result final {
   static_assert(Check<V>(), "V should be valid");
   static_assert(Check<E>(), "E should be valid");
@@ -88,7 +88,7 @@ class [[nodiscard]] Result final {
   Result& operator=(const Result& other) noexcept(std::is_nothrow_copy_assignable_v<Variant>) = default;
 
   template <typename... Args>
-  Result(Args&&... args) noexcept(std::is_nothrow_constructible_v<Variant, std::in_place_type_t<ValueT>, Args...>)
+  Result(Args&&... args) noexcept(std::is_nothrow_constructible_v<Variant, std::in_place_type_t<ValueT>, Args&&...>)
       : _result{std::in_place_type_t<ValueT>{}, std::forward<Args>(args)...} {
   }
 

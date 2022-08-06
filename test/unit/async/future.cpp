@@ -126,7 +126,7 @@ TEST(JustWorks, RunError) {
   auto tp = yaclib::MakeThreadPool();
   auto result = yaclib::Run(*tp,
                             [] {
-                              return yaclib::Result<void>{yaclib::StopTag{}};
+                              return yaclib::Result<>{yaclib::StopTag{}};
                             })
                   .Then([] {
                     return 1;
@@ -193,7 +193,7 @@ TEST(JustWorks, AsyncRun) {
 
 TEST(JustWorks, Promise) {
   auto tp = yaclib::MakeThreadPool(2);
-  auto [f, p] = yaclib::MakeContract<void>();
+  auto [f, p] = yaclib::MakeContract<>();
 
   int i = 0;
   auto g = std::move(f).Then(*tp, [&] {
@@ -298,7 +298,7 @@ TEST(ThenThreadPool, Simple) {
 
 TEST(Simple, ThenOn) {
   auto tp = yaclib::MakeThreadPool(2);
-  auto [f, p] = yaclib::MakeContract<void>();
+  auto [f, p] = yaclib::MakeContract<>();
   auto g = std::move(f).Then(*tp, [&] {
     EXPECT_EQ(&yaclib::CurrentThreadPool(), tp);
     return 42;
@@ -314,11 +314,11 @@ TEST(Simple, ThenOn) {
 TEST(Simple, Stop) {
   auto tp = yaclib::MakeThreadPool(1);
   {
-    yaclib::Promise<void> p;
+    yaclib::Promise<> p;
     {
-      yaclib::Future<void> f;
+      yaclib::Future<> f;
       {
-        std::tie(f, p) = yaclib::MakeContract<void>();
+        std::tie(f, p) = yaclib::MakeContract<>();
         auto g = std::move(f).Then(*tp, [] {
           return 42;
         });
@@ -328,7 +328,7 @@ TEST(Simple, Stop) {
   {
     yaclib::FutureOn<int> g;
     {
-      auto [f, p] = yaclib::MakeContract<void>();
+      auto [f, p] = yaclib::MakeContract<>();
       g = std::move(f).Then(*tp, [] {
         return 42;
       });
@@ -535,7 +535,7 @@ TEST(Exception, CallbackReturningValue) {
              .Then([](yaclib::Result<int>) {
                throw std::runtime_error{""};
              })
-             .Then([](yaclib::Result<void> result) {
+             .Then([](yaclib::Result<> result) {
                EXPECT_EQ(result.State(), yaclib::ResultState::Exception);
                return 0;
              });
@@ -550,10 +550,10 @@ TEST(Exception, CallbackReturningFuture) {
                        [] {
                          return 1;
                        })
-             .Then([](int) -> yaclib::Future<void> {
+             .Then([](int) -> yaclib::Future<> {
                throw std::runtime_error{""};
              })
-             .Then([](yaclib::Result<void> result) {
+             .Then([](yaclib::Result<> result) {
                EXPECT_EQ(result.State(), yaclib::ResultState::Exception);
                return 0;
              });

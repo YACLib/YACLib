@@ -8,8 +8,8 @@ namespace test {
 namespace {
 
 TEST(Result, VoidSizeof) {
-  static_assert(sizeof(yaclib::Result<void>) == sizeof(std::exception_ptr) + alignof(std::exception_ptr));
-  fprintf(stderr, "%lu\n", sizeof(yaclib::Result<void>));
+  static_assert(sizeof(yaclib::Result<>) == sizeof(std::exception_ptr) + alignof(std::exception_ptr));
+  fprintf(stderr, "%lu\n", sizeof(yaclib::Result<>));
 }
 
 TEST(Result, IntSizeof) {
@@ -58,7 +58,7 @@ TEST(Core, EmptySizeof) {
   });
 
   static_assert(sizeof(void*) == sizeof(int) || sizeof(*core) == (sizeof(yaclib::detail::BaseCore) +  //
-                                                                  sizeof(yaclib::Result<void>) +      //
+                                                                  sizeof(yaclib::Result<>) +          //
                                                                   kZeroCaptureLambdaSizeof +          //
                                                                   0));
   fprintf(stderr, "%lu\n", sizeof(*core));
@@ -72,7 +72,7 @@ void kek() {
 TEST(Core, Sizeof) {
   auto* core = yaclib::detail::MakeCore<yaclib::detail::CoreType::Run, void, yaclib::StopError>(kek);
   static_assert(sizeof(void*) == sizeof(int) || sizeof(*core) == (sizeof(yaclib::detail::BaseCore) +  //
-                                                                  sizeof(yaclib::Result<void>) +      //
+                                                                  sizeof(yaclib::Result<>) +          //
                                                                   sizeof(&kek) +                      //
                                                                   0));
   fprintf(stderr, "%lu\n", sizeof(*core));

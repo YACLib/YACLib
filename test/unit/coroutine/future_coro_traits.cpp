@@ -27,8 +27,8 @@ TEST(CoroTraits, CoReturnInt) {
   EXPECT_EQ(res, 42);
 }
 
-yaclib::Future<void> test_void_coro() {
-  co_return;
+yaclib::Future<> test_void_coro() {
+  co_return{};
 }
 
 TEST(CoroTraits, VoidCoro) {
@@ -61,11 +61,11 @@ TEST(CoroTraits, ThrowException) {
   EXPECT_THROW(std::move(future).Touch().Ok(), std::runtime_error);
 }
 
-yaclib::Future<void> throw_exc_void_at1(int x) {
+yaclib::Future<> throw_exc_void_at1(int x) {
   if (x == 1) {
     throw std::runtime_error{"From coro"};
   }
-  co_return;
+  co_return{};
 }
 
 TEST(CoroTraits, ThrowExceptionVoid) {

@@ -1,10 +1,9 @@
 #pragma once
 
-#include "yaclib/util/detail/unique_counter.hpp"
-
 #include <yaclib/async/detail/result_core.hpp>
 #include <yaclib/config.hpp>
 #include <yaclib/util/detail/atomic_counter.hpp>
+#include <yaclib/util/detail/unique_counter.hpp>
 
 namespace yaclib::detail {
 
@@ -23,7 +22,7 @@ class Core : public ResultCoreT<Type, Ret, E> {
   using Base = ResultCoreT<Type, Ret, E>;
 
   template <typename Func>
-  explicit Core(Func&& f) noexcept(std::is_nothrow_constructible_v<Wrapper, Func>) : _wrapper{std::forward<Func>(f)} {
+  explicit Core(Func&& f) noexcept(std::is_nothrow_constructible_v<Wrapper, Func&&>) : _wrapper{std::forward<Func>(f)} {
   }
 
  private:
@@ -43,14 +42,13 @@ class Core : public ResultCoreT<Type, Ret, E> {
     if (!this->Alive()) {
       return this->Drop();
     }
+    YACLIB_ASSERT(Wrapper::kIsAsync || state == InlineCore::kHereCall);
     if constexpr (Wrapper::kIsAsync) {
       if (state == InlineCore::kHereWrap) {
         auto& core = static_cast<ResultCore<Ret, E>&>(caller);
         return this->Done(std::move(core.Get()), [] {
         });
       }
-    } else {
-      YACLIB_DEBUG(state != InlineCore::kHereCall, "");
     }
     auto& core = static_cast<ResultCore<Arg, E>&>(caller);
     _wrapper.Call(*this, std::move(core.Get()));
@@ -148,7 +146,7 @@ class FuncWrapper final {
       /**
        * We can't use this strategy for other Func::Invoke,
        * because in that case user will not have compile error for that case:
-       * MakeFuture<void>() // state == ResultState::Value
+       * MakeFuture<>() // state == ResultState::Value
        *   .ThenInline([](E/std::exception_ptr) -> yaclib::Result/Future<double> {
        *     throw std::runtime_error{""};
        *   }).ThenInline([](yaclib::Result<double>) { // need double value, we only have void

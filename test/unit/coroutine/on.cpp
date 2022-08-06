@@ -24,11 +24,11 @@ TEST(On, JustWorks) {
   auto main_thread = yaclib_std::this_thread::get_id();
 
   auto tp = yaclib::MakeThreadPool();
-  auto coro = [&]() -> yaclib::Future<void> {
+  auto coro = [&]() -> yaclib::Future<> {
     co_await On(*tp);
     auto other_thread = yaclib_std::this_thread::get_id();
     EXPECT_NE(other_thread, main_thread);
-    co_return;
+    co_return{};
   };
   auto f = coro();
   std::ignore = std::move(f).Get();
@@ -42,16 +42,16 @@ TEST(On, ManyCoros) {
   auto main_thread = yaclib_std::this_thread::get_id();
   auto tp = yaclib::MakeThreadPool();
   yaclib_std::atomic_int32_t sum = 0;
-  auto coro = [&](int a) -> yaclib::Future<void> {
+  auto coro = [&](int a) -> yaclib::Future<> {
     co_await On(*tp);
     auto other_thread = yaclib_std::this_thread::get_id();
     EXPECT_NE(other_thread, main_thread);
     sum.fetch_add(a, std::memory_order_acquire);
-    co_return;
+    co_return{};
   };
 
   const int N = 10;
-  std::vector<yaclib::Future<void>> vec;
+  std::vector<yaclib::Future<>> vec;
   vec.reserve(N);
   for (int i = 0; i < N; ++i) {
     vec.push_back(coro(i));
@@ -80,16 +80,16 @@ TEST(On, Drop) {
   yaclib_std::atomic_size_t sum = 0;
 
   auto main_thread = yaclib_std::this_thread::get_id();
-  auto coro = [&](std::size_t a) -> yaclib::Future<void> {
+  auto coro = [&](std::size_t a) -> yaclib::Future<> {
     co_await On(*tp);
     auto curr_thread = yaclib_std::this_thread::get_id();
     EXPECT_NE(curr_thread, main_thread);
     sum.fetch_add(a, std::memory_order_relaxed);
-    co_return;
+    co_return{};
   };
 
   constexpr std::size_t kSize = 10;
-  std::array<yaclib::Future<void>, kSize> futures;
+  std::array<yaclib::Future<>, kSize> futures;
   for (std::size_t i = 0; i != kSize; ++i) {
     futures[i] = coro(i);
   }
@@ -112,25 +112,25 @@ TEST(On, LockWithStrand) {
 
   std::size_t sum = 0;
   yaclib_std::atomic_bool end = true;
-  auto inc = [&, mutex = strand](yaclib::IExecutor& thread) -> yaclib::Future<void> {
+  auto inc = [&, mutex = strand](yaclib::IExecutor& thread) -> yaclib::Future<> {
     co_await On(*mutex);  // lock
     end.store(true, std::memory_order_release);
     ++sum;
     co_await On(thread);  //  unlock
-    co_return;
+    co_return{};
   };
-  auto add_value = [&, t = tp](size_t increments) -> yaclib::Future<void> {
+  auto add_value = [&, t = tp](size_t increments) -> yaclib::Future<> {
     co_await On(*t);  // schedule to thread pool
-    std::vector<yaclib::Future<void>> vec;
+    std::vector<yaclib::Future<>> vec;
     vec.reserve(increments);
     for (size_t i = 0; i != increments; ++i) {
       vec.push_back(inc(*t));
     }
     co_await Await(vec.begin(), vec.size());
-    co_return;
+    co_return{};
   };
 
-  std::vector<yaclib::Future<void>> vec;
+  std::vector<yaclib::Future<>> vec;
   vec.reserve(kIncrements);
   for (size_t i = 0; i != kThreads; ++i) {
     vec.push_back(add_value(kIncrements));

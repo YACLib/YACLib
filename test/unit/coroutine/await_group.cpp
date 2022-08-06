@@ -1,8 +1,8 @@
 #include <util/time.hpp>
 
+#include <yaclib/algo/wait_group.hpp>
 #include <yaclib/async/run.hpp>
 #include <yaclib/coroutine/await.hpp>
-#include <yaclib/coroutine/await_group.hpp>
 #include <yaclib/coroutine/future_traits.hpp>
 #include <yaclib/coroutine/on.hpp>
 #include <yaclib/executor/manual.hpp>
@@ -32,11 +32,10 @@ TEST(AwaitGroup, JustWorks) {
       return 2;
     });
 
-    yaclib::AwaitGroup await_group;
-    await_group.Add(f1);
-    await_group.Add(f2);
+    yaclib::WaitGroup<> wg;
+    wg.Attach(f1, f2);
 
-    co_await await_group;
+    co_await wg;
     co_return std::move(f1).Touch().Ok() + std::move(f2).Touch().Ok();
   };
   auto f = coro(tp);
@@ -48,23 +47,24 @@ TEST(AwaitGroup, JustWorks) {
 TEST(AwaitGroup, OneWaiter) {
   auto scheduler = yaclib::MakeManual();
 
-  yaclib::AwaitGroup wg;
+  yaclib::WaitGroup<> wg;
 
   bool waiter_done = false;
   bool worker_done = false;
 
-  auto waiter = [&]() -> yaclib::Future<void> {
+  auto waiter = [&]() -> yaclib::Future<> {
     co_await On(*scheduler);
 
     co_await wg;
 
     EXPECT_TRUE(worker_done);
     waiter_done = true;
+    co_return{};
   };
 
   auto future_waiter = waiter();
 
-  auto worker = [&]() -> yaclib::Future<void> {
+  auto worker = [&]() -> yaclib::Future<> {
     co_await On(*scheduler);
 
     for (size_t i = 0; i < 10; ++i) {
@@ -74,6 +74,7 @@ TEST(AwaitGroup, OneWaiter) {
     worker_done = true;
 
     wg.Done();
+    co_return{};
   };
 
   wg.Add(1);
@@ -88,7 +89,7 @@ TEST(AwaitGroup, OneWaiter) {
 TEST(AwaitGroup, Workers) {
   auto scheduler = yaclib::MakeManual();
 
-  yaclib::AwaitGroup wg;
+  yaclib::WaitGroup<> wg{0};
 
   static constexpr std::size_t kWorkers = 3;
   static constexpr std::size_t kWaiters = 4;
@@ -97,19 +98,20 @@ TEST(AwaitGroup, Workers) {
   std::size_t waiters_done = 0;
   std::size_t workers_done = 0;
 
-  auto waiter = [&]() -> yaclib::Future<void> {
+  auto waiter = [&]() -> yaclib::Future<> {
     co_await On(*scheduler);
 
     co_await wg;
     EXPECT_EQ(workers_done, kWorkers);
     ++waiters_done;
+    co_return{};
   };
 
   for (std::size_t i = 0; i < kWaiters; ++i) {
     std::ignore = waiter();
   }
 
-  auto worker = [&]() -> yaclib::Future<void> {
+  auto worker = [&]() -> yaclib::Future<> {
     co_await On(*scheduler);
 
     for (std::size_t i = 0; i < kYields; ++i) {
@@ -119,6 +121,7 @@ TEST(AwaitGroup, Workers) {
     ++workers_done;
 
     wg.Done();
+    co_return{};
   };
 
   wg.Add(kWorkers);
@@ -138,7 +141,7 @@ TEST(AwaitGroup, BlockingWait) {
   const static std::size_t HW_CONC = std::max(2u, yaclib_std::thread::hardware_concurrency());
   auto scheduler = yaclib::MakeThreadPool(HW_CONC);
 
-  yaclib::AwaitGroup wg;
+  yaclib::WaitGroup<> wg;
 
   std::atomic<std::size_t> workers = 0;
 
@@ -146,26 +149,27 @@ TEST(AwaitGroup, BlockingWait) {
 
   wg.Add(kWorkers);
 
-  auto waiter = [&]() -> yaclib::Future<void> {
+  auto waiter = [&]() -> yaclib::Future<> {
     co_await On(*scheduler);
 
     co_await wg;
     EXPECT_EQ(workers.load(), kWorkers);
-    co_return;
+    co_return{};
   };
 
-  auto worker = [&]() -> yaclib::Future<void> {
+  auto worker = [&]() -> yaclib::Future<> {
     co_await On(*scheduler);
 
-    std::this_thread::sleep_for(.5s * YACLIB_CI_SLOWDOWN);
+    std::this_thread::sleep_for(0.5s * YACLIB_CI_SLOWDOWN);
     ++workers;
     wg.Done();
+    co_return{};
   };
 
   util::StopWatch sw;
 
   auto waiter_future = waiter();
-  std::vector<yaclib::Future<void>> worker_futures(kWorkers);
+  std::vector<yaclib::Future<>> worker_futures(kWorkers);
   for (size_t i = 0; i < kWorkers; ++i) {
     worker_futures[i] = worker();
   }
@@ -179,7 +183,7 @@ TEST(AwaitGroup, BlockingWait) {
 TEST(AwaitGroup, WithFutures) {
   auto scheduler = yaclib::MakeThreadPool(4);
 
-  yaclib::AwaitGroup wg;
+  yaclib::WaitGroup<> wg;
 
   yaclib_std::atomic_size_t done = 0;
   yaclib_std::atomic_bool flag = false;
@@ -197,7 +201,7 @@ TEST(AwaitGroup, WithFutures) {
     auto one = squarer(1);
     auto four = squarer(2);
     auto nine = squarer(3);
-    wg.Add(one, four, nine);
+    wg.Attach(one, four, nine);
     EXPECT_FALSE(flag.load());
     co_await wg.Await(*scheduler);
     EXPECT_TRUE(flag.load());
@@ -217,7 +221,7 @@ TEST(AwaitGroup, WithFutures) {
 TEST(AwaitGroup, SwichThread) {
   auto scheduler = yaclib::MakeThreadPool(4);
 
-  yaclib::AwaitGroup wg;
+  yaclib::WaitGroup<> wg;
 
   auto squarer = [&](int x) -> yaclib::Future<int> {
     co_await On(*scheduler);
@@ -229,7 +233,7 @@ TEST(AwaitGroup, SwichThread) {
 
   auto waiter = [&]() -> yaclib::Future<int> {
     auto one = squarer(1);
-    wg.Add(one);
+    wg.Attach(one);
     co_await wg.Await(*scheduler);
     EXPECT_NE(main_thread, yaclib_std::this_thread::get_id());
     co_return std::move(one).Get().Value();
@@ -244,24 +248,22 @@ TEST(AwaitGroup, SwichThread) {
 TEST(AwaitGroup, NonCoroWait) {
   auto scheduler = yaclib::MakeThreadPool(4);
 
-  yaclib::AwaitGroup wg;
+  yaclib::WaitGroup<> wg;
   yaclib_std::atomic_int cnt{0};
 
-  auto coro = [&](int x) -> yaclib::Future<void> {
+  auto coro = [&](int x) -> yaclib::Future<> {
     co_await On(*scheduler);
     yaclib_std::this_thread::sleep_for(YACLIB_CI_SLOWDOWN * 25ms);
     cnt.fetch_add(1);
-    co_return;
+    co_return{};
   };
-  yaclib::Future<void> f1, f2, f3;
+  yaclib::Future<> f1, f2, f3;
   f1 = coro(1);
   f2 = coro(2);
   f3 = coro(3);
-  wg.Add(f1);
-  wg.Add(f2);
-  wg.Add(f3);
+  wg.Attach(f1, f2, f3);
 
-  Wait(wg);
+  wg.Wait();
 
   EXPECT_EQ(3, cnt.load());
 
@@ -272,7 +274,7 @@ TEST(AwaitGroup, NonCoroWait) {
 TEST(AwaitGroup, Reset) {
   auto scheduler = yaclib::MakeThreadPool(4);
 
-  yaclib::AwaitGroup wg;
+  yaclib::WaitGroup<> wg;
 
   auto squarer = [&](int x) -> yaclib::Future<int> {
     co_await On(*scheduler);
@@ -284,7 +286,7 @@ TEST(AwaitGroup, Reset) {
 
   auto waiter = [&](int x) -> yaclib::Future<int> {
     auto one = squarer(x);
-    wg.Add(one);
+    wg.Attach(one);
     co_await wg.Await(*scheduler);
     EXPECT_NE(main_thread, yaclib_std::this_thread::get_id());
     co_return std::move(one).Get().Value();

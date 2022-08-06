@@ -1,8 +1,8 @@
 #include <util/time.hpp>
 
+#include <yaclib/algo/wait_group.hpp>
 #include <yaclib/async/run.hpp>
 #include <yaclib/coroutine/await.hpp>
-#include <yaclib/coroutine/await_group.hpp>
 #include <yaclib/coroutine/future_traits.hpp>
 #include <yaclib/coroutine/on.hpp>
 #include <yaclib/executor/manual.hpp>
@@ -24,31 +24,33 @@ void Stress1(const std::size_t kWaiters, const std::size_t kWorkers, test::util:
   auto tp = yaclib::MakeThreadPool();
   util::StopWatch sw;
   while (sw.Elapsed() < dur) {
-    yaclib::AwaitGroup wg;
+    yaclib::WaitGroup<> wg;
 
     yaclib_std::atomic_size_t waiters_done{0};
     yaclib_std::atomic_size_t workers_done{0};
 
     wg.Add(kWorkers);
 
-    auto waiter = [&]() -> yaclib::Future<void> {
+    auto waiter = [&]() -> yaclib::Future<> {
       co_await On(*tp);
       co_await wg;
       waiters_done.fetch_add(1);
+      co_return{};
     };
 
-    std::vector<yaclib::Future<void>> waiters(kWaiters);
+    std::vector<yaclib::Future<>> waiters(kWaiters);
     for (std::size_t i = 0; i < kWaiters; ++i) {
       waiters[i] = waiter();
     }
 
-    auto worker = [&]() -> yaclib::Future<void> {
+    auto worker = [&]() -> yaclib::Future<> {
       co_await On(*tp);
       workers_done.fetch_add(1);
       wg.Done();
+      co_return{};
     };
 
-    std::vector<yaclib::Future<void>> workers(kWorkers);
+    std::vector<yaclib::Future<>> workers(kWorkers);
     for (std::size_t i = 0; i < kWorkers; ++i) {
       workers[i] = worker();
     }
@@ -73,9 +75,10 @@ TEST(AwaitGroup, Stress1) {
     }
   }
 }
+
 class Goer {
  public:
-  explicit Goer(yaclib::IExecutor& scheduler, yaclib::AwaitGroup& wg) : scheduler_(scheduler), wg_(wg) {
+  explicit Goer(yaclib::IExecutor& scheduler, yaclib::WaitGroup<>& wg) : scheduler_(scheduler), wg_(wg) {
   }
 
   void Start(size_t steps) {
@@ -88,11 +91,11 @@ class Goer {
   }
 
  private:
-  yaclib::Future<void> NextStep() {
+  yaclib::Future<> NextStep() {
     co_await On(scheduler_);
     Step();
     wg_.Done();
-    co_return;
+    co_return{};
   }
 
   void Step() {
@@ -109,8 +112,8 @@ class Goer {
 
  private:
   yaclib::IExecutor& scheduler_;
-  yaclib::AwaitGroup& wg_;
-  std::size_t steps_left_;
+  yaclib::WaitGroup<>& wg_;
+  std::size_t steps_left_ = 0;
   std::size_t steps_made_ = 0;
 };
 
@@ -125,10 +128,10 @@ void Stress2(util::Duration duration) {
 
     bool done = false;
 
-    auto tester = [&scheduler, &done, iter]() -> yaclib::Future<void> {
+    auto tester = [&scheduler, &done, iter]() -> yaclib::Future<> {
       const size_t steps = 1 + iter % 3;
 
-      auto wg = yaclib::AwaitGroup();
+      yaclib::WaitGroup<> wg;
 
       Goer goer{*scheduler, wg};
       goer.Start(steps);
@@ -139,6 +142,7 @@ void Stress2(util::Duration duration) {
       EXPECT_TRUE(steps > 0);
 
       done = true;
+      co_return{};
     };
 
     std::ignore = tester().Get();

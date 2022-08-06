@@ -1,9 +1,10 @@
 #include <yaclib/async/contract.hpp>
 #include <yaclib/config.hpp>
 #include <yaclib/executor/detail/unique_job.hpp>
+#include <yaclib/util/detail/default_event.hpp>
+#include <yaclib/util/detail/mutex_event.hpp>
 
 #if YACLIB_CORO
-#  include <yaclib/coroutine/await_group.hpp>
 #  include <yaclib/coroutine/detail/promise_type.hpp>
 #  include <yaclib/executor/inline.hpp>
 #  include <yaclib/util/detail/nope_counter.hpp>
@@ -22,7 +23,7 @@ void CallInlineState() {
 }
 
 TEST(InlineCore, CallInline) {
-#ifndef YACLIB_LOG_ERROR
+#ifndef YACLIB_LOG_DEBUG
   CallInlineState();
 #else
   EXPECT_FATAL_FAILURE(CallInlineState(), "");
@@ -36,7 +37,7 @@ void CallState() {
 }
 
 TEST(InlineCore, Call) {
-#ifndef YACLIB_LOG_ERROR
+#ifndef YACLIB_LOG_DEBUG
   CallState();
 #else
   EXPECT_FATAL_FAILURE(CallState(), "");
@@ -50,7 +51,7 @@ void DropState() {
 }
 
 TEST(InlineCore, Drop) {
-#ifndef YACLIB_LOG_ERROR
+#ifndef YACLIB_LOG_DEBUG
   DropState();
 #else
   EXPECT_FATAL_FAILURE(DropState(), "");
@@ -63,6 +64,21 @@ TEST(UniqueJob, Ref) {
   task->IncRef();
   task->DecRef();
   task->Drop();
+}
+
+TEST(MutexEvent, Reset) {
+  yaclib::detail::NopeCounter<yaclib::detail::MutexEvent> m;
+  m.Reset();
+}
+
+TEST(DefaultEvent, Reset) {
+  yaclib::detail::NopeCounter<yaclib::detail::DefaultEvent> m;
+  m.Reset();
+}
+
+TEST(UniqueCounter, IncRef) {
+  yaclib::IntrusivePtr<yaclib::IRef> ptr = yaclib::MakeUnique<yaclib::IRef>();
+  ptr->IncRef();
 }
 
 TEST(CoroDummy, DestroyResume) {
@@ -80,20 +96,6 @@ TEST(CoroDummy, BaseCoroGetHandle) {
   core.IncRef();
   core.Store(yaclib::Unit{});
   std::ignore = core.GetHandle();
-#else
-  GTEST_SKIP();
-#endif
-}
-
-TEST(AwaitGroupDummy, Cancel) {
-#if YACLIB_CORO
-  yaclib::OneShotEventWait tmp;
-  tmp.Drop();
-
-  yaclib::detail::NopeCounter<yaclib::OneShotEvent> event;
-
-  yaclib::OneShotEventAwaiter tmp2{yaclib::MakeInline(), event};
-  // tmp2.Drop();
 #else
   GTEST_SKIP();
 #endif

@@ -163,7 +163,7 @@ class AsyncMutex final {
       }
     }
 
-    YACLIB_INLINE void await_resume() noexcept {
+    constexpr void await_resume() noexcept {
     }
 
    protected:
@@ -224,7 +224,7 @@ class AsyncMutex final {
       }
     }
 
-    YACLIB_INLINE void await_resume() noexcept {
+    constexpr void await_resume() noexcept {
     }
 
    private:
