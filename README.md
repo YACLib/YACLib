@@ -42,18 +42,23 @@ https://discord.gg/xy2fDKj8VZ)
 * [Getting started](#getting-started)
 * [Examples](#examples)
     * [Asynchronous pipeline](#asynchronous-pipeline)
-    * [Thread Pool](#thread-pool)
-    * [Strand, Serial Executor, AsyncMutex](#strand-serial-executor-async-mutex)
+    * [C++20 coroutine](#c20-coroutine)
+    * [Thread pool](#thread-pool)
+    * [Strand, Serial executor](#strand-serial-executor)
+    * [AsyncMutex](#asyncmutex)
+    * [Rescheduling](#rescheduling)
     * [WhenAll](#whenall)
     * [WhenAny](#whenany)
-    * [Future Unwrapping](#future-unwrapping)
+    * [Future unwrapping](#future-unwrapping)
     * [Timed wait](#timed-wait)
+    * [WaitGroup](#waitgroup)
     * [Exception recovering](#exception-recovering)
     * [Error recovering](#error-recovering)
     * [Using Result for smart recovering](#use-result-for-smart-recovering)
 * [Requirements](#requirements)
 * [Releases](#releases)
 * [Contributing](#contributing)
+* [Thanks](#thanks)
 * [Contacts](#contacts)
 * [License](#license)
 
@@ -95,22 +100,48 @@ check <a href="https://yaclib.github.io/YACLib/examples.html">documentation</a>.
 #### Asynchronous pipeline
 
 ```C++
-auto tp = yaclib::MakeThreadPool(/*threads=*/4);
-yaclib::Run(*tp, [] {
+auto cpu_tp = yaclib::MakeThreadPool(/*threads=*/4);
+auto io_tp = yaclib::MakeThreadPool(/*threads=*/4);
+yaclib::Run(*cpu_tp, [] {  // on cpu_tp
     return 42;
-  }).Then([](int r) {
-    return r * 2;
-  }).Then([](int r) {
-    return r + 1; 
-  }).Then([](int r) {
+  }).ThenInline([](int r) {  // called directly after 'return 42', without Submit to cpu_tp
+    return r + 1;
+  }).Then([](int r) {  // on cpu_tp
     return std::to_string(r);
-  }).Detach([](std::string r) {
-    std::cout << "Pipeline result: <"  << r << ">" << std::endl;
+  }).Detach(*io_tp, [](std::string&& r) {  // on io_tp
+    std::cout << "Pipeline result: <"  << r << ">" << std::endl; // 43
   });
-};
 ```
 
-#### Thread Pool
+We guarantee that no more than one allocation will be made for each step of the pipeline.
+
+We have `Then/Detach` x `IExecutor/previous step IExecutor/Inline`.
+
+#### C++20 coroutine
+
+```C++
+yaclib::Future<int> task42() {
+  co_return 42;
+}
+
+yaclib::Future<int> task43() {
+  auto value = co_await task42();
+  co_return value + 1;
+}
+```
+
+You also can zero cost combine Future coroutine code with Future callbacks code.
+That allow to use yaclib for smooth transfer from C++17 to C++20 with coroutines.
+
+Also Future with coroutine doesn't make additional allocation for Future,
+only coroutine frame allocation that caused by compiler,
+and [can be optimize](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0981r0.html).
+
+And finally co_await doesn't require allocation,
+so you can combine some async operation without allocation.
+
+
+#### Thread pool
 
 ```C++
 auto tp = yaclib::MakeThreadPool(/*threads=*/4);
@@ -125,7 +156,7 @@ tp->Stop();
 tp->Wait();
 ```
 
-#### Strand, Serial Executor, Async Mutex
+#### Strand, Serial executor
 
 ```C++
 auto tp = yaclib::MakeThreadPool(4);
@@ -133,16 +164,58 @@ auto tp = yaclib::MakeThreadPool(4);
 auto strand = yaclib::MakeStrand(tp);
 
 size_t counter = 0;
-auto tp2 = yaclib::MakeThreadPool(4);
-
 for (std::size_t i = 0; i < 100; ++i) {
-  Submit(*tp2, [&] {
+  Submit(*tp, [&] {
     Submit(*strand, [&] {
       ++counter; // no data race!
     });
   });
 }
 ```
+
+This is much more efficient than a mutex because first of you don't block the threadpool thread.
+Secondly, we execute critical sections in batches (the idea is known as flat-combining).
+
+And also the implementation of strand is an efficient lock-free, without additional allocations.
+
+#### AsyncMutex
+
+```C++
+auto tp = yaclib::MakeThreadPool(4);
+yaclib::AsyncMutex m;
+
+size_t counter = 0;
+
+auto compute = [&] (size_t index) -> yaclib::Future<> {
+  co_await On(tp);
+  // ... some coumpute with index ...
+  auto guard = co_await m.Guard();
+  // ... co_await On(other thread pool) ...
+  counter += index;
+};
+
+for (size_t i = 0; i < 100; ++i) {
+  compute(i);
+}
+```
+
+Firstly, this is the only correct mutex implementation for C++20 coroutines
+as far as I know (cppcoro, libunifex, folly::coro implement Unlock incorrectly, it serializes the code after Unlock)
+
+Secondly, inherits all the Strand benefits.
+
+#### Rescheduling
+
+```C++
+yaclib::Future<> bar(yaclib::IExecutor& cpu, yaclib::IExecutor& io) {
+  co_await On(cpu);
+  ... some heavy compute ...
+  co_await On(io);
+  ... some io compute ...
+}
+```
+
+This is really zero-cost, just suspend the coroutine and submit its resume to another executor, without synchronization inside the coroutine and allocations anywhere.
 
 #### WhenAll
 
@@ -165,6 +238,8 @@ std::vector<int> unique_ints = std::move(all).Then([](std::vector<int> ints) {
 }).Get().Ok();
 ```
 
+Doesn't make more than 3 allocations regardless of input size
+
 #### WhenAny
 
 ```C++
@@ -185,14 +260,9 @@ WhenAny(fs.begin(), fs.size()).Detach([](int i) {
 });
 ```
 
+Doesn't make more than 2 allocations regardless of input size.
+
 #### Future unwrapping
-
-Sometimes it is necessary to return from one async function the result of the other. It would be possible with the wait
-on this result. But this would cause blocking thread while waiting for the task to complete.
-
-This problem can be solved using future unwrapping: when an async function returns a Future object, instead of setting
-its result to the Future object, the inner Future will "replace" the outer Future. This means that the outer Future will
-complete when the inner Future finishes and will acquire the result of the inner Future.
 
 ```C++
 auto tp_output = yaclib::MakeThreadPool(/*threads=*/1);
@@ -209,6 +279,15 @@ auto future = yaclib::Run(*tp_output, [] {
 });
 ```
 
+Sometimes it's necessary to return from one async function the result of the other. It would be possible with the wait
+on this result. But this would cause blocking thread while waiting for the task to complete.
+
+This problem can be solved using future unwrapping: when an async function returns a Future object, instead of setting
+its result to the Future object, the inner Future will "replace" the outer Future. This means that the outer Future will
+complete when the inner Future finishes and will acquire the result of the inner Future.
+
+It also doesn't require additional allocations.
+
 #### Timed wait
 
 ```C++
@@ -221,7 +300,7 @@ WaitFor(10ms, f1, f2);  // or Wait / WaitUntil
 
 if (f1.Ready()) {
   Process(std::as_const(f1).Get());
-  yaclib::util::Result<int> res1 = std::as_const(f1).Get();
+  yaclib::Result<int> res1 = std::as_const(f1).Get();
   assert(f1.Valid());  // f1 valid here
 }
 
@@ -230,6 +309,44 @@ if (f2.Ready()) {
   assert(!f2.Valid());  // f2 invalid here
 }
 ```
+
+We support `Wait/WaitFor/WaitUntil`.
+Also all of them don't make allocation, and we have optimized path for single `Future` (used in `Future::Get()`).
+
+#### WaitGroup
+
+```C++
+yaclib::WaitGroup wg{1};
+
+auto tp = yaclib::MakeThreaPool();
+
+wg.Add(2/*default=1*/);
+Submit(*tp, [] {
+   wg.Done();
+});
+Submit(*tp, [] {
+   wg.Done();
+});
+
+yaclib::Future<int> f1 = yaclib::Run(*tp, [] {...});
+wg.Attach(f1);  // auto Done then Future became Ready
+
+yaclib::Future<> f2 = yaclib::Run(*tp, [] {...});
+wg.Consume(std::move(f2));  // auto Done then Future became Ready
+
+auto coro = [&] () -> yaclib::Future<> {
+  co_await On(*tp);
+  co_await wg; // alias for co_await wg.Await(CurrentThreadPool());
+  std::cout << f1.Touch().Ok(); // Valid access to Result of Ready Future
+};
+
+auto coro_f = coro();
+
+wg.Done(/*default=1*/);
+wg.Wait();
+```
+
+Effective like simple atomic counter in intrusive pointer, also doesn't require any allocation.
 
 #### Exception recovering
 
@@ -295,11 +412,11 @@ auto f = yaclib::Run(*tp, [] {
       throw std::runtime_error{"2"};
     }
     return y + 15;
-  }).Then([](yaclib::util::Result<int> z) {
+  }).Then([](yaclib::Result<int>&& z) {
     if (!z) {
-      return 10; // Some default value
+      return 10;  // Some default value
     }
-    return z.Value(); 
+    return std::move(z).Value();
   });
 int x = std::move(f).Get().Value();
 ```
@@ -324,10 +441,12 @@ We test following configurations:
 
 | OS\Compiler | Linux | Windows   | macOS | Android |
 |-------------|-------|-----------|-------|---------|
-| GCC         | ✅ 7+  | ✅ MinGW   | ✅ 9+  | 👌      |
-| Clang       | ✅ 8+  | ✅ ClangCL |       | 👌      |
+| GCC         | ✅ 7+  | 👌 MinGW   | ✅ 7+  | 👌      |
+| Clang       | ✅ 8+  | ✅ ClangCL | ✅ 8+  | 👌      |
 | AppleClang  | —     | —         | ✅ 12+ | —       |
 | MSVC        | —     | ✅ 14.20+  | —     | —       |
+
+MinGW works in CI early, check [this](https://github.com/YACLib/YACLib/issues/190).
 
 ## Releases
 
@@ -336,7 +455,16 @@ YACLib follows the [Abseil Live at Head philosophy](https://abseil.io/about/phil
 
 So we recommend using the latest commit in the main branch in your projects.
 
-However, we realize this philosophy doesn't work for every project, so we also provide Releases.
+This is safe because we suggest compiling YACLib from source,
+and each commit in main goes through dozens of test runs in various configurations.
+Our test coverage is 100%, to simplify, we run tests on the cartesian product of possible configurations:
+
+`os x compiler x stdlib x sanitizer x fault injection backend`
+
+However, we realize this philosophy doesn't work for every project, so we also provide [Releases](https://github.com/YACLib/YACLib/releases).
+
+We don't believe in [SemVer](https://semver.org), check [this](https://gist.github.com/jashkenas/cbd2b088e20279ae2c8e), so we use `year.month.day[.patch]` approach.
+I'll release a new version if you ask, or I'll decide we have important or enough changes.
 
 ## Contributing
 
@@ -349,15 +477,15 @@ We are always open for issues and pull requests. For more details you can check 
 * [Style guide](doc/style_guide.md)
 * [How to use sanitizers](doc/sanitizer.md)
 
+## Thanks
+
+* [Roman Lipovsky](https://gitlab.com/Lipovsky) for an incredible [course about concurrency](https://gitlab.com/Lipovsky/concurrency-course), which gave us a lot of ideas for this library and for showing us how important to test concurrency correctly.
+
+* Paul E. McKenney for an incredible [book about parallel programming](https://cdn.kernel.org/pub/linux/kernel/people/paulmck/perfbook/perfbook.html), which gave me a lot of insight into memory models and how they relate to what's going on in hardware.
+
 ## Contacts
 
-You can contact us by our emails:
-
-* valery.mironow@gmail.com
-* kononov.nikolay.nk1@gmail.com
-* ionin.code@gmail.com
-* zakhar.zakharov.zz16@gmail.com
-* myannyax@gmail.com
+You can contact us by my email: valery.mironow@gmail.com
 
 Or join our [Discord Server](https://discord.gg/xy2fDKj8VZ)
 
