@@ -479,7 +479,7 @@ We are always open for issues and pull requests. For more details you can check 
 
 ## Thanks
 
-* [Roman Lipovsky](https://gitlab.com/Lipovsky) for an incredible [course about concurrency](https://gitlab.com/Lipovsky/concurrency-course), which gave me a lot of ideas for this library and for showing me how to test concurrency correctly.
+* [Roman Lipovsky](https://gitlab.com/Lipovsky) for an incredible [course about concurrency](https://gitlab.com/Lipovsky/concurrency-course), which gave us a lot of ideas for this library and for showing us how important to test concurrency correctly.
 
 * Paul E. McKenney for an incredible [book about parallel programming](https://cdn.kernel.org/pub/linux/kernel/people/paulmck/perfbook/perfbook.html), which gave me a lot of insight into memory models and how they relate to what's going on in hardware.
 
