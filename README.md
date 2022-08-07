@@ -485,9 +485,9 @@ We are always open for issues and pull requests. For more details you can check 
 
 ## Contacts
 
-You can contact us by my email: valery.mironow@gmail.com.
+You can contact us by my email: valery.mironow@gmail.com
 
-Or join our [Discord Server](https://discord.gg/xy2fDKj8VZ).
+Or join our [Discord Server](https://discord.gg/xy2fDKj8VZ)
 
 ## License
 
