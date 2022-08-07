@@ -90,6 +90,8 @@ link_libraries(yaclib)
 
 For more details check [install guide](doc/install.md).
 
+For more details about fault injection check [doc](yaclib_std/README.md).
+
 ## Examples
 
 <details open><summary> 
