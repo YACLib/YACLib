@@ -119,6 +119,8 @@ We guarantee that no more than one allocation will be made for each step of the 
 
 We have `Then/Detach` x `IExecutor/previous step IExecutor/Inline`.
 
+Also Future/Promise don't contains shared atomic counter!
+
 #### C++20 coroutine
 
 ```C++
