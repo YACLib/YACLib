@@ -92,11 +92,6 @@ class FutureBase {
   [[nodiscard]] Result<V, E> Touch() && noexcept;
 
   /**
-   * Stop pipeline before current step, if possible.
-   */
-  void Stop() && noexcept;
-
-  /**
    * Specify executor for continuation.
    * Make FutureOn -- Future with executor
    */

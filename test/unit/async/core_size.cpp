@@ -62,7 +62,7 @@ TEST(Core, EmptySizeof) {
                                                                   kZeroCaptureLambdaSizeof +          //
                                                                   0));
   fprintf(stderr, "%lu\n", sizeof(*core));
-  core->SetWait(yaclib::detail::InlineCore::kWaitStop);
+  core->SetWait(yaclib::detail::InlineCore::kWaitDrop);
   core->Drop();
 }
 
@@ -77,7 +77,7 @@ TEST(Core, Sizeof) {
                                                                   0));
   fprintf(stderr, "%lu\n", sizeof(*core));
   core->Drop();
-  core->SetWait(yaclib::detail::InlineCore::kWaitStop);
+  core->SetWait(yaclib::detail::InlineCore::kWaitDrop);
 }
 
 }  // namespace
