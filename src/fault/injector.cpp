@@ -15,6 +15,8 @@ void Injector::MaybeInject() noexcept {
 #if YACLIB_FAULT == 2
     yaclib_std::this_thread::yield();
     sInjectedCount += 1;
+#elif defined(_MSC_VER)
+    yaclib_std::this_thread::yield();
 #else
     yaclib_std::this_thread::sleep_for(std::chrono::nanoseconds(1 + GetRandNumber(sSleepTime)));
 #endif
