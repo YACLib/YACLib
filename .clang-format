@@ -20,6 +20,7 @@ BraceWrapping:
   BeforeLambdaBody: true
 AlignEscapedNewlines: Right
 ContinuationIndentWidth: 2
+ConstructorInitializerIndentWidth: 2
 AlignAfterOpenBracket: Align # TODO(MBkkt) Try BlockIndent clang-format 15
 
 IncludeCategories:
