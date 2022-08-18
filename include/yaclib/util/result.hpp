@@ -89,11 +89,11 @@ class [[nodiscard]] Result final {
 
   template <typename... Args>
   Result(Args&&... args) noexcept(std::is_nothrow_constructible_v<Variant, std::in_place_type_t<ValueT>, Args&&...>)
-      : _result{std::in_place_type_t<ValueT>{}, std::forward<Args>(args)...} {
+    : _result{std::in_place_type_t<ValueT>{}, std::forward<Args>(args)...} {
   }
 
   Result(std::exception_ptr exception) noexcept
-      : _result{std::in_place_type_t<std::exception_ptr>{}, std::move(exception)} {
+    : _result{std::in_place_type_t<std::exception_ptr>{}, std::move(exception)} {
   }
 
   Result(E error) noexcept : _result{std::in_place_type_t<E>{}, std::move(error)} {
