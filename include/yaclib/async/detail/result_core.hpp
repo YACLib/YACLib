@@ -17,7 +17,7 @@ class ResultCore : public BaseCore {
 
   template <typename... Args>
   explicit ResultCore(Args&&... args) noexcept(std::is_nothrow_constructible_v<Result<V, E>, Args&&...>)
-      : BaseCore{kResult}, _result{std::forward<Args>(args)...} {
+    : BaseCore{kResult}, _result{std::forward<Args>(args)...} {
   }
 
   ~ResultCore() noexcept override {

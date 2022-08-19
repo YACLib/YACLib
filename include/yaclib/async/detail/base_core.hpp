@@ -16,7 +16,6 @@ namespace yaclib::detail {
 class BaseCore : public InlineCore {
  public:
   [[nodiscard]] bool Empty() const noexcept;
-  [[nodiscard]] bool Alive() const noexcept;
 
 #if YACLIB_CORO != 0
   virtual yaclib_std::coroutine_handle<> GetHandle() noexcept {

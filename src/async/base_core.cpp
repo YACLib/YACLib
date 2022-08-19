@@ -41,7 +41,7 @@ bool BaseCore::SetWait(IRef& callback, State state) noexcept {
 }
 
 void BaseCore::SetWait(State state) noexcept {
-  YACLIB_ASSERT(state == kWaitDrop || state == kWaitStop);
+  YACLIB_ASSERT(state == kWaitDrop);
   if (!SetCallback(&static_cast<IRef&>(kEmptyRef), state)) {
     DecRef();
   }
@@ -56,12 +56,6 @@ bool BaseCore::Empty() const noexcept {
   auto callback = _callback.load(std::memory_order_acquire);
   YACLIB_ASSERT(callback == kEmpty || callback == kResult);
   return callback == kEmpty;
-}
-
-bool BaseCore::Alive() const noexcept {
-  const State callback{kMask & _callback.load(std::memory_order_acquire)};
-  YACLIB_DEBUG(callback == kResult, "No needed to check Alive after store kResult or from Future side");
-  return callback != kWaitStop;
 }
 
 IExecutorPtr& BaseCore::GetExecutor() noexcept {
@@ -98,8 +92,6 @@ void BaseCore::SetResult() noexcept {
       YACLIB_ASSERT(callback != nullptr);
       Submit(*callback, state);
     } break;
-    case kWaitStop:
-      [[fallthrough]];
     case kWaitDrop:
       DecRef();
       [[fallthrough]];

@@ -34,9 +34,9 @@ void CallFunc(std::size_t /*priority*/, std::string_view /*name*/, IFunc& f, IFu
 class LightThread final : public IThread {
  public:
   LightThread(std::size_t priority, std::string_view name, IFuncPtr func, IFuncPtr acquire, IFuncPtr release)
-      : _thread{[priority, name, func = std::move(func), acquire = std::move(acquire), release = std::move(release)] {
-          CallFunc(priority, name, *func, acquire.Get(), release.Get());
-        }} {
+    : _thread{[priority, name, func = std::move(func), acquire = std::move(acquire), release = std::move(release)] {
+        CallFunc(priority, name, *func, acquire.Get(), release.Get());
+      }} {
   }
 
   ~LightThread() final {
@@ -53,9 +53,9 @@ class LightThread final : public IThread {
 class HeavyThread final : public IThread {
  public:
   explicit HeavyThread()
-      : _thread{[this] {
-          Loop();
-        }} {
+    : _thread{[this] {
+        Loop();
+      }} {
   }
 
   void Set(std::size_t priority, std::string_view name, IFuncPtr func, IFuncPtr acquire, IFuncPtr release) {
@@ -268,7 +268,7 @@ class DecoratorThreadFactory : public BaseFactory {
 class PriorityThreadFactory : public DecoratorThreadFactory {
  public:
   PriorityThreadFactory(IThreadFactoryPtr base, std::size_t priority)
-      : DecoratorThreadFactory{std::move(base)}, _priority{priority} {
+    : DecoratorThreadFactory{std::move(base)}, _priority{priority} {
   }
 
  private:
@@ -282,7 +282,7 @@ class PriorityThreadFactory : public DecoratorThreadFactory {
 class NamedThreadFactory : public DecoratorThreadFactory {
  public:
   NamedThreadFactory(IThreadFactoryPtr base, std::string_view name)
-      : DecoratorThreadFactory{std::move(base)}, _name{name} {
+    : DecoratorThreadFactory{std::move(base)}, _name{name} {
   }
 
  private:
@@ -296,7 +296,7 @@ class NamedThreadFactory : public DecoratorThreadFactory {
 class AcquireThreadFactory : public DecoratorThreadFactory {
  public:
   AcquireThreadFactory(IThreadFactoryPtr base, IFuncPtr acquire)
-      : DecoratorThreadFactory{std::move(base)}, _acquire{std::move(acquire)} {
+    : DecoratorThreadFactory{std::move(base)}, _acquire{std::move(acquire)} {
   }
 
  private:
@@ -310,7 +310,7 @@ class AcquireThreadFactory : public DecoratorThreadFactory {
 class ReleaseThreadFactory : public DecoratorThreadFactory {
  public:
   ReleaseThreadFactory(IThreadFactoryPtr base, IFuncPtr release)
-      : DecoratorThreadFactory{std::move(base)}, _release{std::move(release)} {
+    : DecoratorThreadFactory{std::move(base)}, _release{std::move(release)} {
   }
 
  private:
@@ -324,7 +324,7 @@ class ReleaseThreadFactory : public DecoratorThreadFactory {
 class CallbackThreadFactory : public DecoratorThreadFactory {
  public:
   CallbackThreadFactory(IThreadFactoryPtr base, IFuncPtr acquire, IFuncPtr release)
-      : DecoratorThreadFactory{std::move(base)}, _acquire{std::move(acquire)}, _release{std::move(release)} {
+    : DecoratorThreadFactory{std::move(base)}, _acquire{std::move(acquire)}, _release{std::move(release)} {
   }
 
  private:

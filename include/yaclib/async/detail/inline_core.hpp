@@ -16,7 +16,6 @@ class InlineCore : public Job {
     kCall       = std::uint64_t{2} << kShift,
     kHereWrap   = std::uint64_t{3} << kShift,
     kHereCall   = std::uint64_t{4} << kShift,
-    kWaitStop   = std::uint64_t{5} << kShift,
     kWaitDrop   = std::uint64_t{6} << kShift,
     kWaitNope   = std::uint64_t{7} << kShift,
     kMask       = std::uint64_t{7} << kShift,

@@ -602,17 +602,6 @@ TEST(Future, CheckConstGet) {
   EXPECT_NE(ptr, nullptr);
 }
 
-TEST(Future, StopInFlight) {
-  auto tp = yaclib::MakeThreadPool(1);
-  auto f = yaclib::Run(*tp, [] {
-    yaclib_std::this_thread::sleep_for(10ms);
-  });
-  yaclib_std::this_thread::sleep_for(10ms);
-  std::move(f).Stop();
-  tp->Stop();
-  tp->Wait();
-}
-
 TEST(Detach, Drop) {
   auto tp = yaclib::MakeThreadPool(1);
   auto f = yaclib::Run(*tp, [&] {

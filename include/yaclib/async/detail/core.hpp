@@ -27,9 +27,6 @@ class Core : public ResultCoreT<Type, Ret, E> {
 
  private:
   void Call() noexcept final {
-    if (!this->Alive()) {
-      return this->Drop();
-    }
     if constexpr (Type == CoreType::Run) {
       _wrapper.Call(*this, Unit{});
     } else {
@@ -39,9 +36,6 @@ class Core : public ResultCoreT<Type, Ret, E> {
   }
 
   void Here(InlineCore& caller, [[maybe_unused]] InlineCore::State state) noexcept final {
-    if (!this->Alive()) {
-      return this->Drop();
-    }
     YACLIB_ASSERT(Wrapper::kIsAsync || state == InlineCore::kHereCall);
     if constexpr (Wrapper::kIsAsync) {
       if (state == InlineCore::kHereWrap) {

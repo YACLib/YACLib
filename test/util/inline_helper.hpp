@@ -7,11 +7,12 @@
 
 namespace test {
 
-template <bool Inline, typename V, typename E, typename Func>
-auto InlineThen(yaclib::Future<V, E>&& future, Func&& f) {
+template <bool Inline, typename Future, typename Func>
+auto InlineThen(Future&& future, Func&& f) {
   if constexpr (Inline) {
     return std::move(future).ThenInline(std::forward<Func>(f));
   } else {
+    // cast to Future because FutureOn with Inline executor is error prone
     return std::move(future).Then(yaclib::MakeInline(), std::forward<Func>(f)).On(nullptr);
   }
 }

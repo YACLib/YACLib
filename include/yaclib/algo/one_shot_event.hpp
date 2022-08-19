@@ -70,7 +70,7 @@ class OneShotEvent : public IRef {
 class [[nodiscard]] OneShotEventAwaiter final : public detail::NopeCounter<Job> {
  public:
   YACLIB_INLINE explicit OneShotEventAwaiter(OneShotEvent& event, IExecutor& executor) noexcept
-      : _event{event}, _executor{executor} {
+    : _event{event}, _executor{executor} {
   }
 
   YACLIB_INLINE bool await_ready() const noexcept {

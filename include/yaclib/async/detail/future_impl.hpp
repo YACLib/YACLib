@@ -10,7 +10,7 @@ namespace yaclib {
 template <typename V, typename E>
 FutureBase<V, E>::~FutureBase() noexcept {
   if (_core) {
-    std::move(*this).Stop();
+    std::move(*this).Detach();
   }
 }
 
@@ -50,11 +50,6 @@ Result<V, E> FutureBase<V, E>::Touch() && noexcept {
   YACLIB_ERROR(!Ready(), "Try to touch result of not ready Future");
   auto core = std::exchange(_core, nullptr);
   return std::move(core->Get());
-}
-
-template <typename V, typename E>
-void FutureBase<V, E>::Stop() && noexcept {
-  _core.Release()->SetWait(detail::InlineCore::kWaitStop);
 }
 
 template <typename V, typename E>

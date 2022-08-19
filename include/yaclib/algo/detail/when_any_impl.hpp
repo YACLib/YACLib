@@ -24,7 +24,7 @@ class AnyCombinatorBase {
   ResultCorePtr<V, E> _core;
 
   explicit AnyCombinatorBase(std::size_t /*count*/, ResultCorePtr<V, E>&& core) noexcept
-      : _done{false}, _core{std::move(core)} {
+    : _done{false}, _core{std::move(core)} {
   }
 
   bool Done() noexcept {
@@ -47,7 +47,7 @@ class AnyCombinatorBase<V, E, WhenPolicy::LastFail> {
   ResultCorePtr<V, E> _core;
 
   explicit AnyCombinatorBase(std::size_t count, ResultCorePtr<V, E>&& core) noexcept
-      : _state{2 * count}, _core{std::move(core)} {
+    : _state{2 * count}, _core{std::move(core)} {
   }
 
   bool Done() noexcept {
@@ -80,7 +80,7 @@ class AnyCombinatorBase<V, E, WhenPolicy::FirstFail> : public AnyCombinatorBase<
 
  protected:
   explicit AnyCombinatorBase(std::size_t count, ResultCorePtr<V, E>&& core)
-      : Base{count, std::move(core)}, _state{ResultState::Empty}, _unit{} {
+    : Base{count, std::move(core)}, _state{ResultState::Empty}, _unit{} {
   }
 
   ~AnyCombinatorBase() noexcept {

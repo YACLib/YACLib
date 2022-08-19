@@ -1,9 +1,12 @@
+#include "yaclib/executor/manual.hpp"
+
 #include <util/error_suite.hpp>
 #include <util/inline_helper.hpp>
 
 #include <yaclib/async/contract.hpp>
 #include <yaclib/async/future.hpp>
 #include <yaclib/async/promise.hpp>
+#include <yaclib/async/run.hpp>
 #include <yaclib/executor/submit.hpp>
 #include <yaclib/executor/thread_pool.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
@@ -242,7 +245,7 @@ void ThenInlineError() {
 
 TEST(ThenInline, Error) {
   ThenInlineError<true>();
-  // ThenInlineError<false>();
+  ThenInlineError<false>();
 }
 
 template <bool Inline>
@@ -258,16 +261,67 @@ TEST(ThenInline, Callback) {
   ThenInlineCallback<true>();
   ThenInlineCallback<false>();
 }
+
+class StopSource final : public yaclib::detail::NopeCounter<yaclib::IExecutor> {
+ public:
+  explicit StopSource(yaclib::IExecutor& executor) noexcept : _executor{executor} {
+  }
+
+  [[nodiscard]] Type Tag() const final {
+    return Type::Custom;
+  }
+
+  void Submit(yaclib::Job& job) noexcept final {
+    if (!_stop.load(std::memory_order_relaxed)) {
+      _executor.Submit(job);
+    } else {
+      job.Drop();
+    }
+  }
+
+  void Stop() noexcept {
+    _stop.store(true, std::memory_order_relaxed);
+  }
+
+ private:
+  yaclib::IExecutor& _executor;
+  yaclib_std::atomic_bool _stop{false};
+};
+
 template <bool Inline>
 void ThenInlineStopped() {
-  auto [f, p] = yaclib::MakeContract<>();
+  auto e = yaclib::MakeManual();
+  StopSource source{*e};
+  size_t ready = 0;
+  auto inc = [&] {
+    ++ready;
+  };
+  auto f = yaclib::Run(source, inc);
+  auto f1 = InlineThen<Inline>(std::move(f), inc);
+  auto f2 = [&] {
+    if constexpr (Inline) {
+      return std::move(f1).Then(inc);
+    } else {
+      return std::move(f1).Then(source, inc);
+    }
+  }();
+  auto f3 = InlineThen<Inline>(std::move(f2), inc);
+  source.Stop();
+  e->Drain();
+  EXPECT_EQ(ready, 2);
+}
+
+TEST(Future, Stop) {
+  auto tp = yaclib::MakeThreadPool(1);
+  StopSource source{*tp};
+  source.Stop();
   bool ready = false;
-  auto f1 = InlineThen<Inline>(std::move(f), [&] {
+  yaclib::Run(source, [&] {
     ready = true;
-  });
-  std::move(f1).Stop();
-  std::move(p).Set();
+  }).Detach();
   EXPECT_FALSE(ready);
+  tp->Stop();
+  tp->Wait();
 }
 
 TEST(ThenInline, Stopped) {
@@ -281,7 +335,7 @@ void ThenInlineAsync() {
   f = InlineThen<Inline>(std::move(f), [](int x) {
     return yaclib::MakeFuture(x + 2);
   });
-  std::move(f).Stop();
+  std::move(f).Detach();
   std::move(p).Set(3);
 }
 
