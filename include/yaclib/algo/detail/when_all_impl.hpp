@@ -29,21 +29,16 @@ class AllCombinatorBase<void> {
   yaclib_std::atomic_bool _done = false;
 };
 
-template <typename V, typename E, std::size_t N = 0,
-          typename FutureValue =
-            std::conditional_t<std::is_void_v<V>, void, std::conditional_t<N != 0, std::array<V, N>, std::vector<V>>>>
+template <typename V, typename E, typename FutureValue = std::conditional_t<std::is_void_v<V>, void, std::vector<V>>>
 class AllCombinator : public InlineCore, public AllCombinatorBase<FutureValue> {
   static_assert(std::is_void_v<V> || std::is_nothrow_move_assignable_v<V>);
 
-  using Base = AllCombinatorBase<FutureValue>;
   using ResultPtr = ResultCorePtr<FutureValue, E>;
 
  public:
   static std::pair<ResultPtr, AllCombinator*> Make(std::size_t count) {
-    if constexpr (N == 0) {
-      if (count == 0) {
-        return {nullptr, nullptr};
-      }
+    if (count == 0) {
+      return {nullptr, nullptr};
     }
     // TODO(MBkkt) Maybe single allocation instead of two?
     auto raw_core = new UniqueCounter<ResultCore<FutureValue, E>>{};
@@ -68,7 +63,7 @@ class AllCombinator : public InlineCore, public AllCombinatorBase<FutureValue> {
 
  protected:
   explicit AllCombinator(ResultPtr promise, [[maybe_unused]] std::size_t count) : _promise{std::move(promise)} {
-    if constexpr (!std::is_void_v<V> && N == 0) {
+    if constexpr (!std::is_void_v<V>) {
       AllCombinatorBase<FutureValue>::_results.resize(count);
     }
   }
