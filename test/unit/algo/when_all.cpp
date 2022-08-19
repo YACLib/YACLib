@@ -84,13 +84,7 @@ void JustWorks() {
 
   EXPECT_TRUE(all.Ready());
 
-  auto expected = [] {
-    if constexpr (suite == TestSuite::Vector) {
-      return std::vector{7, 3, 5};
-    } else {
-      return std::array<int, 3>{7, 3, 5};
-    }
-  }();
+  std::vector expected{7, 3, 5};
   if constexpr (is_void) {
     EXPECT_EQ(std::move(all).Get().State(), yaclib::ResultState::Value);
   } else {
