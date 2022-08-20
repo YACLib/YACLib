@@ -1,6 +1,7 @@
 #pragma once
 
 #include <yaclib/executor/executor.hpp>
+#include <yaclib/fwd.hpp>
 
 namespace yaclib {
 
@@ -34,5 +35,7 @@ namespace yaclib {
  * \endcode
  */
 IExecutor& MakeInline() noexcept;
+
+IExecutor& MakeInline(StopTag) noexcept;
 
 }  // namespace yaclib

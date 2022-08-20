@@ -22,7 +22,7 @@ class /*alignas(kCacheLineSize)*/ Strand : public Job, public IExecutor {
   }
 
  private:
-  [[nodiscard]] Type Tag() const final {
+  [[nodiscard]] Type Tag() const noexcept final {
     return Type::Strand;
   }
 

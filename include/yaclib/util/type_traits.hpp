@@ -30,6 +30,8 @@ template <typename T>
 inline constexpr bool is_future_base_v = detail::IsInstantiationOf<FutureBase, T>::Value ||  //
                                          detail::IsInstantiationOf<Future, T>::Value ||      //
                                          detail::IsInstantiationOf<FutureOn, T>::Value;
+template <typename T>
+inline constexpr bool is_task_v = detail::IsInstantiationOf<Task, T>::Value;
 
 template <typename T>
 using future_base_value_t = typename detail::FutureBaseTypes<T>::Value;
@@ -44,6 +46,7 @@ constexpr bool Check() noexcept {
   static_assert(!std::is_volatile_v<T>, "T cannot be volatile, because it's unnecessary");
   static_assert(!is_result_v<T>, "T cannot be Result, because it's ambiguous");
   static_assert(!is_future_base_v<T>, "T cannot be Future, because it's ambiguous");
+  static_assert(!is_task_v<T>, "T cannot be Task, because it's ambiguous");
   static_assert(!std::is_same_v<T, std::exception_ptr>, "T cannot be std::exception_ptr, because it's ambiguous");
   static_assert(!std::is_same_v<T, Unit>, "T cannot be Unit, because Unit for internal instead of void usage");
   return true;

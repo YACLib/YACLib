@@ -1,3 +1,4 @@
+#include <util/async_suite.hpp>
 #include <util/intrusive_list.hpp>
 #include <util/time.hpp>
 
@@ -23,7 +24,7 @@
 namespace test {
 namespace {
 
-TEST(AsyncMutex, JustWorks) {
+TYPED_TEST(AsyncSuite, JustWorks) {
   yaclib::AsyncMutex m;
   auto tp = yaclib::MakeThreadPool();
 
@@ -32,8 +33,10 @@ TEST(AsyncMutex, JustWorks) {
   std::array<yaclib::Future<>, kCoros> futures;
   std::size_t cs = 0;
 
-  auto coro1 = [&]() -> yaclib::Future<> {
-    co_await On(*tp);
+  auto coro1 = [&]() -> typename TestFixture::Type {
+    if constexpr (TestFixture::kIsFuture) {
+      co_await On(*tp);
+    }
     co_await m.Lock();
     ++cs;
     m.UnlockHere();
@@ -41,7 +44,11 @@ TEST(AsyncMutex, JustWorks) {
   };
 
   for (std::size_t i = 0; i < kCoros; ++i) {
-    futures[i] = coro1();
+    if constexpr (TestFixture::kIsFuture) {
+      futures[i] = coro1();
+    } else {
+      futures[i] = coro1().ToFuture(*tp).On(nullptr);
+    }
   }
 
   yaclib::Wait(futures.begin(), futures.size());
@@ -51,7 +58,7 @@ TEST(AsyncMutex, JustWorks) {
   tp->Wait();
 }
 
-TEST(AsyncMutex, Counter) {
+TYPED_TEST(AsyncSuite, Counter) {
 #ifdef GTEST_OS_WINDOWS
   GTEST_SKIP();  // Doesn't work for Win32 or Debug, I think its probably because bad symmetric transfer implementation
   // TODO(kononovk) Try to confirm problem and localize it with ifdefs
@@ -64,9 +71,11 @@ TEST(AsyncMutex, Counter) {
   std::array<yaclib::Future<>, kCoros> futures;
   std::size_t cs = 0;
 
-  auto coro1 = [&]() -> yaclib::Future<> {
-    for (std::size_t j = 0; j < kCSperCoro; ++j) {
+  auto coro1 = [&]() -> typename TestFixture::Type {
+    if constexpr (TestFixture::kIsFuture) {
       co_await On(*tp);
+    }
+    for (std::size_t j = 0; j < kCSperCoro; ++j) {
       co_await m.Lock();
       ++cs;
       co_await m.Unlock();
@@ -75,7 +84,11 @@ TEST(AsyncMutex, Counter) {
   };
 
   for (std::size_t i = 0; i < kCoros; ++i) {
-    futures[i] = coro1();
+    if constexpr (TestFixture::kIsFuture) {
+      futures[i] = coro1();
+    } else {
+      futures[i] = coro1().ToFuture(*tp).On(nullptr);
+    }
   }
   Wait(futures.begin(), futures.end());
 
@@ -107,35 +120,42 @@ TEST(AsyncMutex, ScopedLock) {
   m.UnlockHere();
 }
 
-TEST(AsyncMutex, LockAsync) {
+TYPED_TEST(AsyncSuite, LockAsync) {
 #ifdef GTEST_OS_WINDOWS
   GTEST_SKIP();  // Doesn't work for Win32 or Debug, I think its probably because bad symmetric transfer implementation
   // TODO(kononovk) Try to confirm problem and localize it with ifdefs
 #endif
   yaclib::AsyncMutex m;
   auto executor = yaclib::MakeManual();
-  auto tp = yaclib::MakeThreadPool();
   auto [f1, p1] = yaclib::MakeContract<bool>();
   auto [f2, p2] = yaclib::MakeContract<bool>();
 
   std::size_t value = 0;
 
-  auto coro = [&](yaclib::Future<bool>& future) -> yaclib::Future<> {
-    co_await On(*executor);
+  auto coro = [&](yaclib::Future<bool>& future) -> typename TestFixture::Type {
+    if constexpr (TestFixture::kIsFuture) {
+      co_await On(*executor);
+    }
     co_await m.Lock();
     value++;
     co_await Await(future);
     value++;
-    co_await m.UnlockOn(*tp);
+    co_await m.UnlockOn(*executor);
     co_return{};
   };
-
-  auto c1 = coro(f1);
+  auto run_coro = [&](auto&& func, auto&& arg) {
+    if constexpr (TestFixture::kIsFuture) {
+      return func(arg);
+    } else {
+      return func(arg).ToFuture(*executor).On(nullptr);
+    }
+  };
+  auto c1 = run_coro(coro, f1);
   executor->Drain();
   EXPECT_EQ(1, value);
   EXPECT_FALSE(m.TryLock());
 
-  auto c2 = coro(f2);
+  auto c2 = run_coro(coro, f2);
   executor->Drain();
   EXPECT_EQ(1, value);
   EXPECT_FALSE(m.TryLock());
@@ -153,17 +173,18 @@ TEST(AsyncMutex, LockAsync) {
   m.UnlockHere();
 }
 
-TEST(AsyncMutex, ScopedLockAsync) {
+TYPED_TEST(AsyncSuite, ScopedLockAsync) {
   yaclib::AsyncMutex m;
   auto executor = yaclib::MakeManual();
-  auto tp = yaclib::MakeThreadPool();
   auto [f1, p1] = yaclib::MakeContract<bool>();
   auto [f2, p2] = yaclib::MakeContract<bool>();
 
   std::size_t value = 0;
 
-  auto coro = [&](yaclib::Future<bool>& future) -> yaclib::Future<> {
-    co_await On(*executor);
+  auto coro = [&](yaclib::Future<bool>& future) -> typename TestFixture::Type {
+    if constexpr (TestFixture::kIsFuture) {
+      co_await On(*executor);
+    }
     auto g = co_await m.Guard();
     value++;
     co_await Await(future);
@@ -171,12 +192,20 @@ TEST(AsyncMutex, ScopedLockAsync) {
     co_return{};
   };
 
-  auto c1 = coro(f1);
+  auto run_coro = [&](auto&& func, auto&& arg) {
+    if constexpr (TestFixture::kIsFuture) {
+      return func(arg);
+    } else {
+      return func(arg).ToFuture(*executor).On(nullptr);
+    }
+  };
+
+  auto c1 = run_coro(coro, f1);
   executor->Drain();
   EXPECT_EQ(1, value);
   EXPECT_FALSE(m.TryLock());
 
-  auto c2 = coro(f2);
+  auto c2 = run_coro(coro, f2);
   executor->Drain();
   EXPECT_EQ(1, value);
   EXPECT_FALSE(m.TryLock());
@@ -194,7 +223,7 @@ TEST(AsyncMutex, ScopedLockAsync) {
   m.UnlockHere();
 }
 
-TEST(AsyncMutex, GuardRelease) {
+TYPED_TEST(AsyncSuite, GuardRelease) {
 #ifdef GTEST_OS_WINDOWS
   GTEST_SKIP();  // Doesn't work for Win32 or Debug, I think its probably because bad symmetric transfer implementation
   // TODO(kononovk) Try to confirm problem and localize it with ifdefs
@@ -207,10 +236,12 @@ TEST(AsyncMutex, GuardRelease) {
 
   std::array<yaclib::Future<int>, kCoros> futures;
   std::size_t cs = 0;
-
-  auto coro1 = [&]() -> yaclib::Future<int> {
+  using Coro = std::conditional_t<TestFixture::kIsFuture, yaclib::Future<int>, yaclib::Task<int>>;
+  auto coro1 = [&]() -> Coro {
     for (std::size_t j = 0; j < kCSperCoro; ++j) {
-      co_await On(*tp);
+      if constexpr (TestFixture::kIsFuture) {
+        co_await On(*tp);
+      }
       auto g = co_await m.Guard();
       auto another = yaclib::AsyncMutex<>::LockGuard(*g.Release(), std::adopt_lock_t{});
       ++cs;
@@ -219,7 +250,11 @@ TEST(AsyncMutex, GuardRelease) {
     co_return 42;
   };
   for (std::size_t i = 0; i < kCoros; ++i) {
-    futures[i] = coro1();
+    if constexpr (TestFixture::kIsFuture) {
+      futures[i] = coro1();
+    } else {
+      futures[i] = coro1().ToFuture(*tp).On(nullptr);
+    }
   }
 
   Wait(futures.begin(), futures.end());
@@ -229,7 +264,7 @@ TEST(AsyncMutex, GuardRelease) {
   tp->Wait();
 }
 
-TEST(AsyncMutex, UnlockHereBehaviour) {
+TYPED_TEST(AsyncSuite, UnlockHereBehaviour) {
   using namespace std::chrono_literals;
   constexpr std::size_t kThreads = 4;
   constexpr std::size_t kCoros = 4;
@@ -239,8 +274,10 @@ TEST(AsyncMutex, UnlockHereBehaviour) {
   std::array<yaclib::Future<>, kCoros> futures;
   yaclib_std::atomic_bool start{false};
 
-  auto coro1 = [&]() -> yaclib::Future<> {
-    co_await On(*tp);
+  auto coro1 = [&]() -> typename TestFixture::Type {
+    if constexpr (TestFixture::kIsFuture) {
+      co_await On(*tp);
+    }
     co_await mutex.Lock();
     start.store(true, std::memory_order_release);
     auto id = yaclib_std::this_thread::get_id();
@@ -249,8 +286,10 @@ TEST(AsyncMutex, UnlockHereBehaviour) {
     EXPECT_EQ(id, yaclib_std::this_thread::get_id());
     co_return{};
   };
-  auto coro2 = [&]() -> yaclib::Future<> {
-    co_await On(*tp);
+  auto coro2 = [&]() -> typename TestFixture::Type {
+    if constexpr (TestFixture::kIsFuture) {
+      co_await On(*tp);
+    }
     co_await mutex.Lock();
     auto id = yaclib_std::this_thread::get_id();
     mutex.UnlockHere();
@@ -260,12 +299,20 @@ TEST(AsyncMutex, UnlockHereBehaviour) {
   };
 
   util::StopWatch sw;
-  futures[0] = coro1();
+  if constexpr (TestFixture::kIsFuture) {
+    futures[0] = coro1();
+  } else {
+    futures[0] = coro1().ToFuture(*tp).On(nullptr);
+  }
   while (!start.load(std::memory_order_acquire)) {
     yaclib_std::this_thread::sleep_for(10ms);
   }
   for (std::size_t i = 1; i < kCoros; ++i) {
-    futures[i] = coro2();
+    if constexpr (TestFixture::kIsFuture) {
+      futures[i] = coro2();
+    } else {
+      futures[i] = coro2().ToFuture(*tp).On(nullptr);
+    }
   }
   Wait(futures.begin(), futures.end());
 
@@ -276,7 +323,7 @@ TEST(AsyncMutex, UnlockHereBehaviour) {
   tp->Wait();
 }
 
-TEST(AsyncMutex, UnlockOnBehaviour) {
+TYPED_TEST(AsyncSuite, UnlockOnBehaviour) {
 #ifdef GTEST_OS_WINDOWS
   GTEST_SKIP();  // Doesn't work for Win32 or Debug, I think its probably because bad symmetric transfer implementation
   // TODO(kononovk) Try to confirm problem and localize it with ifdefs
@@ -292,8 +339,10 @@ TEST(AsyncMutex, UnlockOnBehaviour) {
   yaclib_std::atomic_bool start{false};
   yaclib_std::thread::id locked_id{};
 
-  auto coro1 = [&]() -> yaclib::Future<> {
-    co_await On(*tp);
+  auto coro1 = [&]() -> typename TestFixture::Type {
+    if constexpr (TestFixture::kIsFuture) {
+      co_await On(*tp);
+    }
     co_await mutex.Lock();
     start.store(true, std::memory_order_release);
     locked_id = yaclib_std::this_thread::get_id();
@@ -301,8 +350,10 @@ TEST(AsyncMutex, UnlockOnBehaviour) {
     co_await mutex.UnlockOn(*tp);
     co_return{};
   };
-  auto coro2 = [&]() -> yaclib::Future<> {
-    co_await On(*tp);
+  auto coro2 = [&]() -> typename TestFixture::Type {
+    if constexpr (TestFixture::kIsFuture) {
+      co_await On(*tp);
+    }
     co_await mutex.Lock();
 #ifdef GTEST_OS_LINUX
     EXPECT_EQ(locked_id, yaclib_std::this_thread::get_id());
@@ -313,12 +364,20 @@ TEST(AsyncMutex, UnlockOnBehaviour) {
   };
 
   util::StopWatch sw;
-  futures[0] = coro1();
+  if constexpr (TestFixture::kIsFuture) {
+    futures[0] = coro1();
+  } else {
+    futures[0] = coro1().ToFuture(*tp).On(nullptr);
+  }
   while (!start.load(std::memory_order_acquire)) {
     yaclib_std::this_thread::sleep_for(10ms);
   }
   for (std::size_t i = 1; i < kCoros; ++i) {
-    futures[i] = coro2();
+    if constexpr (TestFixture::kIsFuture) {
+      futures[i] = coro2();
+    } else {
+      futures[i] = coro2().ToFuture(*tp).On(nullptr);
+    }
   }
   Wait(futures.begin(), futures.end());
 

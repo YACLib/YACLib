@@ -15,7 +15,7 @@ class ManualExecutor : public IExecutor {
   yaclib::detail::List _tasks;
 
  public:
-  [[nodiscard]] Type Tag() const final;
+  [[nodiscard]] Type Tag() const noexcept final;
 
   void Submit(yaclib::Job& f) noexcept final;
 

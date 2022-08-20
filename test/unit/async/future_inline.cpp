@@ -1,5 +1,4 @@
-#include "yaclib/executor/manual.hpp"
-
+#include <util/async_suite.hpp>
 #include <util/error_suite.hpp>
 #include <util/inline_helper.hpp>
 
@@ -7,6 +6,7 @@
 #include <yaclib/async/future.hpp>
 #include <yaclib/async/promise.hpp>
 #include <yaclib/async/run.hpp>
+#include <yaclib/executor/manual.hpp>
 #include <yaclib/executor/submit.hpp>
 #include <yaclib/executor/thread_pool.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
@@ -267,7 +267,7 @@ class StopSource final : public yaclib::detail::NopeCounter<yaclib::IExecutor> {
   explicit StopSource(yaclib::IExecutor& executor) noexcept : _executor{executor} {
   }
 
-  [[nodiscard]] Type Tag() const final {
+  [[nodiscard]] Type Tag() const noexcept final {
     return Type::Custom;
   }
 
@@ -288,7 +288,20 @@ class StopSource final : public yaclib::detail::NopeCounter<yaclib::IExecutor> {
   yaclib_std::atomic_bool _stop{false};
 };
 
-template <bool Inline>
+TYPED_TEST(AsyncSuite, Stop) {
+  auto tp = yaclib::MakeThreadPool(1);
+  StopSource source{*tp};
+  source.Stop();
+  bool ready = false;
+  INVOKE(source, [&] {
+    ready = true;
+  }).Detach();
+  EXPECT_FALSE(ready);
+  tp->Stop();
+  tp->Wait();
+}
+
+template <typename TestFixture, bool Inline>
 void ThenInlineStopped() {
   auto e = yaclib::MakeManual();
   StopSource source{*e};
@@ -296,7 +309,7 @@ void ThenInlineStopped() {
   auto inc = [&] {
     ++ready;
   };
-  auto f = yaclib::Run(source, inc);
+  auto f = INVOKE(source, inc);
   auto f1 = InlineThen<Inline>(std::move(f), inc);
   auto f2 = [&] {
     if constexpr (Inline) {
@@ -305,28 +318,15 @@ void ThenInlineStopped() {
       return std::move(f1).Then(source, inc);
     }
   }();
-  auto f3 = InlineThen<Inline>(std::move(f2), inc);
+  InlineThen<Inline>(std::move(f2), inc).Detach();
   source.Stop();
   e->Drain();
   EXPECT_EQ(ready, 2);
 }
 
-TEST(Future, Stop) {
-  auto tp = yaclib::MakeThreadPool(1);
-  StopSource source{*tp};
-  source.Stop();
-  bool ready = false;
-  yaclib::Run(source, [&] {
-    ready = true;
-  }).Detach();
-  EXPECT_FALSE(ready);
-  tp->Stop();
-  tp->Wait();
-}
-
-TEST(ThenInline, Stopped) {
-  ThenInlineStopped<true>();
-  ThenInlineStopped<false>();
+TYPED_TEST(AsyncSuite, ThenInlineStopped) {
+  ThenInlineStopped<TestFixture, true>();
+  ThenInlineStopped<TestFixture, false>();
 }
 
 template <bool Inline>

@@ -18,8 +18,6 @@ enum class ResultState : char {
   Empty = 3,
 };
 
-struct StopTag final {};
-
 /**
  * Default error
  */

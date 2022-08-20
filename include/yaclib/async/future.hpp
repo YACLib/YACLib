@@ -216,6 +216,7 @@ class [[nodiscard]] FutureOn final : public FutureBase<V, E> {
  public:
   using Base::Base;
   using Base::Detach;
+  using Base::On;
   using Base::Then;
 
   FutureOn(detail::ResultCorePtr<V, E> core) noexcept : Base{std::move(core)} {

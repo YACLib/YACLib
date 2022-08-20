@@ -58,14 +58,6 @@ bool BaseCore::Empty() const noexcept {
   return callback == kEmpty;
 }
 
-IExecutorPtr& BaseCore::GetExecutor() noexcept {
-  return _executor;
-}
-
-void BaseCore::SetExecutor(IExecutorPtr executor) noexcept {
-  _executor = std::move(executor);
-}
-
 BaseCore::BaseCore(State callback) noexcept : _callback{callback}, _caller{&kEmptyRef} {
 }
 
@@ -111,6 +103,11 @@ bool BaseCore::SetCallback(void* callback, State state) noexcept {
   return _callback.load(std::memory_order_acquire) == expected &&
          _callback.compare_exchange_strong(expected, state | reinterpret_cast<std::uint64_t>(callback),
                                            std::memory_order_release, std::memory_order_acquire);
+}
+
+void BaseCore::StoreCallback(void* callback, State state) noexcept {
+  // TODO with atomic_ref can be non atomic store
+  _callback.store(state | reinterpret_cast<std::uint64_t>(callback), std::memory_order_relaxed);
 }
 
 void BaseCore::Submit(BaseCore& callback) noexcept {
