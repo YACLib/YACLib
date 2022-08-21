@@ -1,8 +1,8 @@
 #pragma once
 
 #include <yaclib/async/detail/base_core.hpp>
-#include <yaclib/executor/executor.hpp>
-#include <yaclib/executor/thread_pool.hpp>
+#include <yaclib/exe/executor.hpp>
+#include <yaclib/exe/thread_pool.hpp>
 #include <yaclib/util/detail/default_event.hpp>
 #include <yaclib/util/detail/nope_counter.hpp>
 #include <yaclib/util/ref.hpp>

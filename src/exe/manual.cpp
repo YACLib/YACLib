@@ -1,6 +1,6 @@
 #include <util/intrusive_list.hpp>
 
-#include <yaclib/executor/manual.hpp>
+#include <yaclib/exe/manual.hpp>
 #include <yaclib/util/helper.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 

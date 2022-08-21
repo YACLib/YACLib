@@ -1,6 +1,6 @@
 #pragma once
 
-#include <yaclib/executor/executor.hpp>
+#include <yaclib/exe/executor.hpp>
 #include <yaclib/fwd.hpp>
 
 namespace yaclib {

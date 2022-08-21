@@ -2,9 +2,9 @@
 
 #include <yaclib/coro/coroutine.hpp>
 #include <yaclib/coro/detail/promise_type.hpp>
-#include <yaclib/executor/inline.hpp>
-#include <yaclib/executor/strand.hpp>
-#include <yaclib/executor/thread_pool.hpp>
+#include <yaclib/exe/inline.hpp>
+#include <yaclib/exe/strand.hpp>
+#include <yaclib/exe/thread_pool.hpp>
 
 #include <yaclib_std/atomic>
 

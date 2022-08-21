@@ -1,6 +1,6 @@
 #pragma once
 
-#include <yaclib/executor/job.hpp>
+#include <yaclib/exe/job.hpp>
 #include <yaclib/util/detail/nope_counter.hpp>
 #include <yaclib/util/detail/safe_call.hpp>
 

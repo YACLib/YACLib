@@ -1,9 +1,9 @@
 #include <yaclib/algo/wait_group.hpp>
 #include <yaclib/async/contract.hpp>
 #include <yaclib/async/future.hpp>
-#include <yaclib/executor/executor.hpp>
-#include <yaclib/executor/inline.hpp>
-#include <yaclib/executor/thread_pool.hpp>
+#include <yaclib/exe/executor.hpp>
+#include <yaclib/exe/inline.hpp>
+#include <yaclib/exe/thread_pool.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 
 #include <array>

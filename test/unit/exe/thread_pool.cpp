@@ -1,11 +1,11 @@
 #include <util/cpu_time.hpp>
 #include <util/time.hpp>
 
-#include <yaclib/executor/executor.hpp>
-#include <yaclib/executor/inline.hpp>
-#include <yaclib/executor/submit.hpp>
-#include <yaclib/executor/thread_factory.hpp>
-#include <yaclib/executor/thread_pool.hpp>
+#include <yaclib/exe/executor.hpp>
+#include <yaclib/exe/inline.hpp>
+#include <yaclib/exe/submit.hpp>
+#include <yaclib/exe/thread_factory.hpp>
+#include <yaclib/exe/thread_pool.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 
 #include <cstddef>

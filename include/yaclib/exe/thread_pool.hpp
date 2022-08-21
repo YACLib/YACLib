@@ -1,7 +1,7 @@
 #pragma once
 
-#include <yaclib/executor/executor.hpp>
-#include <yaclib/executor/thread_factory.hpp>
+#include <yaclib/exe/executor.hpp>
+#include <yaclib/exe/thread_factory.hpp>
 
 #include <cstddef>
 #include <yaclib_std/thread>

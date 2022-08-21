@@ -1,10 +1,10 @@
 #include <util/intrusive_list.hpp>
 
-#include <yaclib/executor/executor.hpp>
-#include <yaclib/executor/inline.hpp>
-#include <yaclib/executor/job.hpp>
-#include <yaclib/executor/thread_factory.hpp>
-#include <yaclib/executor/thread_pool.hpp>
+#include <yaclib/exe/executor.hpp>
+#include <yaclib/exe/inline.hpp>
+#include <yaclib/exe/job.hpp>
+#include <yaclib/exe/thread_factory.hpp>
+#include <yaclib/exe/thread_pool.hpp>
 #include <yaclib/log.hpp>
 #include <yaclib/util/detail/nope_counter.hpp>
 #include <yaclib/util/func.hpp>

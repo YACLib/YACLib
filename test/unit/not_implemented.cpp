@@ -1,12 +1,12 @@
 #include <yaclib/async/contract.hpp>
 #include <yaclib/config.hpp>
-#include <yaclib/executor/detail/unique_job.hpp>
+#include <yaclib/exe/detail/unique_job.hpp>
 #include <yaclib/util/detail/default_event.hpp>
 #include <yaclib/util/detail/mutex_event.hpp>
 
 #if YACLIB_CORO
 #  include <yaclib/coro/detail/promise_type.hpp>
-#  include <yaclib/executor/inline.hpp>
+#  include <yaclib/exe/inline.hpp>
 #  include <yaclib/util/detail/nope_counter.hpp>
 #endif
 

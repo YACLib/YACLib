@@ -3,7 +3,7 @@
 #include <yaclib/async/run.hpp>
 #include <yaclib/coro/await.hpp>
 #include <yaclib/coro/future_traits.hpp>
-#include <yaclib/executor/thread_pool.hpp>
+#include <yaclib/exe/thread_pool.hpp>
 
 #include <exception>
 #include <stack>

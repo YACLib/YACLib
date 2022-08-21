@@ -5,8 +5,8 @@
 #include <yaclib/coro/await.hpp>
 #include <yaclib/coro/future_traits.hpp>
 #include <yaclib/coro/on.hpp>
-#include <yaclib/executor/manual.hpp>
-#include <yaclib/executor/thread_pool.hpp>
+#include <yaclib/exe/manual.hpp>
+#include <yaclib/exe/thread_pool.hpp>
 
 #include <array>
 #include <exception>

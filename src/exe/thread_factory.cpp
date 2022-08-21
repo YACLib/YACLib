@@ -1,6 +1,6 @@
 #include <util/intrusive_list.hpp>
 
-#include <yaclib/executor/thread_factory.hpp>
+#include <yaclib/exe/thread_factory.hpp>
 #include <yaclib/log.hpp>
 #include <yaclib/util/detail/nope_counter.hpp>
 #include <yaclib/util/func.hpp>

@@ -2,8 +2,8 @@
 
 #include <yaclib/coro/coroutine.hpp>
 #include <yaclib/coro/detail/promise_type.hpp>
-#include <yaclib/executor/executor.hpp>
-#include <yaclib/executor/job.hpp>
+#include <yaclib/exe/executor.hpp>
+#include <yaclib/exe/job.hpp>
 
 namespace yaclib::detail {
 

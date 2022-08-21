@@ -2,7 +2,7 @@
 
 #include <util/intrusive_list.hpp>
 
-#include <yaclib/executor/executor.hpp>
+#include <yaclib/exe/executor.hpp>
 #include <yaclib/util/helper.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 

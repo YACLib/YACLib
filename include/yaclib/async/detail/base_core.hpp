@@ -2,7 +2,7 @@
 
 #include <yaclib/async/detail/inline_core.hpp>
 #include <yaclib/config.hpp>
-#include <yaclib/executor/executor.hpp>
+#include <yaclib/exe/executor.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 #include <yaclib/util/ref.hpp>
 
