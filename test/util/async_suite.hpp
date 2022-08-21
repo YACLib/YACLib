@@ -1,5 +1,5 @@
 #include <yaclib/async/future.hpp>
-#include <yaclib/async/task.hpp>
+#include <yaclib/lazy/task.hpp>
 
 #include <string>
 

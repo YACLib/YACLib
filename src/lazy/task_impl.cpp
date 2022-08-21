@@ -1,4 +1,4 @@
-#include <yaclib/async/task.hpp>
+#include <yaclib/lazy/task.hpp>
 
 namespace yaclib {
 namespace detail {

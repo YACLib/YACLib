@@ -1,8 +1,8 @@
 #pragma once
 
 #include <yaclib/async/future.hpp>
-#include <yaclib/async/task.hpp>
 #include <yaclib/coro/detail/promise_type.hpp>
+#include <yaclib/lazy/task.hpp>
 
 /**
  * TODO(mkornaukhov03) Add doxygen docs
