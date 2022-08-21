@@ -20,13 +20,14 @@ set(YACLIB_SOURCES
 
 add_subdirectory(algo)
 add_subdirectory(async)
-add_subdirectory(executor)
+add_subdirectory(lazy)
+add_subdirectory(exe)
 add_subdirectory(util)
 add_subdirectory(fault)
 add_subdirectory(std)
 
 if (YACLIB_CORO_NEED)
-  add_subdirectory(coroutine)
+  add_subdirectory(coro)
 endif ()
 
 configure_file(config.hpp.in ${YACLIB_BINARY_DIR}/include/yaclib/config.hpp)

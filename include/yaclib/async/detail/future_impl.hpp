@@ -1,7 +1,7 @@
 #pragma once
 
-#include <yaclib/algo/wait.hpp>
-#include <yaclib/async/detail/core.hpp>
+#include <yaclib/algo/detail/core.hpp>
+#include <yaclib/async/wait.hpp>
 #include <yaclib/log.hpp>
 #include <yaclib/util/result.hpp>
 

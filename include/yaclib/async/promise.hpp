@@ -1,6 +1,6 @@
 #pragma once
 
-#include <yaclib/async/detail/result_core.hpp>
+#include <yaclib/algo/detail/result_core.hpp>
 #include <yaclib/util/type_traits.hpp>
 
 namespace yaclib {

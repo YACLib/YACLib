@@ -8,6 +8,8 @@ list(APPEND YACLIB_INCLUDES
   )
 list(APPEND YACLIB_HEADERS
   ${YACLIB_INCLUDE_DIR}/util/detail/atomic_counter.hpp
+  ${YACLIB_INCLUDE_DIR}/util/detail/atomic_event.hpp
+  ${YACLIB_INCLUDE_DIR}/util/detail/default_deleter.hpp
   ${YACLIB_INCLUDE_DIR}/util/detail/default_event.hpp
   ${YACLIB_INCLUDE_DIR}/util/detail/intrusive_ptr_impl.hpp
   ${YACLIB_INCLUDE_DIR}/util/detail/mutex_event.hpp
@@ -17,6 +19,7 @@ list(APPEND YACLIB_HEADERS
   ${YACLIB_INCLUDE_DIR}/util/detail/set_deleter.hpp
   ${YACLIB_INCLUDE_DIR}/util/detail/shared_func.hpp
   ${YACLIB_INCLUDE_DIR}/util/detail/type_traits_impl.hpp
+  ${YACLIB_INCLUDE_DIR}/util/detail/unique_counter.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/intrusive_list.hpp
   )
 list(APPEND YACLIB_SOURCES
