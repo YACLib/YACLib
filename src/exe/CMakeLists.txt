@@ -1,10 +1,10 @@
 list(APPEND YACLIB_INCLUDES
   ${YACLIB_INCLUDE_DIR}/exe/executor.hpp
   ${YACLIB_INCLUDE_DIR}/exe/inline.hpp
+  ${YACLIB_INCLUDE_DIR}/exe/job.hpp
   ${YACLIB_INCLUDE_DIR}/exe/manual.hpp
   ${YACLIB_INCLUDE_DIR}/exe/strand.hpp
   ${YACLIB_INCLUDE_DIR}/exe/submit.hpp
-  ${YACLIB_INCLUDE_DIR}/exe/job.hpp
   ${YACLIB_INCLUDE_DIR}/exe/thread_factory.hpp
   ${YACLIB_INCLUDE_DIR}/exe/thread_pool.hpp
   )

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <yaclib/algo/detail/wait_impl.hpp>
+#include <yaclib/async/detail/wait_impl.hpp>
 #include <yaclib/async/future.hpp>
 #include <yaclib/util/detail/mutex_event.hpp>
 

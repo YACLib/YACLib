@@ -1,7 +1,7 @@
 #pragma once
 
-#include <yaclib/async/detail/inline_core.hpp>
-#include <yaclib/async/detail/result_core.hpp>
+#include <yaclib/algo/detail/inline_core.hpp>
+#include <yaclib/algo/detail/result_core.hpp>
 #include <yaclib/fwd.hpp>
 #include <yaclib/util/detail/atomic_counter.hpp>
 #include <yaclib/util/detail/unique_counter.hpp>

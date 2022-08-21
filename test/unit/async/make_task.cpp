@@ -1,6 +1,6 @@
 #include <util/error_code.hpp>
 
-#include <yaclib/lazy/task.hpp>
+#include <yaclib/lazy/make.hpp>
 
 #include <gtest/gtest.h>
 

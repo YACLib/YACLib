@@ -2,7 +2,7 @@
 
 #include <yaclib/async/run.hpp>
 #include <yaclib/coro/await.hpp>
-#include <yaclib/coro/future_traits.hpp>
+#include <yaclib/coro/future.hpp>
 
 #include <array>
 #include <stack>

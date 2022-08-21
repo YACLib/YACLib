@@ -1,7 +1,7 @@
 #pragma once
 
-#include <yaclib/async/detail/result_core.hpp>
-#include <yaclib/coro/coroutine.hpp>
+#include <yaclib/algo/detail/result_core.hpp>
+#include <yaclib/coro/coro.hpp>
 #include <yaclib/util/detail/unique_counter.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 

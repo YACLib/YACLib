@@ -1,6 +1,6 @@
 #pragma once
 
-#include <yaclib/async/detail/core.hpp>
+#include <yaclib/algo/detail/core.hpp>
 #include <yaclib/async/future.hpp>
 #include <yaclib/exe/executor.hpp>
 #include <yaclib/log.hpp>
@@ -16,7 +16,7 @@ namespace yaclib {
  * \return \ref FutureOn corresponding f return value
  */
 template <typename E = StopError, typename Func>
-auto Run(IExecutor& e, Func&& f) {
+/*FutureOn*/ auto Run(IExecutor& e, Func&& f) {
   YACLIB_WARN(e.Tag() == IExecutor::Type::Inline,
               "better way is call func explicit, and use MakeFuture to create Future with func result");
   auto* core = detail::MakeCore<detail::CoreType::Run, void, E>(std::forward<Func>(f));

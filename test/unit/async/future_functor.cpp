@@ -1,9 +1,7 @@
-#include <yaclib/async/future.hpp>
+#include <yaclib/async/make.hpp>
 #include <yaclib/util/result.hpp>
 
-#include <iostream>
 #include <string>
-#include <type_traits>
 #include <utility>
 
 #include <gtest/gtest.h>

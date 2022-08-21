@@ -1,4 +1,4 @@
-#include <yaclib/algo/detail/wait_impl.hpp>
+#include <yaclib/async/detail/wait_impl.hpp>
 
 namespace yaclib::detail {
 

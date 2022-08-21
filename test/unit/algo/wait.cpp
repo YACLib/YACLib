@@ -1,12 +1,12 @@
 #include <util/time.hpp>
 
-#include <yaclib/algo/wait.hpp>
-#include <yaclib/algo/wait_for.hpp>
-#include <yaclib/algo/wait_until.hpp>
 #include <yaclib/async/contract.hpp>
 #include <yaclib/async/future.hpp>
 #include <yaclib/async/promise.hpp>
 #include <yaclib/async/run.hpp>
+#include <yaclib/async/wait.hpp>
+#include <yaclib/async/wait_for.hpp>
+#include <yaclib/async/wait_until.hpp>
 #include <yaclib/exe/submit.hpp>
 #include <yaclib/exe/thread_pool.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>

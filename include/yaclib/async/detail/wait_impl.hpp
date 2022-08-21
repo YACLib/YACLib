@@ -1,6 +1,6 @@
 #pragma once
 
-#include <yaclib/async/detail/base_core.hpp>
+#include <yaclib/algo/detail/base_core.hpp>
 #include <yaclib/util/detail/atomic_counter.hpp>
 #include <yaclib/util/detail/default_event.hpp>
 #include <yaclib/util/detail/set_deleter.hpp>

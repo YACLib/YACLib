@@ -7,8 +7,9 @@
 #include <yaclib/async/run.hpp>
 #include <yaclib/coro/async_mutex.hpp>
 #include <yaclib/coro/await.hpp>
-#include <yaclib/coro/future_traits.hpp>
+#include <yaclib/coro/future.hpp>
 #include <yaclib/coro/on.hpp>
+#include <yaclib/coro/task.hpp>
 #include <yaclib/exe/manual.hpp>
 #include <yaclib/exe/submit.hpp>
 #include <yaclib/exe/thread_pool.hpp>

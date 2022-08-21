@@ -1,13 +1,13 @@
 #pragma once
 
-#include <yaclib/async/detail/base_core.hpp>
+#include <yaclib/algo/detail/base_core.hpp>
 #include <yaclib/exe/executor.hpp>
 #include <yaclib/exe/thread_pool.hpp>
 #include <yaclib/util/detail/default_event.hpp>
 #include <yaclib/util/detail/nope_counter.hpp>
 #include <yaclib/util/ref.hpp>
 #if YACLIB_CORO != 0
-#  include <yaclib/coro/coroutine.hpp>
+#  include <yaclib/coro/coro.hpp>
 #endif
 
 namespace yaclib {

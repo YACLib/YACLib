@@ -1,6 +1,6 @@
 #pragma once
 
-#include <yaclib/coro/coroutine.hpp>
+#include <yaclib/coro/coro.hpp>
 #include <yaclib/coro/detail/promise_type.hpp>
 #include <yaclib/exe/executor.hpp>
 #include <yaclib/exe/job.hpp>

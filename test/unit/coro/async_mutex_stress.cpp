@@ -1,9 +1,9 @@
 #include <util/time.hpp>
 
-#include <yaclib/algo/wait.hpp>
+#include <yaclib/async/wait.hpp>
 #include <yaclib/coro/async_mutex.hpp>
 #include <yaclib/coro/await.hpp>
-#include <yaclib/coro/future_traits.hpp>
+#include <yaclib/coro/future.hpp>
 #include <yaclib/coro/on.hpp>
 #include <yaclib/exe/thread_pool.hpp>
 

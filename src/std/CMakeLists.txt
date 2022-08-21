@@ -39,6 +39,8 @@ list(APPEND YACLIB_INCLUDES
   ${YACLIB_STD_INCLUDE_DIR}/detail/jthread.hpp
   ${YACLIB_STD_INCLUDE_DIR}/detail/this_thread.hpp
   ${YACLIB_STD_INCLUDE_DIR}/detail/thread.hpp
+
+  ${YACLIB_STD_INCLUDE_DIR}/thread_local
   )
 
 add_files()

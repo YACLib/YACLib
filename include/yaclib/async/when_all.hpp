@@ -1,9 +1,9 @@
 #pragma once
 
-#include <yaclib/algo/detail/when_all_impl.hpp>
-#include <yaclib/algo/detail/when_impl.hpp>
-#include <yaclib/algo/when_policy.hpp>
+#include <yaclib/async/detail/when_all_impl.hpp>
+#include <yaclib/async/detail/when_impl.hpp>
 #include <yaclib/async/future.hpp>
+#include <yaclib/async/when_policy.hpp>
 #include <yaclib/config.hpp>
 #include <yaclib/util/type_traits.hpp>
 

@@ -1,6 +1,6 @@
 #include <util/error_code.hpp>
 
-#include <yaclib/async/future.hpp>
+#include <yaclib/async/make.hpp>
 
 #include <gtest/gtest.h>
 

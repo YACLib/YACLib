@@ -4,6 +4,7 @@
 
 #include <yaclib/async/contract.hpp>
 #include <yaclib/async/future.hpp>
+#include <yaclib/async/make.hpp>
 #include <yaclib/async/promise.hpp>
 #include <yaclib/async/run.hpp>
 #include <yaclib/exe/manual.hpp>

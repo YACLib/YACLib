@@ -1,6 +1,6 @@
 #pragma once
 
-#include <yaclib/async/detail/inline_core.hpp>
+#include <yaclib/algo/detail/inline_core.hpp>
 #include <yaclib/config.hpp>
 #include <yaclib/exe/executor.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
@@ -8,7 +8,7 @@
 
 #include <yaclib_std/atomic>
 #if YACLIB_CORO != 0
-#  include <yaclib/coro/coroutine.hpp>
+#  include <yaclib/coro/coro.hpp>
 #endif
 
 namespace yaclib::detail {

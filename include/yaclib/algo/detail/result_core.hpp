@@ -1,7 +1,7 @@
 #pragma once
 
-#include <yaclib/async/detail/base_core.hpp>
-#include <yaclib/async/detail/inline_core.hpp>
+#include <yaclib/algo/detail/base_core.hpp>
+#include <yaclib/algo/detail/inline_core.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 #include <yaclib/util/result.hpp>
 

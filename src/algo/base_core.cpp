@@ -1,23 +1,11 @@
-#include <yaclib/async/detail/base_core.hpp>
-#include <yaclib/async/detail/inline_core.hpp>
+#include <yaclib/algo/detail/base_core.hpp>
+#include <yaclib/algo/detail/inline_core.hpp>
 #include <yaclib/exe/executor.hpp>
 #include <yaclib/exe/job.hpp>
 #include <yaclib/log.hpp>
 #include <yaclib/util/detail/nope_counter.hpp>
 
 namespace yaclib::detail {
-
-void InlineCore::Call() noexcept {
-  YACLIB_DEBUG(true, "Pure virtual call");
-}
-
-void InlineCore::Drop() noexcept {
-  YACLIB_DEBUG(true, "Pure virtual call");
-}
-
-void InlineCore::Here(InlineCore&, InlineCore::State) noexcept {
-  YACLIB_DEBUG(true, "Pure virtual call");
-}
 
 static NopeCounter<IRef> kEmptyRef;
 

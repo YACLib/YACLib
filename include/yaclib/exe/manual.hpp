@@ -7,19 +7,20 @@
 #include <yaclib/util/intrusive_ptr.hpp>
 
 namespace yaclib {
+
 /**
  * TODO(mkornaukhov03) Doxygen
  */
 class ManualExecutor : public IExecutor {
- private:
-  yaclib::detail::List _tasks;
-
  public:
   [[nodiscard]] Type Tag() const noexcept final;
 
   void Submit(yaclib::Job& f) noexcept final;
 
   std::size_t Drain();
+
+ private:
+  yaclib::detail::List _tasks;
 };
 
 IntrusivePtr<ManualExecutor> MakeManual();

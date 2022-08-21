@@ -1,4 +1,4 @@
-#include <yaclib/async/detail/result_core.hpp>
+#include <yaclib/algo/detail/result_core.hpp>
 
 namespace yaclib::detail {
 

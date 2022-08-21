@@ -3,13 +3,14 @@
 #include <util/error_suite.hpp>
 #include <util/intrusive_list.hpp>
 
-#include <yaclib/algo/wait.hpp>
+#include <yaclib/algo/detail/inline_core.hpp>
+#include <yaclib/algo/detail/result_core.hpp>
 #include <yaclib/async/contract.hpp>
-#include <yaclib/async/detail/inline_core.hpp>
-#include <yaclib/async/detail/result_core.hpp>
 #include <yaclib/async/future.hpp>
+#include <yaclib/async/make.hpp>
 #include <yaclib/async/promise.hpp>
 #include <yaclib/async/run.hpp>
+#include <yaclib/async/wait.hpp>
 #include <yaclib/exe/executor.hpp>
 #include <yaclib/exe/job.hpp>
 #include <yaclib/exe/manual.hpp>
