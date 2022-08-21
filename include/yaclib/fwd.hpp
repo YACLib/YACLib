@@ -20,13 +20,28 @@ class FutureOn;
 template <typename V, typename E>
 class Promise;
 
-/**
- * For internal instead of void usage
- */
-struct Unit final {};
+#define YACLIB_DEFINE_VOID_TYPE(type)                                                                                  \
+  struct type {};                                                                                                      \
+  constexpr bool operator==(type, type) noexcept {                                                                     \
+    return true;                                                                                                       \
+  }                                                                                                                    \
+  constexpr bool operator!=(type, type) noexcept {                                                                     \
+    return false;                                                                                                      \
+  }                                                                                                                    \
+  constexpr bool operator<(type, type) noexcept {                                                                      \
+    return false;                                                                                                      \
+  }                                                                                                                    \
+  constexpr bool operator<=(type, type) noexcept {                                                                     \
+    return true;                                                                                                       \
+  }                                                                                                                    \
+  constexpr bool operator>=(type, type) noexcept {                                                                     \
+    return true;                                                                                                       \
+  }                                                                                                                    \
+  constexpr bool operator>(type, type) noexcept {                                                                      \
+    return false;                                                                                                      \
+  }
 
-constexpr bool operator==(const Unit&, const Unit&) noexcept {
-  return true;
-}
+YACLIB_DEFINE_VOID_TYPE(Unit);
+YACLIB_DEFINE_VOID_TYPE(StopTag);
 
 }  // namespace yaclib

@@ -20,7 +20,7 @@ auto Run(IExecutor& e, Func&& f) {
   YACLIB_WARN(e.Tag() == IExecutor::Type::Inline,
               "better way is call func explicit, and use MakeFuture to create Future with func result");
   auto* core = detail::MakeCore<detail::CoreType::Run, void, E>(std::forward<Func>(f));
-  core->SetExecutor(&e);
+  core->_executor = &e;
   using ResultCoreT = typename std::remove_reference_t<decltype(*core)>::Base;
   e.Submit(*core);
   return FutureOn{IntrusivePtr<ResultCoreT>{NoRefTag{}, core}};

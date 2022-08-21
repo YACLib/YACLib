@@ -194,17 +194,19 @@ class FuncWrapper final {
   [[no_unique_address]] Store _func;
 };
 
-template <CoreType Type, typename Arg, typename E, typename Func>
+template <CoreType CoreT, typename Arg, typename E, typename Func>
 auto* MakeCore(Func&& f) {
-  static_assert(Type != CoreType::Run || std::is_void_v<Arg>, "It makes no sense to receive some value in first step");
+  constexpr bool kIsDetach = CoreT == CoreType::Detach;
+  static_assert(CoreT != CoreType::Run || std::is_void_v<Arg>,
+                "It makes no sense to receive some value in first pipeline step");
   using AsyncRet = result_value_t<typename detail::Return<Arg, E, Func>::Type>;
-  static_assert(Type != CoreType::Detach || std::is_void_v<AsyncRet>,
+  static_assert(!kIsDetach || std::is_void_v<AsyncRet>,
                 "It makes no sense to return some value in Detach, since no one will be able to use it");
   using Ret = result_value_t<future_base_value_t<AsyncRet>>;
   constexpr bool kIsAsync = is_future_base_v<AsyncRet>;
-  using Wrapper = detail::FuncWrapper<Type == CoreType::Detach, kIsAsync, Ret, Arg, E, decltype(std::forward<Func>(f))>;
+  using Wrapper = detail::FuncWrapper<kIsDetach, kIsAsync, Ret, Arg, E, decltype(std::forward<Func>(f))>;
   // TODO(MBkkt) Think about inline/detach optimization
-  using Core = detail::Core<Ret, Arg, E, Wrapper, Type>;
+  using Core = detail::Core<Ret, Arg, E, Wrapper, CoreT>;
   return new detail::UniqueCounter<Core>{std::forward<Func>(f)};
 }
 
@@ -212,29 +214,42 @@ enum class CallbackType : char {
   Inline = 0,
   InlineOn = 1,
   On = 2,
+  Lazy = 3,
+  LazyInline = 4,
 };
 
 template <CoreType CoreT, CallbackType CallbackT, typename Arg, typename E, typename Func>
-auto SetCallback(ResultCorePtr<Arg, E>& caller, Func&& f) {
-  static_assert(CoreT != CoreType::Run, "SetCallback don't works for Run");
+auto SetCallback(ResultCorePtr<Arg, E>& core, Func&& f) {
+  constexpr bool kIsDetach = CoreT == CoreType::Detach;
+  constexpr bool kIsTask = CallbackT == CallbackType::Lazy || CallbackT == CallbackType::LazyInline;
   auto* callback = MakeCore<CoreT, Arg, E>(std::forward<Func>(f));
-  if constexpr (CoreT != CoreType::Detach) {
-    callback->SetExecutor(caller->GetExecutor());
+  auto* caller = core.Release();
+  if constexpr (!kIsDetach) {
+    callback->_executor = caller->_executor;
   }
-  if constexpr (CallbackT != CallbackType::On) {
-    caller.Release()->SetHere(*callback, InlineCore::kHereCall);
+  if constexpr (CallbackT == CallbackType::Lazy) {
+    callback->_caller = caller;
+    caller->StoreCallback(static_cast<BaseCore*>(callback), InlineCore::kCall);
+  } else if constexpr (CallbackT == CallbackType::LazyInline) {
+    caller->StoreCallback(static_cast<InlineCore*>(callback), InlineCore::kHereCall);
+  } else if constexpr (CallbackT != CallbackType::On) {
+    caller->SetHere(*callback, InlineCore::kHereCall);
   } else {
-    caller.Release()->SetCall(*callback);
+    caller->SetCall(*callback);
   }
-  if constexpr (CoreT == CoreType::Then) {
-    using ResultCoreT = typename std::remove_reference_t<decltype(*callback)>::Base;
+  using ResultCoreT = typename std::remove_reference_t<decltype(*callback)>::Base;
+  if constexpr (kIsTask) {
+    callback->next = caller;
+    return Task{IntrusivePtr<ResultCoreT>{NoRefTag{}, callback}};
+  } else if constexpr (kIsDetach) {
+    callback->SetWait(InlineCore::kWaitDrop);
+  } else {
+    static_assert(CoreT == CoreType::Then, "SetCallback don't works for Run");
     if constexpr (CallbackT == CallbackType::Inline) {
       return Future{IntrusivePtr<ResultCoreT>{NoRefTag{}, callback}};
     } else {
       return FutureOn{IntrusivePtr<ResultCoreT>{NoRefTag{}, callback}};
     }
-  } else if constexpr (CoreT == CoreType::Detach) {
-    callback->SetWait(InlineCore::kWaitDrop);
   }
 }
 

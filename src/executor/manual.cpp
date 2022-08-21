@@ -6,8 +6,8 @@
 
 namespace yaclib {
 
-IExecutor::Type ManualExecutor::Tag() const {
-  return yaclib::IExecutor::Type::Custom;
+IExecutor::Type ManualExecutor::Tag() const noexcept {
+  return Type::Custom;
 }
 
 void ManualExecutor::Submit(yaclib::Job& f) noexcept {

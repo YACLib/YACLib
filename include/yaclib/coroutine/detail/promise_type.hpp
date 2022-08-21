@@ -9,7 +9,7 @@
 
 namespace yaclib::detail {
 
-template <typename V, typename E>
+template <typename V, typename E, bool Lazy>
 class PromiseType;
 
 struct Destroy final {
@@ -26,29 +26,40 @@ struct Destroy final {
   }
 };
 
+template <bool Lazy>
 struct PromiseTypeDeleter final {
   template <typename V, typename E>
   static void Delete(ResultCore<V, E>& core) noexcept {
-    auto& promise = static_cast<PromiseType<V, E>&>(core);
-    auto handle = yaclib_std::coroutine_handle<PromiseType<V, E>>::from_promise(promise);
-    YACLIB_DEBUG(!handle, "handle from promise is null");
+    auto& promise = static_cast<PromiseType<V, E, Lazy>&>(core);
+    auto handle = yaclib_std::coroutine_handle<PromiseType<V, E, Lazy>>::from_promise(promise);
+    YACLIB_ASSERT(handle == core.GetHandle());
+    YACLIB_ASSERT(handle);
     handle.destroy();
   }
 };
 
-template <typename V, typename E>
-class PromiseType : public UniqueCounter<ResultCore<V, E>, PromiseTypeDeleter> {
-  using Base = UniqueCounter<ResultCore<V, E>, PromiseTypeDeleter>;
+template <typename V, typename E, bool Lazy>
+class PromiseType : public UniqueCounter<ResultCore<V, E>, PromiseTypeDeleter<Lazy>> {
+  using Base = UniqueCounter<ResultCore<V, E>, PromiseTypeDeleter<Lazy>>;
 
  public:
   PromiseType() noexcept = default;  // get_return_object is gonna be invoked right after ctor
 
-  Future<V, E> get_return_object() noexcept {
-    return {ResultCorePtr<V, E>{NoRefTag{}, this}};
+  auto get_return_object() noexcept {
+    if constexpr (Lazy) {
+      this->_caller = nullptr;
+      return Task<V, E>{ResultCorePtr<V, E>{NoRefTag{}, this}};
+    } else {
+      return Future<V, E>{ResultCorePtr<V, E>{NoRefTag{}, this}};
+    }
   }
 
-  yaclib_std::suspend_never initial_suspend() noexcept {
-    return {};
+  auto initial_suspend() noexcept {
+    if constexpr (Lazy) {
+      return yaclib_std::suspend_always{};
+    } else {
+      return yaclib_std::suspend_never{};
+    }
   }
 
   Destroy final_suspend() noexcept {
@@ -60,7 +71,7 @@ class PromiseType : public UniqueCounter<ResultCore<V, E>, PromiseTypeDeleter> {
   }
 
   yaclib_std::coroutine_handle<> GetHandle() noexcept final {
-    return yaclib_std::coroutine_handle<PromiseType<V, E>>::from_promise(static_cast<PromiseType<V, E>&>(*this));
+    return yaclib_std::coroutine_handle<PromiseType>::from_promise(*this);
   }
 
   template <typename Value>
@@ -75,9 +86,9 @@ class PromiseType : public UniqueCounter<ResultCore<V, E>, PromiseTypeDeleter> {
 
  private:
   void Call() noexcept final {
-    auto handle = yaclib_std::coroutine_handle<PromiseType<V, E>>::from_promise(static_cast<PromiseType<V, E>&>(*this));
-    YACLIB_DEBUG(!handle, "handle from promise is null");
-    YACLIB_DEBUG(handle.done(), "handle for resume is done");
+    auto handle = GetHandle();
+    YACLIB_ASSERT(handle);
+    YACLIB_ASSERT(!handle.done());
     handle.resume();
   }
 };

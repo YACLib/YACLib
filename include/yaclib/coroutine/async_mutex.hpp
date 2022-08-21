@@ -12,9 +12,19 @@ namespace yaclib {
 
 // TODO(mkornaukhov03) Doxygen docs
 
-template <bool FIFO = false>
+template <bool DefaultFIFO = false, std::int64_t DefaultBatchHere = 1>
 class AsyncMutex final {
  public:
+  /**
+   *
+   */
+  static constexpr std::int64_t kOn = -1;
+
+  /**
+   *
+   */
+  static constexpr std::int64_t kAll = std::numeric_limits<uint32_t>::max();
+
   AsyncMutex() noexcept = default;
   AsyncMutex(const AsyncMutex&) = delete;
   AsyncMutex(AsyncMutex&&) = delete;
@@ -42,14 +52,17 @@ class AsyncMutex final {
                                           std::memory_order_relaxed);
   }
 
-  auto Unlock(IExecutor& executor = CurrentThreadPool()) noexcept {
-    return UnlockAwaiter<UnlockType::Auto>{*this, executor};
+  template <bool FIFO = DefaultFIFO, std::int64_t BatchHere = DefaultBatchHere>
+  auto Unlock(IExecutor& e = CurrentThreadPool()) noexcept {
+    return UnlockAwaiter<FIFO, BatchHere>{*this, e};
   }
 
-  auto UnlockOn(IExecutor& executor = CurrentThreadPool()) noexcept {
-    return UnlockAwaiter<UnlockType::On>{*this, executor};
+  template <bool FIFO = DefaultFIFO, std::int64_t BatchHere = DefaultBatchHere>
+  auto UnlockOn(IExecutor& e = CurrentThreadPool()) noexcept {
+    return Unlock<FIFO, kOn * BatchHere>(e);
   }
 
+  template <bool FIFO = DefaultFIFO>
   void UnlockHere(IExecutor& executor = CurrentThreadPool()) noexcept {
     YACLIB_DEBUG(_state.load(std::memory_order_relaxed) == kNotLocked, "UnlockHere must be called after Lock!");
     auto* next = TryUnlock<FIFO>();
@@ -88,27 +101,28 @@ class AsyncMutex final {
       return _mutex->Lock();
     }
 
+    template <bool FIFO = DefaultFIFO, std::int64_t BatchHere = DefaultBatchHere>
     auto Unlock(IExecutor& executor = CurrentThreadPool()) noexcept {
       YACLIB_ERROR(!_owns, "Cannot unlock not locked mutex");
       _owns = false;
-      return _mutex->Unlock(executor);
+      return _mutex->Unlock<FIFO, BatchHere>(executor);
     }
 
+    template <bool FIFO = DefaultFIFO, std::int64_t BatchHere = DefaultBatchHere>
     auto UnlockOn(IExecutor& executor = CurrentThreadPool()) noexcept {
-      YACLIB_ERROR(!_owns, "Cannot unlock not locked mutex");
-      _owns = false;
-      return _mutex->UnlockOn(executor);
+      return Unlock<FIFO, kOn * BatchHere>();
     }
 
-    void UnlockHere(IExecutor& executor = CurrentThreadPool()/*default value should exist only if we don't have co_await Unlock, so don't have symmetric transfer*/) noexcept {
+    template <bool FIFO = DefaultFIFO>
+    void UnlockHere(IExecutor& executor = CurrentThreadPool()) noexcept {
       YACLIB_ERROR(!_owns, "Cannot unlock not locked mutex");
       _owns = false;
-      _mutex->UnlockHere(executor);
+      _mutex->UnlockHere<FIFO>(executor);
     }
 
-    void Swap(AsyncMutex& oth) noexcept {
-      std::swap(_mutex, oth._mutex);
-      std::swap(_owns, oth._owns);
+    void Swap(AsyncMutex& other) noexcept {
+      std::swap(_mutex, other._mutex);
+      std::swap(_owns, other._owns);
     }
 
     AsyncMutex* Release() noexcept {
@@ -118,7 +132,7 @@ class AsyncMutex final {
 
     ~LockGuard() noexcept {
       if (_owns) {
-        YACLIB_WARN(true, "Better use co_await Guard::Unlock<UnlockType>(executor)");
+        YACLIB_WARN(true, "Better use co_await LockGuard::Unlock(executor)");
         _mutex->UnlockHere(CurrentThreadPool());
       }
     }
@@ -129,11 +143,6 @@ class AsyncMutex final {
   };
 
  private:
-  enum class UnlockType {
-    Auto,
-    On,
-  };
-
   class [[nodiscard]] LockAwaiter {
    public:
     explicit LockAwaiter(AsyncMutex& mutex) noexcept : _mutex{mutex} {
@@ -148,8 +157,8 @@ class AsyncMutex final {
       detail::BaseCore& base_core = handle.promise();
       auto old_state = _mutex._state.load(std::memory_order_relaxed);
       while (true) {
-        if (old_state == _mutex.kNotLocked) {
-          if (_mutex._state.compare_exchange_weak(old_state, _mutex.kLockedNoWaiters, std::memory_order_acquire,
+        if (old_state == AsyncMutex::kNotLocked) {
+          if (_mutex._state.compare_exchange_weak(old_state, AsyncMutex::kLockedNoWaiters, std::memory_order_acquire,
                                                   std::memory_order_relaxed)) {
             return false;
           }
@@ -180,14 +189,14 @@ class AsyncMutex final {
     }
   };
 
-  template <UnlockType Type>
+  template <bool FIFO, std::int64_t BatchHere>
   class [[nodiscard]] UnlockAwaiter final {
    public:
     explicit UnlockAwaiter(AsyncMutex& m, IExecutor& e) noexcept : _mutex{m}, _executor{e} {
     }
 
     bool await_ready() noexcept {
-      if constexpr (Type == UnlockType::Auto) {
+      if constexpr (BatchHere >= 0) {
         auto* next = _mutex.TryUnlock<FIFO>();
         if (next == nullptr) {
           return true;
@@ -200,7 +209,7 @@ class AsyncMutex final {
     template <typename Promise>
     auto await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
       detail::BaseCore* next;
-      if constexpr (Type == UnlockType::Auto) {
+      if constexpr (BatchHere >= 0) {
         next = _mutex._waiters;
       } else {
         next = _mutex.TryUnlock<FIFO>();
@@ -210,13 +219,13 @@ class AsyncMutex final {
         }
       }
       _mutex._waiters = static_cast<detail::BaseCore*>(next->next);
-      if (_mutex._count_batch_here <= 1) {
+      if (_mutex._count_batch_here <= (BatchHere >= 0 ? BatchHere : -BatchHere)) {
         _executor.Submit(handle.promise());
         YACLIB_TRANSFER(next->GetHandle());
       }
       _mutex._count_batch_here = 0;
       _executor.Submit(*next);
-      if constexpr (Type == UnlockType::Auto) {
+      if constexpr (BatchHere >= 0) {
         YACLIB_RESUME(handle);
       } else {
         _executor.Submit(handle.promise());
@@ -232,7 +241,7 @@ class AsyncMutex final {
     IExecutor& _executor;
   };
 
-  template <bool UnlockFIFO = FIFO>
+  template <bool FIFO>
   detail::BaseCore* TryUnlock() noexcept {
     if (_waiters != nullptr) {
       return _waiters;
@@ -246,7 +255,7 @@ class AsyncMutex final {
 
     old_state = _state.exchange(kLockedNoWaiters, std::memory_order_acquire);
     _count_batch_here = old_count_batch_here + 1;
-    if constexpr (UnlockFIFO) {
+    if constexpr (FIFO) {
       detail::Node* node = reinterpret_cast<detail::BaseCore*>(old_state);
       detail::Node* prev = nullptr;
       do {
@@ -266,7 +275,7 @@ class AsyncMutex final {
   // locked without waiters, not locked, otherwise - head of the awaiters list
   yaclib_std::atomic_uint64_t _state = kNotLocked;  // TODO(mkornaukhov03)
   detail::BaseCore* _waiters = nullptr;
-  std::size_t _count_batch_here = 0;
+  std::uint32_t _count_batch_here = 0;
 };
 
 }  // namespace yaclib

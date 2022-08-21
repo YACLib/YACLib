@@ -1,3 +1,4 @@
+#include <util/async_suite.hpp>
 #include <util/error_code.hpp>
 #include <util/error_suite.hpp>
 #include <util/intrusive_list.hpp>
@@ -95,24 +96,24 @@ TEST(JustWorks, Exception) {
   ErrorsCheck<double>(std::make_exception_ptr(std::runtime_error{""}));
 }
 
-TEST(JustWorks, Run) {
+TYPED_TEST(AsyncSuite, Run) {
   auto tp = yaclib::MakeThreadPool();
   bool called = false;
-  auto f = yaclib::Run(*tp, [&] {
+  auto f = INVOKE(*tp, [&] {
     called = true;
   });
-  Wait(f);
+  EXPECT_EQ(std::move(f).Get().Ok(), yaclib::Unit{});
   EXPECT_TRUE(called);
   tp->Stop();
   tp->Wait();
 }
 
-TEST(JustWorks, RunException) {
+TYPED_TEST(AsyncSuite, RunException) {
   auto tp = yaclib::MakeThreadPool();
-  auto result = yaclib::Run(*tp,
-                            [] {
-                              throw std::runtime_error{""};
-                            })
+  auto result = INVOKE(*tp,
+                       [] {
+                         throw std::runtime_error{""};
+                       })
                   .Then([] {
                     return 1;
                   })
@@ -122,12 +123,12 @@ TEST(JustWorks, RunException) {
   tp->Wait();
 }
 
-TEST(JustWorks, RunError) {
+TYPED_TEST(AsyncSuite, JustWorks) {
   auto tp = yaclib::MakeThreadPool();
-  auto result = yaclib::Run(*tp,
-                            [] {
-                              return yaclib::Result<>{yaclib::StopTag{}};
-                            })
+  auto result = INVOKE(*tp,
+                       [] {
+                         return yaclib::Result<>{yaclib::StopTag{}};
+                       })
                   .Then([] {
                     return 1;
                   })
@@ -137,9 +138,9 @@ TEST(JustWorks, RunError) {
   tp->Wait();
 }
 
-TEST(JustWorks, VoidThen) {
+TYPED_TEST(AsyncSuite, JustWorksVoidThen) {
   auto tp = yaclib::MakeThreadPool();
-  auto f = yaclib::Run(*tp, [] {
+  auto f = INVOKE(*tp, [] {
            }).Then([] {
     return yaclib::Result<int>(1);
   });
@@ -281,7 +282,7 @@ TEST(Detach, DetachOn2) {
   EXPECT_TRUE(called);
 }
 
-TEST(ThenThreadPool, Simple) {
+TYPED_TEST(AsyncSuite, ThenThreadPool) {
   auto tp = yaclib::MakeThreadPool(4);
   auto compute = [] {
     return 42;
@@ -289,8 +290,8 @@ TEST(ThenThreadPool, Simple) {
   auto process = [](int v) -> int {
     return v + 1;
   };
-  yaclib::FutureOn<int> f1 = yaclib::Run(*tp, compute);
-  yaclib::FutureOn<int> f2 = std::move(f1).Then(process);
+  auto f1 = INVOKE(*tp, compute);
+  auto f2 = std::move(f1).Then(process);
   EXPECT_EQ(std::move(f2).Get().Ok(), 43);
   tp->Stop();
   tp->Wait();
@@ -339,7 +340,7 @@ TEST(Simple, Stop) {
   tp->Wait();
 }
 
-TEST(Pipeline, Simple) {
+TYPED_TEST(AsyncSuite, PipelineSimple) {
   auto tp = yaclib::MakeThreadPool(1);
 
   // Pipeline stages:
@@ -356,7 +357,7 @@ TEST(Pipeline, Simple) {
     return value + 1;
   };
 
-  auto f = yaclib::Run(*tp, first).Then(second).Then(third);
+  auto f = INVOKE(*tp, first).Then(second).Then(third);
 
   EXPECT_EQ(std::move(f).Get().Ok(), 42 * 2 + 1);
 
@@ -369,28 +370,42 @@ class Calculator {
   Calculator(yaclib::IThreadPoolPtr tp) : _tp(tp) {
   }
 
-  yaclib::FutureOn<int> Increment(int value) {
-    return yaclib::Run(*_tp, [value] {
-      return value + 1;
-    });
+  template <bool IsFuture = true>
+  auto Increment(int value) {
+    if constexpr (IsFuture) {
+      return yaclib::Run(*_tp, [value] {
+        return value + 1;
+      });
+    } else {
+      return yaclib::Schedule(*_tp, [value] {
+        return value + 1;
+      });
+    }
   }
 
-  yaclib::FutureOn<int> Double(int value) {
-    return yaclib::Run(*_tp, [value] {
-      return value * 2;
-    });
+  template <bool IsFuture = true>
+  auto Double(int value) {
+    if constexpr (IsFuture) {
+      return yaclib::Run(*_tp, [value] {
+        return value * 2;
+      });
+    } else {
+      return yaclib::Schedule(*_tp, [value] {
+        return value * 2;
+      });
+    }
   }
 
  private:
   yaclib::IThreadPoolPtr _tp;
 };
 
-TEST(AsyncThen, Simple) {
+TYPED_TEST(AsyncSuite, AsyncThen) {
   auto tp = yaclib::MakeThreadPool(4);
 
   Calculator calculator(tp);
 
-  auto pipeline = calculator.Increment(1)
+  auto pipeline = calculator.Increment<TestFixture::kIsFuture>(1)
                     .Then([&](int value) {
                       return calculator.Double(value);
                     })
@@ -399,7 +414,7 @@ TEST(AsyncThen, Simple) {
                     });
   EXPECT_EQ(std::move(pipeline).Get().Value(), 5);
 
-  auto pipeline2 = calculator.Increment(1)
+  auto pipeline2 = calculator.Increment<TestFixture::kIsFuture>(1)
                      .ThenInline([&](int value) {
                        return calculator.Double(value);
                      })
@@ -526,37 +541,37 @@ TEST(Simple, MakePromiseContract) {
   EXPECT_EQ(4, std::move(g).Get().Ok());
 }
 
-TEST(Exception, CallbackReturningValue) {
+TYPED_TEST(AsyncSuite, ExceptionCallbackReturningValue) {
   auto tp = yaclib::MakeThreadPool(1);
-  auto f = yaclib::Run(*tp,
-                       [] {
-                         return 1;
-                       })
-             .Then([](yaclib::Result<int>) {
-               throw std::runtime_error{""};
-             })
-             .Then([](yaclib::Result<> result) {
-               EXPECT_EQ(result.State(), yaclib::ResultState::Exception);
-               return 0;
-             });
+  auto f = INVOKE(*tp, [] {
+    return 1;
+  });
+  f = std::move(f)
+        .Then([](yaclib::Result<int>) {
+          throw std::runtime_error{""};
+        })
+        .Then([](yaclib::Result<> result) {
+          EXPECT_EQ(result.State(), yaclib::ResultState::Exception);
+          return 0;
+        });
   EXPECT_EQ(std::move(f).Get().Ok(), 0);
   tp->Stop();
   tp->Wait();
 }
 
-TEST(Exception, CallbackReturningFuture) {
+TYPED_TEST(AsyncSuite, ExceptionCallbackReturningFuture) {
   auto tp = yaclib::MakeThreadPool(1);
-  auto f = yaclib::Run(*tp,
-                       [] {
-                         return 1;
-                       })
-             .Then([](int) -> yaclib::Future<> {
-               throw std::runtime_error{""};
-             })
-             .Then([](yaclib::Result<> result) {
-               EXPECT_EQ(result.State(), yaclib::ResultState::Exception);
-               return 0;
-             });
+  auto f = INVOKE(*tp, [] {
+    return 1;
+  });
+  f = std::move(f)
+        .Then([](int) -> yaclib::Future<> {
+          throw std::runtime_error{""};
+        })
+        .Then([](yaclib::Result<> result) {
+          EXPECT_EQ(result.State(), yaclib::ResultState::Exception);
+          return 0;
+        });
   EXPECT_EQ(std::move(f).Get().Ok(), 0);
   tp->Stop();
   tp->Wait();
@@ -578,11 +593,12 @@ TEST(Simple, SetAndGetRequiresOnlyMove) {
   EXPECT_EQ(v.id_, 42);
 }
 
-TEST(Future, special) {
-  EXPECT_FALSE(std::is_copy_constructible_v<yaclib::Future<int>>);
-  EXPECT_FALSE(std::is_copy_assignable_v<yaclib::Future<int>>);
-  EXPECT_TRUE(std::is_move_constructible_v<yaclib::Future<int>>);
-  EXPECT_TRUE(std::is_move_assignable_v<yaclib::Future<int>>);
+TYPED_TEST(AsyncSuite, Special) {
+  using Type = typename TestFixture::Type;
+  static_assert(!std::is_copy_constructible_v<Type>);
+  static_assert(!std::is_copy_assignable_v<Type>);
+  static_assert(std::is_move_constructible_v<Type>);
+  static_assert(std::is_move_assignable_v<Type>);
 }
 
 TEST(Future, CheckReferenceWrapper) {
@@ -602,13 +618,13 @@ TEST(Future, CheckConstGet) {
   EXPECT_NE(ptr, nullptr);
 }
 
-TEST(Detach, Drop) {
+TYPED_TEST(AsyncSuite, DetachDrop) {
   auto tp = yaclib::MakeThreadPool(1);
-  auto f = yaclib::Run(*tp, [&] {
+  auto f = INVOKE(*tp, [&] {
     tp->Stop();
   });
-  std::move(f).Detach([] {
-    ASSERT_TRUE(false);
+  DETACH(f, [] {
+    EXPECT_TRUE(false);
   });
   tp->Wait();
 }

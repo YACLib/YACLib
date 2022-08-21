@@ -41,7 +41,7 @@ class ThreadPool : public IThreadPool, private IFunc {
   }
 
  private:
-  Type Tag() const final {
+  Type Tag() const noexcept final {
     return Type::ThreadPool;
   }
 
