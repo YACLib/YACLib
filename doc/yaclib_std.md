@@ -1,6 +1,6 @@
 ## Fault injection
 
-Inspired mainly by https://gitlab.com/Lipovsky/twist, and also: 
+Inspired mainly by https://gitlab.com/Lipovsky/twist (mostly we rewrote it for achive our goals), and also: 
 * https://github.com/ClickHouse/ClickHouse/blob/master/src/Common/ThreadFuzzer.h
 * https://github.com/dvyukov/relacy
 * https://github.com/apple/foundationdb/tree/main/flow
