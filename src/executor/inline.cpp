@@ -6,24 +6,34 @@
 namespace yaclib {
 namespace detail {
 
+template <bool Stop>
 class Inline final : public NopeCounter<IExecutor> {
  private:
-  [[nodiscard]] Type Tag() const final {
+  [[nodiscard]] Type Tag() const noexcept final {
     return Type::Inline;
   }
 
   void Submit(Job& task) noexcept final {
-    task.Call();
+    if constexpr (Stop) {
+      task.Drop();
+    } else {
+      task.Call();
+    }
   }
 };
 
 // TODO(MBkkt) Make file with depended globals
-static Inline sInline;
+static Inline<false> sAliveInline;
+static Inline<true> sStopInline;
 
 }  // namespace detail
 
 IExecutor& MakeInline() noexcept {
-  return detail::sInline;
+  return detail::sAliveInline;
+}
+
+IExecutor& MakeInline(StopTag) noexcept {
+  return detail::sStopInline;
 }
 
 }  // namespace yaclib

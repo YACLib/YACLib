@@ -23,15 +23,15 @@ class IExecutor : public IRef {
   /**
    * Return type of this executor
    */
-  [[nodiscard]] virtual Type Tag() const = 0;
+  [[nodiscard]] virtual Type Tag() const noexcept = 0;
 
   /**
    * Submit given task. This method may either Call or Drop the task
    *
    * This method increments reference counter if task is submitted.
-   * \param task task to execute
+   * \param job job to execute
    */
-  virtual void Submit(Job& task) noexcept = 0;
+  virtual void Submit(Job& job) noexcept = 0;
 };
 
 using IExecutorPtr = IntrusivePtr<IExecutor>;

@@ -43,6 +43,7 @@ https://discord.gg/xy2fDKj8VZ)
 * [Examples](#examples)
     * [Asynchronous pipeline](#asynchronous-pipeline)
     * [C++20 coroutine](#c20-coroutine)
+    * [Lazy pipeline](#lazy-pipeline)
     * [Thread pool](#thread-pool)
     * [Strand, Serial executor](#strand-serial-executor)
     * [AsyncMutex](#asyncmutex)
@@ -134,7 +135,7 @@ yaclib::Future<int> task43() {
 }
 ```
 
-You also can zero cost combine Future coroutine code with Future callbacks code.
+You can zero cost combine Future coroutine code with Future callbacks code.
 That allow to use yaclib for smooth transfer from C++17 to C++20 with coroutines.
 
 Also Future with coroutine doesn't make additional allocation for Future,
@@ -144,6 +145,22 @@ and [can be optimize](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p
 And finally co_await doesn't require allocation,
 so you can combine some async operation without allocation.
 
+#### Lazy pipeline
+
+```C++
+auto task = yaclib::Schedule(tp1, [] {
+  return 1; 
+}).Then([] (int x) {
+  return x * 2;
+});
+
+task.Run(); // Run task on tp1
+```
+Same as asynchronous pipeline, but not starting only after Run/ToFuture/Get.
+Task can be used as coroutine return type too.
+
+Also running Task with return Future doesn't make allocation.
+And it doesn't need synchronization, so it even faster than asynchronous pipeline.
 
 #### Thread pool
 
@@ -219,7 +236,8 @@ yaclib::Future<> bar(yaclib::IExecutor& cpu, yaclib::IExecutor& io) {
 }
 ```
 
-This is really zero-cost, just suspend the coroutine and submit its resume to another executor, without synchronization inside the coroutine and allocations anywhere.
+This is really zero-cost, just suspend the coroutine and submit its resume to another executor,
+without synchronization inside the coroutine and allocations anywhere.
 
 #### WhenAll
 
@@ -465,9 +483,11 @@ Our test coverage is 100%, to simplify, we run tests on the cartesian product of
 
 `os x compiler x stdlib x sanitizer x fault injection backend`
 
-However, we realize this philosophy doesn't work for every project, so we also provide [Releases](https://github.com/YACLib/YACLib/releases).
+However, we realize this philosophy doesn't work for every project,
+so we also provide [Releases](https://github.com/YACLib/YACLib/releases).
 
-We don't believe in [SemVer](https://semver.org), check [this](https://gist.github.com/jashkenas/cbd2b088e20279ae2c8e), so we use `year.month.day[.patch]` approach.
+We don't believe in [SemVer](https://semver.org), check [this](https://gist.github.com/jashkenas/cbd2b088e20279ae2c8e),
+so we use `year.month.day[.patch]` approach.
 I'll release a new version if you ask, or I'll decide we have important or enough changes.
 
 ## Contributing
@@ -483,9 +503,13 @@ We are always open for issues and pull requests. For more details you can check 
 
 ## Thanks
 
-* [Roman Lipovsky](https://gitlab.com/Lipovsky) for an incredible [course about concurrency](https://gitlab.com/Lipovsky/concurrency-course), which gave us a lot of ideas for this library and for showing us how important to test concurrency correctly.
+* [Roman Lipovsky](https://gitlab.com/Lipovsky) for an incredible
+  [course about concurrency](https://gitlab.com/Lipovsky/concurrency-course),
+  which gave us a lot of ideas for this library and for showing us how important to test concurrency correctly.
 
-* Paul E. McKenney for an incredible [book about parallel programming](https://cdn.kernel.org/pub/linux/kernel/people/paulmck/perfbook/perfbook.html), which gave me a lot of insight into memory models and how they relate to what's going on in hardware.
+* Paul E. McKenney for an incredible
+  [book about parallel programming](https://cdn.kernel.org/pub/linux/kernel/people/paulmck/perfbook/perfbook.html),
+  which gave me a lot of insight into memory models and how they relate to what's going on in hardware.
 
 ## Contacts
 

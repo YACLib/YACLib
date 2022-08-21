@@ -29,10 +29,9 @@ class BaseCore : public InlineCore {
   [[nodiscard]] bool SetWait(IRef& callback, State state) noexcept;
   [[nodiscard]] bool ResetWait() noexcept;
 
-  [[nodiscard]] IExecutorPtr& GetExecutor() noexcept;
-  void SetExecutor(IExecutorPtr executor) noexcept;
-
   void SetResult() noexcept;
+
+  void StoreCallback(void* callback, State state) noexcept;
 
  protected:
   explicit BaseCore(State callback) noexcept;
@@ -42,7 +41,9 @@ class BaseCore : public InlineCore {
 #endif
 
   yaclib_std::atomic_uint64_t _callback;
-  IRef* _caller{nullptr};
+
+ public:
+  IRef* _caller;
   IExecutorPtr _executor;
 
  private:
