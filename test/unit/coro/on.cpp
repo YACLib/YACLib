@@ -1,9 +1,9 @@
 #include <util/time.hpp>
 
 #include <yaclib/async/run.hpp>
-#include <yaclib/coroutine/await.hpp>
-#include <yaclib/coroutine/future_traits.hpp>
-#include <yaclib/coroutine/on.hpp>
+#include <yaclib/coro/await.hpp>
+#include <yaclib/coro/future_traits.hpp>
+#include <yaclib/coro/on.hpp>
 #include <yaclib/executor/strand.hpp>
 #include <yaclib/executor/thread_pool.hpp>
 

@@ -5,7 +5,7 @@
 #include <yaclib/util/detail/mutex_event.hpp>
 
 #if YACLIB_CORO
-#  include <yaclib/coroutine/detail/promise_type.hpp>
+#  include <yaclib/coro/detail/promise_type.hpp>
 #  include <yaclib/executor/inline.hpp>
 #  include <yaclib/util/detail/nope_counter.hpp>
 #endif

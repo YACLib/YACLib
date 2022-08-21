@@ -8,7 +8,7 @@
 
 #include <yaclib_std/atomic>
 #if YACLIB_CORO != 0
-#  include <yaclib/coroutine/coroutine.hpp>
+#  include <yaclib/coro/coroutine.hpp>
 #endif
 
 namespace yaclib::detail {

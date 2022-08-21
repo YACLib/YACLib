@@ -1,10 +1,10 @@
 #include <util/time.hpp>
 
 #include <yaclib/algo/wait.hpp>
-#include <yaclib/coroutine/async_mutex.hpp>
-#include <yaclib/coroutine/await.hpp>
-#include <yaclib/coroutine/future_traits.hpp>
-#include <yaclib/coroutine/on.hpp>
+#include <yaclib/coro/async_mutex.hpp>
+#include <yaclib/coro/await.hpp>
+#include <yaclib/coro/future_traits.hpp>
+#include <yaclib/coro/on.hpp>
 #include <yaclib/executor/thread_pool.hpp>
 
 #include <limits>

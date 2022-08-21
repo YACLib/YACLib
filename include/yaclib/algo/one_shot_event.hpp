@@ -7,7 +7,7 @@
 #include <yaclib/util/detail/nope_counter.hpp>
 #include <yaclib/util/ref.hpp>
 #if YACLIB_CORO != 0
-#  include <yaclib/coroutine/coroutine.hpp>
+#  include <yaclib/coro/coroutine.hpp>
 #endif
 
 namespace yaclib {

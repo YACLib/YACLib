@@ -1,6 +1,6 @@
 #pragma once
 
-#include <yaclib/coroutine/detail/on_awaiter.hpp>
+#include <yaclib/coro/detail/on_awaiter.hpp>
 #include <yaclib/executor/executor.hpp>
 
 namespace yaclib {

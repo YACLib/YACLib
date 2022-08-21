@@ -5,10 +5,10 @@
 #include <yaclib/algo/wait_group.hpp>
 #include <yaclib/async/contract.hpp>
 #include <yaclib/async/run.hpp>
-#include <yaclib/coroutine/async_mutex.hpp>
-#include <yaclib/coroutine/await.hpp>
-#include <yaclib/coroutine/future_traits.hpp>
-#include <yaclib/coroutine/on.hpp>
+#include <yaclib/coro/async_mutex.hpp>
+#include <yaclib/coro/await.hpp>
+#include <yaclib/coro/future_traits.hpp>
+#include <yaclib/coro/on.hpp>
 #include <yaclib/executor/manual.hpp>
 #include <yaclib/executor/submit.hpp>
 #include <yaclib/executor/thread_pool.hpp>
