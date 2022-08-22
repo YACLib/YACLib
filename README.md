@@ -1,6 +1,6 @@
 # YACLib
 
-_Yet Another Concurrency Library_
+[Yet Another Concurrency Library](https://github.com/YACLib/YACLib)
 
 [![GitHub license](
 https://img.shields.io/badge/license-MIT-blue.svg)](
