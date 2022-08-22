@@ -34,7 +34,7 @@ FetchContent_MakeAvailable(yaclib)
 1. `git clone <repo-url>`
 2. In the build directory:
 
-```
+```bash
 cmake <source-dir> <cmake-options>
 ```
 
@@ -51,7 +51,7 @@ CMake options:
 * `-D YACLIB_FLAFS=<EMPTY(default) or WARN or ASAN or TSAN or UBSAN or MEMSAN or COVERAGE>`
   If ON, then.
 
-```
+```bash
 cmake --build . -- <build-options>
 ```
 
