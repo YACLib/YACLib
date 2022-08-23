@@ -79,7 +79,7 @@ For more details check our [design document](doc/design.md) and [documentation](
 
 For quick start just paste this code in your `CMakeLists.txt` file.
 
-```CMake
+```cmake
 include(FetchContent)
 FetchContent_Declare(yaclib
   GIT_REPOSITORY https://github.com/YACLib/YACLib.git
@@ -95,25 +95,23 @@ For more details about 'yaclib_std' or fault injection check [doc](doc/yaclib_st
 
 ## Examples
 
-<details open><summary> 
 Here are short examples of using some features from YACLib, for details
 check <a href="https://yaclib.github.io/YACLib/examples.html">documentation</a>.
-</summary>
 
 #### Asynchronous pipeline
 
-```C++
+```cpp
 auto cpu_tp = yaclib::MakeThreadPool(/*threads=*/4);
 auto io_tp = yaclib::MakeThreadPool(/*threads=*/4);
 yaclib::Run(*cpu_tp, [] {  // on cpu_tp
-    return 42;
-  }).ThenInline([](int r) {  // called directly after 'return 42', without Submit to cpu_tp
-    return r + 1;
-  }).Then([](int r) {  // on cpu_tp
-    return std::to_string(r);
-  }).Detach(*io_tp, [](std::string&& r) {  // on io_tp
-    std::cout << "Pipeline result: <"  << r << ">" << std::endl; // 43
-  });
+  return 42;
+}).ThenInline([](int r) {  // called directly after 'return 42', without Submit to cpu_tp
+  return r + 1;
+}).Then([](int r) {  // on cpu_tp
+  return std::to_string(r);
+}).Detach(*io_tp, [](std::string&& r) {  // on io_tp
+  std::cout << "Pipeline result: <"  << r << ">" << std::endl; // 43
+});
 ```
 
 We guarantee that no more than one allocation will be made for each step of the pipeline.
@@ -124,7 +122,7 @@ Also Future/Promise don't contains shared atomic counter!
 
 #### C++20 coroutine
 
-```C++
+```cpp
 yaclib::Future<int> task42() {
   co_return 42;
 }
@@ -147,7 +145,7 @@ so you can combine some async operation without allocation.
 
 #### Lazy pipeline
 
-```C++
+```cpp
 auto task = yaclib::Schedule(tp1, [] {
   return 1; 
 }).Then([] (int x) {
@@ -156,6 +154,7 @@ auto task = yaclib::Schedule(tp1, [] {
 
 task.Run(); // Run task on tp1
 ```
+
 Same as asynchronous pipeline, but not starting only after Run/ToFuture/Get.
 Task can be used as coroutine return type too.
 
@@ -164,7 +163,7 @@ And it doesn't need synchronization, so it even faster than asynchronous pipelin
 
 #### Thread pool
 
-```C++
+```cpp
 auto tp = yaclib::MakeThreadPool(/*threads=*/4);
 Submit(*tp, [] {
   // some computations...
@@ -179,7 +178,7 @@ tp->Wait();
 
 #### Strand, Serial executor
 
-```C++
+```cpp
 auto tp = yaclib::MakeThreadPool(4);
 // decorated thread pool by serializing tasks:
 auto strand = yaclib::MakeStrand(tp);
@@ -201,7 +200,7 @@ And also the implementation of strand is an efficient lock-free, without additio
 
 #### AsyncMutex
 
-```C++
+```cpp
 auto tp = yaclib::MakeThreadPool(4);
 yaclib::AsyncMutex m;
 
@@ -227,7 +226,7 @@ Secondly, inherits all the Strand benefits.
 
 #### Rescheduling
 
-```C++
+```cpp
 yaclib::Future<> bar(yaclib::IExecutor& cpu, yaclib::IExecutor& io) {
   co_await On(cpu);
   ... some heavy compute ...
@@ -241,7 +240,7 @@ without synchronization inside the coroutine and allocations anywhere.
 
 #### WhenAll
 
-```C++
+```cpp
 auto tp = yaclib::MakeThreadPool(/*threads=*/4);
 std::vector<yaclib::Future<int>> fs;
 
@@ -264,7 +263,7 @@ Doesn't make more than 3 allocations regardless of input size
 
 #### WhenAny
 
-```C++
+```cpp
 auto tp = yaclib::MakeThreadPool(/*threads=*/4);
 std::vector<yaclib::Future<int>> fs;
 
@@ -286,7 +285,7 @@ Doesn't make more than 2 allocations regardless of input size.
 
 #### Future unwrapping
 
-```C++
+```cpp
 auto tp_output = yaclib::MakeThreadPool(/*threads=*/1);
 auto tp_compute = yaclib::MakeThreadPool(/*threads=CPU cores*/);
 
@@ -312,7 +311,7 @@ It also doesn't require additional allocations.
 
 #### Timed wait
 
-```C++
+```cpp
 auto tp = yaclib:MakeThreadPool(/*threads=*/4);
 
 yaclib::Future<int> f1 = yaclib::Run(*tp, [] { return 42; });
@@ -337,7 +336,7 @@ Also all of them don't make allocation, and we have optimized path for single `F
 
 #### WaitGroup
 
-```C++
+```cpp
 yaclib::WaitGroup wg{1};
 
 auto tp = yaclib::MakeThreaPool();
@@ -372,57 +371,57 @@ Effective like simple atomic counter in intrusive pointer, also doesn't require 
 
 #### Exception recovering
 
-```C++
+```cpp
 auto tp = yaclib::MakeThreadPool(/*threads=*/4);
 auto f = yaclib::Run(*tp, [] {
-    if (random() % 2) {
-      throw std::runtime_error{"1"};
-    }
-    return 42;
-  }).Then([](int y) {
-    if (random() % 2) {
-      throw std::runtime_error{"2"};
-    }
-    return y + 15;
-  }).Then([](int z) {  // Will not run if we have any error
-    return z * 2;
-  }).Then([](std::exception_ptr e) {  // Recover from error codes
-    try {
-      std::rethrow_exception(e);
-    } catch (const std::runtime_error& e) {
-      std::cout << e.what() << std::endl;
-    }
-    return 10;  // Some default value
-  });
+  if (random() % 2) {
+    throw std::runtime_error{"1"};
+  }
+  return 42;
+}).Then([](int y) {
+  if (random() % 2) {
+    throw std::runtime_error{"2"};
+  }
+  return y + 15;
+}).Then([](int z) {  // Will not run if we have any error
+  return z * 2;
+}).Then([](std::exception_ptr e) {  // Recover from error codes
+  try {
+    std::rethrow_exception(e);
+  } catch (const std::runtime_error& e) {
+    std::cout << e.what() << std::endl;
+  }
+  return 10;  // Some default value
+});
 int x = std::move(f).Get().Value();
 ```
 
 #### Error recovering
 
-```C++
+```cpp
 auto tp = yaclib::MakeThreadPool(/*threads=*/4);
 auto f = yaclib::Run<std::error_code>(tp, [] {
-    if (random() % 2) {
-      return std::make_error_code(1);
-    }
-    return 42;
-  }).Then([](int y) {
-    if (random() % 2) {
-      return std::make_error_code(2);
-    }
-    return y + 15;
-  }).Then([](int z) {  // Will not run if we have any error
-    return z * 2;
-  }).Then([](std::error_code ec) {  // Recover from error codes
-    std::cout << ec.value() << std::endl;
-    return 10;  // Some default value
-  });
+  if (random() % 2) {
+    return std::make_error_code(1);
+  }
+  return 42;
+}).Then([](int y) {
+  if (random() % 2) {
+    return std::make_error_code(2);
+  }
+  return y + 15;
+}).Then([](int z) {  // Will not run if we have any error
+  return z * 2;
+}).Then([](std::error_code ec) {  // Recover from error codes
+  std::cout << ec.value() << std::endl;
+  return 10;  // Some default value
+});
 int x = std::move(f).Get().Value();
 ```
 
 #### Use Result for smart recovering
 
-```C++
+```cpp
 auto tp = yaclib::MakeThreadPool(/*threads=*/4);
 auto f = yaclib::Run(*tp, [] {
     if (random() % 2) {
@@ -443,8 +442,6 @@ auto f = yaclib::Run(*tp, [] {
 int x = std::move(f).Get().Value();
 ```
 
-</details>
-
 ## Requirements
 
 YACLib is a static library, that uses _CMake_ as a build system and requires a compiler with C++17 or newer.
@@ -461,9 +458,9 @@ We test following configurations:
 
 👌 - manually tested
 
-| OS\Compiler | Linux | Windows   | macOS | Android |
+| Compiler\OS | Linux | Windows   | macOS | Android |
 |-------------|-------|-----------|-------|---------|
-| GCC         | ✅ 7+  | 👌 MinGW   | ✅ 7+  | 👌      |
+| GCC         | ✅ 7+  | 👌 MinGW  | ✅ 7+  | 👌      |
 | Clang       | ✅ 8+  | ✅ ClangCL | ✅ 8+  | 👌      |
 | AppleClang  | —     | —         | ✅ 12+ | —       |
 | MSVC        | —     | ✅ 14.20+  | —     | —       |
@@ -492,12 +489,15 @@ I'll release a new version if you ask, or I'll decide we have important or enoug
 
 ## Contributing
 
-We are always open for issues and pull requests. For more details you can check following links:
+We are always open for issues and pull requests.
+Check our [good first issues](
+https://github.com/YACLib/YACLib/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22).
+
+For more details you can check following links:
 
 * [Specification](https://yaclib.github.io/YACLib)
 * [Targets description](doc/target.md)
 * [Dev dependencies](doc/dependency.md)
-* [PR guide](doc/pr_guide.md)
 * [Style guide](doc/style_guide.md)
 * [How to use sanitizers](doc/sanitizer.md)
 
