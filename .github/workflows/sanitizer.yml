@@ -157,7 +157,6 @@ jobs:
             )
             slowdown=8
           else
-            flags="$flags;ATOMIC_EVENT"
             cxx_compilers=(clang++-14 g++)
             link_options=(
               "-stdlib=libc++;-lc++abi"
@@ -170,7 +169,7 @@ jobs:
             slowdown=1
           fi
 
-          if [[ ${{ matrix.flags }} == "TSAN" ]]; then
+          if [[ "$flags" == "TSAN" ]]; then
             YACLIB_FAULT=(OFF THREAD)
           fi
 
@@ -242,9 +241,14 @@ jobs:
 
           for (( i=0; i<${#names[*]}; i+=1 )); do
             for yaclib_fault in ${YACLIB_FAULT[*]}; do
-              if [[ $flags == ASAN && ${names[$i]} != MSVC ]]; then
+              if [[ "$flags" == "ASAN" && "${names[$i]}" != "MSVC" ]]; then
                 continue  # TODO(MBkkt) I can't build with any other ASAN on Windows
                 # I think ClangCL with ASAN should be possible
+              fi
+              if [[ "${names[$i]}" == "MSVC" ]]; then
+                coroutine_option="CORO"
+              else
+                coroutine_option=""
               fi
 
               dir="build_${names[$i]}_fault_${yaclib_fault}"
@@ -253,7 +257,7 @@ jobs:
               cmake -S . -B $dir                                                                                       \
                 -DYACLIB_CXX_STANDARD=20                                                                               \
                 -DYACLIB_TEST=SINGLE                                                                                   \
-                -DYACLIB_FLAGS="$flags"                                                                                \
+                -DYACLIB_FLAGS="$coroutine_option;$flags"                                                                           \
                 -DYACLIB_FAULT=$yaclib_fault                                                                           \
                 -DYACLIB_LOG="ERROR;DEBUG"                                                                             \
                 -G"${generators[$i]}"                                                                                  \
@@ -280,7 +284,7 @@ jobs:
           export ASAN_OPTIONS="$default debug=1 detect_leaks=0 check_initialization_order=1 detect_stack_use_after_return=1 strict_init_order=1 strict_string_checks=1 detect_invalid_pointer_pairs=0"
           export TSAN_OPTIONS="$default history_size=2 io_sync=0 detect_deadlocks=1 second_deadlock_stack=1"  
           export UBSAN_OPTIONS="$default print_stacktrace=1"
-          if [[ $flags == "LSAN" ]]; then  # This is necessary for the schizo macOS ASAN, who for some reason reads LSAN_OPTIONS
+          if [[ "$flags" == "LSAN" ]]; then  # This is necessary for the schizo macOS ASAN, who for some reason reads LSAN_OPTIONS
             export LSAN_OPTIONS="$default debug=1 detect_leaks=1"
           fi
           for dir in build*/; do

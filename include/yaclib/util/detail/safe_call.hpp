@@ -33,7 +33,7 @@ class SafeCall {
   }
 
  private:
-  [[no_unique_address]] Store _func;
+  YACLIB_NO_UNIQUE_ADDRESS Store _func;
 };
 
 }  // namespace yaclib::detail

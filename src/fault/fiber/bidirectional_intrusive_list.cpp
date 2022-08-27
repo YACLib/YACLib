@@ -5,7 +5,7 @@
 namespace yaclib::detail::fiber {
 
 void BiList::PushBack(Node* node) noexcept {
-  YACLIB_DEBUG(node->prev != nullptr && node->prev != node, "pushed and not popped");
+  YACLIB_DEBUG(node->prev != nullptr && node->prev != node, "Pushed but not popped");
   node->next = &_head;
   _head.prev->next = node;
   node->prev = _head.prev;

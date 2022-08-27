@@ -4,7 +4,6 @@
 #include <yaclib/exe/executor.hpp>
 #include <yaclib/exe/thread_pool.hpp>
 #include <yaclib/util/detail/default_event.hpp>
-#include <yaclib/util/detail/nope_counter.hpp>
 #include <yaclib/util/ref.hpp>
 #if YACLIB_CORO != 0
 #  include <yaclib/coro/coro.hpp>
@@ -17,7 +16,7 @@ class OneShotEventAwaiter;
 /**
  * TODO
  */
-class OneShotEvent : public IRef {
+class OneShotEvent {
  public:
   OneShotEvent() noexcept;
 
@@ -67,7 +66,7 @@ class OneShotEvent : public IRef {
 
 #if YACLIB_CORO != 0
 
-class [[nodiscard]] OneShotEventAwaiter final : public detail::NopeCounter<Job> {
+class [[nodiscard]] OneShotEventAwaiter final : public Job {
  public:
   YACLIB_INLINE explicit OneShotEventAwaiter(OneShotEvent& event, IExecutor& executor) noexcept
     : _event{event}, _executor{executor} {
@@ -90,10 +89,6 @@ class [[nodiscard]] OneShotEventAwaiter final : public detail::NopeCounter<Job> 
   void Call() noexcept final {
     _executor.Submit(*_core);
   }
-
-  void Drop() noexcept final {  // LCOV_EXCL_LINE Never called
-    _core->Drop();              // LCOV_EXCL_LINE
-  }                             // LCOV_EXCL_LINE
 
   OneShotEvent& _event;
   IExecutor& _executor;

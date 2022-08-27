@@ -5,13 +5,13 @@
 #include <yaclib/async/when_policy.hpp>
 #include <yaclib/fwd.hpp>
 #include <yaclib/log.hpp>
-#include <yaclib/util/detail/atomic_counter.hpp>
-#include <yaclib/util/detail/unique_counter.hpp>
+#include <yaclib/util/helper.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 #include <yaclib/util/result.hpp>
 
 #include <cstddef>
 #include <exception>
+#include <type_traits>
 #include <utility>
 #include <yaclib_std/atomic>
 
@@ -33,8 +33,9 @@ class AnyCombinatorBase {
 
   void Combine(Result<V, E>&& result) noexcept {
     if (!_done.exchange(true, std::memory_order_acq_rel)) {
-      _core.Release()->Done(std::move(result), [] {
-      });
+      auto core = _core.Release();
+      core->Store(std::move(result));
+      core->template SetResult<false>();
     }
   }
 };
@@ -56,14 +57,15 @@ class AnyCombinatorBase<V, E, WhenPolicy::LastFail> {
 
   void Combine(Result<V, E>&& result) noexcept {
     if (result) {
-      if ((_state.exchange(1, std::memory_order_acq_rel) & 1U) == 0) {
-        _core.Release()->Done(std::move(result), [] {
-        });
+      if ((_state.exchange(1, std::memory_order_acq_rel) & 1U) != 0) {
+        return;
       }
-    } else if (_state.fetch_sub(2, std::memory_order_acq_rel) == 2) {
-      _core.Release()->Done(std::move(result), [] {
-      });
+    } else if (_state.fetch_sub(2, std::memory_order_acq_rel) != 2) {
+      return;
     }
+    auto core = _core.Release();
+    core->Store(std::move(result));
+    core->template SetResult<false>();
   }
 };
 
@@ -85,19 +87,27 @@ class AnyCombinatorBase<V, E, WhenPolicy::FirstFail> : public AnyCombinatorBase<
 
   ~AnyCombinatorBase() noexcept {
     auto done = this->_done.load(std::memory_order_acquire);
-    auto state = _state.load(std::memory_order_acquire);
-    if (state == ResultState::Error) {
-      if (!done) {
-        this->_core.Release()->Done(std::move(_error), [] {
-        });
+    auto resolve = [&](auto&& func) noexcept {
+      auto state = _state.load(std::memory_order_acquire);
+      if (state == ResultState::Exception) {
+        func(_exception);
+      } else if (state == ResultState::Error) {
+        func(_error);
       }
-      _error.~E();
-    } else if (state == ResultState::Exception) {
-      if (!done) {
-        this->_core.Release()->Done(std::move(_exception), [] {
-        });
-      }
-      _exception.~exception_ptr();
+    };
+    if (!done) {
+      auto core = this->_core.Release();
+      resolve([&](auto& fail) noexcept {
+        core->Store(std::move(fail));
+        using Fail = std::remove_reference_t<decltype(fail)>;
+        fail.~Fail();
+      });
+      core->template SetResult<false>();
+    } else {
+      resolve([&](auto& fail) noexcept {
+        using Fail = std::remove_reference_t<decltype(fail)>;
+        fail.~Fail();
+      });
     }
   }
 
@@ -112,7 +122,7 @@ class AnyCombinatorBase<V, E, WhenPolicy::FirstFail> : public AnyCombinatorBase<
       if (state == ResultState::Exception) {
         new (&_exception) std::exception_ptr{std::move(result).Exception()};
       } else {
-        YACLIB_DEBUG(state != ResultState::Error, "state should be Error, but here it's Empty");
+        YACLIB_ASSERT(state == ResultState::Error);
         new (&_error) E{std::move(result).Error()};
       }
     }
@@ -120,22 +130,22 @@ class AnyCombinatorBase<V, E, WhenPolicy::FirstFail> : public AnyCombinatorBase<
 };
 
 template <typename V, typename E, WhenPolicy P>
-class AnyCombinator : public AnyCombinatorBase<V, E, P>, public InlineCore {
+class AnyCombinator : public InlineCore, public AnyCombinatorBase<V, E, P> {
   using Base = AnyCombinatorBase<V, E, P>;
   using Base::Base;
 
  public:
   static auto Make(std::size_t count) {
     // TODO(MBkkt) Maybe single allocation instead of two?
-    auto raw_core = new UniqueCounter<ResultCore<V, E>>{};
-    ResultCorePtr<V, E> combine_core{NoRefTag{}, raw_core};
-    auto combinator = new AtomicCounter<AnyCombinator<V, E, P>>{count, count, std::move(combine_core)};
+    auto combine_core = MakeUnique<ResultCore<V, E>>();
+    auto* raw_core = combine_core.Get();
+    auto combinator = MakeShared<AnyCombinator<V, E, P>>(count, count, std::move(combine_core));
     ResultCorePtr<V, E> future_core{NoRefTag{}, raw_core};
-    return std::pair{std::move(future_core), combinator};
+    return std::pair{std::move(future_core), combinator.Release()};
   }
 
  private:
-  void Here(InlineCore& caller, State) noexcept final {
+  void Here(InlineCore& caller) noexcept final {
     if (!this->Done()) {
       auto& core = static_cast<ResultCore<V, E>&>(caller);
       this->Combine(std::move(core.Get()));

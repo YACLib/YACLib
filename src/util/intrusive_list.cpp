@@ -24,19 +24,19 @@ void List::PushFront(Node& node) noexcept {
 
 void List::PushBack(Node& node) noexcept {
   // for circular should be node.next = _tail->next;
-  YACLIB_DEBUG(_tail->next != nullptr, "try to push not single node");
+  YACLIB_DEBUG(_tail->next != nullptr, "Try to push not single node");
   node.next = nullptr;
   _tail->next = &node;
   _tail = &node;
 }
 
 bool List::Empty() const noexcept {
-  YACLIB_DEBUG((_head.next == nullptr) != (_tail == &_head), "list empty invariant is failed");
+  YACLIB_DEBUG((_head.next == nullptr) != (_tail == &_head), "List::Empty invariant is failed");
   return _head.next == nullptr;  // valid only for linear
 }
 
 Node& List::PopFront() noexcept {
-  YACLIB_DEBUG(Empty(), "list is empty in pop");
+  YACLIB_ASSERT(!Empty());
   auto* node = _head.next;
   _head.next = node->next;
   if (node->next == nullptr) {  // valid only for linear

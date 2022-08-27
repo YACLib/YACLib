@@ -34,7 +34,7 @@ using IFuncPtr = IntrusivePtr<IFunc>;
  */
 template <typename Func>
 IFuncPtr MakeFunc(Func&& f) {
-  return MakeIntrusive<detail::SharedFunc<Func>>(std::forward<Func>(f));
+  return MakeShared<detail::SharedFunc<Func>>(1, std::forward<Func>(f));
 }
 
 }  // namespace yaclib

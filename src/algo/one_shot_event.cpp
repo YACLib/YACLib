@@ -21,16 +21,11 @@ bool OneShotEvent::Ready() noexcept {
   return _head.load(/*std::memory_order_acquire*/) == OneShotEvent::kAllDone;
 }
 
-// TODO(mkornaukhov03) both Job and DefaultEvent inherited from IRef
-class OneShotEventWaiter final : public detail::NopeCounter<Job, detail::DefaultEvent> {
+class OneShotEventWaiter final : public Job, public detail::DefaultEvent {
  public:
   void Call() noexcept final {
     Set();
   }
-
-  void Drop() noexcept final {  // LCOV_EXCL_LINE Never called
-    Set();                      // LCOV_EXCL_LINE
-  }                             // LCOV_EXCL_LINE
 };
 
 void OneShotEvent::Wait() noexcept {

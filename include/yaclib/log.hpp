@@ -87,8 +87,10 @@ void LogMessage(LogLevel level, std::string_view file, std::size_t line, std::st
 #  define YACLIB_INIT_DEBUG(callback) YACLIB_SET_CALLBACK(::yaclib::detail::LogLevel::Debug, callback)
 #  define YACLIB_DEBUG(cond, message) YACLIB_LOG_MESSAGE(::yaclib::detail::LogLevel::Debug, cond, message)
 #  define YACLIB_ASSERT(cond) YACLIB_LOG_MESSAGE(::yaclib::detail::LogLevel::Debug, !(cond), "")
+#  define YACLIB_PURE_VIRTUAL() YACLIB_LOG_MESSAGE(::yaclib::detail::LogLevel::Debug, true, "Pure virtual call!")
 #else
 #  define YACLIB_INIT_DEBUG(callback) YACLIB_STUB1(callback)
 #  define YACLIB_DEBUG(cond, message) YACLIB_STUB2(cond, message)
 #  define YACLIB_ASSERT(cond) YACLIB_STUB1(!(cond))
+#  define YACLIB_PURE_VIRTUAL() YACLIB_STUB1(true)
 #endif

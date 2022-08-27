@@ -63,13 +63,13 @@ auto Task<V, E>::Then(Func&& f) && {
 
 template <typename V, typename E>
 void Task<V, E>::Cancel() && {
-  _core->StoreCallback(static_cast<IRef*>(&MakeInline(StopTag{})), detail::InlineCore::kWaitDrop);
+  _core->StoreCallback(detail::MakeEmpty(), detail::BaseCore::kWaitDrop);
   detail::Run<true>(_core.Release(), MakeInline(StopTag{}));
 }
 
 template <typename V, typename E>
 void Task<V, E>::Detach(IExecutor& e) && noexcept {
-  _core->StoreCallback(static_cast<IRef*>(&MakeInline()), detail::InlineCore::kWaitDrop);
+  _core->StoreCallback(detail::MakeEmpty(), detail::BaseCore::kWaitDrop);
   detail::Run(_core.Release(), e);
 }
 

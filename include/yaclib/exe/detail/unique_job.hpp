@@ -1,7 +1,6 @@
 #pragma once
 
 #include <yaclib/exe/job.hpp>
-#include <yaclib/util/detail/nope_counter.hpp>
 #include <yaclib/util/detail/safe_call.hpp>
 
 #include <utility>
@@ -9,7 +8,7 @@
 namespace yaclib::detail {
 
 template <typename Func>
-class UniqueJob final : public detail::NopeCounter<Job>, public SafeCall<Func> {
+class UniqueJob final : public Job, public SafeCall<Func> {
  public:
   using SafeCall<Func>::SafeCall;
 

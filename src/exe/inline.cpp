@@ -1,13 +1,12 @@
 #include <yaclib/exe/executor.hpp>
 #include <yaclib/exe/inline.hpp>
 #include <yaclib/exe/job.hpp>
-#include <yaclib/util/detail/nope_counter.hpp>
 
 namespace yaclib {
-namespace detail {
+namespace {
 
 template <bool Stop>
-class Inline final : public NopeCounter<IExecutor> {
+class Inline final : public IExecutor {
  private:
   [[nodiscard]] Type Tag() const noexcept final {
     return Type::Inline;
@@ -26,14 +25,14 @@ class Inline final : public NopeCounter<IExecutor> {
 static Inline<false> sAliveInline;
 static Inline<true> sStopInline;
 
-}  // namespace detail
+}  // namespace
 
 IExecutor& MakeInline() noexcept {
-  return detail::sAliveInline;
+  return sAliveInline;
 }
 
 IExecutor& MakeInline(StopTag) noexcept {
-  return detail::sStopInline;
+  return sStopInline;
 }
 
 }  // namespace yaclib

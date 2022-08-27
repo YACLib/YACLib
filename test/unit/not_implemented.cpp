@@ -4,10 +4,9 @@
 #include <yaclib/util/detail/default_event.hpp>
 #include <yaclib/util/detail/mutex_event.hpp>
 
-#if YACLIB_CORO
+#if YACLIB_CORO != 0
 #  include <yaclib/coro/detail/promise_type.hpp>
 #  include <yaclib/exe/inline.hpp>
-#  include <yaclib/util/detail/nope_counter.hpp>
 #endif
 
 #include <gtest/gtest-spi.h>
@@ -16,45 +15,31 @@
 namespace test {
 namespace {
 
-void CallInlineState() {
+void CheckDrop() {
   auto [f, p] = yaclib::MakeContract();
   auto& core = *p.GetCore();
-  core.InlineCore::Here(core, yaclib::detail::InlineCore::State::kEmpty);
-}
-
-TEST(InlineCore, CallInline) {
-#ifndef YACLIB_LOG_DEBUG
-  CallInlineState();
-#else
-  EXPECT_FATAL_FAILURE(CallInlineState(), "");
-#endif
-}
-
-void CallState() {
-  auto [f, p] = yaclib::MakeContract();
-  auto& core = *p.GetCore();
-  core.InlineCore::Call();
-}
-
-TEST(InlineCore, Call) {
-#ifndef YACLIB_LOG_DEBUG
-  CallState();
-#else
-  EXPECT_FATAL_FAILURE(CallState(), "");
-#endif
-}
-
-void DropState() {
-  auto [f, p] = yaclib::MakeContract();
-  auto& core = *p.GetCore();
-  core.InlineCore::Drop();
+  core.Job::Drop();
 }
 
 TEST(InlineCore, Drop) {
 #ifndef YACLIB_LOG_DEBUG
-  DropState();
+  CheckDrop();
 #else
-  EXPECT_FATAL_FAILURE(DropState(), "");
+  EXPECT_FATAL_FAILURE(CheckDrop(), "");
+#endif
+}
+
+void CheckHere() {
+  auto [f, p] = yaclib::MakeContract();
+  auto& core = *p.GetCore();
+  core.InlineCore::Here(core);
+}
+
+TEST(InlineCore, Here) {
+#ifndef YACLIB_LOG_DEBUG
+  CheckHere();
+#else
+  EXPECT_FATAL_FAILURE(CheckHere(), "");
 #endif
 }
 
@@ -67,35 +52,19 @@ TEST(UniqueJob, Ref) {
 }
 
 TEST(MutexEvent, Reset) {
-  yaclib::detail::NopeCounter<yaclib::detail::MutexEvent> m;
+  yaclib::detail::MutexEvent m;
   m.Reset();
 }
 
 TEST(DefaultEvent, Reset) {
-  yaclib::detail::NopeCounter<yaclib::detail::DefaultEvent> m;
+  yaclib::detail::DefaultEvent m;
   m.Reset();
 }
 
-TEST(UniqueCounter, IncRef) {
-  yaclib::IntrusivePtr<yaclib::IRef> ptr = yaclib::MakeUnique<yaclib::IRef>();
-  ptr->IncRef();
-}
-
 TEST(CoroDummy, DestroyResume) {
-#if YACLIB_CORO
+#if YACLIB_CORO != 0
   yaclib::detail::Destroy d;
   d.await_resume();
-#else
-  GTEST_SKIP();
-#endif
-}
-
-TEST(CoroDummy, BaseCoroGetHandle) {
-#if YACLIB_CORO
-  yaclib::detail::UniqueCounter<yaclib::detail::ResultCore<void, yaclib::StopError>> core;
-  core.IncRef();
-  core.Store(yaclib::Unit{});
-  std::ignore = core.GetHandle();
 #else
   GTEST_SKIP();
 #endif

@@ -2,6 +2,8 @@
 #include <yaclib/async/promise.hpp>
 #include <yaclib/util/result.hpp>
 
+#include <iostream>
+
 #include <gtest/gtest.h>
 
 namespace test {
@@ -9,30 +11,30 @@ namespace {
 
 TEST(Result, VoidSizeof) {
   static_assert(sizeof(yaclib::Result<>) == sizeof(std::exception_ptr) + alignof(std::exception_ptr));
-  fprintf(stderr, "%lu\n", sizeof(yaclib::Result<>));
+  std::cerr << sizeof(yaclib::Result<>) << std::endl;
 }
 
 TEST(Result, IntSizeof) {
   static_assert(sizeof(yaclib::Result<int>) == sizeof(std::exception_ptr) + alignof(std::exception_ptr));
-  fprintf(stderr, "%lu\n", sizeof(yaclib::Result<int>));
+  std::cerr << sizeof(yaclib::Result<int>) << std::endl;
 }
 
 TEST(Result, StringViewSizeof) {
   static_assert(sizeof(yaclib::Result<std::string_view>) == sizeof(std::string_view) + alignof(std::exception_ptr));
-  fprintf(stderr, "%lu\n", sizeof(yaclib::Result<std::string_view>));
+  std::cerr << sizeof(yaclib::Result<std::string_view>) << std::endl;
 }
 
 TEST(Result, VectorSizeof) {
   static_assert(sizeof(yaclib::Result<std::vector<int>>) == sizeof(std::vector<int>) + alignof(std::exception_ptr));
-  fprintf(stderr, "%lu\n", sizeof(yaclib::Result<std::vector<int>>));
+  std::cerr << sizeof(yaclib::Result<std::vector<int>>) << std::endl;
 }
 
 TEST(BaseCore, Sizeof) {
   using Core = yaclib::detail::BaseCore;
-#if YACLIB_FAULT != 2 || !defined(YACLIB_ATOMIC_EVENT)
+#if YACLIB_FAULT != 2 || YACLIB_FUTEX == 0
   static_assert(sizeof(void*) == sizeof(int) || sizeof(Core) == sizeof(void*) * 5);
 #endif
-  fprintf(stderr, "%lu\n", sizeof(Core));
+  std::cerr << sizeof(Core) << std::endl;
 }
 
 #if !defined(LAMBDA_SIZE) && defined(__has_cpp_attribute)
@@ -53,20 +55,22 @@ constexpr size_t kZeroCaptureLambdaSizeof = 0;
 constexpr size_t kZeroCaptureLambdaSizeof = sizeof(void*);
 #endif
 
+void kek() {
+}
+
 TEST(Core, EmptySizeof) {
   auto* core = yaclib::detail::MakeCore<yaclib::detail::CoreType::Run, void, yaclib::StopError>([] {
+    kek();
   });
 
   static_assert(sizeof(void*) == sizeof(int) || sizeof(*core) == (sizeof(yaclib::detail::BaseCore) +  //
                                                                   sizeof(yaclib::Result<>) +          //
                                                                   kZeroCaptureLambdaSizeof +          //
                                                                   0));
-  fprintf(stderr, "%lu\n", sizeof(*core));
-  core->SetWait(yaclib::detail::InlineCore::kWaitDrop);
-  core->Drop();
-}
+  std::cerr << sizeof(*core) << std::endl;
 
-void kek() {
+  core->StoreCallback(yaclib::detail::MakeEmpty(), yaclib::detail::BaseCore::kWaitDrop);
+  core->Drop();
 }
 
 TEST(Core, Sizeof) {
@@ -75,9 +79,10 @@ TEST(Core, Sizeof) {
                                                                   sizeof(yaclib::Result<>) +          //
                                                                   sizeof(&kek) +                      //
                                                                   0));
-  fprintf(stderr, "%lu\n", sizeof(*core));
+  std::cerr << sizeof(*core) << std::endl;
+
+  core->StoreCallback(yaclib::detail::MakeEmpty(), yaclib::detail::BaseCore::kWaitDrop);
   core->Drop();
-  core->SetWait(yaclib::detail::InlineCore::kWaitDrop);
 }
 
 }  // namespace

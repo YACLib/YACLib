@@ -10,7 +10,7 @@
 #  include <yaclib/fault/detail/fiber/thread.hpp>
 #endif
 
-#include <cstdio>
+#include <iostream>
 #include <random>
 #include <yaclib_std/thread>
 
@@ -53,16 +53,62 @@ void InitFault() {
 
 namespace {
 
+static_assert(YACLIB_FINAL_SUSPEND_TRANSFER <= YACLIB_SYMMETRIC_TRANSFER);
+
+#define YACLIB_STRINGIZE(X) YACLIB_DO_STRINGIZE(X)
+#define YACLIB_DO_STRINGIZE(X) #X
+
+/*
+#define YACLIB_JOIN(X, Y) YACLIB_DO_JOIN(X, Y)
+#define YACLIB_DO_JOIN(X, Y) YACLIB_DO_JOIN2(X, Y)
+#define YACLIB_DO_JOIN2(X, Y) X##Y
+*/
+
+#if defined(__clang_version__)
+#  define YACLIB_COMPILER "clang : " __clang_version__
+#elif defined(_MSC_FULL_VER) && defined(_MSC_VER)
+#  define YACLIB_COMPILER "ms visual c++ : " YACLIB_STRINGIZE(_MSC_FULL_VER) " or " YACLIB_STRINGIZE(_MSC_VER)
+#elif defined(_MSC_FULL_VER)
+#  define YACLIB_COMPILER "ms visual c++ : " YACLIB_STRINGIZE(_MSC_FULL_VER)
+#elif defined(_MSC_VER)
+#  define YACLIB_COMPILER "ms visual c++ : " YACLIB_STRINGIZE(_MSC_VER)
+#elif defined(__VERSION__)
+#  define YACLIB_COMPILER "gnu c++ : " __VERSION__
+#else
+#  define YACLIB_COMPILER "unknown"
+#endif
+
+#if defined(__GLIBCXX__)
+#  define YACLIB_STDLIB "gnu libstdc++ : " YACLIB_STRINGIZE(__GLIBCXX__)
+#elif defined(__GLIBCPP__)
+#  define YACLIB_STDLIB "gnu libstdc++ : " YACLIB_STRINGIZE(__GLIBCPP__)
+#elif defined(_LIBCPP_VERSION)
+#  define YACLIB_STDLIB "libc++ : " YACLIB_STRINGIZE(_LIBCPP_VERSION)
+#else
+#  define YACLIB_STDLIB "unknown"
+#endif
+
+#if defined(_WIN64)
+#  define YACLIB_PLATFORM "windows 64-bit"
+#elif defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
+#  define YACLIB_PLATFORM "windows 32-bit"
+#elif defined(__APPLE__)
+#  define YACLIB_PLATFORM "apple"
+#elif defined(__ANDROID__)
+#  define YACLIB_PLATFORM "android"
+#elif defined(__linux__)
+#  define YACLIB_PLATFORM "linux"
+#elif defined(__unix__)
+#  define YACLIB_PLATFORM "unix"
+#elif defined(_POSIX_VERSION)
+#  define YACLIB_PLATFORM "posix"
+#else
+#  define YACLIB_PLATFORM "unknown"
+#endif
+
 void PrintEnvInfo() {
-#ifdef __GLIBCPP__
-  std::fprintf(stderr, "libstdc++: %d\n", __GLIBCPP__);
-#endif
-#ifdef __GLIBCXX__
-  std::fprintf(stderr, "libstdc++: %d\n", __GLIBCXX__);
-#endif
-#ifdef _LIBCPP_VERSION
-  std::fprintf(stderr, "libc++: %d\n", _LIBCPP_VERSION);
-#endif
+  std::cerr << "compiler: " << YACLIB_COMPILER << "\nstdlib: " << YACLIB_STDLIB "\nplatform: " << YACLIB_PLATFORM
+            << std::endl;
 }
 
 }  // namespace

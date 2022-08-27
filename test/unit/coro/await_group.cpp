@@ -254,7 +254,7 @@ TEST(AwaitGroup, NonCoroWait) {
   auto coro = [&](int x) -> yaclib::Future<> {
     co_await On(*scheduler);
     yaclib_std::this_thread::sleep_for(YACLIB_CI_SLOWDOWN * 25ms);
-    cnt.fetch_add(1);
+    cnt.fetch_add(x, std::memory_order_relaxed);
     co_return{};
   };
   yaclib::Future<> f1, f2, f3;
@@ -265,37 +265,38 @@ TEST(AwaitGroup, NonCoroWait) {
 
   wg.Wait();
 
-  EXPECT_EQ(3, cnt.load());
+  EXPECT_EQ(6, cnt.load(std::memory_order_relaxed));
 
   scheduler->HardStop();
   scheduler->Wait();
 }
 
 TEST(AwaitGroup, Reset) {
-  auto scheduler = yaclib::MakeThreadPool(4);
+  auto scheduler = yaclib::MakeThreadPool(1);
 
   yaclib::WaitGroup<> wg;
 
   auto squarer = [&](int x) -> yaclib::Future<int> {
     co_await On(*scheduler);
     yaclib_std::this_thread::sleep_for(YACLIB_CI_SLOWDOWN * 1ms);
-    co_return x* x;
+    co_return x + x;
   };
 
   auto main_thread = yaclib_std::this_thread::get_id();
 
   auto waiter = [&](int x) -> yaclib::Future<int> {
     auto one = squarer(x);
+    EXPECT_EQ(main_thread, yaclib_std::this_thread::get_id());
     wg.Attach(one);
     co_await wg.Await(*scheduler);
-    EXPECT_NE(main_thread, yaclib_std::this_thread::get_id());
-    co_return std::move(one).Get().Value();
+    co_return std::move(one).Touch().Ok();
   };
 
-  EXPECT_EQ(5 * 5, waiter(5).Get().Value());
+  EXPECT_EQ(5 + 5, waiter(5).Get().Ok());
+
   wg.Reset();
 
-  EXPECT_EQ(6 * 6, waiter(6).Get().Value());
+  EXPECT_EQ(6 + 6, waiter(6).Get().Ok());
 
   scheduler->HardStop();
   scheduler->Wait();

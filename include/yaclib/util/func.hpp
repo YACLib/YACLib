@@ -12,7 +12,8 @@ namespace yaclib {
  */
 class IFunc : public IRef {  // TODO(MBkkt) Maybe remove inheritance from IRef
  public:
-  virtual void Call() noexcept = 0;
+  virtual void Call() noexcept {
+  }
 };
 
 }  // namespace yaclib

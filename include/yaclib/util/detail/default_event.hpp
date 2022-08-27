@@ -2,7 +2,7 @@
 
 #include <yaclib/config.hpp>
 
-#ifdef YACLIB_ATOMIC_EVENT
+#if YACLIB_FUTEX != 0
 #  include <yaclib/util/detail/atomic_event.hpp>
 #else
 #  include <yaclib/util/detail/mutex_event.hpp>
@@ -10,7 +10,7 @@
 
 namespace yaclib::detail {
 
-#ifdef YACLIB_ATOMIC_EVENT
+#if YACLIB_FUTEX != 0
 using DefaultEvent = AtomicEvent;
 #else
 using DefaultEvent = MutexEvent;

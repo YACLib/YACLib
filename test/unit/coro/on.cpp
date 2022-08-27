@@ -9,6 +9,7 @@
 
 #include <array>
 #include <exception>
+#include <iostream>
 #include <utility>
 #include <vector>
 #include <yaclib_std/thread>
@@ -148,7 +149,8 @@ TEST(On, LockWithStrand) {
   }
   tp->Stop();
   tp->Wait();
-  fprintf(stderr, "min: %lu | sum: %lu | max %lu", kThreads * kIncrements, sum, 2 * kThreads * kIncrements);
+  std::cerr << "min: " << kThreads * kIncrements << " | sum: " << sum << " | max " << 2 * kThreads * kIncrements
+            << std::endl;
   ASSERT_GT(sum, kThreads * kIncrements);
   ASSERT_LE(sum, 2 * kThreads * kIncrements);
 }

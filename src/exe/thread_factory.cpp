@@ -2,7 +2,6 @@
 
 #include <yaclib/exe/thread_factory.hpp>
 #include <yaclib/log.hpp>
-#include <yaclib/util/detail/nope_counter.hpp>
 #include <yaclib/util/func.hpp>
 #include <yaclib/util/helper.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
@@ -173,7 +172,7 @@ class ThreadFactory : public BaseFactory {
   }
 };
 
-class LightThreadFactory final : public detail::NopeCounter<ThreadFactory> {
+class LightThreadFactory final : public ThreadFactory {
  private:
   IThread* Acquire(IFuncPtr func, std::size_t priority, std::string_view name, IFuncPtr acquire,
                    IFuncPtr release) final {
@@ -347,25 +346,24 @@ IThreadFactoryPtr MakeThreadFactory(std::size_t cache_threads) {
   if (cache_threads == 0) {
     return IThreadFactoryPtr{&sFactory};
   }
-  return MakeIntrusive<HeavyThreadFactory, IThreadFactory>(cache_threads);
+  return MakeShared<HeavyThreadFactory>(1, cache_threads);
 }
 
 IThreadFactoryPtr MakeThreadFactory(IThreadFactoryPtr base, std::size_t priority) {
-  return MakeIntrusive<PriorityThreadFactory, IThreadFactory>(std::move(base), priority);
+  return MakeShared<PriorityThreadFactory>(1, std::move(base), priority);
 }
 
 IThreadFactoryPtr MakeThreadFactory(IThreadFactoryPtr base, std::string_view name) {
-  return MakeIntrusive<NamedThreadFactory, IThreadFactory>(std::move(base), name);
+  return MakeShared<NamedThreadFactory>(1, std::move(base), name);
 }
 
 IThreadFactoryPtr MakeThreadFactory(IThreadFactoryPtr base, IFuncPtr acquire, IFuncPtr release) {
   if (acquire && release) {
-    return MakeIntrusive<CallbackThreadFactory, IThreadFactory>(std::move(base), std::move(acquire),
-                                                                std::move(release));
+    return MakeShared<CallbackThreadFactory>(1, std::move(base), std::move(acquire), std::move(release));
   } else if (acquire) {
-    return MakeIntrusive<AcquireThreadFactory, IThreadFactory>(std::move(base), std::move(acquire));
+    return MakeShared<AcquireThreadFactory>(1, std::move(base), std::move(acquire));
   } else if (release) {
-    return MakeIntrusive<ReleaseThreadFactory, IThreadFactory>(std::move(base), std::move(release));
+    return MakeShared<ReleaseThreadFactory>(1, std::move(base), std::move(release));
   }
   return base;  // Copy elision doesn't work for function arguments, but implicit move guaranteed by standard
 }

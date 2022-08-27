@@ -10,25 +10,17 @@
 namespace yaclib::detail {
 
 template <typename CounterBase, typename Deleter = DefaultDeleter>
-struct AtomicCounter final : CounterBase {
+struct AtomicCounter : CounterBase {
   template <typename... Args>
   AtomicCounter(std::size_t n, Args&&... args) noexcept(std::is_nothrow_constructible_v<CounterBase, Args&&...>)
     : CounterBase{std::forward<Args>(args)...}, count{n} {
   }
 
-  void IncRef() noexcept final {
-    IncRef(1);
-  }
-
-  void DecRef() noexcept final {
-    DecRef(1);
-  }
-
-  YACLIB_INLINE void IncRef(std::size_t delta) noexcept {
+  YACLIB_INLINE void Add(std::size_t delta) noexcept {
     count.fetch_add(delta, std::memory_order_relaxed);
   }
 
-  YACLIB_INLINE void DecRef(std::size_t delta) noexcept {
+  YACLIB_INLINE void Sub(std::size_t delta) noexcept {
     if (SubEqual(delta)) {
       Deleter::Delete(*this);
     }

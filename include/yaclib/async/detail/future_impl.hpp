@@ -69,7 +69,7 @@ auto FutureBase<V, E>::Then(IExecutor& e, Func&& f) && {
 
 template <typename V, typename E>
 void FutureBase<V, E>::Detach() && noexcept {
-  _core.Release()->SetWait(detail::InlineCore::kWaitDrop);
+  (void)detail::Detach(*_core.Release());
 }
 
 template <typename V, typename E>

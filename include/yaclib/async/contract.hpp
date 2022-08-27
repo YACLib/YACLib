@@ -17,9 +17,9 @@ using Contract = std::pair<Future<V, E>, Promise<V, E>>;
  */
 template <typename V = void, typename E = StopError>
 [[nodiscard]] Contract<V, E> MakeContract() {
-  auto core = new detail::UniqueCounter<detail::ResultCore<V, E>>{};
-  Future<V, E> future{detail::ResultCorePtr<V, E>{NoRefTag{}, core}};
-  Promise<V, E> promise{detail::ResultCorePtr<V, E>{NoRefTag{}, core}};
+  auto core = MakeUnique<detail::ResultCore<V, E>>();
+  Future<V, E> future{detail::ResultCorePtr<V, E>{NoRefTag{}, core.Get()}};
+  Promise<V, E> promise{detail::ResultCorePtr<V, E>{NoRefTag{}, core.Release()}};
   return {std::move(future), std::move(promise)};
 }
 

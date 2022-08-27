@@ -26,7 +26,7 @@ namespace test {
 namespace {
 
 TYPED_TEST(AsyncSuite, JustWorks) {
-  yaclib::AsyncMutex m;
+  yaclib::AsyncMutex<> m;
   auto tp = yaclib::MakeThreadPool();
 
   const std::size_t kCoros = 10'000;
@@ -98,17 +98,17 @@ TYPED_TEST(AsyncSuite, Counter) {
   tp->Wait();
 }
 
-TEST(AsyncMutex, TryLock) {
-  yaclib::AsyncMutex mutex;
-  EXPECT_TRUE(mutex.TryLock());
-  EXPECT_FALSE(mutex.TryLock());
-  mutex.UnlockHere();
-  EXPECT_TRUE(mutex.TryLock());
-  mutex.UnlockHere();
+TEST(AsyncMutexSuite, TryLock) {
+  yaclib::AsyncMutex<> m;
+  EXPECT_TRUE(m.TryLock());
+  EXPECT_FALSE(m.TryLock());
+  m.UnlockHere();
+  EXPECT_TRUE(m.TryLock());
+  m.UnlockHere();
 }
 
-TEST(AsyncMutex, ScopedLock) {
-  yaclib::AsyncMutex m;
+TEST(AsyncMutexSuite, ScopedLock) {
+  yaclib::AsyncMutex<> m;
   {
     auto lock = m.TryGuard();
     EXPECT_TRUE(lock.OwnsLock());
@@ -126,7 +126,7 @@ TYPED_TEST(AsyncSuite, LockAsync) {
   GTEST_SKIP();  // Doesn't work for Win32 or Debug, I think its probably because bad symmetric transfer implementation
   // TODO(kononovk) Try to confirm problem and localize it with ifdefs
 #endif
-  yaclib::AsyncMutex m;
+  yaclib::AsyncMutex<> m;
   auto executor = yaclib::MakeManual();
   auto [f1, p1] = yaclib::MakeContract<bool>();
   auto [f2, p2] = yaclib::MakeContract<bool>();
@@ -175,7 +175,7 @@ TYPED_TEST(AsyncSuite, LockAsync) {
 }
 
 TYPED_TEST(AsyncSuite, ScopedLockAsync) {
-  yaclib::AsyncMutex m;
+  yaclib::AsyncMutex<> m;
   auto executor = yaclib::MakeManual();
   auto [f1, p1] = yaclib::MakeContract<bool>();
   auto [f2, p2] = yaclib::MakeContract<bool>();
@@ -229,7 +229,7 @@ TYPED_TEST(AsyncSuite, GuardRelease) {
   GTEST_SKIP();  // Doesn't work for Win32 or Debug, I think its probably because bad symmetric transfer implementation
   // TODO(kononovk) Try to confirm problem and localize it with ifdefs
 #endif
-  yaclib::AsyncMutex m;
+  yaclib::AsyncMutex<> m;
   auto tp = yaclib::MakeThreadPool(2);
 
   const std::size_t kCoros = 20;
@@ -271,7 +271,7 @@ TYPED_TEST(AsyncSuite, UnlockHereBehaviour) {
   constexpr std::size_t kCoros = 4;
 
   auto tp = yaclib::MakeThreadPool(kThreads);
-  yaclib::AsyncMutex mutex;
+  yaclib::AsyncMutex<> m;
   std::array<yaclib::Future<>, kCoros> futures;
   yaclib_std::atomic_bool start{false};
 
@@ -279,11 +279,11 @@ TYPED_TEST(AsyncSuite, UnlockHereBehaviour) {
     if constexpr (TestFixture::kIsFuture) {
       co_await On(*tp);
     }
-    co_await mutex.Lock();
+    co_await m.Lock();
     start.store(true, std::memory_order_release);
     auto id = yaclib_std::this_thread::get_id();
     yaclib_std::this_thread::sleep_for(1s);
-    mutex.UnlockHere();
+    m.UnlockHere();
     EXPECT_EQ(id, yaclib_std::this_thread::get_id());
     co_return{};
   };
@@ -291,9 +291,9 @@ TYPED_TEST(AsyncSuite, UnlockHereBehaviour) {
     if constexpr (TestFixture::kIsFuture) {
       co_await On(*tp);
     }
-    co_await mutex.Lock();
+    co_await m.Lock();
     auto id = yaclib_std::this_thread::get_id();
-    mutex.UnlockHere();
+    m.UnlockHere();
     yaclib_std::this_thread::sleep_for(1s);
     EXPECT_EQ(id, yaclib_std::this_thread::get_id());
     co_return{};
@@ -334,7 +334,7 @@ TYPED_TEST(AsyncSuite, UnlockOnBehaviour) {
   constexpr std::size_t kCoros = 4;
 
   auto tp = yaclib::MakeThreadPool(kThreads);
-  yaclib::AsyncMutex mutex;
+  yaclib::AsyncMutex<> m;
   std::array<yaclib::Future<>, kCoros> futures;
 
   yaclib_std::atomic_bool start{false};
@@ -344,22 +344,22 @@ TYPED_TEST(AsyncSuite, UnlockOnBehaviour) {
     if constexpr (TestFixture::kIsFuture) {
       co_await On(*tp);
     }
-    co_await mutex.Lock();
+    co_await m.Lock();
     start.store(true, std::memory_order_release);
     locked_id = yaclib_std::this_thread::get_id();
     yaclib_std::this_thread::sleep_for(1s);
-    co_await mutex.UnlockOn(*tp);
+    co_await m.UnlockOn(*tp);
     co_return{};
   };
   auto coro2 = [&]() -> typename TestFixture::Type {
     if constexpr (TestFixture::kIsFuture) {
       co_await On(*tp);
     }
-    co_await mutex.Lock();
+    co_await m.Lock();
 #ifdef GTEST_OS_LINUX
     EXPECT_EQ(locked_id, yaclib_std::this_thread::get_id());
 #endif
-    co_await mutex.UnlockOn(*tp);
+    co_await m.UnlockOn(*tp);
     yaclib_std::this_thread::sleep_for(1s);
     co_return{};
   };

@@ -27,7 +27,10 @@
 #  endif
 #endif
 
+// clang-format off
 #define YACLIB_FAULT ${YACLIB_FAULT}
+// clang-format on
+
 // TODO(myannyax) YACLIB_SLOWDOWN with fault
 
 // Maybe we should increase some of this
@@ -53,10 +56,6 @@
 #  else
 #    define YACLIB_MEMORY_OVERHEAD 1
 #  endif
-#endif
-
-#if ${YACLIB_ATOMIC_EVENT}
-#  define YACLIB_ATOMIC_EVENT
 #endif
 
 // TODO(MBkkt) Maybe make all single line not virtual functions are YACLIB_INLINE?
@@ -87,41 +86,72 @@
 #  endif
 #endif
 
-// TODO(mkornaukhov03) figure out more convinient way how to check the possibility of Symmetric Transfer
+#if defined(__has_include)
+#  define YACLIB_HAS_INCLUDE(include) __has_include(include)
+#else
+#  define YACLIB_HAS_INCLUDE(include) 0
+#endif
+
+// TODO(mkornaukhov03) figure out more convenient way how to check the possibility of Symmetric Transfer
 // Now it has a problem: doesn't use Symmetric Transfer even if possible
+// clang-format off
 #if ${YACLIB_CORO_NEED}
-#  if defined(__clang__)
-#    if defined __has_include
-#      if __has_include(<coroutine>)
-#        define YACLIB_CORO 2
-#      else
-#        define YACLIB_CORO 1
-#      endif
-#    endif
-#    if defined(__apple_build_version) && defined(YACLIB_TSAN)
-#      if __apple_build_version < 13100000
-#        define YACLIB_SYMMETRIC_TRANSFER 0  // because of TSAN problems
-#      else
-#        define YACLIB_SYMMETRIC_TRANSFER 1
-#      endif
-#    else
-#      define YACLIB_SYMMETRIC_TRANSFER 1
-#    endif
-#  elif defined(__GNUG__)
-#    define YACLIB_SYMMETRIC_TRANSFER 1
+#  if YACLIB_HAS_INCLUDE(<coroutine>)
 #    define YACLIB_CORO 2
-#  elif defined(_MSC_VER)
-#    if _MSC_VER > 1928
-#      define YACLIB_CORO 2
+#  else
+#    define YACLIB_CORO 1
+#  endif
+#  define YACLIB_SYMMETRIC_TRANSFER ${YACLIB_SYMMETRIC_TRANSFER}
+#  define YACLIB_FINAL_SUSPEND_TRANSFER ${YACLIB_FINAL_SUSPEND_TRANSFER}
+#  if defined(__clang__) && defined(__apple_build_version) && defined(YACLIB_TSAN)
+// apple clang before 13.1 detect false positive data race with tsan
+#    if __apple_build_version < 13100000
+#      undef YACLIB_SYMMETRIC_TRANSFER
+#      define YACLIB_SYMMETRIC_TRANSFER 0
+#      undef YACLIB_FINAL_SUSPEND_TRANSFER
+#      define YACLIB_FINAL_SUSPEND_TRANSFER 0
+#    endif
+#  elif defined(_MSC_VER) && !defined(__clang__)
+#    undef YACLIB_SYMMETRIC_TRANSFER
+#    if YACLIB_CORO == 2
 #      define YACLIB_SYMMETRIC_TRANSFER 1
 #    else
-#      define YACLIB_CORO 1
 #      define YACLIB_SYMMETRIC_TRANSFER 0
 #    endif
-#  else
-#    define YACLIB_SYMMETRIC_TRANSFER 1
-#    define YACLIB_CORO 2
+//   MSVC doesn't seem to like symmetric transfer in final_suspend, runtime segfault or complile time error:
+//   https://developercommunity.visualstudio.com/t/coroutine-compilation-resulting-in-error-c4737-una/1510427
+#    undef YACLIB_FINAL_SUSPEND_TRANSFER
+#    define YACLIB_FINAL_SUSPEND_TRANSFER 0
 #  endif
+#else
+#  define YACLIB_CORO 0
+#  define YACLIB_SYMMETRIC_TRANSFER 0
+#  define YACLIB_FINAL_SUSPEND_TRANSFER 0
+#endif
+
+#if defined(__has_cpp_attribute)
+#  define YACLIB_HAS_ATTRIBUTE(attr) __has_cpp_attribute(attr)
+#else
+#  define YACLIB_HAS_ATTRIBUTE(attr) 0
+#endif
+
+#define YACLIB_FUTEX 0
+#if YACLIB_HAS_INCLUDE(<version>) &&                                                                                   \
+    (   defined(_MSC_VER)                                                                                              \
+     || (defined(_LIBCPP_VERSION) && defined(__linux__))                                                               \
+   /*|| defined(_GLIBCXX_HAVE_LINUX_FUTEX) TODO Some bug in libstdc++*/)
+#  include <version>
+#  if __cpp_lib_atomic_wait != 0
+#    undef YACLIB_FUTEX
+#    define YACLIB_FUTEX ${YACLIB_FUTEX}
+#  endif
+#endif
+// clang-format on
+
+#if YACLIB_HAS_ATTRIBUTE(no_unique_address)
+#  define YACLIB_NO_UNIQUE_ADDRESS [[no_unique_address]]
+#else
+#  define YACLIB_NO_UNIQUE_ADDRESS
 #endif
 
 namespace yaclib {

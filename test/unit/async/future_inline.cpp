@@ -263,7 +263,7 @@ TEST(ThenInline, Callback) {
   ThenInlineCallback<false>();
 }
 
-class StopSource final : public yaclib::detail::NopeCounter<yaclib::IExecutor> {
+class StopSource final : public yaclib::IExecutor {
  public:
   explicit StopSource(yaclib::IExecutor& executor) noexcept : _executor{executor} {
   }

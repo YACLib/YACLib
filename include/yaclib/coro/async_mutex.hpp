@@ -63,7 +63,7 @@ class AsyncMutex final {
   }
 
   template <bool FIFO = DefaultFIFO>
-  void UnlockHere(IExecutor& executor = CurrentThreadPool()) noexcept {
+  void UnlockHere(IExecutor& e = CurrentThreadPool()) noexcept {
     YACLIB_DEBUG(_state.load(std::memory_order_relaxed) == kNotLocked, "UnlockHere must be called after Lock!");
     auto* next = TryUnlock<FIFO>();
     if (next == nullptr) {
@@ -71,7 +71,7 @@ class AsyncMutex final {
     }
     _count_batch_here = 0;
     _waiters = static_cast<detail::BaseCore*>(next->next);
-    executor.Submit(*next);
+    e.Submit(*next);
   }
 
   class [[nodiscard]] LockGuard final {
@@ -102,22 +102,22 @@ class AsyncMutex final {
     }
 
     template <bool FIFO = DefaultFIFO, std::int64_t BatchHere = DefaultBatchHere>
-    auto Unlock(IExecutor& executor = CurrentThreadPool()) noexcept {
+    auto Unlock(IExecutor& e = CurrentThreadPool()) noexcept {
       YACLIB_ERROR(!_owns, "Cannot unlock not locked mutex");
       _owns = false;
-      return _mutex->Unlock<FIFO, BatchHere>(executor);
+      return _mutex->Unlock<FIFO, BatchHere>(e);
     }
 
     template <bool FIFO = DefaultFIFO, std::int64_t BatchHere = DefaultBatchHere>
-    auto UnlockOn(IExecutor& executor = CurrentThreadPool()) noexcept {
-      return Unlock<FIFO, kOn * BatchHere>();
+    auto UnlockOn(IExecutor& e = CurrentThreadPool()) noexcept {
+      return Unlock<FIFO, kOn * BatchHere>(e);
     }
 
     template <bool FIFO = DefaultFIFO>
-    void UnlockHere(IExecutor& executor = CurrentThreadPool()) noexcept {
+    void UnlockHere(IExecutor& e = CurrentThreadPool()) noexcept {
       YACLIB_ERROR(!_owns, "Cannot unlock not locked mutex");
       _owns = false;
-      _mutex->UnlockHere<FIFO>(executor);
+      _mutex->UnlockHere<FIFO>(e);
     }
 
     void Swap(AsyncMutex& other) noexcept {
@@ -221,7 +221,7 @@ class AsyncMutex final {
       _mutex._waiters = static_cast<detail::BaseCore*>(next->next);
       if (_mutex._count_batch_here <= (BatchHere >= 0 ? BatchHere : -BatchHere)) {
         _executor.Submit(handle.promise());
-        YACLIB_TRANSFER(next->GetHandle());
+        YACLIB_TRANSFER(next->Next());
       }
       _mutex._count_batch_here = 0;
       _executor.Submit(*next);

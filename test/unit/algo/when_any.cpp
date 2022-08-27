@@ -1,5 +1,6 @@
 #include <yaclib/algo/detail/result_core.hpp>
 #include <yaclib/async/contract.hpp>
+#include <yaclib/async/make.hpp>
 #include <yaclib/async/promise.hpp>
 #include <yaclib/async/run.hpp>
 #include <yaclib/async/when_any.hpp>
@@ -30,6 +31,15 @@ namespace test {
 namespace {
 
 using namespace std::chrono_literals;
+
+TEST(WhenAny, FirstFailDestroy) {
+  auto exception = yaclib::MakeFuture<int>(std::make_exception_ptr(std::runtime_error{""}));
+  auto error = yaclib::MakeFuture<int>(yaclib::StopTag{});
+  auto ready = yaclib::MakeFuture(1);
+  auto ready2 = yaclib::WhenAny<yaclib::WhenPolicy::FirstFail>(std::move(exception), std::move(ready));
+  auto ready3 = yaclib::WhenAny<yaclib::WhenPolicy::FirstFail>(std::move(error), std::move(ready2));
+  EXPECT_EQ(std::move(ready3).Get().Ok(), 1);
+}
 
 enum class Result {
   Ok,

@@ -24,7 +24,7 @@ template <bool Force>
 void Run(BaseCore* head, IExecutor& e) noexcept {
   while (MoveToCaller<Force>(head, e)) {
   }
-  auto* head_executor = static_cast<IExecutor*>(head->_caller);
+  auto* head_executor = head->_caller;
   if (head_executor == nullptr) {
     e.IncRef();
     head->_caller = head_executor = &e;
@@ -32,7 +32,7 @@ void Run(BaseCore* head, IExecutor& e) noexcept {
   if constexpr (Force) {
     e.Submit(*head);
   } else {
-    head_executor->Submit(*head);
+    static_cast<IExecutor*>(head_executor)->Submit(*head);
   }
 }
 

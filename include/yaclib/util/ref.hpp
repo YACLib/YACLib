@@ -10,12 +10,14 @@ class IRef {
   /**
    * Increments reference counter
    */
-  virtual void IncRef() noexcept = 0;
+  virtual void IncRef() noexcept {
+  }
 
   /**
    * Decrements reference counter
    */
-  virtual void DecRef() noexcept = 0;
+  virtual void DecRef() noexcept {
+  }
 
   virtual ~IRef() noexcept = default;
 };
