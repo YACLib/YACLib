@@ -43,7 +43,7 @@ bool WaitRange(const Timeout& timeout, Range&& range, std::size_t count) noexcep
     // We know we have `wait_count - reset_count` Results, but we must wait until event was not used by cores
   }
   event.Wait(token);
-  return reset_count == 0;
+  return reset_count == 0;  // LCOV_EXCL_LINE shitty gcov cannot parse it
 }
 
 template <typename Event, typename Timeout, typename... Cores>
