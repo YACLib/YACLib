@@ -30,7 +30,7 @@ class AtomicFlag : public AtomicWait<bool> {
     return val;
   }
 
-#ifdef YACLIB_ATOMIC_EVENT
+#if YACLIB_FUTEX != 0
   bool test(std::memory_order) const volatile noexcept {
     return _value;
   }

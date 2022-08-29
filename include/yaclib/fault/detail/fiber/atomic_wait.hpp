@@ -32,7 +32,7 @@ class AtomicWait {
 
   static constexpr bool is_always_lock_free = true;
 
-#ifdef YACLIB_ATOMIC_EVENT
+#if YACLIB_FUTEX != 0
   void wait(T old, std::memory_order) const noexcept {
     while (_value == old) {
       const_cast<FiberQueue*>(&_queue)->Wait(NoTimeoutTag{});
@@ -61,7 +61,7 @@ class AtomicWait {
 
  protected:
   T _value;
-#ifdef YACLIB_ATOMIC_EVENT
+#if YACLIB_FUTEX != 0
   FiberQueue _queue;
 #endif
 };

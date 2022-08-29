@@ -10,7 +10,7 @@ class AtomicWait : protected Impl {
  public:
   using Impl::Impl;
 
-#ifdef YACLIB_ATOMIC_EVENT
+#if YACLIB_FUTEX != 0
   void wait(T old, std::memory_order order = std::memory_order_seq_cst) const noexcept {
     YACLIB_INJECT_FAULT(Impl::wait(old, order));
   }

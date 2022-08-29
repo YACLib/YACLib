@@ -202,7 +202,7 @@ And also the implementation of strand is an efficient lock-free, without additio
 
 ```cpp
 auto tp = yaclib::MakeThreadPool(4);
-yaclib::AsyncMutex m;
+yaclib::AsyncMutex<> m;
 
 size_t counter = 0;
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <yaclib/algo/detail/wait_event.hpp>
 #include <yaclib/algo/one_shot_event.hpp>
 #include <yaclib/async/future.hpp>
 #include <yaclib/config.hpp>
@@ -29,7 +30,7 @@ class WaitGroup final {
    * \param count of async operations
    */
   YACLIB_INLINE void Add(std::size_t count = 1) noexcept {
-    _event.IncRef(count);
+    _event.Add(count);
   }
 
   /**
@@ -38,7 +39,7 @@ class WaitGroup final {
    * \param count of async operations
    */
   YACLIB_INLINE void Done(std::size_t count = 1) noexcept {
-    _event.DecRef(count);
+    _event.Sub(count);
   }
 
   /**
@@ -204,21 +205,16 @@ class WaitGroup final {
     }
     const auto wait_count = range([&](detail::BaseCore& core) noexcept {
       if constexpr (NeedMove) {
-        if (core.SetWait(_event, detail::InlineCore::kWaitDrop)) {
-          return true;
-        }
-        core.DecRef();
-        return false;
+        return detail::Detach(core, _event);
       } else {
-        return core.SetWait(_event, detail::InlineCore::kWaitNope);
+        return core.SetCallback(_event, detail::BaseCore::kWaitNope);
       }
     });
     if (count != wait_count) {  // TODO(MBkkt) is it necessary?
       Done(count - wait_count);
     }
   }
-
-  detail::AtomicCounter<Event, detail::SetDeleter> _event;
+  detail::WaitEvent<Event, detail::AtomicCounter> _event;
 };
 
 extern template class WaitGroup<OneShotEvent>;

@@ -5,13 +5,20 @@
 namespace yaclib::detail {
 
 template <typename CounterBase, typename Deleter = DefaultDeleter>
-struct UniqueCounter : CounterBase {
-  using CounterBase::CounterBase;
+struct OneCounter : CounterBase {
+  template <typename... Args>
+  OneCounter(std::size_t, Args&&... args) noexcept(std::is_nothrow_constructible_v<CounterBase, Args&&...>)
+    : CounterBase{std::forward<Args>(args)...} {
+  }
 
-  void IncRef() noexcept final {  // LCOV_EXCL_LINE compiler remove this call from tests
-  }                               // LCOV_EXCL_LINE
+  constexpr bool SubEqual(std::size_t) const {
+    return false;
+  }
 
-  void DecRef() noexcept final {
+  void Add(std::size_t) noexcept {  // LCOV_EXCL_LINE compiler remove this call from tests
+  }                                 // LCOV_EXCL_LINE
+
+  void Sub(std::size_t) noexcept {
     Deleter::Delete(*this);
   }
 };

@@ -25,7 +25,7 @@ std::size_t ManualExecutor::Drain() {
 }
 
 IntrusivePtr<ManualExecutor> MakeManual() {
-  return MakeIntrusive<ManualExecutor>();
+  return MakeShared<ManualExecutor>(1);
 }
 
 }  // namespace yaclib

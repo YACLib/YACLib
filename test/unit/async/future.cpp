@@ -16,7 +16,6 @@
 #include <yaclib/exe/manual.hpp>
 #include <yaclib/exe/submit.hpp>
 #include <yaclib/exe/thread_pool.hpp>
-#include <yaclib/util/detail/nope_counter.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 #include <yaclib/util/result.hpp>
 
@@ -368,17 +367,17 @@ TYPED_TEST(AsyncSuite, PipelineSimple) {
 
 class Calculator {
  public:
-  Calculator(yaclib::IThreadPoolPtr tp) : _tp(tp) {
+  Calculator(yaclib::IExecutor& e) : _executor{e} {
   }
 
   template <bool IsFuture = true>
   auto Increment(int value) {
     if constexpr (IsFuture) {
-      return yaclib::Run(*_tp, [value] {
+      return yaclib::Run(_executor, [value] {
         return value + 1;
       });
     } else {
-      return yaclib::Schedule(*_tp, [value] {
+      return yaclib::Schedule(_executor, [value] {
         return value + 1;
       });
     }
@@ -387,24 +386,24 @@ class Calculator {
   template <bool IsFuture = true>
   auto Double(int value) {
     if constexpr (IsFuture) {
-      return yaclib::Run(*_tp, [value] {
+      return yaclib::Run(_executor, [value] {
         return value * 2;
       });
     } else {
-      return yaclib::Schedule(*_tp, [value] {
+      return yaclib::Schedule(_executor, [value] {
         return value * 2;
       });
     }
   }
 
  private:
-  yaclib::IThreadPoolPtr _tp;
+  yaclib::IExecutor& _executor;
 };
 
 TYPED_TEST(AsyncSuite, AsyncThen) {
   auto tp = yaclib::MakeThreadPool(4);
 
-  Calculator calculator(tp);
+  Calculator calculator(*tp);
 
   auto pipeline = calculator.Increment<TestFixture::kIsFuture>(1)
                     .Then([&](int value) {
@@ -528,7 +527,7 @@ TEST(Pipeline, Simple2) {
 }
 
 TEST(Simple, MakePromiseContract) {
-  yaclib::detail::NopeCounter<yaclib::ManualExecutor> e;
+  yaclib::ManualExecutor e;
   EXPECT_EQ(e.Tag(), yaclib::IExecutor::Type::Custom);
   auto [f, p] = yaclib::MakeContract<int>();
   auto g = std::move(f).Then(e, [](int x) {

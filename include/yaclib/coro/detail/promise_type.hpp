@@ -18,8 +18,8 @@ struct Destroy final {
   }
 
   template <typename Promise>
-  YACLIB_INLINE void await_suspend(yaclib_std::coroutine_handle<Promise> handle) const noexcept {
-    handle.promise().SetResult();
+  YACLIB_INLINE auto await_suspend(yaclib_std::coroutine_handle<Promise> handle) const noexcept {
+    return handle.promise().template SetResult<YACLIB_FINAL_SUSPEND_TRANSFER != 0>();
   }
 
   constexpr void await_resume() const noexcept {
@@ -29,21 +29,16 @@ struct Destroy final {
 template <bool Lazy>
 struct PromiseTypeDeleter final {
   template <typename V, typename E>
-  static void Delete(ResultCore<V, E>& core) noexcept {
-    auto& promise = static_cast<PromiseType<V, E, Lazy>&>(core);
-    auto handle = yaclib_std::coroutine_handle<PromiseType<V, E, Lazy>>::from_promise(promise);
-    YACLIB_ASSERT(handle == core.GetHandle());
-    YACLIB_ASSERT(handle);
-    handle.destroy();
-  }
+  static void Delete(ResultCore<V, E>& core) noexcept;
 };
 
 template <typename V, typename E, bool Lazy>
-class PromiseType : public UniqueCounter<ResultCore<V, E>, PromiseTypeDeleter<Lazy>> {
-  using Base = UniqueCounter<ResultCore<V, E>, PromiseTypeDeleter<Lazy>>;
+class PromiseType final : public OneCounter<ResultCore<V, E>, PromiseTypeDeleter<Lazy>> {
+  using Base = OneCounter<ResultCore<V, E>, PromiseTypeDeleter<Lazy>>;
 
  public:
-  PromiseType() noexcept = default;  // get_return_object is gonna be invoked right after ctor
+  PromiseType() noexcept : Base{0} {
+  }  // get_return_object is gonna be invoked right after ctor
 
   auto get_return_object() noexcept {
     if constexpr (Lazy) {
@@ -70,10 +65,6 @@ class PromiseType : public UniqueCounter<ResultCore<V, E>, PromiseTypeDeleter<La
     this->Store(std::current_exception());
   }
 
-  yaclib_std::coroutine_handle<> GetHandle() noexcept final {
-    return yaclib_std::coroutine_handle<PromiseType>::from_promise(*this);
-  }
-
   template <typename Value>
   void return_value(Value&& value) noexcept(std::is_nothrow_constructible_v<Result<V, E>, Value&&>) {
     this->Store(std::forward<Value>(value));
@@ -84,13 +75,39 @@ class PromiseType : public UniqueCounter<ResultCore<V, E>, PromiseTypeDeleter<La
     this->Store(Unit{});
   }
 
+  auto Handle() noexcept {
+    return yaclib_std::coroutine_handle<PromiseType>::from_promise(*this);
+  }
+
  private:
+  void DecRef() noexcept final {
+    this->Sub(1);
+  }
+
   void Call() noexcept final {
-    auto handle = GetHandle();
+    auto handle = Handle();
     YACLIB_ASSERT(handle);
     YACLIB_ASSERT(!handle.done());
     handle.resume();
   }
+
+#if YACLIB_SYMMETRIC_TRANSFER != 0
+  yaclib_std::coroutine_handle<> Next() noexcept final {
+    auto handle = Handle();
+    YACLIB_ASSERT(handle);
+    YACLIB_ASSERT(!handle.done());
+    return handle;
+  }
+#endif
 };
+
+template <bool Lazy>
+template <typename V, typename E>
+void PromiseTypeDeleter<Lazy>::Delete(ResultCore<V, E>& core) noexcept {
+  auto& promise = static_cast<PromiseType<V, E, Lazy>&>(core);
+  auto handle = promise.Handle();
+  YACLIB_ASSERT(handle);
+  handle.destroy();
+}
 
 }  // namespace yaclib::detail

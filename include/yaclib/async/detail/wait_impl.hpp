@@ -1,6 +1,7 @@
 #pragma once
 
 #include <yaclib/algo/detail/base_core.hpp>
+#include <yaclib/algo/detail/wait_event.hpp>
 #include <yaclib/util/detail/atomic_counter.hpp>
 #include <yaclib/util/detail/default_event.hpp>
 #include <yaclib/util/detail/set_deleter.hpp>
@@ -15,12 +16,12 @@ namespace yaclib::detail {
 
 struct NoTimeoutTag final {};
 
-template <typename Counter, InlineCore::State State = InlineCore::kWaitNope, typename Timeout, typename Range>
+template <typename Event, BaseCore::State State = BaseCore::kWaitNope, typename Timeout, typename Range>
 bool WaitRange(const Timeout& timeout, Range&& range, std::size_t count) noexcept {
-  Counter event{count + 1};
+  Event event{count + 1};
   // event ref counter = n + 1, it is optimization: we don't want to notify when return true immediately
   auto const wait_count = range([&](BaseCore& core) noexcept {
-    return core.SetWait(event, State);
+    return core.SetCallback(event, State);
   });
   if (wait_count == 0 || event.SubEqual(count - wait_count + 1)) {
     return true;
@@ -34,7 +35,7 @@ bool WaitRange(const Timeout& timeout, Range&& range, std::size_t count) noexcep
       return true;
     }
     reset_count = range([](BaseCore& core) noexcept {
-      return core.ResetWait();
+      return core.Reset();
     });
     if (reset_count != 0 && (reset_count == wait_count || event.SubEqual(reset_count))) {
       return false;
@@ -42,18 +43,8 @@ bool WaitRange(const Timeout& timeout, Range&& range, std::size_t count) noexcep
     // We know we have `wait_count - reset_count` Results, but we must wait until event was not used by cores
   }
   event.Wait(token);
-  return reset_count == 0;
+  return reset_count == 0;  // LCOV_EXCL_LINE shitty gcov cannot parse it
 }
-
-template <typename Event>
-struct OneShotCounter final : UniqueCounter<Event, SetDeleter> {
-  YACLIB_INLINE explicit OneShotCounter(size_t) noexcept {
-  }
-
-  constexpr bool SubEqual(size_t) const {
-    return false;
-  }
-};
 
 template <typename Event, typename Timeout, typename... Cores>
 bool WaitCore(const Timeout& timeout, Cores&... cores) noexcept {
@@ -62,8 +53,9 @@ bool WaitCore(const Timeout& timeout, Cores&... cores) noexcept {
   auto range = [&](auto&& func) noexcept {
     return (... + static_cast<std::size_t>(func(cores)));
   };
-  using Counter = std::conditional_t<sizeof...(cores) == 1, OneShotCounter<Event>, AtomicCounter<Event, SetDeleter>>;
-  return WaitRange<Counter>(timeout, range, sizeof...(cores));
+  using FinalEvent =
+    std::conditional_t<sizeof...(cores) == 1, WaitEvent<Event, OneCounter>, WaitEvent<Event, AtomicCounter>>;
+  return WaitRange<FinalEvent>(timeout, range, sizeof...(cores));
 }
 
 template <typename Event, typename Timeout, typename Iterator>
@@ -75,9 +67,9 @@ bool WaitIterator(const Timeout& timeout, Iterator it, std::size_t count) noexce
   }
   if (count == 1) {
     auto range = [&](auto&& func) noexcept {
-      return func(*it->GetCore());
+      return static_cast<std::size_t>(func(*it->GetCore()));
     };
-    return WaitRange<OneShotCounter<Event>>(timeout, range, 1);
+    return WaitRange<WaitEvent<Event, OneCounter>>(timeout, range, 1);
   }
   auto range = [&](auto&& func) noexcept {
     std::size_t wait_count = 0;
@@ -88,9 +80,11 @@ bool WaitIterator(const Timeout& timeout, Iterator it, std::size_t count) noexce
     }
     return wait_count;
   };
-  return WaitRange<AtomicCounter<Event, SetDeleter>>(timeout, range, count);
+  return WaitRange<WaitEvent<Event, AtomicCounter>>(timeout, range, count);
 }
 
 extern template bool WaitCore<DefaultEvent, NoTimeoutTag, BaseCore>(const NoTimeoutTag&, BaseCore&) noexcept;
+extern template bool WaitCore<DefaultEvent, NoTimeoutTag, BaseCore, BaseCore>(const NoTimeoutTag&, BaseCore&,
+                                                                              BaseCore&) noexcept;
 
 }  // namespace yaclib::detail

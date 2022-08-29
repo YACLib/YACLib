@@ -18,7 +18,7 @@ class /*alignas(kCacheLineSize)*/ Strand : public Job, public IExecutor {
   }
 
   ~Strand() override {
-    YACLIB_DEBUG(_tasks.load(std::memory_order_acquire) != Mark(), "strand in dtor not empty");
+    YACLIB_DEBUG(_tasks.load(std::memory_order_acquire) != Mark(), "Strand not empty in dtor");
   }
 
  private:
@@ -80,7 +80,7 @@ class /*alignas(kCacheLineSize)*/ Strand : public Job, public IExecutor {
 }  // namespace
 
 IExecutorPtr MakeStrand(IExecutorPtr executor) {
-  return MakeIntrusive<Strand, IExecutor>(std::move(executor));
+  return MakeShared<Strand>(1, std::move(executor));
 }
 
 }  // namespace yaclib

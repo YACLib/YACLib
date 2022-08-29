@@ -29,7 +29,7 @@ void Scheduler::Suspend() {
 
 void Scheduler::Stop() {
   Scheduler::Set(nullptr);
-  YACLIB_DEBUG(_running, "scheduler still running on stop");
+  YACLIB_DEBUG(_running, "Scheduler still running on stop");
 }
 
 Scheduler* Scheduler::GetScheduler() noexcept {
@@ -55,7 +55,7 @@ detail::fiber::FiberBase* Scheduler::Current() noexcept {
 }
 
 detail::fiber::FiberBase::Id Scheduler::GetId() {
-  YACLIB_DEBUG(sCurrent == nullptr, "Current can't be null");
+  YACLIB_ASSERT(sCurrent != nullptr);
   return sCurrent->GetId();
 }
 

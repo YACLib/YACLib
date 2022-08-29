@@ -6,7 +6,6 @@
 #include <yaclib/exe/thread_factory.hpp>
 #include <yaclib/exe/thread_pool.hpp>
 #include <yaclib/log.hpp>
-#include <yaclib/util/detail/nope_counter.hpp>
 #include <yaclib/util/func.hpp>
 #include <yaclib/util/helper.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
@@ -148,8 +147,8 @@ IThreadPoolPtr MakeThreadPool(std::size_t threads, IThreadFactoryPtr tf) {
   // if (threads == 1) {
   //   return MakeIntrusive<SingleThread, IThreadPool>(std::move(tf));
   // }
-  auto tp = MakeIntrusive<ThreadPool, IThreadPool>(std::move(tf));
-  static_cast<ThreadPool&>(*tp).Start(threads);
+  auto tp = MakeShared<ThreadPool>(1, std::move(tf));
+  tp->Start(threads);
   return tp;
 }  // LCOV_EXCL_LINE shitty gcov cannot parse it
 

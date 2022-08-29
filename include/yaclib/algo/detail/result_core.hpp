@@ -33,21 +33,15 @@ class ResultCore : public BaseCore {
     return _result;
   }
 
-  template <typename T, typename Func>
-  void Done(T&& object, Func&& f) noexcept(std::is_nothrow_constructible_v<Result<V, E>, T&&>) {
-    Store(std::forward<T>(object));
-    std::forward<Func>(f)();
-    SetResult();
-  }
-
   void Drop() noexcept final {
-    Done(StopTag{}, [] {
-    });
+    Store(StopTag{});
+    SetResult<false>();
   }
 
- private:
+ protected:
   union {
     Result<V, E> _result;
+    char _unwrapping;
   };
 };
 
@@ -57,15 +51,12 @@ class ResultCore<void, void> : public BaseCore {
   ResultCore() noexcept : BaseCore{kEmpty} {
   }
 
-  template <typename T, typename Func>
-  void Done(T&&, Func&& f) noexcept {
-    std::forward<Func>(f)();
-    SetResult();
+  template <typename T>
+  void Store(T&&) noexcept {
   }
 
   void Drop() noexcept final {
-    Done(StopTag{}, [] {
-    });
+    SetResult<false>();
   }
 };
 

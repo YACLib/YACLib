@@ -31,8 +31,13 @@ size_t Core::sInstances = 0;
 class X : public Core {};
 class Y : public X {};
 
-using CounterX = yaclib::detail::AtomicCounter<X>;
-using CounterY = yaclib::detail::AtomicCounter<Y>;
+using CounterX = yaclib::detail::Helper<yaclib::detail::AtomicCounter, X>;
+using CounterY = yaclib::detail::Helper<yaclib::detail::AtomicCounter, Y>;
+
+template <typename T>
+auto MakeIntrusive() {
+  return yaclib::MakeShared<T>(1);
+}
 
 TEST(ctor, default) {
   yaclib::IntrusivePtr<Core> px;
@@ -99,14 +104,14 @@ TEST(ctor, copy) {
   }
   EXPECT_EQ(Core::sInstances, 0);
   {
-    yaclib::IntrusivePtr<X> px1 = yaclib::MakeIntrusive<X>();
+    yaclib::IntrusivePtr<X> px1 = MakeIntrusive<X>();
     yaclib::IntrusivePtr<X> px2(px1);
     EXPECT_EQ(px1, px2);
     EXPECT_EQ(Core::sInstances, 1);
   }
   EXPECT_EQ(Core::sInstances, 0);
   {
-    yaclib::IntrusivePtr<Y> py = yaclib::MakeIntrusive<Y>();
+    yaclib::IntrusivePtr<Y> py = MakeIntrusive<Y>();
     yaclib::IntrusivePtr<X> px(py);
     EXPECT_EQ(py, px);
     EXPECT_EQ(Core::sInstances, 1);
@@ -170,7 +175,7 @@ TEST(assign, copy) {
 
     EXPECT_EQ(Core::sInstances, 0);
 
-    yaclib::IntrusivePtr<X> p4 = yaclib::MakeIntrusive<X>();
+    yaclib::IntrusivePtr<X> p4 = MakeIntrusive<X>();
 
     EXPECT_EQ(Core::sInstances, 1);
 
@@ -210,7 +215,7 @@ TEST(assign, conversation) {
 
     EXPECT_EQ(Core::sInstances, 0);
 
-    yaclib::IntrusivePtr<Y> p4 = yaclib::MakeIntrusive<Y>();
+    yaclib::IntrusivePtr<Y> p4 = MakeIntrusive<Y>();
 
     EXPECT_EQ(Core::sInstances, 1);
     EXPECT_EQ(static_cast<CounterY&>(*p4).GetRef(), 1);
@@ -273,7 +278,7 @@ TEST(assign, pointer) {
 
     EXPECT_EQ(Core::sInstances, 0);
 
-    yaclib::IntrusivePtr<X> p4 = yaclib::MakeIntrusive<X>();
+    yaclib::IntrusivePtr<X> p4 = MakeIntrusive<X>();
 
     EXPECT_EQ(Core::sInstances, 1);
 
@@ -309,7 +314,7 @@ TEST(assign, pointer) {
 
     EXPECT_EQ(Core::sInstances, 0);
 
-    yaclib::IntrusivePtr<Y> p4 = yaclib::MakeIntrusive<Y>();
+    yaclib::IntrusivePtr<Y> p4 = MakeIntrusive<Y>();
 
     EXPECT_EQ(Core::sInstances, 1);
     EXPECT_EQ(static_cast<CounterY&>(*p4).GetRef(), 1);

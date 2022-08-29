@@ -7,7 +7,7 @@
 
 namespace yaclib::detail {
 
-class /*alignas(kCacheLineSize)*/ AtomicEvent : public IRef {
+class /*alignas(kCacheLineSize)*/ AtomicEvent {
  public:
   using Token = Unit;
 
@@ -20,7 +20,7 @@ class /*alignas(kCacheLineSize)*/ AtomicEvent : public IRef {
   void Reset() noexcept;
 
  private:
-  yaclib_std::atomic_uint8_t _state = 0;
+  yaclib_std::atomic_int32_t _state = 0;
 };
 
 }  // namespace yaclib::detail

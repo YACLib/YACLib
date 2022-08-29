@@ -1,30 +1,30 @@
 #pragma once
 
+#include <yaclib/config.hpp>
 #include <yaclib/exe/job.hpp>
 
 #include <cstdint>
 
+#if YACLIB_SYMMETRIC_TRANSFER != 0
+#  include <yaclib/coro/coro.hpp>
+#endif
+
 namespace yaclib::detail {
 
 class InlineCore : public Job {
-  static constexpr std::uint64_t kShift = 61;
-
  public:
-  enum State : std::uint64_t {  // clang-format off
-    kEmpty      = std::uint64_t{0} << kShift,
-    kResult     = std::uint64_t{1} << kShift,
-    kCall       = std::uint64_t{2} << kShift,
-    kHereWrap   = std::uint64_t{3} << kShift,
-    kHereCall   = std::uint64_t{4} << kShift,
-    kWaitDrop   = std::uint64_t{6} << kShift,
-    kWaitNope   = std::uint64_t{7} << kShift,
-    kMask       = std::uint64_t{7} << kShift,
-  };  // clang-format on
+#if YACLIB_SYMMETRIC_TRANSFER != 0
+  virtual yaclib_std::coroutine_handle<> Next() noexcept {
+    Call();
+    return yaclib_std::noop_coroutine();
+  }
+#endif
 
-  void Call() noexcept override;
-  void Drop() noexcept override;
-
-  virtual void Here(InlineCore& caller, State state) noexcept;
+  virtual void Here(InlineCore& /*caller*/) noexcept {  // LCOV_EXCL_LINE  compiler remove this call from tests
+    YACLIB_PURE_VIRTUAL();                              // LCOV_EXCL_LINE
+  }                                                     // LCOV_EXCL_LINE
 };
+
+InlineCore& MakeEmpty();
 
 }  // namespace yaclib::detail

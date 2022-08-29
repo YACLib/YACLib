@@ -18,8 +18,8 @@ namespace yaclib::detail {
 template <typename V>
 class AllCombinatorBase {
  protected:
-  yaclib_std::atomic_bool _done = false;
   yaclib_std::atomic_size_t _ticket = 0;
+  yaclib_std::atomic_bool _done = false;
   V _results;
 };
 
@@ -41,35 +41,35 @@ class AllCombinator : public InlineCore, public AllCombinatorBase<FutureValue> {
       return {nullptr, nullptr};
     }
     // TODO(MBkkt) Maybe single allocation instead of two?
-    auto raw_core = new UniqueCounter<ResultCore<FutureValue, E>>{};
-    ResultPtr combine_core{NoRefTag{}, raw_core};
-    auto combinator = new AtomicCounter<AllCombinator>{count, std::move(combine_core), count};
+    auto combine_core = MakeUnique<ResultCore<FutureValue, E>>();
+    auto* raw_core = combine_core.Get();
+    auto combinator = MakeShared<AllCombinator>(count, std::move(combine_core), count);
     ResultPtr future_core{NoRefTag{}, raw_core};
-    return {std::move(future_core), combinator};
+    return {std::move(future_core), combinator.Release()};
   }
 
   ~AllCombinator() noexcept override {
     if (!this->_done.load(std::memory_order_acquire)) {
+      auto core = _promise.Release();
       if constexpr (std::is_void_v<V>) {
-        _promise.Release()->Done(Unit{}, [] {
-        });
+        core->Store(Unit{});
       } else {
-        _promise.Release()->Done(std::move(this->_results), [] {
-        });
+        core->Store(std::move(this->_results));
       }
+      core->template SetResult<false>();
     }
     YACLIB_ASSERT(_promise == nullptr);
   }
 
  protected:
-  explicit AllCombinator(ResultPtr promise, [[maybe_unused]] std::size_t count) : _promise{std::move(promise)} {
+  explicit AllCombinator(ResultPtr&& promise, [[maybe_unused]] std::size_t count) : _promise{std::move(promise)} {
     if constexpr (!std::is_void_v<V>) {
       AllCombinatorBase<FutureValue>::_results.resize(count);
     }
   }
 
  private:
-  void Here(InlineCore& caller, State) noexcept final {
+  void Here(InlineCore& caller) noexcept final {
     if (!this->_done.load(std::memory_order_acquire)) {
       auto& core = static_cast<ResultCore<V, E>&>(caller);
       Combine(std::move(core.Get()));
@@ -85,13 +85,14 @@ class AllCombinator : public InlineCore, public AllCombinatorBase<FutureValue> {
         this->_results[ticket] = std::move(result).Value();
       }
     } else if (!this->_done.exchange(true, std::memory_order_acq_rel)) {
+      auto* core = _promise.Release();
       if (state == ResultState::Exception) {
-        _promise.Release()->Done(std::move(result).Exception(), [] {
-        });
+        core->Store(std::move(result).Exception());
       } else {
-        _promise.Release()->Done(std::move(result).Error(), [] {
-        });
+        YACLIB_ASSERT(state == ResultState::Error);
+        core->Store(std::move(result).Error());
       }
+      core->template SetResult<false>();
     }
   }
 

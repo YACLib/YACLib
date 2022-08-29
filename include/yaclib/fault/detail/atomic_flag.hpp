@@ -29,7 +29,7 @@ class AtomicFlag : public AtomicWait<Impl, bool> {
     return r;
   }
 
-#ifdef YACLIB_ATOMIC_EVENT
+#if YACLIB_FUTEX != 0
   bool test(std::memory_order order = std::memory_order::seq_cst) const volatile noexcept {
     YACLIB_INJECT_FAULT(auto r = Impl::test(order));
     return r;

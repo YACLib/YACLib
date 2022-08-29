@@ -14,7 +14,6 @@ list(APPEND YACLIB_HEADERS
   ${YACLIB_INCLUDE_DIR}/util/detail/intrusive_ptr_impl.hpp
   ${YACLIB_INCLUDE_DIR}/util/detail/mutex_event.hpp
   ${YACLIB_INCLUDE_DIR}/util/detail/node.hpp
-  ${YACLIB_INCLUDE_DIR}/util/detail/nope_counter.hpp
   ${YACLIB_INCLUDE_DIR}/util/detail/safe_call.hpp
   ${YACLIB_INCLUDE_DIR}/util/detail/set_deleter.hpp
   ${YACLIB_INCLUDE_DIR}/util/detail/shared_func.hpp
@@ -27,7 +26,7 @@ list(APPEND YACLIB_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/mutex_event.cpp
   )
 
-if (YACLIB_ATOMIC_EVENT)
+if (NOT YACLIB_DISABLE_FUTEX)
   list(APPEND YACLIB_HEADERS
     ${YACLIB_INCLUDE_DIR}/util/detail/atomic_event.hpp
     )

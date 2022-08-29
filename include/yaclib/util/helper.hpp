@@ -5,15 +5,32 @@
 #include <yaclib/util/intrusive_ptr.hpp>
 
 namespace yaclib {
+namespace detail {
 
-template <typename ObjectType, typename PtrType = ObjectType, typename... Args>
-IntrusivePtr<PtrType> MakeUnique(Args&&... args) {
-  return {NoRefTag{}, new detail::UniqueCounter<ObjectType>{std::forward<Args>(args)...}};
+template <template <typename...> typename Counter, typename ObjectT>
+class Helper final : public Counter<ObjectT, DefaultDeleter> {
+ public:
+  using Counter<ObjectT, DefaultDeleter>::Counter;
+
+  void IncRef() noexcept final {
+    this->Add(1);
+  }
+
+  void DecRef() noexcept final {
+    this->Sub(1);
+  }
+};
+
+}  // namespace detail
+
+template <typename ObjectT, typename... Args>
+auto MakeUnique(Args&&... args) {
+  return IntrusivePtr{NoRefTag{}, new detail::Helper<detail::OneCounter, ObjectT>{0, std::forward<Args>(args)...}};
 }
 
-template <typename ObjectType, typename PtrType = ObjectType, typename... Args>
-IntrusivePtr<PtrType> MakeIntrusive(Args&&... args) {
-  return {NoRefTag{}, new detail::AtomicCounter<ObjectType>{1, std::forward<Args>(args)...}};
+template <typename ObjectT, typename... Args>
+auto MakeShared(std::size_t n, Args&&... args) {
+  return IntrusivePtr{NoRefTag{}, new detail::Helper<detail::AtomicCounter, ObjectT>{n, std::forward<Args>(args)...}};
 }
 
 }  // namespace yaclib
