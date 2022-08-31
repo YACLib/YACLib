@@ -1,10 +1,10 @@
 ## Fault injection
 
-Inspired mainly by https://gitlab.com/Lipovsky/twist (mostly we rewrote it for achive our goals), and also: 
+Inspired mainly by https://gitlab.com/Lipovsky/twist (mostly we rewrote it to achieve our goals), and also: 
 * https://github.com/ClickHouse/ClickHouse/blob/master/src/Common/ThreadFuzzer.h
 * https://github.com/dvyukov/relacy
 * https://github.com/apple/foundationdb/tree/main/flow
-* papers about fault injection and model cheking
+* papers about fault injection and model checking
 
 #### Options
 
@@ -14,7 +14,7 @@ Inspired mainly by https://gitlab.com/Lipovsky/twist (mostly we rewrote it for a
 
 * `YACLIB_FAULT=THREAD`: 
 
-  Thin wrappers for `::std` primitives with fault injection calls(sleep_for/yield/etc) in some of them methods
+  Thin wrappers for `::std` primitives with fault injection calls (sleep_for, yield etc.) in some of the methods
 
   So it should be able to work in any environment, for example you cannot replace all primitives for `yaclib_std::`
 
@@ -29,13 +29,15 @@ Inspired mainly by https://gitlab.com/Lipovsky/twist (mostly we rewrote it for a
 
 #### Advantages
 
-* You can just grep and replace 
-`<thread>`, `<atomic>`, etc to `<yaclib_std/thread>`, `<yaclib_std/atomic>` and 
-`std::thread`, `std::atomic`, etc to `yaclib_std::thread`, `yaclib_std::atomic`.
+* You can just grep for header names `<thread>`, `<atomic>` etc. and
+  replace them with`<yaclib_std/thread>`, `<yaclib_std/atomic>`.
+  Similarly you can replace names from the standard library, e.g.
+  `std::thread`, `std::atomic` etc. and replace them with YACLib equivalents
+  `yaclib_std::thread`, `yaclib_std::atomic`, ....
 
-  And everything will be just work.
+  And everything will just work.
 
-* `FIBER` backend adopted to easyly run with any test framework, check our [test main](https://github.com/YACLib/YACLib/blob/main/test/test.cpp)
+* `FIBER` backend adopted to easily run with any test framework, check our [test main](https://github.com/YACLib/YACLib/blob/main/test/test.cpp)
 
-* Trying to be fully C++17 `::std` compatible, except `std::future`/etc, because we suggest yaclib as drop-in alternative
+* Trying to be fully C++17 `::std` compatible, except `std::future`/etc, because we suggest YACLib as drop-in alternative
 
