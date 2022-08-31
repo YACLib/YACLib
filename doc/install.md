@@ -47,9 +47,13 @@ CMake options:
 * `-D CMAKE_CXX_COMPILER=<cxx-compiler-path>`
   Path to your C++ compiler.
 * `-D YACLIB_BUILD_TEST=<OFF(default) or ON or SINGLE>`
-  If ON, then build tests, SINGLE, then make one test target
-* `-D YACLIB_FLAFS=<EMPTY(default) or WARN or ASAN or TSAN or UBSAN or MEMSAN or COVERAGE>`
-  If ON, then.
+  If ON, then build tests, if SINGLE, then make one test target
+* `-D YACLIB_FLAGS=<EMPTY(default) or WARN or ASAN or TSAN or UBSAN or LSAN or MEMSAN or COVERAGE or CORO or DISABLE_FUTEX or DISABLE_UNSAFE_FUTEX or DISABLE_SYMMETRIC_TRANSFER or DISABLE_FINAL_SUSPEND_TRANSFER>`
+  Any of the specified flags will enable/disable the respective build property or functionality.
+* `-D YACLIB_FAULT=<OFF(default) or THREAD or FIBER>`
+  Using `THREAD` will provide fault-injection functionality and using `FIBER`
+  will  execute all operations in a single-threaded cooperative fiber
+  scheduler.
 
 ```bash
 cmake --build . -- <build-options>
@@ -57,7 +61,7 @@ cmake --build . -- <build-options>
 
 #### Example
 
-In POSIX compliant shell:
+In POSIX-compliant shell:
 
 ```bash
 git clone git@github.com:YACLib/YACLib.git

@@ -84,19 +84,19 @@ include(FetchContent)
 FetchContent_Declare(yaclib
   GIT_REPOSITORY https://github.com/YACLib/YACLib.git
   GIT_TAG main
-  )
+)
 FetchContent_MakeAvailable(yaclib)
 link_libraries(yaclib)
 ```
 
 For more details check [install guide](doc/install.md).
 
-For more details about 'yaclib_std' or fault injection check [doc](doc/yaclib_std.md).
+For more details about 'yaclib_std' or fault injection, check [doc](doc/yaclib_std.md).
 
 ## Examples
 
 Here are short examples of using some features from YACLib, for details
-check <a href="https://yaclib.github.io/YACLib/examples.html">documentation</a>.
+check [documentation](https://yaclib.github.io/YACLib/examples.html).
 
 #### Asynchronous pipeline
 
@@ -118,7 +118,7 @@ We guarantee that no more than one allocation will be made for each step of the 
 
 We have `Then/Detach` x `IExecutor/previous step IExecutor/Inline`.
 
-Also Future/Promise don't contains shared atomic counter!
+Also Future/Promise don't contain shared atomic counters!
 
 #### C++20 coroutine
 
@@ -133,14 +133,14 @@ yaclib::Future<int> task43() {
 }
 ```
 
-You can zero cost combine Future coroutine code with Future callbacks code.
-That allow to use yaclib for smooth transfer from C++17 to C++20 with coroutines.
+You can zero cost-combine Future coroutine code with Future callbacks code.
+That allows using YAClib for a smooth transfer from C++17 to C++20 with coroutines.
 
 Also Future with coroutine doesn't make additional allocation for Future,
-only coroutine frame allocation that caused by compiler,
-and [can be optimize](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0981r0.html).
+only coroutine frame allocation that is caused by compiler,
+and [can be optimized](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0981r0.html).
 
-And finally co_await doesn't require allocation,
+And finally `co_await` doesn't require allocation,
 so you can combine some async operation without allocation.
 
 #### Lazy pipeline
@@ -155,11 +155,11 @@ auto task = yaclib::Schedule(tp1, [] {
 task.Run(); // Run task on tp1
 ```
 
-Same as asynchronous pipeline, but not starting only after Run/ToFuture/Get.
+Same as asynchronous pipeline, but starting only after Run/ToFuture/Get.
 Task can be used as coroutine return type too.
 
-Also running Task with return Future doesn't make allocation.
-And it doesn't need synchronization, so it even faster than asynchronous pipeline.
+Also running a Task that returns a Future doesn't make allocation.
+And it doesn't need synchronization, so it is even faster than asynchronous pipeline.
 
 #### Thread pool
 
@@ -187,16 +187,18 @@ size_t counter = 0;
 for (std::size_t i = 0; i < 100; ++i) {
   Submit(*tp, [&] {
     Submit(*strand, [&] {
-      ++counter; // no data race!
+      // serialized by Strand, no data race!
+      ++counter; 
     });
   });
 }
 ```
 
-This is much more efficient than a mutex because first of you don't block the threadpool thread.
-Secondly, we execute critical sections in batches (the idea is known as flat-combining).
+This is much more efficient than a mutex because 
+1. don't block the threadpool thread.
+1. we execute critical sections in batches (the idea is known as flat-combining).
 
-And also the implementation of strand is an efficient lock-free, without additional allocations.
+And also the implementation of strand is lock-free and efficient, without additional allocations.
 
 #### AsyncMutex
 
@@ -208,7 +210,7 @@ size_t counter = 0;
 
 auto compute = [&] (size_t index) -> yaclib::Future<> {
   co_await On(tp);
-  // ... some coumpute with index ...
+  // ... some computation with index ...
   auto guard = co_await m.Guard();
   // ... co_await On(other thread pool) ...
   counter += index;
@@ -219,19 +221,19 @@ for (size_t i = 0; i < 100; ++i) {
 }
 ```
 
-Firstly, this is the only correct mutex implementation for C++20 coroutines
+First, this is the only correct mutex implementation for C++20 coroutines
 as far as I know (cppcoro, libunifex, folly::coro implement Unlock incorrectly, it serializes the code after Unlock)
 
-Secondly, inherits all the Strand benefits.
+Second, `AsyncMutex` inherits all the `Strand` benefits.
 
 #### Rescheduling
 
 ```cpp
 yaclib::Future<> bar(yaclib::IExecutor& cpu, yaclib::IExecutor& io) {
   co_await On(cpu);
-  ... some heavy compute ...
+  // ... some heavy computation ...
   co_await On(io);
-  ... some io compute ...
+  // ... some io computation ...
 }
 ```
 
@@ -259,7 +261,7 @@ std::vector<int> unique_ints = std::move(all).Then([](std::vector<int> ints) {
 }).Get().Ok();
 ```
 
-Doesn't make more than 3 allocations regardless of input size
+Doesn't make more than 3 allocations regardless of input size.
 
 #### WhenAny
 
@@ -270,7 +272,7 @@ std::vector<yaclib::Future<int>> fs;
 // Run parallel computations
 for (std::size_t i = 0; i < 5; ++i) {
   fs.push_back(yaclib::Run(*tp, [i] {
-    // connect with one of the database shard
+    // connect with one of the database shards
     return i;
   }));
 }
@@ -290,18 +292,18 @@ auto tp_output = yaclib::MakeThreadPool(/*threads=*/1);
 auto tp_compute = yaclib::MakeThreadPool(/*threads=CPU cores*/);
 
 auto future = yaclib::Run(*tp_output, [] {
-  std::cout << "Outer task" <<   std::endl;
+  std::cout << "Outer task" << std::endl;
   return yaclib::Run(*tp_compute, [] { return 42; });
 }).Then(/*tp_compute*/ [](int result) {
   result *= 13;
   return yaclib::Run(*tp_output, [result] { 
-    return std::cout << "Result = " << result << std::endl; 
+    std::cout << "Result = " << result << std::endl; 
   });
 });
 ```
 
 Sometimes it's necessary to return from one async function the result of the other. It would be possible with the wait
-on this result. But this would cause blocking thread while waiting for the task to complete.
+on this result. But this would cause blocking of the thread while waiting for the task to complete.
 
 This problem can be solved using future unwrapping: when an async function returns a Future object, instead of setting
 its result to the Future object, the inner Future will "replace" the outer Future. This means that the outer Future will
@@ -332,7 +334,7 @@ if (f2.Ready()) {
 ```
 
 We support `Wait/WaitFor/WaitUntil`.
-Also all of them don't make allocation, and we have optimized path for single `Future` (used in `Future::Get()`).
+Also all of them don't make allocation, and we have optimized the path for single `Future` (used in `Future::Get()`).
 
 #### WaitGroup
 
@@ -424,21 +426,21 @@ int x = std::move(f).Get().Value();
 ```cpp
 auto tp = yaclib::MakeThreadPool(/*threads=*/4);
 auto f = yaclib::Run(*tp, [] {
-    if (random() % 2) {
-      return std::make_error_code(1);
-    }
-    return 42;
-  }).Then([](int y) {
-    if (random() % 2) {
-      throw std::runtime_error{"2"};
-    }
-    return y + 15;
-  }).Then([](yaclib::Result<int>&& z) {
-    if (!z) {
-      return 10;  // Some default value
-    }
-    return std::move(z).Value();
-  });
+  if (random() % 2) {
+    return std::make_error_code(1);
+  }
+  return 42;
+}).Then([](int y) {
+  if (random() % 2) {
+    throw std::runtime_error{"2"};
+  }
+  return y + 15;
+}).Then([](yaclib::Result<int>&& z) {
+  if (!z) {
+    return 10;  // Some default value
+  }
+  return std::move(z).Value();
+});
 int x = std::move(f).Get().Value();
 ```
 
@@ -483,8 +485,8 @@ Our test coverage is 100%, to simplify, we run tests on the cartesian product of
 However, we realize this philosophy doesn't work for every project,
 so we also provide [Releases](https://github.com/YACLib/YACLib/releases).
 
-We don't believe in [SemVer](https://semver.org), check [this](https://gist.github.com/jashkenas/cbd2b088e20279ae2c8e),
-so we use `year.month.day[.patch]` approach.
+We don't believe in [SemVer](https://semver.org) (check [this](https://gist.github.com/jashkenas/cbd2b088e20279ae2c8e)),
+but we use a `year.month.day[.patch]` versioning approach.
 I'll release a new version if you ask, or I'll decide we have important or enough changes.
 
 ## Contributing
@@ -493,7 +495,7 @@ We are always open for issues and pull requests.
 Check our [good first issues](
 https://github.com/YACLib/YACLib/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22).
 
-For more details you can check following links:
+For more details you can check the following links:
 
 * [Specification](https://yaclib.github.io/YACLib)
 * [Targets description](doc/target.md)
