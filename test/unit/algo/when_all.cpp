@@ -6,7 +6,6 @@
 #include <yaclib/async/run.hpp>
 #include <yaclib/async/when_all.hpp>
 #include <yaclib/exe/thread_pool.hpp>
-#include <yaclib/util/intrusive_ptr.hpp>
 #include <yaclib/util/result.hpp>
 
 #include <algorithm>
@@ -42,7 +41,21 @@ class WhenAllT : public testing::Test {
 
 using MyTypes = ::testing::Types<int, void>;
 
-TYPED_TEST_SUITE(WhenAllT, MyTypes);
+struct TypeNames {
+  template <typename T>
+  static std::string GetName(int i) {
+    switch (i) {
+      case 0:
+        return "int";
+      case 1:
+        return "void";
+      default:
+        return "unknown";
+    }
+  }
+};
+
+TYPED_TEST_SUITE(WhenAllT, MyTypes, TypeNames);
 
 template <TestSuite suite, typename T = int>
 void JustWorks() {

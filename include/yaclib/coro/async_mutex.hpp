@@ -2,8 +2,6 @@
 
 #include <yaclib/coro/coro.hpp>
 #include <yaclib/coro/detail/promise_type.hpp>
-#include <yaclib/exe/inline.hpp>
-#include <yaclib/exe/strand.hpp>
 #include <yaclib/exe/thread_pool.hpp>
 
 #include <yaclib_std/atomic>
