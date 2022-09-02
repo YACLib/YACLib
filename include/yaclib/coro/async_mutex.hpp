@@ -64,7 +64,6 @@ class AsyncMutex final {
 
   template <bool FIFO = DefaultFIFO>
   void UnlockHere(IExecutor& e = CurrentThreadPool()) noexcept {
-    YACLIB_DEBUG(_state.load(std::memory_order_relaxed) == kNotLocked, "UnlockHere must be called after Lock!");
     auto* next = TryUnlock<FIFO>();
     if (next == nullptr) {
       return;
@@ -243,6 +242,7 @@ class AsyncMutex final {
 
   template <bool FIFO>
   detail::BaseCore* TryUnlock() noexcept {
+    YACLIB_DEBUG(_state.load(std::memory_order_relaxed) == kNotLocked, "UnlockHere must be called after Lock!");
     if (_waiters != nullptr) {
       return _waiters;
     }
