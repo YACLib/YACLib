@@ -44,7 +44,7 @@ class AsyncMutex final {
   }
 
   [[nodiscard]] bool TryLock() noexcept {
-    auto old_state = _state.load(std::memory_order_acquire);
+    auto old_state = _state.load(std::memory_order_relaxed);
     if (old_state != kNotLocked) {
       return false;
     }
