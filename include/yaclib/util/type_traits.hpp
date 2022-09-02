@@ -5,39 +5,49 @@
 
 #include <exception>
 #include <type_traits>
+#include <utility>
 
 namespace yaclib {
 
 template <typename... Args>
-using head_t = typename detail::Head<Args...>::Type;
+using head_t = typename detail::Head<Args...>::Type;  // NOLINT
 
 template <typename Func, typename... Arg>
-inline constexpr bool is_invocable_v = detail::IsInvocable<Func, Arg...>::Value;
+inline constexpr bool is_invocable_v = detail::IsInvocable<Func, Arg...>::Value;  // NOLINT
 
 template <typename Func, typename... Arg>
-using invoke_t = typename detail::Invoke<Func, Arg...>::Type;
+using invoke_t = typename detail::Invoke<Func, Arg...>::Type;  // NOLINT
 
 template <typename T>
-inline constexpr bool is_result_v = detail::IsInstantiationOf<Result, T>::Value;
+inline constexpr bool is_result_v = detail::IsInstantiationOf<Result, T>::Value;  // NOLINT
 
 template <typename T>
-using result_value_t = typename detail::InstantiationTypes<Result, T>::Value;
+using result_value_t = typename detail::InstantiationTypes<Result, T>::Value;  // NOLINT
 
 template <typename T>
-using result_error_t = typename detail::InstantiationTypes<Result, T>::Error;
+using result_error_t = typename detail::InstantiationTypes<Result, T>::Error;  // NOLINT
 
 template <typename T>
-inline constexpr bool is_future_base_v = detail::IsInstantiationOf<FutureBase, T>::Value ||  //
-                                         detail::IsInstantiationOf<Future, T>::Value ||      //
-                                         detail::IsInstantiationOf<FutureOn, T>::Value;
+inline constexpr bool is_future_base_v = detail::IsInstantiationOf<FutureBase, T>::Value ||  // NOLINT
+                                         detail::IsInstantiationOf<Future, T>::Value ||      // dummy comments
+                                         detail::IsInstantiationOf<FutureOn, T>::Value;      // for format
 template <typename T>
-inline constexpr bool is_task_v = detail::IsInstantiationOf<Task, T>::Value;
+inline constexpr bool is_task_v = detail::IsInstantiationOf<Task, T>::Value;  // NOLINT
 
 template <typename T>
-using future_base_value_t = typename detail::FutureBaseTypes<T>::Value;
+using future_base_value_t = typename detail::FutureBaseTypes<T>::Value;  // NOLINT
 
 template <typename T>
-using future_base_error_t = typename detail::FutureBaseTypes<T>::Error;
+using future_base_error_t = typename detail::FutureBaseTypes<T>::Error;  // NOLINT
+
+template <bool Condition, typename T>
+decltype(auto) move_if(T&& arg) noexcept {  // NOLINT
+  if constexpr (Condition) {
+    return std::move(std::forward<T>(arg));
+  } else {
+    return std::forward<T>(arg);
+  }
+}
 
 template <typename T>
 constexpr bool Check() noexcept {

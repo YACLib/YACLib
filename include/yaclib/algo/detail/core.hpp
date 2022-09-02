@@ -265,7 +265,7 @@ auto SetCallback(ResultCorePtr<Arg, E>& core, Func&& f) {
   auto* callback = MakeCore<CoreT, Arg, E>(std::forward<Func>(f));
   auto* caller = core.Release();
   if constexpr (!kIsDetach) {
-    callback->_executor = caller->_executor;
+    callback->_executor = move_if<(!kIsTask && CallbackT != CallbackType::On)>(caller->_executor);
   }
   if constexpr (CallbackT == CallbackType::Lazy) {
     callback->_caller = caller;
