@@ -10,39 +10,52 @@
 
 namespace yaclib {
 
-// TODO(mkornaukhov03) Doxygen docs
-
+/**
+ * Mutex for coroutines
+ *
+ * \note It does not block execution thread, only coroutine
+ */
 template <bool DefaultFIFO = false, std::int64_t DefaultBatchHere = 1>
 class AsyncMutex final {
  public:
-  /**
-   *
-   */
-  static constexpr std::int64_t kOn = -1;
-
-  /**
-   *
-   */
-  static constexpr std::int64_t kAll = std::numeric_limits<uint32_t>::max();
+  AsyncMutex(AsyncMutex&&) = delete;
+  AsyncMutex(const AsyncMutex&) = delete;
+  AsyncMutex& operator=(AsyncMutex&&) = delete;
+  AsyncMutex& operator=(const AsyncMutex&) = delete;
 
   AsyncMutex() noexcept = default;
-  AsyncMutex(const AsyncMutex&) = delete;
-  AsyncMutex(AsyncMutex&&) = delete;
-  AsyncMutex& operator=(const AsyncMutex&) = delete;
-  AsyncMutex& operator=(AsyncMutex&&) = delete;
+  ~AsyncMutex() noexcept = default;
 
+  /**
+   * Lock mutex and create LockGuard for it
+   *
+   * \return Awaitable, which await_resume returns the LockGuard
+   */
   auto Guard() noexcept {
     return GuardAwaiter{*this};
   }
 
+  /**
+   * Try to lock mutex and create LockGuard for it
+   *
+   * \note If we couldn't lock mutex, then LockGuard::OwnsLock() will be false
+   * \return Awaitable, which await_resume returns the LockGuard
+   */
   auto TryGuard() noexcept {
     return LockGuard{*this, std::try_to_lock_t{}};
   }
 
+  /**
+   * Lock mutex
+   */
   auto Lock() noexcept {
     return LockAwaiter{*this};
   }
 
+  /**
+   * Try to lock mutex
+   * @return true if mutex was locked, false otherwise
+   */
   [[nodiscard]] bool TryLock() noexcept {
     auto old_state = _state.load(std::memory_order_relaxed);
     if (old_state != kNotLocked) {
@@ -52,16 +65,51 @@ class AsyncMutex final {
                                           std::memory_order_relaxed);
   }
 
+  /**
+   * Flag for forcing code execution after Unlock() on passed executor
+   */
+  static constexpr std::int64_t kOn = -1;
+
+  /**
+   * Flag to force an attempt to execute the following critical section in this thread after Unlock()
+   */
+  static constexpr std::int64_t kAlways = std::numeric_limits<uint32_t>::max();
+
+  /**
+   * The best way to unlock mutex
+   *
+   * \param e executor which will be used for code after unlock or following critical section
+   */
   template <bool FIFO = DefaultFIFO, std::int64_t BatchHere = DefaultBatchHere>
   auto Unlock(IExecutor& e = CurrentThreadPool()) noexcept {
     return UnlockAwaiter<FIFO, BatchHere>{*this, e};
   }
 
+  /**
+   * This method is an optimization for Unlock() and On()
+   *
+   * Use it instead of
+   * \code
+   * ...
+   * co_await mutex.Unlock(...);
+   * co_await On(e);
+   * ...
+   * \endcode
+   *
+   * \param e executor which will be used for code after unlock
+   */
   template <bool FIFO = DefaultFIFO, std::int64_t BatchHere = DefaultBatchHere>
   auto UnlockOn(IExecutor& e = CurrentThreadPool()) noexcept {
+    static_assert(BatchHere > 0);
     return Unlock<FIFO, kOn * BatchHere>(e);
   }
 
+  /**
+   * The general way to unlock mutex, mainly for RAII
+   *
+   * \param e executor which will be used for the code after unlock,
+   *          only if we have the following critical section
+   */
   template <bool FIFO = DefaultFIFO>
   void UnlockHere(IExecutor& e = CurrentThreadPool()) noexcept {
     auto* next = TryUnlock<FIFO>();
