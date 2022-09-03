@@ -1,5 +1,11 @@
 #include <yaclib/async/run.hpp>
+#include <yaclib/config.hpp>
 #include <yaclib/lazy/schedule.hpp>
+
+#if YACLIB_CORO != 0
+#  include <yaclib/coro/future.hpp>
+#  include <yaclib/coro/task.hpp>
+#endif
 
 #include <string>
 

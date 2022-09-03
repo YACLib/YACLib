@@ -581,6 +581,7 @@ TEST(Simple, SetAndGetRequiresOnlyMove) {
   struct MoveCtorOnly {
     explicit MoveCtorOnly(int id) : id_(id) {
     }
+
     MoveCtorOnly(MoveCtorOnly&&) = default;
     [[maybe_unused]] MoveCtorOnly& operator=(MoveCtorOnly&&) = default;
     MoveCtorOnly(const MoveCtorOnly&) = delete;
@@ -627,6 +628,64 @@ TYPED_TEST(AsyncSuite, DetachDrop) {
     EXPECT_TRUE(false);
   });
   tp->Wait();
+}
+
+struct CDtorCounter {
+  CDtorCounter& operator=(CDtorCounter&&) = delete;
+  CDtorCounter& operator=(const CDtorCounter&) = delete;
+
+  CDtorCounter(int& flag) : _flag{flag} {
+    _flag += 1000;
+  }
+
+  CDtorCounter(CDtorCounter&& other) : _flag{other._flag} {
+    _flag += 100;
+  }
+
+  CDtorCounter(const CDtorCounter& other) : _flag(other._flag) {
+    _flag += 10;
+  }
+
+  ~CDtorCounter() {
+    _flag += 1;
+  }
+
+ private:
+  int& _flag;
+};
+
+TYPED_TEST(AsyncSuite, ExecutorDrop) {
+  int flag = 0;
+
+  INVOKE(MakeInline(yaclib::StopTag{}), [a = CDtorCounter{flag}] {
+  }).Detach();
+
+#if defined(_MSC_VER) && !defined(__clang__)
+  EXPECT_EQ(flag, 1203);  // TODO(kononovk): fix windows
+#else
+  EXPECT_EQ(flag, 1102);
+#endif
+}
+
+TYPED_TEST(AsyncSuite, ExecutorDrop2) {
+  bool invoked_flags[3] = {false};
+
+  INVOKE(MakeInline(yaclib::StopTag{}),
+         [&] {
+           invoked_flags[0] = true;
+         })
+    .Then([&](yaclib::StopError) {
+      invoked_flags[1] = true;
+      return yaclib::MakeFuture();
+    })
+    .Then([&](yaclib::StopError) {
+      invoked_flags[2] = true;
+    })
+    .Detach();
+
+  EXPECT_FALSE(invoked_flags[0]);
+  EXPECT_TRUE(invoked_flags[1]);
+  EXPECT_TRUE(invoked_flags[2]);
 }
 
 }  // namespace

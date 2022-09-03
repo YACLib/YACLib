@@ -1,3 +1,4 @@
+#include <util/async_suite.hpp>
 #include <util/time.hpp>
 
 #include <yaclib/async/run.hpp>
@@ -153,6 +154,24 @@ TEST(On, LockWithStrand) {
             << std::endl;
   ASSERT_GT(sum, kThreads * kIncrements);
   ASSERT_LE(sum, 2 * kThreads * kIncrements);
+}
+
+TYPED_TEST(AsyncSuite, OnStopped) {
+  bool a = false;
+  bool b = false;
+
+  auto coro = [&]() -> typename TestFixture::Type {
+    a = true;
+    co_await On(MakeInline(yaclib::StopTag{}));
+    b = true;
+    co_return{};
+  };
+
+  auto outer_future = coro();
+  EXPECT_EQ(std::move(outer_future).Get().State(), yaclib::ResultState::Error);
+
+  EXPECT_TRUE(a);
+  EXPECT_FALSE(b);
 }
 
 }  // namespace
