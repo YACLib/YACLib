@@ -8,6 +8,16 @@
 
 namespace yaclib::detail {
 
+class NoResultCore : public BaseCore {
+ public:
+  NoResultCore() noexcept : BaseCore{kEmpty} {
+  }
+
+  template <typename T>
+  void Store(T&&) noexcept {
+  }
+};
+
 enum class CoreType : char {
   Run = 0,
   Then = 1,
@@ -15,7 +25,7 @@ enum class CoreType : char {
 };
 
 template <CoreType Type, typename V, typename E>
-using ResultCoreT = std::conditional_t<Type == CoreType::Detach, ResultCore<void, void>, ResultCore<V, E>>;
+using ResultCoreT = std::conditional_t<Type == CoreType::Detach, NoResultCore, ResultCore<V, E>>;
 
 template <typename Ret, typename Arg, typename E, typename Wrapper, CoreType Type>
 class Core : public ResultCoreT<Type, Ret, E> {
@@ -29,27 +39,17 @@ class Core : public ResultCoreT<Type, Ret, E> {
     }
   }
 
- private:
   void Call() noexcept final {
-    if constexpr (Wrapper::kIsAsync) {
-      YACLIB_ASSERT(this->_unwrapping == 0);
-      ++this->_unwrapping;
-    }
     if constexpr (Type == CoreType::Run) {
-      _wrapper.Call(*this, Unit{});
+      Invoke(Unit{});
     } else {
       auto& core = static_cast<ResultCore<Arg, E>&>(*this->_caller);
-      _wrapper.Call(*this, std::move(core.Get()));
+      Invoke(std::move(core.Get()));
     }
   }
 
- public:
   void Drop() noexcept final {
-    if constexpr (Wrapper::kIsAsync) {
-      YACLIB_ASSERT(this->_unwrapping == 0);
-      ++this->_unwrapping;
-    }
-    _wrapper.Call(*this, Result<Arg, E>{StopTag{}});
+    Invoke(Result<Arg, E>{StopTag{}});
   }
 
   void Here(InlineCore& caller) noexcept final {
@@ -65,6 +65,15 @@ class Core : public ResultCoreT<Type, Ret, E> {
   }
 
  private:
+  template <typename A>
+  YACLIB_INLINE void Invoke(A&& arg) noexcept {
+    if constexpr (Wrapper::kIsAsync) {
+      YACLIB_ASSERT(this->_unwrapping == 0);
+      this->_unwrapping = 1;
+    }
+    _wrapper.Call(*this, std::forward<A>(arg));
+  }
+
   YACLIB_NO_UNIQUE_ADDRESS Wrapper _wrapper;
 };
 
@@ -112,7 +121,7 @@ class FuncWrapper final {
 
   using Store = std::decay_t<Func>;
   using Invoke = std::conditional_t<std::is_function_v<std::remove_reference_t<Func>>, Store, Func>;
-  using Core = std::conditional_t<Detach, ResultCore<void, void>, ResultCore<Ret, E>>;
+  using Core = std::conditional_t<Detach, NoResultCore, ResultCore<Ret, E>>;
 
  public:
   static constexpr bool kIsAsync = Async;

@@ -40,17 +40,6 @@ class ResultCore : public BaseCore {
   };
 };
 
-template <>
-class ResultCore<void, void> : public BaseCore {
- public:
-  ResultCore() noexcept : BaseCore{kEmpty} {
-  }
-
-  template <typename T>
-  void Store(T&&) noexcept {
-  }
-};
-
 extern template class ResultCore<void, StopError>;
 
 template <typename V, typename E>
