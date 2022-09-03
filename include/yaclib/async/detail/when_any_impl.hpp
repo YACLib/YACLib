@@ -86,7 +86,6 @@ class AnyCombinatorBase<V, E, WhenPolicy::FirstFail> : public AnyCombinatorBase<
   }
 
   ~AnyCombinatorBase() noexcept {
-    auto done = this->_done.load(std::memory_order_acquire);
     auto resolve = [&](auto&& func) noexcept {
       auto state = _state.load(std::memory_order_acquire);
       if (state == ResultState::Exception) {
@@ -95,8 +94,8 @@ class AnyCombinatorBase<V, E, WhenPolicy::FirstFail> : public AnyCombinatorBase<
         func(_error);
       }
     };
-    if (!done) {
-      auto core = this->_core.Release();
+    auto core = this->_core.Release();
+    if (core != nullptr) {
       resolve([&](auto& fail) noexcept {
         core->Store(std::move(fail));
         using Fail = std::remove_reference_t<decltype(fail)>;
