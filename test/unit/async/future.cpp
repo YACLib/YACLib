@@ -79,7 +79,7 @@ void AsyncGetResult(int num_threads) {
     std::move(p).Set(std::string{kMessage});
   });
   EXPECT_EQ(std::move(f).Get().Ok(), kMessage);
-  tp->HardStop();
+  tp->Cancel();
   tp->Wait();
 }
 
@@ -169,7 +169,7 @@ TEST(JustWorks, AsyncGetResult) {
 
 TEST(JustWorks, AsyncRun) {
   auto tp = yaclib::MakeThreadPool(3);
-  EXPECT_EQ(tp->Tag(), yaclib::IExecutor::Type::ThreadPool);
+  EXPECT_EQ(tp->Tag(), yaclib::IExecutor::Type::FairThreadPool);
 
   auto good = [&] {
     EXPECT_EQ(&yaclib::CurrentThreadPool(), tp);
@@ -226,8 +226,8 @@ TEST(Detach, AsyncSimple) {
     std::move(p).Set("Hello!");
   });
 
-  tp->SoftStop();
   tp->Wait();
+  tp->Cancel();
 
   EXPECT_TRUE(called);
 }
@@ -249,8 +249,8 @@ TEST(Detach, DetachOn) {
   // Schedule to thread pool immediately
   std::move(f).Detach(*tp, callback);
 
-  tp->SoftStop();
   tp->Wait();
+  tp->Cancel();
 
   EXPECT_TRUE(called);
 }
@@ -274,10 +274,10 @@ TEST(Detach, DetachOn2) {
     std::move(p).Set(42);
   });
 
-  tp1->SoftStop();
   tp1->Wait();
-  tp2->SoftStop();
   tp2->Wait();
+  tp1->Cancel();
+  tp2->Cancel();
 
   EXPECT_TRUE(called);
 }
@@ -336,8 +336,8 @@ TEST(Simple, Stop) {
     }
     EXPECT_THROW(std::move(g).Get().Ok(), yaclib::ResultError<yaclib::StopError>);
   }
-  tp->SoftStop();
   tp->Wait();
+  tp->Cancel();
 }
 
 TYPED_TEST(AsyncSuite, PipelineSimple) {
@@ -423,8 +423,8 @@ TYPED_TEST(AsyncSuite, AsyncThen) {
                      });
   EXPECT_EQ(std::move(pipeline2).Get().Value(), 5);
 
-  tp->SoftStop();
   tp->Wait();
+  tp->Cancel();
 }
 
 TYPED_TEST(Error, Simple1) {

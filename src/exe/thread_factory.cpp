@@ -40,8 +40,8 @@ class LightThread final : public IThread {
 
   ~LightThread() final {
     YACLIB_ERROR(_thread.get_id() == yaclib_std::this_thread::get_id(),
-                 "Thread try to join itself, probably because you forgot Stop ThreadPool, "
-                 "and ThreadPool dtor was called in ThreadPool thread");
+                 "Thread try to join itself, probably because you forgot Wait() IThreadPool, "
+                 "and IThreadPool dtor was called in IThreadPool thread");
     _thread.join();
   }
 
@@ -80,8 +80,8 @@ class HeavyThread final : public IThread {
 
   ~HeavyThread() final {
     YACLIB_ERROR(_thread.get_id() == yaclib_std::this_thread::get_id(),
-                 "Thread try to join itself, probably because you forgot Stop ThreadPool, "
-                 "and ThreadPool dtor was called in ThreadPool thread");
+                 "Thread try to join itself, probably because you forgot Wait() IThreadPool, "
+                 "and IThreadPool dtor was called in IThreadPool thread");
     {
       std::lock_guard lock{_m};
       _state = State::Stop;

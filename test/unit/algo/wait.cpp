@@ -216,8 +216,8 @@ TEST(Wait, ResetWait) {
     }));
   }
   yaclib::WaitFor(0ns, fs.begin(), fs.end());
-  tp->HardStop();
   tp->Wait();
+  tp->Cancel();
 }
 // silly test to pass codecov
 TEST(SillyTest, ForTouch) {
@@ -237,6 +237,6 @@ TEST(SillyTest, ForTouch) {
   yaclib::Wait(fut);
   auto res = std::as_const(fut).Touch();
   EXPECT_EQ(std::move(res).Ok(), 42);
-  tp->HardStop();
   tp->Wait();
+  tp->Cancel();
 }

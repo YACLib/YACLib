@@ -49,8 +49,8 @@ TEST(Example, Detach) {
 
   EXPECT_TRUE(!f.Valid());
 
-  tp->SoftStop();
   tp->Wait();
+  tp->Cancel();
 }
 
 TEST(Example, Then) {
@@ -72,8 +72,8 @@ TEST(Example, Then) {
 
   std::cout << "process(compute()) -> " << std::move(f2).Get().Ok() << std::endl;
 
-  tp->SoftStop();
   tp->Wait();
+  tp->Cancel();
 }
 
 TEST(Example, Pipeline) {
@@ -104,8 +104,8 @@ TEST(Example, Pipeline) {
   // Chain pipeline stages and run them in thread pool
   yaclib::Run(*tp, first).Then(second).Then(third).Then(fourth).Detach(last);
 
-  tp->SoftStop();
   tp->Wait();
+  tp->Cancel();
 }
 
 class CalculatorService {
@@ -145,8 +145,8 @@ TEST(Example, AsyncPipeline) {
       std::cout << "Result: " << std::move(r).Ok() << std::endl;
     });
 
-  tp->SoftStop();
   tp->Wait();
+  tp->Cancel();
 }
 
 /**
@@ -167,10 +167,10 @@ TEST(Example, Race) {
     std::cout << "Hello from the second thread pool!";
   });
 
-  tp->SoftStop();
   tp->Wait();
-  tp2->SoftStop();
   tp2->Wait();
+  tp->Cancel();
+  tp2->Cancel();
 }
 
 TEST(Example, StrandAsync) {
@@ -196,6 +196,6 @@ TEST(Example, StrandAsync) {
       std::cout << "Final result: " << std::move(r).Value() << std::endl;
     });
 
-  tp->SoftStop();
   tp->Wait();
+  tp->Cancel();
 }

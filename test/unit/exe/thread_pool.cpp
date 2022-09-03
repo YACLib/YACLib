@@ -6,10 +6,8 @@
 #include <yaclib/exe/submit.hpp>
 #include <yaclib/exe/thread_factory.hpp>
 #include <yaclib/exe/thread_pool.hpp>
-#include <yaclib/util/intrusive_ptr.hpp>
 
 #include <cstddef>
-#include <initializer_list>
 #include <stdexcept>
 #include <thread>
 #include <vector>
@@ -144,8 +142,8 @@ void ExecuteFrom(yaclib::IThreadPoolPtr& tp) {
   };
   Submit(*tp, task);
 
-  tp->SoftStop();
   tp->Wait();
+  tp->Cancel();
 
   EXPECT_TRUE(done);
 }
@@ -186,13 +184,14 @@ void AfterStopImpl(yaclib::IThreadPoolPtr& tp, StopType stop_type, bool need_wai
 
   switch (stop_type) {
     case StopType::SoftStop:
-      tp->SoftStop();
+      tp->Wait();
+      tp->Cancel();
       break;
     case StopType::Stop:
       tp->Stop();
       break;
     case StopType::HardStop:
-      tp->HardStop();
+      tp->Cancel();
       break;
   }
 
@@ -270,10 +269,10 @@ void TwoThreadPool(yaclib::IThreadPoolPtr& tp1, yaclib::IThreadPoolPtr& tp2) {
     yaclib_std::this_thread::sleep_for(200ms);
   });
 
-  tp1->SoftStop();
-  tp2->SoftStop();
   tp1->Wait();
+  tp1->Cancel();
   tp2->Wait();
+  tp2->Cancel();
   EXPECT_TRUE(done1);
   EXPECT_TRUE(done2);
   EXPECT_LT(stop_watch.Elapsed(), 400ms);
@@ -299,7 +298,8 @@ TEST_F(MultiHeavyThread, TwoThreadPool) {
 void Join(yaclib::IThreadPoolPtr& tp, StopType stop_type) {
   switch (stop_type) {
     case StopType::SoftStop:
-      tp->SoftStop();
+      tp->Wait();
+      tp->Cancel();
       break;
     case StopType::Stop:
       tp->Stop();
@@ -356,7 +356,8 @@ void Exception(yaclib::IThreadPoolPtr& tp, StopType stop_type) {
 
   switch (stop_type) {
     case StopType::SoftStop:
-      tp->SoftStop();
+      tp->Wait();
+      tp->Cancel();
       break;
     case StopType::Stop:
       tp->Stop();

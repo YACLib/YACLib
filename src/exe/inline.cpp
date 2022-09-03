@@ -12,6 +12,10 @@ class Inline final : public IExecutor {
     return Type::Inline;
   }
 
+  [[nodiscard]] bool Alive() const noexcept final {
+    return true;
+  }
+
   void Submit(Job& task) noexcept final {
     if constexpr (Stop) {
       task.Drop();

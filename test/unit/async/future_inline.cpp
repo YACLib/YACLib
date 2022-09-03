@@ -272,6 +272,10 @@ class StopSource final : public yaclib::IExecutor {
     return Type::Custom;
   }
 
+  [[nodiscard]] bool Alive() const noexcept final {
+    return _stop.load(std::memory_order_relaxed);
+  }
+
   void Submit(yaclib::Job& job) noexcept final {
     if (!_stop.load(std::memory_order_relaxed)) {
       _executor.Submit(job);

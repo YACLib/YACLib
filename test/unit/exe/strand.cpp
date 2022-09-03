@@ -36,8 +36,8 @@ TEST(ExecuteTask, Simple) {
     done = true;
   });
 
-  tp->SoftStop();
   tp->Wait();
+  tp->Cancel();
 
   EXPECT_TRUE(done);
 }
@@ -55,8 +55,8 @@ TEST(counter, simple) {
     });
   }
 
-  tp->SoftStop();
   tp->Wait();
+  tp->Cancel();
 
   EXPECT_EQ(counter, kIncrements);
 }
@@ -75,8 +75,8 @@ TEST(fifo, simple) {
     });
   }
 
-  tp->SoftStop();
   tp->Wait();
+  tp->Cancel();
 
   EXPECT_EQ(next_ticket, kTickets);
 }
@@ -122,8 +122,8 @@ TEST(concurrent_strands, simple) {
     }
   }
 
-  tp->SoftStop();
   tp->Wait();
+  tp->Cancel();
 
   for (std::size_t i = 0; i < kStrands; ++i) {
     EXPECT_EQ(counters[i].Value(), kBatchSize * kIterations);
@@ -132,7 +132,7 @@ TEST(concurrent_strands, simple) {
 
 TEST(batching, simple) {
   auto tp = yaclib::MakeThreadPool(1);
-  EXPECT_EQ(tp->Tag(), yaclib::IExecutor::Type::ThreadPool);
+  EXPECT_EQ(tp->Tag(), yaclib::IExecutor::Type::FairThreadPool);
   Submit(*tp, [] {
     // bubble
     yaclib_std::this_thread::sleep_for(1s);
@@ -149,8 +149,8 @@ TEST(batching, simple) {
     });
   }
 
-  tp->SoftStop();
   tp->Wait();
+  tp->Cancel();
 
   EXPECT_EQ(completed, kStrandTasks);
 }
@@ -165,8 +165,8 @@ TEST(strand_over_strand, simple) {
     done = true;
   });
 
-  tp->SoftStop();
   tp->Wait();
+  tp->Cancel();
 
   EXPECT_TRUE(done);
 }
@@ -224,8 +224,8 @@ TEST(keep_strong_ref, simple) {
     done = true;
   });
 
-  tp->SoftStop();
   tp->Wait();
+  tp->Cancel();
   EXPECT_TRUE(done);
 }
 
@@ -260,8 +260,8 @@ TEST(do_not_occupy_thread, simple) {
     yaclib_std::this_thread::sleep_for(kStepPause);
   }
 
-  tp->HardStop();
   tp->Wait();
+  tp->Cancel();
 }
 
 TEST(exceptions, simple) {
@@ -281,8 +281,8 @@ TEST(exceptions, simple) {
     done = true;
   });
 
-  tp->SoftStop();
   tp->Wait();
+  tp->Cancel();
   EXPECT_TRUE(done);
 }
 
@@ -301,8 +301,8 @@ TEST(non_blocking_execute, simple) {
   });
   EXPECT_LE(stop_watch.Elapsed(), 100ms);
 
-  tp->SoftStop();
   tp->Wait();
+  tp->Cancel();
 }
 
 TEST(do_not_block_thread_pool, simple) {
@@ -328,8 +328,8 @@ TEST(do_not_block_thread_pool, simple) {
   yaclib_std::this_thread::sleep_for(20ms * YACLIB_CI_SLOWDOWN);
   EXPECT_TRUE(done.load());
 
-  tp->HardStop();
   tp->Wait();
+  tp->Cancel();
 }
 
 TEST(memory_leak, simple) {
@@ -342,8 +342,8 @@ TEST(memory_leak, simple) {
   Submit(*strand, [] {
   });
 
-  tp->HardStop();
   tp->Wait();
+  tp->Cancel();
 }
 
 }  // namespace

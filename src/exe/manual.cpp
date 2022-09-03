@@ -7,7 +7,11 @@
 namespace yaclib {
 
 IExecutor::Type ManualExecutor::Tag() const noexcept {
-  return Type::Custom;
+  return yaclib::IExecutor::Type::Custom;
+}
+
+bool ManualExecutor::Alive() const noexcept {
+  return true;
 }
 
 void ManualExecutor::Submit(yaclib::Job& f) noexcept {

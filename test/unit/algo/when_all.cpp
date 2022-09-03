@@ -246,7 +246,7 @@ void MultiThreaded() {
     }
   }
 
-  tp->HardStop();
+  tp->Cancel();
   tp->Wait();
 }
 

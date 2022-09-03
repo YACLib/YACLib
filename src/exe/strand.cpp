@@ -26,6 +26,10 @@ class /*alignas(kCacheLineSize)*/ Strand : public Job, public IExecutor {
     return Type::Strand;
   }
 
+  [[nodiscard]] bool Alive() const noexcept final {
+    return _executor->Alive();
+  }
+
   void Submit(Job& task) noexcept final {
     auto* old = _tasks.load(std::memory_order_relaxed);
     do {

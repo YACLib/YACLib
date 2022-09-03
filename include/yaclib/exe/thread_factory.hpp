@@ -7,6 +7,9 @@
 #include <cstddef>
 #include <string_view>
 
+/**
+ * TODO(kononovk): add all descriptions, readme, reimplementation, tests...
+ */
 namespace yaclib {
 
 class IThread : public detail::Node {

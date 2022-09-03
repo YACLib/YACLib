@@ -56,6 +56,7 @@ set(YACLIB_UNIT_SOURCES
   unit/algo/when_any
   unit/algo/wait_group
   unit/exe/thread_pool
+  unit/exe/golang_thread_pool
   unit/async/stress
   unit/exe/strand
   unit/not_implemented
@@ -129,13 +130,13 @@ add_executable(unit_log
   unit/log.cpp
   )
 
-if (NOT "YACLIB_LOG_ERROR" IN_LIST YACLIB_DEFINITIONS)
+if (NOT YACLIB_DEFINITIONS MATCHES "YACLIB_LOG_ERROR")
   list(APPEND YACLIB_DEFINITIONS "YACLIB_LOG_ERROR")
 endif ()
-if (NOT "YACLIB_LOG_WARN" IN_LIST YACLIB_DEFINITIONS)
+if (NOT YACLIB_DEFINITIONS MATCHES "YACLIB_LOG_WARN")
   list(APPEND YACLIB_DEFINITIONS "YACLIB_LOG_WARN")
 endif ()
-if (NOT "YACLIB_LOG_DEBUG" IN_LIST YACLIB_DEFINITIONS)
+if (NOT YACLIB_DEFINITIONS MATCHES "YACLIB_LOG_DEBUG")
   list(APPEND YACLIB_DEFINITIONS "YACLIB_LOG_DEBUG")
 endif ()
 

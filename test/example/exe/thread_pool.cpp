@@ -1,5 +1,5 @@
 /**
- * \example thread_pool.cpp
+ * \example fair_thread_pool.cpp
  * Simple \ref IThreadPool examples
  */
 
@@ -15,8 +15,8 @@
 namespace test {
 namespace {
 
-TEST(Example, ThreadPool) {
-  std::cout << "ThreadPool" << std::endl;
+TEST(Example, FairThreadPool) {
+  std::cout << "FairThreadPool" << std::endl;
 
   auto tp = yaclib::MakeThreadPool(4);
 

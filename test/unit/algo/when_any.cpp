@@ -195,7 +195,7 @@ void MultiThreaded() {
     EXPECT_TRUE(kOuts.find(result) != kOuts.end());
   }
 
-  tp->HardStop();
+  tp->Cancel();
   tp->Wait();
 }
 
@@ -242,7 +242,7 @@ void TimeTest() {
     EXPECT_EQ(result, 5);
   }
 
-  tp->HardStop();
+  tp->Cancel();
   tp->Wait();
 }
 
