@@ -45,7 +45,7 @@ class AwaitEvent final : public InlineCore, public AtomicCounter<NopeBase, NopeD
   }
 
 #if YACLIB_SYMMETRIC_TRANSFER != 0
-  yaclib_std::coroutine_handle<> Next() noexcept final {
+  [[nodiscard]] yaclib_std::coroutine_handle<> Next() noexcept final {
     if (this->SubEqual(1)) {
       return static_cast<InlineCore*>(next)->Next();
     }

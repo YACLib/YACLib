@@ -3,8 +3,6 @@
 #include <yaclib/async/future.hpp>
 #include <yaclib/coro/coro.hpp>
 #include <yaclib/coro/detail/await_awaiter.hpp>
-#include <yaclib/lazy/task.hpp>
-#include <yaclib/util/detail/atomic_counter.hpp>
 #include <yaclib/util/type_traits.hpp>
 
 namespace yaclib {

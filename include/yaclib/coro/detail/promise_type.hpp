@@ -75,7 +75,7 @@ class PromiseType final : public OneCounter<ResultCore<V, E>, PromiseTypeDeleter
     this->Store(Unit{});
   }
 
-  auto Handle() noexcept {
+  [[nodiscard]] auto Handle() noexcept {
     auto handle = yaclib_std::coroutine_handle<PromiseType>::from_promise(*this);
     YACLIB_ASSERT(handle);
     return handle;
@@ -97,7 +97,7 @@ class PromiseType final : public OneCounter<ResultCore<V, E>, PromiseTypeDeleter
   }
 
 #if YACLIB_SYMMETRIC_TRANSFER != 0
-  yaclib_std::coroutine_handle<> Next() noexcept final {
+  [[nodiscard]] yaclib_std::coroutine_handle<> Next() noexcept final {
     auto handle = Handle();
     YACLIB_ASSERT(!handle.done());
     return handle;
