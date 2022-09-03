@@ -75,8 +75,10 @@ class PromiseType final : public OneCounter<ResultCore<V, E>, PromiseTypeDeleter
     this->Store(Unit{});
   }
 
-  auto Handle() noexcept {
-    return yaclib_std::coroutine_handle<PromiseType>::from_promise(*this);
+  [[nodiscard]] auto Handle() noexcept {
+    auto handle = yaclib_std::coroutine_handle<PromiseType>::from_promise(*this);
+    YACLIB_ASSERT(handle);
+    return handle;
   }
 
  private:
@@ -85,16 +87,18 @@ class PromiseType final : public OneCounter<ResultCore<V, E>, PromiseTypeDeleter
   }
 
   void Call() noexcept final {
-    auto handle = Handle();
-    YACLIB_ASSERT(handle);
-    YACLIB_ASSERT(!handle.done());
-    handle.resume();
+    auto next = Next();
+    next.resume();
+  }
+
+  void Drop() noexcept final {
+    this->Store(StopTag{});
+    this->template SetResult<false>();
   }
 
 #if YACLIB_SYMMETRIC_TRANSFER != 0
-  yaclib_std::coroutine_handle<> Next() noexcept final {
+  [[nodiscard]] yaclib_std::coroutine_handle<> Next() noexcept final {
     auto handle = Handle();
-    YACLIB_ASSERT(handle);
     YACLIB_ASSERT(!handle.done());
     return handle;
   }
@@ -106,7 +110,6 @@ template <typename V, typename E>
 void PromiseTypeDeleter<Lazy>::Delete(ResultCore<V, E>& core) noexcept {
   auto& promise = static_cast<PromiseType<V, E, Lazy>&>(core);
   auto handle = promise.Handle();
-  YACLIB_ASSERT(handle);
   handle.destroy();
 }
 

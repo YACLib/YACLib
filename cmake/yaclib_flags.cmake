@@ -50,6 +50,7 @@ endif ()
 if (DISABLE_FUTEX IN_LIST YACLIB_FLAGS)
   set(YACLIB_FUTEX 0)
 elseif (DISABLE_UNSAFE_FUTEX IN_LIST YACLIB_FLAGS OR YACLIB_FAULT STREQUAL "FIBER")
+  # Our fiber fault injection atomic rely on `*this` in `notify_one`
   set(YACLIB_FUTEX 1)
 else ()
   # It's safe if we need only address for notify

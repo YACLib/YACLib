@@ -8,6 +8,16 @@
 
 namespace yaclib::detail {
 
+class NoResultCore : public BaseCore {
+ public:
+  NoResultCore() noexcept : BaseCore{kEmpty} {
+  }
+
+  template <typename T>
+  void Store(T&&) noexcept {
+  }
+};
+
 enum class CoreType : char {
   Run = 0,
   Then = 1,
@@ -15,7 +25,7 @@ enum class CoreType : char {
 };
 
 template <CoreType Type, typename V, typename E>
-using ResultCoreT = std::conditional_t<Type == CoreType::Detach, ResultCore<void, void>, ResultCore<V, E>>;
+using ResultCoreT = std::conditional_t<Type == CoreType::Detach, NoResultCore, ResultCore<V, E>>;
 
 template <typename Ret, typename Arg, typename E, typename Wrapper, CoreType Type>
 class Core : public ResultCoreT<Type, Ret, E> {
@@ -29,21 +39,19 @@ class Core : public ResultCoreT<Type, Ret, E> {
     }
   }
 
- private:
   void Call() noexcept final {
-    if constexpr (Wrapper::kIsAsync) {
-      YACLIB_ASSERT(this->_unwrapping == 0);
-      ++this->_unwrapping;
-    }
     if constexpr (Type == CoreType::Run) {
-      _wrapper.Call(*this, Unit{});
+      Invoke(Unit{});
     } else {
       auto& core = static_cast<ResultCore<Arg, E>&>(*this->_caller);
-      _wrapper.Call(*this, std::move(core.Get()));
+      Invoke(std::move(core.Get()));
     }
   }
 
- public:
+  void Drop() noexcept final {
+    Invoke(Result<Arg, E>{StopTag{}});
+  }
+
   void Here(InlineCore& caller) noexcept final {
     if constexpr (Wrapper::kIsAsync) {
       if (this->_unwrapping++ != 0) {
@@ -57,6 +65,15 @@ class Core : public ResultCoreT<Type, Ret, E> {
   }
 
  private:
+  template <typename A>
+  YACLIB_INLINE void Invoke(A&& arg) noexcept {
+    if constexpr (Wrapper::kIsAsync) {
+      YACLIB_ASSERT(this->_unwrapping == 0);
+      this->_unwrapping = 1;
+    }
+    _wrapper.Call(*this, std::forward<A>(arg));
+  }
+
   YACLIB_NO_UNIQUE_ADDRESS Wrapper _wrapper;
 };
 
@@ -104,8 +121,7 @@ class FuncWrapper final {
 
   using Store = std::decay_t<Func>;
   using Invoke = std::conditional_t<std::is_function_v<std::remove_reference_t<Func>>, Store, Func>;
-  using Core = std::conditional_t<Detach, ResultCore<void, void>, ResultCore<Ret, E>>;
-  static constexpr bool kEarlyDestroy = true;
+  using Core = std::conditional_t<Detach, NoResultCore, ResultCore<Ret, E>>;
 
  public:
   static constexpr bool kIsAsync = Async;
@@ -136,16 +152,8 @@ class FuncWrapper final {
   template <typename T>
   void Done(Core& self, T&& value) noexcept {
     self.Store(std::forward<T>(value));
-    if constexpr (kEarlyDestroy) {
-      _func.store.~Store();
-    }
+    _func.store.~Store();
     self.template SetResult<false>();
-  }
-
-  ~FuncWrapper() noexcept {
-    if constexpr (!kEarlyDestroy) {
-      _func.store.~Store();
-    }
   }
 
  private:
@@ -162,15 +170,20 @@ class FuncWrapper final {
       }
     } else {
       /**
-       * We can't use this strategy for other Func::Invoke,
-       * because in that case user will not have compile error for that case:
-       * MakeFuture<>() // state == ResultState::Value
+       * TLDR: Before and after the "recovery" callback must have the same value type
+       *
+       * Why can't we use the above strategy for other Invoke?
+       * Because user will not have compile error for this case:
+       * MakeFuture()
+       *   // Can't call next recovery callback, because our result is Ok, so we will skip next callback
        *   .ThenInline([](E/std::exception_ptr) -> yaclib::Result/Future<double> {
        *     throw std::runtime_error{""};
-       *   }).ThenInline([](yaclib::Result<double>) { // need double value, we only have void
+       *   })
+       *   // Previous callback was skipped, so previous Result type is void (received from MakeFuture)
+       *   // But here we need Result<double>, so it leeds error
+       *   .ThenInline([](yaclib::Result<double>) {
        *     return 1;
        *   });
-       * TLDR: Before and after the "recovery" callback must have the same value type
        */
       constexpr bool kIsException = is_invocable_v<Invoke, std::exception_ptr>;
       constexpr bool kIsError = is_invocable_v<Invoke, E>;
@@ -217,10 +230,10 @@ class FuncWrapper final {
     YACLIB_NO_UNIQUE_ADDRESS Unit stub;
     YACLIB_NO_UNIQUE_ADDRESS Store store;
 
-    State() {
+    State() noexcept {
     }
 
-    ~State() {
+    ~State() noexcept {
     }
   };
   YACLIB_NO_UNIQUE_ADDRESS State _func;
@@ -265,7 +278,7 @@ auto SetCallback(ResultCorePtr<Arg, E>& core, Func&& f) {
   auto* callback = MakeCore<CoreT, Arg, E>(std::forward<Func>(f));
   auto* caller = core.Release();
   if constexpr (!kIsDetach) {
-    callback->_executor = caller->_executor;
+    callback->_executor = move_if<(!kIsTask && CallbackT != CallbackType::On)>(caller->_executor);
   }
   if constexpr (CallbackT == CallbackType::Lazy) {
     callback->_caller = caller;

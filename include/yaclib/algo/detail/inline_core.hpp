@@ -14,7 +14,7 @@ namespace yaclib::detail {
 class InlineCore : public Job {
  public:
 #if YACLIB_SYMMETRIC_TRANSFER != 0
-  virtual yaclib_std::coroutine_handle<> Next() noexcept {
+  [[nodiscard]] virtual yaclib_std::coroutine_handle<> Next() noexcept {
     Call();
     return yaclib_std::noop_coroutine();
   }

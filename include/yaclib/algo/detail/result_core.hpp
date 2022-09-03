@@ -33,31 +33,11 @@ class ResultCore : public BaseCore {
     return _result;
   }
 
-  void Drop() noexcept final {
-    Store(StopTag{});
-    SetResult<false>();
-  }
-
  protected:
   union {
     Result<V, E> _result;
     char _unwrapping;
   };
-};
-
-template <>
-class ResultCore<void, void> : public BaseCore {
- public:
-  ResultCore() noexcept : BaseCore{kEmpty} {
-  }
-
-  template <typename T>
-  void Store(T&&) noexcept {
-  }
-
-  void Drop() noexcept final {
-    SetResult<false>();
-  }
 };
 
 extern template class ResultCore<void, StopError>;
