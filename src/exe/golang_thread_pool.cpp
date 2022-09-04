@@ -1,5 +1,5 @@
 /**
- * TODO: This Thread Pool based on golang... blah blah blah
+ * This Thread Pool inspired on golang and based on tokio implementation
  */
 #include <util/global_queue.hpp>
 #include <util/metrics.hpp>
@@ -13,9 +13,10 @@
 #include <iostream>
 #include <optional>
 #include <random>
-#include <utility>
 #include <yaclib_std/atomic>
 #include <yaclib_std/thread_local>
+#include <exe/idle.hpp>
+#include <exe/parker.hpp>
 
 namespace yaclib {
 namespace {

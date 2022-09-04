@@ -10,6 +10,8 @@ list(APPEND YACLIB_INCLUDES
   )
 list(APPEND YACLIB_HEADERS
   ${YACLIB_INCLUDE_DIR}/exe/detail/unique_job.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/idle.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/parker.hpp
   )
 list(APPEND YACLIB_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/fair_thread_pool.cpp
