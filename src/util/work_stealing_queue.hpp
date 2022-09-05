@@ -104,10 +104,20 @@ class alignas(kCacheLineSize) WorkStealingQueue {
     return n;
   }
 
+  /**
+   * Clear WorkStealingQueue
+   */
   void Clear() noexcept {
+    // TODO(kononovk): make more optimal
     while (auto* job = TryPop()) {
       job->Drop();
     }
+  }
+
+  bool Empty() const noexcept {
+    std::uint16_t real{};
+    std::tie(std::ignore, real) = Unpack(_head.load(std::memory_order_acquire));
+    return _tail.load(std::memory_order_acquire) == real;
   }
 
  private:

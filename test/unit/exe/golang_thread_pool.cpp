@@ -4,7 +4,6 @@
 #include <chrono>
 #include <iostream>
 #include <yaclib_std/thread>
-
 #include <gtest/gtest.h>
 
 namespace test {

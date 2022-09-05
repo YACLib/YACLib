@@ -1,6 +1,8 @@
 /**
  * This Thread Pool inspired on golang and based on tokio implementation
  */
+#include <exe/idle.hpp>
+#include <exe/parker.hpp>
 #include <util/global_queue.hpp>
 #include <util/metrics.hpp>
 #include <util/work_stealing_queue.hpp>
@@ -15,20 +17,17 @@
 #include <random>
 #include <yaclib_std/atomic>
 #include <yaclib_std/thread_local>
-#include <exe/idle.hpp>
-#include <exe/parker.hpp>
 
 namespace yaclib {
 namespace {
 
 constexpr size_t kTickFrequency = 61;
 
-struct GolangThreadPool;
-struct Worker;
+class GolangThreadPool;
+class Worker;
 YACLIB_THREAD_LOCAL_PTR(Worker) _worker;
 
-struct Worker {
- private:
+class Worker {
   static constexpr size_t kLocalQueueCapacity = 256;
 
  public:
@@ -75,6 +74,10 @@ struct Worker {
   // Wake parked worker
   void Wake() {
   }
+
+  void Park();
+
+  void Tick();
 
   static Worker* Current() {
     return _worker;
@@ -128,11 +131,14 @@ struct Worker {
   std::size_t _tick{0};
 
   detail::WorkerMetrics _metrics;  // TODO(kononovk): add metrics
+
+  bool _is_shutdown{false};
 };
 
 class GolangThreadPool : public IThreadPool {
  public:
-  explicit GolangThreadPool(std::size_t threads) noexcept : _threads{threads} {
+  explicit GolangThreadPool(std::size_t threads) noexcept
+    : _threads{threads}, _idle(static_cast<std::uint16_t>(threads)) {
   }
 
   void Start() {
@@ -202,32 +208,38 @@ class GolangThreadPool : public IThreadPool {
  private:
   std::size_t _threads;
   std::deque<Worker> _workers;
+
+  /// Global task queue used for:
+  ///  1. Submit work to the scheduler while **not** currently on a worker thread.
+  ///  2. Submit work to the scheduler when a worker run queue is saturated
   detail::GlobalQueue _global_tasks;
+
+  /// Coordinates idle workers
+  Idle _idle;
+
   yaclib_std::atomic_bool _stopped{false};
   yaclib_std::atomic_size_t _joined_workers{0};
 };
 
+// TODO(kononovk): 0) LIFO slot
 Job* Worker::PickNextTask() {
   Job* job = nullptr;
 
-  // [Periodically] Global queue
+  // 1) Periodically global queue
   if (_tick == kTickFrequency) {
     job = _host._global_tasks.TryPopOne();
     if (job != nullptr) {
-      _tick = 0;
       return job;
     }
   }
 
-  // TODO(kononovk): 0) LIFO slot
-
-  // 1) Local queue
+  // 2) Local queue
   job = _local_jobs.TryPop();
   if (job != nullptr) {
     return job;
   }
 
-  // 2) Global queue
+  // 3) Global queue
   if (_tick != kTickFrequency) {
     job = _host._global_tasks.TryPopOne();
     if (job != nullptr) {
@@ -235,21 +247,18 @@ Job* Worker::PickNextTask() {
     }
   }
 
-  if (_tick == kTickFrequency) {
-    _tick = 0;
-  }
-
-  // 3) Work stealing
+  // 4) Work stealing
   for (size_t i = 1; i < _host._threads; ++i) {
     size_t index = (_index + i) % _host._threads;
     YACLIB_ASSERT(index != _index);
-
+    // TODO(kononovk): Maybe steal randomly to minimize contention ??
     job = TryStealJobs(_host._workers[index]);
     if (job != nullptr) {
       return job;
     }
   }
 
+  // 5) Park, no tasks =(
   return nullptr;
 }
 
@@ -259,13 +268,18 @@ void Worker::Clear() {
 }
 
 void Worker::Work() {
-  while (_host.Alive()) {
-    Job* next = PickNextTask();
-    if (next == nullptr) {
-      continue;
+  while (!_is_shutdown) {
+    if (_tick == kTickFrequency) {
+      _is_shutdown = !_host.Alive();
     }
-    _tick++;
-    next->Call();
+    Job* next = PickNextTask();
+    if (next != nullptr) {
+      next->Call();
+    } else {
+      // Park woker
+      Park();
+    }
+    Tick();
   }
 
   if (_host._joined_workers.fetch_add(1, std::memory_order_acq_rel) == _host._threads - 1) {
@@ -273,6 +287,43 @@ void Worker::Work() {
       _host._workers[index].Clear();
     }
     _host._global_tasks.Clear();
+  }
+}
+
+void Worker::Tick() {
+  if (_tick++ == kTickFrequency) {
+    _tick = 1;
+  }
+}
+
+void Worker::Park() {
+  bool transition_to_parked = false;
+
+  // Workers should not park if they have work to do
+  // TODO(kononovk): add also LIFO slot checking
+  YACLIB_ASSERT(_local_jobs.Empty());
+  if (!_local_jobs.Empty()) {
+    transition_to_parked = false;
+  }
+  // TODO: add transition_to_parked and transition_to_searching methods from rust
+
+  if (transition_to_parked) {
+    while (_is_shutdown) {
+      /*core = self.park_timeout(core, None);
+
+       // Run regularly scheduled maintenance
+       core.maintenance(&self.worker);
+
+       if (transition_from_parked()) {
+           break;
+         }
+     }*/
+    }
+
+    /*if let Some(f) = &self.worker.shared.config.after_unpark {
+        f();
+      }
+    core*/
   }
 }
 
