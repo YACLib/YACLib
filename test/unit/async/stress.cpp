@@ -60,13 +60,14 @@ struct StressTest : testing::Test {
     uint32_t num_slots{64 * kNumThreads};
     std::vector<StressTest::Slot> slots{num_slots};
     std::vector<yaclib_std::thread> threads;
+    threads.reserve(kNumThreads);
 
     // producer
     for (uint32_t i = 0; i < kNumThreads / 2; ++i) {
       threads.emplace_back(yaclib_std::thread([&producer_idx, i, num_slots, &slots, &e] {
         std::mt19937 rng(i);
         for (uint32_t r = 0; r < kNumRounds; ++r) {
-          auto [f, p] = yaclib::MakeContract<Value>();
+          auto [f, p] = yaclib::MakeContractOn<Value>(e);
           auto idx = producer_idx.fetch_add(1, std::memory_order_acq_rel);
           auto slot_round = (idx / num_slots) * 2;
           idx %= num_slots;
@@ -74,7 +75,7 @@ struct StressTest : testing::Test {
             yaclib_std::this_thread::yield();
           }
           ASSERT_FALSE(slots[idx].future.Valid());
-          slots[idx].future = std::move(f).On(e);
+          slots[idx].future = std::move(f);
           slots[idx].round.store(slot_round + 1, std::memory_order_release);
           volatile auto work = rng() % 2048;
           for (uint32_t x = 0; x < work; ++x) {

@@ -1,5 +1,6 @@
 #include <yaclib/exe/thread_pool.hpp>
 #include <yaclib/lazy/make.hpp>
+#include <yaclib/lazy/schedule.hpp>
 #include <yaclib/util/result.hpp>
 
 #include <thread>
@@ -46,8 +47,7 @@ TEST(Task, Simple2) {
                           .Then([&] {
                             called += 2;
                           })
-                          .On(*tp)
-                          .Then([&] {
+                          .Then(*tp, [&] {
                             called += 3;
                           });
   EXPECT_TRUE(task.Valid());
@@ -69,7 +69,6 @@ TEST(Task, Cancel) {
   yaclib::Task<> task1 = yaclib::Schedule([&] {
                            called += 1;
                          })
-                           .On(nullptr)
                            .Then([&] {
                              called += 2;
                            })
@@ -83,8 +82,7 @@ TEST(Task, Cancel) {
                            .Then([&] {
                              called += 2;
                            })
-                           .On(*tp)
-                           .Then([&] {
+                           .Then(*tp, [&] {
                              called += 3;
                            });
   EXPECT_TRUE(task1.Valid());
