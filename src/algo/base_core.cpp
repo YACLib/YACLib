@@ -22,7 +22,6 @@ void BaseCore::SetInline(InlineCore& callback) noexcept {
 }
 
 void BaseCore::SetCall(BaseCore& callback) noexcept {
-  callback._caller = this;  // move ownership
   if (!SetCallback(callback, kCall)) {
     Submit(callback);
   }
@@ -39,14 +38,11 @@ bool BaseCore::Empty() const noexcept {
   return callback == kEmpty;
 }
 
-BaseCore::BaseCore(State callback) noexcept : _callback{callback}, _caller{&kEmptyCore} {
+BaseCore::BaseCore(State callback) noexcept : _callback{callback} {
 }
 
 template <bool SymmetricTransfer>
 BaseCore::ReturnT<SymmetricTransfer> BaseCore::SetResult() noexcept {
-  auto* caller = _caller;
-  YACLIB_ASSERT(std::exchange(_caller, &kEmptyCore) != nullptr);
-  caller->DecRef();
   auto expected = _callback.exchange(kResult, std::memory_order_acq_rel);
   const State state{expected & kMask};
   auto* const callback = reinterpret_cast<InlineCore*>(expected & ~kMask);
@@ -70,8 +66,7 @@ BaseCore::ReturnT<SymmetricTransfer> BaseCore::SetResult() noexcept {
       DecRef();
       break;
     case kCall:
-      YACLIB_ASSERT(static_cast<detail::BaseCore*>(callback)->_caller == this);
-      Submit(*callback);
+      Submit(static_cast<BaseCore&>(*callback));
       [[fallthrough]];
     default:
       break;
@@ -101,10 +96,12 @@ void BaseCore::StoreCallback(InlineCore& callback, State state) noexcept {
   _callback.store(state | reinterpret_cast<std::uint64_t>(&callback), std::memory_order_relaxed);
 }
 
-void BaseCore::Submit(Job& job) noexcept {
-  YACLIB_ASSERT(_executor != nullptr);
-  auto executor = std::move(_executor);
-  executor->Submit(job);
+void BaseCore::Submit(BaseCore& callback) noexcept {
+  if (!callback._executor) {
+    YACLIB_ASSERT(_executor != nullptr);
+    callback._executor = std::move(_executor);
+  }
+  callback._executor->Submit(callback);
 }
 
 }  // namespace yaclib::detail

@@ -92,12 +92,6 @@ class FutureBase {
   [[nodiscard]] Result<V, E> Touch() && noexcept;
 
   /**
-   * Specify executor for continuation.
-   * Make FutureOn -- Future with executor
-   */
-  [[nodiscard]] FutureOn<V, E> On(IExecutor& executor) && noexcept;
-
-  /**
    * Attach the continuation func to *this
    *
    * The func will be executed on the specified executor.
@@ -193,7 +187,6 @@ class [[nodiscard]] FutureOn final : public FutureBase<V, E> {
  public:
   using Base::Base;
   using Base::Detach;
-  using Base::On;
   using Base::Then;
 
   FutureOn(detail::ResultCorePtr<V, E> core) noexcept : Base{std::move(core)} {

@@ -9,10 +9,7 @@ namespace yaclib {
  */
 template <typename E = StopError, typename Func>
 /*Task*/ auto Schedule(IExecutor& e, Func&& f) {
-  auto task = detail::Schedule<E>(&e, std::forward<Func>(f));
-  e.IncRef();
-  task.GetCore()->_caller = &e;
-  return task;
+  return detail::Schedule<E>(e, std::forward<Func>(f));
 }
 
 /**
@@ -20,9 +17,7 @@ template <typename E = StopError, typename Func>
  */
 template <typename E = StopError, typename Func>
 /*Task*/ auto Schedule(Func&& f) {
-  auto task = detail::Schedule<E>(nullptr, std::forward<Func>(f));
-  task.GetCore()->_caller = nullptr;
-  return task;
+  return detail::Schedule<E>(MakeInline(), std::forward<Func>(f));
 }
 
 }  // namespace yaclib

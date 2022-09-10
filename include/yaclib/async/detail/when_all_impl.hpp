@@ -69,7 +69,7 @@ class AllCombinator : public InlineCore, public AllCombinatorBase<FutureValue> {
   }
 
  private:
-  void Here(InlineCore& caller) noexcept final {
+  void Here(BaseCore& caller) noexcept final {
     if (!this->_done.load(std::memory_order_acquire)) {
       auto& core = static_cast<ResultCore<V, E>&>(caller);
       Combine(std::move(core.Get()));
