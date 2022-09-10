@@ -225,8 +225,8 @@ TEST(AwaitGroup, SwichThread) {
 
   auto squarer = [&](int x) -> yaclib::Future<int> {
     co_await On(*scheduler);
-    yaclib_std::this_thread::sleep_for(YACLIB_CI_SLOWDOWN * 1ms);
-    co_return x* x;
+    yaclib_std::this_thread::sleep_for(YACLIB_CI_SLOWDOWN * 10ms);
+    co_return x + x;
   };
 
   auto main_thread = yaclib_std::this_thread::get_id();
@@ -239,7 +239,7 @@ TEST(AwaitGroup, SwichThread) {
     co_return std::move(one).Get().Value();
   };
 
-  EXPECT_EQ(1, waiter().Get().Value());
+  EXPECT_EQ(2, waiter().Get().Value());
 
   scheduler->HardStop();
   scheduler->Wait();
