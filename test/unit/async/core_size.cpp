@@ -32,7 +32,7 @@ TEST(Result, VectorSizeof) {
 TEST(BaseCore, Sizeof) {
   using Core = yaclib::detail::BaseCore;
 #if YACLIB_FAULT != 2 || YACLIB_FUTEX == 0
-  static_assert(sizeof(void*) == sizeof(int) || sizeof(Core) == sizeof(void*) * 5);
+  static_assert(sizeof(void*) == sizeof(int) || sizeof(Core) == sizeof(void*) * 4);
 #endif
   std::cerr << sizeof(Core) << std::endl;
 }

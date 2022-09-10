@@ -9,6 +9,11 @@
 
 namespace yaclib::detail {
 
+struct Callback {
+  IRef* caller;
+  char unwrapping;
+};
+
 template <typename V, typename E>
 class ResultCore : public BaseCore {
  public:
@@ -33,10 +38,10 @@ class ResultCore : public BaseCore {
     return _result;
   }
 
- protected:
+ public:
   union {
     Result<V, E> _result;
-    char _unwrapping;
+    Callback _self;
   };
 };
 

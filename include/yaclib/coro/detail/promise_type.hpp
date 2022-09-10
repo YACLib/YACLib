@@ -42,7 +42,6 @@ class PromiseType final : public OneCounter<ResultCore<V, E>, PromiseTypeDeleter
 
   auto get_return_object() noexcept {
     if constexpr (Lazy) {
-      this->_caller = nullptr;
       return Task<V, E>{ResultCorePtr<V, E>{NoRefTag{}, this}};
     } else {
       return Future<V, E>{ResultCorePtr<V, E>{NoRefTag{}, this}};

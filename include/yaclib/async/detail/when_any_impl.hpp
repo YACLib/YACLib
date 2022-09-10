@@ -144,7 +144,7 @@ class AnyCombinator : public InlineCore, public AnyCombinatorBase<V, E, P> {
   }
 
  private:
-  void Here(InlineCore& caller) noexcept final {
+  void Here(BaseCore& caller) noexcept final {
     if (!this->Done()) {
       auto& core = static_cast<ResultCore<V, E>&>(caller);
       this->Combine(std::move(core.Get()));

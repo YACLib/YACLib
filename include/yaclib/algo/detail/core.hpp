@@ -16,6 +16,8 @@ class NoResultCore : public BaseCore {
   template <typename T>
   void Store(T&&) noexcept {
   }
+
+  Callback _self;
 };
 
 enum class CoreType : char {
@@ -34,16 +36,14 @@ class Core : public ResultCoreT<Type, Ret, E> {
 
   template <typename Func>
   explicit Core(Func&& f) noexcept(std::is_nothrow_constructible_v<Wrapper, Func&&>) : _wrapper{std::forward<Func>(f)} {
-    if constexpr (Wrapper::kIsAsync) {
-      this->_unwrapping = 0;
-    }
+    this->_self = Callback{&MakeEmpty(), 0};
   }
 
   void Call() noexcept final {
     if constexpr (Type == CoreType::Run) {
       Invoke(Unit{});
     } else {
-      auto& core = static_cast<ResultCore<Arg, E>&>(*this->_caller);
+      auto& core = static_cast<ResultCore<Arg, E>&>(*this->_self.caller);
       Invoke(std::move(core.Get()));
     }
   }
@@ -52,13 +52,16 @@ class Core : public ResultCoreT<Type, Ret, E> {
     Invoke(Result<Arg, E>{StopTag{}});
   }
 
-  void Here(InlineCore& caller) noexcept final {
+  void Here(BaseCore& caller) noexcept final {
     if constexpr (Wrapper::kIsAsync) {
-      if (this->_unwrapping++ != 0) {
-        YACLIB_ASSERT(this->_unwrapping == 2);
+      if (this->_self.unwrapping++ != 0) {
+        YACLIB_ASSERT(this->_self.unwrapping == 2);
         auto& core = static_cast<ResultCore<Ret, E>&>(caller);
         return _wrapper.Done(*this, std::move(core.Get()));
       }
+    }
+    if (!this->_executor) {
+      this->_executor = std::move(caller._executor);
     }
     auto& core = static_cast<ResultCore<Arg, E>&>(caller);
     _wrapper.Call(*this, std::move(core.Get()));
@@ -68,8 +71,8 @@ class Core : public ResultCoreT<Type, Ret, E> {
   template <typename A>
   YACLIB_INLINE void Invoke(A&& arg) noexcept {
     if constexpr (Wrapper::kIsAsync) {
-      YACLIB_ASSERT(this->_unwrapping == 0);
-      this->_unwrapping = 1;
+      YACLIB_ASSERT(this->_self.unwrapping == 0);
+      this->_self.unwrapping = 1;
     }
     _wrapper.Call(*this, std::forward<A>(arg));
   }
@@ -151,7 +154,11 @@ class FuncWrapper final {
 
   template <typename T>
   void Done(Core& self, T&& value) noexcept {
+    auto* caller = self._self.caller;
     self.Store(std::forward<T>(value));
+    // TODO(MBkkt) What order is better here?
+    // Now it's construct return object, then destroy and dealloc argument, and then destroy current callback functor
+    caller->DecRef();
     _func.store.~Store();
     self.template SetResult<false>();
   }
@@ -272,20 +279,19 @@ enum class CallbackType : char {
 }
 
 template <CoreType CoreT, CallbackType CallbackT, typename Arg, typename E, typename Func>
-auto SetCallback(ResultCorePtr<Arg, E>& core, Func&& f) {
+auto SetCallback(ResultCorePtr<Arg, E>& core, IExecutor* executor, Func&& f) {
   constexpr bool kIsDetach = CoreT == CoreType::Detach;
   constexpr bool kIsTask = CallbackT == CallbackType::Lazy || CallbackT == CallbackType::LazyInline;
   auto* callback = MakeCore<CoreT, Arg, E>(std::forward<Func>(f));
+  callback->_executor = executor;
   auto* caller = core.Release();
-  if constexpr (!kIsDetach) {
-    callback->_executor = move_if<(!kIsTask && CallbackT != CallbackType::On)>(caller->_executor);
-  }
   if constexpr (CallbackT == CallbackType::Lazy) {
-    callback->_caller = caller;
+    callback->_self.caller = caller;
     caller->StoreCallback(*callback, BaseCore::kCall);
   } else if constexpr (CallbackT == CallbackType::LazyInline) {
     caller->StoreCallback(*callback, BaseCore::kInline);
   } else if constexpr (CallbackT == CallbackType::On) {
+    callback->_self.caller = caller;
     caller->SetCall(*callback);
   } else {
     caller->SetInline(*callback);

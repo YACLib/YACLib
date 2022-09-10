@@ -50,20 +50,13 @@ class BaseCore : public InlineCore {
  protected:
   explicit BaseCore(State callback) noexcept;
 
-#ifdef YACLIB_LOG_DEBUG
-  ~BaseCore() noexcept override {
-    YACLIB_ASSERT(_caller == &MakeEmpty());
-  }
-#endif
-
   yaclib_std::atomic_uint64_t _callback;
 
  public:
-  IRef* _caller;
-  IExecutorPtr _executor;
+  IExecutorPtr _executor{NoRefTag{}, &MakeInline()};
 
  private:
-  void Submit(Job& job) noexcept;
+  void Submit(BaseCore& callback) noexcept;
 };
 
 }  // namespace yaclib::detail

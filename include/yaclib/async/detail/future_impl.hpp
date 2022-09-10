@@ -53,18 +53,11 @@ Result<V, E> FutureBase<V, E>::Touch() && noexcept {
 }
 
 template <typename V, typename E>
-FutureOn<V, E> FutureBase<V, E>::On(IExecutor& e) && noexcept {
-  _core->_executor = &e;
-  return FutureOn<V, E>{std::move(_core)};
-}
-
-template <typename V, typename E>
 template <typename Func>
 auto FutureBase<V, E>::Then(IExecutor& e, Func&& f) && {
   YACLIB_WARN(e.Tag() == IExecutor::Type::Inline,
               "better way is use ThenInline(...) instead of Then(MakeInline(), ...)");
-  _core->_executor = &e;
-  return detail::SetCallback<detail::CoreType::Then, detail::CallbackType::On>(_core, std::forward<Func>(f));
+  return detail::SetCallback<detail::CoreType::Then, detail::CallbackType::On>(_core, &e, std::forward<Func>(f));
 }
 
 template <typename V, typename E>
@@ -75,7 +68,7 @@ void FutureBase<V, E>::Detach() && noexcept {
 template <typename V, typename E>
 template <typename Func>
 void FutureBase<V, E>::DetachInline(Func&& f) && {
-  detail::SetCallback<detail::CoreType::Detach, detail::CallbackType::Inline>(_core, std::forward<Func>(f));
+  detail::SetCallback<detail::CoreType::Detach, detail::CallbackType::Inline>(_core, nullptr, std::forward<Func>(f));
 }
 
 template <typename V, typename E>
@@ -83,8 +76,7 @@ template <typename Func>
 void FutureBase<V, E>::Detach(IExecutor& e, Func&& f) && {
   YACLIB_WARN(e.Tag() == IExecutor::Type::Inline,
               "better way is use DetachInline(...) instead of Detach(MakeInline(), ...)");
-  _core->_executor = &e;
-  detail::SetCallback<detail::CoreType::Detach, detail::CallbackType::On>(_core, std::forward<Func>(f));
+  detail::SetCallback<detail::CoreType::Detach, detail::CallbackType::On>(_core, &e, std::forward<Func>(f));
 }
 
 template <typename V, typename E>
@@ -99,32 +91,33 @@ detail::ResultCorePtr<V, E>& FutureBase<V, E>::GetCore() noexcept {
 template <typename V, typename E>
 template <typename Func>
 auto Future<V, E>::ThenInline(Func&& f) && {
-  return detail::SetCallback<detail::CoreType::Then, detail::CallbackType::Inline>(this->_core, std::forward<Func>(f));
+  return detail::SetCallback<detail::CoreType::Then, detail::CallbackType::Inline>(this->_core, nullptr,
+                                                                                   std::forward<Func>(f));
 }
 
 template <typename V, typename E>
 Future<V, E> FutureOn<V, E>::On(std::nullptr_t) && noexcept {
-  this->_core->_executor = nullptr;
   return {std::move(this->_core)};
 }
 
 template <typename V, typename E>
 template <typename Func>
 auto FutureOn<V, E>::ThenInline(Func&& f) && {
-  return detail::SetCallback<detail::CoreType::Then, detail::CallbackType::InlineOn>(this->_core,
+  return detail::SetCallback<detail::CoreType::Then, detail::CallbackType::InlineOn>(this->_core, nullptr,
                                                                                      std::forward<Func>(f));
 }
 
 template <typename V, typename E>
 template <typename Func>
 auto FutureOn<V, E>::Then(Func&& f) && {
-  return detail::SetCallback<detail::CoreType::Then, detail::CallbackType::On>(this->_core, std::forward<Func>(f));
+  return detail::SetCallback<detail::CoreType::Then, detail::CallbackType::On>(this->_core, nullptr,
+                                                                               std::forward<Func>(f));
 }
 
 template <typename V, typename E>
 template <typename Func>
 void FutureOn<V, E>::Detach(Func&& f) && {
-  detail::SetCallback<detail::CoreType::Detach, detail::CallbackType::On>(this->_core, std::forward<Func>(f));
+  detail::SetCallback<detail::CoreType::Detach, detail::CallbackType::On>(this->_core, nullptr, std::forward<Func>(f));
 }
 
 }  // namespace yaclib

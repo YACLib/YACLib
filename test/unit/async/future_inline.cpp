@@ -321,7 +321,7 @@ void ThenInlineStopped() {
   }();
   InlineThen<Inline>(std::move(f2), inc).Detach();
   source.Stop();
-  e->Drain();
+  EXPECT_EQ(e->Drain(), 1);
   EXPECT_EQ(ready, 2);
 }
 

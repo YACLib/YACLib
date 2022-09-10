@@ -4,40 +4,27 @@ namespace yaclib {
 namespace detail {
 namespace {
 
-template <bool Force>
-bool MoveToCaller(BaseCore*& iterator, IExecutor& e) noexcept {
-  if (iterator->next == nullptr) {
-    return false;
+BaseCore* MoveToCaller(BaseCore* head) noexcept {
+  while (head->next != nullptr) {
+    auto* next = static_cast<BaseCore*>(head->next);
+    head->next = nullptr;
+    head = next;
   }
-  auto* caller = static_cast<BaseCore*>(iterator->next);
-  iterator->next = nullptr;
-  if (Force || !caller->_executor) {
-    caller->_executor = &e;
-  }
-  iterator = caller;
-  return true;
+  return head;
 }
 
 }  // namespace
 
-template <bool Force>
 void Run(BaseCore* head, IExecutor& e) noexcept {
-  while (MoveToCaller<Force>(head, e)) {
-  }
-  auto* head_executor = head->_caller;
-  if (head_executor == nullptr) {
-    e.IncRef();
-    head->_caller = head_executor = &e;
-  }
-  if constexpr (Force) {
-    e.Submit(*head);
-  } else {
-    static_cast<IExecutor*>(head_executor)->Submit(*head);
-  }
+  head = MoveToCaller(head);
+  head->_executor = &e;
+  e.Submit(*head);
 }
 
-template void Run<false>(detail::BaseCore* head, IExecutor& e) noexcept;
-template void Run<true>(detail::BaseCore* head, IExecutor& e) noexcept;
+void Run(BaseCore* head) noexcept {
+  head = MoveToCaller(head);
+  head->_executor->Submit(*head);
+}
 
 }  // namespace detail
 

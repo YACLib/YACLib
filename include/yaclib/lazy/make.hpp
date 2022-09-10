@@ -12,12 +12,12 @@ template <typename V = Unit, typename E = StopError, typename... Args>
 /*Task*/ auto MakeTask(Args&&... args) {
   // TODO(MBkkt) optimize sizeof: now we store Result twice
   if constexpr (sizeof...(Args) == 0) {
-    return Schedule<E>(MakeInline(), [] {
+    return Schedule<E>([] {
     });
   } else {
     using T = std::conditional_t<sizeof...(Args) == 1 && std::is_same_v<V, Unit>, head_t<Args...>, V>;
     static_assert(!std::is_same_v<T, Unit>);
-    return Schedule<E>(MakeInline(), [result = Result<T, E>{std::forward<Args>(args)...}]() mutable {
+    return Schedule<E>([result = Result<T, E>{std::forward<Args>(args)...}]() mutable {
       return std::move(result);
     });
   }

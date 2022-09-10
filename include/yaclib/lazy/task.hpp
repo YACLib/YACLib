@@ -32,10 +32,10 @@ class [[nodiscard]] Task final {
   [[nodiscard]] bool Valid() const& noexcept;
 
   /**
+   * Do nothing, just for compatibility with FutureOn
    * TODO(MBkkt) think about force On/Detach/ToFuture:
    *  It's able to set passed executor to previous nullptr/all/head/etc or replace
    */
-  Task<V, E> On(IExecutor& e) && noexcept;
   Task<V, E> On(std::nullptr_t) && noexcept;
 
   template <typename Func>
@@ -47,12 +47,13 @@ class [[nodiscard]] Task final {
 
   void Cancel() &&;
 
-  void Detach(IExecutor& e = MakeInline()) && noexcept;
+  void Detach() && noexcept;
+  void Detach(IExecutor& e) && noexcept;
 
   Future<V, E> ToFuture() && noexcept;
   FutureOn<V, E> ToFuture(IExecutor& e) && noexcept;
 
-  Result<V, E> Get(IExecutor& e = MakeInline()) && noexcept;
+  Result<V, E> Get() && noexcept;
 
   /**
    * Method that get internal Core state
