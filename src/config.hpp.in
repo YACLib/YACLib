@@ -138,8 +138,8 @@
 #define YACLIB_FUTEX 0
 #if YACLIB_HAS_INCLUDE(<version>) &&                                                                                   \
     (   defined(_MSC_VER)                                                                                              \
-     || (defined(_LIBCPP_VERSION) && defined(__linux__))                                                               \
-   /*|| defined(_GLIBCXX_HAVE_LINUX_FUTEX) TODO Some bug in libstdc++*/)
+     || (defined(_LIBCPP_VERSION) && (defined(__linux__) || defined(_LIBCPP_USE_ULOCK)))                               \
+     || defined(_GLIBCXX_HAVE_LINUX_FUTEX))
 #  include <version>
 #  if __cpp_lib_atomic_wait != 0
 #    undef YACLIB_FUTEX
