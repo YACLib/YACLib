@@ -8,7 +8,7 @@
 
 namespace yaclib {
 
-struct Inner {
+struct Waiter {
  public:
   void Park() {
     for (size_t i = 0; i < 3; ++i) {

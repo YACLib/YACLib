@@ -68,13 +68,18 @@ class GlobalQueue {
     }
   }
 
+  bool Empty() const noexcept {
+    std::lock_guard lock{_m};
+    return _jobs.Empty();
+  }
+
  private:
   void PushImpl(Job* item) noexcept {
     _jobs.PushBack(*item);
     _jobs_size++;
   }
 
-  yaclib_std::mutex _m;
+  mutable yaclib_std::mutex _m;
   detail::List _jobs;
   size_t _jobs_size{0};
 };
