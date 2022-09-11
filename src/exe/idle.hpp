@@ -3,6 +3,7 @@
 #include <vector>
 #include <yaclib_std/atomic>
 #include <yaclib_std/mutex>
+#include <yaclib/log.hpp>
 
 namespace yaclib {
 
@@ -25,8 +26,8 @@ class Idle {
   }
 
   // returns std::numeric_limits<std::uint16_t>::max() if no worker to notify
-  std::uint16_t WorkerToNotify() noexcept {
-    if (!NotifyShouldWakeup()) {
+  std::uint16_t WorkerToNotify(bool force=false) noexcept {
+    if (!force && !NotifyShouldWakeup()) {
       return std::numeric_limits<std::uint16_t>::max();
     }
 
@@ -34,7 +35,12 @@ class Idle {
     std::lock_guard lock{_sleepers_mutex};
 
     // Check again, now that the lock is acquired
-    if (!NotifyShouldWakeup()) {
+    if (!force && !NotifyShouldWakeup()) {
+      return std::numeric_limits<std::uint16_t>::max();
+    }
+
+    if (_sleepers.empty()) {
+      YACLIB_ASSERT(force);
       return std::numeric_limits<std::uint16_t>::max();
     }
 

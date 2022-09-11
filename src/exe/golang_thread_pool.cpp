@@ -29,6 +29,7 @@ YACLIB_THREAD_LOCAL_PTR(Worker) _worker;
 
 class Worker {
   static constexpr size_t kLocalQueueCapacity = 256;
+  friend class GolangThreadPool;
 
  public:
   Worker(GolangThreadPool& host, size_t index) : _host(host), _index(index) {
@@ -118,6 +119,8 @@ class Worker {
   // parent thread pool
   GolangThreadPool& _host;
 
+  Waiter _waiter;
+
   // worker index in thread pool's workers queue
   const size_t _index;
 
@@ -143,6 +146,8 @@ class Worker {
 
 class GolangThreadPool : public IThreadPool {
  public:
+  friend class Worker;
+
   explicit GolangThreadPool(std::size_t threads) noexcept
     : _threads{threads}, _idle(static_cast<std::uint16_t>(threads)) {
   }
@@ -156,6 +161,11 @@ class GolangThreadPool : public IThreadPool {
     }
   }
 
+  void NotifyOne() {
+    if (auto index = _idle.WorkerToNotify(); index != std::numeric_limits<uint16_t>::max()) {
+      _workers[index]._waiter.Unpark();
+    }
+  }
   [[nodiscard]] Type Tag() const noexcept final {
     return IExecutor::Type::GolangThreadPool;
   }
@@ -174,14 +184,11 @@ class GolangThreadPool : public IThreadPool {
    * \param job task to execute
    */
   void Submit(Job& job) noexcept final {
-    if (_worker != nullptr && _worker->TrySubmit(job)) {
-      return;
-    }
-    _global_tasks.Push(&job);
     // TODO(kononovk): metrics
-    if (auto index = _idle.WorkerToNotify(); index != std::numeric_limits<uint16_t>::max()) {
-      _waiter.Unpark();
+    if (_worker == nullptr || !_worker->TrySubmit(job)) {
+      _global_tasks.Push(&job);
     }
+    NotifyOne();
   }
 
   /**
@@ -201,10 +208,13 @@ class GolangThreadPool : public IThreadPool {
    */
   void Stop() noexcept final {
     _stopped.store(true);
-    for (auto& worker : _workers) {
-      if (auto index = _idle.WorkerToNotify(); index != std::numeric_limits<uint16_t>::max()) {
-        _waiter.Unpark();
+
+    while (true) {
+      auto index = _idle.WorkerToNotify(true);
+      if (index == std::numeric_limits<uint16_t>::max()) {
+        break;
       }
+      _workers[index]._waiter.Unpark();
     }
     for (auto& worker : _workers) {
       worker.Join();
@@ -219,7 +229,6 @@ class GolangThreadPool : public IThreadPool {
   void Cancel() noexcept final {
     std::terminate();
   }
-  friend class Worker;
 
  private:
   std::size_t _threads;
@@ -232,7 +241,6 @@ class GolangThreadPool : public IThreadPool {
 
   /// Coordinates idle workers
   Idle _idle;
-  Waiter _waiter;
   yaclib_std::atomic_bool _stopped{false};
   yaclib_std::atomic_size_t _joined_workers{0};
 };
@@ -351,23 +359,21 @@ void Worker::Park() {
     [&] {
       for (auto& worker : _host._workers) {
         if (!worker._local_jobs.Empty()) {
-          if (auto index = _host._idle.WorkerToNotify(); index != std::numeric_limits<uint16_t>::max()) {
-            _host._waiter.Unpark();
+          if (_host._idle.UnparkWorkerById(static_cast<uint16_t>(worker._index))) {
+            worker._waiter.Unpark();
           }
           return;
         }
       }
       if (_host._global_tasks.Empty()) {
-        if (auto index = _host._idle.WorkerToNotify(); index != std::numeric_limits<uint16_t>::max()) {
-          _host._waiter.Unpark();
-        }
+        _host.NotifyOne();
       }
     }();
     // TODO: worker.shared.notify_if_work_pending();
   }
   while (!_is_shutdown) {
     // TODO: metrics before
-    _host._waiter.Park();  // TODO
+    _waiter.Park();  // TODO
     // TODO: metrics after
     _is_shutdown = !_host.Alive();
     // TODO: lifo slot

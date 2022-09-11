@@ -5,6 +5,7 @@
 #include <yaclib_std/condition_variable>
 #include <yaclib_std/mutex>
 #include <yaclib_std/thread>
+#include <iostream>
 
 namespace yaclib {
 
@@ -44,6 +45,7 @@ struct Waiter {
       YACLIB_ASSERT(old == State::Notified);  // park state changed unexpectedly
       return;
     }
+    std::cout << static_cast<std::uint32_t>(state) << std::endl;
     YACLIB_ASSERT(cas_ok);
 
     while (true) {
@@ -69,7 +71,7 @@ struct Waiter {
     ParkedCondvar = 1,
     Notified = 2,
   };
-  yaclib_std::atomic<State> _state;
+  yaclib_std::atomic<State> _state{State::Empty};
 };
 
 }  // namespace yaclib
