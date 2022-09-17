@@ -66,7 +66,7 @@ class FairThreadPool : public IThreadPool, private IFunc {
 
   void Wait() noexcept final {
     std::unique_lock lock{_m};
-    while(!NoTasks()) {
+    while (!NoTasks()) {
       _empty.wait(lock);
     }
   }

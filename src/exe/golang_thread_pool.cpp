@@ -4,7 +4,6 @@
 #include <exe/idle.hpp>
 #include <exe/parker.hpp>
 #include <util/global_queue.hpp>
-#include <util/metrics.hpp>
 #include <util/work_stealing_queue.hpp>
 
 #include <yaclib/exe/thread_factory.hpp>
@@ -12,9 +11,7 @@
 
 #include <cstddef>
 #include <deque>
-#include <iostream>
 #include <optional>
-#include <random>
 #include <yaclib_std/atomic>
 #include <yaclib_std/thread_local>
 
@@ -25,14 +22,15 @@ constexpr size_t kTickFrequency = 61;
 
 class GolangThreadPool;
 class Worker;
+
 YACLIB_THREAD_LOCAL_PTR(Worker) _worker;
 
-class Worker {
-  static constexpr size_t kLocalQueueCapacity = 256;
+class Worker final {
+  static constexpr std::size_t kLocalQueueCapacity = 256;
   friend class GolangThreadPool;
 
  public:
-  Worker(GolangThreadPool& host, size_t index) : _host(host), _index(index) {
+  Worker(GolangThreadPool& host, std::uint16_t index) : _host{host}, _index{index} {
   }
 
   Worker(Worker&&) = delete;
@@ -40,24 +38,7 @@ class Worker {
   Worker(const Worker&) = delete;
   Worker& operator=(const Worker&) = delete;
 
-  void Start() {
-    _thread.emplace([this]() noexcept {
-      _worker = this;
-      Work();
-      _worker = nullptr;
-    });
-  }
-
-  // Submit job
-  bool TrySubmit(Job& job) noexcept {
-    // TODO metrics
-    // TODO(kononovk): add LIFO slot
-    return _local_jobs.TryPush(&job);
-  }
-
-  void Join() {
-    _thread->join();  // NOLINT(bugprone-unchecked-optional-access)
-  }
+  void Start();
 
   // Steal from this worker
   Job* TryStealJobs(Worker& steal_from) {
@@ -75,9 +56,7 @@ class Worker {
     return _stealed_jobs[0];
   }
 
-  // Wake parked worker
-  void Wake() {
-  }
+  bool TryPark();
 
   void Park();
 
@@ -85,27 +64,9 @@ class Worker {
 
   void Tick();
 
-  static Worker* Current() {
-    return _worker;
-  }
-
-  detail::WorkerMetrics Metrics() const {
-    return _metrics;
-  }
-
-  GolangThreadPool& Host() const {
-    return _host;
-  }
-
  private:
-  void OffloadTasksToGlobalQueue(Job* overflow) {
-  }
-
   // Blocking
   Job* PickNextTask();
-
-  // Clear tasks
-  void Clear();
 
   // Run Loop
   void Work();
@@ -122,23 +83,12 @@ class Worker {
   Waiter _waiter;
 
   // worker index in thread pool's workers queue
-  const size_t _index;
-
-  // LIFO slot
-  [[maybe_unused]] Job* _lifo_slot{nullptr};  // TODO(kononovk)
+  const std::uint16_t _index;
 
   // Worker thread
-  std::optional<yaclib_std::thread> _thread{};
-
-  // For work stealing
-  std::mt19937_64 _twister{};  // NOLINT
-
-  // Parking lot
-  yaclib_std::atomic<uint32_t> _wakeups{};
+  yaclib_std::thread _thread;
 
   std::size_t _tick{0};
-
-  detail::WorkerMetrics _metrics;  // TODO(kononovk): add metrics
 
   bool _is_shutdown{false};
   bool _is_searching{false};
@@ -166,15 +116,16 @@ class GolangThreadPool : public IThreadPool {
       _workers[index]._waiter.Unpark();
     }
   }
+
   [[nodiscard]] Type Tag() const noexcept final {
-    return IExecutor::Type::GolangThreadPool;
+    return Type::GolangThreadPool;
   }
 
   /**
    * Return true if executor still alive, that means job passed to submit will be Call
    */
   [[nodiscard]] bool Alive() const noexcept final {
-    return !_stopped.load();
+    return _stopped.load() == 0;
   }
 
   /**
@@ -184,8 +135,8 @@ class GolangThreadPool : public IThreadPool {
    * \param job task to execute
    */
   void Submit(Job& job) noexcept final {
-    // TODO(kononovk): metrics
-    if (_worker == nullptr || !_worker->TrySubmit(job)) {
+    if (_worker == nullptr || !_worker->_local_jobs.TryPush(&job)) {
+      // TODO(kononovk) move half of _local_jobs to _global_task
       _global_tasks.Push(&job);
     }
     NotifyOne();
@@ -198,7 +149,10 @@ class GolangThreadPool : public IThreadPool {
    * \note It can not be called from this thread pool job
    */
   void Wait() noexcept final {
-    std::terminate();
+    for (auto& worker : _workers) {
+      YACLIB_ASSERT(worker._thread.joinable());
+      worker._thread.join();
+    }
   }
 
   /**
@@ -207,17 +161,9 @@ class GolangThreadPool : public IThreadPool {
    * \note after Stop() was called Alive() returns false
    */
   void Stop() noexcept final {
-    _stopped.store(true);
-
-    while (true) {
-      auto index = _idle.WorkerToNotify(true);
-      if (index == std::numeric_limits<uint16_t>::max()) {
-        break;
-      }
-      _workers[index]._waiter.Unpark();
-    }
+    _stopped.store(1);
     for (auto& worker : _workers) {
-      worker.Join();
+      worker._waiter.Unpark();
     }
   }
 
@@ -227,7 +173,10 @@ class GolangThreadPool : public IThreadPool {
    * \note Drop() can be called here or in thread pool's threads
    */
   void Cancel() noexcept final {
-    std::terminate();
+    _stopped.store(2);
+    for (auto& worker : _workers) {
+      worker._waiter.Unpark();
+    }
   }
 
  private:
@@ -241,8 +190,8 @@ class GolangThreadPool : public IThreadPool {
 
   /// Coordinates idle workers
   Idle _idle;
-  yaclib_std::atomic_bool _stopped{false};
   yaclib_std::atomic_size_t _joined_workers{0};
+  yaclib_std::atomic_uint8_t _stopped{0};
 };
 
 // TODO(kononovk): 0) LIFO slot
@@ -292,17 +241,9 @@ Job* Worker::PickNextTask() {
 
   // 5) Fallback on checking the global queue
   job = _host._global_tasks.TryPopOne();
-  if (job != nullptr) {
-    return job;
-  }
 
-  // 6) Park, no tasks =(
-  return nullptr;
-}
-
-void Worker::Clear() {
-  _local_jobs.Clear();
-  // TODO(kononovk): LIFO slot
+  // 6) Park if job == nullptr, because we don't have tasks =(
+  return job;
 }
 
 void Worker::Work() {
@@ -313,9 +254,9 @@ void Worker::Work() {
     }
     Job* next = PickNextTask();
     if (next != nullptr) {
+      fprintf(stderr, "5: %lu\n", pthread_self());
       RunJob(*next);
     } else {
-      // Park woker
       Park();
     }
     Tick();
@@ -323,9 +264,9 @@ void Worker::Work() {
 
   if (_host._joined_workers.fetch_add(1, std::memory_order_acq_rel) == _host._threads - 1) {
     for (size_t index = 0; index < _host._threads; ++index) {
-      _host._workers[index].Clear();
+      _host._workers[index]._local_jobs.Drain(_host._stopped.load() == 1);
     }
-    _host._global_tasks.Clear();
+    _host._global_tasks.Drain(_host._stopped.load() == 1);
   }
 }
 
@@ -333,11 +274,9 @@ void Worker::RunJob(Job& job) {
   if (_is_searching) {
     _is_searching = false;
     if (_host._idle.TransitionWorkerFromSearching()) {
-      // TODO: host.NotifyParker();
+      _host.NotifyOne();
     }
   }
-  // TODO: metrics
-
   // Run the task
   job.Call();
 }
@@ -348,40 +287,57 @@ void Worker::Tick() {
   }
 }
 
-void Worker::Park() {
-  // Workers should not park if they have work to do
-  // TODO(kononovk): add also LIFO slot checking
+bool Worker::TryPark() {
+  // return false; if we want busy wait
   YACLIB_ASSERT(_local_jobs.Empty());
-  bool is_last_searcher = _host._idle.TransitionWorkerToParked(static_cast<uint16_t>(_index), _is_searching);
-  _is_searching = false;
-
-  if (is_last_searcher) {
-    [&] {
-      for (auto& worker : _host._workers) {
-        if (!worker._local_jobs.Empty()) {
-          if (_host._idle.UnparkWorkerById(static_cast<uint16_t>(worker._index))) {
-            worker._waiter.Unpark();
-          }
-          return;
-        }
-      }
-      if (_host._global_tasks.Empty()) {
-        _host.NotifyOne();
-      }
-    }();
-    // TODO: worker.shared.notify_if_work_pending();
+  if (!_host._idle.TransitionWorkerToParked(_index, std::exchange(_is_searching, false))) {
+    fprintf(stderr, "1: %lu\n", pthread_self());
+    return true;
   }
-  while (!_is_shutdown) {
-    // TODO: metrics before
-    _waiter.Park();  // TODO
-    // TODO: metrics after
-    _is_shutdown = !_host.Alive();
-    // TODO: lifo slot
+  for (auto& worker : _host._workers) {
+    if (!worker._local_jobs.Empty()) {
+      if (_host._idle.UnparkWorkerById(worker._index)) {
+        worker._waiter.Unpark();
+      }
+      fprintf(stderr, "2: %lu\n", pthread_self());
+      return true;
+    }
+  }
+  if (_host._global_tasks.Empty()) {
+    fprintf(stderr, "3: %lu\n", pthread_self());
+    return true;
+  }
+  (void)_host._idle.UnparkWorkerById(_index);
+  return false;
+}
+
+void Worker::Park() {
+  if (!TryPark()) {
+    return;
+  }
+  while (true) {
+    fprintf(stderr, "7: %lu\n", pthread_self());
+    _is_shutdown = _waiter.Park([&] {
+      return !_host.Alive();
+    });
+    fprintf(stderr, "8: %lu\n", pthread_self());
+    if (_is_shutdown) {
+      break;
+    }
     if (!_host._idle.IsParked(static_cast<uint16_t>(_index))) {
       _is_searching = true;
       break;
     }
   }
+}
+
+void Worker::Start() {
+  _thread = std::thread{[this]() noexcept {
+    SetCurrentThreadPool(_host);
+    _worker = this;
+    Work();
+    _worker = nullptr;
+  }};
 }
 
 }  // namespace

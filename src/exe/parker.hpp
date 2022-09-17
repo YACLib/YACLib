@@ -5,60 +5,58 @@
 #include <yaclib_std/condition_variable>
 #include <yaclib_std/mutex>
 #include <yaclib_std/thread>
-#include <iostream>
 
 namespace yaclib {
 
 struct Waiter {
  public:
-  void Park() {
+  template <typename Func>
+  bool Park(const Func& func) noexcept {
     for (size_t i = 0; i < 3; ++i) {
-      auto state = State::Notified;
-      if (_state.compare_exchange_strong(state, State::Empty)) {
-        return;
+      auto expected = State::Notified;
+      if (_state.compare_exchange_strong(expected, State::Empty)) {
+        return func();
       }
-      // yaclib_std::this_thread::yield();
     }
-    // TODO(kononovk): driver
-    ParkCondvar();  // Going to sleep
+    return ParkCondvar(func);
   }
 
-  void Unpark() {
+  void Unpark() noexcept {
     auto state = _state.exchange(State::Notified);
     if (state == State::ParkedCondvar) {
       UnparkCondvar();
     }
-    // TODO(kononovk) Driver
-  }
-
-  void Shutdown() {
-    _cv.notify_all();
   }
 
  private:
-  void ParkCondvar() {
+  template <typename Func>
+  [[nodiscard]] bool ParkCondvar(const Func& func) noexcept {
     std::unique_lock lock{_mutex};
-    auto state = State::Empty;
-    [[maybe_unused]] bool cas_ok = _state.compare_exchange_strong(state, State::ParkedCondvar);
-    if (state == State::Notified) {
+    if (func()) {
+      return true;
+    }
+    auto expected = State::Empty;
+    [[maybe_unused]] bool cas_ok = _state.compare_exchange_strong(expected, State::ParkedCondvar);
+    if (expected == State::Notified) {
       auto old = _state.exchange(State::Empty);
       YACLIB_ASSERT(old == State::Notified);  // park state changed unexpectedly
-      return;
+      return false;
     }
-    std::cout << static_cast<std::uint32_t>(state) << std::endl;
     YACLIB_ASSERT(cas_ok);
-
     while (true) {
       _cv.wait(lock);
-      state = State::Notified;
-      if (_state.compare_exchange_strong(state, State::Empty)) {
-        return;  // got a notification
+      if (func()) {
+        return true;
+      }
+      expected = State::Notified;
+      if (_state.compare_exchange_strong(expected, State::Empty)) {
+        return false;  // got a notification
       }
       // go back to sleep
     }
   }
 
-  void UnparkCondvar() {
+  void UnparkCondvar() noexcept {
     _mutex.lock();
     _mutex.unlock();
     _cv.notify_one();

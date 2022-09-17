@@ -24,6 +24,7 @@ class GlobalQueue {
    * Offload all jobs into the global queue
    */
   void Offload(std::span<Job*> buffer) noexcept {
+    // TODO create queue from buffer and push it
     std::lock_guard lock{_m};
     for (auto* job : buffer) {
       PushImpl(job);
@@ -38,7 +39,7 @@ class GlobalQueue {
     if (_jobs.Empty()) {
       return nullptr;
     }
-    _jobs_size--;
+    --_jobs_size;
     return static_cast<Job*>(&_jobs.PopFront());
   }
 
@@ -57,14 +58,18 @@ class GlobalQueue {
     }
     for (; number < to_grab; ++number) {
       out_buffer[number] = static_cast<Job*>(&_jobs.PopFront());
-      _jobs_size--;
+      --_jobs_size;
     }
     return to_grab;
   }
 
-  void Clear() noexcept {
-    while (Job* job = TryPopOne()) {
-      job->Drop();
+  void Drain(bool soft) noexcept {
+    while (auto* job = TryPopOne()) {
+      if (soft) {
+        job->Call();
+      } else {
+        job->Drop();
+      }
     }
   }
 
@@ -76,7 +81,7 @@ class GlobalQueue {
  private:
   void PushImpl(Job* item) noexcept {
     _jobs.PushBack(*item);
-    _jobs_size++;
+    ++_jobs_size;
   }
 
   mutable yaclib_std::mutex _m;

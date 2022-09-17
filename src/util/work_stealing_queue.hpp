@@ -107,10 +107,14 @@ class alignas(kCacheLineSize) WorkStealingQueue {
   /**
    * Clear WorkStealingQueue
    */
-  void Clear() noexcept {
+  void Drain(bool soft) noexcept {
     // TODO(kononovk): make more optimal
     while (auto* job = TryPop()) {
-      job->Drop();
+      if (soft) {
+        job->Call();
+      } else {
+        job->Drop();
+      }
     }
   }
 

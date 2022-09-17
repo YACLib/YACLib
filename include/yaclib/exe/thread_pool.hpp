@@ -14,14 +14,6 @@ namespace yaclib {
 class IThreadPool : public IExecutor {
  public:
   /**
-   * Wait until all threads joined or idle
-   *
-   * \note It is blocking
-   * \note It can not be called from this thread pool job
-   */
-  virtual void Wait() noexcept = 0;
-
-  /**
    * Disable further Submit() calls from being accepted
    *
    * \note after Stop() was called Alive() returns false
@@ -34,6 +26,15 @@ class IThreadPool : public IExecutor {
    * \note Drop() can be called here or in thread pool's threads
    */
   virtual void Cancel() noexcept = 0;
+
+  /**
+   * TODO rename to join?
+   * Wait until all threads joined
+   *
+   * \note It is blocking
+   * \note It can not be called from this thread pool job
+   */
+  virtual void Wait() noexcept = 0;
 };
 
 using IThreadPoolPtr = IntrusivePtr<IThreadPool>;
@@ -53,13 +54,13 @@ void SetCurrentThreadPool(IExecutor& executor) noexcept;
 /**
  * TODO(kononovk, MBkkt): think about ThreadPoolGuard
  */
-//struct ThreadPoolGuard {
-//  IThreadPoolPtr self;
-//  ~ThreadPoolGuard() {
-//    self->Cancel();
-//    self->Wait();
-//  }
-//};
+// struct ThreadPoolGuard {
+//   IThreadPoolPtr self;
+//   ~ThreadPoolGuard() {
+//     self->Cancel();
+//     self->Wait();
+//   }
+// };
 
 /**
  * Create new thread pool object
