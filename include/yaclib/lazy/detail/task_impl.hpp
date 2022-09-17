@@ -62,14 +62,16 @@ void Task<V, E>::Cancel() && {
 
 template <typename V, typename E>
 void Task<V, E>::Detach() && noexcept {
-  _core->StoreCallback(detail::MakeEmpty(), detail::BaseCore::kWaitDrop);
-  detail::Run(_core.Release());
+  auto* core = _core.Release();
+  core->StoreCallback(detail::MakeDrop(), detail::BaseCore::kInline);
+  detail::Run(core);
 }
 
 template <typename V, typename E>
 void Task<V, E>::Detach(IExecutor& e) && noexcept {
-  _core->StoreCallback(detail::MakeEmpty(), detail::BaseCore::kWaitDrop);
-  detail::Run(_core.Release(), e);
+  auto* core = _core.Release();
+  core->StoreCallback(detail::MakeDrop(), detail::BaseCore::kInline);
+  detail::Run(core, e);
 }
 
 template <typename V, typename E>

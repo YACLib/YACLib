@@ -8,7 +8,7 @@
 
 namespace yaclib::detail {
 
-class /*alignas(kCacheLineSize)*/ MutexEvent {
+class MutexEvent {
  public:
   using Token = std::unique_lock<yaclib_std::mutex>;
 

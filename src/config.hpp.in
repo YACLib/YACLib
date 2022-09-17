@@ -153,9 +153,3 @@
 #else
 #  define YACLIB_NO_UNIQUE_ADDRESS
 #endif
-
-namespace yaclib {
-
-inline constexpr std::size_t kCacheLineSize = 64;  // TODO(MBkkt) Make better
-
-}  // namespace yaclib

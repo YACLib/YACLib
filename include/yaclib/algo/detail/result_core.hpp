@@ -50,4 +50,7 @@ extern template class ResultCore<void, StopError>;
 template <typename V, typename E>
 using ResultCorePtr = IntrusivePtr<ResultCore<V, E>>;
 
+template <typename V, typename E>
+class DoneCore : ResultCore<V, E> {};
+
 }  // namespace yaclib::detail

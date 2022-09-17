@@ -16,12 +16,12 @@ namespace yaclib::detail {
 
 struct NoTimeoutTag final {};
 
-template <typename Event, BaseCore::State State = BaseCore::kWaitNope, typename Timeout, typename Range>
+template <typename Event, typename Timeout, typename Range>
 bool WaitRange(const Timeout& timeout, Range&& range, std::size_t count) noexcept {
   Event event{count + 1};
   // event ref counter = n + 1, it is optimization: we don't want to notify when return true immediately
   auto const wait_count = range([&](BaseCore& core) noexcept {
-    return core.SetCallback(event, State);
+    return core.SetCallback(event.GetCall(), BaseCore::kInline);
   });
   if (wait_count == 0 || event.SubEqual(count - wait_count + 1)) {
     return true;
@@ -53,8 +53,8 @@ bool WaitCore(const Timeout& timeout, Cores&... cores) noexcept {
   auto range = [&](auto&& func) noexcept {
     return (... + static_cast<std::size_t>(func(cores)));
   };
-  using FinalEvent =
-    std::conditional_t<sizeof...(cores) == 1, WaitEvent<Event, OneCounter>, WaitEvent<Event, AtomicCounter>>;
+  using FinalEvent = std::conditional_t<sizeof...(cores) == 1, MultiEvent<Event, OneCounter, CallCallback>,
+                                        MultiEvent<Event, AtomicCounter, CallCallback>>;
   return WaitRange<FinalEvent>(timeout, range, sizeof...(cores));
 }
 
@@ -69,7 +69,7 @@ bool WaitIterator(const Timeout& timeout, Iterator it, std::size_t count) noexce
     auto range = [&](auto&& func) noexcept {
       return static_cast<std::size_t>(func(*it->GetCore()));
     };
-    return WaitRange<WaitEvent<Event, OneCounter>>(timeout, range, 1);
+    return WaitRange<MultiEvent<Event, OneCounter, CallCallback>>(timeout, range, 1);
   }
   auto range = [&](auto&& func) noexcept {
     std::size_t wait_count = 0;
@@ -80,7 +80,7 @@ bool WaitIterator(const Timeout& timeout, Iterator it, std::size_t count) noexce
     }
     return wait_count;
   };
-  return WaitRange<WaitEvent<Event, AtomicCounter>>(timeout, range, count);
+  return WaitRange<MultiEvent<Event, AtomicCounter, CallCallback>>(timeout, range, count);
 }
 
 extern template bool WaitCore<DefaultEvent, NoTimeoutTag, BaseCore>(const NoTimeoutTag&, BaseCore&) noexcept;

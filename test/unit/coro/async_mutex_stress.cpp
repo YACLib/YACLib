@@ -1,9 +1,9 @@
 #include <util/time.hpp>
 
 #include <yaclib/async/wait.hpp>
-#include <yaclib/coro/async_mutex.hpp>
 #include <yaclib/coro/await.hpp>
 #include <yaclib/coro/future.hpp>
+#include <yaclib/coro/mutex.hpp>
 #include <yaclib/coro/on.hpp>
 #include <yaclib/exe/thread_pool.hpp>
 
@@ -17,21 +17,20 @@ namespace {
 
 void Stress1(const std::size_t kCoros, test::util::Duration dur) {
   auto tp = yaclib::MakeThreadPool();
-  yaclib::AsyncMutex<> m;
+  yaclib::Mutex<> m;
   std::vector<yaclib::Future<>> futures(kCoros);
-  std::size_t cs = 0;
+  std::uint64_t cs = 0;
   test::util::StopWatch sw;
 
   auto coro = [&]() -> yaclib::Future<> {
     co_await On(*tp);
     while (sw.Elapsed() < dur) {
-      auto guard = co_await m.Guard();
-      if (std::numeric_limits<std::size_t>::max() != cs) {
-        cs++;
-      }
+      co_await m.Lock();
+      ++cs;
       if (cs == 7) {
         co_await On(*tp);
       }
+      m.UnlockHere();
     }
     co_return{};
   };
@@ -48,7 +47,7 @@ void Stress1(const std::size_t kCoros, test::util::Duration dur) {
 
 void Stress2(const std::size_t kCoros, test::util::Duration dur) {
   auto tp = yaclib::MakeThreadPool();
-  yaclib::AsyncMutex<> m;
+  yaclib::Mutex<> m;
   std::vector<yaclib::Future<>> futures(kCoros);
   std::uint64_t cs;
   test::util::StopWatch sw;
@@ -57,7 +56,7 @@ void Stress2(const std::size_t kCoros, test::util::Duration dur) {
     co_await On(*tp);
     co_await m.Lock();
     ++cs;
-    co_await m.Unlock(*tp);
+    co_await m.Unlock();
     co_return{};
   };
 
@@ -73,7 +72,7 @@ void Stress2(const std::size_t kCoros, test::util::Duration dur) {
   tp->Wait();
 }
 
-TEST(AsyncMutexStress, TimerPerCoro) {
+TEST(MutexStress, TimerPerCoro) {
 #if YACLIB_FAULT == 2
   GTEST_SKIP();  // TODO(myannyax): make time run forward even without switches
 #endif
@@ -82,7 +81,7 @@ TEST(AsyncMutexStress, TimerPerCoro) {
   Stress1(100, 1s);
 }
 
-TEST(AsyncMutexStress, CommonTimer) {
+TEST(MutexStress, CommonTimer) {
 #if YACLIB_FAULT == 2
   GTEST_SKIP();  // TODO(myannyax): make time run forward even without switches
 #endif

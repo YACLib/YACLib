@@ -46,7 +46,11 @@ class ResultError final : public std::exception {
   ResultError& operator=(ResultError&&) noexcept(std::is_nothrow_move_assignable_v<Error>) = default;
   ResultError& operator=(const ResultError&) noexcept(std::is_nothrow_copy_assignable_v<Error>) = default;
 
-  explicit ResultError(Error&& error) noexcept(std::is_nothrow_copy_constructible_v<Error>) : _error{std::move(error)} {
+  explicit ResultError(Error&& error) noexcept(std::is_nothrow_move_constructible_v<Error>) : _error{std::move(error)} {
+  }
+
+  explicit ResultError(const Error& error) noexcept(std::is_nothrow_copy_constructible_v<Error>)
+    : _error{std::move(error)} {
   }
 
   [[nodiscard]] Error& Get() noexcept {
@@ -85,7 +89,8 @@ class [[nodiscard]] Result final {
   Result& operator=(Result&& other) noexcept(std::is_nothrow_move_assignable_v<Variant>) = default;
   Result& operator=(const Result& other) noexcept(std::is_nothrow_copy_assignable_v<Variant>) = default;
 
-  template <typename... Args>
+  template <typename... Args,
+            typename = std::enable_if_t<sizeof...(Args) != 1 || !is_result_v<std::decay_t<head_t<Args...>>>, void>>
   Result(Args&&... args) noexcept(std::is_nothrow_constructible_v<Variant, std::in_place_type_t<ValueT>, Args&&...>)
     : _result{std::in_place_type_t<ValueT>{}, std::forward<Args>(args)...} {
   }
@@ -103,7 +108,7 @@ class [[nodiscard]] Result final {
   Result() noexcept : _result{std::monostate{}} {
   }
 
-  template <typename Arg>
+  template <typename Arg, typename = std::enable_if_t<!is_result_v<std::decay_t<Arg>>, void>>
   Result& operator=(Arg&& arg) noexcept(std::is_nothrow_assignable_v<Variant, Arg>) {
     _result = std::forward<Arg>(arg);
     return *this;

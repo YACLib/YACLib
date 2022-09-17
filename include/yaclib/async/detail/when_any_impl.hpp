@@ -149,8 +149,16 @@ class AnyCombinator : public InlineCore, public AnyCombinatorBase<V, E, P> {
       auto& core = static_cast<ResultCore<V, E>&>(caller);
       this->Combine(std::move(core.Get()));
     }
+    caller.DecRef();
     DecRef();
   }
+
+#if YACLIB_FINAL_SUSPEND_TRANSFER != 0
+  [[nodiscard]] yaclib_std::coroutine_handle<> Next(BaseCore& caller) noexcept final {
+    Here(caller);
+    return yaclib_std::noop_coroutine();
+  }
+#endif
 };
 
 }  // namespace yaclib::detail

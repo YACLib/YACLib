@@ -3,7 +3,6 @@
 #include <yaclib/exe/strand.hpp>
 #include <yaclib/log.hpp>
 #include <yaclib/util/helper.hpp>
-#include <yaclib/util/intrusive_ptr.hpp>
 
 #include <utility>
 #include <yaclib_std/atomic>
@@ -11,14 +10,14 @@
 namespace yaclib {
 namespace {
 
-class /*alignas(kCacheLineSize)*/ Strand : public Job, public IExecutor {
+class Strand : private Job, public IExecutor {
   // Inheritance from two IRef's, but that's okay, because they are pure virtual
  public:
   explicit Strand(IExecutorPtr executor) : _executor{std::move(executor)} {
   }
 
   ~Strand() override {
-    YACLIB_DEBUG(_tasks.load(std::memory_order_acquire) != Mark(), "Strand not empty in dtor");
+    YACLIB_DEBUG(_jobs.load(std::memory_order_relaxed) != Mark(), "Strand not empty in dtor");
   }
 
  private:
@@ -26,19 +25,19 @@ class /*alignas(kCacheLineSize)*/ Strand : public Job, public IExecutor {
     return Type::Strand;
   }
 
-  void Submit(Job& task) noexcept final {
-    auto* old = _tasks.load(std::memory_order_relaxed);
+  void Submit(Job& job) noexcept final {
+    auto* expected = _jobs.load(std::memory_order_relaxed);
     do {
-      task.next = old == Mark() ? nullptr : old;
-    } while (!_tasks.compare_exchange_weak(old, &task, std::memory_order_acq_rel, std::memory_order_relaxed));
-    if (old == Mark()) {
+      job.next = expected == Mark() ? nullptr : expected;
+    } while (!_jobs.compare_exchange_weak(expected, &job, std::memory_order_acq_rel, std::memory_order_relaxed));
+    if (expected == Mark()) {
       static_cast<Job&>(*this).IncRef();
       _executor->Submit(*this);
     }
   }
 
   void Call() noexcept final {
-    auto* node = _tasks.exchange(nullptr, std::memory_order_acquire);
+    auto* node = _jobs.exchange(nullptr, std::memory_order_acquire);
     Node* prev = nullptr;
     do {
       auto* next = node->next;
@@ -51,16 +50,16 @@ class /*alignas(kCacheLineSize)*/ Strand : public Job, public IExecutor {
       static_cast<Job*>(prev)->Call();
       prev = next;
     } while (prev != nullptr);
-    if (_tasks.load(std::memory_order_acquire) != node ||
-        !_tasks.compare_exchange_strong(node, Mark(), std::memory_order_acq_rel, std::memory_order_relaxed)) {
-      _executor->Submit(*this);
-    } else {
+    if (_jobs.load(std::memory_order_relaxed) == node &&
+        _jobs.compare_exchange_strong(node, Mark(), std::memory_order_release, std::memory_order_relaxed)) {
       static_cast<Job&>(*this).DecRef();
+    } else {
+      _executor->Submit(*this);
     }
   }
 
   void Drop() noexcept final {
-    auto* node = _tasks.exchange(Mark(), std::memory_order_acq_rel);
+    auto* node = _jobs.exchange(Mark(), std::memory_order_acq_rel);
     do {
       auto* next = node->next;
       static_cast<Job*>(node)->Drop();
@@ -74,7 +73,7 @@ class /*alignas(kCacheLineSize)*/ Strand : public Job, public IExecutor {
   }
 
   IExecutorPtr _executor;
-  yaclib_std::atomic<Node*> _tasks{Mark()};
+  yaclib_std::atomic<Node*> _jobs{Mark()};
 };
 
 }  // namespace

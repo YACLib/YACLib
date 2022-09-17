@@ -15,7 +15,8 @@ struct OneCounter : CounterBase {
     return false;
   }
 
-  void Add(std::size_t) noexcept {  // LCOV_EXCL_LINE compiler remove this call from tests
+  // compiler remove this call from code
+  void Add(std::size_t) noexcept {  // LCOV_EXCL_LINE
   }                                 // LCOV_EXCL_LINE
 
   void Sub(std::size_t) noexcept {

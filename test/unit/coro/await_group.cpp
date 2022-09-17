@@ -203,7 +203,7 @@ TEST(AwaitGroup, WithFutures) {
     auto nine = squarer(3);
     wg.Attach(one, four, nine);
     EXPECT_FALSE(flag.load());
-    co_await wg.Await(*scheduler);
+    co_await wg.AwaitOn(*scheduler);
     EXPECT_TRUE(flag.load());
     co_return std::move(one).Get().Value() + std::move(four).Get().Value() + std::move(nine).Get().Value();
   };
@@ -234,7 +234,7 @@ TEST(AwaitGroup, SwichThread) {
   auto waiter = [&]() -> yaclib::Future<int> {
     auto one = squarer(1);
     wg.Attach(one);
-    co_await wg.Await(*scheduler);
+    co_await wg.AwaitOn(*scheduler);
     EXPECT_NE(main_thread, yaclib_std::this_thread::get_id());
     co_return std::move(one).Get().Value();
   };
@@ -288,7 +288,7 @@ TEST(AwaitGroup, Reset) {
     auto one = squarer(x);
     EXPECT_EQ(main_thread, yaclib_std::this_thread::get_id());
     wg.Attach(one);
-    co_await wg.Await(*scheduler);
+    co_await wg.AwaitOn(*scheduler);
     co_return std::move(one).Touch().Ok();
   };
 
@@ -301,5 +301,41 @@ TEST(AwaitGroup, Reset) {
   scheduler->HardStop();
   scheduler->Wait();
 }
+
+TEST(AwaitGroup, AwaitOn) {
+  yaclib::WaitGroup<> wg{1};
+  wg.Done();
+  int count = 0;
+  auto coro = [&]() -> yaclib::Future<> {
+    ++count;
+    co_await wg.AwaitOn(yaclib::MakeInline());
+    ++count;
+    co_await wg.AwaitOn(yaclib::MakeInline(yaclib::StopTag{}));
+    ++count;
+    co_return{};
+  };
+  EXPECT_THROW(coro().Get().Ok(), yaclib::ResultError<yaclib::StopError>);
+  EXPECT_EQ(count, 2);
+}
+
+TEST(AwaitGroup, Detach) {
+  auto tp = yaclib::MakeThreadPool(1);
+  int counter = 0;
+  yaclib::WaitGroup<> wg;
+  auto coro = [&]() -> yaclib::Future<> {
+    ++counter;
+    co_await On(*tp);
+    yaclib_std::this_thread::sleep_for(100ms);
+    ++counter;
+    co_return{};
+  };
+  wg.Consume(coro());
+  wg.Wait();
+
+  tp->Stop();
+  tp->Wait();
+  EXPECT_EQ(counter, 2);
+}
+
 }  // namespace
 }  // namespace test

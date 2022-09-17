@@ -5,9 +5,11 @@
 #include <yaclib/algo/wait_group.hpp>
 #include <yaclib/async/contract.hpp>
 #include <yaclib/async/run.hpp>
-#include <yaclib/coro/async_mutex.hpp>
 #include <yaclib/coro/await.hpp>
 #include <yaclib/coro/future.hpp>
+#include <yaclib/coro/guard_sticky.hpp>
+#include <yaclib/coro/guard_unique.hpp>
+#include <yaclib/coro/mutex.hpp>
 #include <yaclib/coro/on.hpp>
 #include <yaclib/coro/task.hpp>
 #include <yaclib/exe/manual.hpp>
@@ -16,7 +18,6 @@
 
 #include <array>
 #include <exception>
-#include <mutex>
 #include <utility>
 #include <yaclib_std/thread>
 
@@ -26,7 +27,7 @@ namespace test {
 namespace {
 
 TYPED_TEST(AsyncSuite, JustWorks) {
-  yaclib::AsyncMutex<> m;
+  yaclib::Mutex<> m;
   auto tp = yaclib::MakeThreadPool();
 
   const std::size_t kCoros = 10'000;
@@ -64,7 +65,7 @@ TYPED_TEST(AsyncSuite, Counter) {
   GTEST_SKIP();  // Doesn't work for Win32 or Debug, I think its probably because bad symmetric transfer implementation
   // TODO(kononovk) Try to confirm problem and localize it with ifdefs
 #endif
-  yaclib::AsyncMutex<true> m;
+  yaclib::Mutex<true> m;
   auto tp = yaclib::MakeThreadPool();
 
   const std::size_t kCoros = 20;
@@ -98,17 +99,18 @@ TYPED_TEST(AsyncSuite, Counter) {
   tp->Wait();
 }
 
-TEST(AsyncMutexSuite, TryLock) {
-  yaclib::AsyncMutex<> m;
+TEST(MutexSuite, TryLock) {
+  yaclib::Mutex<> m;
   EXPECT_TRUE(m.TryLock());
   EXPECT_FALSE(m.TryLock());
   m.UnlockHere();
   EXPECT_TRUE(m.TryLock());
   m.UnlockHere();
 }
+/*
 
-TEST(AsyncMutexSuite, ScopedLock) {
-  yaclib::AsyncMutex<> m;
+TEST(MutexSuite, ScopedLock) {
+  yaclib::Mutex<> m;
   {
     auto lock = m.TryGuard();
     EXPECT_TRUE(lock.OwnsLock());
@@ -120,13 +122,14 @@ TEST(AsyncMutexSuite, ScopedLock) {
   EXPECT_TRUE(m.TryLock());
   m.UnlockHere();
 }
+*/
 
 TYPED_TEST(AsyncSuite, LockAsync) {
 #ifdef GTEST_OS_WINDOWS
   GTEST_SKIP();  // Doesn't work for Win32 or Debug, I think its probably because bad symmetric transfer implementation
   // TODO(kononovk) Try to confirm problem and localize it with ifdefs
 #endif
-  yaclib::AsyncMutex<> m;
+  yaclib::Mutex<> m;
   auto executor = yaclib::MakeManual();
   auto [f1, p1] = yaclib::MakeContract<bool>();
   auto [f2, p2] = yaclib::MakeContract<bool>();
@@ -175,7 +178,7 @@ TYPED_TEST(AsyncSuite, LockAsync) {
 }
 
 TYPED_TEST(AsyncSuite, ScopedLockAsync) {
-  yaclib::AsyncMutex<> m;
+  yaclib::Mutex<> m;
   auto executor = yaclib::MakeManual();
   auto [f1, p1] = yaclib::MakeContract<bool>();
   auto [f2, p2] = yaclib::MakeContract<bool>();
@@ -186,10 +189,11 @@ TYPED_TEST(AsyncSuite, ScopedLockAsync) {
     if constexpr (TestFixture::kIsFuture) {
       co_await On(*executor);
     }
-    auto g = co_await m.Guard();
+    co_await m.Lock();
     value++;
     co_await Await(future);
     value++;
+    m.UnlockHere();
     co_return{};
   };
 
@@ -229,7 +233,7 @@ TYPED_TEST(AsyncSuite, GuardRelease) {
   GTEST_SKIP();  // Doesn't work for Win32 or Debug, I think its probably because bad symmetric transfer implementation
   // TODO(kononovk) Try to confirm problem and localize it with ifdefs
 #endif
-  yaclib::AsyncMutex<> m;
+  yaclib::Mutex<> m;
   auto tp = yaclib::MakeThreadPool(2);
 
   const std::size_t kCoros = 20;
@@ -243,10 +247,9 @@ TYPED_TEST(AsyncSuite, GuardRelease) {
       if constexpr (TestFixture::kIsFuture) {
         co_await On(*tp);
       }
-      auto g = co_await m.Guard();
-      auto another = yaclib::AsyncMutex<>::LockGuard(*g.Release(), std::adopt_lock_t{});
+      co_await m.Lock();
       ++cs;
-      co_await another.UnlockOn(*tp);
+      co_await m.UnlockOn(*tp);
     }
     co_return 42;
   };
@@ -271,7 +274,7 @@ TYPED_TEST(AsyncSuite, UnlockHereBehaviour) {
   constexpr std::size_t kCoros = 4;
 
   auto tp = yaclib::MakeThreadPool(kThreads);
-  yaclib::AsyncMutex<> m;
+  yaclib::Mutex<> m;
   std::array<yaclib::Future<>, kCoros> futures;
   yaclib_std::atomic_bool start{false};
 
@@ -334,7 +337,7 @@ TYPED_TEST(AsyncSuite, UnlockOnBehaviour) {
   constexpr std::size_t kCoros = 4;
 
   auto tp = yaclib::MakeThreadPool(kThreads);
-  yaclib::AsyncMutex<> m;
+  yaclib::Mutex<> m;
   std::array<yaclib::Future<>, kCoros> futures;
 
   yaclib_std::atomic_bool start{false};

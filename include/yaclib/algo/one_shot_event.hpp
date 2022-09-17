@@ -11,7 +11,8 @@
 
 namespace yaclib {
 
-class OneShotEventAwaiter;
+class OneShotEventAwait;
+class OneShotEventAwaitOn;
 
 /**
  * TODO
@@ -39,12 +40,17 @@ class OneShotEvent {
   /**
    * TODO
    */
-  OneShotEventAwaiter Await(IExecutor& executor = CurrentThreadPool()) noexcept;
+  OneShotEventAwait operator co_await() noexcept;
 
   /**
    * TODO
    */
-  OneShotEventAwaiter operator co_await() noexcept;
+  OneShotEventAwait Await() noexcept;
+
+  /**
+   * TODO
+   */
+  OneShotEventAwaitOn AwaitOn(IExecutor& executor) noexcept;
 #endif
 
   /**
@@ -66,10 +72,9 @@ class OneShotEvent {
 
 #if YACLIB_CORO != 0
 
-class [[nodiscard]] OneShotEventAwaiter final : public Job {
+class [[nodiscard]] OneShotEventAwait : public Job {
  public:
-  YACLIB_INLINE explicit OneShotEventAwaiter(OneShotEvent& event, IExecutor& executor) noexcept
-    : _event{event}, _executor{executor} {
+  explicit OneShotEventAwait(OneShotEvent& event) noexcept : _event{event} {
   }
 
   YACLIB_INLINE bool await_ready() const noexcept {
@@ -85,22 +90,48 @@ class [[nodiscard]] OneShotEventAwaiter final : public Job {
   constexpr void await_resume() const noexcept {
   }
 
- private:
+ protected:
   void Call() noexcept final {
-    _executor.Submit(*_core);
+    _core->_executor->Submit(*_core);
   }
 
-  OneShotEvent& _event;
-  IExecutor& _executor;
   detail::BaseCore* _core = nullptr;
+  OneShotEvent& _event;
 };
 
-YACLIB_INLINE OneShotEventAwaiter OneShotEvent::Await(IExecutor& executor) noexcept {
-  return OneShotEventAwaiter{*this, executor};
+class [[nodiscard]] OneShotEventAwaitOn final : public OneShotEventAwait {
+ public:
+  explicit OneShotEventAwaitOn(OneShotEvent& event, IExecutor& executor) noexcept
+    : OneShotEventAwait{event}, _executor{executor} {
+  }
+
+  YACLIB_INLINE bool await_ready() const noexcept {
+    return false;
+  }
+
+  template <typename Promise>
+  YACLIB_INLINE void await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
+    _core = &handle.promise();
+    _core->_executor = &_executor;
+    if (!_event.TryAdd(this)) {
+      Call();
+    }
+  }
+
+ private:
+  IExecutor& _executor;
+};
+
+YACLIB_INLINE OneShotEventAwait OneShotEvent::operator co_await() noexcept {
+  return Await();
 }
 
-YACLIB_INLINE OneShotEventAwaiter operator co_await(OneShotEvent& event) noexcept {
-  return event.Await();
+YACLIB_INLINE OneShotEventAwait OneShotEvent::Await() noexcept {
+  return OneShotEventAwait{*this};
+}
+
+YACLIB_INLINE OneShotEventAwaitOn OneShotEvent::AwaitOn(IExecutor& executor) noexcept {
+  return OneShotEventAwaitOn{*this, executor};
 }
 
 #endif
