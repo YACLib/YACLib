@@ -2,7 +2,7 @@
 
 #include <yaclib/coro/coro.hpp>
 #include <yaclib/coro/detail/promise_type.hpp>
-#include <yaclib/exe/thread_pool.hpp>
+#include <yaclib/runtime/fair_thread_pool.hpp>
 
 #include <yaclib_std/atomic>
 
@@ -79,7 +79,7 @@ class AsyncMutex final {
    * \param e executor which will be used for code after unlock or following critical section
    */
   template <bool FIFO = DefaultFIFO, std::int64_t BatchHere = DefaultBatchHere>
-  auto Unlock(IExecutor& e = CurrentThreadPool()) noexcept {
+  auto Unlock(IExecutor& e = MakeInline() /*CurrentThreadPool()*/) noexcept {
     return UnlockAwaiter<FIFO, BatchHere>{*this, e};
   }
 
@@ -97,7 +97,7 @@ class AsyncMutex final {
    * \param e executor which will be used for code after unlock
    */
   template <bool FIFO = DefaultFIFO, std::int64_t BatchHere = DefaultBatchHere>
-  auto UnlockOn(IExecutor& e = CurrentThreadPool()) noexcept {
+  auto UnlockOn(IExecutor& e = MakeInline()) noexcept {
     static_assert(BatchHere > 0);
     return Unlock<FIFO, kOn * BatchHere>(e);
   }
@@ -109,7 +109,7 @@ class AsyncMutex final {
    *          only if we have the following critical section
    */
   template <bool FIFO = DefaultFIFO>
-  void UnlockHere(IExecutor& e = CurrentThreadPool()) noexcept {
+  void UnlockHere(IExecutor& e = MakeInline()) noexcept {
     auto* next = TryUnlock<FIFO>();
     if (next == nullptr) {
       return;
@@ -147,19 +147,19 @@ class AsyncMutex final {
     }
 
     template <bool FIFO = DefaultFIFO, std::int64_t BatchHere = DefaultBatchHere>
-    auto Unlock(IExecutor& e = CurrentThreadPool()) noexcept {
+    auto Unlock(IExecutor& e = MakeInline()) noexcept {
       YACLIB_ERROR(!_owns, "Cannot unlock not locked mutex");
       _owns = false;
       return _mutex->Unlock<FIFO, BatchHere>(e);
     }
 
     template <bool FIFO = DefaultFIFO, std::int64_t BatchHere = DefaultBatchHere>
-    auto UnlockOn(IExecutor& e = CurrentThreadPool()) noexcept {
+    auto UnlockOn(IExecutor& e = MakeInline()) noexcept {
       return Unlock<FIFO, kOn * BatchHere>(e);
     }
 
     template <bool FIFO = DefaultFIFO>
-    void UnlockHere(IExecutor& e = CurrentThreadPool()) noexcept {
+    void UnlockHere(IExecutor& e = MakeInline()) noexcept {
       YACLIB_ERROR(!_owns, "Cannot unlock not locked mutex");
       _owns = false;
       _mutex->UnlockHere<FIFO>(e);
@@ -178,7 +178,7 @@ class AsyncMutex final {
     ~LockGuard() noexcept {
       if (_owns) {
         YACLIB_WARN(true, "Better use co_await LockGuard::Unlock(executor)");
-        _mutex->UnlockHere(CurrentThreadPool());
+        _mutex->UnlockHere(MakeInline());
       }
     }
 

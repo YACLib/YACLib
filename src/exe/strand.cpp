@@ -26,6 +26,10 @@ class /*alignas(kCacheLineSize)*/ Strand : public Job, public IExecutor {
     return Type::Strand;
   }
 
+  [[nodiscard]] bool Alive() const noexcept final {
+    return _executor->Alive();
+  }
+
   void Submit(Job& task) noexcept final {
     auto* old = _tasks.load(std::memory_order_relaxed);
     do {
@@ -51,11 +55,11 @@ class /*alignas(kCacheLineSize)*/ Strand : public Job, public IExecutor {
       static_cast<Job*>(prev)->Call();
       prev = next;
     } while (prev != nullptr);
-    if (_tasks.load(std::memory_order_acquire) != node ||
-        !_tasks.compare_exchange_strong(node, Mark(), std::memory_order_acq_rel, std::memory_order_relaxed)) {
-      _executor->Submit(*this);
-    } else {
+    if (_tasks.load(std::memory_order_relaxed) == node &&
+        _tasks.compare_exchange_strong(node, Mark(), std::memory_order_release, std::memory_order_relaxed)) {
       static_cast<Job&>(*this).DecRef();
+    } else {
+      _executor->Submit(*this);
     }
   }
 

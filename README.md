@@ -172,8 +172,8 @@ Submit(*tp, [] {
   // some computations...
 });
 
-tp->Stop();
-tp->Wait();
+tp.Stop();
+tp.Wait();
 ```
 
 #### Strand, Serial executor

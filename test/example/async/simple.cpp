@@ -9,7 +9,7 @@
 #include <yaclib/async/run.hpp>
 #include <yaclib/exe/executor.hpp>
 #include <yaclib/exe/strand.hpp>
-#include <yaclib/exe/thread_pool.hpp>
+#include <yaclib/runtime/fair_thread_pool.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 #include <yaclib/util/result.hpp>
 
@@ -37,9 +37,9 @@ TEST(Example, HelloWorld) {
 }
 
 TEST(Example, Detach) {
-  auto tp = yaclib::MakeThreadPool(4);
+  yaclib::FairThreadPool tp{4};
 
-  auto f = yaclib::Run(*tp, [] {
+  auto f = yaclib::Run(tp, [] {
     return 42;
   });
 
@@ -49,12 +49,12 @@ TEST(Example, Detach) {
 
   EXPECT_TRUE(!f.Valid());
 
-  tp->SoftStop();
-  tp->Wait();
+  tp.SoftStop();
+  tp.Wait();
 }
 
 TEST(Example, Then) {
-  auto tp = yaclib::MakeThreadPool(4);
+  yaclib::FairThreadPool tp{4};
 
   auto compute = [] {
     return 42;
@@ -64,7 +64,7 @@ TEST(Example, Then) {
     return r + 1;
   };
 
-  yaclib::FutureOn<int> f1 = yaclib::Run(*tp, compute);
+  yaclib::FutureOn<int> f1 = yaclib::Run(tp, compute);
 
   yaclib::FutureOn<int> f2 = std::move(f1).Then(process);
 
@@ -72,12 +72,12 @@ TEST(Example, Then) {
 
   std::cout << "process(compute()) -> " << std::move(f2).Get().Ok() << std::endl;
 
-  tp->SoftStop();
-  tp->Wait();
+  tp.SoftStop();
+  tp.Wait();
 }
 
 TEST(Example, Pipeline) {
-  auto tp = yaclib::MakeThreadPool(4);
+  yaclib::FairThreadPool tp{4};
 
   // Pipeline stages:
 
@@ -102,10 +102,10 @@ TEST(Example, Pipeline) {
   };
 
   // Chain pipeline stages and run them in thread pool
-  yaclib::Run(*tp, first).Then(second).Then(third).Then(fourth).Detach(last);
+  yaclib::Run(tp, first).Then(second).Then(third).Then(fourth).Detach(last);
 
-  tp->SoftStop();
-  tp->Wait();
+  tp.SoftStop();
+  tp.Wait();
 }
 
 class CalculatorService {
@@ -130,9 +130,9 @@ class CalculatorService {
 };
 
 TEST(Example, AsyncPipeline) {
-  auto tp = yaclib::MakeThreadPool(4);
+  yaclib::FairThreadPool tp{4};
 
-  CalculatorService calculator(tp);
+  CalculatorService calculator(&tp);
 
   calculator.Increment(1)
     .Then([&](int r) {
@@ -145,8 +145,8 @@ TEST(Example, AsyncPipeline) {
       std::cout << "Result: " << std::move(r).Ok() << std::endl;
     });
 
-  tp->SoftStop();
-  tp->Wait();
+  tp.SoftStop();
+  tp.Wait();
 }
 
 /**
@@ -154,28 +154,28 @@ TEST(Example, AsyncPipeline) {
  */
 
 TEST(Example, Race) {
-  auto tp = yaclib::MakeThreadPool(1);
-  auto tp2 = yaclib::MakeThreadPool(1);
+  yaclib::FairThreadPool tp{1};
+  yaclib::FairThreadPool tp2{1};
 
   auto [f, p] = yaclib::MakeContract<int>();
 
-  yaclib::Run(*tp, [p = std::move(p)]() mutable {
+  yaclib::Run(tp, [p = std::move(p)]() mutable {
     std::move(p).Set(42);
   }).Detach();
 
-  std::move(f).Detach(*tp2, [](yaclib::Result<int> /*r*/) {
+  std::move(f).Detach(tp2, [](yaclib::Result<int> /*r*/) {
     std::cout << "Hello from the second thread pool!";
   });
 
-  tp->SoftStop();
-  tp->Wait();
-  tp2->SoftStop();
-  tp2->Wait();
+  tp.SoftStop();
+  tp.Wait();
+  tp2.SoftStop();
+  tp2.Wait();
 }
 
 TEST(Example, StrandAsync) {
-  auto tp = yaclib::MakeThreadPool(1);
-  auto strand = yaclib::MakeStrand(tp);
+  yaclib::FairThreadPool tp{1};
+  auto strand = yaclib::MakeStrand(&tp);
 
   auto first = []() {
     return 42;
@@ -189,13 +189,13 @@ TEST(Example, StrandAsync) {
     return r + 1;
   };
 
-  yaclib::Run(*tp, first)
+  yaclib::Run(tp, first)
     .Then(*strand, second)  // Serialized
-    .Then(*tp, third)
+    .Then(tp, third)
     .Detach([](yaclib::Result<int> r) {
       std::cout << "Final result: " << std::move(r).Value() << std::endl;
     });
 
-  tp->SoftStop();
-  tp->Wait();
+  tp.SoftStop();
+  tp.Wait();
 }

@@ -6,7 +6,7 @@
 #include <yaclib/coro/await.hpp>
 #include <yaclib/coro/future.hpp>
 #include <yaclib/coro/task.hpp>
-#include <yaclib/exe/thread_pool.hpp>
+#include <yaclib/runtime/fair_thread_pool.hpp>
 
 #include <array>
 #include <utility>
@@ -20,13 +20,13 @@ namespace {
 using namespace std::chrono_literals;
 
 TYPED_TEST(AsyncSuite, JustWorksPack) {
-  auto tp = yaclib::MakeThreadPool();
+  yaclib::FairThreadPool tp;
   auto coro = [&]() -> std::conditional_t<TestFixture::kIsFuture, yaclib::Future<int>, yaclib::Task<int>> {
-    auto f1 = yaclib::Run(*tp, [] {
+    auto f1 = yaclib::Run(tp, [] {
       yaclib_std::this_thread::sleep_for(1ms * YACLIB_CI_SLOWDOWN);
       return 1;
     });
-    auto f2 = yaclib::Run(*tp, [] {
+    auto f2 = yaclib::Run(tp, [] {
       return 2;
     });
 
@@ -35,19 +35,19 @@ TYPED_TEST(AsyncSuite, JustWorksPack) {
   };
   auto f = coro();
   EXPECT_EQ(std::move(f).Get().Ok(), 3);
-  tp->HardStop();
-  tp->Wait();
+  tp.HardStop();
+  tp.Wait();
 }
 
 TYPED_TEST(AsyncSuite, JustWorksRange) {
-  auto tp = yaclib::MakeThreadPool();
+  yaclib::FairThreadPool tp;
   auto coro = [&]() -> std::conditional_t<TestFixture::kIsFuture, yaclib::Future<int>, yaclib::Task<int>> {
     std::array<yaclib::FutureOn<int>, 2> arr;
-    arr[0] = yaclib::Run(*tp, [] {
+    arr[0] = yaclib::Run(tp, [] {
       yaclib_std::this_thread::sleep_for(50ms * YACLIB_CI_SLOWDOWN);
       return 1;
     });
-    arr[1] = yaclib::Run(*tp, [] {
+    arr[1] = yaclib::Run(tp, [] {
       return 2;
     });
 
@@ -57,23 +57,23 @@ TYPED_TEST(AsyncSuite, JustWorksRange) {
   };
   auto future = coro();
   EXPECT_EQ(std::move(future).Get().Ok(), 3);
-  tp->HardStop();
-  tp->Wait();
+  tp.HardStop();
+  tp.Wait();
 }
 
 TYPED_TEST(AsyncSuite, CheckSuspend) {
   int counter = 0;
-  auto tp = yaclib::MakeThreadPool(2);
+  yaclib::FairThreadPool tp{2};
   const auto coro_sleep_time = 50ms * YACLIB_CI_SLOWDOWN;
   auto was = yaclib_std::chrono::steady_clock::now();
   std::atomic_bool barrier = false;
 
   auto coro = [&]() -> typename TestFixture::Type {
     counter = 1;
-    auto future1 = yaclib::Run(*tp, [&] {
+    auto future1 = yaclib::Run(tp, [&] {
       yaclib_std::this_thread::sleep_for(coro_sleep_time);
     });
-    auto future2 = yaclib::Run(*tp, [&] {
+    auto future2 = yaclib::Run(tp, [&] {
       yaclib_std::this_thread::sleep_for(coro_sleep_time);
     });
 
@@ -100,8 +100,8 @@ TYPED_TEST(AsyncSuite, CheckSuspend) {
 
   EXPECT_EQ(2, counter);
   EXPECT_GE(yaclib_std::chrono::steady_clock::now() - was, coro_sleep_time);
-  tp->HardStop();
-  tp->Wait();
+  tp.HardStop();
+  tp.Wait();
 }
 
 TYPED_TEST(AsyncSuite, AwaitNoSuspend) {

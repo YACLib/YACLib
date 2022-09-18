@@ -12,7 +12,7 @@
 #include <yaclib/coro/task.hpp>
 #include <yaclib/exe/manual.hpp>
 #include <yaclib/exe/submit.hpp>
-#include <yaclib/exe/thread_pool.hpp>
+#include <yaclib/runtime/fair_thread_pool.hpp>
 
 #include <array>
 #include <exception>
@@ -27,7 +27,7 @@ namespace {
 
 TYPED_TEST(AsyncSuite, JustWorks) {
   yaclib::AsyncMutex<> m;
-  auto tp = yaclib::MakeThreadPool();
+  yaclib::FairThreadPool tp;
 
   const std::size_t kCoros = 10'000;
 
@@ -36,7 +36,7 @@ TYPED_TEST(AsyncSuite, JustWorks) {
 
   auto coro1 = [&]() -> typename TestFixture::Type {
     if constexpr (TestFixture::kIsFuture) {
-      co_await On(*tp);
+      co_await On(tp);
     }
     co_await m.Lock();
     ++cs;
@@ -48,15 +48,15 @@ TYPED_TEST(AsyncSuite, JustWorks) {
     if constexpr (TestFixture::kIsFuture) {
       futures[i] = coro1();
     } else {
-      futures[i] = coro1().ToFuture(*tp).On(nullptr);
+      futures[i] = coro1().ToFuture(tp).On(nullptr);
     }
   }
 
   yaclib::Wait(futures.begin(), futures.size());
 
   EXPECT_EQ(kCoros, cs);
-  tp->HardStop();
-  tp->Wait();
+  tp.HardStop();
+  tp.Wait();
 }
 
 TYPED_TEST(AsyncSuite, Counter) {
@@ -65,7 +65,7 @@ TYPED_TEST(AsyncSuite, Counter) {
   // TODO(kononovk) Try to confirm problem and localize it with ifdefs
 #endif
   yaclib::AsyncMutex<true> m;
-  auto tp = yaclib::MakeThreadPool();
+  yaclib::FairThreadPool tp;
 
   const std::size_t kCoros = 20;
   const std::size_t kCSperCoro = 2000;
@@ -74,7 +74,7 @@ TYPED_TEST(AsyncSuite, Counter) {
 
   auto coro1 = [&]() -> typename TestFixture::Type {
     if constexpr (TestFixture::kIsFuture) {
-      co_await On(*tp);
+      co_await On(tp);
     }
     for (std::size_t j = 0; j < kCSperCoro; ++j) {
       co_await m.Lock();
@@ -88,14 +88,14 @@ TYPED_TEST(AsyncSuite, Counter) {
     if constexpr (TestFixture::kIsFuture) {
       futures[i] = coro1();
     } else {
-      futures[i] = coro1().ToFuture(*tp).On(nullptr);
+      futures[i] = coro1().ToFuture(tp).On(nullptr);
     }
   }
   Wait(futures.begin(), futures.end());
 
   EXPECT_EQ(kCoros * kCSperCoro, cs);
-  tp->HardStop();
-  tp->Wait();
+  tp.HardStop();
+  tp.Wait();
 }
 
 TEST(AsyncMutexSuite, TryLock) {
@@ -230,7 +230,7 @@ TYPED_TEST(AsyncSuite, GuardRelease) {
   // TODO(kononovk) Try to confirm problem and localize it with ifdefs
 #endif
   yaclib::AsyncMutex<> m;
-  auto tp = yaclib::MakeThreadPool(2);
+  yaclib::FairThreadPool tp{2};
 
   const std::size_t kCoros = 20;
   const std::size_t kCSperCoro = 200;
@@ -241,12 +241,12 @@ TYPED_TEST(AsyncSuite, GuardRelease) {
   auto coro1 = [&]() -> Coro {
     for (std::size_t j = 0; j < kCSperCoro; ++j) {
       if constexpr (TestFixture::kIsFuture) {
-        co_await On(*tp);
+        co_await On(tp);
       }
       auto g = co_await m.Guard();
       auto another = yaclib::AsyncMutex<>::LockGuard(*g.Release(), std::adopt_lock_t{});
       ++cs;
-      co_await another.UnlockOn(*tp);
+      co_await another.UnlockOn(tp);
     }
     co_return 42;
   };
@@ -254,15 +254,15 @@ TYPED_TEST(AsyncSuite, GuardRelease) {
     if constexpr (TestFixture::kIsFuture) {
       futures[i] = coro1();
     } else {
-      futures[i] = coro1().ToFuture(*tp).On(nullptr);
+      futures[i] = coro1().ToFuture(tp).On(nullptr);
     }
   }
 
   Wait(futures.begin(), futures.end());
 
   EXPECT_EQ(kCoros * kCSperCoro, cs);
-  tp->HardStop();
-  tp->Wait();
+  tp.HardStop();
+  tp.Wait();
 }
 
 TYPED_TEST(AsyncSuite, UnlockHereBehaviour) {
@@ -270,14 +270,14 @@ TYPED_TEST(AsyncSuite, UnlockHereBehaviour) {
   constexpr std::size_t kThreads = 4;
   constexpr std::size_t kCoros = 4;
 
-  auto tp = yaclib::MakeThreadPool(kThreads);
+  yaclib::FairThreadPool tp{kThreads};
   yaclib::AsyncMutex<> m;
   std::array<yaclib::Future<>, kCoros> futures;
   yaclib_std::atomic_bool start{false};
 
   auto coro1 = [&]() -> typename TestFixture::Type {
     if constexpr (TestFixture::kIsFuture) {
-      co_await On(*tp);
+      co_await On(tp);
     }
     co_await m.Lock();
     start.store(true, std::memory_order_release);
@@ -289,7 +289,7 @@ TYPED_TEST(AsyncSuite, UnlockHereBehaviour) {
   };
   auto coro2 = [&]() -> typename TestFixture::Type {
     if constexpr (TestFixture::kIsFuture) {
-      co_await On(*tp);
+      co_await On(tp);
     }
     co_await m.Lock();
     auto id = yaclib_std::this_thread::get_id();
@@ -303,7 +303,7 @@ TYPED_TEST(AsyncSuite, UnlockHereBehaviour) {
   if constexpr (TestFixture::kIsFuture) {
     futures[0] = coro1();
   } else {
-    futures[0] = coro1().ToFuture(*tp).On(nullptr);
+    futures[0] = coro1().ToFuture(tp).On(nullptr);
   }
   while (!start.load(std::memory_order_acquire)) {
     yaclib_std::this_thread::sleep_for(10ms);
@@ -312,7 +312,7 @@ TYPED_TEST(AsyncSuite, UnlockHereBehaviour) {
     if constexpr (TestFixture::kIsFuture) {
       futures[i] = coro2();
     } else {
-      futures[i] = coro2().ToFuture(*tp).On(nullptr);
+      futures[i] = coro2().ToFuture(tp).On(nullptr);
     }
   }
   Wait(futures.begin(), futures.end());
@@ -320,8 +320,8 @@ TYPED_TEST(AsyncSuite, UnlockHereBehaviour) {
   // 1s (coro1 sleep with acquired lock) + 1s (coro2 parallel sleep)
   EXPECT_LT(sw.Elapsed(), 2.5s);
 
-  tp->HardStop();
-  tp->Wait();
+  tp.HardStop();
+  tp.Wait();
 }
 
 TYPED_TEST(AsyncSuite, UnlockOnBehaviour) {
@@ -333,7 +333,7 @@ TYPED_TEST(AsyncSuite, UnlockOnBehaviour) {
   constexpr std::size_t kThreads = 4;
   constexpr std::size_t kCoros = 4;
 
-  auto tp = yaclib::MakeThreadPool(kThreads);
+  yaclib::FairThreadPool tp{kThreads};
   yaclib::AsyncMutex<> m;
   std::array<yaclib::Future<>, kCoros> futures;
 
@@ -342,24 +342,24 @@ TYPED_TEST(AsyncSuite, UnlockOnBehaviour) {
 
   auto coro1 = [&]() -> typename TestFixture::Type {
     if constexpr (TestFixture::kIsFuture) {
-      co_await On(*tp);
+      co_await On(tp);
     }
     co_await m.Lock();
     start.store(true, std::memory_order_release);
     locked_id = yaclib_std::this_thread::get_id();
     yaclib_std::this_thread::sleep_for(1s);
-    co_await m.UnlockOn(*tp);
+    co_await m.UnlockOn(tp);
     co_return{};
   };
   auto coro2 = [&]() -> typename TestFixture::Type {
     if constexpr (TestFixture::kIsFuture) {
-      co_await On(*tp);
+      co_await On(tp);
     }
     co_await m.Lock();
 #ifdef GTEST_OS_LINUX
     EXPECT_EQ(locked_id, yaclib_std::this_thread::get_id());
 #endif
-    co_await m.UnlockOn(*tp);
+    co_await m.UnlockOn(tp);
     yaclib_std::this_thread::sleep_for(1s);
     co_return{};
   };
@@ -368,7 +368,7 @@ TYPED_TEST(AsyncSuite, UnlockOnBehaviour) {
   if constexpr (TestFixture::kIsFuture) {
     futures[0] = coro1();
   } else {
-    futures[0] = coro1().ToFuture(*tp).On(nullptr);
+    futures[0] = coro1().ToFuture(tp).On(nullptr);
   }
   while (!start.load(std::memory_order_acquire)) {
     yaclib_std::this_thread::sleep_for(10ms);
@@ -377,7 +377,7 @@ TYPED_TEST(AsyncSuite, UnlockOnBehaviour) {
     if constexpr (TestFixture::kIsFuture) {
       futures[i] = coro2();
     } else {
-      futures[i] = coro2().ToFuture(*tp).On(nullptr);
+      futures[i] = coro2().ToFuture(tp).On(nullptr);
     }
   }
   Wait(futures.begin(), futures.end());
@@ -385,8 +385,8 @@ TYPED_TEST(AsyncSuite, UnlockOnBehaviour) {
   // 1s (coro1 sleep with acquired lock) + 1s (coro2 parallel sleep)
   EXPECT_LT(sw.Elapsed(), 2.5s);
 
-  tp->HardStop();
-  tp->Wait();
+  tp.HardStop();
+  tp.Wait();
 }
 
 }  // namespace

@@ -2,7 +2,7 @@
 
 #include <yaclib/algo/detail/base_core.hpp>
 #include <yaclib/exe/executor.hpp>
-#include <yaclib/exe/thread_pool.hpp>
+#include <yaclib/runtime/fair_thread_pool.hpp>
 #include <yaclib/util/detail/default_event.hpp>
 #include <yaclib/util/ref.hpp>
 #if YACLIB_CORO != 0
@@ -39,7 +39,7 @@ class OneShotEvent {
   /**
    * TODO
    */
-  OneShotEventAwaiter Await(IExecutor& executor = CurrentThreadPool()) noexcept;
+  OneShotEventAwaiter Await(IExecutor& executor = MakeInline()) noexcept;
 
   /**
    * TODO

@@ -1,7 +1,7 @@
-#include <yaclib/exe/thread_pool.hpp>
+#include <yaclib/runtime/fair_thread_pool.hpp>
 #include <yaclib/lazy/make.hpp>
-#include <yaclib/lazy/schedule.hpp>
 #include <yaclib/util/result.hpp>
+#include <yaclib/lazy/schedule.hpp>
 
 #include <thread>
 #include <utility>
@@ -24,30 +24,30 @@ TEST(Task, Simple) {
                             called += 3;
                           });
 
-  auto tp = yaclib::MakeThreadPool(1);
+  yaclib::FairThreadPool tp{1};
   EXPECT_TRUE(task.Valid());
-  yaclib::FutureOn<> future = std::move(task).ToFuture(*tp);
+  yaclib::FutureOn<> future = std::move(task).ToFuture(tp);
   EXPECT_FALSE(task.Valid());
   std::ignore = std::move(future).Get();
 
   EXPECT_EQ(called, 6);
 
-  tp->Stop();
-  tp->Wait();
+  tp.Stop();
+  tp.Wait();
 }
 
 TEST(Task, Simple2) {
-  auto tp = yaclib::MakeThreadPool(1);
+  yaclib::FairThreadPool tp{1};
 
   size_t called = 0;
-  yaclib::Task<> task = yaclib::Schedule(*tp,
+  yaclib::Task<> task = yaclib::Schedule(tp,
                                          [&] {
                                            called += 1;
                                          })
                           .Then([&] {
                             called += 2;
                           })
-                          .Then(*tp, [&] {
+                          .Then(tp, [&] {
                             called += 3;
                           });
   EXPECT_TRUE(task.Valid());
@@ -57,12 +57,12 @@ TEST(Task, Simple2) {
 
   EXPECT_EQ(called, 6);
 
-  tp->Stop();
-  tp->Wait();
+  tp.Stop();
+  tp.Wait();
 }
 
 TEST(Task, Cancel) {
-  auto tp = yaclib::MakeThreadPool(1);
+  yaclib::FairThreadPool tp{1};
 
   size_t called = 0;
   std::ignore = yaclib::MakeTask(1);
@@ -75,14 +75,14 @@ TEST(Task, Cancel) {
                            .Then([&] {
                              called += 3;
                            });
-  yaclib::Task<> task2 = yaclib::Schedule(*tp,
+  yaclib::Task<> task2 = yaclib::Schedule(tp,
                                           [&] {
                                             called += 1;
                                           })
                            .Then([&] {
                              called += 2;
                            })
-                           .Then(*tp, [&] {
+                           .Then(tp, [&] {
                              called += 3;
                            });
   EXPECT_TRUE(task1.Valid());
@@ -92,8 +92,8 @@ TEST(Task, Cancel) {
   std::move(task2).Cancel();
   EXPECT_FALSE(task2.Valid());
   EXPECT_EQ(called, 0);
-  tp->Stop();
-  tp->Wait();
+  tp.Stop();
+  tp.Wait();
   EXPECT_EQ(called, 0);
 }
 

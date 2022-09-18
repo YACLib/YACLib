@@ -1,47 +1,45 @@
+#pragma once
+
 #include <util/intrusive_list.hpp>
 
 #include <yaclib/exe/executor.hpp>
 #include <yaclib/exe/inline.hpp>
 #include <yaclib/exe/job.hpp>
-#include <yaclib/exe/thread_factory.hpp>
-#include <yaclib/exe/thread_pool.hpp>
 #include <yaclib/log.hpp>
 #include <yaclib/util/func.hpp>
 #include <yaclib/util/helper.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 
 #include <cstddef>
+#include <thread>
 #include <utility>
+#include <vector>
 #include <yaclib_std/condition_variable>
 #include <yaclib_std/mutex>
+#include <yaclib_std/thread>
 #include <yaclib_std/thread_local>
 
 namespace yaclib {
-namespace {
 
-static YACLIB_THREAD_LOCAL_PTR(IExecutor) tlCurrentThreadPool{&MakeInline()};
-
-class ThreadPool : public IThreadPool, private IFunc {
+class FairThreadPool : public IExecutor {
  public:
-  explicit ThreadPool(IThreadFactoryPtr factory) : _factory{std::move(factory)}, _task_count{0} {
-  }
-
-  void Start(std::size_t threads) {  // needed to prevent pure virtual call
+  explicit FairThreadPool(std::size_t threads = std::thread::hardware_concurrency()) : _task_count{0} {
+    _workers.reserve(threads);
     for (std::size_t i = 0; i != threads; ++i) {
-      auto* thread = _factory->Acquire(this);
-      YACLIB_ERROR(thread == nullptr, "Acquired from thread factory thread is null");
-      _threads.PushBack(*thread);
+      _workers.emplace_back([&] {
+        // SetCurrentThreadPool(*this);
+        Loop();
+        // SetCurrentThreadPool(MakeInline());
+      });
     }
   }
 
-  ~ThreadPool() override {
-    HardStop();
-    Wait();
+  ~FairThreadPool() noexcept override {
+    YACLIB_ERROR(!_workers.empty(), "Explicitly join ThreadPool");
   }
 
- private:
   Type Tag() const noexcept final {
-    return Type::ThreadPool;
+    return Type::FairThreadPool;
   }
 
   [[nodiscard]] bool WasStop() const noexcept {
@@ -56,7 +54,7 @@ class ThreadPool : public IThreadPool, private IFunc {
   void Stop(std::unique_lock<yaclib_std::mutex>&& lock) noexcept {
     _task_count |= 1U;
     lock.unlock();
-    _cv.notify_all();
+    _idle.notify_all();
   }
 
   void Submit(Job& task) noexcept final {
@@ -69,10 +67,15 @@ class ThreadPool : public IThreadPool, private IFunc {
     _tasks.PushBack(task);
     _task_count += 4;  // Add Task
     lock.unlock();
-    _cv.notify_one();
+    _idle.notify_one();
   }
 
-  void SoftStop() final {
+  bool Alive() const noexcept final {
+    std::lock_guard lock{_m};
+    return !WasStop();
+  }
+
+  void SoftStop() {
     std::unique_lock lock{_m};
     if (NoTasks()) {
       Stop(std::move(lock));
@@ -81,11 +84,11 @@ class ThreadPool : public IThreadPool, private IFunc {
     }
   }
 
-  void Stop() final {
+  void Stop() {
     Stop(std::unique_lock{_m});
   }
 
-  void HardStop() final {
+  void HardStop() {
     std::unique_lock lock{_m};
     detail::List tasks{std::move(_tasks)};
     Stop(std::move(lock));
@@ -95,13 +98,15 @@ class ThreadPool : public IThreadPool, private IFunc {
     }
   }
 
-  void Wait() final {
-    while (!_threads.Empty()) {
-      auto& thread = _threads.PopFront();
-      _factory->Release(&static_cast<IThread&>(thread));
+  // TODO: Rename to join
+  void Wait() {
+    for (auto& worker : _workers) {
+      worker.join();
     }
+    _workers.clear();
   }
 
+ private:
   void Loop() noexcept {
     std::unique_lock lock{_m};
     while (true) {
@@ -118,38 +123,15 @@ class ThreadPool : public IThreadPool, private IFunc {
       if (WasStop()) {
         return;
       }
-      _cv.wait(lock);
+      _idle.wait(lock);
     }
   }
 
-  void Call() noexcept final {
-    tlCurrentThreadPool = this;
-    Loop();
-    tlCurrentThreadPool = &MakeInline();
-  }
-
-  yaclib_std::mutex _m;
-  yaclib_std::condition_variable _cv;
-  IThreadFactoryPtr _factory;
-  detail::List _threads;
+  std::vector<yaclib_std::thread> _workers;
+  mutable yaclib_std::mutex _m;
+  yaclib_std::condition_variable _idle;
   detail::List _tasks;
   std::size_t _task_count;
 };
-
-}  // namespace
-
-IExecutor& CurrentThreadPool() noexcept {
-  return *tlCurrentThreadPool;
-}
-
-IThreadPoolPtr MakeThreadPool(std::size_t threads, IThreadFactoryPtr tf) {
-  // TODO(MBkkt) Optimize this case
-  // if (threads == 1) {
-  //   return MakeIntrusive<SingleThread, IThreadPool>(std::move(tf));
-  // }
-  auto tp = MakeShared<ThreadPool>(1, std::move(tf));
-  tp->Start(threads);
-  return tp;
-}  // LCOV_EXCL_LINE shitty gcov cannot parse it
 
 }  // namespace yaclib

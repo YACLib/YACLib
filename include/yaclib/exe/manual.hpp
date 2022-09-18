@@ -15,6 +15,8 @@ class ManualExecutor : public IExecutor {
  public:
   [[nodiscard]] Type Tag() const noexcept final;
 
+  [[nodiscard]] bool Alive() const noexcept final;
+
   void Submit(yaclib::Job& f) noexcept final;
 
   std::size_t Drain();

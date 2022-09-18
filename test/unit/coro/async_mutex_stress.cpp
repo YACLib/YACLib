@@ -5,7 +5,7 @@
 #include <yaclib/coro/await.hpp>
 #include <yaclib/coro/future.hpp>
 #include <yaclib/coro/on.hpp>
-#include <yaclib/exe/thread_pool.hpp>
+#include <yaclib/runtime/fair_thread_pool.hpp>
 
 #include <limits>
 #include <vector>
@@ -16,21 +16,21 @@ namespace test {
 namespace {
 
 void Stress1(const std::size_t kCoros, test::util::Duration dur) {
-  auto tp = yaclib::MakeThreadPool();
+  yaclib::FairThreadPool tp;
   yaclib::AsyncMutex<> m;
   std::vector<yaclib::Future<>> futures(kCoros);
   std::size_t cs = 0;
   test::util::StopWatch sw;
 
   auto coro = [&]() -> yaclib::Future<> {
-    co_await On(*tp);
+    co_await On(tp);
     while (sw.Elapsed() < dur) {
       auto guard = co_await m.Guard();
       if (std::numeric_limits<std::size_t>::max() != cs) {
         cs++;
       }
       if (cs == 7) {
-        co_await On(*tp);
+        co_await On(tp);
       }
     }
     co_return{};
@@ -42,22 +42,22 @@ void Stress1(const std::size_t kCoros, test::util::Duration dur) {
 
   Wait(futures.begin(), futures.end());
   ASSERT_GE(cs, 1234);
-  tp->HardStop();
-  tp->Wait();
+  tp.HardStop();
+  tp.Wait();
 }
 
 void Stress2(const std::size_t kCoros, test::util::Duration dur) {
-  auto tp = yaclib::MakeThreadPool();
+  yaclib::FairThreadPool tp;
   yaclib::AsyncMutex<> m;
   std::vector<yaclib::Future<>> futures(kCoros);
   std::uint64_t cs;
   test::util::StopWatch sw;
 
   auto coro = [&]() -> yaclib::Future<> {
-    co_await On(*tp);
+    co_await On(tp);
     co_await m.Lock();
     ++cs;
-    co_await m.Unlock(*tp);
+    co_await m.Unlock(tp);
     co_return{};
   };
 
@@ -69,8 +69,8 @@ void Stress2(const std::size_t kCoros, test::util::Duration dur) {
     Wait(futures.begin(), futures.end());
     ASSERT_GE(cs, kCoros);
   }
-  tp->HardStop();
-  tp->Wait();
+  tp.HardStop();
+  tp.Wait();
 }
 
 TEST(AsyncMutexStress, TimerPerCoro) {

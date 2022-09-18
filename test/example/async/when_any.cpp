@@ -4,7 +4,7 @@
  */
 #include <yaclib/async/run.hpp>
 #include <yaclib/async/when_any.hpp>
-#include <yaclib/exe/thread_pool.hpp>
+#include <yaclib/runtime/fair_thread_pool.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 #include <yaclib/util/result.hpp>
 
@@ -25,14 +25,14 @@ using namespace std::chrono_literals;
 // std::vector<Future<T>> -> Future<T>
 
 TEST(Example, WhenAny) {
-  auto tp = yaclib::MakeThreadPool(4);
+  yaclib::FairThreadPool tp{4};
 
   std::vector<yaclib::FutureOn<int>> futs;
 
   // Run sync computations in parallel
 
   for (int i = 0; i < 5; ++i) {
-    futs.push_back(yaclib::Run(*tp, [i]() -> int {
+    futs.push_back(yaclib::Run(tp, [i]() -> int {
       return i;
     }));
   }
@@ -45,8 +45,8 @@ TEST(Example, WhenAny) {
   // First value
   std::cout << "Any value: " << std::move(any).Get().Ok() << std::endl;
 
-  tp->Stop();
-  tp->Wait();
+  tp.Stop();
+  tp.Wait();
 }
 
 }  // namespace
