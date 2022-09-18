@@ -4,7 +4,6 @@
 #include <yaclib/algo/one_shot_event.hpp>
 #include <yaclib/async/future.hpp>
 #include <yaclib/config.hpp>
-#include <yaclib/exe/thread_pool.hpp>
 #include <yaclib/util/detail/set_deleter.hpp>
 #include <yaclib/util/type_traits.hpp>
 

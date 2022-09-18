@@ -4,10 +4,13 @@
 #include <cstdlib>
 #include <ctime>
 
+#include <gtest/gtest.h>
+
 namespace test::util {
 
-/* TODO(Ri7ay): dont work on windows, check thread_pool tests */
-#if __linux
+/* TODO(Ri7ay) dont work on windows, check thread_pool tests */
+#if defined(GTEST_OS_LINUX) || defined(GTEST_OS_MAC)
+
 class ProcessCPUTimer {
  public:
   ProcessCPUTimer() {
@@ -63,6 +66,7 @@ class ThreadCPUTimer {
 
   timespec _start{};
 };
-#endif  // linux
+
+#endif
 
 }  // namespace test::util

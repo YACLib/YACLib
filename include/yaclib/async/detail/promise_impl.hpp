@@ -7,7 +7,7 @@ namespace yaclib {
 template <typename V, typename E>
 template <typename T>
 void Promise<V, E>::Set(T&& object) && {
-  static_assert(std::is_constructible_v<Result<V, E>, T>, "TODO(MBkkt): Add message");
+  static_assert(std::is_constructible_v<Result<V, E>, T>, "TODO(MBkkt) Add message");
   YACLIB_ASSERT(Valid());
   auto& core = *_core.Release();
   core.Store(std::forward<T>(object));

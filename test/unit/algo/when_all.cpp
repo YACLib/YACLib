@@ -5,7 +5,7 @@
 #include <yaclib/async/promise.hpp>
 #include <yaclib/async/run.hpp>
 #include <yaclib/async/when_all.hpp>
-#include <yaclib/exe/thread_pool.hpp>
+#include <yaclib/runtime/fair_thread_pool.hpp>
 #include <yaclib/util/result.hpp>
 
 #include <algorithm>
@@ -206,10 +206,10 @@ template <TestSuite suite, typename T = int>
 void MultiThreaded() {
   static constexpr bool kIsVoid = std::is_void_v<T>;
 
-  auto tp = yaclib::MakeThreadPool(4);
+  yaclib::FairThreadPool tp{4};
 
-  auto async_value = [tp](int value) {
-    return Run(*tp, [value] {
+  auto async_value = [&tp](int value) {
+    return Run(tp, [value] {
       yaclib_std::this_thread::sleep_for(10ms);
       if constexpr (kIsVoid) {
         std::ignore = value;
@@ -246,8 +246,8 @@ void MultiThreaded() {
     }
   }
 
-  tp->HardStop();
-  tp->Wait();
+  tp.HardStop();
+  tp.Wait();
 }
 
 TYPED_TEST(WhenAllT, VectorMultiThreaded) {
@@ -260,18 +260,18 @@ TYPED_TEST(WhenAllT, ArrayMultiThreaded) {
 
 template <typename Error = yaclib::StopError>
 void FirstFail() {
-  auto tp = yaclib::MakeThreadPool();
+  yaclib::FairThreadPool tp;
   std::vector<yaclib::FutureOn<void, Error>> ints;
   std::size_t count = yaclib_std::thread::hardware_concurrency() * 4;
   ints.reserve(count * 2);
   for (int j = 0; j != 200; ++j) {
     for (std::size_t i = 0; i != count; ++i) {
-      ints.push_back(yaclib::Run<Error>(*tp, [] {
+      ints.push_back(yaclib::Run<Error>(tp, [] {
         std::this_thread::sleep_for(4ms);
       }));
     }
     for (std::size_t i = 0; i != count; ++i) {
-      ints.push_back(yaclib::Run<Error>(*tp, [] {
+      ints.push_back(yaclib::Run<Error>(tp, [] {
         std::this_thread::sleep_for(2ms);
         return yaclib::Result<void, Error>{yaclib::StopTag{}};
       }));
@@ -279,8 +279,8 @@ void FirstFail() {
     EXPECT_THROW(WhenAll(ints.begin(), ints.end()).Get().Ok(), yaclib::ResultError<Error>);
     ints.clear();
   }
-  tp->Stop();
-  tp->Wait();
+  tp.Stop();
+  tp.Wait();
 }
 
 TEST(WhenAll, FirstFail) {

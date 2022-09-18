@@ -5,7 +5,7 @@
 #include <yaclib/coro/future.hpp>
 #include <yaclib/coro/mutex.hpp>
 #include <yaclib/coro/on.hpp>
-#include <yaclib/exe/thread_pool.hpp>
+#include <yaclib/runtime/fair_thread_pool.hpp>
 
 #include <limits>
 #include <vector>
@@ -16,19 +16,19 @@ namespace test {
 namespace {
 
 void Stress1(const std::size_t kCoros, test::util::Duration dur) {
-  auto tp = yaclib::MakeThreadPool();
+  yaclib::FairThreadPool tp;
   yaclib::Mutex<> m;
   std::vector<yaclib::Future<>> futures(kCoros);
   std::uint64_t cs = 0;
   test::util::StopWatch sw;
 
   auto coro = [&]() -> yaclib::Future<> {
-    co_await On(*tp);
+    co_await On(tp);
     while (sw.Elapsed() < dur) {
       co_await m.Lock();
       ++cs;
       if (cs == 7) {
-        co_await On(*tp);
+        co_await On(tp);
       }
       m.UnlockHere();
     }
@@ -41,19 +41,19 @@ void Stress1(const std::size_t kCoros, test::util::Duration dur) {
 
   Wait(futures.begin(), futures.end());
   ASSERT_GE(cs, 1234);
-  tp->HardStop();
-  tp->Wait();
+  tp.HardStop();
+  tp.Wait();
 }
 
 void Stress2(const std::size_t kCoros, test::util::Duration dur) {
-  auto tp = yaclib::MakeThreadPool();
+  yaclib::FairThreadPool tp;
   yaclib::Mutex<> m;
   std::vector<yaclib::Future<>> futures(kCoros);
   std::uint64_t cs;
   test::util::StopWatch sw;
 
   auto coro = [&]() -> yaclib::Future<> {
-    co_await On(*tp);
+    co_await On(tp);
     co_await m.Lock();
     ++cs;
     co_await m.Unlock();
@@ -68,13 +68,13 @@ void Stress2(const std::size_t kCoros, test::util::Duration dur) {
     Wait(futures.begin(), futures.end());
     ASSERT_GE(cs, kCoros);
   }
-  tp->HardStop();
-  tp->Wait();
+  tp.HardStop();
+  tp.Wait();
 }
 
 TEST(MutexStress, TimerPerCoro) {
 #if YACLIB_FAULT == 2
-  GTEST_SKIP();  // TODO(myannyax): make time run forward even without switches
+  GTEST_SKIP();  // TODO(myannyax) make time run forward even without switches
 #endif
   using namespace std::chrono_literals;
   Stress1(4, 1s);
@@ -83,7 +83,7 @@ TEST(MutexStress, TimerPerCoro) {
 
 TEST(MutexStress, CommonTimer) {
 #if YACLIB_FAULT == 2
-  GTEST_SKIP();  // TODO(myannyax): make time run forward even without switches
+  GTEST_SKIP();  // TODO(myannyax) make time run forward even without switches
 #endif
 #ifdef GTEST_OS_WINDOWS
   GTEST_SKIP();  // Doesn't work for Win32 or Debug, I think its probably because bad symmetric transfer implementation

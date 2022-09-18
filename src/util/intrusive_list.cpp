@@ -1,6 +1,5 @@
-#include <util/intrusive_list.hpp>
-
 #include <yaclib/log.hpp>
+#include <yaclib/util/detail/intrusive_list.hpp>
 
 #include <utility>
 

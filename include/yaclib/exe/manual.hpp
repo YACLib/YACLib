@@ -1,10 +1,10 @@
 #pragma once
 
-#include <util/intrusive_list.hpp>
-
 #include <yaclib/exe/executor.hpp>
-#include <yaclib/util/helper.hpp>
-#include <yaclib/util/intrusive_ptr.hpp>
+#include <yaclib/exe/job.hpp>
+#include <yaclib/util/detail/intrusive_list.hpp>
+
+#include <cstddef>
 
 namespace yaclib {
 
@@ -15,14 +15,16 @@ class ManualExecutor : public IExecutor {
  public:
   [[nodiscard]] Type Tag() const noexcept final;
 
-  void Submit(yaclib::Job& f) noexcept final;
+  [[nodiscard]] bool Alive() const noexcept final;
 
-  std::size_t Drain();
+  void Submit(Job& f) noexcept final;
+
+  [[nodiscard]] std::size_t Drain() noexcept;
 
  private:
-  yaclib::detail::List _tasks;
+  detail::List _tasks;
 };
 
-IntrusivePtr<ManualExecutor> MakeManual();
+IExecutorPtr MakeManual();
 
 }  // namespace yaclib

@@ -5,14 +5,13 @@
 #include <yaclib/exe/executor.hpp>
 #include <yaclib/exe/inline.hpp>
 #include <yaclib/log.hpp>
-#include <yaclib/util/intrusive_ptr.hpp>
 #include <yaclib/util/ref.hpp>
-
-#include <yaclib_std/atomic>
 
 #if YACLIB_CORO != 0
 #  include <yaclib/coro/coro.hpp>
 #endif
+
+#include <yaclib_std/atomic>
 
 namespace yaclib::detail {
 

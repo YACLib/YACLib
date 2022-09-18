@@ -7,7 +7,7 @@
 
 using namespace std::chrono_literals;
 
-// TODO(myannyax): add better test mutexes not used in code
+// TODO(myannyax) add better test mutexes not used in code
 
 TEST(FiberSharedMutex, basic) {
   yaclib_std::shared_mutex m;

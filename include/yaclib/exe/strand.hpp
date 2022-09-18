@@ -1,8 +1,35 @@
 #pragma once
 
 #include <yaclib/exe/executor.hpp>
+#include <yaclib/exe/job.hpp>
+
+#include <yaclib_std/atomic>
 
 namespace yaclib {
+
+class Strand : private Job, public IExecutor {
+  // Inheritance from two IRef's, but that's okay, because they are pure virtual
+ public:
+  explicit Strand(IExecutorPtr e) noexcept;
+
+  ~Strand() noexcept override;
+
+  [[nodiscard]] Type Tag() const noexcept final;
+
+  [[nodiscard]] bool Alive() const noexcept final;
+
+  void Submit(Job& job) noexcept final;
+
+ private:
+  void Call() noexcept final;
+
+  void Drop() noexcept final;
+
+  Node* Mark() noexcept;
+
+  IExecutorPtr _executor;
+  yaclib_std::atomic<Node*> _jobs{Mark()};
+};
 
 /**
  * Strand is the asynchronous analogue of a mutex

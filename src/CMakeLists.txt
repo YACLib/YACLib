@@ -20,11 +20,12 @@ set(YACLIB_SOURCES
 
 add_subdirectory(algo)
 add_subdirectory(async)
-add_subdirectory(lazy)
 add_subdirectory(exe)
-add_subdirectory(util)
 add_subdirectory(fault)
+add_subdirectory(lazy)
+add_subdirectory(runtime)
 add_subdirectory(std)
+add_subdirectory(util)
 
 if (YACLIB_CORO_NEED)
   add_subdirectory(coro)

@@ -18,13 +18,13 @@ Inspired mainly by https://gitlab.com/Lipovsky/twist (mostly we rewrote it to ac
 
   So it should be able to work in any environment, for example you cannot replace all primitives for `yaclib_std::`
 
-* `YACLIB_FAULT=FIBER`: 
+* `YACLIB_FAULT=FIBER`:
 
   Single thread cooperative, deterministic execution, trying to be `::std` compatible.
 
   Using fiber instead of `std::thread` and cooperative primitives for it with our own fiber scheduler.
 
-* TODO Write about runtime configuration options
+* TODO(MBkkt) Write about runtime configuration options
 
 
 #### Advantages

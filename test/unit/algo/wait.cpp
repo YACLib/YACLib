@@ -8,7 +8,7 @@
 #include <yaclib/async/wait_for.hpp>
 #include <yaclib/async/wait_until.hpp>
 #include <yaclib/exe/submit.hpp>
-#include <yaclib/exe/thread_pool.hpp>
+#include <yaclib/runtime/fair_thread_pool.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 #include <yaclib/util/result.hpp>
 
@@ -35,12 +35,12 @@ enum class WaitPolicy {
 
 template <WaitPolicy policy>
 void TestJustWorks() {
-  auto tp = yaclib::MakeThreadPool(1);
+  yaclib::FairThreadPool tp{1};
   auto [f, p] = yaclib::MakeContract<>();
 
   test::util::StopWatch timer;
 
-  Submit(*tp, [p = std::move(p)]() mutable {
+  Submit(tp, [p = std::move(p)]() mutable {
     yaclib_std::this_thread::sleep_for(150ms * YACLIB_CI_SLOWDOWN);
     std::move(p).Set();
   });
@@ -58,8 +58,8 @@ void TestJustWorks() {
     EXPECT_LE(timer.Elapsed(), 100ms * YACLIB_CI_SLOWDOWN);
   }
 
-  tp->Stop();
-  tp->Wait();
+  tp.Stop();
+  tp.Wait();
 }
 
 TEST(Wait, Empty) {
@@ -92,11 +92,11 @@ TEST(WaitUntil, JustWorks) {
 template <WaitPolicy kPolicy>
 void TestMultiThreaded() {
   static constexpr int kThreads = 4;
-  auto tp = yaclib::MakeThreadPool(kThreads);
+  yaclib::FairThreadPool tp{kThreads};
   yaclib::FutureOn<int> fs[kThreads];
 
   for (int i = 0; i < kThreads; ++i) {
-    fs[i] = yaclib::Run(*tp, [i] {
+    fs[i] = yaclib::Run(tp, [i] {
       yaclib_std::this_thread::sleep_for(50ms * YACLIB_CI_SLOWDOWN);
       return i;
     });
@@ -122,8 +122,8 @@ void TestMultiThreaded() {
   for (int i = 0; i < kThreads; ++i) {
     EXPECT_EQ(std::move(fs[i]).Get().Value(), i);
   }
-  tp->Stop();
-  tp->Wait();
+  tp.Stop();
+  tp.Wait();
 }
 
 TEST(Wait, Multithreaded) {
@@ -144,8 +144,8 @@ template <WaitPolicy kPolicy>
 void TestHaveResults() {
   auto [f1, p1] = yaclib::MakeContract<>();
   auto [f2, p2] = yaclib::MakeContract<>();
-  auto tp = yaclib::MakeThreadPool(1);
-  Submit(*tp, [p1 = std::move(p1), p2 = std::move(p2)]() mutable {
+  yaclib::FairThreadPool tp{1};
+  Submit(tp, [p1 = std::move(p1), p2 = std::move(p2)]() mutable {
     std::move(p1).Set();
     std::move(p2).Set();
   });
@@ -160,6 +160,9 @@ void TestHaveResults() {
 
   EXPECT_TRUE(f1.Ready());
   EXPECT_TRUE(f2.Ready());
+
+  tp.HardStop();
+  tp.Wait();
 }
 
 TEST(Wait, HaveResults) {
@@ -176,11 +179,11 @@ TEST(WaitUntil, HaveResults) {
 
 TEST(WaitFor, Diff) {
   static constexpr int kThreads = 4;
-  auto tp = yaclib::MakeThreadPool(kThreads);
+  yaclib::FairThreadPool tp{kThreads};
   yaclib::FutureOn<int> fs[kThreads];
 
   for (int i = 0; i < kThreads; ++i) {
-    fs[i] = yaclib::Run(*tp, [i] {
+    fs[i] = yaclib::Run(tp, [i] {
       yaclib_std::this_thread::sleep_for(i * 50ms * YACLIB_CI_SLOWDOWN);
       return i;
     });
@@ -201,35 +204,35 @@ TEST(WaitFor, Diff) {
   for (int i = 0; i < kThreads; ++i) {
     EXPECT_EQ(std::move(fs[i]).Get().Value(), i);
   }
-  tp->Stop();
-  tp->Wait();
+  tp.Stop();
+  tp.Wait();
 }
 
 TEST(Wait, ResetWait) {
-  auto tp = yaclib::MakeThreadPool();
+  yaclib::FairThreadPool tp;
   std::vector<yaclib::FutureOn<size_t>> fs;
   fs.reserve(1000 * yaclib_std::thread::hardware_concurrency());
   for (size_t i = 0; i != 1000 * yaclib_std::thread::hardware_concurrency(); ++i) {
-    fs.push_back(yaclib::Run(*tp, [i] {
+    fs.push_back(yaclib::Run(tp, [i] {
       yaclib_std::this_thread::sleep_for(1ns);
       return i;
     }));
   }
   yaclib::WaitFor(0ns, fs.begin(), fs.end());
-  tp->HardStop();
-  tp->Wait();
+  tp.HardStop();
+  tp.Wait();
 }
 // silly test to pass codecov
 TEST(SillyTest, ForTouch) {
-  auto tp = yaclib::MakeThreadPool();
-  yaclib::FutureOn<int> fut = yaclib::Run(*tp, [] {
+  yaclib::FairThreadPool tp;
+  yaclib::FutureOn<int> fut = yaclib::Run(tp, [] {
     yaclib_std::this_thread::sleep_for(1ms);
     return 42;
   });
   yaclib::Wait(fut);
   EXPECT_EQ(std::move(fut).Touch().Ok(), 42);
 
-  fut = yaclib::Run(*tp, [] {
+  fut = yaclib::Run(tp, [] {
     yaclib_std::this_thread::sleep_for(1ms);
     return 42;
   });
@@ -237,6 +240,6 @@ TEST(SillyTest, ForTouch) {
   yaclib::Wait(fut);
   auto res = std::as_const(fut).Touch();
   EXPECT_EQ(std::move(res).Ok(), 42);
-  tp->HardStop();
-  tp->Wait();
+  tp.HardStop();
+  tp.Wait();
 }

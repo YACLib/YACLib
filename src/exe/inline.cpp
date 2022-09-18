@@ -5,15 +5,19 @@
 namespace yaclib {
 namespace {
 
-template <bool Stop>
+template <bool Stopped>
 class Inline final : public IExecutor {
  private:
   [[nodiscard]] Type Tag() const noexcept final {
     return Type::Inline;
   }
 
+  [[nodiscard]] bool Alive() const noexcept final {
+    return !Stopped;
+  }
+
   void Submit(Job& task) noexcept final {
-    if constexpr (Stop) {
+    if constexpr (Stopped) {
       task.Drop();
     } else {
       task.Call();
@@ -22,17 +26,17 @@ class Inline final : public IExecutor {
 };
 
 // TODO(MBkkt) Make file with depended globals
-static Inline<false> sAliveInline;
-static Inline<true> sStopInline;
+static Inline<false> sCallInline;
+static Inline<true> sDropInline;
 
 }  // namespace
 
 IExecutor& MakeInline() noexcept {
-  return sAliveInline;
+  return sCallInline;
 }
 
 IExecutor& MakeInline(StopTag) noexcept {
-  return sStopInline;
+  return sDropInline;
 }
 
 }  // namespace yaclib

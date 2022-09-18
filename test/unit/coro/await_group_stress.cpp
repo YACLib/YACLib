@@ -6,7 +6,7 @@
 #include <yaclib/coro/future.hpp>
 #include <yaclib/coro/on.hpp>
 #include <yaclib/exe/manual.hpp>
-#include <yaclib/exe/thread_pool.hpp>
+#include <yaclib/runtime/fair_thread_pool.hpp>
 
 #include <array>
 #include <exception>
@@ -21,7 +21,7 @@ namespace {
 
 using namespace std::chrono_literals;
 void Stress1(const std::size_t kWaiters, const std::size_t kWorkers, test::util::Duration dur) {
-  auto tp = yaclib::MakeThreadPool();
+  yaclib::FairThreadPool tp;
   util::StopWatch sw;
   while (sw.Elapsed() < dur) {
     yaclib::WaitGroup<> wg;
@@ -32,7 +32,7 @@ void Stress1(const std::size_t kWaiters, const std::size_t kWorkers, test::util:
     wg.Add(kWorkers);
 
     auto waiter = [&]() -> yaclib::Future<> {
-      co_await On(*tp);
+      co_await On(tp);
       co_await wg;
       waiters_done.fetch_add(1);
       co_return{};
@@ -44,7 +44,7 @@ void Stress1(const std::size_t kWaiters, const std::size_t kWorkers, test::util:
     }
 
     auto worker = [&]() -> yaclib::Future<> {
-      co_await On(*tp);
+      co_await On(tp);
       workers_done.fetch_add(1);
       wg.Done();
       co_return{};
@@ -60,8 +60,8 @@ void Stress1(const std::size_t kWaiters, const std::size_t kWorkers, test::util:
     EXPECT_EQ(waiters_done.load(), kWaiters);
     EXPECT_EQ(workers_done.load(), kWorkers);
   }
-  tp->HardStop();
-  tp->Wait();
+  tp.HardStop();
+  tp.Wait();
 }
 
 TEST(AwaitGroup, Stress1) {
@@ -118,7 +118,7 @@ class Goer {
 };
 
 void Stress2(util::Duration duration) {
-  auto scheduler = yaclib::MakeThreadPool(4);
+  yaclib::FairThreadPool tp{4};
 
   std::size_t iter = 0;
 
@@ -128,12 +128,12 @@ void Stress2(util::Duration duration) {
 
     bool done = false;
 
-    auto tester = [&scheduler, &done, iter]() -> yaclib::Future<> {
+    auto tester = [&tp, &done, iter]() -> yaclib::Future<> {
       const size_t steps = 1 + iter % 3;
 
       yaclib::WaitGroup<> wg;
 
-      Goer goer{*scheduler, wg};
+      Goer goer{tp, wg};
       goer.Start(steps);
 
       co_await wg;
@@ -149,8 +149,8 @@ void Stress2(util::Duration duration) {
 
     EXPECT_TRUE(done);
   }
-  scheduler->HardStop();
-  scheduler->Wait();
+  tp.HardStop();
+  tp.Wait();
 }
 
 TEST(AwaitGroup, Stress2) {

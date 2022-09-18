@@ -8,6 +8,9 @@
 
 namespace yaclib::detail {
 
+InlineCore& MakeEmpty() noexcept;
+InlineCore& MakeDrop() noexcept;
+
 class NoResultCore : public BaseCore {
  public:
   NoResultCore() noexcept : BaseCore{kEmpty} {
