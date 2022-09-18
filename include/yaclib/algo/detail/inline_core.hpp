@@ -22,10 +22,10 @@ class InlineCore : public Job {
 
 #if YACLIB_FINAL_SUSPEND_TRANSFER != 0
   // Compiler inline this call in tests
-  [[nodiscard]] virtual yaclib_std::coroutine_handle<> Next(BaseCore& caller) noexcept {  // LCOV_EXCL_LINE
-    YACLIB_PURE_VIRTUAL();                                                                // LCOV_EXCL_LINE
-    return {};                                                                            // LCOV_EXCL_LINE
-  }                                                                                       // LCOV_EXCL_LINE
+  [[nodiscard]] virtual yaclib_std::coroutine_handle<> Next(BaseCore& /*caller*/) noexcept {  // LCOV_EXCL_LINE
+    YACLIB_PURE_VIRTUAL();                                                                    // LCOV_EXCL_LINE
+    return {};                                                                                // LCOV_EXCL_LINE
+  }                                                                                           // LCOV_EXCL_LINE
 #endif
 };
 

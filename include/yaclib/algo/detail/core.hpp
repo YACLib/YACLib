@@ -17,6 +17,10 @@ class NoResultCore : public BaseCore {
   void Store(T&&) noexcept {
   }
 
+  [[nodiscard]] YACLIB_INLINE Callback& GetArgument() noexcept {
+    return _self;
+  }
+
   Callback _self;
 };
 
@@ -52,8 +56,9 @@ class Core : public ResultCoreT<Type, Ret, E> {
  private:
   void Tick() noexcept {
     if constexpr (Async) {
-      YACLIB_ASSERT(this->_self.unwrapping == 0);
-      this->_self.unwrapping = 1;
+      auto& argument = this->GetArgument();
+      YACLIB_ASSERT(argument.unwrapping == 0);
+      argument.unwrapping = 1;
     }
   }
 
@@ -62,7 +67,8 @@ class Core : public ResultCoreT<Type, Ret, E> {
     if constexpr (Type == CoreType::Run) {
       CallImpl(Unit{});
     } else {
-      auto& core = static_cast<ResultCore<Arg, E>&>(*this->_self.caller);
+      auto& argument = this->GetArgument();
+      auto& core = static_cast<ResultCore<Arg, E>&>(*argument.caller);
       CallImpl(std::move(core.Get()));
     }
   }
@@ -74,8 +80,9 @@ class Core : public ResultCoreT<Type, Ret, E> {
 
   void Here(BaseCore& caller) noexcept final {
     if constexpr (Async) {
-      if (this->_self.unwrapping++ != 0) {
-        YACLIB_ASSERT(this->_self.unwrapping == 2);
+      auto& argument = this->GetArgument();
+      if (argument.unwrapping++ != 0) {
+        YACLIB_ASSERT(argument.unwrapping == 2);
         auto& core = static_cast<ResultCore<Ret, E>&>(caller);
         Done(std::move(core.Get()));
         caller.DecRef();
@@ -113,7 +120,7 @@ class Core : public ResultCoreT<Type, Ret, E> {
 
   template <typename T>
   void Done(T&& value) noexcept {
-    auto* caller = this->_self.caller;
+    auto* caller = this->GetArgument().caller;
     this->Store(std::forward<T>(value));
     // TODO(MBkkt) What order is better here?
     // Now it's construct return object, then destroy and dealloc argument, and then destroy current callback functor
@@ -286,12 +293,12 @@ auto SetCallback(ResultCorePtr<Arg, E>& core, IExecutor* executor, Func&& f) {
   callback->_executor = executor;
   auto* caller = core.Release();
   if constexpr (CallbackT == CallbackType::Lazy) {
-    callback->_self.caller = caller;
+    callback->GetArgument().caller = caller;
     caller->StoreCallback(*callback, BaseCore::kCall);
   } else if constexpr (CallbackT == CallbackType::LazyInline) {
     caller->StoreCallback(*callback, BaseCore::kInline);
   } else if constexpr (CallbackT == CallbackType::On) {
-    callback->_self.caller = caller;
+    callback->GetArgument().caller = caller;
     caller->SetCall(*callback);
   } else {
     caller->SetInline(*callback);

@@ -22,27 +22,23 @@ class ResultCore : public BaseCore {
 
   template <typename... Args>
   explicit ResultCore(Args&&... args) noexcept(std::is_nothrow_constructible_v<Result<V, E>, Args&&...>)
-    : BaseCore{kResult}, _result{std::forward<Args>(args)...} {
-  }
-
-  ~ResultCore() noexcept override {
-    _result.~Result<V, E>();
+    : BaseCore{kResult}, _self{std::in_place_index_t<1>{}, std::forward<Args>(args)...} {
   }
 
   template <typename T>
   void Store(T&& object) noexcept(std::is_nothrow_constructible_v<Result<V, E>, T&&>) {
-    new (&_result) Result<V, E>{std::forward<T>(object)};
+    _self = Result<V, E>{std::forward<T>(object)};
   }
 
   [[nodiscard]] Result<V, E>& Get() noexcept {
-    return _result;
+    return std::get<1>(_self);
+  }
+  [[nodiscard]] YACLIB_INLINE Callback& GetArgument() noexcept {
+    return std::get<2>(_self);
   }
 
  public:
-  union {
-    Result<V, E> _result;
-    Callback _self;
-  };
+  std::variant<std::monostate, Result<V, E>, Callback> _self{std::monostate{}};
 };
 
 extern template class ResultCore<void, StopError>;
