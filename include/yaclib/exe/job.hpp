@@ -11,7 +11,8 @@ namespace yaclib {
  */
 class Job : public IFunc, public detail::Node {
  public:
-  virtual void Drop() noexcept {  // LCOV_EXCL_LINE  compiler remove this call from tests
+  // Compiler inline this call in tests
+  virtual void Drop() noexcept {  // LCOV_EXCL_LINE
     YACLIB_PURE_VIRTUAL();        // LCOV_EXCL_LINE
   }                               // LCOV_EXCL_LINE
 };

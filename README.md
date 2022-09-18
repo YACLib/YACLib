@@ -46,7 +46,7 @@ https://discord.gg/xy2fDKj8VZ)
     * [Lazy pipeline](#lazy-pipeline)
     * [Thread pool](#thread-pool)
     * [Strand, Serial executor](#strand-serial-executor)
-    * [AsyncMutex](#asyncmutex)
+    * [Mutex](#asyncmutex)
     * [Rescheduling](#rescheduling)
     * [WhenAll](#whenall)
     * [WhenAny](#whenany)
@@ -200,11 +200,11 @@ This is much more efficient than a mutex because
 
 And also the implementation of strand is lock-free and efficient, without additional allocations.
 
-#### AsyncMutex
+#### Mutex
 
 ```cpp
 auto tp = yaclib::MakeThreadPool(4);
-yaclib::AsyncMutex<> m;
+yaclib::Mutex<> m;
 
 size_t counter = 0;
 
@@ -224,7 +224,7 @@ for (size_t i = 0; i < 100; ++i) {
 First, this is the only correct mutex implementation for C++20 coroutines
 as far as I know (cppcoro, libunifex, folly::coro implement Unlock incorrectly, it serializes the code after Unlock)
 
-Second, `AsyncMutex` inherits all the `Strand` benefits.
+Second, `Mutex` inherits all the `Strand` benefits.
 
 #### Rescheduling
 

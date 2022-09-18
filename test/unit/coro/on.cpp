@@ -3,8 +3,10 @@
 
 #include <yaclib/async/run.hpp>
 #include <yaclib/coro/await.hpp>
+#include <yaclib/coro/current_executor.hpp>
 #include <yaclib/coro/future.hpp>
 #include <yaclib/coro/on.hpp>
+#include <yaclib/coro/yield.hpp>
 #include <yaclib/exe/strand.hpp>
 #include <yaclib/exe/thread_pool.hpp>
 
@@ -38,14 +40,17 @@ TEST(On, JustWorks) {
   tp->Wait();
 }
 
-// TODO(mkornaukhov03)
-// Bad test, TSAN fails
 TEST(On, ManyCoros) {
   auto main_thread = yaclib_std::this_thread::get_id();
   auto tp = yaclib::MakeThreadPool();
   yaclib_std::atomic_int32_t sum = 0;
   auto coro = [&](int a) -> yaclib::Future<> {
     co_await On(*tp);
+    co_await yaclib::kYield;
+    yaclib::IExecutor* current1 = &co_await yaclib::CurrentExecutor();
+    yaclib::IExecutor* current2 = &co_await yaclib::Yield();
+    EXPECT_EQ(current1, current2);
+    EXPECT_EQ(current1, tp);
     auto other_thread = yaclib_std::this_thread::get_id();
     EXPECT_NE(other_thread, main_thread);
     sum.fetch_add(a, std::memory_order_acquire);
@@ -172,6 +177,24 @@ TYPED_TEST(AsyncSuite, OnStopped) {
 
   EXPECT_TRUE(a);
   EXPECT_FALSE(b);
+}
+
+TYPED_TEST(AsyncSuite, Detach) {
+  auto tp = yaclib::MakeThreadPool(1);
+  int counter = 0;
+
+  auto coro = [&]() -> typename TestFixture::Type {
+    ++counter;
+    co_await On(*tp);
+    yaclib_std::this_thread::sleep_for(100ms);
+    ++counter;
+    co_return{};
+  };
+  coro().Detach();
+
+  tp->Stop();
+  tp->Wait();
+  EXPECT_EQ(counter, 2);
 }
 
 }  // namespace

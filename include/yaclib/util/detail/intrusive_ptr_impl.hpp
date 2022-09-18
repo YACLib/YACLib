@@ -21,15 +21,14 @@ IntrusivePtr<T>::IntrusivePtr(IntrusivePtr&& other) noexcept : _ptr{other._ptr} 
 }
 
 template <typename T>
-IntrusivePtr<T>::IntrusivePtr(const IntrusivePtr& other) noexcept : _ptr{other._ptr} {
-  if (_ptr) {
-    _ptr->IncRef();
-  }
+IntrusivePtr<T>::IntrusivePtr(const IntrusivePtr& other) noexcept : IntrusivePtr{other._ptr} {
 }
 
 template <typename T>
 IntrusivePtr<T>& IntrusivePtr<T>::operator=(T* other) noexcept {
-  IntrusivePtr{other}.Swap(*this);
+  if (_ptr != other) {
+    IntrusivePtr{other}.Swap(*this);
+  }
   return *this;
 }
 
@@ -41,8 +40,7 @@ IntrusivePtr<T>& IntrusivePtr<T>::operator=(IntrusivePtr&& other) noexcept {
 
 template <typename T>
 IntrusivePtr<T>& IntrusivePtr<T>::operator=(const IntrusivePtr& other) noexcept {
-  IntrusivePtr{other}.Swap(*this);
-  return *this;
+  return operator=(other._ptr);
 }
 
 template <typename T>
@@ -53,10 +51,7 @@ IntrusivePtr<T>::IntrusivePtr(IntrusivePtr<U>&& other) noexcept : _ptr{other._pt
 
 template <typename T>
 template <typename U>
-IntrusivePtr<T>::IntrusivePtr(const IntrusivePtr<U>& other) noexcept : _ptr{other._ptr} {
-  if (_ptr) {
-    _ptr->IncRef();
-  }
+IntrusivePtr<T>::IntrusivePtr(const IntrusivePtr<U>& other) noexcept : IntrusivePtr{other._ptr} {
 }
 
 template <typename T>
@@ -69,8 +64,7 @@ IntrusivePtr<T>& IntrusivePtr<T>::operator=(IntrusivePtr<U>&& other) noexcept {
 template <typename T>
 template <typename U>
 IntrusivePtr<T>& IntrusivePtr<T>::operator=(const IntrusivePtr<U>& other) noexcept {
-  IntrusivePtr{other}.Swap(*this);
-  return *this;
+  return operator=(other._ptr);
 }
 
 template <typename T>
@@ -99,19 +93,19 @@ IntrusivePtr<T>::operator bool() const noexcept {
 
 template <typename T>
 T& IntrusivePtr<T>::operator*() const noexcept {
-  YACLIB_DEBUG(_ptr == nullptr, "try to dereference null");
+  YACLIB_ASSERT(_ptr != nullptr);
   return *_ptr;
 }
 
 template <typename T>
 T* IntrusivePtr<T>::operator->() const noexcept {
-  YACLIB_DEBUG(_ptr == nullptr, "try to dereference null");
+  YACLIB_ASSERT(_ptr != nullptr);
   return _ptr;
 }
 
 template <typename T>
 void IntrusivePtr<T>::Swap(IntrusivePtr& other) noexcept {
-  auto ptr = _ptr;
+  auto* ptr = _ptr;
   _ptr = other._ptr;
   other._ptr = ptr;
 }

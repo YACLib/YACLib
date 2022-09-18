@@ -15,6 +15,20 @@
 namespace test {
 namespace {
 
+void CheckCall() {
+  auto [f, p] = yaclib::MakeContract();
+  auto& core = *p.GetCore();
+  core.Job::Call();
+}
+
+TEST(InlineCore, Call) {
+#ifndef YACLIB_LOG_DEBUG
+  CheckCall();
+#else
+  EXPECT_FATAL_FAILURE(CheckCall(), "");
+#endif
+}
+
 void CheckDrop() {
   auto [f, p] = yaclib::MakeContract();
   auto& core = *p.GetCore();
@@ -42,6 +56,38 @@ TEST(InlineCore, Here) {
   EXPECT_FATAL_FAILURE(CheckHere(), "");
 #endif
 }
+
+#if YACLIB_FINAL_SUSPEND_TRANSFER != 0
+void CheckNext() {
+  auto [f, p] = yaclib::MakeContract();
+  auto& core = *p.GetCore();
+  std::ignore = core.InlineCore::Next(core);
+}
+
+TEST(InlineCore, Next) {
+#  ifndef YACLIB_LOG_DEBUG
+  CheckNext();
+#  else
+  EXPECT_FATAL_FAILURE(CheckNext(), "");
+#  endif
+}
+#endif
+
+#if YACLIB_CORO != 0
+void CheckCurr() {
+  auto [f, p] = yaclib::MakeContract();
+  auto& core = *p.GetCore();
+  std::ignore = core.BaseCore::Curr();
+}
+
+TEST(BaseCore, Curr) {
+#  ifndef YACLIB_LOG_DEBUG
+  CheckCurr();
+#  else
+  EXPECT_FATAL_FAILURE(CheckCurr(), "");
+#  endif
+}
+#endif
 
 TEST(UniqueJob, Ref) {
   auto task = yaclib::detail::MakeUniqueJob([] {

@@ -7,7 +7,7 @@
 
 namespace yaclib::detail {
 
-class /*alignas(kCacheLineSize)*/ AtomicEvent {
+class AtomicEvent {
  public:
   using Token = Unit;
 

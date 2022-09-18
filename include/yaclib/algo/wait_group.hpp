@@ -134,21 +134,27 @@ class WaitGroup final {
 #if YACLIB_CORO != 0
   /**
    * TODO
-   *
-   * \param e TODO
-   * \return TODO
-   */
-  YACLIB_INLINE auto Await(IExecutor& e = CurrentThreadPool()) noexcept {
-    return _event.Await(e);
-  }
-
-  /**
-   * TODO
    */
   YACLIB_INLINE auto operator co_await() noexcept {
     return Await();
   }
 
+  /**
+   * TODO
+   */
+  YACLIB_INLINE auto Await() noexcept {
+    return _event.Await();
+  }
+
+  /**
+   * TODO
+   *
+   * \param e TODO
+   * \return TODO
+   */
+  YACLIB_INLINE auto AwaitOn(IExecutor& e) noexcept {
+    return _event.AwaitOn(e);
+  }
 #endif
 
   /**
@@ -205,16 +211,20 @@ class WaitGroup final {
     }
     const auto wait_count = range([&](detail::BaseCore& core) noexcept {
       if constexpr (NeedMove) {
-        return detail::Detach(core, _event);
+        if (core.SetCallback(_event.GetDrop(), detail::BaseCore::kInline)) {
+          return true;
+        }
+        core.DecRef();
+        return false;
       } else {
-        return core.SetCallback(_event, detail::BaseCore::kWaitNope);
+        return core.SetCallback(_event.GetCall(), detail::BaseCore::kInline);
       }
     });
     if (count != wait_count) {  // TODO(MBkkt) is it necessary?
       Done(count - wait_count);
     }
   }
-  detail::WaitEvent<Event, detail::AtomicCounter> _event;
+  detail::MultiEvent<Event, detail::AtomicCounter, detail::CallCallback, detail::DropCallback> _event;
 };
 
 extern template class WaitGroup<OneShotEvent>;

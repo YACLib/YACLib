@@ -5,7 +5,7 @@
 
 #include <cstdint>
 
-#if YACLIB_SYMMETRIC_TRANSFER != 0
+#if YACLIB_CORO != 0
 #  include <yaclib/coro/coro.hpp>
 #endif
 
@@ -15,18 +15,21 @@ class BaseCore;
 
 class InlineCore : public Job {
  public:
-#if YACLIB_SYMMETRIC_TRANSFER != 0
-  [[nodiscard]] virtual yaclib_std::coroutine_handle<> Next() noexcept {
-    Call();
-    return yaclib_std::noop_coroutine();
-  }
-#endif
-
-  virtual void Here(BaseCore& /*caller*/) noexcept {  // LCOV_EXCL_LINE  compiler remove this call from tests
+  // Compiler inline this call in tests
+  virtual void Here(BaseCore& /*caller*/) noexcept {  // LCOV_EXCL_LINE
     YACLIB_PURE_VIRTUAL();                            // LCOV_EXCL_LINE
   }                                                   // LCOV_EXCL_LINE
+
+#if YACLIB_FINAL_SUSPEND_TRANSFER != 0
+  // Compiler inline this call in tests
+  [[nodiscard]] virtual yaclib_std::coroutine_handle<> Next(BaseCore& caller) noexcept {  // LCOV_EXCL_LINE
+    YACLIB_PURE_VIRTUAL();                                                                // LCOV_EXCL_LINE
+    return {};                                                                            // LCOV_EXCL_LINE
+  }                                                                                       // LCOV_EXCL_LINE
+#endif
 };
 
-InlineCore& MakeEmpty();
+InlineCore& MakeEmpty() noexcept;
+InlineCore& MakeDrop() noexcept;
 
 }  // namespace yaclib::detail

@@ -24,6 +24,22 @@ TEST(Simple, Simple) {
   result = 5;
   EXPECT_EQ(result.State(), yaclib::ResultState::Value);
   EXPECT_EQ(std::move(result).Ok(), 5);
+  {
+    yaclib::Result<int> result2 = std::move(result);
+    yaclib::Result<int> result3 = result2;
+    result = std::move(result2);
+    result = result3;
+  }
+  {
+    yaclib::StopTag tag;
+    yaclib::StopError error{tag};
+    yaclib::Result<int> result2 = tag;
+    yaclib::Result<int> result3 = error;
+    yaclib::Result<int> result4 = std::move(tag);
+    yaclib::Result<int> result5 = std::move(error);
+    result2 = result3;
+    result4 = std::move(result2);
+  }
 }
 
 TEST(Simple, NotDefaultConstructible) {
@@ -65,48 +81,70 @@ TEST(State, Exception) {
 TEST(State, Value) {
   TestState(yaclib::ResultState::Value);
 }
-template <typename E = yaclib::StopError>
-void TestOk(yaclib::ResultState state) {
-  yaclib::Result<int, E> result;
+
+template <typename Result>
+void TestOk(Result&& result, yaclib::ResultState state) {
   EXPECT_EQ(result.State(), yaclib::ResultState::Empty);
   switch (state) {
     case yaclib::ResultState::Value: {
-      result = 1;
-      EXPECT_EQ(std::move(result).Ok(), 1);
+      result = "1";
+      EXPECT_EQ(std::forward<Result>(result).Ok(), "1");
     } break;
     case yaclib::ResultState::Error: {
       result = yaclib::StopTag{};
-      EXPECT_THROW(std::move(result).Ok(), yaclib::ResultError<E>);
+      EXPECT_THROW(std::forward<Result>(result).Ok(),
+                   yaclib::ResultError<yaclib::result_error_t<std::decay_t<Result>>>);
     } break;
     case yaclib::ResultState::Exception: {
       result = std::make_exception_ptr(std::runtime_error{""});
-      EXPECT_THROW(std::move(result).Ok(), std::runtime_error);
+      EXPECT_THROW(std::forward<Result>(result).Ok(), std::runtime_error);
     } break;
     case yaclib::ResultState::Empty: {
-      EXPECT_THROW(std::move(result).Ok(), yaclib::ResultEmpty);
+      EXPECT_THROW(std::forward<Result>(result).Ok(), yaclib::ResultEmpty);
     } break;
   }
   EXPECT_EQ(result.State(), state);
+  result = {};
 }
 
 TEST(Ok, Value) {
-  TestOk(yaclib::ResultState::Value);
-  TestOk<LikeErrorCode>(yaclib::ResultState::Value);
+  yaclib::Result<std::string> r1;
+  TestOk(r1, yaclib::ResultState::Value);
+  TestOk(std::move(r1), yaclib::ResultState::Value);
+
+  yaclib::Result<std::string, LikeErrorCode> r2;
+  TestOk(r2, yaclib::ResultState::Value);
+  TestOk(std::move(r2), yaclib::ResultState::Value);
 }
 
 TEST(Ok, Error) {
-  TestOk(yaclib::ResultState::Error);
-  TestOk<LikeErrorCode>(yaclib::ResultState::Error);
+  yaclib::Result<std::string> r1;
+  TestOk(r1, yaclib::ResultState::Error);
+  TestOk(std::move(r1), yaclib::ResultState::Error);
+
+  yaclib::Result<std::string, LikeErrorCode> r2;
+  TestOk(r2, yaclib::ResultState::Error);
+  TestOk(std::move(r2), yaclib::ResultState::Error);
 }
 
 TEST(Ok, Exception) {
-  TestOk(yaclib::ResultState::Exception);
-  TestOk<LikeErrorCode>(yaclib::ResultState::Exception);
+  yaclib::Result<std::string> r1;
+  TestOk(r1, yaclib::ResultState::Exception);
+  TestOk(std::move(r1), yaclib::ResultState::Exception);
+
+  yaclib::Result<std::string, LikeErrorCode> r2;
+  TestOk(r2, yaclib::ResultState::Exception);
+  TestOk(std::move(r2), yaclib::ResultState::Exception);
 }
 
 TEST(Ok, Empty) {
-  TestOk(yaclib::ResultState::Empty);
-  TestOk<LikeErrorCode>(yaclib::ResultState::Empty);
+  yaclib::Result<std::string> r1;
+  TestOk(r1, yaclib::ResultState::Empty);
+  TestOk(std::move(r1), yaclib::ResultState::Empty);
+
+  yaclib::Result<std::string, LikeErrorCode> r2;
+  TestOk(r2, yaclib::ResultState::Empty);
+  TestOk(std::move(r2), yaclib::ResultState::Empty);
 }
 
 }  // namespace

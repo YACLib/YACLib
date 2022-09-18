@@ -207,6 +207,55 @@ TEST(JustWorks, Promise) {
   tp->Wait();
 }
 
+TEST(Future, VoidParameter) {
+  int called = 0;
+  auto f = yaclib::Run(yaclib::MakeInline(),
+                       [&] {
+                         ++called;
+                       })
+             .ThenInline([&] {
+               ++called;
+             })
+             .Then([&] {
+               ++called;
+             });
+  EXPECT_EQ(called, 3);
+}
+
+TEST(Future, UnitParameter) {
+  int called = 0;
+  auto f = yaclib::Run(yaclib::MakeInline(),
+                       [&](yaclib::Unit) {
+                         ++called;
+                       })
+             .ThenInline([&](yaclib::Unit) {
+               ++called;
+             })
+             .Then([&](yaclib::Unit) {
+               ++called;
+             });
+  EXPECT_EQ(called, 3);
+}
+
+TEST(Future, AutoParameter) {
+  int called = 0;
+  auto f = yaclib::Run(yaclib::MakeInline(),
+                       [&](auto&& v) {
+                         if constexpr (std::is_same_v<decltype(v), yaclib::Unit&&>) {
+                           ++called;
+                         }
+                       })
+             .ThenInline([&](auto&& v) {
+               std::ignore = v.Ok();
+               ++called;
+             })
+             .Then([&](auto&& v) {
+               std::ignore = v.Ok();
+               ++called;
+             });
+  EXPECT_EQ(called, 3);
+}
+
 TEST(Detach, AsyncSimple) {
   auto tp = yaclib::MakeThreadPool(1);
 

@@ -69,8 +69,8 @@ TEST(Core, EmptySizeof) {
                                                                   0));
   std::cerr << sizeof(*core) << std::endl;
 
-  core->StoreCallback(yaclib::detail::MakeEmpty(), yaclib::detail::BaseCore::kWaitDrop);
-  core->Drop();
+  core->StoreCallback(yaclib::detail::MakeDrop(), yaclib::detail::BaseCore::kInline);
+  static_cast<yaclib::Job*>(core)->Drop();
 }
 
 TEST(Core, Sizeof) {
@@ -81,8 +81,8 @@ TEST(Core, Sizeof) {
                                                                   0));
   std::cerr << sizeof(*core) << std::endl;
 
-  core->StoreCallback(yaclib::detail::MakeEmpty(), yaclib::detail::BaseCore::kWaitDrop);
-  core->Drop();
+  core->StoreCallback(yaclib::detail::MakeDrop(), yaclib::detail::BaseCore::kInline);
+  static_cast<yaclib::Job*>(core)->Drop();
 }
 
 }  // namespace

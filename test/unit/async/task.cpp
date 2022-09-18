@@ -85,13 +85,17 @@ TEST(Task, Cancel) {
                            .Then(*tp, [&] {
                              called += 3;
                            });
+
   EXPECT_TRUE(task1.Valid());
   std::move(task1).Cancel();
   EXPECT_FALSE(task1.Valid());
+  EXPECT_EQ(called, 0);
+
   EXPECT_TRUE(task2.Valid());
   std::move(task2).Cancel();
   EXPECT_FALSE(task2.Valid());
   EXPECT_EQ(called, 0);
+
   tp->Stop();
   tp->Wait();
   EXPECT_EQ(called, 0);

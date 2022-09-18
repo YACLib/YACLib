@@ -19,7 +19,8 @@ struct Destroy final {
 
   template <typename Promise>
   YACLIB_INLINE auto await_suspend(yaclib_std::coroutine_handle<Promise> handle) const noexcept {
-    return handle.promise().template SetResult<YACLIB_FINAL_SUSPEND_TRANSFER != 0>();
+    auto& promise = handle.promise();
+    return promise.template SetResult<YACLIB_FINAL_SUSPEND_TRANSFER != 0>();
   }
 
   constexpr void await_resume() const noexcept {
@@ -86,7 +87,7 @@ class PromiseType final : public OneCounter<ResultCore<V, E>, PromiseTypeDeleter
   }
 
   void Call() noexcept final {
-    auto next = Next();
+    auto next = Curr();
     next.resume();
   }
 
@@ -95,13 +96,23 @@ class PromiseType final : public OneCounter<ResultCore<V, E>, PromiseTypeDeleter
     this->template SetResult<false>();
   }
 
-#if YACLIB_SYMMETRIC_TRANSFER != 0
-  [[nodiscard]] yaclib_std::coroutine_handle<> Next() noexcept final {
+  void Here(BaseCore& caller) noexcept final {
+    this->_executor = std::move(caller._executor);
+    Call();
+  }
+
+#if YACLIB_FINAL_SUSPEND_TRANSFER != 0
+  [[nodiscard]] yaclib_std::coroutine_handle<> Next(BaseCore& caller) noexcept final {
+    this->_executor = std::move(caller._executor);
+    return Curr();
+  }
+#endif
+
+  [[nodiscard]] yaclib_std::coroutine_handle<> Curr() noexcept final {
     auto handle = Handle();
     YACLIB_ASSERT(!handle.done());
     return handle;
   }
-#endif
 };
 
 template <bool Lazy>

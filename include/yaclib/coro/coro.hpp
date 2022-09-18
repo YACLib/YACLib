@@ -12,7 +12,7 @@ using std::coroutine_traits;
 using std::suspend_always;
 using std::suspend_never;
 
-#  if YACLIB_SYMMETRIC_TRANSFER == 1
+#  if YACLIB_SYMMETRIC_TRANSFER != 0
 using std::noop_coroutine;
 #  endif
 
@@ -27,35 +27,30 @@ using std::experimental::coroutine_traits;
 using std::experimental::suspend_always;
 using std::experimental::suspend_never;
 
-#  if YACLIB_SYMMETRIC_TRANSFER == 1
+#  if YACLIB_SYMMETRIC_TRANSFER != 0
 using std::experimental::noop_coroutine;
 #  endif
+
 }  // namespace yaclib_std
 #else
 #  error "Don't have coroutine header"
 #endif
 
-#if YACLIB_SYMMETRIC_TRANSFER == 1
-namespace yaclib_std {
-
-using suspend_type = yaclib_std::coroutine_handle<>;
-
-}  // namespace yaclib_std
-
+#if YACLIB_SYMMETRIC_TRANSFER != 0
 #  define YACLIB_TRANSFER(handle)                                                                                      \
-    return yaclib_std::suspend_type {                                                                                  \
+    return yaclib_std::coroutine_handle<> {                                                                            \
       handle                                                                                                           \
     }
 #  define YACLIB_RESUME(handle) YACLIB_TRANSFER(handle)
 #  define YACLIB_SUSPEND() YACLIB_TRANSFER(yaclib_std::noop_coroutine())
-
 #else
 namespace yaclib_std {
 
-using suspend_type = bool;
+constexpr yaclib_std::coroutine_handle<> noop_coroutine() noexcept {
+  return {};
+}
 
 }  // namespace yaclib_std
-
 #  define YACLIB_TRANSFER(handle)                                                                                      \
     handle.resume();                                                                                                   \
     return true

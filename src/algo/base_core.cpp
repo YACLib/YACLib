@@ -1,7 +1,6 @@
 #include <yaclib/algo/detail/base_core.hpp>
 #include <yaclib/algo/detail/inline_core.hpp>
 #include <yaclib/exe/executor.hpp>
-#include <yaclib/exe/job.hpp>
 #include <yaclib/log.hpp>
 
 namespace yaclib::detail {
@@ -10,14 +9,32 @@ class Empty final : public InlineCore {};
 
 static Empty kEmptyCore;
 
-InlineCore& MakeEmpty() {
+InlineCore& MakeEmpty() noexcept {
   return kEmptyCore;
+}
+
+class Drop final : public InlineCore {
+  void Here(BaseCore& caller) noexcept final {
+    caller.DecRef();
+  }
+
+#if YACLIB_FINAL_SUSPEND_TRANSFER != 0
+  [[nodiscard]] yaclib_std::coroutine_handle<> Next(BaseCore& caller) noexcept final {
+    Here(caller);
+    return yaclib_std::noop_coroutine();
+  }
+#endif
+};
+
+static Drop kDropCore;
+
+InlineCore& MakeDrop() noexcept {
+  return kDropCore;
 }
 
 void BaseCore::SetInline(InlineCore& callback) noexcept {
   if (!SetCallback(callback, BaseCore::kInline)) {
     callback.Here(*this);
-    DecRef();
   }
 }
 
@@ -28,7 +45,7 @@ void BaseCore::SetCall(BaseCore& callback) noexcept {
 }
 
 bool BaseCore::Reset() noexcept {
-  std::uint64_t expected = _callback.load(std::memory_order_relaxed);
+  auto expected = _callback.load(std::memory_order_relaxed);
   return expected != kResult && _callback.compare_exchange_strong(expected, kEmpty, std::memory_order_relaxed);
 }
 
@@ -48,22 +65,15 @@ BaseCore::ReturnT<SymmetricTransfer> BaseCore::SetResult() noexcept {
   auto* const callback = reinterpret_cast<InlineCore*>(expected & ~kMask);
   YACLIB_ASSERT(state == kEmpty || callback != nullptr);
   switch (state) {
-    case kWaitDrop:
-      DecRef();
-      [[fallthrough]];
-    case kWaitNope:
+    case kInline:
 #if YACLIB_FINAL_SUSPEND_TRANSFER != 0
       if constexpr (SymmetricTransfer) {
-        return callback->Next();
+        return callback->Next(*this);
       } else
 #endif
       {
-        callback->Call();
+        callback->Here(*this);
       }
-      break;
-    case kInline:
-      callback->Here(*this);
-      DecRef();
       break;
     case kCall:
       Submit(static_cast<BaseCore&>(*callback));

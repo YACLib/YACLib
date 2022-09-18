@@ -3,8 +3,11 @@
 
 #include <yaclib/async/make.hpp>
 #include <yaclib/async/run.hpp>
+#include <yaclib/async/when_all.hpp>
+#include <yaclib/async/when_any.hpp>
 #include <yaclib/coro/await.hpp>
 #include <yaclib/coro/future.hpp>
+#include <yaclib/coro/on.hpp>
 #include <yaclib/coro/task.hpp>
 #include <yaclib/exe/thread_pool.hpp>
 
@@ -123,6 +126,53 @@ TYPED_TEST(AsyncSuite, AwaitNoSuspend) {
     EXPECT_EQ(0, counter);
   }
   std::ignore = std::move(outer_future).Get();
+}
+
+TYPED_TEST(AsyncSuite, CheckCallback) {
+  int counter = 0;
+
+  auto coro = [&]() -> typename TestFixture::Type {
+    ++counter;
+    co_return{};
+  };
+  std::ignore = coro()
+                  .ThenInline([&] {
+                    ++counter;
+                  })
+                  .Get()
+                  .Ok();
+  EXPECT_EQ(counter, 2);
+}
+
+TEST(CoroFuture, WhenAll) {
+  auto tp = yaclib::MakeThreadPool(1);
+  yaclib_std::atomic_int counter = 0;
+  auto coro = [&]() -> yaclib::Future<int> {
+    co_await On(*tp);
+    yaclib_std::this_thread::sleep_for(10ms);
+    co_return counter.fetch_add(1);
+  };
+  auto f = yaclib::WhenAll(coro(), coro());
+  auto results = std::move(f).Get().Ok();
+  std::vector<int> expected{0, 1};
+  EXPECT_EQ(results, expected);
+  tp->HardStop();
+  tp->Wait();
+}
+
+TEST(CoroFuture, WhenAny) {
+  auto tp = yaclib::MakeThreadPool(1);
+  yaclib_std::atomic_int counter = 0;
+  auto coro = [&]() -> yaclib::Future<int> {
+    co_await On(*tp);
+    yaclib_std::this_thread::sleep_for(10ms);
+    co_return counter.fetch_add(1);
+  };
+  auto f = yaclib::WhenAny(coro(), coro());
+  auto result = std::move(f).Get().Ok();
+  EXPECT_EQ(result, 0);
+  tp->HardStop();
+  tp->Wait();
 }
 
 }  // namespace

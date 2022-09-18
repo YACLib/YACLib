@@ -47,6 +47,8 @@ if (CORO IN_LIST YACLIB_FLAGS)
   include(yaclib_coro)
 endif ()
 
+set(YACLIB_FUTEX 0) # TODO Fucking atomic::wait bugged
+#[[
 if (DISABLE_FUTEX IN_LIST YACLIB_FLAGS)
   set(YACLIB_FUTEX 0)
 elseif (DISABLE_UNSAFE_FUTEX IN_LIST YACLIB_FLAGS OR YACLIB_FAULT STREQUAL "FIBER")
@@ -56,6 +58,7 @@ else ()
   # It's safe if we need only address for notify
   set(YACLIB_FUTEX 2)
 endif ()
+]]
 
 if (DISABLE_SYMMETRIC_TRANSFER IN_LIST YACLIB_FLAGS)
   set(YACLIB_SYMMETRIC_TRANSFER 0)

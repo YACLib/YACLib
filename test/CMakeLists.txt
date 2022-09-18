@@ -21,10 +21,12 @@ if (NOT GTEST_FOUND)
 endif ()
 
 set(TEST_UTIL_INCLUDES
+  util/async_suite.hpp
   util/cpu_time.hpp
-  util/error_suite.hpp
-  util/inline_helper.hpp
   util/error_code.hpp
+  util/error_suite.hpp
+  util/helpers.hpp
+  util/inline_helper.hpp
   util/time.hpp
   )
 set(TEST_UTIL_SOURCES

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <yaclib/algo/detail/inline_core.hpp>
+#include <yaclib/config.hpp>
 #include <yaclib/exe/executor.hpp>
 #include <yaclib/exe/inline.hpp>
 #include <yaclib/log.hpp>
@@ -9,20 +10,22 @@
 
 #include <yaclib_std/atomic>
 
+#if YACLIB_CORO != 0
+#  include <yaclib/coro/coro.hpp>
+#endif
+
 namespace yaclib::detail {
 
 class BaseCore : public InlineCore {
-  static constexpr std::uint64_t kShift = 61;
+  static constexpr std::uint64_t kShift = 62;
 
  public:
   enum State : std::uint64_t {  // clang-format off
-    kEmpty    = std::uint64_t{0} << kShift,
-    kResult   = std::uint64_t{1} << kShift,
-    kWaitDrop = std::uint64_t{2} << kShift,
-    kWaitNope = std::uint64_t{3} << kShift,
-    kInline   = std::uint64_t{4} << kShift,
-    kCall     = std::uint64_t{5} << kShift,
-    kMask     = std::uint64_t{7} << kShift,
+    kEmpty  = std::uint64_t{0} << kShift,
+    kResult = std::uint64_t{1} << kShift,
+    kInline = std::uint64_t{2} << kShift,
+    kCall   = std::uint64_t{3} << kShift,
+    kMask   = std::uint64_t{3} << kShift,
   };  // clang-format on
 
   [[nodiscard]] bool Empty() const noexcept;
@@ -46,6 +49,14 @@ class BaseCore : public InlineCore {
 
   template <bool SymmetricTransfer>
   ReturnT<SymmetricTransfer> SetResult() noexcept;
+
+#if YACLIB_CORO != 0
+  // Compiler inline this call in tests
+  [[nodiscard]] virtual yaclib_std::coroutine_handle<> Curr() noexcept {  // LCOV_EXCL_LINE
+    YACLIB_PURE_VIRTUAL();                                                // LCOV_EXCL_LINE
+    return {};                                                            // LCOV_EXCL_LINE
+  }                                                                       // LCOV_EXCL_LINE
+#endif
 
  protected:
   explicit BaseCore(State callback) noexcept;
