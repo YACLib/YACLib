@@ -1,7 +1,6 @@
 #pragma once
 
 #include <yaclib/algo/detail/base_core.hpp>
-#include <yaclib/algo/detail/inline_core.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 #include <yaclib/util/result.hpp>
 
@@ -49,8 +48,5 @@ extern template class ResultCore<void, StopError>;
 
 template <typename V, typename E>
 using ResultCorePtr = IntrusivePtr<ResultCore<V, E>>;
-
-template <typename V, typename E>
-class DoneCore : ResultCore<V, E> {};
 
 }  // namespace yaclib::detail

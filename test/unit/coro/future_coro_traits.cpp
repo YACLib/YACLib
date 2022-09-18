@@ -3,12 +3,12 @@
 #include <yaclib/async/run.hpp>
 #include <yaclib/coro/await.hpp>
 #include <yaclib/coro/future.hpp>
-#include <yaclib/exe/thread_pool.hpp>
 
 #include <exception>
 #include <stack>
 #include <utility>
 #include <vector>
+#include <yaclib_std/thread>
 
 #include <gtest/gtest.h>
 

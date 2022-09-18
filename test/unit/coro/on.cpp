@@ -8,7 +8,7 @@
 #include <yaclib/coro/on.hpp>
 #include <yaclib/coro/yield.hpp>
 #include <yaclib/exe/strand.hpp>
-#include <yaclib/exe/thread_pool.hpp>
+#include <yaclib/runtime/fair_thread_pool.hpp>
 
 #include <array>
 #include <exception>
@@ -27,30 +27,30 @@ using namespace std::chrono_literals;
 TEST(On, JustWorks) {
   auto main_thread = yaclib_std::this_thread::get_id();
 
-  auto tp = yaclib::MakeThreadPool();
+  yaclib::FairThreadPool tp;
   auto coro = [&]() -> yaclib::Future<> {
-    co_await On(*tp);
+    co_await On(tp);
     auto other_thread = yaclib_std::this_thread::get_id();
     EXPECT_NE(other_thread, main_thread);
     co_return{};
   };
   auto f = coro();
   std::ignore = std::move(f).Get();
-  tp->HardStop();
-  tp->Wait();
+  tp.HardStop();
+  tp.Wait();
 }
 
 TEST(On, ManyCoros) {
   auto main_thread = yaclib_std::this_thread::get_id();
-  auto tp = yaclib::MakeThreadPool();
+  yaclib::FairThreadPool tp;
   yaclib_std::atomic_int32_t sum = 0;
   auto coro = [&](int a) -> yaclib::Future<> {
-    co_await On(*tp);
+    co_await On(tp);
     co_await yaclib::kYield;
     yaclib::IExecutor* current1 = &co_await yaclib::CurrentExecutor();
     yaclib::IExecutor* current2 = &co_await yaclib::Yield();
     EXPECT_EQ(current1, current2);
-    EXPECT_EQ(current1, tp);
+    EXPECT_EQ(current1, &tp);
     auto other_thread = yaclib_std::this_thread::get_id();
     EXPECT_NE(other_thread, main_thread);
     sum.fetch_add(a, std::memory_order_acquire);
@@ -73,22 +73,22 @@ TEST(On, ManyCoros) {
 
   EXPECT_EQ((0 + 9) * 10 / 2, sum.fetch_add(0, std::memory_order_relaxed));
 
-  tp->HardStop();
-  tp->Wait();
+  tp.HardStop();
+  tp.Wait();
 }
 
 // TODO(mkornaukhov03) Bad test, tasks are not submitted in thread pool
 TEST(On, Drop) {
   using namespace std::chrono_literals;
-  auto tp = yaclib::MakeThreadPool(1);
-  tp->Stop();
-  tp->Wait();
+  yaclib::FairThreadPool tp{1};
+  tp.Stop();
+  tp.Wait();
 
   yaclib_std::atomic_size_t sum = 0;
 
   auto main_thread = yaclib_std::this_thread::get_id();
   auto coro = [&](std::size_t a) -> yaclib::Future<> {
-    co_await On(*tp);
+    co_await On(tp);
     auto curr_thread = yaclib_std::this_thread::get_id();
     EXPECT_NE(curr_thread, main_thread);
     sum.fetch_add(a, std::memory_order_relaxed);
@@ -114,8 +114,8 @@ TEST(On, LockWithStrand) {
 #endif
   const std::size_t kThreads = std::max(3U, yaclib_std::thread::hardware_concurrency() / 2) - 1;
 
-  auto tp = yaclib::MakeThreadPool(kThreads);
-  auto strand = yaclib::MakeStrand(tp);
+  yaclib::FairThreadPool tp{kThreads};
+  auto strand = yaclib::MakeStrand(&tp);
 
   std::size_t sum = 0;
   yaclib_std::atomic_bool end = true;
@@ -126,12 +126,12 @@ TEST(On, LockWithStrand) {
     co_await On(thread);  //  unlock
     co_return{};
   };
-  auto add_value = [&, t = tp](size_t increments) -> yaclib::Future<> {
-    co_await On(*t);  // schedule to thread pool
+  auto add_value = [&](size_t increments) -> yaclib::Future<> {
+    co_await On(tp);  // schedule to thread pool
     std::vector<yaclib::Future<>> vec;
     vec.reserve(increments);
     for (size_t i = 0; i != increments; ++i) {
-      vec.push_back(inc(*t));
+      vec.push_back(inc(tp));
     }
     co_await Await(vec.begin(), vec.size());
     co_return{};
@@ -153,8 +153,8 @@ TEST(On, LockWithStrand) {
   while (!end.load(std::memory_order_acquire)) {
     yaclib_std::this_thread::yield();
   }
-  tp->Stop();
-  tp->Wait();
+  tp.Stop();
+  tp.Wait();
   std::cerr << "min: " << kThreads * kIncrements << " | sum: " << sum << " | max " << 2 * kThreads * kIncrements
             << std::endl;
   ASSERT_GT(sum, kThreads * kIncrements);
@@ -180,20 +180,20 @@ TYPED_TEST(AsyncSuite, OnStopped) {
 }
 
 TYPED_TEST(AsyncSuite, Detach) {
-  auto tp = yaclib::MakeThreadPool(1);
+  yaclib::FairThreadPool tp{1};
   int counter = 0;
 
   auto coro = [&]() -> typename TestFixture::Type {
     ++counter;
-    co_await On(*tp);
+    co_await On(tp);
     yaclib_std::this_thread::sleep_for(100ms);
     ++counter;
     co_return{};
   };
   coro().Detach();
 
-  tp->Stop();
-  tp->Wait();
+  tp.Stop();
+  tp.Wait();
   EXPECT_EQ(counter, 2);
 }
 

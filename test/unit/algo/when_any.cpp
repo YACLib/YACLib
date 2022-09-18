@@ -4,7 +4,7 @@
 #include <yaclib/async/promise.hpp>
 #include <yaclib/async/run.hpp>
 #include <yaclib/async/when_any.hpp>
-#include <yaclib/exe/thread_pool.hpp>
+#include <yaclib/runtime/fair_thread_pool.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 #include <yaclib/util/result.hpp>
 
@@ -156,10 +156,10 @@ template <Result R, Container C, yaclib::WhenPolicy P, typename V>
 void MultiThreaded() {
   static constexpr bool kIsVoid = std::is_void_v<V>;
 
-  auto tp = yaclib::MakeThreadPool();
+  yaclib::FairThreadPool tp;
 
-  auto async_value = [tp](int value) {
-    return Run(*tp, [value] {
+  auto async_value = [&tp](int value) {
+    return Run(tp, [value] {
       yaclib_std::this_thread::sleep_for(100ms * YACLIB_CI_SLOWDOWN);
       if constexpr (kIsVoid) {
         std::ignore = value;
@@ -195,8 +195,8 @@ void MultiThreaded() {
     EXPECT_TRUE(kOuts.find(result) != kOuts.end());
   }
 
-  tp->HardStop();
-  tp->Wait();
+  tp.HardStop();
+  tp.Wait();
 }
 
 template <Result R, Container C, yaclib::WhenPolicy P, typename V>
@@ -204,10 +204,10 @@ void TimeTest() {
   using Duration = std::chrono::nanoseconds;
   static constexpr bool is_void = std::is_void_v<V>;
 
-  auto tp = yaclib::MakeThreadPool();
+  yaclib::FairThreadPool tp;
 
-  auto async_value = [tp](int value, Duration d) {
-    return Run(*tp, [value, d] {
+  auto async_value = [&tp](int value, Duration d) {
+    return Run(tp, [value, d] {
       yaclib_std::this_thread::sleep_for(d * YACLIB_CI_SLOWDOWN);
       if constexpr (!is_void) {
         return value;
@@ -242,8 +242,8 @@ void TimeTest() {
     EXPECT_EQ(result, 5);
   }
 
-  tp->HardStop();
-  tp->Wait();
+  tp.HardStop();
+  tp.Wait();
 }
 
 std::string ToString(Result c) {

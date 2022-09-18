@@ -9,7 +9,7 @@
 #include <yaclib/async/run.hpp>
 #include <yaclib/exe/manual.hpp>
 #include <yaclib/exe/submit.hpp>
-#include <yaclib/exe/thread_pool.hpp>
+#include <yaclib/runtime/fair_thread_pool.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 #include <yaclib/util/result.hpp>
 
@@ -81,20 +81,20 @@ TEST(DetachInline, ErrorSimple) {
 
 template <bool Inline>
 void AsyncSimple() {
-  auto tp = yaclib::MakeThreadPool(1);
+  yaclib::FairThreadPool tp{1};
   auto [f, p] = yaclib::MakeContract<std::string>();
   bool called = false;
   InlineDetach<Inline>(std::move(f), [&](yaclib::Result<std::string> r) {
-    EXPECT_EQ(&yaclib::CurrentThreadPool(), tp);
+    // EXPECT_EQ(&yaclib::CurrentThreadPool(), tp);
     EXPECT_EQ(std::move(r).Ok(), "Hello!");
     called = true;
   });
   EXPECT_FALSE(called);
-  Submit(*tp, [p = std::move(p)]() mutable {
+  Submit(tp, [p = std::move(p)]() mutable {
     std::move(p).Set("Hello!");
   });
-  tp->Stop();
-  tp->Wait();
+  tp.Stop();
+  tp.Wait();
   EXPECT_TRUE(called);
 }
 
@@ -272,8 +272,12 @@ class StopSource final : public yaclib::IExecutor {
     return Type::Custom;
   }
 
+  [[nodiscard]] bool Alive() const noexcept final {
+    return !_stop.load(std::memory_order_relaxed);
+  }
+
   void Submit(yaclib::Job& job) noexcept final {
-    if (!_stop.load(std::memory_order_relaxed)) {
+    if (Alive()) {
       _executor.Submit(job);
     } else {
       job.Drop();
@@ -290,22 +294,22 @@ class StopSource final : public yaclib::IExecutor {
 };
 
 TYPED_TEST(AsyncSuite, Stop) {
-  auto tp = yaclib::MakeThreadPool(1);
-  StopSource source{*tp};
+  yaclib::FairThreadPool tp{1};
+  StopSource source{tp};
   source.Stop();
   bool ready = false;
   INVOKE(source, [&] {
     ready = true;
   }).Detach();
   EXPECT_FALSE(ready);
-  tp->Stop();
-  tp->Wait();
+  tp.Stop();
+  tp.Wait();
 }
 
 template <typename TestFixture, bool Inline>
 void ThenInlineStopped() {
-  auto e = yaclib::MakeManual();
-  StopSource source{*e};
+  auto manual = yaclib::MakeManual();
+  StopSource source{*manual};
   size_t ready = 0;
   auto inc = [&] {
     ++ready;
@@ -321,7 +325,7 @@ void ThenInlineStopped() {
   }();
   InlineThen<Inline>(std::move(f2), inc).Detach();
   source.Stop();
-  EXPECT_EQ(e->Drain(), 1);
+  EXPECT_EQ(static_cast<yaclib::ManualExecutor&>(*manual).Drain(), 1);
   EXPECT_EQ(ready, 2);
 }
 

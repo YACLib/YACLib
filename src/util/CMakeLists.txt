@@ -5,6 +5,7 @@ list(APPEND YACLIB_INCLUDES
   ${YACLIB_INCLUDE_DIR}/util/ref.hpp
   ${YACLIB_INCLUDE_DIR}/util/result.hpp
   ${YACLIB_INCLUDE_DIR}/util/type_traits.hpp
+  ${YACLIB_INCLUDE_DIR}/util/detail/intrusive_list.hpp
   )
 list(APPEND YACLIB_HEADERS
   ${YACLIB_INCLUDE_DIR}/util/detail/atomic_counter.hpp
@@ -19,7 +20,6 @@ list(APPEND YACLIB_HEADERS
   ${YACLIB_INCLUDE_DIR}/util/detail/shared_func.hpp
   ${YACLIB_INCLUDE_DIR}/util/detail/type_traits_impl.hpp
   ${YACLIB_INCLUDE_DIR}/util/detail/unique_counter.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/intrusive_list.hpp
   )
 list(APPEND YACLIB_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/intrusive_list.cpp

@@ -54,7 +54,6 @@ set(YACLIB_UNIT_SOURCES
   unit/async/future_functor
   unit/algo/when_all
   unit/algo/wait
-  unit/exe/thread_factory
   unit/algo/when_any
   unit/algo/wait_group
   unit/exe/thread_pool

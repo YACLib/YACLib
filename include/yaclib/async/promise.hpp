@@ -44,7 +44,7 @@ class [[nodiscard]] Promise final {
    * \param value value
    */
   template <typename T>
-  void Set(T&& value) && /*TODO noexcept*/;
+  void Set(T&& value) && /*TODO(MBkkt) noexcept(Result{value})*/;
 
   /**
    * Set \ref Promise<> result

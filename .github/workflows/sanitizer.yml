@@ -233,7 +233,7 @@ jobs:
         run: |
           flags=${{ matrix.flags }}
 
-          names=(MSVC ClangCL) # TODO MinGW
+          names=(MSVC ClangCL) # TODO(MBkkt) MinGW
           generators=("Visual Studio 17 2022" "Visual Studio 17 2022" "MinGW Makefiles")
           options=("-A x64" "-A x64 -T ClangCL" "-DCMAKE_BUILD_TYPE=${{ matrix.build_type }}")
           # TODO(myannyax?) FIBER

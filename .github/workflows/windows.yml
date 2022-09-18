@@ -71,7 +71,7 @@ jobs:
           else
             slowdown=1
           fi
-          names=(MSVC ClangCL)  # TODO MinGW
+          names=(MSVC ClangCL)  # TODO(MBkkt) MinGW
           generators=("Visual Studio $msvc" "Visual Studio $msvc" "MinGW Makefiles")
           options=("-A $arch" "-A $arch -T ClangCL" "-DCMAKE_BUILD_TYPE=${{ matrix.build_type }}")
 

@@ -30,7 +30,7 @@ WarningsAsErrors: '*'
 
 HeaderFilterRegex: '^<.*\.hpp>$'
 
-CheckOptions: # TODO(Ri7ay): Setup all options
+CheckOptions: # TODO(Ri7ay) Setup all options
   - key: readability-identifier-naming.NamespaceCase
     value: lower_case
   - key: readability-identifier-naming.ClassCase

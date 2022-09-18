@@ -5,33 +5,6 @@
 
 namespace yaclib::detail {
 
-class Empty final : public InlineCore {};
-
-static Empty kEmptyCore;
-
-InlineCore& MakeEmpty() noexcept {
-  return kEmptyCore;
-}
-
-class Drop final : public InlineCore {
-  void Here(BaseCore& caller) noexcept final {
-    caller.DecRef();
-  }
-
-#if YACLIB_FINAL_SUSPEND_TRANSFER != 0
-  [[nodiscard]] yaclib_std::coroutine_handle<> Next(BaseCore& caller) noexcept final {
-    Here(caller);
-    return yaclib_std::noop_coroutine();
-  }
-#endif
-};
-
-static Drop kDropCore;
-
-InlineCore& MakeDrop() noexcept {
-  return kDropCore;
-}
-
 void BaseCore::SetInline(InlineCore& callback) noexcept {
   if (!SetCallback(callback, BaseCore::kInline)) {
     callback.Here(*this);
@@ -102,7 +75,7 @@ bool BaseCore::SetCallback(InlineCore& callback, State state) noexcept {
 }
 
 void BaseCore::StoreCallback(InlineCore& callback, State state) noexcept {
-  // TODO with atomic_ref here can be non-atomic store
+  // TODO(MBkkt) with atomic_ref here can be non-atomic store
   _callback.store(state | reinterpret_cast<std::uint64_t>(&callback), std::memory_order_relaxed);
 }
 

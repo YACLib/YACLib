@@ -24,7 +24,7 @@ bool Thread::joinable() const noexcept {
 void Thread::join() {
   YACLIB_ERROR(_joined_or_detached, "already joined or detached on join");
   _joined_or_detached = true;
-  // TODO(myannyax): allow joining from other threads
+  // TODO(myannyax) allow joining from other threads
   while (_impl->GetState() != Completed) {
     _impl->SetJoiningFiber(fault::Scheduler::GetScheduler()->Current());
     fault::Scheduler::GetScheduler()->Suspend();

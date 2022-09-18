@@ -46,7 +46,7 @@ https://discord.gg/xy2fDKj8VZ)
     * [Lazy pipeline](#lazy-pipeline)
     * [Thread pool](#thread-pool)
     * [Strand, Serial executor](#strand-serial-executor)
-    * [Mutex](#asyncmutex)
+    * [Mutex](#mutex)
     * [Rescheduling](#rescheduling)
     * [WhenAll](#whenall)
     * [WhenAny](#whenany)
@@ -101,15 +101,16 @@ check [documentation](https://yaclib.github.io/YACLib/examples.html).
 #### Asynchronous pipeline
 
 ```cpp
-auto cpu_tp = yaclib::MakeThreadPool(/*threads=*/4);
-auto io_tp = yaclib::MakeThreadPool(/*threads=*/4);
-yaclib::Run(*cpu_tp, [] {  // on cpu_tp
+yaclib::FairThreadPool cpu_tp{/*threads=*/4};
+yaclib::FairThreadPool io_tp{/*threads=*/1};
+
+yaclib::Run(cpu_tp, [] {  // on cpu_tp
   return 42;
 }).ThenInline([](int r) {  // called directly after 'return 42', without Submit to cpu_tp
   return r + 1;
 }).Then([](int r) {  // on cpu_tp
   return std::to_string(r);
-}).Detach(*io_tp, [](std::string&& r) {  // on io_tp
+}).Detach(io_tp, [](std::string&& r) {  // on io_tp
   std::cout << "Pipeline result: <"  << r << ">" << std::endl; // 43
 });
 ```
@@ -164,28 +165,28 @@ And it doesn't need synchronization, so it is even faster than asynchronous pipe
 #### Thread pool
 
 ```cpp
-auto tp = yaclib::MakeThreadPool(/*threads=*/4);
-Submit(*tp, [] {
+yaclib::FairThreadPool tp{/*threads=*/4};
+Submit(tp, [] {
   // some computations...
 });
-Submit(*tp, [] {
+Submit(tp, [] {
   // some computations...
 });
 
-tp->Stop();
-tp->Wait();
+tp.Stop();
+tp.Wait();
 ```
 
 #### Strand, Serial executor
 
 ```cpp
-auto tp = yaclib::MakeThreadPool(4);
+yaclib::FairThreadPool tp{/*threads=*/4};
 // decorated thread pool by serializing tasks:
-auto strand = yaclib::MakeStrand(tp);
+auto strand = yaclib::MakeStrand(&tp);
 
 size_t counter = 0;
 for (std::size_t i = 0; i < 100; ++i) {
-  Submit(*tp, [&] {
+  Submit(tp, [&] {
     Submit(*strand, [&] {
       // serialized by Strand, no data race!
       ++counter; 
@@ -203,7 +204,7 @@ And also the implementation of strand is lock-free and efficient, without additi
 #### Mutex
 
 ```cpp
-auto tp = yaclib::MakeThreadPool(4);
+yaclib::FairThreadPool tp{4};
 yaclib::Mutex<> m;
 
 size_t counter = 0;
@@ -243,12 +244,12 @@ without synchronization inside the coroutine and allocations anywhere.
 #### WhenAll
 
 ```cpp
-auto tp = yaclib::MakeThreadPool(/*threads=*/4);
+yaclib::FairThreadPool tp{/*threads=*/4};
 std::vector<yaclib::Future<int>> fs;
 
 // Run parallel computations
 for (std::size_t i = 0; i < 5; ++i) {
-  fs.push_back(yaclib::Run(*tp, [i]() -> int {
+  fs.push_back(yaclib::Run(tp, [i]() -> int {
     return random() * i;
   }));
 }
@@ -266,12 +267,12 @@ Doesn't make more than 3 allocations regardless of input size.
 #### WhenAny
 
 ```cpp
-auto tp = yaclib::MakeThreadPool(/*threads=*/4);
+yaclib::FairThreadPool tp{/*threads=*/4};
 std::vector<yaclib::Future<int>> fs;
 
 // Run parallel computations
 for (std::size_t i = 0; i < 5; ++i) {
-  fs.push_back(yaclib::Run(*tp, [i] {
+  fs.push_back(yaclib::Run(tp, [i] {
     // connect with one of the database shards
     return i;
   }));
@@ -288,15 +289,15 @@ Doesn't make more than 2 allocations regardless of input size.
 #### Future unwrapping
 
 ```cpp
-auto tp_output = yaclib::MakeThreadPool(/*threads=*/1);
-auto tp_compute = yaclib::MakeThreadPool(/*threads=CPU cores*/);
+yaclib::FairThreadPool tp_output{/*threads=*/1};
+yaclib::FairThreadPool tp_compute{/*threads=CPU cores*/};
 
-auto future = yaclib::Run(*tp_output, [] {
+auto future = yaclib::Run(tp_output, [] {
   std::cout << "Outer task" << std::endl;
-  return yaclib::Run(*tp_compute, [] { return 42; });
+  return yaclib::Run(tp_compute, [] { return 42; });
 }).Then(/*tp_compute*/ [](int result) {
   result *= 13;
-  return yaclib::Run(*tp_output, [result] { 
+  return yaclib::Run(tp_output, [result] { 
     std::cout << "Result = " << result << std::endl; 
   });
 });
@@ -314,10 +315,10 @@ It also doesn't require additional allocations.
 #### Timed wait
 
 ```cpp
-auto tp = yaclib:MakeThreadPool(/*threads=*/4);
+yaclib::FairThreadPool tp{/*threads=*/4};
 
-yaclib::Future<int> f1 = yaclib::Run(*tp, [] { return 42; });
-yaclib::Future<double> f2 = yaclib::Run(*tp, [] { return 15.0; });
+yaclib::Future<int> f1 = yaclib::Run(tp, [] { return 42; });
+yaclib::Future<double> f2 = yaclib::Run(tp, [] { return 15.0; });
 
 WaitFor(10ms, f1, f2);  // or Wait / WaitUntil
 
@@ -341,24 +342,24 @@ Also all of them don't make allocation, and we have optimized the path for singl
 ```cpp
 yaclib::WaitGroup wg{1};
 
-auto tp = yaclib::MakeThreaPool();
+yaclib::FairThreadPool tp;
 
 wg.Add(2/*default=1*/);
-Submit(*tp, [] {
+Submit(tp, [] {
    wg.Done();
 });
-Submit(*tp, [] {
+Submit(tp, [] {
    wg.Done();
 });
 
-yaclib::Future<int> f1 = yaclib::Run(*tp, [] {...});
+yaclib::Future<int> f1 = yaclib::Run(tp, [] {...});
 wg.Attach(f1);  // auto Done then Future became Ready
 
-yaclib::Future<> f2 = yaclib::Run(*tp, [] {...});
+yaclib::Future<> f2 = yaclib::Run(tp, [] {...});
 wg.Consume(std::move(f2));  // auto Done then Future became Ready
 
 auto coro = [&] () -> yaclib::Future<> {
-  co_await On(*tp);
+  co_await On(tp);
   co_await wg; // alias for co_await wg.Await(CurrentThreadPool());
   std::cout << f1.Touch().Ok(); // Valid access to Result of Ready Future
 };
@@ -374,8 +375,9 @@ Effective like simple atomic counter in intrusive pointer, also doesn't require 
 #### Exception recovering
 
 ```cpp
-auto tp = yaclib::MakeThreadPool(/*threads=*/4);
-auto f = yaclib::Run(*tp, [] {
+yaclib::FairThreadPool tp{/*threads=*/4};
+
+auto f = yaclib::Run(tp, [] {
   if (random() % 2) {
     throw std::runtime_error{"1"};
   }
@@ -401,7 +403,8 @@ int x = std::move(f).Get().Value();
 #### Error recovering
 
 ```cpp
-auto tp = yaclib::MakeThreadPool(/*threads=*/4);
+yaclib::FairThreadPool tp{/*threads=*/4};
+
 auto f = yaclib::Run<std::error_code>(tp, [] {
   if (random() % 2) {
     return std::make_error_code(1);
@@ -424,8 +427,9 @@ int x = std::move(f).Get().Value();
 #### Use Result for smart recovering
 
 ```cpp
-auto tp = yaclib::MakeThreadPool(/*threads=*/4);
-auto f = yaclib::Run(*tp, [] {
+yaclib::FairThreadPool tp{/*threads=*/4};
+
+auto f = yaclib::Run(tp, [] {
   if (random() % 2) {
     return std::make_error_code(1);
   }

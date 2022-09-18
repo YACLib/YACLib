@@ -2,7 +2,6 @@
 
 #include <yaclib/async/future.hpp>
 #include <yaclib/coro/coro.hpp>
-#include <yaclib/exe/thread_pool.hpp>
 #include <yaclib/lazy/task.hpp>
 #include <yaclib/util/detail/atomic_counter.hpp>
 #include <yaclib/util/type_traits.hpp>

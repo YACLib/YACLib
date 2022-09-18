@@ -1,10 +1,10 @@
 /**
- * \example thread_pool.cpp
+ * \example fair_thread_pool.cpp
  * Simple \ref IThreadPool examples
  */
 
 #include <yaclib/exe/submit.hpp>
-#include <yaclib/exe/thread_pool.hpp>
+#include <yaclib/runtime/fair_thread_pool.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 
 #include <cstddef>
@@ -15,10 +15,10 @@
 namespace test {
 namespace {
 
-TEST(Example, ThreadPool) {
-  std::cout << "ThreadPool" << std::endl;
+TEST(Example, FairThreadPool) {
+  std::cout << "FairThreadPool" << std::endl;
 
-  auto tp = yaclib::MakeThreadPool(4);
+  yaclib::FairThreadPool tp{4};
 
   std::atomic<size_t> counter{0};
 
@@ -29,13 +29,13 @@ TEST(Example, ThreadPool) {
 #endif
 
   for (std::size_t i = 0; i < kIncrements; ++i) {
-    Submit(*tp, [&counter] {
+    Submit(tp, [&counter] {
       counter.store(counter.load() + 1);
     });
   }
 
-  tp->Stop();
-  tp->Wait();
+  tp.Stop();
+  tp.Wait();
 
   std::cout << "Counter value = " << counter << ", expected " << kIncrements << std::endl;
 

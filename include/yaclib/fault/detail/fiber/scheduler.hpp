@@ -60,9 +60,9 @@ class Scheduler final {
 
   void WakeUpNeeded() noexcept;
 
-  // TODO(myannyax): priority queue?
+  // TODO(myannyax) priority queue?
   std::map<uint64_t, detail::fiber::BiList> _sleep_list;
-  // TODO(myannyax): priority queue?
+  // TODO(myannyax) priority queue?
   detail::fiber::BiList _queue;
   uint64_t _time{0};
   bool _running{false};

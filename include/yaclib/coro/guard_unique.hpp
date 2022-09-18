@@ -77,7 +77,7 @@ class [[nodiscard]] Mutex<DefaultFIFO, DefaultBatchHere>::GuardUnique {
 
  protected:
   Mutex* _mutex;
-  bool _owns;  // TODO add as _mutex bit
+  bool _owns;  // TODO(MBkkt) add as _mutex bit
 };
 
 template <bool DefaultFIFO, std::uint8_t DefaultBatchHere>

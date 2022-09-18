@@ -47,7 +47,7 @@ if (CORO IN_LIST YACLIB_FLAGS)
   include(yaclib_coro)
 endif ()
 
-set(YACLIB_FUTEX 0) # TODO Fucking atomic::wait bugged
+set(YACLIB_FUTEX 0) # TODO(MBkkt) Fucking atomic::wait bugged
 #[[
 if (DISABLE_FUTEX IN_LIST YACLIB_FLAGS)
   set(YACLIB_FUTEX 0)

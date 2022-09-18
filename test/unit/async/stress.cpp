@@ -3,7 +3,7 @@
 #include <yaclib/async/future.hpp>
 #include <yaclib/exe/executor.hpp>
 #include <yaclib/exe/inline.hpp>
-#include <yaclib/exe/thread_pool.hpp>
+#include <yaclib/runtime/fair_thread_pool.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 
 #include <array>
@@ -150,9 +150,9 @@ TEST_F(StressTest, Then) {
 #if defined(GTEST_OS_WINDOWS) && YACLIB_FAULT == 1
   GTEST_SKIP();  // Too long
 #endif
-  auto tp = yaclib::MakeThreadPool();
-  Run(*tp, [](yaclib::WaitGroup<>& wg, yaclib::FutureOn<Value> future, uint32_t idx, uint32_t slot_round,
-              auto& num_resolved_futures) {
+  yaclib::FairThreadPool tp;
+  Run(tp, [](yaclib::WaitGroup<>& wg, yaclib::FutureOn<Value> future, uint32_t idx, uint32_t slot_round,
+             auto& num_resolved_futures) {
     auto f = std::move(future)
                .Then([slot_round](StressTest::Value&& x) noexcept {
                  return x.v / slot_round;
@@ -164,8 +164,8 @@ TEST_F(StressTest, Then) {
                });
     wg.Consume(std::move(f));
   });
-  tp->Stop();
-  tp->Wait();
+  tp.Stop();
+  tp.Wait();
 }
 
 }  // namespace
