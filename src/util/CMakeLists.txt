@@ -20,6 +20,9 @@ list(APPEND YACLIB_HEADERS
   ${YACLIB_INCLUDE_DIR}/util/detail/type_traits_impl.hpp
   ${YACLIB_INCLUDE_DIR}/util/detail/unique_counter.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/intrusive_list.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/work_stealing_queue.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/global_queue.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/idle.hpp
   )
 list(APPEND YACLIB_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/intrusive_list.cpp
