@@ -453,7 +453,7 @@ TEST(InlineDrop, Alive) {
 
 // TODO(Ri7ay) Don't work on windows, check this:
 //  https://stackoverflow.com/questions/12606033/computing-cpu-time-in-c-on-windows
-#if defined(GTEST_OS_LINUX) || defined(GTEST_OS_MAC)
+#if YACLIB_CI_SLOWDOWN == 1 && (defined(GTEST_OS_LINUX) || defined(GTEST_OS_MAC))
 void NotBurnCPU(yaclib::FairThreadPool& tp, std::size_t threads) {
   // Warmup
   for (std::size_t i = 0; i != threads; ++i) {
