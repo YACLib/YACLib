@@ -67,7 +67,7 @@ TEST(AwaitGroup, OneWaiter) {
   auto worker = [&]() -> yaclib::Future<> {
     co_await On(*manual);
 
-    for (size_t i = 0; i < 10; ++i) {
+    for (std::size_t i = 0; i < 10; ++i) {
       co_await On(*manual);
     }
 
@@ -170,7 +170,7 @@ TEST(AwaitGroup, BlockingWait) {
 
   auto waiter_future = waiter();
   std::vector<yaclib::Future<>> worker_futures(kWorkers);
-  for (size_t i = 0; i < kWorkers; ++i) {
+  for (std::size_t i = 0; i < kWorkers; ++i) {
     worker_futures[i] = worker();
   }
 

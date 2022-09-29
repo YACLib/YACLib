@@ -6,9 +6,9 @@
 
 namespace yaclib::detail {
 
-uint32_t Injector::sYieldFrequency = 16;
-uint32_t Injector::sSleepTime = 100;
-uint64_t Injector::sInjectedCount = 0;
+std::uint32_t Injector::sYieldFrequency = 16;
+std::uint32_t Injector::sSleepTime = 100;
+std::uint64_t Injector::sInjectedCount = 0;
 
 void Injector::MaybeInject() noexcept {
   if (NeedInject()) {
@@ -35,30 +35,30 @@ bool Injector::NeedInject() noexcept {
 }
 
 void Injector::Reset() noexcept {
-  _count = static_cast<uint32_t>(GetRandNumber(sYieldFrequency));
+  _count = static_cast<std::uint32_t>(GetRandNumber(sYieldFrequency));
 }
 
-void Injector::SetFrequency(uint32_t freq) noexcept {
+void Injector::SetFrequency(std::uint32_t freq) noexcept {
   sYieldFrequency = freq;
 }
 
-void Injector::SetSleepTime(uint32_t ns) noexcept {
+void Injector::SetSleepTime(std::uint32_t ns) noexcept {
   sSleepTime = ns;
 }
 
-uint32_t Injector::GetSleepTime() noexcept {
+std::uint32_t Injector::GetSleepTime() noexcept {
   return sSleepTime;
 }
 
-uint64_t Injector::GetInjectedCount() noexcept {
+std::uint64_t Injector::GetInjectedCount() noexcept {
   return sInjectedCount;
 }
 
-uint32_t Injector::GetState() const noexcept {
+std::uint32_t Injector::GetState() const noexcept {
   return _count;
 }
 
-void Injector::SetState(uint32_t state) noexcept {
+void Injector::SetState(std::uint32_t state) noexcept {
   _count = state;
 }
 

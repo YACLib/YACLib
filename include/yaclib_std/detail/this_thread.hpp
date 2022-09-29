@@ -9,8 +9,8 @@ namespace yaclib_std::this_thread {
 
 template <typename Clock, typename Duration>
 inline void sleep_until(const std::chrono::time_point<Clock, Duration>& sleep_time) {
-  uint64_t time = std::chrono::duration_cast<std::chrono::nanoseconds>(sleep_time.time_since_epoch()).count();
-  yaclib::fault::Scheduler::GetScheduler()->Sleep(time);
+  std::uint64_t timeout = std::chrono::duration_cast<std::chrono::nanoseconds>(sleep_time.time_since_epoch()).count();
+  yaclib::fault::Scheduler::GetScheduler()->Sleep(timeout);
 }
 
 template <typename Rep, typename Period>

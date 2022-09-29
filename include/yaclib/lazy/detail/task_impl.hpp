@@ -10,7 +10,7 @@ void Run(detail::BaseCore* head) noexcept;
 
 template <typename E, typename Func>
 auto Schedule(IExecutor& e, Func&& f) {
-  auto* core = detail::MakeCore<detail::CoreType::Run, void, E>(std::forward<Func>(f));
+  auto* core = detail::MakeCore<detail::CoreType::Run, true, void, E>(std::forward<Func>(f));
   e.IncRef();
   core->_executor.Reset(NoRefTag{}, &e);
   using ResultCoreT = typename std::remove_reference_t<decltype(*core)>::Base;
@@ -39,7 +39,7 @@ Task<V, E> Task<V, E>::On(std::nullptr_t) && noexcept {
 template <typename V, typename E>
 template <typename Func>
 auto Task<V, E>::Then(IExecutor& e, Func&& f) && {
-  return detail::SetCallback<detail::CoreType::Then, detail::CallbackType::Lazy>(_core, &e, std::forward<Func>(f));
+  return detail::SetCallback<detail::CoreType::Then, detail::CallbackType::LazyOn>(_core, &e, std::forward<Func>(f));
 }
 
 template <typename V, typename E>
@@ -52,7 +52,8 @@ auto Task<V, E>::ThenInline(Func&& f) && {
 template <typename V, typename E>
 template <typename Func>
 auto Task<V, E>::Then(Func&& f) && {
-  return detail::SetCallback<detail::CoreType::Then, detail::CallbackType::Lazy>(_core, nullptr, std::forward<Func>(f));
+  return detail::SetCallback<detail::CoreType::Then, detail::CallbackType::LazyOn>(_core, nullptr,
+                                                                                   std::forward<Func>(f));
 }
 
 template <typename V, typename E>
@@ -63,14 +64,14 @@ void Task<V, E>::Cancel() && {
 template <typename V, typename E>
 void Task<V, E>::Detach() && noexcept {
   auto* core = _core.Release();
-  core->StoreCallback(detail::MakeDrop(), detail::BaseCore::kInline);
+  core->StoreCallback(detail::MakeDrop());
   detail::Run(core);
 }
 
 template <typename V, typename E>
 void Task<V, E>::Detach(IExecutor& e) && noexcept {
   auto* core = _core.Release();
-  core->StoreCallback(detail::MakeDrop(), detail::BaseCore::kInline);
+  core->StoreCallback(detail::MakeDrop());
   detail::Run(core, e);
 }
 

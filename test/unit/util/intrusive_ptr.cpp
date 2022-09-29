@@ -26,7 +26,7 @@ class Core : public yaclib::IRef {
   }
 };
 
-size_t Core::sInstances = 0;
+std::size_t Core::sInstances = 0;
 
 class X : public Core {};
 class Y : public X {};

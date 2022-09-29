@@ -16,15 +16,15 @@ class DefaultAllocator final : public IStackAllocator {
 
   void Release(Allocation allocation) final;
 
-  void SetMinStackSize(size_t pages) noexcept final;
+  void SetMinStackSize(std::size_t pages) noexcept final;
 
-  size_t GetMinStackSize() noexcept final;
+  std::size_t GetMinStackSize() noexcept final;
 
-  static void SetCacheSize(uint32_t size) noexcept;
+  static void SetCacheSize(std::uint32_t size) noexcept;
 
  private:
   std::vector<Allocation> _pool;
-  size_t _stack_size_pages{8};
+  std::size_t _stack_size_pages{8};
 };
 
 }  // namespace yaclib::detail::fiber

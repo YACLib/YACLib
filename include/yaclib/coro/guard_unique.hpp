@@ -32,28 +32,28 @@ class [[nodiscard]] Mutex<DefaultFIFO, DefaultBatchHere>::GuardUnique {
   }
 
   auto Lock() noexcept {
-    YACLIB_ERROR(_owns, "Cannot lock already locked mutex");
+    YACLIB_ERROR(_owns, "Cannot Lock already locked mutex");
     _owns = true;
     return _mutex->Lock();
   }
 
   template <bool FIFO = DefaultFIFO, std::uint8_t BatchHere = DefaultBatchHere>
   auto Unlock() noexcept {
-    YACLIB_ERROR(!_owns, "Cannot unlock not locked mutex");
+    YACLIB_ERROR(!_owns, "Cannot Unlock not locked mutex");
     _owns = false;
     return _mutex->Unlock<FIFO, BatchHere>();
   }
 
   template <bool FIFO = DefaultFIFO, std::uint8_t BatchHere = DefaultBatchHere>
   auto UnlockOn(IExecutor& e) noexcept {
-    YACLIB_ERROR(!_owns, "Cannot unlock not locked mutex");
+    YACLIB_ERROR(!_owns, "Cannot UnlockOn not locked mutex");
     _owns = false;
     return _mutex->UnlockOn<FIFO, BatchHere>(e);
   }
 
   template <bool FIFO = DefaultFIFO>
   void UnlockHere() noexcept {
-    YACLIB_ERROR(!_owns, "Cannot unlock not locked mutex");
+    YACLIB_ERROR(!_owns, "Cannot UnlockHere not locked mutex");
     _owns = false;
     _mutex->UnlockHere<FIFO>();
   }
@@ -75,7 +75,6 @@ class [[nodiscard]] Mutex<DefaultFIFO, DefaultBatchHere>::GuardUnique {
     }
   }
 
- protected:
   Mutex* _mutex;
   bool _owns;  // TODO(MBkkt) add as _mutex bit
 };

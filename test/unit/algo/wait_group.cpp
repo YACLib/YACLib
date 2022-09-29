@@ -246,7 +246,15 @@ void TestMultiThreaded() {
   test::util::StopWatch<> timer;
   yaclib::WaitGroup<> wg;
   wg.Attach(fs, kThreads);
+#if YACLIB_FAULT == 0  // TODO(MBkkt) Fix fault injection
+  EXPECT_FALSE(wg.WaitFor(0ns));
+  EXPECT_FALSE(wg.WaitUntil(std::chrono::steady_clock::now()));
+#endif
   wg.Wait();
+#if YACLIB_FAULT == 0
+  EXPECT_TRUE(wg.WaitFor(0ns));
+  EXPECT_TRUE(wg.WaitUntil(std::chrono::system_clock::now()));
+#endif
 
   EXPECT_LE(timer.Elapsed(), 100ms * YACLIB_CI_SLOWDOWN);
   EXPECT_TRUE(std::all_of(std::begin(fs), std::end(fs), [](auto& f) {

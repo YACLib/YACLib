@@ -5,6 +5,7 @@
 #include <yaclib/async/contract.hpp>
 #include <yaclib/async/run.hpp>
 #include <yaclib/coro/await.hpp>
+#include <yaclib/coro/current_executor.hpp>
 #include <yaclib/coro/future.hpp>
 #include <yaclib/coro/guard_sticky.hpp>
 #include <yaclib/coro/guard_unique.hpp>
@@ -61,7 +62,7 @@ TYPED_TEST(AsyncSuite, JustWorks) {
 }
 
 TYPED_TEST(AsyncSuite, Counter) {
-#ifdef GTEST_OS_WINDOWS
+#if defined(GTEST_OS_WINDOWS) && !(defined(NDEBUG) && defined(_WIN64))
   GTEST_SKIP();  // Doesn't work for Win32 or Debug, I think its probably because bad symmetric transfer implementation
   // TODO(kononovk) Try to confirm problem and localize it with ifdefs
 #endif
@@ -123,7 +124,7 @@ TEST(MutexSuite, UniqueGuard) {
 }
 
 TYPED_TEST(AsyncSuite, LockAsync) {
-#ifdef GTEST_OS_WINDOWS
+#if defined(GTEST_OS_WINDOWS) && !(defined(NDEBUG) && defined(_WIN64))
   GTEST_SKIP();  // Doesn't work for Win32 or Debug, I think its probably because bad symmetric transfer implementation
   // TODO(kononovk) Try to confirm problem and localize it with ifdefs
 #endif
@@ -186,11 +187,10 @@ TYPED_TEST(AsyncSuite, ScopedLockAsync) {
     if constexpr (TestFixture::kIsFuture) {
       co_await On(*manual);
     }
-    co_await m.Lock();
+    auto guard = co_await m.UniqueGuard();
     value++;
     co_await Await(future);
     value++;
-    m.UnlockHere();
     co_return{};
   };
 
@@ -225,7 +225,7 @@ TYPED_TEST(AsyncSuite, ScopedLockAsync) {
 }
 
 TYPED_TEST(AsyncSuite, GuardRelease) {
-#ifdef GTEST_OS_WINDOWS
+#if defined(GTEST_OS_WINDOWS) && !(defined(NDEBUG) && defined(_WIN64))
   GTEST_SKIP();  // Doesn't work for Win32 or Debug, I think its probably because bad symmetric transfer implementation
   // TODO(kononovk) Try to confirm problem and localize it with ifdefs
 #endif
@@ -243,9 +243,10 @@ TYPED_TEST(AsyncSuite, GuardRelease) {
       if constexpr (TestFixture::kIsFuture) {
         co_await On(tp);
       }
-      co_await m.Lock();
+      auto g = co_await m.UniqueGuard();
+      auto another = yaclib::Mutex<>::GuardUnique{*g.Release(), std::adopt_lock};
       ++cs;
-      co_await m.UnlockOn(tp);
+      co_await another.UnlockOn(tp);
     }
     co_return 42;
   };
@@ -324,7 +325,7 @@ TYPED_TEST(AsyncSuite, UnlockHereBehaviour) {
 }
 
 TYPED_TEST(AsyncSuite, UnlockOnBehaviour) {
-#ifdef GTEST_OS_WINDOWS
+#if defined(GTEST_OS_WINDOWS) && !(defined(NDEBUG) && defined(_WIN64))
   GTEST_SKIP();  // Doesn't work for Win32 or Debug, I think its probably because bad symmetric transfer implementation
   // TODO(kononovk) Try to confirm problem and localize it with ifdefs
 #endif
@@ -386,6 +387,45 @@ TYPED_TEST(AsyncSuite, UnlockOnBehaviour) {
 
   tp.HardStop();
   tp.Wait();
+}
+
+TEST(Mutex, StickyGuard) {
+#if defined(GTEST_OS_WINDOWS) && !(defined(NDEBUG) && defined(_WIN64))
+  GTEST_SKIP();  // Doesn't work for Win32 or Debug, I think its probably because bad symmetric transfer implementation
+  // TODO(kononovk) Try to confirm problem and localize it with ifdefs
+#endif
+  yaclib::Mutex<> m;
+  std::uint64_t counter = 0;
+  yaclib::FairThreadPool tp1{1};
+  yaclib::FairThreadPool tp2{1};
+  auto coro = [&](yaclib::IExecutor& executor) -> yaclib::Future<> {
+    co_await On(executor);
+    auto& schedulerBeforeLock = co_await yaclib::CurrentExecutor();
+    EXPECT_EQ(&executor, &schedulerBeforeLock);
+    for (int i = 0; i != 1000; ++i) {
+      auto guard = co_await m.StickyGuard();
+      YACLIB_ASSERT(guard.OwnsLock());
+      auto& schedulerAfterLock = co_await yaclib::CurrentExecutor();
+      counter += &schedulerBeforeLock != &schedulerAfterLock;
+      YACLIB_ASSERT(guard.OwnsLock());
+      yaclib_std::this_thread::sleep_for(std::chrono::nanoseconds{1});
+      YACLIB_ASSERT(guard.OwnsLock());
+      co_await guard.Unlock();
+      YACLIB_ASSERT(!guard.OwnsLock());
+      auto& schedulerAfterUnlock = co_await yaclib::CurrentExecutor();
+      EXPECT_EQ(&schedulerBeforeLock, &schedulerAfterUnlock);
+      YACLIB_ASSERT(!guard.OwnsLock());
+    }
+    co_return{};
+  };
+  auto f1 = coro(tp1);
+  auto f2 = coro(tp2);
+  Wait(f1, f2);
+  EXPECT_GT(counter, 0);
+  tp1.Stop();
+  tp1.Wait();
+  tp2.Stop();
+  tp2.Wait();
 }
 
 }  // namespace

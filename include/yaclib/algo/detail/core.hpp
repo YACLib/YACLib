@@ -32,36 +32,23 @@ enum class CoreType : char {
 template <CoreType Type, typename V, typename E>
 using ResultCoreT = std::conditional_t<Type == CoreType::Detach, NoResultCore, ResultCore<V, E>>;
 
-template <typename Ret, typename Arg, typename E, typename Func, CoreType Type, bool Async>
+template <typename Ret, typename Arg, typename E, typename Func, CoreType Type, bool kIsAsync, bool kIsCall>
 class Core : public ResultCoreT<Type, Ret, E> {
   using Storage = std::decay_t<Func>;
   using Invoke = std::conditional_t<std::is_function_v<std::remove_reference_t<Func>>, Storage, Func>;
 
-  static_assert(!(Type == CoreType::Detach && Async), "Detach cannot be Async, should be void");
+  static_assert(!(Type == CoreType::Detach && kIsAsync), "Detach cannot be Async, should be void");
 
  public:
   using Base = ResultCoreT<Type, Ret, E>;
 
-  explicit Core(Storage&& f) noexcept(std::is_nothrow_move_constructible_v<Storage>) {
-    this->_self = Callback{&MakeEmpty(), 0};
-    new (&_func.storage) Storage{std::move(f)};
-  }
-
-  explicit Core(const Storage& f) noexcept(std::is_nothrow_copy_constructible_v<Storage>) {
-    this->_self = Callback{&MakeEmpty(), 0};
-    new (&_func.storage) Storage{std::move(f)};
+  explicit Core(Func&& f) {
+    this->_self = Callback{&MakeEmpty(), Type == CoreType::Run};
+    new (&_func.storage) Storage{std::forward<Func>(f)};
   }
 
  private:
-  void Tick() noexcept {
-    if constexpr (Async) {
-      YACLIB_ASSERT(this->_self.unwrapping == 0);
-      this->_self.unwrapping = 1;
-    }
-  }
-
   void Call() noexcept final {
-    Tick();
     if constexpr (Type == CoreType::Run) {
       CallImpl(Unit{});
     } else {
@@ -71,29 +58,30 @@ class Core : public ResultCoreT<Type, Ret, E> {
   }
 
   void Drop() noexcept final {
-    Tick();
     CallImpl(Result<Arg, E>{StopTag{}});
   }
 
   void Here(BaseCore& caller) noexcept final {
-    if constexpr (Async) {
-      if (this->_self.unwrapping++ != 0) {
-        YACLIB_ASSERT(this->_self.unwrapping == 2);
+    if constexpr (kIsAsync) {
+      if (this->_self.unwrapping != 0) {
         auto& core = static_cast<ResultCore<Ret, E>&>(caller);
         Done(std::move(core.Get()));
         caller.DecRef();
         return;
       }
+      this->_self.unwrapping = 1;
     }
     if constexpr (Type != CoreType::Run) {
-      if (!this->_executor) {
-        this->_executor = std::move(caller._executor);
-      }
+      caller.MoveExecutorTo(*this);
     }
-    YACLIB_ASSERT(this->_executor);
-    auto& core = static_cast<ResultCore<Arg, E>&>(caller);
-    CallImpl(std::move(core.Get()));
-    caller.DecRef();
+    if constexpr (kIsCall) {
+      this->_self.caller = &caller;
+      this->_executor->Submit(*this);
+    } else {
+      auto& core = static_cast<ResultCore<Arg, E>&>(caller);
+      CallImpl(std::move(core.Get()));
+      caller.DecRef();
+    }
   }
 
 #if YACLIB_FINAL_SUSPEND_TRANSFER != 0
@@ -170,7 +158,7 @@ class Core : public ResultCoreT<Type, Ret, E> {
 
   template <typename T>
   void CallResolveAsync(T&& value) {
-    if constexpr (Async) {
+    if constexpr (kIsAsync) {
       auto future = CallResolveVoid(std::forward<T>(value));
       future.GetCore().Release()->SetInline(*this);
     } else {
@@ -254,7 +242,7 @@ struct Return<V, E, Func, 5> final {
   using Type = invoke_t<Func, Unit>;
 };
 
-template <CoreType CoreT, typename Arg0, typename E, typename Func>
+template <CoreType CoreT, bool kIsCall, typename Arg0, typename E, typename Func>
 auto* MakeCore(Func&& f) {
   using Arg = std::conditional_t<std::is_same_v<Arg0, Unit>, void, Arg0>;
   static_assert(CoreT != CoreType::Run || std::is_void_v<Arg>,
@@ -265,47 +253,39 @@ auto* MakeCore(Func&& f) {
   using Ret = result_value_t<future_base_value_t<AsyncRet>>;
   constexpr bool kIsAsync = is_future_base_v<AsyncRet>;
   // TODO(MBkkt) Think about inline/detach optimization
-  using Core = detail::Core<Ret, Arg, E, Func&&, CoreT, kIsAsync>;
+  using Core = detail::Core<Ret, Arg, E, Func&&, CoreT, kIsAsync, kIsCall>;
   return MakeUnique<Core>(std::forward<Func>(f)).Release();
 }
 
 enum class CallbackType : char {
   Inline = 0,
-  InlineOn = 1,
-  On = 2,
-  Lazy = 3,
-  LazyInline = 4,
+  On = 1,
+  InlineOn = 2,
+  LazyInline = 3,
+  LazyOn = 4,
 };
 
 template <CoreType CoreT, CallbackType CallbackT, typename Arg, typename E, typename Func>
 auto SetCallback(ResultCorePtr<Arg, E>& core, IExecutor* executor, Func&& f) {
   constexpr bool kIsDetach = CoreT == CoreType::Detach;
-  constexpr bool kIsTask = CallbackT == CallbackType::Lazy || CallbackT == CallbackType::LazyInline;
-  auto* callback = MakeCore<CoreT, Arg, E>(std::forward<Func>(f));
+  constexpr bool kIsLazy = CallbackT == CallbackType::LazyInline || CallbackT == CallbackType::LazyOn;
+  constexpr bool kIsCall = CallbackT == CallbackType::On || CallbackT == CallbackType::LazyOn;
+  auto* callback = MakeCore<CoreT, kIsCall, Arg, E>(std::forward<Func>(f));
   // TODO(MBkkt) callback, executor, caller should be in ctor
   if constexpr (kIsDetach) {
-    callback->StoreCallback(detail::MakeDrop(), detail::BaseCore::kInline);
+    callback->StoreCallback(detail::MakeDrop());
   }
   callback->_executor = executor;
   auto* caller = core.Release();
-  if constexpr (CallbackT == CallbackType::Lazy) {
-    callback->_self.caller = caller;
-    caller->StoreCallback(*callback, BaseCore::kCall);
-  } else if constexpr (CallbackT == CallbackType::LazyInline) {
-    caller->StoreCallback(*callback, BaseCore::kInline);
-  } else if constexpr (CallbackT == CallbackType::On) {
-    callback->_self.caller = caller;
-    caller->SetCall(*callback);
-  } else {
+  if constexpr (!kIsLazy) {
     caller->SetInline(*callback);
   }
-
   using ResultCoreT = typename std::remove_reference_t<decltype(*callback)>::Base;
-  if constexpr (kIsTask) {
+  if constexpr (kIsLazy) {
     callback->next = caller;
+    caller->StoreCallback(*callback);
     return Task{IntrusivePtr<ResultCoreT>{NoRefTag{}, callback}};
   } else if constexpr (!kIsDetach) {
-    static_assert(CoreT == CoreType::Then, "SetCallback don't works for Run");
     if constexpr (CallbackT == CallbackType::Inline) {
       return Future{IntrusivePtr<ResultCoreT>{NoRefTag{}, callback}};
     } else {

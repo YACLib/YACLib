@@ -27,7 +27,7 @@ class ProcessCPUTimer {
 
  private:
   [[nodiscard]] std::size_t ElapsedMicros() const {
-    const auto clocks = static_cast<size_t>(std::clock() - _start_ts);
+    const auto clocks = static_cast<std::size_t>(std::clock() - _start_ts);
     return ClocksToMicros(clocks);
   }
 
@@ -53,15 +53,15 @@ class ThreadCPUTimer {
   }
 
  private:
-  [[nodiscard]] uint64_t ElapsedNanos() const {
+  [[nodiscard]] std::uint64_t ElapsedNanos() const {
     timespec now{};
     clock_gettime(CLOCK_THREAD_CPUTIME_ID, &now);
 
     return ToNanos(now) - ToNanos(_start);
   }
 
-  static uint64_t ToNanos(const timespec& tp) {
-    return static_cast<uint64_t>(tp.tv_sec * 1'000'000'000 + tp.tv_nsec);
+  static std::uint64_t ToNanos(const timespec& tp) {
+    return static_cast<std::uint64_t>(tp.tv_sec * 1'000'000'000 + tp.tv_nsec);
   }
 
   timespec _start{};

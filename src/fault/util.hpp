@@ -7,14 +7,14 @@
 
 namespace yaclib::detail {
 
-void SetSeed(uint32_t new_seed);
+void SetSeed(std::uint32_t new_seed);
 
-uint32_t GetSeed();
+std::uint32_t GetSeed();
 
-uint64_t GetRandNumber(uint64_t max);
+std::uint64_t GetRandNumber(std::uint64_t max);
 
-uint64_t GetRandCount();
+std::uint64_t GetRandCount();
 
-void ForwardToRandCount(uint64_t random_count);
+void ForwardToRandCount(std::uint64_t random_count);
 
 }  // namespace yaclib::detail

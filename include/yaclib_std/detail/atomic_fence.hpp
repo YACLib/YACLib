@@ -8,10 +8,10 @@
 
 namespace yaclib_std {
 
-inline void atomic_thread_fence(std::memory_order order) noexcept {
+inline void atomic_thread_fence(std::memory_order /*order*/) noexcept {
 }
 
-inline void atomic_signal_fence(std::memory_order order) noexcept {
+inline void atomic_signal_fence(std::memory_order /*order*/) noexcept {
 }
 
 }  // namespace yaclib_std

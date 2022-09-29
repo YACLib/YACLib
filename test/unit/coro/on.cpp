@@ -126,11 +126,11 @@ TEST(On, LockWithStrand) {
     co_await On(thread);  //  unlock
     co_return{};
   };
-  auto add_value = [&](size_t increments) -> yaclib::Future<> {
+  auto add_value = [&](std::size_t increments) -> yaclib::Future<> {
     co_await On(tp);  // schedule to thread pool
     std::vector<yaclib::Future<>> vec;
     vec.reserve(increments);
-    for (size_t i = 0; i != increments; ++i) {
+    for (std::size_t i = 0; i != increments; ++i) {
       vec.push_back(inc(tp));
     }
     co_await Await(vec.begin(), vec.size());
@@ -139,7 +139,7 @@ TEST(On, LockWithStrand) {
 
   std::vector<yaclib::Future<>> vec;
   vec.reserve(kIncrements);
-  for (size_t i = 0; i != kThreads; ++i) {
+  for (std::size_t i = 0; i != kThreads; ++i) {
     vec.push_back(add_value(kIncrements));
   }
   Wait(vec.data(), vec.size());
@@ -147,7 +147,7 @@ TEST(On, LockWithStrand) {
   ASSERT_EQ(sum, kThreads * kIncrements);
 
   end.store(false, std::memory_order_release);
-  for (size_t i = 0; i != kThreads; ++i) {
+  for (std::size_t i = 0; i != kThreads; ++i) {
     add_value(kIncrements).Detach();
   }
   while (!end.load(std::memory_order_acquire)) {

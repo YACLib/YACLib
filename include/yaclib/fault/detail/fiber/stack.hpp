@@ -11,16 +11,16 @@ namespace yaclib::detail::fiber {
  */
 class Stack final {
  public:
-  explicit Stack(IStackAllocator& allocator) : _allocation(allocator.Allocate()), _allocator(allocator) {
+  explicit Stack(IStackAllocator& allocator) : _allocation{allocator.Allocate()}, _allocator{&allocator} {
   }
 
   Stack(Stack&& that) noexcept = default;
 
   Stack& operator=(Stack&& other) noexcept {
     auto& new_allocation = other.GetAllocation();
-    _allocator.Release(_allocation);
+    _allocator->Release(_allocation);
     _allocation = other.GetAllocation();
-    _allocator = other.GetAllocator();
+    _allocator = &other.GetAllocator();
     new_allocation.size = 0;
     new_allocation.start = nullptr;
     return *this;
@@ -31,16 +31,16 @@ class Stack final {
   }
 
   [[nodiscard]] IStackAllocator& GetAllocator() const noexcept {
-    return _allocator;
+    return *_allocator;
   }
 
   ~Stack() {
-    _allocator.Release(_allocation);
+    _allocator->Release(_allocation);
   }
 
  private:
   Allocation _allocation;
-  IStackAllocator& _allocator;
+  IStackAllocator* _allocator;
 };
 
 }  // namespace yaclib::detail::fiber

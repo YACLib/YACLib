@@ -11,31 +11,26 @@
 #  include <yaclib/coro/coro.hpp>
 #endif
 
+#include <cstdint>
+#include <limits>
 #include <yaclib_std/atomic>
 
 namespace yaclib::detail {
 
 class BaseCore : public InlineCore {
-  static constexpr std::uint64_t kShift = 62;
-
  public:
-  enum State : std::uint64_t {  // clang-format off
-    kEmpty  = std::uint64_t{0} << kShift,
-    kResult = std::uint64_t{1} << kShift,
-    kInline = std::uint64_t{2} << kShift,
-    kCall   = std::uint64_t{3} << kShift,
-    kMask   = std::uint64_t{3} << kShift,
-  };  // clang-format on
+  enum State : std::uintptr_t {
+    kEmpty = std::uintptr_t{0},
+    kResult = std::numeric_limits<std::uintptr_t>::max(),
+  };
 
   [[nodiscard]] bool Empty() const noexcept;
 
   void SetInline(InlineCore& callback) noexcept;
 
-  void SetCall(BaseCore& callback) noexcept;
+  [[nodiscard]] bool SetCallback(InlineCore& callback) noexcept;
 
-  [[nodiscard]] bool SetCallback(InlineCore& callback, State state) noexcept;
-
-  void StoreCallback(InlineCore& callback, State state) noexcept;
+  void StoreCallback(InlineCore& callback) noexcept;
 
   [[nodiscard]] bool Reset() noexcept;
 
@@ -60,13 +55,12 @@ class BaseCore : public InlineCore {
  protected:
   explicit BaseCore(State callback) noexcept;
 
-  yaclib_std::atomic_uint64_t _callback;
+  yaclib_std::atomic_uintptr_t _callback;
 
  public:
   IExecutorPtr _executor{NoRefTag{}, &MakeInline()};
 
- private:
-  void Submit(BaseCore& callback) noexcept;
+  void MoveExecutorTo(BaseCore& callback) noexcept;
 };
 
 }  // namespace yaclib::detail

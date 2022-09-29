@@ -22,7 +22,7 @@ struct [[nodiscard]] AwaitAwaiter {
 
   template <typename Promise>
   YACLIB_INLINE bool await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
-    return _caller.SetCallback(handle.promise(), BaseCore::kInline);
+    return _caller.SetCallback(handle.promise());
   }
 
   constexpr void await_resume() const noexcept {
@@ -82,7 +82,7 @@ template <typename... Cores>
 AwaitAwaiter<false>::AwaitAwaiter(Cores&... cores) noexcept : _event{sizeof...(cores) + 1} {
   static_assert(sizeof...(cores) >= 2, "Number of futures must be at least two");
   static_assert((... && std::is_same_v<BaseCore, Cores>), "Futures must be Future in Wait function");
-  const auto wait_count = (... + static_cast<std::size_t>(cores.SetCallback(_event, BaseCore::kInline)));
+  const auto wait_count = (... + static_cast<std::size_t>(cores.SetCallback(_event)));
   _event.count.fetch_sub(sizeof...(cores) - wait_count, std::memory_order_relaxed);
 }
 
@@ -90,7 +90,7 @@ template <typename It>
 AwaitAwaiter<false>::AwaitAwaiter(It it, std::size_t count) noexcept : _event{count + 1} {
   std::size_t wait_count = 0;
   for (std::size_t i = 0; i != count; ++i) {
-    wait_count += static_cast<std::size_t>(it->GetCore()->SetCallback(_event, BaseCore::kInline));
+    wait_count += static_cast<std::size_t>(it->GetCore()->SetCallback(_event));
     ++it;
   }
   _event.count.fetch_sub(count - wait_count, std::memory_order_relaxed);

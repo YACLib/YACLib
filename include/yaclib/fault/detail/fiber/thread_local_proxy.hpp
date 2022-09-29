@@ -2,13 +2,13 @@
 
 namespace yaclib::detail::fiber {
 
-extern uint64_t sNextFreeIndex;
+extern std::uint64_t sNextFreeIndex;
 
-void* GetImpl(uint64_t i);
+void* GetImpl(std::uint64_t i);
 
-void Set(void* new_value, uint64_t i);
+void Set(void* new_value, std::uint64_t i);
 
-void SetDefault(void* new_value, uint64_t i);
+void SetDefault(void* new_value, std::uint64_t i);
 
 template <typename Type>
 class ThreadLocalPtrProxy final {
@@ -86,7 +86,7 @@ class ThreadLocalPtrProxy final {
   }
 
  private:
-  uint64_t _i;
+  std::uint64_t _i;
 };
 
 template <typename T, typename U>

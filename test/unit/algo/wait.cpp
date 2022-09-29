@@ -210,9 +210,9 @@ TEST(WaitFor, Diff) {
 
 TEST(Wait, ResetWait) {
   yaclib::FairThreadPool tp;
-  std::vector<yaclib::FutureOn<size_t>> fs;
+  std::vector<yaclib::FutureOn<std::size_t>> fs;
   fs.reserve(1000 * yaclib_std::thread::hardware_concurrency());
-  for (size_t i = 0; i != 1000 * yaclib_std::thread::hardware_concurrency(); ++i) {
+  for (std::size_t i = 0; i != 1000 * yaclib_std::thread::hardware_concurrency(); ++i) {
     fs.push_back(yaclib::Run(tp, [i] {
       yaclib_std::this_thread::sleep_for(1ns);
       return i;

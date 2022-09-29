@@ -4,10 +4,13 @@
 #include <unistd.h>
 
 namespace yaclib::detail::fiber {
+namespace {
 
-static const uint32_t kPageSize = sysconf(_SC_PAGESIZE);
+const auto kPageSize = static_cast<std::size_t>(sysconf(_SC_PAGESIZE));
 
-static uint32_t cache_size = 100;
+std::uint32_t gCacheSize = 100;
+
+}  // namespace
 
 Allocation DefaultAllocator::Allocate() {
   if (!_pool.empty()) {
@@ -15,7 +18,7 @@ Allocation DefaultAllocator::Allocate() {
     _pool.pop_back();
     return allocation;
   }
-  size_t size = _stack_size_pages * kPageSize;
+  std::size_t size = _stack_size_pages * kPageSize;
 
   void* start = mmap(nullptr, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
   YACLIB_ERROR(start == MAP_FAILED, "mmap for stack failed");
@@ -27,7 +30,7 @@ Allocation DefaultAllocator::Allocate() {
 }
 
 void DefaultAllocator::Release(Allocation allocation) {
-  if (_pool.size() < cache_size) {
+  if (_pool.size() < gCacheSize) {
     _pool.push_back(allocation);
   } else {
     if (allocation.start == nullptr) {
@@ -39,7 +42,7 @@ void DefaultAllocator::Release(Allocation allocation) {
   }
 }
 
-void DefaultAllocator::SetMinStackSize(size_t pages) noexcept {
+void DefaultAllocator::SetMinStackSize(std::size_t pages) noexcept {
   if (pages > _stack_size_pages) {
     for (auto& allocation : _pool) {
       Release(allocation);
@@ -49,12 +52,12 @@ void DefaultAllocator::SetMinStackSize(size_t pages) noexcept {
   }
 }
 
-size_t DefaultAllocator::GetMinStackSize() noexcept {
+std::size_t DefaultAllocator::GetMinStackSize() noexcept {
   return _stack_size_pages;
 }
 
-void DefaultAllocator::SetCacheSize(uint32_t size) noexcept {
-  cache_size = size;
+void DefaultAllocator::SetCacheSize(std::uint32_t size) noexcept {
+  gCacheSize = size;
 }
 
 }  // namespace yaclib::detail::fiber

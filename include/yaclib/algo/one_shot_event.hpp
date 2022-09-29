@@ -3,7 +3,10 @@
 #include <yaclib/algo/detail/base_core.hpp>
 #include <yaclib/exe/executor.hpp>
 #include <yaclib/util/detail/default_event.hpp>
+#include <yaclib/util/detail/mutex_event.hpp>
+#include <yaclib/util/helper.hpp>
 #include <yaclib/util/ref.hpp>
+
 #if YACLIB_CORO != 0
 #  include <yaclib/coro/coro.hpp>
 #endif
@@ -35,6 +38,22 @@ class OneShotEvent {
    */
   void Wait() noexcept;
 
+  /**
+   * TODO
+   */
+  template <typename Rep, typename Period>
+  YACLIB_INLINE bool WaitFor(const std::chrono::duration<Rep, Period>& timeout_duration) {
+    return TimedWait(timeout_duration);
+  }
+
+  /**
+   * TODO
+   */
+  template <typename Clock, typename Duration>
+  YACLIB_INLINE bool WaitUntil(const std::chrono::time_point<Clock, Duration>& timeout_time) {
+    return TimedWait(timeout_time);
+  }
+
 #if YACLIB_CORO != 0
   /**
    * TODO
@@ -63,6 +82,24 @@ class OneShotEvent {
   void Reset() noexcept;
 
  private:
+  template <typename Timeout>
+  bool TimedWait(const Timeout& timeout) {
+    struct OneShotTimedEventWaiter : Job, detail::MutexEvent {
+      void Call() noexcept final {
+        Set();  // under condition? Only if ref count != 1
+        DecRef();
+      }
+    };
+    auto waiter = MakeShared<OneShotTimedEventWaiter>(2);
+    if (TryAdd(waiter.Get())) {
+      auto token = waiter->Make();
+      return waiter->Wait(token, timeout);
+    } else {
+      delete waiter.Release();
+      return true;
+    }
+  }
+
   static constexpr std::uint64_t kEmpty = 0;
   static constexpr std::uint64_t kAllDone = 1;
 

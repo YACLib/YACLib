@@ -65,22 +65,22 @@ void SetHardwareConcurrency(std::uint32_t c) noexcept;
 /**
  * @return current random count for fiber-based execution
  */
-uint64_t GetFaultRandomCount() noexcept;
+std::uint64_t GetFaultRandomCount() noexcept;
 
 /**
  * Forwards random count for fiber-based execution to supplied one
  */
-void ForwardToFaultRandomCount(uint64_t random_count) noexcept;
+void ForwardToFaultRandomCount(std::uint64_t random_count) noexcept;
 
 /**
  * @return current injector state
  */
-uint32_t GetInjectorState() noexcept;
+std::uint32_t GetInjectorState() noexcept;
 
 /**
  * Sets injector state to the supplied one
  */
-void SetInjectorState(uint32_t state) noexcept;
+void SetInjectorState(std::uint32_t state) noexcept;
 
 }  // namespace fiber
 }  // namespace yaclib

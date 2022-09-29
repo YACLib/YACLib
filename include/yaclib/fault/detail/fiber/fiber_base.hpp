@@ -26,7 +26,7 @@ enum FiberState {
 
 class FiberBase : public BiNodeScheduler, public BiNodeWaitQueue {
  public:
-  using Id = uint64_t;
+  using Id = std::uint64_t;
 
   FiberBase();
 
@@ -46,9 +46,9 @@ class FiberBase : public BiNodeScheduler, public BiNodeWaitQueue {
 
   [[nodiscard]] bool IsThreadlikeInstanceAlive() const noexcept;
 
-  void* GetTls(uint64_t id, std::unordered_map<uint64_t, void*>& defaults);
+  void* GetTls(std::uint64_t id, std::unordered_map<std::uint64_t, void*>& defaults);
 
-  void SetTls(uint64_t id, void* value);
+  void SetTls(std::uint64_t id, void* value);
 
   static IStackAllocator& GetAllocator() noexcept;
 
@@ -65,7 +65,7 @@ class FiberBase : public BiNodeScheduler, public BiNodeWaitQueue {
  private:
   static DefaultAllocator sAllocator;
   ExecutionContext _caller_context{};
-  std::unordered_map<uint64_t, void*> _tls;
+  std::unordered_map<std::uint64_t, void*> _tls;
   FiberBase* _joining_fiber{nullptr};
   Id _id;
   FiberState _state{Suspended};

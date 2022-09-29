@@ -6,7 +6,7 @@ namespace yaclib::detail::fiber {
 
 struct Allocation final {
   char* start = nullptr;
-  size_t size = 0;
+  std::size_t size = 0;
 };
 
 /**
@@ -20,9 +20,9 @@ class IStackAllocator {
 
   virtual void Release(Allocation) = 0;
 
-  virtual void SetMinStackSize(size_t bytes) = 0;
+  virtual void SetMinStackSize(std::size_t bytes) = 0;
 
-  virtual size_t GetMinStackSize() = 0;
+  virtual std::size_t GetMinStackSize() = 0;
 
   virtual ~IStackAllocator() = default;
 };

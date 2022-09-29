@@ -25,11 +25,11 @@ class Scheduler final {
 
   [[nodiscard]] bool IsRunning() const noexcept;
 
-  void Sleep(uint64_t ns);
+  void Sleep(std::uint64_t ns);
 
-  void SleepPreemptive(uint64_t ns);
+  void SleepPreemptive(std::uint64_t ns);
 
-  [[nodiscard]] uint64_t GetTimeNs() const noexcept;
+  [[nodiscard]] std::uint64_t GetTimeNs() const noexcept;
 
   static detail::fiber::FiberBase* Current() noexcept;
 
@@ -37,9 +37,9 @@ class Scheduler final {
 
   static void RescheduleCurrent();
 
-  static void SetTickLength(uint32_t tick) noexcept;
+  static void SetTickLength(std::uint32_t tick) noexcept;
 
-  static void SetRandomListPick(uint32_t k) noexcept;
+  static void SetRandomListPick(std::uint32_t k) noexcept;
 
   void Stop();
 
@@ -61,10 +61,10 @@ class Scheduler final {
   void WakeUpNeeded() noexcept;
 
   // TODO(myannyax) priority queue?
-  std::map<uint64_t, detail::fiber::BiList> _sleep_list;
+  std::map<std::uint64_t, detail::fiber::BiList> _sleep_list;
   // TODO(myannyax) priority queue?
   detail::fiber::BiList _queue;
-  uint64_t _time{0};
+  std::uint64_t _time{0};
   bool _running{false};
 };
 

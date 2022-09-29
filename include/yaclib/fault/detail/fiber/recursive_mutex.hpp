@@ -25,7 +25,7 @@ class RecursiveMutex {
 
   FiberQueue _queue;
   FiberBase::Id _owner_id{0};
-  uint32_t _occupied_count{0};
+  std::uint32_t _occupied_count{0};
 };
 
 }  // namespace yaclib::detail::fiber

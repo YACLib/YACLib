@@ -13,7 +13,7 @@ detail::Injector* GetInjector() noexcept;
 
 void InjectFault() noexcept;
 
-uint64_t GetInjectedCount() noexcept;
+std::uint64_t GetInjectedCount() noexcept;
 
 }  // namespace yaclib
 

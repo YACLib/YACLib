@@ -40,26 +40,26 @@ TEST(BaseCore, Sizeof) {
 #if !defined(LAMBDA_SIZE) && defined(__has_cpp_attribute)
 #  if __has_cpp_attribute(no_unique_address)
 #    define LAMBDA_SIZE
-constexpr size_t kZeroCaptureLambdaSizeof = 0;
+constexpr std::size_t kZeroCaptureLambdaSizeof = 0;
 #  endif
 #endif
 
 #if !defined(LAMBDA_SIZE) && defined(__has_attribute)
 #  if __has_attribute(no_unique_address)
 #    define LAMBDA_SIZE
-constexpr size_t kZeroCaptureLambdaSizeof = 0;
+constexpr std::size_t kZeroCaptureLambdaSizeof = 0;
 #  endif
 #endif
 
 #ifndef LAMBDA_SIZE
-constexpr size_t kZeroCaptureLambdaSizeof = sizeof(void*);
+constexpr std::size_t kZeroCaptureLambdaSizeof = sizeof(void*);
 #endif
 
 void kek() {
 }
 
 TEST(Core, EmptySizeof) {
-  auto* core = yaclib::detail::MakeCore<yaclib::detail::CoreType::Run, void, yaclib::StopError>([] {
+  auto* core = yaclib::detail::MakeCore<yaclib::detail::CoreType::Run, true, void, yaclib::StopError>([] {
     kek();
   });
 
@@ -69,19 +69,19 @@ TEST(Core, EmptySizeof) {
                                                                   0));
   std::cerr << sizeof(*core) << std::endl;
 
-  core->StoreCallback(yaclib::detail::MakeDrop(), yaclib::detail::BaseCore::kInline);
+  core->StoreCallback(yaclib::detail::MakeDrop());
   static_cast<yaclib::Job*>(core)->Drop();
 }
 
 TEST(Core, Sizeof) {
-  auto* core = yaclib::detail::MakeCore<yaclib::detail::CoreType::Run, void, yaclib::StopError>(kek);
+  auto* core = yaclib::detail::MakeCore<yaclib::detail::CoreType::Run, true, void, yaclib::StopError>(kek);
   static_assert(sizeof(void*) == sizeof(int) || sizeof(*core) == (sizeof(yaclib::detail::BaseCore) +  //
                                                                   sizeof(yaclib::Result<>) +          //
                                                                   sizeof(&kek) +                      //
                                                                   0));
   std::cerr << sizeof(*core) << std::endl;
 
-  core->StoreCallback(yaclib::detail::MakeDrop(), yaclib::detail::BaseCore::kInline);
+  core->StoreCallback(yaclib::detail::MakeDrop());
   static_cast<yaclib::Job*>(core)->Drop();
 }
 

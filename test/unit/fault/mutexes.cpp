@@ -47,9 +47,9 @@ TEST(FiberTimedMutex, basic) {
   m.lock();
   yaclib_std::thread t1([&] {
     auto clock = yaclib_std::chrono::steady_clock();
-    auto time = clock.now();
+    auto was = clock.now();
     ASSERT_FALSE(m.try_lock_for(10ms));
-    ASSERT_GE(clock.now() - time, 10ms);
+    ASSERT_GE(clock.now() - was, 10ms);
   });
 
   t1.join();
@@ -63,9 +63,11 @@ TEST(FiberRecursiveTimedMutex, basic) {
   ASSERT_TRUE(m.try_lock());
   yaclib_std::thread t1([&] {
     auto clock = yaclib_std::chrono::steady_clock();
-    auto time = clock.now();
+    auto was = clock.now();
     ASSERT_FALSE(m.try_lock_for(10ms));
-    ASSERT_GE(clock.now() - time, 10ms);
+    auto dur = clock.now() - was;
+    ASSERT_GE(dur, 10ms);
+    ASSERT_LE(dur, 11ms);
   });
 
   t1.join();
@@ -86,12 +88,16 @@ TEST(FiberSharedTimedMutex, basic) {
   m.lock();
   yaclib_std::thread t1([&] {
     auto clock = yaclib_std::chrono::steady_clock();
-    auto time = clock.now();
+    auto was = clock.now();
     ASSERT_FALSE(m.try_lock_for(10ms));
-    ASSERT_GE(clock.now() - time, 10ms);
-    time = clock.now();
+    auto dur = clock.now() - was;
+    ASSERT_GE(dur, 10ms);
+    ASSERT_LE(dur, 11ms);
+    was = clock.now();
     ASSERT_FALSE(m.try_lock_shared_for(10ms));
-    ASSERT_GE(clock.now() - time, 10ms);
+    dur = clock.now() - was;
+    ASSERT_GE(dur, 10ms);
+    ASSERT_LE(dur, 11ms);
   });
 
   t1.join();
@@ -101,9 +107,9 @@ TEST(FiberSharedTimedMutex, basic) {
 
   yaclib_std::thread t2([&] {
     auto clock = yaclib_std::chrono::steady_clock();
-    auto time = clock.now();
+    auto was = clock.now();
     ASSERT_FALSE(m.try_lock_for(10ms));
-    ASSERT_GE(clock.now() - time, 10ms);
+    ASSERT_GE(clock.now() - was, 10ms);
     ASSERT_TRUE(m.try_lock_shared_for(10ms));
   });
 
