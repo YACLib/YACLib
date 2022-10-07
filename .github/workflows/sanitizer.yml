@@ -176,6 +176,7 @@ jobs:
           for (( i=0; i<${#cxx_compilers[*]}; i+=1 )); do
             for (( j=0; j<${#link_options[*]}; j+=1 )); do
               for yaclib_fault in ${YACLIB_FAULT[*]}; do
+                link_option=${link_options[$j]}; compile_option=${compile_options[$j]}
                 if [[ ${{ matrix.os }} == "macos-12" ]]; then # macOS workarounds
                   if [[ "${compiler_names[$i]}" != "gnu" && "$flags" == "LSAN" ]]; then
                     # AppleClang doesn't support LSAN.
@@ -185,7 +186,8 @@ jobs:
                     # After all, if your application crashed from lack of memory, why fix it? Better buy a new mac!
                     continue
                   fi
-                  if [[ "${compiler_names[$i]}" == "gnu" && "$flags" == "TSAN" ]]; then
+                  if [[ "${compiler_names[$i]}" == "gnu" ]]; then
+                    # TODO https://stackoverflow.com/questions/73714336/xcode-update-to-version-2395-ld-compile-problem-occurs-computedatomcount-m
                     continue  # Link error
                   fi
                 fi
@@ -196,7 +198,6 @@ jobs:
                   # Btw I dunno what stdlib would be using libstdcxx or apple_libcxx, just some default
                   continue
                 fi
-                link_option=${link_options[$j]}; compile_option=${compile_options[$j]}
                 if [[ "${compiler_names[$i]}" == "clang" ]]; then
                   if [[ ${{ matrix.os }} == "macos-12" && "${stdlib_names[$j]}" == "libstdcxx" ]]; then
                     continue  # TODO(MBkkt) Specify path to libstdcxx

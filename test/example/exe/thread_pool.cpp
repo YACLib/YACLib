@@ -20,7 +20,7 @@ TEST(Example, FairThreadPool) {
 
   yaclib::FairThreadPool tp{4};
 
-  std::atomic<size_t> counter{0};
+  std::atomic<std::size_t> counter{0};
 
 #if YACLIB_FAULT == 1
   constexpr std::size_t kIncrements = 1000;

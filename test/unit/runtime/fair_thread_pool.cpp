@@ -22,7 +22,7 @@ namespace {
 using namespace std::chrono_literals;
 
 const auto kCoresCount = [] {
-  auto const cores_count{yaclib_std::thread::hardware_concurrency()};
+  const auto cores_count{yaclib_std::thread::hardware_concurrency()};
   EXPECT_GT(cores_count, 1);
   return cores_count;
 }();
@@ -411,8 +411,8 @@ void RacyCounter() {
 #endif
   yaclib::FairThreadPool tp{2 * kCoresCount};
 
-  yaclib_std::atomic<size_t> counter1{0};
-  yaclib_std::atomic<size_t> counter2{0};
+  yaclib_std::atomic<std::size_t> counter1{0};
+  yaclib_std::atomic<std::size_t> counter2{0};
 
   static const std::size_t kIncrements = 123456;
   for (std::size_t i = 0; i < kIncrements; ++i) {

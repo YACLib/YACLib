@@ -22,11 +22,11 @@ class TimedMutex : public Mutex {
   }
 
  private:
-  template <typename Time>
-  bool TimedWaitHelper(const Time& time) {
+  template <typename Timeout>
+  bool TimedWaitHelper(const Timeout& timeout) {
     bool r = true;
     if (_occupied) {
-      r = _queue.Wait(time) == WaitStatus::Ready;
+      r = _queue.Wait(timeout) == WaitStatus::Ready;
     }
     YACLIB_DEBUG(r && _occupied, "about to be locked twice");
     if (r) {

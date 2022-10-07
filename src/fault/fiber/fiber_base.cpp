@@ -62,7 +62,7 @@ bool FiberBase::IsThreadlikeInstanceAlive() const noexcept {
   return _threadlike_instance_alive;
 }
 
-void* FiberBase::GetTls(uint64_t id, std::unordered_map<uint64_t, void*>& defaults) {
+void* FiberBase::GetTls(std::uint64_t id, std::unordered_map<std::uint64_t, void*>& defaults) {
   auto it = _tls.find(id);
   if (it == _tls.end()) {
     return defaults[id];
@@ -71,7 +71,7 @@ void* FiberBase::GetTls(uint64_t id, std::unordered_map<uint64_t, void*>& defaul
   }
 }
 
-void FiberBase::SetTls(uint64_t id, void* value) {
+void FiberBase::SetTls(std::uint64_t id, void* value) {
   _tls[id] = value;
 }
 

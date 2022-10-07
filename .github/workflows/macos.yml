@@ -46,7 +46,7 @@ jobs:
       - name: Configure CMake
         run: |
           if [[ "${{ matrix.os }}" == "12" ]]; then
-            compiler_names=(clang gnu)
+            compiler_names=(clang) # TODO gnu
             llvm=/usr/local/opt/llvm@8
             cxx_compilers=("$llvm/bin/clang++" g++-7)
             stdlib_names=(libcxx libstdcxx default)

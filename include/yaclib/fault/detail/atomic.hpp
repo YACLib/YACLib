@@ -9,7 +9,7 @@ namespace yaclib::detail {
 
 bool ShouldFailAtomicWeak();
 
-void SetAtomicWeakFailFrequency(uint32_t k);
+void SetAtomicWeakFailFrequency(std::uint32_t k);
 
 template <typename Impl, typename T>
 class AtomicBase : public AtomicWait<Impl, T> {

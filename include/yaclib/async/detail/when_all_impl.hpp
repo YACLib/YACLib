@@ -86,7 +86,7 @@ class AllCombinator : public InlineCore, public AllCombinatorBase<FutureValue> {
 #endif
 
   void Combine(Result<V, E>&& result) noexcept {
-    auto const state = result.State();
+    const auto state = result.State();
     if (state == ResultState::Value) {
       if constexpr (!std::is_void_v<V>) {
         const auto ticket = this->_ticket.fetch_add(1, std::memory_order_acq_rel);

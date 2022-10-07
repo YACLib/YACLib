@@ -66,15 +66,15 @@ void SetHardwareConcurrency([[maybe_unused]] std::uint32_t c) noexcept {
 #endif
 }
 
-uint64_t GetFaultRandomCount() noexcept {
+std::uint64_t GetFaultRandomCount() noexcept {
   return detail::GetRandCount();
 }
 
-void ForwardToFaultRandomCount(uint64_t random_count) noexcept {
+void ForwardToFaultRandomCount(std::uint64_t random_count) noexcept {
   return detail::ForwardToRandCount(random_count);
 }
 
-uint32_t GetInjectorState() noexcept {
+std::uint32_t GetInjectorState() noexcept {
 #if YACLIB_FAULT != 0
   return yaclib::GetInjector()->GetState();
 #else
@@ -82,7 +82,7 @@ uint32_t GetInjectorState() noexcept {
 #endif
 }
 
-void SetInjectorState([[maybe_unused]] uint32_t state) noexcept {
+void SetInjectorState([[maybe_unused]] std::uint32_t state) noexcept {
 #if YACLIB_FAULT != 0
   yaclib::GetInjector()->SetState(state);
 #endif

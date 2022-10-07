@@ -12,7 +12,7 @@ void InjectFault() noexcept {
   GetInjector()->MaybeInject();
 }
 
-uint64_t GetInjectedCount() noexcept {
+std::uint64_t GetInjectedCount() noexcept {
   return detail::Injector::GetInjectedCount();
 }
 

@@ -81,12 +81,12 @@ class Goer {
   explicit Goer(yaclib::IExecutor& scheduler, yaclib::WaitGroup<>& wg) : scheduler_(scheduler), wg_(wg) {
   }
 
-  void Start(size_t steps) {
+  void Start(std::size_t steps) {
     steps_left_ = steps;
     Step();
   }
 
-  size_t Steps() const {
+  std::size_t Steps() const {
     return steps_made_;
   }
 
@@ -129,7 +129,7 @@ void Stress2(util::Duration duration) {
     bool done = false;
 
     auto tester = [&tp, &done, iter]() -> yaclib::Future<> {
-      const size_t steps = 1 + iter % 3;
+      const std::size_t steps = 1 + iter % 3;
 
       yaclib::WaitGroup<> wg;
 

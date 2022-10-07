@@ -20,8 +20,8 @@ template <typename Event, typename Timeout, typename Range>
 bool WaitRange(const Timeout& timeout, Range&& range, std::size_t count) noexcept {
   Event event{count + 1};
   // event ref counter = n + 1, it is optimization: we don't want to notify when return true immediately
-  auto const wait_count = range([&](BaseCore& core) noexcept {
-    return core.SetCallback(event.GetCall(), BaseCore::kInline);
+  const auto wait_count = range([&](BaseCore& core) noexcept {
+    return core.SetCallback(event.GetCall());
   });
   if (wait_count == 0 || event.SubEqual(count - wait_count + 1)) {
     return true;

@@ -19,7 +19,7 @@ template <typename E = StopError, typename Func>
 /*FutureOn*/ auto Run(IExecutor& e, Func&& f) {
   YACLIB_WARN(e.Tag() == IExecutor::Type::Inline,
               "better way is call func explicit, and use MakeFuture to create Future with func result");
-  auto* core = detail::MakeCore<detail::CoreType::Run, void, E>(std::forward<Func>(f));
+  auto* core = detail::MakeCore<detail::CoreType::Run, true, void, E>(std::forward<Func>(f));
   core->_executor = &e;
   using ResultCoreT = typename std::remove_reference_t<decltype(*core)>::Base;
   e.Submit(*core);

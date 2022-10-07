@@ -453,24 +453,52 @@ TYPED_TEST(AsyncSuite, AsyncThen) {
   yaclib::FairThreadPool tp{4};
 
   Calculator calculator(tp);
-
-  auto pipeline = calculator.Increment<TestFixture::kIsFuture>(1)
-                    .Then([&](int value) {
-                      return calculator.Double(value);
-                    })
-                    .Then([&](int value) {
-                      return calculator.Increment(value);
-                    });
-  EXPECT_EQ(std::move(pipeline).Get().Value(), 5);
-
-  auto pipeline2 = calculator.Increment<TestFixture::kIsFuture>(1)
-                     .ThenInline([&](int value) {
-                       return calculator.Double(value);
-                     })
-                     .ThenInline([&](int value) {
-                       return calculator.Increment(value);
-                     });
-  EXPECT_EQ(std::move(pipeline2).Get().Value(), 5);
+  {
+    auto pipeline1 = calculator.Increment<TestFixture::kIsFuture>(1)
+                       .Then([&](int value) {
+                         return calculator.Double(value);
+                       })
+                       .Then([&](int value) {
+                         return calculator.Increment(value);
+                       });
+    EXPECT_EQ(std::move(pipeline1).Get().Value(), 5);
+  }
+  {
+    auto pipeline2 = calculator.Increment<TestFixture::kIsFuture>(1)
+                       .ThenInline([&](int value) {
+                         return calculator.Double(value);
+                       })
+                       .ThenInline([&](int value) {
+                         return calculator.Increment(value);
+                       });
+    EXPECT_EQ(std::move(pipeline2).Get().Value(), 5);
+  }
+  {
+    auto pipeline3 = INVOKE(tp,
+                            [&] {
+                              return calculator.Increment<true>(1);
+                            })
+                       .Then([&](int value) {
+                         return calculator.Double(value);
+                       })
+                       .Then([&](int value) {
+                         return calculator.Increment(value);
+                       });
+    EXPECT_EQ(std::move(pipeline3).Get().Value(), 5);
+  }
+  {
+    auto pipeline4 = INVOKE(tp,
+                            [&] {
+                              return calculator.Increment<true>(1);
+                            })
+                       .ThenInline([&](int value) {
+                         return calculator.Double(value);
+                       })
+                       .ThenInline([&](int value) {
+                         return calculator.Increment(value);
+                       });
+    EXPECT_EQ(std::move(pipeline4).Get().Value(), 5);
+  }
 
   tp.SoftStop();
   tp.Wait();

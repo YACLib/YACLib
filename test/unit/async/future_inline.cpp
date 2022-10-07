@@ -310,7 +310,7 @@ template <typename TestFixture, bool Inline>
 void ThenInlineStopped() {
   auto manual = yaclib::MakeManual();
   StopSource source{*manual};
-  size_t ready = 0;
+  std::size_t ready = 0;
   auto inc = [&] {
     ++ready;
   };

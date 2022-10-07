@@ -174,7 +174,7 @@ void MultiThreaded() {
 
   std::array<yaclib::FutureOn<V>, 6> fs;
   for (int i = 0; i < kValues; ++i) {
-    fs[static_cast<size_t>(i)] = async_value(i);
+    fs[static_cast<std::size_t>(i)] = async_value(i);
   }
   auto gen_fs = [&fs] {
     if constexpr (C == Container::Vector) {
@@ -187,8 +187,8 @@ void MultiThreaded() {
 
   auto begin = yaclib_std::chrono::steady_clock::now();
   auto ints = gen_fs().Get();
-  auto time = yaclib_std::chrono::steady_clock::now() - begin;
-  EXPECT_LT(time, 200ms * YACLIB_CI_SLOWDOWN);
+  auto dur = yaclib_std::chrono::steady_clock::now() - begin;
+  EXPECT_LT(dur, 200ms * YACLIB_CI_SLOWDOWN);
 
   auto result = std::move(ints).Ok();
   if constexpr (!kIsVoid) {
@@ -234,8 +234,8 @@ void TimeTest() {
 
   auto begin = yaclib_std::chrono::steady_clock::now();
   auto ints = gen_fs().Get();
-  auto time = yaclib_std::chrono::steady_clock::now() - begin;
-  EXPECT_LT(time, 100ms * YACLIB_CI_SLOWDOWN);
+  auto dur = yaclib_std::chrono::steady_clock::now() - begin;
+  EXPECT_LT(dur, 100ms * YACLIB_CI_SLOWDOWN);
 
   auto result = std::move(ints).Ok();
   if constexpr (!is_void) {

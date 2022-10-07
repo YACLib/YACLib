@@ -54,15 +54,15 @@ class ConditionVariable {
   native_handle_type native_handle();
 
  private:
-  template <typename Time, typename Predicate>
-  bool WaitImplWithPredicate(std::unique_lock<yaclib::detail::fiber::Mutex>& lock, const Time& time,
+  template <typename Timeout, typename Predicate>
+  bool WaitImplWithPredicate(std::unique_lock<yaclib::detail::fiber::Mutex>& lock, const Timeout& timeout,
                              const Predicate& predicate) {
     while (!predicate()) {
-      if (WaitImpl(lock, time) == WaitStatus::Timeout) {
+      if (WaitImpl(lock, timeout) == WaitStatus::Timeout) {
         break;
       }
     }
-    if constexpr (!std::is_same_v<Time, NoTimeoutTag>) {
+    if constexpr (!std::is_same_v<Timeout, NoTimeoutTag>) {
       return predicate();
     } else {
       YACLIB_DEBUG(!predicate(), "Should be true");
@@ -70,11 +70,11 @@ class ConditionVariable {
     }
   }
 
-  template <typename Time>
-  WaitStatus WaitImpl(std::unique_lock<yaclib::detail::fiber::Mutex>& lock, const Time& time) {
+  template <typename Timeout>
+  WaitStatus WaitImpl(std::unique_lock<yaclib::detail::fiber::Mutex>& lock, const Timeout& timeout) {
     InjectFault();
     lock.unlock();
-    auto status = _queue.Wait(time);
+    auto status = _queue.Wait(timeout);
     lock.lock();
     InjectFault();
     return status;

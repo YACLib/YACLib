@@ -21,7 +21,7 @@ class [[nodiscard]] UnlockStickyAwaiter {
   }
 
   template <typename Promise>
-  YACLIB_INLINE bool await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
+  YACLIB_INLINE auto await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
     YACLIB_ASSERT(_executor != nullptr);
     return _mutex.UnlockOnImpl<FIFO, BatchHere>(handle.promise(), *_executor);
   }
@@ -43,18 +43,18 @@ class [[nodiscard]] Mutex<DefaultFIFO, DefaultBatchHere>::LockStickyAwaiter {
   }
 
   YACLIB_INLINE bool await_ready() noexcept {
-    _guard._executor = nullptr;
-    return _guard._mutex.TryLock();
+    _guard.executor = nullptr;
+    return _guard._mutex->TryLock();
   }
 
   template <typename Promise>
   YACLIB_INLINE bool await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
     auto& promise = handle.promise();
-    _guard._executor = promise._executor.Get();
-    if (_guard._mutex.Lock(promise)) {
+    _guard.executor = promise._executor.Get();
+    if (static_cast<detail::MutexImpl*>(_guard._mutex)->Lock(promise)) {
       return true;  // suspend
     }
-    _guard._executor = nullptr;
+    _guard.executor = nullptr;
     return false;
   }
 
@@ -68,7 +68,9 @@ class [[nodiscard]] Mutex<DefaultFIFO, DefaultBatchHere>::LockStickyAwaiter {
 template <bool DefaultFIFO, std::uint8_t DefaultBatchHere>
 class [[nodiscard]] Mutex<DefaultFIFO, DefaultBatchHere>::GuardSticky : public GuardUnique {
  public:
-  GuardSticky(GuardSticky&& other) noexcept : GuardUnique{other}, _executor{other._executor} {
+  using GuardUnique::GuardUnique;
+
+  GuardSticky(GuardSticky&& other) noexcept : GuardUnique{std::move(other)}, executor{other.executor} {
   }
 
   GuardSticky& operator=(GuardSticky&& other) noexcept {
@@ -77,23 +79,24 @@ class [[nodiscard]] Mutex<DefaultFIFO, DefaultBatchHere>::GuardSticky : public G
   }
 
   auto Lock() noexcept {
-    YACLIB_ERROR(this->_owns, "Cannot lock already locked mutex");
+    YACLIB_ERROR(this->_owns, "Cannot LockSticky already locked mutex");
     this->_owns = true;
     return LockStickyAwaiter{*this};
   }
 
   template <bool FIFO = DefaultFIFO, std::uint8_t BatchHere = DefaultBatchHere>
   auto Unlock() noexcept {
-    return detail::UnlockStickyAwaiter<FIFO, BatchHere>{this->_mutex, _executor};
+    YACLIB_ERROR(!this->_owns, "Cannot UnlockSticky not locked mutex");
+    this->_owns = false;
+    return detail::UnlockStickyAwaiter<FIFO, BatchHere>{*this->_mutex, executor};
   }
 
   void Swap(GuardSticky& other) noexcept {
     GuardUnique::Swap(other);
-    std::swap(_executor, other._executor);
+    std::swap(executor, other._executor);
   }
 
- protected:
-  IExecutor* _executor = nullptr;
+  IExecutor* executor = nullptr;
 };
 
 template <bool DefaultFIFO, std::uint8_t DefaultBatchHere>
@@ -107,12 +110,14 @@ class [[nodiscard]] Mutex<DefaultFIFO, DefaultBatchHere>::GuardStickyAwaiter {
     return awaiter.await_ready();
   }
 
-  YACLIB_INLINE bool await_suspend() noexcept {
+  template <typename Promise>
+  YACLIB_INLINE bool await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
     LockStickyAwaiter awaiter{_guard};
-    return awaiter.await_suspend();
+    return awaiter.await_suspend(handle);
   }
 
   YACLIB_INLINE GuardSticky await_resume() noexcept {
+    YACLIB_ASSERT(_guard.OwnsLock());
     return std::move(_guard);
   }
 

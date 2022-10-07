@@ -5,12 +5,12 @@
 
 namespace yaclib::fault {
 
-Scheduler* sCurrentScheduler = nullptr;
+static Scheduler* sCurrentScheduler = nullptr;
 
 static thread_local detail::fiber::FiberBase* sCurrent;
 
-static uint32_t sTickLength = 10;
-static uint32_t sRandomListPick = 10;
+static std::uint32_t sTickLength = 10;
+static std::uint32_t sRandomListPick = 10;
 
 detail::fiber::FiberBase* Scheduler::GetNext() {
   YACLIB_DEBUG(_queue.Empty(), "Queue can't be empty");
@@ -70,7 +70,7 @@ void Scheduler::AdvanceTime() noexcept {
   }
 }
 
-uint64_t Scheduler::GetTimeNs() const noexcept {
+std::uint64_t Scheduler::GetTimeNs() const noexcept {
   return _time;
 }
 
@@ -114,15 +114,15 @@ void Scheduler::RescheduleCurrent() {
   fiber->Suspend();
 }
 
-void Scheduler::SetTickLength(uint32_t tick) noexcept {
+void Scheduler::SetTickLength(std::uint32_t tick) noexcept {
   sTickLength = tick;
 }
 
-void Scheduler::SetRandomListPick(uint32_t k) noexcept {
+void Scheduler::SetRandomListPick(std::uint32_t k) noexcept {
   sRandomListPick = k;
 }
 
-void Scheduler::Sleep(uint64_t ns) {
+void Scheduler::Sleep(std::uint64_t ns) {
   if (ns <= GetTimeNs()) {
     return;
   }
@@ -132,7 +132,7 @@ void Scheduler::Sleep(uint64_t ns) {
   Suspend();
 }
 
-void Scheduler::SleepPreemptive(uint64_t ns) {
+void Scheduler::SleepPreemptive(std::uint64_t ns) {
   ns += detail::GetRandNumber(GetFaultSleepTime());
   Sleep(ns);
   // <= because wakeup called before time adjustment

@@ -2,31 +2,31 @@
 
 namespace yaclib::detail {
 
-static uint32_t sSeed{1239};
+static std::uint32_t sSeed{1239};
 
 #if YACLIB_FAULT == 2
-static int sRandCount{0};
+static std::uint64_t sRandCount{0};
 #endif
 
 static thread_local std::mt19937_64 eng{sSeed};
 
-void SetSeed(uint32_t new_seed) {
+void SetSeed(std::uint32_t new_seed) {
   sSeed = new_seed;
   eng.seed(new_seed);
 }
 
-uint32_t GetSeed() {
+std::uint32_t GetSeed() {
   return sSeed;
 }
 
-uint64_t GetRandNumber(uint64_t max) {
+std::uint64_t GetRandNumber(std::uint64_t max) {
 #if YACLIB_FAULT == 2
   sRandCount++;
 #endif
   return eng() % max;
 }
 
-uint64_t GetRandCount() {
+std::uint64_t GetRandCount() {
 #if YACLIB_FAULT == 2
   return sRandCount;
 #else
@@ -34,9 +34,9 @@ uint64_t GetRandCount() {
 #endif
 }
 
-void ForwardToRandCount([[maybe_unused]] uint64_t random_count) {
+void ForwardToRandCount([[maybe_unused]] std::uint64_t random_count) {
 #if YACLIB_FAULT == 2
-  for (int i = 0; i < random_count; ++i) {
+  for (std::uint64_t i = 0; i != random_count; ++i) {
     GetRandNumber(1);
   }
 #endif

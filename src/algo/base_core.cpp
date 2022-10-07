@@ -6,14 +6,8 @@
 namespace yaclib::detail {
 
 void BaseCore::SetInline(InlineCore& callback) noexcept {
-  if (!SetCallback(callback, BaseCore::kInline)) {
+  if (!SetCallback(callback)) {
     callback.Here(*this);
-  }
-}
-
-void BaseCore::SetCall(BaseCore& callback) noexcept {
-  if (!SetCallback(callback, kCall)) {
-    Submit(callback);
   }
 }
 
@@ -33,26 +27,18 @@ BaseCore::BaseCore(State callback) noexcept : _callback{callback} {
 
 template <bool SymmetricTransfer>
 BaseCore::ReturnT<SymmetricTransfer> BaseCore::SetResult() noexcept {
-  auto expected = _callback.exchange(kResult, std::memory_order_acq_rel);
-  const State state{expected & kMask};
-  auto* const callback = reinterpret_cast<InlineCore*>(expected & ~kMask);
-  YACLIB_ASSERT(state == kEmpty || callback != nullptr);
-  switch (state) {
-    case kInline:
+  const auto expected = _callback.exchange(kResult, std::memory_order_acq_rel);
+  if (expected != kEmpty) {
+    YACLIB_ASSERT(expected != kResult);
+    auto* const callback = reinterpret_cast<InlineCore*>(expected);
 #if YACLIB_FINAL_SUSPEND_TRANSFER != 0
-      if constexpr (SymmetricTransfer) {
-        return callback->Next(*this);
-      } else
+    if constexpr (SymmetricTransfer) {
+      return callback->Next(*this);
+    } else
 #endif
-      {
-        callback->Here(*this);
-      }
-      break;
-    case kCall:
-      Submit(static_cast<BaseCore&>(*callback));
-      [[fallthrough]];
-    default:
-      break;
+    {
+      callback->Here(*this);
+    }
   }
 #if YACLIB_FINAL_SUSPEND_TRANSFER != 0
   if constexpr (SymmetricTransfer) {
@@ -67,24 +53,25 @@ template BaseCore::ReturnT<false> BaseCore::SetResult<false>() noexcept;
 template BaseCore::ReturnT<true> BaseCore::SetResult<true>() noexcept;
 #endif
 
-bool BaseCore::SetCallback(InlineCore& callback, State state) noexcept {
-  std::uint64_t expected = kEmpty;
+bool BaseCore::SetCallback(InlineCore& callback) noexcept {
+  YACLIB_ASSERT(reinterpret_cast<std::uintptr_t>(&callback) != kEmpty);
+  YACLIB_ASSERT(reinterpret_cast<std::uintptr_t>(&callback) != kResult);
+  std::uintptr_t expected = kEmpty;
   return _callback.load(std::memory_order_acquire) == expected &&
-         _callback.compare_exchange_strong(expected, state | reinterpret_cast<std::uint64_t>(&callback),
+         _callback.compare_exchange_strong(expected, reinterpret_cast<std::uintptr_t>(&callback),
                                            std::memory_order_release, std::memory_order_acquire);
 }
 
-void BaseCore::StoreCallback(InlineCore& callback, State state) noexcept {
+void BaseCore::StoreCallback(InlineCore& callback) noexcept {
   // TODO(MBkkt) with atomic_ref here can be non-atomic store
-  _callback.store(state | reinterpret_cast<std::uint64_t>(&callback), std::memory_order_relaxed);
+  _callback.store(reinterpret_cast<std::uintptr_t>(&callback), std::memory_order_relaxed);
 }
 
-void BaseCore::Submit(BaseCore& callback) noexcept {
+void BaseCore::MoveExecutorTo(BaseCore& callback) noexcept {
   if (!callback._executor) {
     YACLIB_ASSERT(_executor != nullptr);
     callback._executor = std::move(_executor);
   }
-  callback._executor->Submit(callback);
 }
 
 }  // namespace yaclib::detail

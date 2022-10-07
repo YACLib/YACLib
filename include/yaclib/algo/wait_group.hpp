@@ -129,6 +129,21 @@ class WaitGroup final {
   YACLIB_INLINE void Wait() noexcept {
     _event.Wait();
   }
+  /**
+   * TODO
+   */
+  template <typename Rep, typename Period>
+  YACLIB_INLINE bool WaitFor(const std::chrono::duration<Rep, Period>& timeout_duration) {
+    return _event.WaitFor(timeout_duration);
+  }
+
+  /**
+   * TODO
+   */
+  template <typename Clock, typename Duration>
+  YACLIB_INLINE bool WaitUntil(const std::chrono::time_point<Clock, Duration>& timeout_time) {
+    return _event.WaitUntil(timeout_time);
+  }
 
 #if YACLIB_CORO != 0
   /**
@@ -210,13 +225,13 @@ class WaitGroup final {
     }
     const auto wait_count = range([&](detail::BaseCore& core) noexcept {
       if constexpr (NeedMove) {
-        if (core.SetCallback(_event.GetDrop(), detail::BaseCore::kInline)) {
+        if (core.SetCallback(_event.GetDrop())) {
           return true;
         }
         core.DecRef();
         return false;
       } else {
-        return core.SetCallback(_event.GetCall(), detail::BaseCore::kInline);
+        return core.SetCallback(_event.GetCall());
       }
     });
     if (count != wait_count) {  // TODO(MBkkt) is it necessary?

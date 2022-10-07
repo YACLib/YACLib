@@ -184,7 +184,7 @@ yaclib::FairThreadPool tp{/*threads=*/4};
 // decorated thread pool by serializing tasks:
 auto strand = yaclib::MakeStrand(&tp);
 
-size_t counter = 0;
+std::size_t counter = 0;
 for (std::size_t i = 0; i < 100; ++i) {
   Submit(tp, [&] {
     Submit(*strand, [&] {
@@ -207,9 +207,9 @@ And also the implementation of strand is lock-free and efficient, without additi
 yaclib::FairThreadPool tp{4};
 yaclib::Mutex<> m;
 
-size_t counter = 0;
+std::size_t counter = 0;
 
-auto compute = [&] (size_t index) -> yaclib::Future<> {
+auto compute = [&] (std::size_t index) -> yaclib::Future<> {
   co_await On(tp);
   // ... some computation with index ...
   auto guard = co_await m.Guard();
@@ -217,7 +217,7 @@ auto compute = [&] (size_t index) -> yaclib::Future<> {
   counter += index;
 };
 
-for (size_t i = 0; i < 100; ++i) {
+for (std::size_t i = 0; i < 100; ++i) {
   compute(i);
 }
 ```

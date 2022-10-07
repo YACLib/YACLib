@@ -12,7 +12,7 @@ namespace test {
 namespace {
 
 TEST(Task, Simple) {
-  size_t called = 0;
+  std::size_t called = 0;
   yaclib::Task<> task = yaclib::Schedule([&] {
                           called += 1;
                         })
@@ -39,7 +39,7 @@ TEST(Task, Simple) {
 TEST(Task, Simple2) {
   yaclib::FairThreadPool tp{1};
 
-  size_t called = 0;
+  std::size_t called = 0;
   yaclib::Task<> task = yaclib::Schedule(tp,
                                          [&] {
                                            called += 1;
@@ -64,7 +64,7 @@ TEST(Task, Simple2) {
 TEST(Task, Cancel) {
   yaclib::FairThreadPool tp{1};
 
-  size_t called = 0;
+  std::size_t called = 0;
   std::ignore = yaclib::MakeTask(1);
   yaclib::Task<> task1 = yaclib::Schedule([&] {
                            called += 1;

@@ -3,6 +3,7 @@
 #include <yaclib/async/wait.hpp>
 #include <yaclib/coro/await.hpp>
 #include <yaclib/coro/future.hpp>
+#include <yaclib/coro/guard_unique.hpp>
 #include <yaclib/coro/mutex.hpp>
 #include <yaclib/coro/on.hpp>
 #include <yaclib/runtime/fair_thread_pool.hpp>
@@ -25,12 +26,11 @@ void Stress1(const std::size_t kCoros, test::util::Duration dur) {
   auto coro = [&]() -> yaclib::Future<> {
     co_await On(tp);
     while (sw.Elapsed() < dur) {
-      co_await m.Lock();
+      auto g = co_await m.UniqueGuard();
       ++cs;
       if (cs == 7) {
         co_await On(tp);
       }
-      m.UnlockHere();
     }
     co_return{};
   };
@@ -85,8 +85,8 @@ TEST(MutexStress, CommonTimer) {
 #if YACLIB_FAULT == 2
   GTEST_SKIP();  // TODO(myannyax) make time run forward even without switches
 #endif
-#ifdef GTEST_OS_WINDOWS
-  GTEST_SKIP();  // Doesn't work for Win32 or Debug, I think its probably because bad symmetric transfer implementation
+#if !defined(_WIN64) && (defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__))
+  GTEST_SKIP();  // Doesn't work for Win32, I think its probably because bad symmetric transfer implementation
   // TODO(kononovk) Try to confirm problem and localize it with ifdefs
 #endif
   using namespace std::chrono_literals;

@@ -29,7 +29,7 @@ struct MutexImpl {
         }
       } else {
         new_state.next = reinterpret_cast<BaseCore*>(expected);
-        if (sender.compare_exchange_weak(expected, reinterpret_cast<std::uint64_t>(&new_state),
+        if (sender.compare_exchange_weak(expected, reinterpret_cast<std::uintptr_t>(&new_state),
                                          std::memory_order_release, std::memory_order_relaxed)) {
           return true;  // need suspend
         }
@@ -39,7 +39,7 @@ struct MutexImpl {
 
   template <bool FIFO>
   [[nodiscard]] BaseCore* TryUnlock() noexcept {
-    YACLIB_DEBUG(sender.load(std::memory_order_relaxed) == kNotLocked, "UnlockHere must be called after Lock!");
+    YACLIB_ASSERT(sender.load(std::memory_order_relaxed) != kNotLocked);
     if (receiver != nullptr) {
       return receiver;
     }
@@ -73,8 +73,8 @@ struct MutexImpl {
     if (next == nullptr) {
       return;
     }
-    batch_here = 0;
     receiver = static_cast<detail::BaseCore*>(next->next);
+    batch_here = 0;
     // next->_executor for next critical section
     next->_executor->Submit(*next);
   }
@@ -100,11 +100,11 @@ struct MutexImpl {
     YACLIB_TRANSFER(next->Curr());
   }
 
-  static constexpr std::uint64_t kNotLocked = 1;
-  static constexpr std::uint64_t kLockedNoWaiters = 0;
+  static constexpr auto kLockedNoWaiters = std::uintptr_t{0};
+  static constexpr auto kNotLocked = std::numeric_limits<std::uintptr_t>::max();
 
   // locked without waiters, not locked, otherwise - head of the waiters list
-  yaclib_std::atomic_uint64_t sender = kNotLocked;
+  yaclib_std::atomic_uintptr_t sender = kNotLocked;
   BaseCore* receiver = nullptr;
   std::uint8_t batch_here = 0;
 };

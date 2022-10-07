@@ -32,7 +32,7 @@ class SharedMutex {
 
   FiberQueue _shared_queue;
   FiberQueue _exclusive_queue;
-  uint32_t _shared_owners_count{0};
+  std::uint32_t _shared_owners_count{0};
   bool _occupied{false};
   bool _exclusive_mode{false};
 };
