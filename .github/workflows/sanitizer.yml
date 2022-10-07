@@ -62,6 +62,15 @@ jobs:
             os: macos-12
             flags: LSAN
             build_type: RelWithDebInfo
+          # TODO enable when xcode ld for gcc will be fixed
+          - isPR: false
+            os: macos-12
+            flags: LSAN
+            build_type: Debug
+          - isPR: false
+            os: macos-12
+            flags: LSAN
+            build_type: RelWithDebInfo
           #  Doesn't build with ClanCL ASAN. Random crash on start before main() with MSVC ASAN. THANKS TO THE BEST OS.
           - os: windows-2022
             flags: ASAN
