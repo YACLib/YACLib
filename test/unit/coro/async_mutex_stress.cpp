@@ -85,8 +85,8 @@ TEST(MutexStress, CommonTimer) {
 #if YACLIB_FAULT == 2
   GTEST_SKIP();  // TODO(myannyax) make time run forward even without switches
 #endif
-#if !defined(_WIN64) && (defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__))
-  GTEST_SKIP();  // Doesn't work for Win32, I think its probably because bad symmetric transfer implementation
+#if defined(GTEST_OS_WINDOWS) && !(defined(NDEBUG) && defined(_WIN64))
+  GTEST_SKIP();  // Doesn't work for Win32 or Debug, I think its probably because bad symmetric transfer implementation
   // TODO(kononovk) Try to confirm problem and localize it with ifdefs
 #endif
   using namespace std::chrono_literals;
