@@ -1,5 +1,6 @@
 #pragma once
 
+#include <yaclib/fwd.hpp>
 #include <yaclib/util/type_traits.hpp>
 
 #include <exception>
@@ -73,8 +74,8 @@ struct ResultEmpty final : std::exception {};
  * \tparam V type of value that stored in Result
  * \tparam E type of error that stored in Result
  */
-template <typename V = void, typename E = StopError>
-class [[nodiscard]] Result final {
+template <typename V, typename E>
+class Result final {
   static_assert(Check<V>(), "V should be valid");
   static_assert(Check<E>(), "E should be valid");
   static_assert(!std::is_same_v<V, E>, "Result cannot be instantiated with same V and E, because it's ambiguous");

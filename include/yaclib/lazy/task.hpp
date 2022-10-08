@@ -4,6 +4,7 @@
 #include <yaclib/async/future.hpp>
 #include <yaclib/exe/executor.hpp>
 #include <yaclib/exe/inline.hpp>
+#include <yaclib/fwd.hpp>
 #include <yaclib/util/helper.hpp>
 #include <yaclib/util/type_traits.hpp>
 
@@ -13,8 +14,8 @@ namespace yaclib {
  * Provides a mechanism to schedule the some async operations
  * TODO(MBkkt) add description
  */
-template <typename V = void, typename E = StopError>
-class [[nodiscard]] Task final {
+template <typename V, typename E>
+class Task final {
  public:
   static_assert(Check<V>(), "V should be valid");
   static_assert(Check<E>(), "E should be valid");

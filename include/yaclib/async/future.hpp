@@ -2,6 +2,7 @@
 
 #include <yaclib/algo/detail/result_core.hpp>
 #include <yaclib/exe/executor.hpp>
+#include <yaclib/fwd.hpp>
 #include <yaclib/util/helper.hpp>
 #include <yaclib/util/type_traits.hpp>
 
@@ -150,8 +151,8 @@ extern template class FutureBase<void, StopError>;
  * Future and \ref Promise are like a Single Producer/Single Consumer one-shot one-element channel.
  * Use the \ref Promise to fulfill the \ref Future.
  */
-template <typename V = void, typename E = StopError>
-class [[nodiscard]] Future final : public FutureBase<V, E> {
+template <typename V, typename E>
+class Future final : public FutureBase<V, E> {
   using Base = FutureBase<V, E>;
 
  public:
@@ -180,8 +181,8 @@ extern template class Future<void, StopError>;
  * Future and \ref Promise are like a Single Producer/Single Consumer one-shot one-element channel.
  * Use the \ref Promise to fulfill the \ref Future.
  */
-template <typename V = void, typename E = StopError>
-class [[nodiscard]] FutureOn final : public FutureBase<V, E> {
+template <typename V, typename E>
+class FutureOn final : public FutureBase<V, E> {
   using Base = FutureBase<V, E>;
 
  public:

@@ -2,23 +2,25 @@
 
 namespace yaclib {
 
-template <typename V, typename E>
-class Result;
+struct [[nodiscard]] StopError;
+
+template <typename V = void, typename E = StopError>
+class [[nodiscard]] Result;
+
+template <typename V = void, typename E = StopError>
+class [[nodiscard]] Task;
 
 template <typename V, typename E>
-class Task;
+class [[nodiscard]] FutureBase;
 
-template <typename V, typename E>
-class FutureBase;
+template <typename V = void, typename E = StopError>
+class [[nodiscard]] Future;
 
-template <typename V, typename E>
-class Future;
+template <typename V = void, typename E = StopError>
+class [[nodiscard]] FutureOn;
 
-template <typename V, typename E>
-class FutureOn;
-
-template <typename V, typename E>
-class Promise;
+template <typename V = void, typename E = StopError>
+class [[nodiscard]] Promise;
 
 #define YACLIB_DEFINE_VOID_TYPE(type)                                                                                  \
   struct type {};                                                                                                      \
