@@ -1,12 +1,13 @@
 #pragma once
 
 #include <yaclib/algo/detail/result_core.hpp>
+#include <yaclib/fwd.hpp>
 #include <yaclib/util/type_traits.hpp>
 
 namespace yaclib {
 
-template <typename V = void, typename E = StopError>
-class [[nodiscard]] Promise final {
+template <typename V, typename E>
+class Promise final {
   static_assert(Check<V>(), "V should be valid");
   static_assert(Check<E>(), "E should be valid");
   static_assert(!std::is_same_v<V, E>, "Promise cannot be instantiated with same V and E, because it's ambiguous");
