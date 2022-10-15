@@ -44,9 +44,50 @@ TEST(MakeReadyFuture, Void) {
   }
 }
 
+struct Default {
+  Default() = default;
+  Default(Default const&) = delete;
+  Default(Default&&) = delete;
+};
+
+TEST(MakeReadyFuture, Default) {
+  {
+    yaclib::Future<Default> f = yaclib::MakeFuture<Default>();
+    EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
+  }
+  {
+    yaclib::Future<Default, LikeErrorCode> f = yaclib::MakeFuture<Default, LikeErrorCode>();
+    EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
+  }
+}
+
 TEST(MakeReadyFuture, Int) {
   {
     yaclib::Future<int> f = yaclib::MakeFuture(1);
+    EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
+    EXPECT_EQ(std::move(f).Get().Ok(), 1);
+  }
+  {
+    const int x = 1;
+    yaclib::Future<int> f = yaclib::MakeFuture(x);
+    EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
+    EXPECT_EQ(std::move(f).Get().Ok(), 1);
+  }
+  {
+    int x = 1;
+    yaclib::Future<int> f = yaclib::MakeFuture(x);
+    EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
+    EXPECT_EQ(std::move(f).Get().Ok(), 1);
+  }
+  {
+    const int x = 1;
+    yaclib::Future<int> f = yaclib::MakeFuture(std::move(x));
+    EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
+    EXPECT_EQ(std::move(f).Get().Ok(), 1);
+  }
+  {
+    int x = 1;
+    yaclib::Future<int> f = yaclib::MakeFuture(std::move(x));
     EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
     EXPECT_EQ(std::move(f).Get().Ok(), 1);
   }

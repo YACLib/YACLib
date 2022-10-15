@@ -24,9 +24,10 @@ namespace yaclib {
 template <typename V = Unit, typename E = StopError, typename... Args>
 auto MakeFuture(Args&&... args) {
   if constexpr (sizeof...(Args) == 0) {
-    return Future{detail::ResultCorePtr<void, E>{MakeUnique<detail::ResultCore<void, E>>(Unit{})}};
+    using T = std::conditional_t<std::is_same_v<V, Unit>, void, V>;
+    return Future{detail::ResultCorePtr<T, E>{MakeUnique<detail::ResultCore<T, E>>(std::in_place)}};
   } else {
-    using T = std::conditional_t<sizeof...(Args) == 1 && std::is_same_v<V, Unit>, head_t<Args...>, V>;
+    using T = std::conditional_t<sizeof...(Args) == 1 && std::is_same_v<V, Unit>, std::decay_t<head_t<Args&&...>>, V>;
     static_assert(!std::is_same_v<T, Unit>);
     return Future{detail::ResultCorePtr<T, E>{MakeUnique<detail::ResultCore<T, E>>(std::forward<Args>(args)...)}};
   }

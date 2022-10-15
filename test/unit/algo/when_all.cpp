@@ -33,13 +33,20 @@ enum class TestSuite {
   Array,
 };
 
+struct Int {};
+struct Void {};
+
 template <typename T>
 class WhenAllT : public testing::Test {
  public:
-  using Type = T;
+  static constexpr bool kIsInt = std::is_same_v<Int, T>;
+  static constexpr bool kIsVoid = std::is_same_v<Void, T>;
+  static constexpr bool kIsAll = kIsInt || kIsVoid;
+  static constexpr yaclib::WhenPolicy Policy = kIsAll ? yaclib::WhenPolicy::None : yaclib::WhenPolicy::FirstFail;
+  using Type = std::conditional_t<kIsInt, int, std::conditional_t<kIsVoid, void, T>>;
 };
 
-using MyTypes = ::testing::Types<int, void>;
+using MyTypes = ::testing::Types<int, void, Int, Void>;
 
 struct TypeNames {
   template <typename T>
@@ -49,6 +56,10 @@ struct TypeNames {
         return "int";
       case 1:
         return "void";
+      case 2:
+        return "int-all";
+      case 3:
+        return "void-all";
       default:
         return "unknown";
     }
@@ -57,7 +68,7 @@ struct TypeNames {
 
 TYPED_TEST_SUITE(WhenAllT, MyTypes, TypeNames);
 
-template <TestSuite suite, typename T = int>
+template <TestSuite suite, typename T, yaclib::WhenPolicy P>
 void JustWorks() {
   constexpr int kSize = 3;
   static constexpr bool is_void = std::is_void_v<T>;
@@ -70,9 +81,9 @@ void JustWorks() {
 
   auto all = [&futures] {
     if constexpr (suite == TestSuite::Array) {
-      return WhenAll(std::move(futures[0]), std::move(futures[1]), std::move(futures[2]));
+      return yaclib::WhenAll<P>(std::move(futures[0]), std::move(futures[1]), std::move(futures[2]));
     } else {
-      return WhenAll(futures.begin(), futures.end());
+      return yaclib::WhenAll<P>(futures.begin(), futures.end());
     }
   }();
 
@@ -98,7 +109,19 @@ void JustWorks() {
   EXPECT_TRUE(all.Ready());
 
   std::vector expected{7, 3, 5};
-  if constexpr (is_void) {
+  if constexpr (P == yaclib::WhenPolicy::None) {
+    auto values = std::move(all).Touch().Value();
+    size_t i = 0;
+    for (auto const& v : values) {
+      if constexpr (is_void) {
+        EXPECT_EQ(v.Ok(), yaclib::Unit{});
+      } else {
+        EXPECT_EQ(v.Ok(), expected[i]);
+      }
+      ++i;
+    }
+    EXPECT_EQ(i, 3);
+  } else if constexpr (is_void) {
     EXPECT_EQ(std::move(all).Get().State(), yaclib::ResultState::Value);
   } else {
     EXPECT_EQ(std::move(all).Get().Ok(), expected);
@@ -106,11 +129,11 @@ void JustWorks() {
 }
 
 TYPED_TEST(WhenAllT, VectorJustWorks) {
-  JustWorks<TestSuite::Vector, typename TestFixture::Type>();
+  JustWorks<TestSuite::Vector, typename TestFixture::Type, TestFixture::Policy>();
 }
 
 TYPED_TEST(WhenAllT, ArrayJustWorks) {
-  JustWorks<TestSuite::Array, typename TestFixture::Type>();
+  JustWorks<TestSuite::Array, typename TestFixture::Type, TestFixture::Policy>();
 }
 
 template <TestSuite suite, typename T = void, typename E = yaclib::StopError>

@@ -15,7 +15,7 @@ template <typename V = Unit, typename E = StopError, typename... Args>
     return Schedule<E>([] {
     });
   } else {
-    using T = std::conditional_t<sizeof...(Args) == 1 && std::is_same_v<V, Unit>, head_t<Args...>, V>;
+    using T = std::conditional_t<sizeof...(Args) == 1 && std::is_same_v<V, Unit>, std::decay_t<head_t<Args&&...>>, V>;
     static_assert(!std::is_same_v<T, Unit>);
     return Schedule<E>([result = Result<T, E>{std::forward<Args>(args)...}]() mutable {
       return std::move(result);

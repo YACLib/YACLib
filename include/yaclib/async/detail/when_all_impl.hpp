@@ -5,8 +5,8 @@
 #include <yaclib/fwd.hpp>
 #include <yaclib/util/detail/atomic_counter.hpp>
 #include <yaclib/util/detail/unique_counter.hpp>
+#include <yaclib/util/helper.hpp>
 
-#include <array>
 #include <cstddef>
 #include <type_traits>
 #include <utility>
@@ -33,6 +33,7 @@ template <typename V, typename E, typename FutureValue = std::conditional_t<std:
 class AllCombinator : public InlineCore, public AllCombinatorBase<FutureValue> {
   static_assert(std::is_void_v<V> || std::is_nothrow_move_assignable_v<V>);
 
+  using Value = result_value_t<V>;
   using ResultPtr = ResultCorePtr<FutureValue, E>;
 
  public:
@@ -49,7 +50,7 @@ class AllCombinator : public InlineCore, public AllCombinatorBase<FutureValue> {
   }
 
   ~AllCombinator() noexcept override {
-    if (!this->_done.load(std::memory_order_acquire)) {
+    if (!std::is_same_v<V, Value> || !this->_done.load(std::memory_order_acquire)) {
       auto core = _promise.Release();
       if constexpr (std::is_void_v<V>) {
         core->Store(Unit{});
@@ -71,8 +72,13 @@ class AllCombinator : public InlineCore, public AllCombinatorBase<FutureValue> {
  private:
   void Here(BaseCore& caller) noexcept final {
     if (!this->_done.load(std::memory_order_acquire)) {
-      auto& core = static_cast<ResultCore<V, E>&>(caller);
-      Combine(std::move(core.Get()));
+      auto& core = static_cast<ResultCore<Value, E>&>(caller);
+      if constexpr (std::is_same_v<V, Value>) {
+        Combine(std::move(core.Get()));
+      } else {
+        const auto ticket = this->_ticket.fetch_add(1, std::memory_order_acq_rel);
+        this->_results[ticket] = std::move(core.Get());
+      }
     }
     caller.DecRef();
     DecRef();
@@ -85,7 +91,7 @@ class AllCombinator : public InlineCore, public AllCombinatorBase<FutureValue> {
   }
 #endif
 
-  void Combine(Result<V, E>&& result) noexcept {
+  void Combine(Result<Value, E>&& result) noexcept {
     const auto state = result.State();
     if (state == ResultState::Value) {
       if constexpr (!std::is_void_v<V>) {
