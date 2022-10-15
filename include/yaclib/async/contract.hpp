@@ -1,3 +1,5 @@
+#pragma once
+
 #include <yaclib/async/future.hpp>
 #include <yaclib/async/promise.hpp>
 #include <yaclib/exe/executor.hpp>

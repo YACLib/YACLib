@@ -90,20 +90,26 @@ class Result final {
   Result& operator=(Result&& other) noexcept(std::is_nothrow_move_assignable_v<Variant>) = default;
   Result& operator=(const Result& other) noexcept(std::is_nothrow_copy_assignable_v<Variant>) = default;
 
-  template <typename... Args,
-            typename = std::enable_if_t<sizeof...(Args) != 1 || !is_result_v<std::decay_t<head_t<Args...>>>, void>>
+  template <typename... Args, typename = std::enable_if_t<
+                                sizeof...(Args) != 1 || !std::is_same_v<std::decay_t<head_t<Args&&...>>, Result>, void>>
   Result(Args&&... args) noexcept(std::is_nothrow_constructible_v<Variant, std::in_place_type_t<ValueT>, Args&&...>)
-    : _result{std::in_place_type_t<ValueT>{}, std::forward<Args>(args)...} {
+    : Result{std::in_place, std::forward<Args>(args)...} {
+  }
+
+  template <typename... Args>
+  Result(std::in_place_t,
+         Args&&... args) noexcept(std::is_nothrow_constructible_v<Variant, std::in_place_type_t<ValueT>, Args&&...>)
+    : _result{std::in_place_type<ValueT>, std::forward<Args>(args)...} {
   }
 
   Result(std::exception_ptr exception) noexcept
-    : _result{std::in_place_type_t<std::exception_ptr>{}, std::move(exception)} {
+    : _result{std::in_place_type<std::exception_ptr>, std::move(exception)} {
   }
 
-  Result(E error) noexcept : _result{std::in_place_type_t<E>{}, std::move(error)} {
+  Result(E error) noexcept : _result{std::in_place_type<E>, std::move(error)} {
   }
 
-  Result(StopTag tag) noexcept : _result{std::in_place_type_t<E>{}, tag} {
+  Result(StopTag tag) noexcept : _result{std::in_place_type<E>, tag} {
   }
 
   Result() noexcept : _result{std::monostate{}} {

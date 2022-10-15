@@ -51,6 +51,30 @@ TEST(MakeReadyTask, Int) {
     EXPECT_EQ(std::move(f).Get().Ok(), 1);
   }
   {
+    const int x = 1;
+    yaclib::Task<int> f = yaclib::MakeTask(x);
+    EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
+    EXPECT_EQ(std::move(f).Get().Ok(), 1);
+  }
+  {
+    int x = 1;
+    yaclib::Task<int> f = yaclib::MakeTask(x);
+    EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
+    EXPECT_EQ(std::move(f).Get().Ok(), 1);
+  }
+  {
+    const int x = 1;
+    yaclib::Task<int> f = yaclib::MakeTask(std::move(x));
+    EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
+    EXPECT_EQ(std::move(f).Get().Ok(), 1);
+  }
+  {
+    int x = 1;
+    yaclib::Task<int> f = yaclib::MakeTask(std::move(x));
+    EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
+    EXPECT_EQ(std::move(f).Get().Ok(), 1);
+  }
+  {
     yaclib::Task<int> f = yaclib::MakeTask<int>(1);
     EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
     EXPECT_EQ(std::move(f).Get().Ok(), 1);
