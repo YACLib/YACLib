@@ -15,9 +15,9 @@ namespace yaclib {
  */
 template <typename Func>
 void Submit(IExecutor& executor, Func&& f) {
-  static_assert(!std::is_base_of_v<Job, std::decay_t<Func>>);
-  auto task = detail::MakeUniqueJob(std::forward<Func>(f));
-  executor.Submit(*task);
+  static_assert(!std::is_base_of_v<Job, std::decay_t<Func>>, "Please use executor.Submit(job)");
+  auto* job = detail::MakeUniqueJob(std::forward<Func>(f));
+  executor.Submit(*job);
 }
 
 }  // namespace yaclib

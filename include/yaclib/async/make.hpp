@@ -22,14 +22,17 @@ namespace yaclib {
  * \return Ready Future
  */
 template <typename V = Unit, typename E = StopError, typename... Args>
-auto MakeFuture(Args&&... args) {
+/*Future*/ auto MakeFuture(Args&&... args) {
   if constexpr (sizeof...(Args) == 0) {
     using T = std::conditional_t<std::is_same_v<V, Unit>, void, V>;
     return Future{detail::ResultCorePtr<T, E>{MakeUnique<detail::ResultCore<T, E>>(std::in_place)}};
+  } else if constexpr (std::is_same_v<V, Unit>) {
+    using T0 = std::decay_t<head_t<Args&&...>>;
+    using T = std::conditional_t<std::is_same_v<T0, Unit>, void, T0>;
+    return Future{
+      detail::ResultCorePtr<T, E>{MakeUnique<detail::ResultCore<T, E>>(std::in_place, std::forward<Args>(args)...)}};
   } else {
-    using T = std::conditional_t<sizeof...(Args) == 1 && std::is_same_v<V, Unit>, std::decay_t<head_t<Args&&...>>, V>;
-    static_assert(!std::is_same_v<T, Unit>);
-    return Future{detail::ResultCorePtr<T, E>{MakeUnique<detail::ResultCore<T, E>>(std::forward<Args>(args)...)}};
+    return Future{detail::ResultCorePtr<V, E>{MakeUnique<detail::ResultCore<V, E>>(std::forward<Args>(args)...)}};
   }
 }
 

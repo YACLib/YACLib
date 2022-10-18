@@ -132,7 +132,7 @@ void Fail() {
     std::conditional_t<(P == yaclib::WhenPolicy::LastFail && R == Result::Exception) ||
                          ((P == yaclib::WhenPolicy::None || P == yaclib::WhenPolicy::FirstFail) && R == Result::Error),
                        yaclib::ResultError<yaclib::StopError>, std::runtime_error>;
-  EXPECT_THROW(std::move(any).Get().Ok(), ExceptionType);
+  EXPECT_THROW(std::ignore = std::move(any).Get().Ok(), ExceptionType);
 }
 
 template <Result R, Container C, yaclib::WhenPolicy P, typename V>
@@ -149,7 +149,7 @@ void EmptyInput() {
   //  EXPECT_TRUE(any.Ready());
   //  auto result = std::move(any).Get();
   //  EXPECT_EQ(result.State(), ResultState::Empty);
-  //  EXPECT_THROW(std::move(result).Ok(), ResultEmpty);
+  //  EXPECT_THROW(std::ignore = std::move(result).Ok(), ResultEmpty);
 }
 
 template <Result R, Container C, yaclib::WhenPolicy P, typename V>

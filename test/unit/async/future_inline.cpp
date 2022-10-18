@@ -66,7 +66,7 @@ void ErrorSimple() {
   bool called = false;
   InlineDetach<Inline>(std::move(f), [&called](yaclib::Result<int> r) {
     called = true;
-    EXPECT_THROW(std::move(r).Ok(), std::runtime_error);
+    EXPECT_THROW(std::ignore = std::move(r).Ok(), std::runtime_error);
   });
   EXPECT_TRUE(called);
 }
@@ -354,34 +354,34 @@ void FutureMakeFuture() {
   {
     auto f = yaclib::MakeFuture();
     bool ready = false;
-    InlineThen<Inline>(std::move(f),
-                       [&] {
-                         ready = true;
-                       })
-      .Get()
-      .Ok();
+    std::ignore = InlineThen<Inline>(std::move(f),
+                                     [&] {
+                                       ready = true;
+                                     })
+                    .Get()
+                    .Ok();
     EXPECT_TRUE(ready);
   }
   {
     auto f = yaclib::MakeFuture(1.0F);
     bool ready = false;
-    InlineThen<Inline>(std::move(f),
-                       [&](float) {
-                         ready = true;
-                       })
-      .Get()
-      .Ok();
+    std::ignore = InlineThen<Inline>(std::move(f),
+                                     [&](float) {
+                                       ready = true;
+                                     })
+                    .Get()
+                    .Ok();
     EXPECT_TRUE(ready);
   }
   {
     auto f = yaclib::MakeFuture<double>(1.0F);
     bool ready = false;
-    InlineThen<Inline>(std::move(f),
-                       [&](double) {
-                         ready = true;
-                       })
-      .Get()
-      .Ok();
+    std::ignore = InlineThen<Inline>(std::move(f),
+                                     [&](double) {
+                                       ready = true;
+                                     })
+                    .Get()
+                    .Ok();
     EXPECT_TRUE(ready);
   }
 }

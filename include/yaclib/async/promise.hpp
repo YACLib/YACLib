@@ -41,16 +41,11 @@ class Promise final {
   /**
    * Set \ref Promise result
    *
-   * \tparam T \ref Result<T> should be constructable from this type
-   * \param value value
+   * \tparam Args \ref Result<T> should be constructable from this types
+   * \param args arguments
    */
-  template <typename T>
-  void Set(T&& value) && /*TODO(MBkkt) noexcept(Result{value})*/;
-
-  /**
-   * Set \ref Promise<> result
-   */
-  void Set() && noexcept;
+  template <typename... Args>
+  void Set(Args&&... args) &&;
 
   /**
    * Part of unsafe but internal API
@@ -62,7 +57,7 @@ class Promise final {
   detail::ResultCorePtr<V, E> _core;
 };
 
-extern template class Promise<void, StopError>;
+extern template class Promise<>;
 
 }  // namespace yaclib
 

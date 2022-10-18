@@ -20,7 +20,7 @@ class IExecutor : public IRef {
    * FairThreadPool
    * GolangThreadPool
    */
-  enum class Type : char {
+  enum class Type : unsigned char {
     Custom = 0,
     Inline = 1,
     Manual = 2,

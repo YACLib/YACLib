@@ -5,19 +5,15 @@
 namespace yaclib {
 
 template <typename V, typename E>
-template <typename T>
-void Promise<V, E>::Set(T&& object) && {
-  static_assert(std::is_constructible_v<Result<V, E>, T>, "TODO(MBkkt) Add message");
+template <typename... Args>
+void Promise<V, E>::Set(Args&&... args) && {
   YACLIB_ASSERT(Valid());
-  auto& core = *_core.Release();
-  core.Store(std::forward<T>(object));
-  core.template SetResult<false>();
-}
-
-template <typename V, typename E>
-void Promise<V, E>::Set() && noexcept {
-  static_assert(std::is_void_v<V>);
-  std::move(*this).Set(Unit{});
+  if constexpr (sizeof...(Args) == 0) {
+    _core->Store(std::in_place);
+  } else {
+    _core->Store(std::forward<Args>(args)...);
+  }
+  _core.Release()->template SetResult<false>();
 }
 
 template <typename V, typename E>

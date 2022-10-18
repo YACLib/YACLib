@@ -4,22 +4,44 @@
 #include <yaclib/lazy/task.hpp>
 
 namespace yaclib {
+namespace detail {
+
+template <typename V, typename E>
+class ReadyCore : public ResultCore<V, E> {
+ public:
+  template <typename... Args>
+  ReadyCore(Args&&... args) noexcept(std::is_nothrow_constructible_v<Result<V, E>, Args&&...>) {
+    this->Store(std::forward<Args>(args)...);
+  }
+
+  void Call() noexcept final {
+    this->template SetResult<false>();
+  }
+
+  void Drop() noexcept final {
+    this->_result.~Result<V, E>();
+    this->Store(StopTag{});
+    Call();
+  }
+};
+
+}  // namespace detail
 
 /**
  * TODO(MBkkt) add description
  */
 template <typename V = Unit, typename E = StopError, typename... Args>
 /*Task*/ auto MakeTask(Args&&... args) {
-  // TODO(MBkkt) optimize sizeof: now we store Result twice
   if constexpr (sizeof...(Args) == 0) {
-    return Schedule<E>([] {
-    });
+    using T = std::conditional_t<std::is_same_v<V, Unit>, void, V>;
+    return Task{detail::ResultCorePtr<T, E>{MakeUnique<detail::ReadyCore<T, E>>(std::in_place)}};
+  } else if constexpr (std::is_same_v<V, Unit>) {
+    using T0 = std::decay_t<head_t<Args&&...>>;
+    using T = std::conditional_t<std::is_same_v<T0, Unit>, void, T0>;
+    return Task{
+      detail::ResultCorePtr<T, E>{MakeUnique<detail::ReadyCore<T, E>>(std::in_place, std::forward<Args>(args)...)}};
   } else {
-    using T = std::conditional_t<sizeof...(Args) == 1 && std::is_same_v<V, Unit>, std::decay_t<head_t<Args&&...>>, V>;
-    static_assert(!std::is_same_v<T, Unit>);
-    return Schedule<E>([result = Result<T, E>{std::forward<Args>(args)...}]() mutable {
-      return std::move(result);
-    });
+    return Task{detail::ResultCorePtr<V, E>{MakeUnique<detail::ReadyCore<V, E>>(std::forward<Args>(args)...)}};
   }
 }
 

@@ -9,7 +9,7 @@ namespace yaclib {
  * FirstFail -- save first fail, default for WhenAll
  * LastFail  -- save last fail,  default for WhenAny
  */
-enum class WhenPolicy : char {
+enum class WhenPolicy : unsigned char {
   None = 0,
   FirstFail = 1,
   LastFail = 2,

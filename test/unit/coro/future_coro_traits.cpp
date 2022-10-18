@@ -58,7 +58,7 @@ yaclib::Future<int> throw_exc_at1(int x) {
 TEST(CoroTraits, ThrowException) {
   int arg = 1;
   auto future = throw_exc_at1(arg);
-  EXPECT_THROW(std::move(future).Touch().Ok(), std::runtime_error);
+  EXPECT_THROW(std::ignore = std::move(future).Touch().Ok(), std::runtime_error);
 }
 
 yaclib::Future<> throw_exc_void_at1(int x) {
@@ -70,7 +70,7 @@ yaclib::Future<> throw_exc_void_at1(int x) {
 
 TEST(CoroTraits, ThrowExceptionVoid) {
   auto future = throw_exc_void_at1(1);
-  EXPECT_THROW(std::move(future).Touch().Ok(), std::runtime_error);
+  EXPECT_THROW(std::ignore = std::move(future).Touch().Ok(), std::runtime_error);
 }
 
 yaclib::Future<int> nested_intermed_coro(int x) {

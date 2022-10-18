@@ -26,9 +26,10 @@ auto WhenAll(It begin, std::size_t count) {
   static_assert(P != WhenPolicy::LastFail, "TODO(Ri7ay, MBkkt) Add other policy for WhenAll");
   static_assert(is_future_base_v<T>, "WhenAll function Iterator must be point to some Future");
   YACLIB_WARN(count < 2, "Don't use combinators for one or zero futures");
-  using V0 = future_base_value_t<T>;
-  using V1 = std::conditional_t<P == WhenPolicy::None, yaclib::Result<V0>, V0>;
-  auto [future_core, combinator] = detail::AllCombinator<V1, future_base_error_t<T>>::Make(count);
+  using V = future_base_value_t<T>;
+  using E = future_base_error_t<T>;
+  using R = std::conditional_t<P == WhenPolicy::None, Result<V, E>, V>;
+  auto [future_core, combinator] = detail::AllCombinator<R, E>::Make(count);
   detail::WhenImpl(combinator, begin, count);
   return Future{std::move(future_core)};
 }
@@ -63,9 +64,9 @@ auto WhenAll(FutureBase<V, E>&&... futures) {
   static_assert(P != WhenPolicy::LastFail, "TODO(Ri7ay, MBkkt) Add other policy for WhenAll");
   constexpr std::size_t kSize = sizeof...(V);
   static_assert(kSize >= 2, "WhenAll wants at least two futures");
-  using V0 = head_t<V...>;
-  using V1 = std::conditional_t<P == WhenPolicy::None, yaclib::Result<V0>, V0>;
-  auto [future_core, combinator] = detail::AllCombinator<V1, E>::Make(kSize);
+  using Head = head_t<V...>;
+  using R = std::conditional_t<P == WhenPolicy::None, Result<Head, E>, Head>;
+  auto [future_core, combinator] = detail::AllCombinator<R, E>::Make(kSize);
   detail::WhenImpl(combinator, std::move(futures)...);
   return Future{std::move(future_core)};
 }
