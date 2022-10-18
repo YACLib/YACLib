@@ -11,7 +11,7 @@ using LogCallback = void (*)(std::string_view file, std::size_t line, std::strin
 
 namespace detail {
 
-enum class LogLevel : char {
+enum class LogLevel : unsigned char {
   Debug = 0,
   Warn = 1,
   Error = 2,

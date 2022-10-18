@@ -68,7 +68,7 @@ class Task final {
   detail::ResultCorePtr<V, E> _core;
 };
 
-extern template class Task<void, StopError>;
+extern template class Task<>;
 
 }  // namespace yaclib
 

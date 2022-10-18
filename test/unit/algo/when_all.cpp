@@ -2,6 +2,7 @@
 
 #include <yaclib/async/contract.hpp>
 #include <yaclib/async/future.hpp>
+#include <yaclib/async/make.hpp>
 #include <yaclib/async/promise.hpp>
 #include <yaclib/async/run.hpp>
 #include <yaclib/async/when_all.hpp>
@@ -162,7 +163,7 @@ void AllFails() {
   // Second error
   std::move(promises[0]).Set(yaclib::StopTag{});
 
-  EXPECT_THROW(std::move(all).Get().Ok(), std::runtime_error);
+  EXPECT_THROW(std::ignore = std::move(all).Get().Ok(), std::runtime_error);
 }
 
 TYPED_TEST(WhenAllT, VectorAllFails) {
@@ -299,11 +300,49 @@ void FirstFail() {
         return yaclib::Result<void, Error>{yaclib::StopTag{}};
       }));
     }
-    EXPECT_THROW(WhenAll(ints.begin(), ints.end()).Get().Ok(), yaclib::ResultError<Error>);
+    EXPECT_THROW(std::ignore = WhenAll(ints.begin(), ints.end()).Get().Ok(), yaclib::ResultError<Error>);
     ints.clear();
   }
   tp.Stop();
   tp.Wait();
+}
+
+struct DeleteAssign {
+  DeleteAssign() = default;
+  DeleteAssign(DeleteAssign&&) = default;
+  DeleteAssign(const DeleteAssign&) = default;
+  DeleteAssign& operator=(DeleteAssign&&) = delete;
+  DeleteAssign& operator=(const DeleteAssign&) = delete;
+};
+
+struct DeleteMove {
+  DeleteMove() = default;
+  DeleteMove(DeleteMove&&) = default;
+  DeleteMove(const DeleteMove&) = default;
+  DeleteMove& operator=(DeleteMove&&) = delete;
+  DeleteMove& operator=(const DeleteMove&) = default;
+};
+
+struct DeleteCopy {
+  DeleteCopy() = default;
+  DeleteCopy(DeleteCopy&&) = default;
+  DeleteCopy(const DeleteCopy&) = default;
+  DeleteCopy& operator=(DeleteCopy&&) = default;
+  DeleteCopy& operator=(const DeleteCopy&) = delete;
+};
+
+template <typename T>
+void TestBadTypes() {
+  auto f1 = yaclib::MakeFuture<T>();
+  auto f2 = yaclib::MakeFuture<T>();
+  auto f_all = yaclib::WhenAll<yaclib::WhenPolicy::None>(std::move(f1), std::move(f2)).Get();
+  EXPECT_EQ(f_all.State(), yaclib::ResultState::Value);
+}
+
+TEST(WhenAll, BadTypes) {
+  TestBadTypes<DeleteCopy>();
+  TestBadTypes<DeleteMove>();
+  TestBadTypes<DeleteAssign>();
 }
 
 TEST(WhenAll, FirstFail) {

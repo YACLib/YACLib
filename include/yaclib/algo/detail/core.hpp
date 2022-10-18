@@ -23,7 +23,7 @@ class NoResultCore : public BaseCore {
   Callback _self;
 };
 
-enum class CoreType : char {
+enum class CoreType : unsigned char {
   Run = 0,
   Then = 1,
   Detach = 2,
@@ -50,7 +50,11 @@ class Core : public ResultCoreT<Type, Ret, E> {
  private:
   void Call() noexcept final {
     if constexpr (Type == CoreType::Run) {
-      CallImpl(Unit{});
+      if constexpr (is_invocable_v<Invoke>) {
+        CallImpl(Unit{});  // optimization
+      } else {
+        CallImpl(Result<Arg, E>{Unit{}});
+      }
     } else {
       auto& core = static_cast<ResultCore<Arg, E>&>(*this->_self.caller);
       CallImpl(std::move(core.Get()));
@@ -168,7 +172,7 @@ class Core : public ResultCoreT<Type, Ret, E> {
 
   template <typename T>
   auto CallResolveVoid(T&& value) {
-    constexpr bool kArgVoid = is_invocable_v<Invoke, void>;
+    constexpr bool kArgVoid = is_invocable_v<Invoke>;
     constexpr bool kRetVoid = std::is_void_v<invoke_t<Invoke, std::conditional_t<kArgVoid, void, T>>>;
     if constexpr (kRetVoid) {
       if constexpr (kArgVoid) {
@@ -188,7 +192,7 @@ class Core : public ResultCoreT<Type, Ret, E> {
     YACLIB_NO_UNIQUE_ADDRESS Unit stub;
     YACLIB_NO_UNIQUE_ADDRESS Storage storage;
 
-    State() noexcept {
+    State() noexcept : stub{} {
     }
 
     ~State() noexcept {
@@ -242,22 +246,22 @@ struct Return<V, E, Func, 5> final {
   using Type = invoke_t<Func, Unit>;
 };
 
-template <CoreType CoreT, bool kIsCall, typename Arg0, typename E, typename Func>
+template <CoreType CoreT, bool kIsCall, typename Arg, typename E, typename Func>
 auto* MakeCore(Func&& f) {
-  using Arg = std::conditional_t<std::is_same_v<Arg0, Unit>, void, Arg0>;
   static_assert(CoreT != CoreType::Run || std::is_void_v<Arg>,
                 "It makes no sense to receive some value in first pipeline step");
   using AsyncRet = result_value_t<typename detail::Return<Arg, E, Func&&>::Type>;
   static_assert(CoreT != CoreType::Detach || std::is_void_v<AsyncRet>,
                 "It makes no sense to return some value in Detach, since no one will be able to use it");
-  using Ret = result_value_t<future_base_value_t<AsyncRet>>;
+  using Ret0 = result_value_t<future_base_value_t<AsyncRet>>;
+  using Ret = std::conditional_t<std::is_same_v<Ret0, Unit>, void, Ret0>;
   constexpr bool kIsAsync = is_future_base_v<AsyncRet>;
   // TODO(MBkkt) Think about inline/detach optimization
   using Core = detail::Core<Ret, Arg, E, Func&&, CoreT, kIsAsync, kIsCall>;
   return MakeUnique<Core>(std::forward<Func>(f)).Release();
 }
 
-enum class CallbackType : char {
+enum class CallbackType : unsigned char {
   Inline = 0,
   On = 1,
   InlineOn = 2,

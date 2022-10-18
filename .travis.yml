@@ -1,0 +1,47 @@
+language: cpp
+
+jobs:
+  include:
+    - os: linux
+      arch:
+        - amd64
+        - arm64
+        - ppc64le
+        - s390x
+      compiler:
+        - gcc
+        - clang
+    - os: linux
+      arch: arm64-graviton2
+      virt:
+        - lxd
+        - vm
+      group: edge
+      compiler:
+        - gcc
+        - clang
+
+
+install: skip
+
+script:
+  - mkdir -p build
+  - cmake -S . -B build         \
+    -DCMAKE_BUILD_TYPE=Debug    \
+    -DYACLIB_CXX_STANDARD=20    \
+    -DYACLIB_TEST=SINGLE        \
+    -DYACLIB_FLAGS="CORO"       \
+    -DYACLIB_LOG="ERROR;DEBUG"
+  - cmake --build $dir --config Debug --parallel
+  - cd build
+  - ctest --output-on-failure -V
+  - cd ..
+  - cmake -S . -B build                \
+    -DCMAKE_BUILD_TYPE=RelWithDebInfo  \
+    -DYACLIB_CXX_STANDARD=20           \
+    -DYACLIB_TEST=SINGLE               \
+    -DYACLIB_FLAGS="CORO"              \
+    -DYACLIB_LOG="ERROR;DEBUG"
+  - cmake --build $dir --config RelWithDebInfo --parallel
+  - cd build
+  - ctest --output-on-failure -V

@@ -28,9 +28,9 @@ class ResultCore : public BaseCore {
     _result.~Result<V, E>();
   }
 
-  template <typename T>
-  void Store(T&& object) noexcept(std::is_nothrow_constructible_v<Result<V, E>, T&&>) {
-    new (&_result) Result<V, E>{std::forward<T>(object)};
+  template <typename... Args>
+  void Store(Args&&... args) noexcept(std::is_nothrow_constructible_v<Result<V, E>, Args&&...>) {
+    new (&_result) Result<V, E>{std::forward<Args>(args)...};
   }
 
   [[nodiscard]] Result<V, E>& Get() noexcept {

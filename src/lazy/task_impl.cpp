@@ -28,6 +28,6 @@ void Run(BaseCore* head) noexcept {
 
 }  // namespace detail
 
-template class Task<void, StopError>;
+template class Task<>;
 
 }  // namespace yaclib

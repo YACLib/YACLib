@@ -118,7 +118,7 @@ TYPED_TEST(AsyncSuite, RunException) {
                     return 1;
                   })
                   .Get();
-  EXPECT_THROW(std::move(result).Ok(), std::runtime_error);
+  EXPECT_THROW(std::ignore = std::move(result).Ok(), std::runtime_error);
   tp.Stop();
   tp.Wait();
 }
@@ -133,7 +133,7 @@ TYPED_TEST(AsyncSuite, JustWorks) {
                     return 1;
                   })
                   .Get();
-  EXPECT_THROW(std::move(result).Ok(), yaclib::ResultError<yaclib::StopError>);
+  EXPECT_THROW(std::ignore = std::move(result).Ok(), yaclib::ResultError<yaclib::StopError>);
   tp.Stop();
   tp.Wait();
 }
@@ -186,7 +186,7 @@ TEST(JustWorks, AsyncRun) {
   EXPECT_TRUE(f1.Ready());
   EXPECT_TRUE(f2.Ready());
   EXPECT_EQ(std::move(f1).Get().Ok(), "Hello!");
-  EXPECT_THROW(std::move(f2).Get().Ok(), std::logic_error);
+  EXPECT_THROW(std::ignore = std::move(f2).Get().Ok(), std::logic_error);
 
   tp.Stop();
   tp.Wait();
@@ -209,51 +209,33 @@ TEST(JustWorks, Promise) {
 
 TEST(Future, VoidParameter) {
   int called = 0;
-  auto f = yaclib::Run(yaclib::MakeInline(),
-                       [&] {
-                         ++called;
-                       })
-             .ThenInline([&] {
-               ++called;
-             })
-             .Then([&] {
-               ++called;
-             });
-  EXPECT_EQ(called, 3);
+  auto func = [&] {
+    ++called;
+    return yaclib::Unit{};
+  };
+  yaclib::Run(yaclib::MakeInline(), func).ThenInline(func).Then(func).Detach([&] {
+    func();
+  });
+  EXPECT_EQ(called, 4);
 }
 
 TEST(Future, UnitParameter) {
   int called = 0;
-  auto f = yaclib::Run(yaclib::MakeInline(),
-                       [&](yaclib::Unit) {
-                         ++called;
-                       })
-             .ThenInline([&](yaclib::Unit) {
-               ++called;
-             })
-             .Then([&](yaclib::Unit) {
-               ++called;
-             });
-  EXPECT_EQ(called, 3);
+  auto func = [&](yaclib::Unit) {
+    ++called;
+  };
+  yaclib::Run(yaclib::MakeInline(), func).ThenInline(func).Then(func).Detach(func);
+  EXPECT_EQ(called, 4);
 }
 
 TEST(Future, AutoParameter) {
   int called = 0;
-  auto f = yaclib::Run(yaclib::MakeInline(),
-                       [&](auto&& v) {
-                         if constexpr (std::is_same_v<decltype(v), yaclib::Unit&&>) {
-                           ++called;
-                         }
-                       })
-             .ThenInline([&](auto&& v) {
-               std::ignore = v.Ok();
-               ++called;
-             })
-             .Then([&](auto&& v) {
-               std::ignore = v.Ok();
-               ++called;
-             });
-  EXPECT_EQ(called, 3);
+  auto func = [&](auto&& v) {
+    std::ignore = v.Ok();
+    ++called;
+  };
+  yaclib::Run(yaclib::MakeInline(), func).ThenInline(func).Then(func).Detach(func);
+  EXPECT_EQ(called, 4);
 }
 
 TEST(Detach, AsyncSimple) {
@@ -383,7 +365,7 @@ TEST(Simple, Stop) {
         return 42;
       });
     }
-    EXPECT_THROW(std::move(g).Get().Ok(), yaclib::ResultError<yaclib::StopError>);
+    EXPECT_THROW(std::ignore = std::move(g).Get().Ok(), yaclib::ResultError<yaclib::StopError>);
   }
   tp.SoftStop();
   tp.Wait();

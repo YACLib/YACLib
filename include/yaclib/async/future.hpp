@@ -173,7 +173,7 @@ class Future final : public FutureBase<V, E> {
   [[nodiscard]] /*Future*/ auto ThenInline(Func&& f) &&;
 };
 
-extern template class Future<void, StopError>;
+extern template class Future<>;
 
 /**
  * Provides a mechanism to access the result of async operations
@@ -230,7 +230,7 @@ class FutureOn final : public FutureBase<V, E> {
   void Detach(Func&& f) &&;
 };
 
-extern template class FutureOn<void, StopError>;
+extern template class FutureOn<>;
 
 }  // namespace yaclib
 

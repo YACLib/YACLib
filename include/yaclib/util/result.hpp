@@ -4,15 +4,16 @@
 #include <yaclib/util/type_traits.hpp>
 
 #include <exception>
+#include <utility>
 #include <variant>
 
 namespace yaclib {
 
 /**
  * Result states \see Result
- * \enum Empty, Value, Error, Exception
+ * \enum Value, Exception, Error, Empty
  */
-enum class ResultState : char {
+enum class [[nodiscard]] ResultState : unsigned char{
   Value = 0,
   Exception = 1,
   Error = 2,
@@ -22,7 +23,7 @@ enum class ResultState : char {
 /**
  * Default error
  */
-struct StopError final {
+struct [[nodiscard]] StopError final {
   constexpr StopError(StopTag) noexcept {
   }
   constexpr StopError(StopError&&) noexcept = default;
@@ -31,16 +32,14 @@ struct StopError final {
   constexpr StopError& operator=(const StopError&) noexcept = default;
 };
 
-constexpr bool operator==(const StopError&, const StopError&) noexcept {
-  return true;
-}
+YACLIB_DEFINE_VOID_COMPARE(StopError)
 
 /**
  * \class Exception for Error
  * \see Result
  */
 template <typename Error>
-class ResultError final : public std::exception {
+class [[nodiscard]] ResultError final : public std::exception {
  public:
   ResultError(ResultError&&) noexcept(std::is_nothrow_move_constructible_v<Error>) = default;
   ResultError(const ResultError&) noexcept(std::is_nothrow_copy_constructible_v<Error>) = default;
@@ -49,12 +48,13 @@ class ResultError final : public std::exception {
 
   explicit ResultError(Error&& error) noexcept(std::is_nothrow_move_constructible_v<Error>) : _error{std::move(error)} {
   }
-
-  explicit ResultError(const Error& error) noexcept(std::is_nothrow_copy_constructible_v<Error>)
-    : _error{std::move(error)} {
+  explicit ResultError(const Error& error) noexcept(std::is_nothrow_copy_constructible_v<Error>) : _error{error} {
   }
 
-  [[nodiscard]] Error& Get() noexcept {
+  [[nodiscard]] Error& Get() & noexcept {
+    return _error;
+  }
+  [[nodiscard]] const Error& Get() const& noexcept {
     return _error;
   }
 
@@ -71,18 +71,17 @@ struct ResultEmpty final : std::exception {};
 /**
  * Encapsulated return value from caller
  *
- * \tparam V type of value that stored in Result
+ * \tparam ValueT type of value that stored in Result
  * \tparam E type of error that stored in Result
  */
-template <typename V, typename E>
+template <typename ValueT, typename E>
 class Result final {
-  static_assert(Check<V>(), "V should be valid");
+  static_assert(Check<ValueT>(), "V should be valid");
   static_assert(Check<E>(), "E should be valid");
-  static_assert(!std::is_same_v<V, E>, "Result cannot be instantiated with same V and E, because it's ambiguous");
-  static_assert(std::is_constructible_v<E, StopTag>, "Error should be constructable from StopError");
-
-  using ValueT = std::conditional_t<std::is_void_v<V>, Unit, V>;
-  using Variant = std::variant<ValueT, std::exception_ptr, E, std::monostate>;
+  static_assert(!std::is_same_v<ValueT, E>, "Result cannot be instantiated with same V and E, because it's ambiguous");
+  static_assert(std::is_constructible_v<E, StopTag>, "Error should be constructable from StopTag");
+  using V = std::conditional_t<std::is_void_v<ValueT>, Unit, ValueT>;
+  using Variant = std::variant<V, std::exception_ptr, E, std::monostate>;
 
  public:
   Result(Result&& other) noexcept(std::is_nothrow_move_constructible_v<Variant>) = default;
@@ -90,16 +89,17 @@ class Result final {
   Result& operator=(Result&& other) noexcept(std::is_nothrow_move_assignable_v<Variant>) = default;
   Result& operator=(const Result& other) noexcept(std::is_nothrow_copy_assignable_v<Variant>) = default;
 
-  template <typename... Args, typename = std::enable_if_t<
-                                sizeof...(Args) != 1 || !std::is_same_v<std::decay_t<head_t<Args&&...>>, Result>, void>>
-  Result(Args&&... args) noexcept(std::is_nothrow_constructible_v<Variant, std::in_place_type_t<ValueT>, Args&&...>)
+  template <typename... Args,
+            typename =
+              std::enable_if_t<(sizeof...(Args) > 1 || !std::is_same_v<std::decay_t<head_t<Args&&...>>, Result>), void>>
+  Result(Args&&... args) noexcept(std::is_nothrow_constructible_v<Variant, std::in_place_type_t<V>, Args&&...>)
     : Result{std::in_place, std::forward<Args>(args)...} {
   }
 
   template <typename... Args>
   Result(std::in_place_t,
-         Args&&... args) noexcept(std::is_nothrow_constructible_v<Variant, std::in_place_type_t<ValueT>, Args&&...>)
-    : _result{std::in_place_type<ValueT>, std::forward<Args>(args)...} {
+         Args&&... args) noexcept(std::is_nothrow_constructible_v<Variant, std::in_place_type_t<V>, Args&&...>)
+    : _result{std::in_place_type<V>, std::forward<Args>(args)...} {
   }
 
   Result(std::exception_ptr exception) noexcept
@@ -125,42 +125,24 @@ class Result final {
     return State() == ResultState::Value;
   }
 
-  /*[[nodiscard]]*/ ValueT&& Ok() && {
-    switch (State()) {
-      case ResultState::Value:
-        return std::move(*this).Value();
-      case ResultState::Exception:
-        std::rethrow_exception(std::move(*this).Exception());
-      case ResultState::Error:
-        throw ResultError{std::move(*this).Error()};
-      default:
-        throw ResultEmpty{};
-    }
+  [[nodiscard]] V&& Ok() && {
+    return Get(std::move(*this));
   }
 
-  /*[[nodiscard]]*/ const ValueT& Ok() const& {
-    switch (State()) {
-      case ResultState::Value:
-        return Value();
-      case ResultState::Exception:
-        std::rethrow_exception(Exception());
-      case ResultState::Error:
-        throw ResultError{Error()};
-      default:
-        throw ResultEmpty{};
-    }
+  [[nodiscard]] const V& Ok() const& {
+    return Get(*this);
   }
 
   [[nodiscard]] ResultState State() const noexcept {
-    return ResultState{static_cast<char>(_result.index())};
+    return ResultState{static_cast<unsigned char>(_result.index())};
   }
 
-  [[nodiscard]] ValueT&& Value() && noexcept {
-    return std::get<ValueT>(std::move(_result));
+  [[nodiscard]] V&& Value() && noexcept {
+    return std::get<V>(std::move(_result));
   }
 
-  [[nodiscard]] const ValueT& Value() const& noexcept {
-    return std::get<ValueT>(_result);
+  [[nodiscard]] const V& Value() const& noexcept {
+    return std::get<V>(_result);
   }
 
   [[nodiscard]] std::exception_ptr&& Exception() && noexcept {
@@ -185,7 +167,23 @@ class Result final {
   }
 
  private:
+  template <typename R>
+  static decltype(auto) Get(R&& r) {
+    switch (r.State()) {
+      case ResultState::Value:
+        return std::forward<R>(r).Value();
+      case ResultState::Exception:
+        std::rethrow_exception(std::forward<R>(r).Exception());
+      case ResultState::Error:
+        throw ResultError{std::forward<R>(r).Error()};
+      default:
+        throw ResultEmpty{};
+    }
+  }
+
   Variant _result;
 };
+
+extern template class Result<>;
 
 }  // namespace yaclib

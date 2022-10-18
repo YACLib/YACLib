@@ -2,6 +2,6 @@
 
 namespace yaclib {
 
-template class Promise<void, StopError>;
+template class Promise<>;
 
 }  // namespace yaclib

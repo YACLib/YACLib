@@ -71,8 +71,7 @@ class PromiseType final : public OneCounter<ResultCore<V, E>, PromiseTypeDeleter
   }
 
   void return_value(Unit) noexcept {
-    static_assert(std::is_void_v<V>);
-    this->Store(Unit{});
+    this->Store(std::in_place);
   }
 
   [[nodiscard]] auto Handle() noexcept {
