@@ -75,6 +75,12 @@ if (YACLIB_CORO_NEED)
     )
 endif ()
 
+if (NOT YACLIB_SAN AND YACLIB_CORO_NEED)
+  list(APPEND YACLIB_UNIT_SOURCES
+    unit/async/dealloc_order
+    )
+endif ()
+
 if (YACLIB_FAULT STREQUAL "FIBER")
   list(APPEND YACLIB_UNIT_SOURCES
     unit/fault/mutexes

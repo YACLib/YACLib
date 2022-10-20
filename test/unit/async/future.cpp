@@ -747,5 +747,11 @@ TYPED_TEST(AsyncSuite, ExecutorDrop2) {
   EXPECT_TRUE(invoked_flags[2]);
 }
 
+TYPED_TEST(AsyncSuite, InvokeAsync) {
+  INVOKE(yaclib::MakeInline(), [] {
+    return yaclib::MakeFuture();
+  }).Detach();
+}
+
 }  // namespace
 }  // namespace test
