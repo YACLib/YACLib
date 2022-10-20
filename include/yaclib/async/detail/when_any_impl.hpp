@@ -11,6 +11,7 @@
 
 #include <cstddef>
 #include <exception>
+#include <limits>
 #include <type_traits>
 #include <utility>
 #include <yaclib_std/atomic>
@@ -19,29 +20,32 @@ namespace yaclib::detail {
 
 template <typename V, typename E, WhenPolicy P /*None*/>
 class AnyCombinatorBase {
- protected:
   yaclib_std::atomic_bool _done;
+
+ protected:
   ResultCorePtr<V, E> _core;
 
   explicit AnyCombinatorBase(std::size_t /*count*/, ResultCorePtr<V, E>&& core) noexcept
     : _done{false}, _core{std::move(core)} {
   }
 
-  bool Done() noexcept {
-    return _done.load(std::memory_order_acquire);
-  }
-
-  void Combine(Result<V, E>&& result) noexcept {
-    if (!_done.exchange(true, std::memory_order_acq_rel)) {
-      auto core = _core.Release();
-      core->Store(std::move(result));
-      core->template SetResult<false>();
+  bool Combine(ResultCore<V, E>& caller) noexcept {
+    if (!_done.load(std::memory_order_acquire) && !_done.exchange(true, std::memory_order_acq_rel)) {
+      _core->Store(std::move(caller.Get()));
+      caller.DecRef();
+      return true;
     }
+    caller.DecRef();
+    return false;
   }
 };
 
 template <typename V, typename E>
 class AnyCombinatorBase<V, E, WhenPolicy::LastFail> {
+  static bool DoneImpl(std::size_t value) noexcept {
+    return (value & 1U) != 0;
+  }
+
   yaclib_std::atomic_size_t _state;
 
  protected:
@@ -51,80 +55,75 @@ class AnyCombinatorBase<V, E, WhenPolicy::LastFail> {
     : _state{2 * count}, _core{std::move(core)} {
   }
 
-  bool Done() noexcept {
-    return (_state.load(std::memory_order_acquire) & 1U) != 0;
-  }
-
-  void Combine(Result<V, E>&& result) noexcept {
-    if (result) {
-      if ((_state.exchange(1, std::memory_order_acq_rel) & 1U) != 0) {
-        return;
+  bool Combine(ResultCore<V, E>& caller) noexcept {
+    if (!DoneImpl(_state.load(std::memory_order_acquire))) {
+      auto& result = caller.Get();
+      if (result) {
+        if (!DoneImpl(_state.exchange(1, std::memory_order_acq_rel))) {
+          _core->Store(std::move(result));
+          caller.DecRef();
+          return true;
+        }
+      } else if (_state.fetch_sub(2, std::memory_order_acq_rel) == 2) {
+        _core->Store(std::move(result));
+        caller.DecRef();
+        return true;
       }
-    } else if (_state.fetch_sub(2, std::memory_order_acq_rel) != 2) {
-      return;
     }
-    auto core = _core.Release();
-    core->Store(std::move(result));
-    core->template SetResult<false>();
+    caller.DecRef();
+    return false;
   }
 };
 
 template <typename V, typename E>
-class AnyCombinatorBase<V, E, WhenPolicy::FirstFail> : public AnyCombinatorBase<V, E, WhenPolicy::None> {
-  using Base = AnyCombinatorBase<V, E, WhenPolicy::None>;
+class AnyCombinatorBase<V, E, WhenPolicy::FirstFail> {
+  static constexpr auto kDoneImpl = std::numeric_limits<std::uintptr_t>::max();
 
-  yaclib_std::atomic<ResultState> _state;
-  union {
-    Unit _unit;
-    E _error;
-    std::exception_ptr _exception;
-  };
+  yaclib_std::atomic_uintptr_t _state;
 
  protected:
-  explicit AnyCombinatorBase(std::size_t count, ResultCorePtr<V, E>&& core)
-    : Base{count, std::move(core)}, _state{ResultState::Empty}, _unit{} {
+  ResultCorePtr<V, E> _core;
+
+  explicit AnyCombinatorBase(std::size_t /*count*/, ResultCorePtr<V, E>&& core) : _state{0}, _core{std::move(core)} {
   }
 
   ~AnyCombinatorBase() noexcept {
-    auto resolve = [&](auto&& func) noexcept {
-      auto state = _state.load(std::memory_order_acquire);
-      if (state == ResultState::Exception) {
-        func(_exception);
-      } else if (state == ResultState::Error) {
-        func(_error);
-      }
-    };
-    auto core = this->_core.Release();
-    if (core != nullptr) {
-      resolve([&](auto& fail) noexcept {
-        core->Store(std::move(fail));
-        using Fail = std::remove_reference_t<decltype(fail)>;
-        fail.~Fail();
-      });
-      core->template SetResult<false>();
-    } else {
-      resolve([&](auto& fail) noexcept {
-        using Fail = std::remove_reference_t<decltype(fail)>;
-        fail.~Fail();
-      });
+    const auto state = _state.load(std::memory_order_relaxed);
+    if (!_core) {
+      YACLIB_ASSERT(state == kDoneImpl);
+      return;
     }
+    YACLIB_ASSERT(state != 0);
+    auto& fail = *reinterpret_cast<ResultCore<V, E>*>(state);
+    _core->Store(std::move(fail.Get()));
+    fail.DecRef();
+    _core.Release()->template SetResult<false>();
   }
 
-  void Combine(Result<V, E>&& result) noexcept {
-    auto state = result.State();
-    if (state == ResultState::Value) {
-      return Base::Combine(std::move(result));
-    }
-    auto old_state = _state.load(std::memory_order_acquire);
-    if (old_state == ResultState::Empty &&
-        _state.compare_exchange_strong(old_state, state, std::memory_order_acq_rel, std::memory_order_relaxed)) {
-      if (state == ResultState::Exception) {
-        new (&_exception) std::exception_ptr{std::move(result).Exception()};
-      } else {
-        YACLIB_ASSERT(state == ResultState::Error);
-        new (&_error) E{std::move(result).Error()};
+  bool Combine(ResultCore<V, E>& caller) noexcept {
+    auto state = _state.load(std::memory_order_acquire);
+    if (state != kDoneImpl) {
+      auto& result = caller.Get();
+      if (!result) {
+        if (state != 0 || !_state.compare_exchange_strong(state, reinterpret_cast<std::uintptr_t>(&caller),
+                                                          std::memory_order_acq_rel)) {
+          caller.DecRef();
+        }
+        return false;
+      }
+      state = _state.exchange(kDoneImpl, std::memory_order_acq_rel);
+      if (state != kDoneImpl) {
+        if (state != 0) {
+          auto& fail = *reinterpret_cast<ResultCore<V, E>*>(state);
+          fail.DecRef();
+        }
+        _core->Store(std::move(caller.Get()));
+        caller.DecRef();
+        return true;
       }
     }
+    caller.DecRef();
+    return false;
   }
 };
 
@@ -145,12 +144,13 @@ class AnyCombinator : public InlineCore, public AnyCombinatorBase<V, E, P> {
 
  private:
   void Here(BaseCore& caller) noexcept final {
-    if (!this->Done()) {
-      auto& core = static_cast<ResultCore<V, E>&>(caller);
-      this->Combine(std::move(core.Get()));
+    if (this->Combine(static_cast<ResultCore<V, E>&>(caller))) {
+      auto* callback = this->_core.Release();
+      DecRef();
+      callback->template SetResult<false>();
+    } else {
+      DecRef();
     }
-    caller.DecRef();
-    DecRef();
   }
 
 #if YACLIB_FINAL_SUSPEND_TRANSFER != 0
