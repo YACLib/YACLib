@@ -66,25 +66,22 @@ class Core : public ResultCoreT<Type, Ret, E> {
   }
 
   void Here(BaseCore& caller) noexcept final {
+    this->_self.caller = &caller;
     if constexpr (kIsAsync) {
       if (this->_self.unwrapping != 0) {
         auto& core = static_cast<ResultCore<Ret, E>&>(caller);
         Done(std::move(core.Get()));
-        caller.DecRef();
         return;
       }
-      this->_self.unwrapping = 1;
     }
     if constexpr (Type != CoreType::Run) {
       caller.MoveExecutorTo(*this);
     }
     if constexpr (kIsCall) {
-      this->_self.caller = &caller;
       this->_executor->Submit(*this);
     } else {
       auto& core = static_cast<ResultCore<Arg, E>&>(caller);
       CallImpl(std::move(core.Get()));
-      caller.DecRef();
     }
   }
 
@@ -108,11 +105,19 @@ class Core : public ResultCoreT<Type, Ret, E> {
 
   template <typename T>
   void Done(T&& value) noexcept {
+    // Order defined here is important:
+    // 1. Save caller on stack
+    // 2. Save return value to union where was caller
+    // 3. Destroy and dealloc argument storage
+    // 4. Destroy functor storage
+    // 5. Make current core ready, maybe execute next callback
+    // 3 and 4 can be executed in any order TODO(MBkkt) What order is better here?
+    // Other steps cannot be reordered, examples:
+    // [] (X&& x) -> X&& { touch x, then return it by rvalue reference }
+    // [X x]   () -> X&& { touch x, then return it by rvalue reference }
     auto* caller = this->_self.caller;
     this->Store(std::forward<T>(value));
-    // TODO(MBkkt) What order is better here?
-    // Now it's construct return object, then destroy and dealloc argument, and then destroy current callback functor
-    if constexpr (Type != CoreType::Run) {
+    if constexpr (Type != CoreType::Run || kIsAsync) {
       caller->DecRef();
     }
     _func.storage.~Storage();
@@ -164,6 +169,12 @@ class Core : public ResultCoreT<Type, Ret, E> {
   void CallResolveAsync(T&& value) {
     if constexpr (kIsAsync) {
       auto future = CallResolveVoid(std::forward<T>(value));
+      if constexpr (Type != CoreType::Run) {
+        this->_self.caller->DecRef();
+      }
+      this->_self.unwrapping = 1;
+      // We can detect _func already destroyed in Done only with runtime if, so instead of this we use lazy destroy
+      // _func.storage.~Storage();
       future.GetCore().Release()->SetInline(*this);
     } else {
       Done(CallResolveVoid(std::forward<T>(value)));
