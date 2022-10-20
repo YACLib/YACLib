@@ -345,6 +345,22 @@ TEST(WhenAll, BadTypes) {
   TestBadTypes<DeleteAssign>();
 }
 
+TEST(WhenAll, Bool) {
+  yaclib::FairThreadPool tp{2};
+  auto func = [] {
+    yaclib_std::this_thread::sleep_for(100ms);
+    return false;
+  };
+  auto f1 = yaclib::Run(tp, func);
+  auto f2 = yaclib::Run(tp, func);
+  auto v = yaclib::WhenAll(std::move(f1), std::move(f2)).Get().Ok();
+  std::vector<unsigned char> expected{0, 0};
+  EXPECT_EQ(v, expected);
+
+  tp.Stop();
+  tp.Wait();
+}
+
 TEST(WhenAll, FirstFail) {
 #if YACLIB_FAULT == 2
   GTEST_SKIP();  // Too long

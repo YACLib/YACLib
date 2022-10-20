@@ -3,6 +3,7 @@
 #include <yaclib/algo/detail/inline_core.hpp>
 #include <yaclib/algo/detail/result_core.hpp>
 #include <yaclib/fwd.hpp>
+#include <yaclib/log.hpp>
 #include <yaclib/util/detail/atomic_counter.hpp>
 #include <yaclib/util/detail/unique_counter.hpp>
 #include <yaclib/util/helper.hpp>
@@ -17,19 +18,38 @@ namespace yaclib::detail {
 
 template <typename V>
 struct AllCombinatorBase {
-  yaclib_std::atomic_size_t _ticket = 0;
+  using FutureValue = std::vector<V>;
+
   yaclib_std::atomic_bool _done = false;
-  V _results;
+  yaclib_std::atomic_size_t _ticket = 0;
+  FutureValue _results;
+};
+
+template <typename V, typename E>
+struct AllCombinatorBase<Result<V, E>> {
+  using FutureValue = std::vector<Result<V, E>>;
+  yaclib_std::atomic_size_t _ticket = 0;
+  FutureValue _results;
+};
+
+template <>
+struct AllCombinatorBase<bool> {
+  using FutureValue = std::vector<unsigned char>;
+  yaclib_std::atomic_bool _done = false;
+  yaclib_std::atomic_size_t _ticket = 0;
+  FutureValue _results;
 };
 
 template <>
 struct AllCombinatorBase<void> {
+  using FutureValue = void;
   yaclib_std::atomic_bool _done = false;
 };
 
-template <typename V, typename E, typename FutureValue = std::conditional_t<std::is_void_v<V>, V, std::vector<V>>>
-class AllCombinator : public InlineCore, protected AllCombinatorBase<FutureValue> {
-  using Value = result_value_t<V>;
+template <typename R, typename E>
+class AllCombinator : public InlineCore, protected AllCombinatorBase<R> {
+  using V = result_value_t<R>;
+  using FutureValue = typename AllCombinatorBase<R>::FutureValue;
   using ResultPtr = ResultCorePtr<FutureValue, E>;
 
  public:
@@ -45,40 +65,43 @@ class AllCombinator : public InlineCore, protected AllCombinatorBase<FutureValue
     return {std::move(future_core), combinator.Release()};
   }
 
+ protected:
   ~AllCombinator() noexcept override {
-    if (!std::is_same_v<V, Value> || !this->_done.load(std::memory_order_acquire)) {
-      auto core = _promise.Release();
-      if constexpr (std::is_void_v<V>) {
-        core->Store(std::in_place);
-      } else {
-        core->Store(std::move(this->_results));
-      }
-      core->template SetResult<false>();
+    if (std::is_same_v<R, V> && !_core) {
+      return;
     }
-    YACLIB_ASSERT(_promise == nullptr);
+    if constexpr (std::is_void_v<R>) {
+      _core->Store(std::in_place);
+    } else {
+      _core->Store(std::move(this->_results));
+    }
+    _core.Release()->template SetResult<false>();
   }
 
- protected:
-  explicit AllCombinator(ResultPtr&& promise, [[maybe_unused]] std::size_t count) : _promise{std::move(promise)} {
-    if constexpr (!std::is_void_v<V>) {
-      AllCombinatorBase<FutureValue>::_results.resize(count);
+  explicit AllCombinator(ResultPtr&& core, [[maybe_unused]] std::size_t count) noexcept(std::is_void_v<R>)
+    : _core{std::move(core)} {
+    if constexpr (!std::is_void_v<R>) {
+      AllCombinatorBase<R>::_results.resize(count);
     }
   }
 
  private:
   void Here(BaseCore& caller) noexcept final {
-    if (!this->_done.load(std::memory_order_acquire)) {
-      auto& core = static_cast<ResultCore<Value, E>&>(caller);
-      if constexpr (std::is_same_v<V, Value>) {
-        Combine(std::move(core.Get()));
+    auto& core = static_cast<ResultCore<V, E>&>(caller);
+    if constexpr (std::is_same_v<R, V>) {
+      if (!this->_done.load(std::memory_order_acquire) && CombineValue(std::move(core.Get()))) {
+        auto* callback = _core.Release();
+        Done(core);
+        callback->template SetResult<false>();
       } else {
-        const auto ticket = this->_ticket.fetch_add(1, std::memory_order_acq_rel);
-        this->_results[ticket].~Result<Value, E>();
-        new (&this->_results[ticket]) Result<Value, E>{std::move(core.Get())};
+        Done(core);
       }
+    } else {
+      const auto ticket = this->_ticket.fetch_add(1, std::memory_order_acq_rel);
+      this->_results[ticket].~R();
+      new (&this->_results[ticket]) R{std::move(core.Get())};
+      Done(core);
     }
-    caller.DecRef();
-    DecRef();
   }
 
 #if YACLIB_FINAL_SUSPEND_TRANSFER != 0
@@ -88,7 +111,7 @@ class AllCombinator : public InlineCore, protected AllCombinatorBase<FutureValue
   }
 #endif
 
-  void Combine(Result<Value, E>&& result) noexcept {
+  bool CombineValue(Result<V, E>&& result) noexcept {
     const auto state = result.State();
     if (state == ResultState::Value) {
       if constexpr (!std::is_void_v<V>) {
@@ -96,18 +119,23 @@ class AllCombinator : public InlineCore, protected AllCombinatorBase<FutureValue
         this->_results[ticket] = std::move(result).Value();
       }
     } else if (!this->_done.exchange(true, std::memory_order_acq_rel)) {
-      auto* core = _promise.Release();
       if (state == ResultState::Exception) {
-        core->Store(std::move(result).Exception());
+        _core->Store(std::move(result).Exception());
       } else {
         YACLIB_ASSERT(state == ResultState::Error);
-        core->Store(std::move(result).Error());
+        _core->Store(std::move(result).Error());
       }
-      core->template SetResult<false>();
+      return true;
     }
+    return false;
   }
 
-  ResultPtr _promise;
+  void Done(ResultCore<V, E>& caller) noexcept {
+    caller.DecRef();
+    DecRef();
+  }
+
+  ResultPtr _core;
 };
 
 }  // namespace yaclib::detail
