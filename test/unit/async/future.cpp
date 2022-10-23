@@ -231,7 +231,7 @@ TEST(Future, UnitParameter) {
 TEST(Future, AutoParameter) {
   int called = 0;
   auto func = [&](auto&& v) {
-    std::ignore = v.Ok();
+    std::ignore = std::move(v).Ok();
     ++called;
   };
   yaclib::Run(yaclib::MakeInline(), func).ThenInline(func).Then(func).Detach(func);

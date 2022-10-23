@@ -88,19 +88,19 @@ void TestOk(Result&& result, yaclib::ResultState state) {
   switch (state) {
     case yaclib::ResultState::Value: {
       result = "1";
-      EXPECT_EQ(std::forward<Result>(result).Ok(), "1");
+      EXPECT_EQ(std::as_const(result).Ok(), "1");
     } break;
     case yaclib::ResultState::Error: {
       result = yaclib::StopTag{};
-      EXPECT_THROW(std::ignore = std::forward<Result>(result).Ok(),
+      EXPECT_THROW(std::ignore = std::as_const(result).Ok(),
                    yaclib::ResultError<yaclib::result_error_t<std::decay_t<Result>>>);
     } break;
     case yaclib::ResultState::Exception: {
       result = std::make_exception_ptr(std::runtime_error{""});
-      EXPECT_THROW(std::ignore = std::forward<Result>(result).Ok(), std::runtime_error);
+      EXPECT_THROW(std::ignore = std::as_const(result).Ok(), std::runtime_error);
     } break;
     case yaclib::ResultState::Empty: {
-      EXPECT_THROW(std::ignore = std::forward<Result>(result).Ok(), yaclib::ResultEmpty);
+      EXPECT_THROW(std::ignore = std::as_const(result).Ok(), yaclib::ResultEmpty);
     } break;
   }
   EXPECT_EQ(result.State(), state);

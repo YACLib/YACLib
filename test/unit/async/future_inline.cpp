@@ -349,6 +349,70 @@ TEST(ThenInline, Async) {
   ThenInlineAsync<false>();
 }
 
+template <typename Func>
+auto MakeFinally(Func&& func) {
+  using F = std::decay_t<Func>;
+  auto deleter = [](F* p) {
+    std::forward<Func> (*p)();
+    delete p;
+  };
+  return std::unique_ptr<F, decltype(deleter)>{new F{std::forward<Func>(func)}, deleter};
+}
+
+TEST(ThenInline, OrderFunctorDestroy) {
+  int x = 0;
+  yaclib::ManualExecutor e;
+  auto f1 = [&]() noexcept {
+    EXPECT_EQ(x, 0);
+    x += 10;
+  };
+  auto f2 = [&]() noexcept {
+    EXPECT_EQ(x, 10);
+    x += 100;
+    EXPECT_EQ(1U, e.Drain());
+    EXPECT_EQ(x, 1110);
+  };
+  auto f3 = [&]() noexcept {
+    EXPECT_EQ(x, 110);
+    x += 1000;
+  };
+  auto f4 = [&]() noexcept {
+    EXPECT_EQ(x, 1110);
+    x += 10000;
+  };
+  auto f5 = [&]() noexcept {
+    EXPECT_EQ(x, 11110);
+    x += 100000;
+  };
+  auto f6 = [&]() noexcept {
+    EXPECT_EQ(x, 111110);
+    x += 1000000;
+  };
+  auto f = yaclib::MakeFuture()
+             .ThenInline([&, d1 = MakeFinally(f1)] {
+               EXPECT_EQ(x, 0);
+             })
+             .ThenInline([&, d2 = MakeFinally(f2)] {
+               EXPECT_EQ(x, 10);
+               return yaclib::Run(e, [&, d3 = MakeFinally(f3)] {
+                 EXPECT_EQ(x, 110);
+               });
+             })
+             .ThenInline([&, d5 = MakeFinally(f5)] {
+               EXPECT_EQ(x, 1110);
+               auto temp = yaclib::Run(yaclib::MakeInline(), [&, d4 = MakeFinally(f4)] {
+                 EXPECT_EQ(x, 1110);
+               });
+               EXPECT_EQ(x, 11110);
+               return temp;
+             })
+             .ThenInline([&, d6 = MakeFinally(f6)] {
+               EXPECT_EQ(x, 111110);
+             });
+  EXPECT_TRUE(f.Ready());
+  EXPECT_EQ(x, 1111110);
+};
+
 template <bool Inline>
 void FutureMakeFuture() {
   {

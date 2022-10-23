@@ -125,10 +125,18 @@ class Result final {
     return State() == ResultState::Value;
   }
 
+  void Ok() & = delete;
+  void Ok() const&& = delete;
+  void Value() & = delete;
+  void Value() const&& = delete;
+  void Exception() & = delete;
+  void Exception() const&& = delete;
+  void Error() & = delete;
+  void Error() const&& = delete;
+
   [[nodiscard]] V&& Ok() && {
     return Get(std::move(*this));
   }
-
   [[nodiscard]] const V& Ok() const& {
     return Get(*this);
   }
@@ -140,7 +148,6 @@ class Result final {
   [[nodiscard]] V&& Value() && noexcept {
     return std::get<V>(std::move(_result));
   }
-
   [[nodiscard]] const V& Value() const& noexcept {
     return std::get<V>(_result);
   }
@@ -148,7 +155,6 @@ class Result final {
   [[nodiscard]] std::exception_ptr&& Exception() && noexcept {
     return std::get<std::exception_ptr>(std::move(_result));
   }
-
   [[nodiscard]] const std::exception_ptr& Exception() const& noexcept {
     return std::get<std::exception_ptr>(_result);
   }
@@ -156,14 +162,12 @@ class Result final {
   [[nodiscard]] E&& Error() && noexcept {
     return std::get<E>(std::move(_result));
   }
-
   [[nodiscard]] const E& Error() const& noexcept {
     return std::get<E>(_result);
   }
 
-  template <typename T>
-  [[nodiscard]] T&& Extract() && noexcept {
-    return std::get<T>(std::move(_result));
+  [[nodiscard]] Variant& Internal() {
+    return _result;
   }
 
  private:
