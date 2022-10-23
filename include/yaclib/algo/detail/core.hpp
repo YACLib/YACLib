@@ -70,7 +70,7 @@ class Core : public ResultCoreT<Type, Ret, E> {
     if constexpr (kIsAsync) {
       if (this->_self.unwrapping != 0) {
         auto& core = static_cast<ResultCore<Ret, E>&>(caller);
-        Done(std::move(core.Get()));
+        Done<true>(std::move(core.Get()));
         return;
       }
     }
@@ -103,7 +103,7 @@ class Core : public ResultCoreT<Type, Ret, E> {
     Done(std::current_exception());
   }
 
-  template <typename T>
+  template <bool Async = false, typename T>
   void Done(T&& value) noexcept {
     // Order defined here is important:
     // 1. Save caller on stack
@@ -117,10 +117,12 @@ class Core : public ResultCoreT<Type, Ret, E> {
     // [X x]   () -> X&& { touch x, then return it by rvalue reference }
     auto* caller = this->_self.caller;
     this->Store(std::forward<T>(value));
-    if constexpr (Type != CoreType::Run || kIsAsync) {
+    if constexpr (Type != CoreType::Run || Async) {
       caller->DecRef();
     }
-    _func.storage.~Storage();
+    if constexpr (!Async) {
+      _func.storage.~Storage();
+    }
     this->template SetResult<false>();
   }
 
@@ -158,7 +160,7 @@ class Core : public ResultCoreT<Type, Ret, E> {
       constexpr auto kState = kIsException ? ResultState::Exception : ResultState::Error;
       if (state == kState) {
         using T = std::conditional_t<kIsException, std::exception_ptr, E>;
-        CallResolveAsync(std::move(r).template Extract<T>());
+        CallResolveAsync(std::get<T>(std::move(r.Internal())));
       } else {
         Done(std::move(r));
       }
@@ -173,8 +175,7 @@ class Core : public ResultCoreT<Type, Ret, E> {
         this->_self.caller->DecRef();
       }
       this->_self.unwrapping = 1;
-      // We can detect _func already destroyed in Done only with runtime if, so instead of this we use lazy destroy
-      // _func.storage.~Storage();
+      _func.storage.~Storage();
       future.GetCore().Release()->SetInline(*this);
     } else {
       Done(CallResolveVoid(std::forward<T>(value)));
