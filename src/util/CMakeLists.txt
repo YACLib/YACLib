@@ -1,11 +1,11 @@
 list(APPEND YACLIB_INCLUDES
+  ${YACLIB_INCLUDE_DIR}/util/fail_policy.hpp
   ${YACLIB_INCLUDE_DIR}/util/func.hpp
   ${YACLIB_INCLUDE_DIR}/util/helper.hpp
   ${YACLIB_INCLUDE_DIR}/util/intrusive_ptr.hpp
   ${YACLIB_INCLUDE_DIR}/util/ref.hpp
   ${YACLIB_INCLUDE_DIR}/util/result.hpp
   ${YACLIB_INCLUDE_DIR}/util/type_traits.hpp
-  ${YACLIB_INCLUDE_DIR}/util/when_policy.hpp
   )
 list(APPEND YACLIB_HEADERS
   ${YACLIB_INCLUDE_DIR}/util/detail/atomic_counter.hpp
