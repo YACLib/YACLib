@@ -18,7 +18,7 @@
 
 namespace yaclib::detail {
 
-template <typename V, typename E, WhenPolicy P /*None*/>
+template <typename V, typename E, FailPolicy P /*None*/>
 class AnyCombinatorBase {
   yaclib_std::atomic_bool _done;
 
@@ -41,7 +41,7 @@ class AnyCombinatorBase {
 };
 
 template <typename V, typename E>
-class AnyCombinatorBase<V, E, WhenPolicy::LastFail> {
+class AnyCombinatorBase<V, E, FailPolicy::LastFail> {
   static bool DoneImpl(std::size_t value) noexcept {
     return (value & 1U) != 0;
   }
@@ -76,7 +76,7 @@ class AnyCombinatorBase<V, E, WhenPolicy::LastFail> {
 };
 
 template <typename V, typename E>
-class AnyCombinatorBase<V, E, WhenPolicy::FirstFail> {
+class AnyCombinatorBase<V, E, FailPolicy::FirstFail> {
   static constexpr auto kDoneImpl = std::numeric_limits<std::uintptr_t>::max();
 
   yaclib_std::atomic_uintptr_t _state;
@@ -127,7 +127,7 @@ class AnyCombinatorBase<V, E, WhenPolicy::FirstFail> {
   }
 };
 
-template <typename V, typename E, WhenPolicy P>
+template <typename V, typename E, FailPolicy P>
 class AnyCombinator : public InlineCore, public AnyCombinatorBase<V, E, P> {
   using Base = AnyCombinatorBase<V, E, P>;
   using Base::Base;

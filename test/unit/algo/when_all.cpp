@@ -43,7 +43,7 @@ class WhenAllT : public testing::Test {
   static constexpr bool kIsInt = std::is_same_v<Int, T>;
   static constexpr bool kIsVoid = std::is_same_v<Void, T>;
   static constexpr bool kIsAll = kIsInt || kIsVoid;
-  static constexpr yaclib::WhenPolicy Policy = kIsAll ? yaclib::WhenPolicy::None : yaclib::WhenPolicy::FirstFail;
+  static constexpr yaclib::FailPolicy Policy = kIsAll ? yaclib::FailPolicy::None : yaclib::FailPolicy::FirstFail;
   using Type = std::conditional_t<kIsInt, int, std::conditional_t<kIsVoid, void, T>>;
 };
 
@@ -69,7 +69,7 @@ struct TypeNames {
 
 TYPED_TEST_SUITE(WhenAllT, MyTypes, TypeNames);
 
-template <TestSuite suite, typename T, yaclib::WhenPolicy P>
+template <TestSuite suite, typename T, yaclib::FailPolicy P>
 void JustWorks() {
   constexpr int kSize = 3;
   static constexpr bool is_void = std::is_void_v<T>;
@@ -110,7 +110,7 @@ void JustWorks() {
   EXPECT_TRUE(all.Ready());
 
   std::vector expected{7, 3, 5};
-  if constexpr (P == yaclib::WhenPolicy::None) {
+  if constexpr (P == yaclib::FailPolicy::None) {
     auto values = std::move(all).Touch().Value();
     size_t i = 0;
     for (auto const& v : values) {
@@ -335,7 +335,7 @@ template <typename T>
 void TestBadTypes() {
   auto f1 = yaclib::MakeFuture<T>();
   auto f2 = yaclib::MakeFuture<T>();
-  auto f_all = yaclib::WhenAll<yaclib::WhenPolicy::None>(std::move(f1), std::move(f2)).Get();
+  auto f_all = yaclib::WhenAll<yaclib::FailPolicy::None>(std::move(f1), std::move(f2)).Get();
   EXPECT_EQ(f_all.State(), yaclib::ResultState::Value);
 }
 

@@ -22,7 +22,7 @@ namespace yaclib {
  * \param begin , count the range of futures to combine
  * \return Future<T>
  */
-template <WhenPolicy P = WhenPolicy::LastFail, typename It, typename T = typename std::iterator_traits<It>::value_type>
+template <FailPolicy P = FailPolicy::LastFail, typename It, typename T = typename std::iterator_traits<It>::value_type>
 auto WhenAny(It begin, std::size_t count) {
   static_assert(is_future_base_v<T>, "WhenAny function Iterator must be point to some Future");
   using V = future_base_value_t<T>;
@@ -48,7 +48,7 @@ auto WhenAny(It begin, std::size_t count) {
  * \param begin , end the range of futures to combine
  * \return Future<T>
  */
-template <WhenPolicy P = WhenPolicy::LastFail, typename It, typename T = typename std::iterator_traits<It>::value_type>
+template <FailPolicy P = FailPolicy::LastFail, typename It, typename T = typename std::iterator_traits<It>::value_type>
 YACLIB_INLINE auto WhenAny(It begin, It end) {
   static_assert(is_future_base_v<T>, "WhenAny function Iterator must be point to some Future");
   // We don't use std::distance because we want to alert the user to the fact that it can be expensive.
@@ -65,7 +65,7 @@ YACLIB_INLINE auto WhenAny(It begin, It end) {
  * \param futures two or more futures to combine
  * \return Future<T>
  */
-template <WhenPolicy P = WhenPolicy::LastFail, typename E, typename... V>
+template <FailPolicy P = FailPolicy::LastFail, typename E, typename... V>
 auto WhenAny(FutureBase<V, E>&&... futures) {
   constexpr std::size_t kSize = sizeof...(V);
   static_assert(kSize >= 2, "WhenAny wants at least two futures");
