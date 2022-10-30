@@ -3,9 +3,9 @@
 #include <yaclib/async/detail/when_any_impl.hpp>
 #include <yaclib/async/detail/when_impl.hpp>
 #include <yaclib/async/future.hpp>
-#include <yaclib/async/when_policy.hpp>
 #include <yaclib/config.hpp>
 #include <yaclib/util/type_traits.hpp>
+#include <yaclib/util/when_policy.hpp>
 
 #include <cstddef>
 #include <iterator>

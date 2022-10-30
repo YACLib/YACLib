@@ -5,13 +5,14 @@ list(APPEND YACLIB_INCLUDES
   ${YACLIB_INCLUDE_DIR}/util/ref.hpp
   ${YACLIB_INCLUDE_DIR}/util/result.hpp
   ${YACLIB_INCLUDE_DIR}/util/type_traits.hpp
-  ${YACLIB_INCLUDE_DIR}/util/detail/intrusive_list.hpp
+  ${YACLIB_INCLUDE_DIR}/util/when_policy.hpp
   )
 list(APPEND YACLIB_HEADERS
   ${YACLIB_INCLUDE_DIR}/util/detail/atomic_counter.hpp
   ${YACLIB_INCLUDE_DIR}/util/detail/atomic_event.hpp
   ${YACLIB_INCLUDE_DIR}/util/detail/default_deleter.hpp
   ${YACLIB_INCLUDE_DIR}/util/detail/default_event.hpp
+  ${YACLIB_INCLUDE_DIR}/util/detail/intrusive_list.hpp
   ${YACLIB_INCLUDE_DIR}/util/detail/intrusive_ptr_impl.hpp
   ${YACLIB_INCLUDE_DIR}/util/detail/mutex_event.hpp
   ${YACLIB_INCLUDE_DIR}/util/detail/node.hpp

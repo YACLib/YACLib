@@ -2,12 +2,12 @@
 
 #include <yaclib/algo/detail/inline_core.hpp>
 #include <yaclib/algo/detail/result_core.hpp>
-#include <yaclib/async/when_policy.hpp>
 #include <yaclib/fwd.hpp>
 #include <yaclib/log.hpp>
 #include <yaclib/util/helper.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 #include <yaclib/util/result.hpp>
+#include <yaclib/util/when_policy.hpp>
 
 #include <cstddef>
 #include <exception>
