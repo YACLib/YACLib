@@ -51,7 +51,7 @@ YACLIB_INLINE auto WhenAll(It begin, It end) {
   static_assert(is_future_base_v<T>, "WhenAll function Iterator must be point to some Future");
   // We don't use std::distance because we want to alert the user to the fact that it can be expensive.
   // Maybe the user has the size of the range, otherwise it is suggested to call WhenAll(begin, distance(begin, end))
-  return WhenAll<F, O>(begin, end - begin);
+  return WhenAll<F, O>(begin, static_cast<std::size_t>(end - begin));
 }
 
 /**

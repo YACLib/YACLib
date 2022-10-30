@@ -29,7 +29,7 @@ template <typename Event = detail::DefaultEvent, typename It>
 YACLIB_INLINE std::enable_if_t<!is_future_base_v<It>, void> Wait(It begin, It end) noexcept {
   // We don't use std::distance because we want to alert the user to the fact that it can be expensive.
   // Maybe the user has the size of the range, otherwise it is suggested to call Wait*(..., begin, distance(begin, end))
-  detail::WaitIterator<Event>(detail::NoTimeoutTag{}, begin, end - begin);
+  detail::WaitIterator<Event>(detail::NoTimeoutTag{}, begin, static_cast<std::size_t>(end - begin));
 }
 
 /**

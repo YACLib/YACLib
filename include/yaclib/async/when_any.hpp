@@ -53,7 +53,7 @@ YACLIB_INLINE auto WhenAny(It begin, It end) {
   static_assert(is_future_base_v<T>, "WhenAny function Iterator must be point to some Future");
   // We don't use std::distance because we want to alert the user to the fact that it can be expensive.
   // Maybe the user has the size of the range, otherwise it is suggested to call WhenAny(begin, distance(begin, end))
-  return WhenAny<P>(begin, end - begin);
+  return WhenAny<P>(begin, static_cast<std::size_t>(end - begin));
 }
 
 /**

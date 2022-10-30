@@ -29,7 +29,7 @@ YACLIB_INLINE auto AwaitOn(IExecutor& e, BeginIt begin, EndIt end) noexcept
   -> std::enable_if_t<!is_future_base_v<BeginIt>, detail::AwaitOnAwaiter<false>> {
   // We don't use std::distance because we want to alert the user to the fact that it can be expensive.
   // Maybe the user has the size of the range, otherwise it is suggested to call Await(begin, distance(begin, end))
-  return AwaitOn(e, begin, end - begin);
+  return AwaitOn(e, begin, static_cast<std::size_t>(end - begin));
 }
 
 }  // namespace yaclib
