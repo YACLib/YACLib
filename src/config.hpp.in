@@ -101,6 +101,7 @@
 #  else
 #    define YACLIB_CORO 1
 #  endif
+#  define YACLIB_NEXT_IMPL ${YACLIB_NEXT_IMPL}
 #  define YACLIB_SYMMETRIC_TRANSFER ${YACLIB_SYMMETRIC_TRANSFER}
 #  define YACLIB_FINAL_SUSPEND_TRANSFER ${YACLIB_FINAL_SUSPEND_TRANSFER}
 #  if defined(__clang__) && defined(__apple_build_version) && defined(YACLIB_TSAN)
@@ -125,6 +126,7 @@
 #  endif
 #else
 #  define YACLIB_CORO 0
+#  define YACLIB_NEXT_IMPL 0
 #  define YACLIB_SYMMETRIC_TRANSFER 0
 #  define YACLIB_FINAL_SUSPEND_TRANSFER 0
 #endif

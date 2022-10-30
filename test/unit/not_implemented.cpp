@@ -46,7 +46,7 @@ TEST(InlineCore, Drop) {
 void CheckHere() {
   auto [f, p] = yaclib::MakeContract();
   auto& core = *p.GetCore();
-  core.InlineCore::Here(core);
+  core.Here(core);
 }
 
 TEST(InlineCore, Here) {
@@ -61,7 +61,7 @@ TEST(InlineCore, Here) {
 void CheckNext() {
   auto [f, p] = yaclib::MakeContract();
   auto& core = *p.GetCore();
-  std::ignore = core.InlineCore::Next(core);
+  std::ignore = core.Next(core);
 }
 
 TEST(InlineCore, Next) {

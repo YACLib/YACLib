@@ -144,6 +144,7 @@ class AnyCombinator : public CombinatorCore, public AnyCombinatorBase<V, E, P> {
   }
 
  private:
+  DEFAULT_NEXT_IMPL
   void Here(BaseCore& caller) noexcept final {
     if (this->Combine(static_cast<ResultCore<V, E>&>(caller))) {
       auto* callback = this->_core.Release();
@@ -153,13 +154,6 @@ class AnyCombinator : public CombinatorCore, public AnyCombinatorBase<V, E, P> {
       DecRef();
     }
   }
-
-#if YACLIB_FINAL_SUSPEND_TRANSFER != 0
-  [[nodiscard]] yaclib_std::coroutine_handle<> Next(BaseCore& caller) noexcept final {
-    Here(caller);
-    return yaclib_std::noop_coroutine();
-  }
-#endif
 };
 
 }  // namespace yaclib::detail

@@ -114,6 +114,7 @@ class AllCombinator : public CombinatorCore, protected AllCombinatorBase<O, R> {
   }
 
  private:
+  DEFAULT_NEXT_IMPL
   void Here(BaseCore& caller) noexcept final {
     auto& core = static_cast<ResultCore<V, E>&>(caller);
     if constexpr (std::is_same_v<R, V>) {
@@ -131,13 +132,6 @@ class AllCombinator : public CombinatorCore, protected AllCombinatorBase<O, R> {
       Done(core);
     }
   }
-
-#if YACLIB_FINAL_SUSPEND_TRANSFER != 0
-  [[nodiscard]] yaclib_std::coroutine_handle<> Next(BaseCore& caller) noexcept final {
-    Here(caller);
-    return yaclib_std::noop_coroutine();
-  }
-#endif
 
   bool CombineValue(Result<V, E>&& result) noexcept {
     const auto state = result.State();
@@ -228,6 +222,7 @@ class AllCombinator<OrderPolicy::Same, R, E> : public CombinatorCore, public All
   }
 
  private:
+  DEFAULT_NEXT_IMPL
   void Here(BaseCore& caller) noexcept final {
     auto& core = static_cast<ResultCore<V, E>&>(caller);
     if constexpr (std::is_same_v<R, V>) {
@@ -242,13 +237,6 @@ class AllCombinator<OrderPolicy::Same, R, E> : public CombinatorCore, public All
       DecRef();
     }
   }
-
-#if YACLIB_FINAL_SUSPEND_TRANSFER != 0
-  [[nodiscard]] yaclib_std::coroutine_handle<> Next(BaseCore& caller) noexcept final {
-    Here(caller);
-    return yaclib_std::noop_coroutine();
-  }
-#endif
 
   bool CombineValue(Result<V, E>&& result) noexcept {
     const auto state = result.State();
