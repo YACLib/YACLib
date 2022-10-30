@@ -2,6 +2,7 @@
 
 #include <yaclib/algo/detail/inline_core.hpp>
 #include <yaclib/algo/detail/result_core.hpp>
+#include <yaclib/async/detail/when_impl.hpp>
 #include <yaclib/fwd.hpp>
 #include <yaclib/log.hpp>
 #include <yaclib/util/fail_policy.hpp>
@@ -128,7 +129,7 @@ class AnyCombinatorBase<V, E, FailPolicy::FirstFail> {
 };
 
 template <typename V, typename E, FailPolicy P>
-class AnyCombinator : public InlineCore, public AnyCombinatorBase<V, E, P> {
+class AnyCombinator : public CombinatorCore, public AnyCombinatorBase<V, E, P> {
   using Base = AnyCombinatorBase<V, E, P>;
   using Base::Base;
 

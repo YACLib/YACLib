@@ -35,7 +35,7 @@ auto WhenAny(It begin, std::size_t count) {
     return Future<V, E>{std::exchange(begin->GetCore(), nullptr)};
   }
   auto [future_core, combinator] = detail::AnyCombinator<V, E, P>::Make(count);
-  detail::WhenImpl(combinator, begin, count);
+  detail::WhenImpl(*combinator, begin, count);
   return Future{std::move(future_core)};
 }
 
@@ -70,7 +70,7 @@ auto WhenAny(FutureBase<V, E>&&... futures) {
   constexpr std::size_t kSize = sizeof...(V);
   static_assert(kSize >= 2, "WhenAny wants at least two futures");
   auto [future_core, combinator] = detail::AnyCombinator<head_t<V...>, E, P>::Make(kSize);
-  detail::WhenImpl(combinator, std::move(futures)...);
+  detail::WhenImpl(*combinator, std::move(futures)...);
   return Future{std::move(future_core)};
 }
 
