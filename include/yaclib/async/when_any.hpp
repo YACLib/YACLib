@@ -3,8 +3,8 @@
 #include <yaclib/async/detail/when_any_impl.hpp>
 #include <yaclib/async/detail/when_impl.hpp>
 #include <yaclib/async/future.hpp>
-#include <yaclib/async/when_policy.hpp>
 #include <yaclib/config.hpp>
+#include <yaclib/util/fail_policy.hpp>
 #include <yaclib/util/type_traits.hpp>
 
 #include <cstddef>
@@ -22,7 +22,7 @@ namespace yaclib {
  * \param begin , count the range of futures to combine
  * \return Future<T>
  */
-template <WhenPolicy P = WhenPolicy::LastFail, typename It, typename T = typename std::iterator_traits<It>::value_type>
+template <FailPolicy P = FailPolicy::LastFail, typename It, typename T = typename std::iterator_traits<It>::value_type>
 auto WhenAny(It begin, std::size_t count) {
   static_assert(is_future_base_v<T>, "WhenAny function Iterator must be point to some Future");
   using V = future_base_value_t<T>;
@@ -35,7 +35,7 @@ auto WhenAny(It begin, std::size_t count) {
     return Future<V, E>{std::exchange(begin->GetCore(), nullptr)};
   }
   auto [future_core, combinator] = detail::AnyCombinator<V, E, P>::Make(count);
-  detail::WhenImpl(combinator, begin, count);
+  detail::WhenImpl(*combinator, begin, count);
   return Future{std::move(future_core)};
 }
 
@@ -48,12 +48,12 @@ auto WhenAny(It begin, std::size_t count) {
  * \param begin , end the range of futures to combine
  * \return Future<T>
  */
-template <WhenPolicy P = WhenPolicy::LastFail, typename It, typename T = typename std::iterator_traits<It>::value_type>
+template <FailPolicy P = FailPolicy::LastFail, typename It, typename T = typename std::iterator_traits<It>::value_type>
 YACLIB_INLINE auto WhenAny(It begin, It end) {
   static_assert(is_future_base_v<T>, "WhenAny function Iterator must be point to some Future");
   // We don't use std::distance because we want to alert the user to the fact that it can be expensive.
   // Maybe the user has the size of the range, otherwise it is suggested to call WhenAny(begin, distance(begin, end))
-  return WhenAny<P>(begin, end - begin);
+  return WhenAny<P>(begin, static_cast<std::size_t>(end - begin));
 }
 
 /**
@@ -65,12 +65,12 @@ YACLIB_INLINE auto WhenAny(It begin, It end) {
  * \param futures two or more futures to combine
  * \return Future<T>
  */
-template <WhenPolicy P = WhenPolicy::LastFail, typename E, typename... V>
+template <FailPolicy P = FailPolicy::LastFail, typename E, typename... V>
 auto WhenAny(FutureBase<V, E>&&... futures) {
   constexpr std::size_t kSize = sizeof...(V);
   static_assert(kSize >= 2, "WhenAny wants at least two futures");
   auto [future_core, combinator] = detail::AnyCombinator<head_t<V...>, E, P>::Make(kSize);
-  detail::WhenImpl(combinator, std::move(futures)...);
+  detail::WhenImpl(*combinator, std::move(futures)...);
   return Future{std::move(future_core)};
 }
 

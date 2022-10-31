@@ -2,9 +2,10 @@
 
 #include <yaclib/algo/detail/inline_core.hpp>
 #include <yaclib/algo/detail/result_core.hpp>
-#include <yaclib/async/when_policy.hpp>
+#include <yaclib/async/detail/when_impl.hpp>
 #include <yaclib/fwd.hpp>
 #include <yaclib/log.hpp>
+#include <yaclib/util/fail_policy.hpp>
 #include <yaclib/util/helper.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 #include <yaclib/util/result.hpp>
@@ -18,7 +19,7 @@
 
 namespace yaclib::detail {
 
-template <typename V, typename E, WhenPolicy P /*None*/>
+template <typename V, typename E, FailPolicy P /*None*/>
 class AnyCombinatorBase {
   yaclib_std::atomic_bool _done;
 
@@ -41,7 +42,7 @@ class AnyCombinatorBase {
 };
 
 template <typename V, typename E>
-class AnyCombinatorBase<V, E, WhenPolicy::LastFail> {
+class AnyCombinatorBase<V, E, FailPolicy::LastFail> {
   static bool DoneImpl(std::size_t value) noexcept {
     return (value & 1U) != 0;
   }
@@ -76,7 +77,7 @@ class AnyCombinatorBase<V, E, WhenPolicy::LastFail> {
 };
 
 template <typename V, typename E>
-class AnyCombinatorBase<V, E, WhenPolicy::FirstFail> {
+class AnyCombinatorBase<V, E, FailPolicy::FirstFail> {
   static constexpr auto kDoneImpl = std::numeric_limits<std::uintptr_t>::max();
 
   yaclib_std::atomic_uintptr_t _state;
@@ -127,8 +128,8 @@ class AnyCombinatorBase<V, E, WhenPolicy::FirstFail> {
   }
 };
 
-template <typename V, typename E, WhenPolicy P>
-class AnyCombinator : public InlineCore, public AnyCombinatorBase<V, E, P> {
+template <typename V, typename E, FailPolicy P>
+class AnyCombinator : public CombinatorCore, public AnyCombinatorBase<V, E, P> {
   using Base = AnyCombinatorBase<V, E, P>;
   using Base::Base;
 
@@ -143,6 +144,7 @@ class AnyCombinator : public InlineCore, public AnyCombinatorBase<V, E, P> {
   }
 
  private:
+  DEFAULT_NEXT_IMPL
   void Here(BaseCore& caller) noexcept final {
     if (this->Combine(static_cast<ResultCore<V, E>&>(caller))) {
       auto* callback = this->_core.Release();
@@ -152,13 +154,6 @@ class AnyCombinator : public InlineCore, public AnyCombinatorBase<V, E, P> {
       DecRef();
     }
   }
-
-#if YACLIB_FINAL_SUSPEND_TRANSFER != 0
-  [[nodiscard]] yaclib_std::coroutine_handle<> Next(BaseCore& caller) noexcept final {
-    Here(caller);
-    return yaclib_std::noop_coroutine();
-  }
-#endif
 };
 
 }  // namespace yaclib::detail

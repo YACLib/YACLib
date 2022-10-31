@@ -9,7 +9,6 @@ list(APPEND YACLIB_INCLUDES
   ${YACLIB_INCLUDE_DIR}/async/wait_until.hpp
   ${YACLIB_INCLUDE_DIR}/async/when_all.hpp
   ${YACLIB_INCLUDE_DIR}/async/when_any.hpp
-  ${YACLIB_INCLUDE_DIR}/async/when_policy.hpp
   )
 list(APPEND YACLIB_HEADERS
   ${YACLIB_INCLUDE_DIR}/async/detail/future_impl.hpp

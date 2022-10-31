@@ -41,7 +41,7 @@ YACLIB_INLINE std::enable_if_t<!is_future_base_v<Iterator>, bool> WaitUntil(
   const std::chrono::time_point<Clock, Duration>& timeout_time, Iterator begin, Iterator end) noexcept {
   // We don't use std::distance because we want to alert the user to the fact that it can be expensive.
   // Maybe the user has the size of the range, otherwise it is suggested to call Wait*(..., begin, distance(begin, end))
-  return detail::WaitIterator<Event>(timeout_time, begin, end - begin);
+  return detail::WaitIterator<Event>(timeout_time, begin, static_cast<std::size_t>(end - begin));
 }
 
 /**

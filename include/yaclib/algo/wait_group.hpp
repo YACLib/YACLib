@@ -65,7 +65,7 @@ class WaitGroup final {
    */
   template <bool NeedAdd = true, typename It>
   YACLIB_INLINE std::enable_if_t<!is_future_base_v<It>, void> Consume(It begin, It end) noexcept {
-    InsertIt<true, NeedAdd>(begin, end - begin);
+    InsertIt<true, NeedAdd>(begin, static_cast<std::size_t>(end - begin));
   }
 
   /**
@@ -106,7 +106,7 @@ class WaitGroup final {
    */
   template <bool NeedAdd = true, typename It>
   YACLIB_INLINE std::enable_if_t<!is_future_base_v<It>, void> Attach(It begin, It end) noexcept {
-    InsertIt<false, NeedAdd>(begin, end - begin);
+    InsertIt<false, NeedAdd>(begin, static_cast<std::size_t>(end - begin));
   }
 
   /**

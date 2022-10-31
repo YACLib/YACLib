@@ -12,20 +12,27 @@ namespace yaclib::detail {
 
 class BaseCore;
 
+#if YACLIB_NEXT_IMPL != 0 && YACLIB_FINAL_SUSPEND_TRANSFER != 0
+#  define DEFAULT_NEXT_IMPL                                                                                            \
+    [[nodiscard]] yaclib_std::coroutine_handle<> Next(BaseCore& caller) noexcept final {                               \
+      Here(caller);                                                                                                    \
+      return yaclib_std::noop_coroutine();                                                                             \
+    }
+#else
+#  define DEFAULT_NEXT_IMPL
+#endif
+
 class InlineCore : public Job {
  public:
-  // Compiler inline this call in tests
-  virtual void Here(BaseCore& /*caller*/) noexcept {  // LCOV_EXCL_LINE
-    YACLIB_PURE_VIRTUAL();                            // LCOV_EXCL_LINE
-  }                                                   // LCOV_EXCL_LINE
-
-#if YACLIB_FINAL_SUSPEND_TRANSFER != 0
-  // Compiler inline this call in tests
-  [[nodiscard]] virtual yaclib_std::coroutine_handle<> Next(BaseCore& /*caller*/) noexcept {  // LCOV_EXCL_LINE
-    YACLIB_PURE_VIRTUAL();                                                                    // LCOV_EXCL_LINE
-    return {};                                                                                // LCOV_EXCL_LINE
-  }                                                                                           // LCOV_EXCL_LINE
+#if YACLIB_NEXT_IMPL != 0 && YACLIB_FINAL_SUSPEND_TRANSFER != 0
+  [[nodiscard]] virtual yaclib_std::coroutine_handle<> Next(BaseCore& /*caller*/) noexcept = 0;
+#elif YACLIB_FINAL_SUSPEND_TRANSFER != 0
+  [[nodiscard]] virtual yaclib_std::coroutine_handle<> Next(BaseCore& caller) noexcept {
+    Here(caller);
+    return yaclib_std::noop_coroutine();
+  }
 #endif
+  virtual void Here(BaseCore& /*caller*/) noexcept = 0;
 };
 
 }  // namespace yaclib::detail

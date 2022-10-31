@@ -16,6 +16,16 @@ struct Callback {
 template <typename V, typename E>
 class ResultCore : public BaseCore {
  public:
+#if YACLIB_NEXT_IMPL != 0 && YACLIB_FINAL_SUSPEND_TRANSFER != 0
+  [[nodiscard]] yaclib_std::coroutine_handle<> Next(BaseCore& /*caller*/) noexcept override {
+    YACLIB_PURE_VIRTUAL();
+    return yaclib_std::noop_coroutine();
+  }
+#endif
+  void Here(BaseCore& /*caller*/) noexcept override {
+    YACLIB_PURE_VIRTUAL();
+  }
+
   ResultCore() noexcept : BaseCore{kEmpty} {
   }
 
@@ -37,7 +47,6 @@ class ResultCore : public BaseCore {
     return _result;
   }
 
- public:
   union {
     Result<V, E> _result;
     Callback _self;

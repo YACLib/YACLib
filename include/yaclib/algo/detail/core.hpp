@@ -43,7 +43,7 @@ class Core : public ResultCoreT<Type, Ret, E> {
   using Base = ResultCoreT<Type, Ret, E>;
 
   explicit Core(Func&& f) {
-    this->_self = Callback{&MakeEmpty(), Type == CoreType::Run};
+    this->_self = Callback{&MakeDrop(), Type == CoreType::Run};
     new (&_func.storage) Storage{std::forward<Func>(f)};
   }
 
