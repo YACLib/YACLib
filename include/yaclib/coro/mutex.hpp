@@ -83,6 +83,7 @@ struct MutexImpl {
   auto UnlockOnImpl(BaseCore& curr, IExecutor& executor) noexcept {
     // _executor for current coroutine resume
     auto curr_executor = std::exchange(curr._executor, &executor);
+    YACLIB_ASSERT(curr_executor != nullptr);
     executor.Submit(curr);
     auto* next = TryUnlock<FIFO>();
     if (next == nullptr) {

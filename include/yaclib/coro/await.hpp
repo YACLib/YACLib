@@ -7,6 +7,11 @@
 
 namespace yaclib {
 
+template <typename V, typename E>
+YACLIB_INLINE auto Await(Task<V, E>& task) noexcept {
+  return detail::TransferAwaiter{static_cast<detail::BaseCore&>(*task.GetCore())};
+}
+
 template <typename... V, typename... E>
 YACLIB_INLINE auto Await(FutureBase<V, E>&... fs) noexcept {
   return detail::AwaitAwaiter<sizeof...(fs) == 1>{static_cast<detail::BaseCore&>(*fs.GetCore())...};

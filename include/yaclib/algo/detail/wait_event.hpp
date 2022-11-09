@@ -12,9 +12,9 @@ struct CallCallback : InlineCore {
   }
 
  private:
-  DEFAULT_NEXT_IMPL
-  void Here(BaseCore& /*caller*/) noexcept final {
+  [[nodiscard]] InlineCore* Here(InlineCore& /*caller*/) noexcept final {
     static_cast<Derived&>(*this).Sub(1);
+    return nullptr;
   }
 };
 
@@ -25,10 +25,10 @@ struct DropCallback : InlineCore {
   }
 
  private:
-  DEFAULT_NEXT_IMPL
-  void Here(BaseCore& caller) noexcept final {
+  [[nodiscard]] InlineCore* Here(InlineCore& caller) noexcept final {
     caller.DecRef();
     static_cast<Derived&>(*this).Sub(1);
+    return nullptr;
   }
 };
 

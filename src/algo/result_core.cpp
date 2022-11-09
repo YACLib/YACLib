@@ -5,11 +5,10 @@ namespace yaclib::detail {
 namespace {
 
 class Drop final : public InlineCore {
-  void Here(BaseCore& caller) noexcept final {
+  [[nodiscard]] InlineCore* Here(InlineCore& caller) noexcept final {
     caller.DecRef();
+    return nullptr;
   }
-
-  DEFAULT_NEXT_IMPL
 };
 
 static Drop kDropCore;

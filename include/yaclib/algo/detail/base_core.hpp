@@ -26,7 +26,7 @@ class BaseCore : public InlineCore {
 
   [[nodiscard]] bool Empty() const noexcept;
 
-  void SetInline(InlineCore& callback) noexcept;
+  [[nodiscard]] InlineCore* SetInline(InlineCore& callback) noexcept;
 
   [[nodiscard]] bool SetCallback(InlineCore& callback) noexcept;
 
@@ -35,17 +35,16 @@ class BaseCore : public InlineCore {
   [[nodiscard]] bool Reset() noexcept;
 
   template <bool SymmetricTransfer>
-#if YACLIB_FINAL_SUSPEND_TRANSFER != 0
-  using ReturnT = std::conditional_t<SymmetricTransfer, yaclib_std::coroutine_handle<>, void>;
+#if YACLIB_SYMMETRIC_TRANSFER != 0
+  using ReturnT = std::conditional_t<SymmetricTransfer, yaclib_std::coroutine_handle<>, InlineCore*>;
 #else
-  using ReturnT = void;
+  using ReturnT = InlineCore*;
 #endif
 
   template <bool SymmetricTransfer>
-  ReturnT<SymmetricTransfer> SetResult() noexcept;
+  [[nodiscard]] ReturnT<SymmetricTransfer> SetResult() noexcept;
 
-#if YACLIB_CORO != 0
-  // Compiler inline this call in tests
+#if YACLIB_CORO != 0                                                      // Compiler inline this call in tests
   [[nodiscard]] virtual yaclib_std::coroutine_handle<> Curr() noexcept {  // LCOV_EXCL_LINE
     YACLIB_PURE_VIRTUAL();                                                // LCOV_EXCL_LINE
     return {};                                                            // LCOV_EXCL_LINE
@@ -62,5 +61,13 @@ class BaseCore : public InlineCore {
 
   void MoveExecutorTo(BaseCore& callback) noexcept;
 };
+
+inline void Loop(InlineCore* prev, InlineCore* next) noexcept {
+  while (next != nullptr) {
+    auto* next_next = next->Here(*prev);
+    prev = next;
+    next = next_next;
+  }
+}
 
 }  // namespace yaclib::detail

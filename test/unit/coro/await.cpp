@@ -1,6 +1,7 @@
 #include <util/async_suite.hpp>
 #include <util/time.hpp>
 
+#include <yaclib/async/contract.hpp>
 #include <yaclib/async/make.hpp>
 #include <yaclib/async/run.hpp>
 #include <yaclib/async/when_all.hpp>
@@ -9,6 +10,7 @@
 #include <yaclib/coro/future.hpp>
 #include <yaclib/coro/on.hpp>
 #include <yaclib/coro/task.hpp>
+#include <yaclib/lazy/make.hpp>
 #include <yaclib/runtime/fair_thread_pool.hpp>
 
 #include <array>
@@ -177,6 +179,84 @@ TEST(CoroFuture, WhenAny) {
 
   tp.HardStop();
   tp.Wait();
+}
+
+TEST(Task, Check) {
+  auto coro = []() -> yaclib::Task<int> {
+    auto task = yaclib::MakeTask(10);
+    co_await Await(task);
+    co_return std::as_const(task).Touch();
+  };
+  EXPECT_EQ(coro().Get().Ok(), 10);
+}
+
+yaclib::Task<int> recursiveLazyFunc(int x) {
+  return yaclib::MakeTask(x).ThenInline([](int y) -> yaclib::Task<int> {
+    if (y <= 0) {
+      EXPECT_EQ(y, 0);  // set break point here
+      return yaclib::MakeTask(42);
+    } else {
+      return recursiveLazyFunc(y - 1);
+    }
+  });
+}
+
+yaclib::Future<int> recursiveEagerFunc(int x) {
+  return yaclib::MakeFuture(x).ThenInline([](int y) -> yaclib::Future<int> {
+    if (y <= 0) {
+      EXPECT_EQ(y, 0);  // set break point here
+      return yaclib::MakeFuture(42);
+    } else {
+      return recursiveEagerFunc(y - 1);
+    }
+  });
+}
+
+yaclib::Task<int> recursiveLazyCoro(int x) {
+  if (x <= 0) {
+    EXPECT_EQ(x, 0);  // set break point here
+    co_return 42;
+  }
+  auto task = recursiveLazyCoro(x - 1);
+  co_await Await(task);
+  co_return std::move(task).Touch();  // set break point here, gdb not cool with coro
+}
+
+yaclib::Future<int> recursiveEagerCoro(int x) {
+  if (x <= 0) {
+    EXPECT_EQ(x, 0);  // set break point here
+    co_return 42;
+  }
+  auto task = recursiveEagerCoro(x - 1);
+  co_await Await(task);
+  co_return std::move(task).Touch();  // set break point here, gdb not cool with coro
+}
+
+static constexpr int kLazyRecursion = 1'000'000;
+static constexpr int kEagerRecursion = 10;
+
+TEST(Recursion, LazyFunc) {
+  EXPECT_EQ(recursiveLazyFunc(kLazyRecursion).Get().Ok(), 42);
+}
+
+TEST(Recursion, EagerFunc) {
+  EXPECT_EQ(recursiveEagerFunc(kEagerRecursion).Get().Ok(), 42);
+}
+
+#if YACLIB_FINAL_SUSPEND_TRANSFER != 0 && defined(__clang__) && defined(__linux__)
+// GCC Debug bad in symmetric transfer
+// I'm also not sure about llvm clang on apple, apple clang, and clangcl
+static constexpr int kLazyCoroRecursion = kLazyRecursion;
+#else
+static constexpr int kLazyCoroRecursion = kEagerRecursion;
+#endif
+
+TEST(Recursion, LazyCoro) {
+  EXPECT_EQ(recursiveLazyCoro(kLazyCoroRecursion).Get().Ok(), 42);
+}
+
+TEST(Recursion, EagerCoro) {
+  EXPECT_EQ(recursiveEagerCoro(kEagerRecursion).Get().Ok(), 42);
 }
 
 }  // namespace

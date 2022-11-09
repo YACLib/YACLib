@@ -8,6 +8,27 @@
 
 namespace yaclib::detail {
 
+struct [[nodiscard]] TransferAwaiter {
+  TransferAwaiter(BaseCore& caller) noexcept : _caller{caller} {
+  }
+
+  constexpr bool await_ready() const noexcept {
+    return false;
+  }
+
+  template <typename Promise>
+  YACLIB_INLINE auto await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
+    _caller.StoreCallback(handle.promise());
+    return MoveToCaller(&_caller)->Next(handle.promise());
+  }
+
+  constexpr void await_resume() const noexcept {
+  }
+
+ private:
+  BaseCore& _caller;
+};
+
 /**
  * TODO(mkornaukhov03) Add doxygen docs
  */
@@ -37,14 +58,15 @@ class AwaitEvent final : public InlineCore, public AtomicCounter<NopeBase, NopeD
   using AtomicCounter<NopeBase, NopeDeleter>::AtomicCounter;
 
  private:
-  void Here(BaseCore& caller) noexcept final {
+  [[nodiscard]] InlineCore* Here(InlineCore& caller) noexcept final {
     if (this->SubEqual(1)) {
       return static_cast<InlineCore*>(next)->Here(caller);
     }
+    return nullptr;
   }
 
-#if YACLIB_FINAL_SUSPEND_TRANSFER != 0
-  [[nodiscard]] yaclib_std::coroutine_handle<> Next(BaseCore& caller) noexcept final {
+#if YACLIB_SYMMETRIC_TRANSFER != 0
+  [[nodiscard]] yaclib_std::coroutine_handle<> Next(InlineCore& caller) noexcept final {
     if (this->SubEqual(1)) {
       return static_cast<InlineCore*>(next)->Next(caller);
     }
@@ -65,6 +87,7 @@ class [[nodiscard]] AwaitAwaiter<false> final {
   YACLIB_INLINE bool await_ready() const noexcept {
     return _event.GetRef() == 1;
   }
+
   template <typename Promise>
   YACLIB_INLINE bool await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
     _event.next = &handle.promise();

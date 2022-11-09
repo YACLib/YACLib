@@ -2,18 +2,6 @@
 
 namespace yaclib {
 namespace detail {
-namespace {
-
-BaseCore* MoveToCaller(BaseCore* head) noexcept {
-  while (head->next != nullptr) {
-    auto* next = static_cast<BaseCore*>(head->next);
-    head->next = nullptr;
-    head = next;
-  }
-  return head;
-}
-
-}  // namespace
 
 void Run(BaseCore* head, IExecutor& e) noexcept {
   head = MoveToCaller(head);

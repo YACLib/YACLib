@@ -5,10 +5,11 @@
 
 namespace yaclib::detail {
 
-void BaseCore::SetInline(InlineCore& callback) noexcept {
+InlineCore* BaseCore::SetInline(InlineCore& callback) noexcept {
   if (!SetCallback(callback)) {
-    callback.Here(*this);
+    return callback.Here(*this);
   }
+  return nullptr;
 }
 
 bool BaseCore::Reset() noexcept {
@@ -31,25 +32,28 @@ BaseCore::ReturnT<SymmetricTransfer> BaseCore::SetResult() noexcept {
   if (expected != kEmpty) {
     YACLIB_ASSERT(expected != kResult);
     auto* const callback = reinterpret_cast<InlineCore*>(expected);
-#if YACLIB_FINAL_SUSPEND_TRANSFER != 0
+#if YACLIB_SYMMETRIC_TRANSFER != 0
     if constexpr (SymmetricTransfer) {
       return callback->Next(*this);
     } else
 #endif
     {
-      callback->Here(*this);
+      return callback;
     }
   }
-#if YACLIB_FINAL_SUSPEND_TRANSFER != 0
+#if YACLIB_SYMMETRIC_TRANSFER != 0
   if constexpr (SymmetricTransfer) {
     return yaclib_std::noop_coroutine();
-  }
+  } else
 #endif
+  {
+    return nullptr;
+  }
 }
 
 template BaseCore::ReturnT<false> BaseCore::SetResult<false>() noexcept;
 
-#if YACLIB_FINAL_SUSPEND_TRANSFER != 0
+#if YACLIB_SYMMETRIC_TRANSFER != 0
 template BaseCore::ReturnT<true> BaseCore::SetResult<true>() noexcept;
 #endif
 

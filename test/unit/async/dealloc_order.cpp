@@ -5,6 +5,7 @@
 
 #include <array>
 #include <cstddef>
+#include <new>
 
 #include <gtest/gtest.h>
 
@@ -76,6 +77,7 @@ struct Log {
 template <std::size_t N>
 std::ostream& operator<<(std::ostream& out, Log<N> const& log) {
   auto was_enabled = std::exchange(log.enabled, false);
+  out << "length: " << log.position << "\n";
   for (std::size_t i = 0; i != log.position; ++i) {
     auto& e = log.entries[i];
     out << "type: " << ToString(e.type) << " pointer: " << e.pointer << " size: " << e.size << "\n";
@@ -144,6 +146,7 @@ TEST(Dealloc, SyncLinear) {
       valid &= gLog.entries[i].type == LogEntry::Type::Delete;
       valid &= gLog.entries[i].pointer == gLog.entries[i - 4].pointer;
     }
+    ASSERT_TRUE(valid) << "Incorrect position: " << i << ", all log: \n" << gLog;
   }
   EXPECT_TRUE(valid) << gLog;
 }
@@ -186,6 +189,7 @@ TEST(Dealloc, AsyncLinear) {
         valid &= gLog.entries[i].pointer == gLog.entries[i - 2].pointer;
       }
     }
+    ASSERT_TRUE(valid) << "Incorrect position: " << i << ", all log: \n" << gLog;
   }
   EXPECT_TRUE(valid) << gLog;
 }
@@ -224,6 +228,7 @@ TEST(Dealloc, SyncFast) {
         valid &= gLog.entries[i].pointer == gLog.entries[i - 3].pointer;
       }
     }
+    ASSERT_TRUE(valid) << "Incorrect position: " << i << ", all log: \n" << gLog;
   }
   EXPECT_TRUE(valid) << gLog;
 }
@@ -264,6 +269,7 @@ TEST(Dealloc, AsyncFast) {
         valid &= gLog.entries[i].pointer == gLog.entries[i - 5].pointer;
       }
     }
+    ASSERT_TRUE(valid) << "Incorrect position: " << i << ", log: \n" << gLog;
   }
   EXPECT_TRUE(valid) << gLog;
 }

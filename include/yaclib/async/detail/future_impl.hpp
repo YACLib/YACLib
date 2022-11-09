@@ -63,7 +63,8 @@ auto FutureBase<V, E>::Then(IExecutor& e, Func&& f) && {
 template <typename V, typename E>
 void FutureBase<V, E>::Detach() && noexcept {
   auto* core = _core.Release();
-  core->SetInline(detail::MakeDrop());
+  [[maybe_unused]] auto* next = core->SetInline(detail::MakeDrop());
+  YACLIB_ASSERT(next == nullptr);
 }
 
 template <typename V, typename E>

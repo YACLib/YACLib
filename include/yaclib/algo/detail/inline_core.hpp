@@ -4,35 +4,39 @@
 #include <yaclib/exe/job.hpp>
 #include <yaclib/log.hpp>
 
-#if YACLIB_FINAL_SUSPEND_TRANSFER != 0
+#if YACLIB_CORO != 0
 #  include <yaclib/coro/coro.hpp>
 #endif
 
 namespace yaclib::detail {
 
-class BaseCore;
-
-#if YACLIB_NEXT_IMPL != 0 && YACLIB_FINAL_SUSPEND_TRANSFER != 0
-#  define DEFAULT_NEXT_IMPL                                                                                            \
-    [[nodiscard]] yaclib_std::coroutine_handle<> Next(BaseCore& caller) noexcept final {                               \
-      Here(caller);                                                                                                    \
-      return yaclib_std::noop_coroutine();                                                                             \
-    }
-#else
-#  define DEFAULT_NEXT_IMPL
-#endif
-
 class InlineCore : public Job {
  public:
-#if YACLIB_NEXT_IMPL != 0 && YACLIB_FINAL_SUSPEND_TRANSFER != 0
-  [[nodiscard]] virtual yaclib_std::coroutine_handle<> Next(BaseCore& /*caller*/) noexcept = 0;
-#elif YACLIB_FINAL_SUSPEND_TRANSFER != 0
-  [[nodiscard]] virtual yaclib_std::coroutine_handle<> Next(BaseCore& caller) noexcept {
-    Here(caller);
+  [[nodiscard]] virtual InlineCore* Here(InlineCore& /*caller*/) noexcept = 0;
+
+#if YACLIB_SYMMETRIC_TRANSFER != 0
+  [[nodiscard]] virtual yaclib_std::coroutine_handle<> Next(InlineCore& caller) noexcept {
+    NextImpl(caller);
     return yaclib_std::noop_coroutine();
   }
+#elif YACLIB_CORO != 0
+  void Next(InlineCore& caller) noexcept {
+    NextImpl(caller);
+  }
 #endif
-  virtual void Here(BaseCore& /*caller*/) noexcept = 0;
+
+ private:
+#if YACLIB_CORO != 0
+  YACLIB_INLINE void NextImpl(InlineCore& caller) noexcept {
+    InlineCore* prev = &caller;
+    InlineCore* next = this;
+    do {
+      auto* next_next = next->Here(*prev);
+      prev = next;
+      next = next_next;
+    } while (next != nullptr);
+  }
+#endif
 };
 
 }  // namespace yaclib::detail

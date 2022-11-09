@@ -75,7 +75,7 @@ struct AllCombinatorBase<OrderPolicy::Fifo, void> {
 };
 
 template <OrderPolicy O /*= Any*/, typename R, typename E>
-class AllCombinator : public CombinatorCore, protected AllCombinatorBase<O, R> {
+class AllCombinator : public InlineCore, protected AllCombinatorBase<O, R> {
   using V = result_value_t<R>;
   using FutureValue = typename AllCombinatorBase<O, R>::FutureValue;
   using ResultPtr = ResultCorePtr<FutureValue, E>;
@@ -93,6 +93,11 @@ class AllCombinator : public CombinatorCore, protected AllCombinatorBase<O, R> {
     return {std::move(future_core), combinator.Release()};
   }
 
+  void AddInput(ResultCore<V, E>& input) noexcept {
+    [[maybe_unused]] auto* next = input.SetInline(*this);
+    YACLIB_ASSERT(next == nullptr);
+  }
+
  protected:
   ~AllCombinator() noexcept override {
     if (std::is_same_v<R, V> && !_core) {
@@ -103,7 +108,8 @@ class AllCombinator : public CombinatorCore, protected AllCombinatorBase<O, R> {
     } else {
       _core->Store(std::move(this->_results));
     }
-    _core.Release()->template SetResult<false>();
+    auto* core = _core.Release();
+    Loop(core, core->template SetResult<false>());
   }
 
   explicit AllCombinator(ResultPtr&& core, [[maybe_unused]] std::size_t count) noexcept(std::is_void_v<R>)
@@ -114,14 +120,13 @@ class AllCombinator : public CombinatorCore, protected AllCombinatorBase<O, R> {
   }
 
  private:
-  DEFAULT_NEXT_IMPL
-  void Here(BaseCore& caller) noexcept final {
+  [[nodiscard]] InlineCore* Here(InlineCore& caller) noexcept final {
     auto& core = static_cast<ResultCore<V, E>&>(caller);
     if constexpr (std::is_same_v<R, V>) {
       if (!this->_done.load(std::memory_order_acquire) && CombineValue(std::move(core.Get()))) {
         auto* callback = _core.Release();
         Done(core);
-        callback->template SetResult<false>();
+        return callback->template SetResult<false>();
       } else {
         Done(core);
       }
@@ -131,6 +136,7 @@ class AllCombinator : public CombinatorCore, protected AllCombinatorBase<O, R> {
       new (&this->_results[ticket]) R{std::move(core.Get())};
       Done(core);
     }
+    return nullptr;
   }
 
   bool CombineValue(Result<V, E>&& result) noexcept {
@@ -161,7 +167,7 @@ class AllCombinator : public CombinatorCore, protected AllCombinatorBase<O, R> {
 };
 
 template <typename R, typename E>
-class AllCombinator<OrderPolicy::Same, R, E> : public CombinatorCore, public AllCombinatorBase<OrderPolicy::Same, R> {
+class AllCombinator<OrderPolicy::Same, R, E> : public InlineCore, public AllCombinatorBase<OrderPolicy::Same, R> {
   using V = result_value_t<R>;
   using FutureValue = typename AllCombinatorBase<OrderPolicy::Same, R>::FutureValue;
   using ResultPtr = ResultCorePtr<FutureValue, E>;
@@ -179,9 +185,10 @@ class AllCombinator<OrderPolicy::Same, R, E> : public CombinatorCore, public All
     return {std::move(future_core), combinator.Release()};
   }
 
-  void AddInput(ResultCore<V, E>* core) noexcept {
-    _callers.push_back(core);
-    CombinatorCore::AddInput(core);
+  void AddInput(ResultCore<V, E>& input) noexcept {
+    _callers.push_back(&input);  // we made reserve in ctor, so noexcept
+    [[maybe_unused]] auto* next = input.SetInline(*this);
+    YACLIB_ASSERT(next == nullptr);
   }
 
  protected:
@@ -214,7 +221,8 @@ class AllCombinator<OrderPolicy::Same, R, E> : public CombinatorCore, public All
       _callers = {};
       _core->Store(std::move(results));
     }
-    _core.Release()->template SetResult<false>();
+    auto* core = _core.Release();
+    Loop(core, core->template SetResult<false>());
   }
 
   explicit AllCombinator(ResultPtr&& core, std::size_t count) : _core{std::move(core)} {
@@ -222,20 +230,20 @@ class AllCombinator<OrderPolicy::Same, R, E> : public CombinatorCore, public All
   }
 
  private:
-  DEFAULT_NEXT_IMPL
-  void Here(BaseCore& caller) noexcept final {
+  [[nodiscard]] InlineCore* Here(InlineCore& caller) noexcept final {
     auto& core = static_cast<ResultCore<V, E>&>(caller);
     if constexpr (std::is_same_v<R, V>) {
       if (!this->_done.load(std::memory_order_acquire) && CombineValue(std::move(core.Get()))) {
         auto* callback = _core.Release();
         DecRef();
-        callback->template SetResult<false>();
+        return callback->template SetResult<false>();
       } else {
         DecRef();
       }
     } else {
       DecRef();
     }
+    return nullptr;
   }
 
   bool CombineValue(Result<V, E>&& result) noexcept {
