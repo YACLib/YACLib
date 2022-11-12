@@ -244,18 +244,20 @@ TEST(Coro, FutureUnwrapping) {
   EXPECT_EQ(std::move(f).Get().Ok(), 8);
 }
 
-TEST(Coro, TaskUnwrapping) {
+TYPED_TEST(AsyncSuite, CoroTaskUnwrapping) {
   auto coro = [](int x) -> yaclib::Task<int> {
     EXPECT_EQ(x, 1);
     co_return x * 2;
   };
-  auto f = yaclib::MakeFuture(1).ThenInline([&](int x) {
+  auto f = INVOKE(yaclib::MakeInline(), [] {
+             return 1;
+           }).ThenInline([&](int x) {
     return coro(x)
       .ThenInline([](int y) {
         return y * 2;
       })
-      .ThenInline([](int y) {
-        return y * 2;
+      .ThenInline([](int y) -> yaclib::Task<int> {
+        co_return y * 2;
       })
       .ThenInline([](int y) {
         return y * 2;
@@ -263,13 +265,15 @@ TEST(Coro, TaskUnwrapping) {
   });
 
   EXPECT_EQ(std::move(f).Get().Ok(), 16);
-  f = yaclib::MakeFuture(1).ThenInline([&](int x) {
+  f = INVOKE(yaclib::MakeInline(), [] {
+        return 1;
+      }).ThenInline([&](int x) {
     return yaclib::MakeTask(x)
       .ThenInline([](int y) {
         return y * 2;
       })
-      .ThenInline([](int y) {
-        return y * 2;
+      .ThenInline([](int y) -> yaclib::Task<int> {
+        co_return y * 2;
       })
       .ThenInline([](int y) {
         return y * 2;
