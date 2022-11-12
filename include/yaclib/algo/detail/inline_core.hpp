@@ -19,14 +19,16 @@ class InlineCore : public Job {
 #endif
 };
 
-template <bool SymmetricTransfer>
+template <bool SymmetricTransfer, bool Skip = false>
 YACLIB_INLINE auto Step([[maybe_unused]] InlineCore& caller, InlineCore& callback) noexcept {
 #if YACLIB_SYMMETRIC_TRANSFER != 0
   if constexpr (SymmetricTransfer) {
     return callback.Next(caller);
   } else
 #endif
-  {
+    if constexpr (Skip) {  // sometimes our callback won't be next caller, in general when caller isn't *this
+    return callback.Here(caller);
+  } else {
     return &callback;
   }
 }

@@ -66,14 +66,7 @@ class AwaitEvent final : public InlineCore, public AtomicCounter<NopeBase, NopeD
   template <bool SymmetricTransfer>
   [[nodiscard]] YACLIB_INLINE auto Impl(InlineCore& caller) noexcept {
     if (this->SubEqual(1)) {
-#if YACLIB_SYMMETRIC_TRANSFER != 0
-      if constexpr (SymmetricTransfer) {
-        return static_cast<InlineCore*>(next)->Next(caller);
-      } else
-#endif
-      {
-        return static_cast<InlineCore*>(next)->Here(caller);
-      }
+      return Step<SymmetricTransfer, true>(caller, *static_cast<InlineCore*>(next));
     }
     return Noop<SymmetricTransfer>();
   }
