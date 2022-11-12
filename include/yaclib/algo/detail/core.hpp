@@ -82,6 +82,7 @@ class Core : public ResultCoreT<Type, Ret, E> {
         return Done<SymmetricTransfer, true>(std::move(core.Get()));
       }
     }
+    // TODO make it nullptr in ctor
     YACLIB_ASSERT(this->_self.caller == &MakeDrop());
     this->_self.caller = &caller;
     if constexpr (Type != CoreType::Run) {
