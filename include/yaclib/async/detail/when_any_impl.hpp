@@ -98,7 +98,8 @@ class AnyCombinatorBase<V, E, FailPolicy::FirstFail> {
     auto& fail = *reinterpret_cast<ResultCore<V, E>*>(state);
     _core->Store(std::move(fail.Get()));
     fail.DecRef();
-    _core.Release()->template SetResult<false>();
+    auto* core = _core.Release();
+    Loop(core, core->template SetResult<false>());
   }
 
   bool Combine(ResultCore<V, E>& caller) noexcept {
@@ -129,7 +130,7 @@ class AnyCombinatorBase<V, E, FailPolicy::FirstFail> {
 };
 
 template <typename V, typename E, FailPolicy P>
-class AnyCombinator : public CombinatorCore, public AnyCombinatorBase<V, E, P> {
+class AnyCombinator : public InlineCore, public AnyCombinatorBase<V, E, P> {
   using Base = AnyCombinatorBase<V, E, P>;
   using Base::Base;
 
@@ -143,17 +144,30 @@ class AnyCombinator : public CombinatorCore, public AnyCombinatorBase<V, E, P> {
     return std::pair{std::move(future_core), combinator.Release()};
   }
 
+  void AddInput(ResultCore<V, E>& input) noexcept {
+    input.CallInline(*this);
+  }
+
  private:
-  DEFAULT_NEXT_IMPL
-  void Here(BaseCore& caller) noexcept final {
+  template <bool SymmetricTransfer>
+  [[nodiscard]] YACLIB_INLINE auto Impl(InlineCore& caller) noexcept {
     if (this->Combine(static_cast<ResultCore<V, E>&>(caller))) {
       auto* callback = this->_core.Release();
       DecRef();
-      callback->template SetResult<false>();
+      return callback->template SetResult<SymmetricTransfer>();
     } else {
       DecRef();
+      return Noop<SymmetricTransfer>();
     }
   }
+  [[nodiscard]] InlineCore* Here(InlineCore& caller) noexcept final {
+    return Impl<false>(caller);
+  }
+#if YACLIB_SYMMETRIC_TRANSFER != 0
+  [[nodiscard]] yaclib_std::coroutine_handle<> Next(InlineCore& caller) noexcept final {
+    return Impl<true>(caller);
+  }
+#endif
 };
 
 }  // namespace yaclib::detail

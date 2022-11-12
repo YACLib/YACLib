@@ -15,7 +15,7 @@ class ReadyCore : public ResultCore<V, E> {
   }
 
   void Call() noexcept final {
-    this->template SetResult<false>();
+    Loop(this, this->template SetResult<false>());
   }
 
   void Drop() noexcept final {
@@ -23,6 +23,15 @@ class ReadyCore : public ResultCore<V, E> {
     this->Store(StopTag{});
     Call();
   }
+
+  [[nodiscard]] InlineCore* Here(InlineCore& /*caller*/) noexcept final {
+    return this->template SetResult<false>();
+  }
+#if YACLIB_SYMMETRIC_TRANSFER != 0
+  [[nodiscard]] yaclib_std::coroutine_handle<> Next(InlineCore& /*caller*/) noexcept final {
+    return this->template SetResult<true>();
+  }
+#endif
 };
 
 }  // namespace detail

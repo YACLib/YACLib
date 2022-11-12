@@ -8,7 +8,6 @@
 
 namespace yaclib::detail {
 
-InlineCore& MakeEmpty() noexcept;
 InlineCore& MakeDrop() noexcept;
 
 class NoResultCore : public BaseCore {
@@ -32,6 +31,15 @@ enum class CoreType : unsigned char {
 template <CoreType Type, typename V, typename E>
 using ResultCoreT = std::conditional_t<Type == CoreType::Detach, NoResultCore, ResultCore<V, E>>;
 
+YACLIB_INLINE BaseCore* MoveToCaller(BaseCore* head) noexcept {
+  while (head->next != nullptr) {
+    auto* next = static_cast<BaseCore*>(head->next);
+    head->next = nullptr;
+    head = next;
+  }
+  return head;
+}
+
 template <typename Ret, typename Arg, typename E, typename Func, CoreType Type, bool kIsAsync, bool kIsCall>
 class Core : public ResultCoreT<Type, Ret, E> {
   using Storage = std::decay_t<Func>;
@@ -51,60 +59,64 @@ class Core : public ResultCoreT<Type, Ret, E> {
   void Call() noexcept final {
     if constexpr (Type == CoreType::Run) {
       if constexpr (is_invocable_v<Invoke>) {
-        CallImpl(Unit{});  // optimization
+        Loop(this, CallImpl<false>(Unit{}));  // optimization
       } else {
-        CallImpl(Result<Arg, E>{Unit{}});
+        Loop(this, CallImpl<false>(Result<Arg, E>{Unit{}}));
       }
     } else {
       auto& core = static_cast<ResultCore<Arg, E>&>(*this->_self.caller);
-      CallImpl(std::move(core.Get()));
+      Loop(this, CallImpl<false>(std::move(core.Get())));
     }
   }
 
   void Drop() noexcept final {
-    CallImpl(Result<Arg, E>{StopTag{}});
+    Loop(this, CallImpl<false>(Result<Arg, E>{StopTag{}}));
   }
 
-  void Here(BaseCore& caller) noexcept final {
-    this->_self.caller = &caller;
+  template <bool SymmetricTransfer>
+  [[nodiscard]] YACLIB_INLINE auto Impl(InlineCore& caller) noexcept {
     if constexpr (kIsAsync) {
       if (this->_self.unwrapping != 0) {
-        auto& core = static_cast<ResultCore<Ret, E>&>(caller);
-        Done<true>(std::move(core.Get()));
-        return;
+        YACLIB_ASSERT(&caller == this || &caller == this->_self.caller);
+        auto& core = static_cast<ResultCore<Ret, E>&>(*this->_self.caller);
+        return Done<SymmetricTransfer, true>(std::move(core.Get()));
       }
     }
+    YACLIB_ASSERT(this->_self.caller == &MakeDrop());
+    this->_self.caller = &caller;
     if constexpr (Type != CoreType::Run) {
-      caller.MoveExecutorTo(*this);
+      static_cast<BaseCore&>(caller).MoveExecutorTo(*this);
     }
     if constexpr (kIsCall) {
       this->_executor->Submit(*this);
+      return Noop<SymmetricTransfer>();
     } else {
       auto& core = static_cast<ResultCore<Arg, E>&>(caller);
-      CallImpl(std::move(core.Get()));
+      return CallImpl<SymmetricTransfer>(std::move(core.Get()));
     }
   }
-
-#if YACLIB_FINAL_SUSPEND_TRANSFER != 0
-  [[nodiscard]] yaclib_std::coroutine_handle<> Next(BaseCore& caller) noexcept final {
-    Here(caller);
-    return yaclib_std::noop_coroutine();
+  [[nodiscard]] InlineCore* Here(InlineCore& caller) noexcept final {
+    return Impl<false>(caller);
+  }
+#if YACLIB_SYMMETRIC_TRANSFER != 0
+  [[nodiscard]] yaclib_std::coroutine_handle<> Next(InlineCore& caller) noexcept final {
+    return Impl<true>(caller);
   }
 #endif
 
-  template <typename T>
-  void CallImpl(T&& r) noexcept try {
+  template <bool SymmetricTransfer, typename T>
+  [[nodiscard]] YACLIB_INLINE auto CallImpl(T&& r) noexcept try {
     if constexpr (std::is_same_v<T, Unit> || is_invocable_v<Invoke, Result<Arg, E>>) {
-      CallResolveAsync(std::forward<T>(r));
+      return CallResolveAsync<SymmetricTransfer>(std::forward<T>(r));
     } else {
-      CallResolveState(std::forward<T>(r));
+      return CallResolveState<SymmetricTransfer>(std::forward<T>(r));
     }
   } catch (...) {
-    Done(std::current_exception());
+    return Done<SymmetricTransfer>(std::current_exception());
   }
 
-  template <bool Async = false, typename T>
-  void Done(T&& value) noexcept {
+  template <bool SymmetricTransfer, bool Async = false, typename T>
+  [[nodiscard]] YACLIB_INLINE auto Done(T&& value) noexcept {
     // Order defined here is important:
     // 1. Save caller on stack
     // 2. Save return value to union where was caller
@@ -123,19 +135,20 @@ class Core : public ResultCoreT<Type, Ret, E> {
     if constexpr (!Async) {
       _func.storage.~Storage();
     }
-    this->template SetResult<false>();
+    return this->template SetResult<SymmetricTransfer>();
   }
 
-  void CallResolveState(Result<Arg, E>&& r) {
+  template <bool SymmetricTransfer>
+  [[nodiscard]] YACLIB_INLINE auto CallResolveState(Result<Arg, E>&& r) {
     const auto state = r.State();
     if constexpr (is_invocable_v<Invoke, Arg> || (std::is_void_v<Arg> && is_invocable_v<Invoke, Unit>)) {
       if (state == ResultState::Value) {
-        CallResolveAsync(std::move(r).Value());
+        return CallResolveAsync<SymmetricTransfer>(std::move(r).Value());
       } else if (state == ResultState::Exception) {
-        Done(std::move(r).Exception());
+        return Done<SymmetricTransfer>(std::move(r).Exception());
       } else {
         YACLIB_ASSERT(state == ResultState::Error);
-        Done(std::move(r).Error());
+        return Done<SymmetricTransfer>(std::move(r).Error());
       }
     } else {
       /**
@@ -160,30 +173,38 @@ class Core : public ResultCoreT<Type, Ret, E> {
       constexpr auto kState = kIsException ? ResultState::Exception : ResultState::Error;
       if (state == kState) {
         using T = std::conditional_t<kIsException, std::exception_ptr, E>;
-        CallResolveAsync(std::get<T>(std::move(r.Internal())));
+        return CallResolveAsync<SymmetricTransfer>(std::get<T>(std::move(r.Internal())));
       } else {
-        Done(std::move(r));
+        return Done<SymmetricTransfer>(std::move(r));
       }
     }
   }
 
-  template <typename T>
-  void CallResolveAsync(T&& value) {
+  template <bool SymmetricTransfer, typename T>
+  [[nodiscard]] YACLIB_INLINE auto CallResolveAsync(T&& value) {
     if constexpr (kIsAsync) {
-      auto future = CallResolveVoid(std::forward<T>(value));
+      auto async = CallResolveVoid(std::forward<T>(value));
+      BaseCore* core = async.GetCore().Release();
       if constexpr (Type != CoreType::Run) {
         this->_self.caller->DecRef();
       }
       this->_self.unwrapping = 1;
+      this->_self.caller = core;
       _func.storage.~Storage();
-      future.GetCore().Release()->SetInline(*this);
+      if constexpr (is_task_v<decltype(async)>) {
+        core->StoreCallback(*this);
+        core = MoveToCaller(core);
+        return Step<SymmetricTransfer>(*this, *core);
+      } else {
+        return core->SetInline<SymmetricTransfer>(*this);
+      }
     } else {
-      Done(CallResolveVoid(std::forward<T>(value)));
+      return Done<SymmetricTransfer>(CallResolveVoid(std::forward<T>(value)));
     }
   }
 
   template <typename T>
-  auto CallResolveVoid(T&& value) {
+  [[nodiscard]] YACLIB_INLINE auto CallResolveVoid(T&& value) {
     constexpr bool kArgVoid = is_invocable_v<Invoke>;
     constexpr bool kRetVoid = std::is_void_v<invoke_t<Invoke, std::conditional_t<kArgVoid, void, T>>>;
     if constexpr (kRetVoid) {
@@ -265,9 +286,9 @@ auto* MakeCore(Func&& f) {
   using AsyncRet = result_value_t<typename detail::Return<Arg, E, Func&&>::Type>;
   static_assert(CoreT != CoreType::Detach || std::is_void_v<AsyncRet>,
                 "It makes no sense to return some value in Detach, since no one will be able to use it");
-  using Ret0 = result_value_t<future_base_value_t<AsyncRet>>;
+  using Ret0 = result_value_t<future_base_value_t<task_value_t<AsyncRet>>>;
   using Ret = std::conditional_t<std::is_same_v<Ret0, Unit>, void, Ret0>;
-  constexpr bool kIsAsync = is_future_base_v<AsyncRet>;
+  constexpr bool kIsAsync = is_future_base_v<AsyncRet> || is_task_v<AsyncRet>;
   // TODO(MBkkt) Think about inline/detach optimization
   using Core = detail::Core<Ret, Arg, E, Func&&, CoreT, kIsAsync, kIsCall>;
   return MakeUnique<Core>(std::forward<Func>(f)).Release();
@@ -289,12 +310,12 @@ auto SetCallback(ResultCorePtr<Arg, E>& core, IExecutor* executor, Func&& f) {
   auto* callback = MakeCore<CoreT, kIsCall, Arg, E>(std::forward<Func>(f));
   // TODO(MBkkt) callback, executor, caller should be in ctor
   if constexpr (kIsDetach) {
-    callback->StoreCallback(detail::MakeDrop());
+    callback->StoreCallback(MakeDrop());
   }
   callback->_executor = executor;
-  auto* caller = core.Release();
+  BaseCore* caller = core.Release();
   if constexpr (!kIsLazy) {
-    caller->SetInline(*callback);
+    Loop(caller, caller->SetInline<false>(*callback));
   }
   using ResultCoreT = typename std::remove_reference_t<decltype(*callback)>::Base;
   if constexpr (kIsLazy) {
