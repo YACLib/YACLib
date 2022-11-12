@@ -8,10 +8,11 @@
 
 namespace yaclib::detail {
 
+// Combinator should be pointer for case when count == 0
 template <typename Combinator, typename It>
-void WhenImpl(Combinator& combinator, It it, std::size_t count) noexcept {
+void WhenImpl(Combinator* combinator, It it, std::size_t count) noexcept {
   for (std::size_t i = 0; i != count; ++i) {
-    combinator.AddInput(*it->GetCore().Release());
+    combinator->AddInput(*it->GetCore().Release());
     ++it;
   }
 }

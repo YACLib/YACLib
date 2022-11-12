@@ -1,5 +1,6 @@
 #pragma once
 
+#include <yaclib/algo/detail/func_core.hpp>
 #include <yaclib/algo/detail/result_core.hpp>
 #include <yaclib/config.hpp>
 #include <yaclib/util/detail/atomic_counter.hpp>
@@ -41,29 +42,32 @@ YACLIB_INLINE BaseCore* MoveToCaller(BaseCore* head) noexcept {
 }
 
 template <typename Ret, typename Arg, typename E, typename Func, CoreType Type, bool kIsAsync, bool kIsCall>
-class Core : public ResultCoreT<Type, Ret, E> {
-  using Storage = std::decay_t<Func>;
-  using Invoke = std::conditional_t<std::is_function_v<std::remove_reference_t<Func>>, Storage, Func>;
+class Core : public ResultCoreT<Type, Ret, E>, public FuncCore<Func> {
+  using F = FuncCore<Func>;
+  using Storage = typename F::Storage;
+  using Invoke = typename F::Invoke;
 
   static_assert(!(Type == CoreType::Detach && kIsAsync), "Detach cannot be Async, should be void");
 
  public:
   using Base = ResultCoreT<Type, Ret, E>;
 
-  explicit Core(Func&& f) {
-    this->_self = Callback{&MakeDrop(), Type == CoreType::Run};
-    new (&_func.storage) Storage{std::forward<Func>(f)};
+  explicit Core(Func&& f) : F{std::forward<Func>(f)} {
+    this->_self = Callback{nullptr, 0};
   }
 
  private:
   void Call() noexcept final {
+    YACLIB_ASSERT(this->_self.unwrapping == 0);
     if constexpr (Type == CoreType::Run) {
+      YACLIB_ASSERT(this->_self.caller == nullptr);
       if constexpr (is_invocable_v<Invoke>) {
         Loop(this, CallImpl<false>(Unit{}));  // optimization
       } else {
         Loop(this, CallImpl<false>(Result<Arg, E>{Unit{}}));
       }
     } else {
+      YACLIB_ASSERT(this->_self.caller != this);
       auto& core = static_cast<ResultCore<Arg, E>&>(*this->_self.caller);
       Loop(this, CallImpl<false>(std::move(core.Get())));
     }
@@ -74,26 +78,30 @@ class Core : public ResultCoreT<Type, Ret, E> {
   }
 
   template <bool SymmetricTransfer>
-  [[nodiscard]] YACLIB_INLINE auto Impl(InlineCore& caller) noexcept {
-    if constexpr (kIsAsync) {
-      if (this->_self.unwrapping != 0) {
-        YACLIB_ASSERT(&caller == this || &caller == this->_self.caller);
-        auto& core = static_cast<ResultCore<Ret, E>&>(*this->_self.caller);
-        return Done<SymmetricTransfer, true>(std::move(core.Get()));
-      }
-    }
-    // TODO make it nullptr in ctor
-    YACLIB_ASSERT(this->_self.caller == &MakeDrop());
-    this->_self.caller = &caller;
-    if constexpr (Type != CoreType::Run) {
-      static_cast<BaseCore&>(caller).MoveExecutorTo(*this);
-    }
-    if constexpr (kIsCall) {
-      this->_executor->Submit(*this);
-      return Noop<SymmetricTransfer>();
+  [[nodiscard]] YACLIB_INLINE auto Impl([[maybe_unused]] InlineCore& caller) noexcept {
+    auto async_done = [&] {
+      YACLIB_ASSERT(&caller == this || &caller == this->_self.caller);
+      auto& core = static_cast<ResultCore<Ret, E>&>(*this->_self.caller);
+      return Done<SymmetricTransfer, true>(std::move(core.Get()));
+    };
+    if constexpr (Type == CoreType::Run) {
+      return async_done();
     } else {
-      auto& core = static_cast<ResultCore<Arg, E>&>(caller);
-      return CallImpl<SymmetricTransfer>(std::move(core.Get()));
+      if constexpr (kIsAsync) {
+        if (this->_self.unwrapping != 0) {
+          return async_done();
+        }
+      }
+      YACLIB_ASSERT(this->_self.caller == nullptr);
+      this->_self.caller = &caller;
+      static_cast<BaseCore&>(caller).MoveExecutorTo(*this);
+      if constexpr (kIsCall) {
+        this->_executor->Submit(*this);
+        return Noop<SymmetricTransfer>();
+      } else {
+        auto& core = static_cast<ResultCore<Arg, E>&>(caller);
+        return CallImpl<SymmetricTransfer>(std::move(core.Get()));
+      }
     }
   }
   [[nodiscard]] InlineCore* Here(InlineCore& caller) noexcept final {
@@ -134,7 +142,7 @@ class Core : public ResultCoreT<Type, Ret, E> {
       caller->DecRef();
     }
     if constexpr (!Async) {
-      _func.storage.~Storage();
+      this->_func.storage.~Storage();
     }
     return this->template SetResult<SymmetricTransfer>();
   }
@@ -188,10 +196,10 @@ class Core : public ResultCoreT<Type, Ret, E> {
       BaseCore* core = async.GetCore().Release();
       if constexpr (Type != CoreType::Run) {
         this->_self.caller->DecRef();
+        this->_self.unwrapping = 1;
       }
-      this->_self.unwrapping = 1;
       this->_self.caller = core;
-      _func.storage.~Storage();
+      this->_func.storage.~Storage();
       if constexpr (is_task_v<decltype(async)>) {
         core->StoreCallback(*this);
         core = MoveToCaller(core);
@@ -210,29 +218,17 @@ class Core : public ResultCoreT<Type, Ret, E> {
     constexpr bool kRetVoid = std::is_void_v<invoke_t<Invoke, std::conditional_t<kArgVoid, void, T>>>;
     if constexpr (kRetVoid) {
       if constexpr (kArgVoid) {
-        std::forward<Invoke>(_func.storage)();
+        std::forward<Invoke>(this->_func.storage)();
       } else {
-        std::forward<Invoke>(_func.storage)(std::forward<T>(value));
+        std::forward<Invoke>(this->_func.storage)(std::forward<T>(value));
       }
       return Unit{};
     } else if constexpr (kArgVoid) {
-      return std::forward<Invoke>(_func.storage)();
+      return std::forward<Invoke>(this->_func.storage)();
     } else {
-      return std::forward<Invoke>(_func.storage)(std::forward<T>(value));
+      return std::forward<Invoke>(this->_func.storage)(std::forward<T>(value));
     }
   }
-
-  union State {
-    YACLIB_NO_UNIQUE_ADDRESS Unit stub;
-    YACLIB_NO_UNIQUE_ADDRESS Storage storage;
-
-    State() noexcept : stub{} {
-    }
-
-    ~State() noexcept {
-    }
-  };
-  YACLIB_NO_UNIQUE_ADDRESS State _func;
 };
 
 template <typename V, typename E, typename Func>
