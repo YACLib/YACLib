@@ -24,28 +24,31 @@ class BaseCore : public InlineCore {
     kResult = std::numeric_limits<std::uintptr_t>::max(),
   };
 
-  [[nodiscard]] bool Empty() const noexcept;
+  void StoreCallback(InlineCore& callback) noexcept;
 
-  void SetInline(InlineCore& callback) noexcept;
+  [[nodiscard]] bool Empty() const noexcept;
 
   [[nodiscard]] bool SetCallback(InlineCore& callback) noexcept;
 
-  void StoreCallback(InlineCore& callback) noexcept;
-
   [[nodiscard]] bool Reset() noexcept;
 
+  // sometimes we know it will be last callback in cycle, so we want call it right now, instead of SetInline
+  void CallInline(InlineCore& callback) noexcept;
+
   template <bool SymmetricTransfer>
-#if YACLIB_FINAL_SUSPEND_TRANSFER != 0
-  using ReturnT = std::conditional_t<SymmetricTransfer, yaclib_std::coroutine_handle<>, void>;
+#if YACLIB_SYMMETRIC_TRANSFER != 0
+  using Transfer = std::conditional_t<SymmetricTransfer, yaclib_std::coroutine_handle<>, InlineCore*>;
 #else
-  using ReturnT = void;
+  using Transfer = InlineCore*;
 #endif
 
   template <bool SymmetricTransfer>
-  ReturnT<SymmetricTransfer> SetResult() noexcept;
+  [[nodiscard]] Transfer<SymmetricTransfer> SetInline(InlineCore& callback) noexcept;
 
-#if YACLIB_CORO != 0
-  // Compiler inline this call in tests
+  template <bool SymmetricTransfer>
+  [[nodiscard]] Transfer<SymmetricTransfer> SetResult() noexcept;
+
+#if YACLIB_CORO != 0                                                      // Compiler inline this call in tests
   [[nodiscard]] virtual yaclib_std::coroutine_handle<> Curr() noexcept {  // LCOV_EXCL_LINE
     YACLIB_PURE_VIRTUAL();                                                // LCOV_EXCL_LINE
     return {};                                                            // LCOV_EXCL_LINE
@@ -62,5 +65,13 @@ class BaseCore : public InlineCore {
 
   void MoveExecutorTo(BaseCore& callback) noexcept;
 };
+
+YACLIB_INLINE void Loop(InlineCore* prev, InlineCore* next) noexcept {
+  while (next != nullptr) {
+    auto* next_next = next->Here(*prev);
+    prev = next;
+    next = next_next;
+  }
+}
 
 }  // namespace yaclib::detail

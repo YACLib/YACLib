@@ -4,35 +4,45 @@
 #include <yaclib/exe/job.hpp>
 #include <yaclib/log.hpp>
 
-#if YACLIB_FINAL_SUSPEND_TRANSFER != 0
+#if YACLIB_SYMMETRIC_TRANSFER != 0
 #  include <yaclib/coro/coro.hpp>
 #endif
 
 namespace yaclib::detail {
 
-class BaseCore;
-
-#if YACLIB_NEXT_IMPL != 0 && YACLIB_FINAL_SUSPEND_TRANSFER != 0
-#  define DEFAULT_NEXT_IMPL                                                                                            \
-    [[nodiscard]] yaclib_std::coroutine_handle<> Next(BaseCore& caller) noexcept final {                               \
-      Here(caller);                                                                                                    \
-      return yaclib_std::noop_coroutine();                                                                             \
-    }
-#else
-#  define DEFAULT_NEXT_IMPL
-#endif
-
 class InlineCore : public Job {
  public:
-#if YACLIB_NEXT_IMPL != 0 && YACLIB_FINAL_SUSPEND_TRANSFER != 0
-  [[nodiscard]] virtual yaclib_std::coroutine_handle<> Next(BaseCore& /*caller*/) noexcept = 0;
-#elif YACLIB_FINAL_SUSPEND_TRANSFER != 0
-  [[nodiscard]] virtual yaclib_std::coroutine_handle<> Next(BaseCore& caller) noexcept {
-    Here(caller);
-    return yaclib_std::noop_coroutine();
-  }
+  [[nodiscard]] virtual InlineCore* Here(InlineCore& caller) noexcept = 0;
+
+#if YACLIB_SYMMETRIC_TRANSFER != 0
+  [[nodiscard]] virtual yaclib_std::coroutine_handle<> Next(InlineCore& caller) noexcept = 0;
 #endif
-  virtual void Here(BaseCore& /*caller*/) noexcept = 0;
 };
+
+template <bool SymmetricTransfer, bool Skip = false>
+YACLIB_INLINE auto Step([[maybe_unused]] InlineCore& caller, InlineCore& callback) noexcept {
+#if YACLIB_SYMMETRIC_TRANSFER != 0
+  if constexpr (SymmetricTransfer) {
+    return callback.Next(caller);
+  } else
+#endif
+    if constexpr (Skip) {  // sometimes our callback won't be next caller, in general when caller isn't *this
+    return callback.Here(caller);
+  } else {
+    return &callback;
+  }
+}
+
+template <bool SymmetricTransfer>
+YACLIB_INLINE auto Noop() noexcept {
+#if YACLIB_SYMMETRIC_TRANSFER != 0
+  if constexpr (SymmetricTransfer) {
+    return yaclib_std::coroutine_handle<>{yaclib_std::noop_coroutine()};
+  } else
+#endif
+  {
+    return static_cast<InlineCore*>(nullptr);
+  }
+}
 
 }  // namespace yaclib::detail

@@ -172,7 +172,12 @@ TYPED_TEST(AsyncSuite, OnStopped) {
     co_return{};
   };
 
-  auto outer_future = coro();
+  auto outer_future = coro()
+                        .ThenInline([](auto&& r) {
+                          return std::move(r);
+                        })
+                        .ThenInline([] {
+                        });
   EXPECT_EQ(std::move(outer_future).Get().State(), yaclib::ResultState::Error);
 
   EXPECT_TRUE(a);

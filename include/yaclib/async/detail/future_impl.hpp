@@ -63,7 +63,8 @@ auto FutureBase<V, E>::Then(IExecutor& e, Func&& f) && {
 template <typename V, typename E>
 void FutureBase<V, E>::Detach() && noexcept {
   auto* core = _core.Release();
-  core->SetInline(detail::MakeDrop());
+  // TODO if use SetCallback it will single virtual call instead of two
+  core->CallInline(detail::MakeDrop());
 }
 
 template <typename V, typename E>

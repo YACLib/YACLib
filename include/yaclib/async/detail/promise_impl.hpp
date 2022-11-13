@@ -13,7 +13,8 @@ void Promise<V, E>::Set(Args&&... args) && {
   } else {
     _core->Store(std::forward<Args>(args)...);
   }
-  _core.Release()->template SetResult<false>();
+  auto* core = _core.Release();
+  detail::Loop(core, core->template SetResult<false>());
 }
 
 template <typename V, typename E>

@@ -28,6 +28,12 @@ template <typename T>
 using result_error_t = typename detail::InstantiationTypes<Result, T>::Error;  // NOLINT
 
 template <typename T>
+using task_value_t = typename detail::InstantiationTypes<Task, T>::Value;  // NOLINT
+
+template <typename T>
+using task_error_t = typename detail::InstantiationTypes<Task, T>::Error;  // NOLINT
+
+template <typename T>
 inline constexpr bool is_future_base_v = detail::IsInstantiationOf<FutureBase, T>::Value ||  // NOLINT
                                          detail::IsInstantiationOf<Future, T>::Value ||      // dummy comments
                                          detail::IsInstantiationOf<FutureOn, T>::Value;      // for format

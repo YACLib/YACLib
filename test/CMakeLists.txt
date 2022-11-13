@@ -75,12 +75,6 @@ if (YACLIB_CORO_NEED)
     )
 endif ()
 
-if (NOT YACLIB_SAN AND YACLIB_CORO_NEED)
-  list(APPEND YACLIB_UNIT_SOURCES
-    unit/async/dealloc_order
-    )
-endif ()
-
 if (YACLIB_FAULT STREQUAL "FIBER")
   list(APPEND YACLIB_UNIT_SOURCES
     unit/fault/mutexes
@@ -131,10 +125,12 @@ else ()
   endforeach ()
 endif ()
 
-add_executable(unit_log
-  test.cpp
-  unit/log.cpp
-  )
+unset(YACLIB_TEST_SOURCES)
+
+if (NOT YACLIB_SAN AND YACLIB_CORO_NEED)
+  add_executable(yaclib_dealloc_order_test test.cpp unit/async/dealloc_order.cpp)
+  yaclib_add_test(yaclib_dealloc_order_test)
+endif ()
 
 if (NOT "YACLIB_LOG_ERROR" IN_LIST YACLIB_DEFINITIONS)
   list(APPEND YACLIB_DEFINITIONS "YACLIB_LOG_ERROR")
@@ -146,6 +142,7 @@ if (NOT "YACLIB_LOG_DEBUG" IN_LIST YACLIB_DEFINITIONS)
   list(APPEND YACLIB_DEFINITIONS "YACLIB_LOG_DEBUG")
 endif ()
 
-yaclib_add_test(unit_log)
+add_executable(yaclib_log_test test.cpp unit/log.cpp)
+yaclib_add_test(yaclib_log_test)
 
 set(YACLIB_DEFINITIONS OLD_YACLIB_DEFINITIONS)

@@ -16,15 +16,16 @@ struct Callback {
 template <typename V, typename E>
 class ResultCore : public BaseCore {
  public:
-#if YACLIB_NEXT_IMPL != 0 && YACLIB_FINAL_SUSPEND_TRANSFER != 0
-  [[nodiscard]] yaclib_std::coroutine_handle<> Next(BaseCore& /*caller*/) noexcept override {
+  [[nodiscard]] InlineCore* Here(InlineCore& /*caller*/) noexcept override {
+    YACLIB_PURE_VIRTUAL();
+    return nullptr;
+  }
+#if YACLIB_SYMMETRIC_TRANSFER != 0
+  [[nodiscard]] yaclib_std::coroutine_handle<> Next(InlineCore& /*caller*/) noexcept override {
     YACLIB_PURE_VIRTUAL();
     return yaclib_std::noop_coroutine();
   }
 #endif
-  void Here(BaseCore& /*caller*/) noexcept override {
-    YACLIB_PURE_VIRTUAL();
-  }
 
   ResultCore() noexcept : BaseCore{kEmpty} {
   }

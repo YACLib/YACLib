@@ -56,6 +56,19 @@ class Task final {
 
   Result<V, E> Get() && noexcept;
 
+  void Touch() & = delete;
+  void Touch() const&& = delete;
+
+  const Result<V, E>& Touch() const& noexcept {
+    YACLIB_ERROR(_core->Empty(), "Try to touch result of not ready Task");
+    return _core->Get();
+  }
+  Result<V, E> Touch() && noexcept {
+    YACLIB_ERROR(_core->Empty(), "Try to touch result of not ready Task");
+    auto core = std::exchange(_core, nullptr);
+    return std::move(core->Get());
+  }
+
   /**
    * Method that get internal Core state
    *

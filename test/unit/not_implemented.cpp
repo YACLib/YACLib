@@ -46,7 +46,7 @@ TEST(InlineCore, Drop) {
 void CheckHere() {
   auto [f, p] = yaclib::MakeContract();
   auto& core = *p.GetCore();
-  core.Here(core);
+  std::ignore = core.Here(core);
 }
 
 TEST(InlineCore, Here) {
@@ -57,7 +57,7 @@ TEST(InlineCore, Here) {
 #endif
 }
 
-#if YACLIB_FINAL_SUSPEND_TRANSFER != 0
+#if YACLIB_SYMMETRIC_TRANSFER != 0
 void CheckNext() {
   auto [f, p] = yaclib::MakeContract();
   auto& core = *p.GetCore();

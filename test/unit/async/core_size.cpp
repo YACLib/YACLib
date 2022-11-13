@@ -11,22 +11,22 @@ namespace {
 
 TEST(Result, VoidSizeof) {
   static_assert(sizeof(yaclib::Result<>) == sizeof(std::exception_ptr) + alignof(std::exception_ptr));
-  std::cerr << sizeof(yaclib::Result<>) << std::endl;
+  std::cout << "sizeof(yaclib::Result<>): " << sizeof(yaclib::Result<>) << std::endl;
 }
 
 TEST(Result, IntSizeof) {
   static_assert(sizeof(yaclib::Result<int>) == sizeof(std::exception_ptr) + alignof(std::exception_ptr));
-  std::cerr << sizeof(yaclib::Result<int>) << std::endl;
+  std::cout << "sizeof(yaclib::Result<int>): " << sizeof(yaclib::Result<int>) << std::endl;
 }
 
 TEST(Result, StringViewSizeof) {
   static_assert(sizeof(yaclib::Result<std::string_view>) == sizeof(std::string_view) + alignof(std::exception_ptr));
-  std::cerr << sizeof(yaclib::Result<std::string_view>) << std::endl;
+  std::cout << "sizeof(yaclib::Result<std::string_view>): " << sizeof(yaclib::Result<std::string_view>) << std::endl;
 }
 
 TEST(Result, VectorSizeof) {
   static_assert(sizeof(yaclib::Result<std::vector<int>>) == sizeof(std::vector<int>) + alignof(std::exception_ptr));
-  std::cerr << sizeof(yaclib::Result<std::vector<int>>) << std::endl;
+  std::cout << "sizeof(yaclib::Result<std::vector<int>>): " << sizeof(yaclib::Result<std::vector<int>>) << std::endl;
 }
 
 TEST(BaseCore, Sizeof) {
@@ -34,7 +34,7 @@ TEST(BaseCore, Sizeof) {
 #if YACLIB_FAULT != 2 || YACLIB_FUTEX == 0
   static_assert(sizeof(void*) == sizeof(int) || sizeof(Core) == sizeof(void*) * 4);
 #endif
-  std::cerr << sizeof(Core) << std::endl;
+  std::cout << "sizeof(yaclib::detail::BaseCore): " << sizeof(Core) << std::endl;
 }
 
 #if !defined(LAMBDA_SIZE) && defined(__has_cpp_attribute)
@@ -67,7 +67,7 @@ TEST(Core, EmptySizeof) {
                                                                   sizeof(yaclib::Result<>) +          //
                                                                   kZeroCaptureLambdaSizeof +          //
                                                                   0));
-  std::cerr << sizeof(*core) << std::endl;
+  std::cout << "sizeof(yaclib::MakeCore, zero capture lambda): " << sizeof(*core) << std::endl;
 
   core->StoreCallback(yaclib::detail::MakeDrop());
   static_cast<yaclib::Job*>(core)->Drop();
@@ -79,7 +79,7 @@ TEST(Core, Sizeof) {
                                                                   sizeof(yaclib::Result<>) +          //
                                                                   sizeof(&kek) +                      //
                                                                   0));
-  std::cerr << sizeof(*core) << std::endl;
+  std::cout << "sizeof(yaclib::MakeCore, function): " << sizeof(*core) << std::endl;
 
   core->StoreCallback(yaclib::detail::MakeDrop());
   static_cast<yaclib::Job*>(core)->Drop();

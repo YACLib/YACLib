@@ -17,7 +17,7 @@ namespace yaclib {
 template <typename Event = OneShotEvent>
 class WaitGroup final {
  public:
-  YACLIB_INLINE explicit WaitGroup(std::size_t count = 0) : _event{count} {
+  explicit WaitGroup(std::size_t count = 0) : _event{count} {
   }
 
   /**

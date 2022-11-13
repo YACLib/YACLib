@@ -12,10 +12,19 @@ struct CallCallback : InlineCore {
   }
 
  private:
-  DEFAULT_NEXT_IMPL
-  void Here(BaseCore& /*caller*/) noexcept final {
+  template <bool SymmetricTransfer>
+  [[nodiscard]] YACLIB_INLINE auto Impl() noexcept {
     static_cast<Derived&>(*this).Sub(1);
+    return Noop<SymmetricTransfer>();
   }
+  [[nodiscard]] InlineCore* Here(InlineCore& /*caller*/) noexcept final {
+    return Impl<false>();
+  }
+#if YACLIB_SYMMETRIC_TRANSFER != 0
+  [[nodiscard]] yaclib_std::coroutine_handle<> Next(InlineCore& /*caller*/) noexcept final {
+    return Impl<true>();
+  }
+#endif
 };
 
 template <typename Derived>
@@ -25,11 +34,20 @@ struct DropCallback : InlineCore {
   }
 
  private:
-  DEFAULT_NEXT_IMPL
-  void Here(BaseCore& caller) noexcept final {
+  template <bool SymmetricTransfer>
+  [[nodiscard]] YACLIB_INLINE auto Impl(InlineCore& caller) noexcept {
     caller.DecRef();
     static_cast<Derived&>(*this).Sub(1);
+    return Noop<SymmetricTransfer>();
   }
+  [[nodiscard]] InlineCore* Here(InlineCore& caller) noexcept final {
+    return Impl<false>(caller);
+  }
+#if YACLIB_SYMMETRIC_TRANSFER != 0
+  [[nodiscard]] yaclib_std::coroutine_handle<> Next(InlineCore& caller) noexcept final {
+    return Impl<true>(caller);
+  }
+#endif
 };
 
 template <typename Event, template <typename...> typename Counter, template <typename...> typename... Callbacks>
