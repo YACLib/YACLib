@@ -32,7 +32,7 @@ auto WhenAll(It begin, std::size_t count) {
   using E = future_base_error_t<T>;
   using R = std::conditional_t<F == FailPolicy::None, Result<V, E>, V>;
   auto [future_core, combinator] = detail::AllCombinator<O, R, E>::Make(count);
-  detail::WhenImpl(*combinator, begin, count);
+  detail::WhenImpl(combinator, begin, count);
   return Future{std::move(future_core)};
 }
 

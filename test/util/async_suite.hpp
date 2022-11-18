@@ -46,6 +46,15 @@ TYPED_TEST_SUITE(AsyncSuite, Types, TypeNames);
     }                                                                                                                  \
   }()
 
+#define INVOKE_V(V, executor, func)                                                                                    \
+  [&] {                                                                                                                \
+    if constexpr (TestFixture::kIsFuture) {                                                                            \
+      return yaclib::AsyncContract<V>(executor, func);                                                                 \
+    } else {                                                                                                           \
+      return yaclib::LazyContract<V>(executor, func);                                                                  \
+    }                                                                                                                  \
+  }()
+
 #define DETACH(future, func)                                                                                           \
   do {                                                                                                                 \
     if constexpr (TestFixture::kIsFuture) {                                                                            \

@@ -753,5 +753,80 @@ TYPED_TEST(AsyncSuite, InvokeAsync) {
   }).Detach();
 }
 
+TYPED_TEST(AsyncSuite, InvokePromiseJust) {
+  auto f = INVOKE_V(int, yaclib::MakeInline(), [](yaclib::Promise<int>&& p) {
+    std::move(p).Set(1);
+  });
+  EXPECT_EQ(std::move(f).Get().Ok(), 1);
+}
+
+TYPED_TEST(AsyncSuite, InvokePromiseDrop) {
+  auto f = INVOKE_V(int, yaclib::MakeInline(yaclib::StopTag{}), [](yaclib::Promise<int>&& p) {
+    std::move(p).Set(1);
+  });
+  try {
+    std::ignore = std::move(f).Get().Ok();
+  } catch (const yaclib::ResultError<yaclib::StopError>& e) {
+    EXPECT_EQ(e.Get(), yaclib::StopError{yaclib::StopTag{}});
+  } catch (...) {
+    FAIL();
+  }
+}
+
+TYPED_TEST(AsyncSuite, InvokePromiseSetAfterCall) {
+  yaclib::FairThreadPool tp{1};
+  auto f = INVOKE_V(int, tp, [&](yaclib::Promise<int>&& p) {
+    yaclib::Run(tp, [p = std::move(p)]() mutable {
+      yaclib_std::this_thread::sleep_for(10ms);
+      std::move(p).Set(1);
+    }).Detach();
+  });
+  EXPECT_EQ(std::move(f).Get().Ok(), 1);
+  tp.Stop();
+  tp.Wait();
+}
+
+TYPED_TEST(AsyncSuite, InvokePromiseSetInCall) {
+  yaclib::FairThreadPool tp{1};
+  auto f = INVOKE_V(int, tp, [kek = std::make_unique<int>(2)](yaclib::Promise<int>&& p) {
+    std::move(p).Set(1);
+    yaclib_std::this_thread::sleep_for(10ms);
+    EXPECT_EQ(*kek, 2);
+  });
+  EXPECT_EQ(std::move(f).Get().Ok(), 1);
+  tp.Stop();
+  tp.Wait();
+}
+
+TYPED_TEST(AsyncSuite, InvokePromiseException) {
+  // exception
+  {
+    static constexpr std::string_view kTest = "rdpsliora";
+    auto f = INVOKE_V(int, yaclib::MakeInline(), [](yaclib::Promise<int>&&) {
+      throw std::runtime_error{kTest.data()};
+    });
+    try {
+      std::ignore = std::move(f).Get().Ok();
+    } catch (const std::runtime_error& e) {
+      EXPECT_EQ(e.what(), kTest);
+    } catch (...) {
+      FAIL();
+    }
+  }
+  // exception after move just ignored
+  {
+    auto f = INVOKE_V(int, yaclib::MakeInline(), [](yaclib::Promise<int>) {
+      throw 1;
+    });
+    try {
+      std::ignore = std::move(f).Get().Ok();
+    } catch (const yaclib::ResultError<yaclib::StopError>& e) {
+      EXPECT_EQ(e.Get(), yaclib::StopError{yaclib::StopTag{}});
+    } catch (...) {
+      FAIL();
+    }
+  }
+}
+
 }  // namespace
 }  // namespace test

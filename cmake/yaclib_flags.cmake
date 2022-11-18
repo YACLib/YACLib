@@ -31,7 +31,7 @@ if (MEMSAN IN_LIST YACLIB_FLAGS)
 endif ()
 if (YACLIB_SAN AND NOT CMAKE_CXX_COMPILER_ID STREQUAL "MSVC" AND NOT CMAKE_CXX_SIMULATE_ID STREQUAL "MSVC")
   # Nicer stack trace and recover
-  list(APPEND YACLIB_COMPILE_OPTIONS -fno-omit-frame-pointer -fsanitize-recover=all)
+  list(APPEND YACLIB_COMPILE_OPTIONS -fno-omit-frame-pointer)
 endif ()
 
 set(YACLIB_COVERAGE 0)

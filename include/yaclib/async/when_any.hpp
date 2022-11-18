@@ -35,7 +35,7 @@ auto WhenAny(It begin, std::size_t count) {
     return Future<V, E>{std::exchange(begin->GetCore(), nullptr)};
   }
   auto [future_core, combinator] = detail::AnyCombinator<V, E, P>::Make(count);
-  detail::WhenImpl(*combinator, begin, count);
+  detail::WhenImpl(combinator, begin, count);
   return Future{std::move(future_core)};
 }
 
