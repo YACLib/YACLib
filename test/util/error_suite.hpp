@@ -1,3 +1,5 @@
+#pragma once
+
 #include <util/error_code.hpp>
 
 #include <yaclib/util/result.hpp>

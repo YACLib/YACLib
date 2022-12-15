@@ -1,3 +1,5 @@
+#pragma once
+
 #include <yaclib/async/run.hpp>
 #include <yaclib/config.hpp>
 #include <yaclib/lazy/schedule.hpp>
