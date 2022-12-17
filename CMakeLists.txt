@@ -14,6 +14,12 @@ endif ()
 
 if (YACLIB_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD ${YACLIB_CXX_STANDARD})
+elseif (NOT CORO IN_LIST YACLIB_FLAGS)
+  message("Set default standard to c++17")
+  set(CMAKE_CXX_STANDARD 17)
+else ()
+  message("Set default standard to c++20")
+  set(CMAKE_CXX_STANDARD 20)
 endif ()
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -25,6 +31,13 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 list(APPEND CMAKE_MODULE_PATH "${YACLIB_SOURCE_DIR}/cmake")
 include(yaclib_flags)
+
+if (YACLIB_INSTALL)
+  include(GNUInstallDirs)
+  install(DIRECTORY ${YACLIB_SOURCE_DIR}/include/yaclib TYPE INCLUDE)
+  install(DIRECTORY ${YACLIB_SOURCE_DIR}/include/yaclib_std TYPE INCLUDE)
+  install(DIRECTORY ${YACLIB_BINARY_DIR}/include/yaclib TYPE INCLUDE)
+endif()
 
 add_subdirectory(src) # Create static library
 

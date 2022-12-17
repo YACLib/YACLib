@@ -56,3 +56,7 @@ target_include_directories(yaclib
   PUBLIC ${YACLIB_BINARY_DIR}/include # for config.hpp
   PRIVATE ${YACLIB_SOURCE_DIR}/src
   )
+
+if (YACLIB_INSTALL)
+  install(TARGETS yaclib)
+endif ()
