@@ -14,6 +14,12 @@ endif ()
 
 if (YACLIB_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD ${YACLIB_CXX_STANDARD})
+elseif (NOT CORO IN_LIST YACLIB_FLAGS)
+  message("Set default standard to c++17")
+  set(CMAKE_CXX_STANDARD 17)
+else ()
+message("Set default standard to c++20")
+  set(CMAKE_CXX_STANDARD 20)
 endif ()
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
