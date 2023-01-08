@@ -6,11 +6,11 @@ OneShotEvent::OneShotEvent() noexcept : _head{OneShotEvent::kEmpty} {
 }
 
 bool OneShotEvent::TryAdd(Job* job) noexcept {
-  std::uint64_t head = _head.load(/*std::memory_order_acquire*/);
+  std::uint64_t head = _head.load(std::memory_order_acquire);
   std::uint64_t node = reinterpret_cast<std::uint64_t>(job);
   while (head != OneShotEvent::kAllDone) {
     job->next = reinterpret_cast<Job*>(head);
-    if (_head.compare_exchange_weak(head, node /*, std::memory_order_release, std::memory_order_acquire*/)) {
+    if (_head.compare_exchange_weak(head, node, std::memory_order_release, std::memory_order_acquire)) {
       return true;
     }
   }
@@ -18,7 +18,7 @@ bool OneShotEvent::TryAdd(Job* job) noexcept {
 }
 
 bool OneShotEvent::Ready() noexcept {
-  return _head.load(/*std::memory_order_acquire*/) == OneShotEvent::kAllDone;
+  return _head.load(std::memory_order_acquire) == OneShotEvent::kAllDone;
 }
 
 class OneShotEventWaiter final : public Job, public detail::DefaultEvent {
@@ -37,7 +37,7 @@ void OneShotEvent::Wait() noexcept {
 }
 
 void OneShotEvent::Set() noexcept {
-  auto head = _head.exchange(OneShotEvent::kAllDone /*, std::memory_order_acq_rel*/);
+  auto head = _head.exchange(OneShotEvent::kAllDone, std::memory_order_acq_rel);
   auto job = reinterpret_cast<Job*>(head);
   while (job != nullptr) {
     auto next = static_cast<Job*>(job->next);
@@ -47,7 +47,7 @@ void OneShotEvent::Set() noexcept {
 }
 
 void OneShotEvent::Reset() noexcept {
-  _head.store(OneShotEvent::kEmpty /*, std::memory_order_release*/);
+  _head.store(OneShotEvent::kEmpty, std::memory_order_release);
 }
 
 }  // namespace yaclib
