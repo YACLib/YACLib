@@ -121,12 +121,9 @@ jobs:
         if: ${{ matrix.os == 'ubuntu-22.04' }}
         run: |
           sudo apt-get update
-          sudo wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-          sudo add-apt-repository "deb http://apt.llvm.org/jammy/     llvm-toolchain-jammy-14   main"
-          sudo apt-get update
           sudo apt-get install ninja-build googletest                                                                  \
                                gcc-12 g++-12 libstdc++-12-dev                                                          \
-                               clang-14 lld-14 libc++-14-dev libc++abi-14-dev
+                               clang-14 lld-14 libc++-14-dev libc++abi-14-dev libclang-common-14-dev
           # We use lld because it faster than ld and gold and don't have strange issues like mold
           sudo ln -sf /usr/bin/lld-14 /usr/local/bin/ld
 
@@ -158,6 +155,7 @@ jobs:
           build_type=${{ matrix.build_type }}
           compiler_names=(clang gnu apple_clang)
           stdlib_names=(libcxx libstdcxx default)
+          linker=""
           if [[ ${{ matrix.os }} == "macos-12" ]]; then
             llvm=/usr/local/opt/llvm@14
             # TODO(myannyax?) FIBER
@@ -185,6 +183,7 @@ jobs:
               "-stdlib=libstdc++"
             )
             slowdown=1
+            linker="-fuse-ld=lld-14"
           fi
 
           if [[ "$flags" == "TSAN" ]]; then
@@ -236,7 +235,7 @@ jobs:
                   -DYACLIB_FLAGS="CORO;$flags"                                                                         \
                   -DCMAKE_CXX_COMPILER=${cxx_compilers[$i]}                                                            \
                   -G"Ninja"                                                                                            \
-                  -DYACLIB_LINK_OPTIONS="$link_option"                                                                 \
+                  -DYACLIB_LINK_OPTIONS="$link_option;$linker"                                                         \
                   -DYACLIB_COMPILE_OPTIONS="$compile_option"                                                           \
                   -DYACLIB_FAULT=$yaclib_fault                                                                         \
                   -DYACLIB_LOG="ERROR;DEBUG"                                                                           \
