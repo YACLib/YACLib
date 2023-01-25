@@ -222,7 +222,7 @@ jobs:
                 -DYACLIB_CXX_STANDARD="$standard"                                                                      \
                 -DYACLIB_TEST=SINGLE                                                                                   \
                 -DYACLIB_FLAGS="$flags"                                                                                \
-                -DCMAKE_CXX_COMPILER="$compiler"                                                                   \
+                -DCMAKE_CXX_COMPILER="$compiler"                                                                       \
                 -G"Ninja"                                                                                              \
                 -DYACLIB_LINK_OPTIONS="$link_option"                                                                   \
                 -DYACLIB_LOG="ERROR;DEBUG"                                                                             \

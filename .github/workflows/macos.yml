@@ -35,7 +35,6 @@ jobs:
 
       - name: Update deps on macOS
         run: |
-          brew update
           # Install oldest compiler that possible
           if [[ "${{ matrix.os }}" == "12" ]]; then
             brew install ninja llvm@8 gcc@7
