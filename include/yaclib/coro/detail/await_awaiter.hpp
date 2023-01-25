@@ -8,8 +8,8 @@
 
 namespace yaclib::detail {
 
-struct [[nodiscard]] TransferAwaiter {
-  TransferAwaiter(BaseCore& caller) noexcept : _caller{caller} {
+struct [[nodiscard]] TransferAwaiter final {
+  explicit TransferAwaiter(BaseCore& caller) noexcept : _caller{caller} {
   }
 
   constexpr bool await_ready() const noexcept {
@@ -32,6 +32,35 @@ struct [[nodiscard]] TransferAwaiter {
 
  private:
   BaseCore& _caller;
+};
+
+template <typename V, typename E>
+struct [[nodiscard]] TransferSingleAwaiter final {
+  explicit TransferSingleAwaiter(ResultCorePtr<V, E>&& result) noexcept : _result{std::move(result)} {
+    YACLIB_ASSERT(_result != nullptr);
+  }
+
+  constexpr bool await_ready() const noexcept {
+    return false;
+  }
+
+  template <typename Promise>
+  YACLIB_INLINE auto await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
+    _result->StoreCallback(handle.promise());
+    auto* next = MoveToCaller(_result.Get());
+#if YACLIB_SYMMETRIC_TRANSFER != 0
+    return next->Next(handle.promise());
+#else
+    return Loop(&handle.promise(), next);
+#endif
+  }
+
+  auto await_resume() {
+    return std::move(_result->Get()).Ok();
+  }
+
+ private:
+  ResultCorePtr<V, E> _result;
 };
 
 /**

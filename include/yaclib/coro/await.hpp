@@ -48,4 +48,9 @@ YACLIB_INLINE auto operator co_await(FutureBase<V, E>&& future) noexcept {
   return detail::AwaitSingleAwaiter{std::move(future.GetCore())};
 }
 
+template <typename V, typename E>
+YACLIB_INLINE auto operator co_await(Task<V, E>&& task) noexcept {
+  return detail::TransferSingleAwaiter{std::move(task.GetCore())};
+}
+
 }  // namespace yaclib
