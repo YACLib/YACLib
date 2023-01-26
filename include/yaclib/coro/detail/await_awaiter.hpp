@@ -8,8 +8,8 @@
 
 namespace yaclib::detail {
 
-struct [[nodiscard]] TransferAwaiter {
-  TransferAwaiter(BaseCore& caller) noexcept : _caller{caller} {
+struct [[nodiscard]] TransferAwaiter final {
+  explicit TransferAwaiter(BaseCore& caller) noexcept : _caller{caller} {
   }
 
   constexpr bool await_ready() const noexcept {
@@ -34,12 +34,41 @@ struct [[nodiscard]] TransferAwaiter {
   BaseCore& _caller;
 };
 
+template <typename V, typename E>
+struct [[nodiscard]] TransferSingleAwaiter final {
+  explicit TransferSingleAwaiter(ResultCorePtr<V, E>&& result) noexcept : _result{std::move(result)} {
+    YACLIB_ASSERT(_result != nullptr);
+  }
+
+  constexpr bool await_ready() const noexcept {
+    return false;
+  }
+
+  template <typename Promise>
+  YACLIB_INLINE auto await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
+    _result->StoreCallback(handle.promise());
+    auto* next = MoveToCaller(_result.Get());
+#if YACLIB_SYMMETRIC_TRANSFER != 0
+    return next->Next(handle.promise());
+#else
+    return Loop(&handle.promise(), next);
+#endif
+  }
+
+  auto await_resume() {
+    return std::move(_result->Get()).Ok();
+  }
+
+ private:
+  ResultCorePtr<V, E> _result;
+};
+
 /**
  * TODO(mkornaukhov03) Add doxygen docs
  */
 template <bool Single>
-struct [[nodiscard]] AwaitAwaiter {
-  AwaitAwaiter(BaseCore& caller) noexcept : _caller{caller} {
+struct [[nodiscard]] AwaitAwaiter final {
+  explicit AwaitAwaiter(BaseCore& caller) noexcept : _caller{caller} {
   }
 
   YACLIB_INLINE bool await_ready() const noexcept {
@@ -123,5 +152,29 @@ AwaitAwaiter<false>::AwaitAwaiter(It it, std::size_t count) noexcept : _event{co
   }
   _event.count.fetch_sub(count - wait_count, std::memory_order_relaxed);
 }
+
+template <typename V, typename E>
+class [[nodiscard]] AwaitSingleAwaiter final {
+ public:
+  explicit AwaitSingleAwaiter(ResultCorePtr<V, E>&& result) noexcept : _result{std::move(result)} {
+    YACLIB_ASSERT(_result != nullptr);
+  }
+
+  YACLIB_INLINE bool await_ready() const noexcept {
+    return !_result->Empty();
+  }
+
+  template <typename Promise>
+  YACLIB_INLINE bool await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
+    return _result->SetCallback(handle.promise());
+  }
+
+  auto await_resume() {
+    return std::move(_result->Get()).Ok();
+  }
+
+ private:
+  ResultCorePtr<V, E> _result;
+};
 
 }  // namespace yaclib::detail

@@ -67,6 +67,38 @@ TYPED_TEST(AsyncSuite, JustWorksRange) {
   tp.Wait();
 }
 
+TYPED_TEST(AsyncSuite, JustWorksCoAwait) {
+  yaclib::FairThreadPool tp;
+  auto coro = [&]() -> std::conditional_t<TestFixture::kIsFuture, yaclib::Future<int>, yaclib::Task<int>> {
+    auto f1 = yaclib::Run(tp, [] {
+      yaclib_std::this_thread::sleep_for(50ms * YACLIB_CI_SLOWDOWN);
+      return 1;
+    });
+
+    co_return co_await std::move(f1);
+  };
+  auto future = coro();
+  EXPECT_EQ(std::move(future).Get().Ok(), 1);
+  tp.HardStop();
+  tp.Wait();
+}
+
+TYPED_TEST(AsyncSuite, JustWorksCoAwaitException) {
+  yaclib::FairThreadPool tp;
+  auto coro = [&]() -> std::conditional_t<TestFixture::kIsFuture, yaclib::Future<int>, yaclib::Task<int>> {
+    auto f1 = yaclib::Run(tp, [] {
+      throw std::runtime_error{""};
+      return 2;
+    });
+
+    co_return co_await std::move(f1);
+  };
+  auto future = coro();
+  EXPECT_THROW((void)std::move(future).Get().Ok(), std::runtime_error);
+  tp.HardStop();
+  tp.Wait();
+}
+
 TYPED_TEST(AsyncSuite, CheckSuspend) {
   int counter = 0;
   yaclib::FairThreadPool tp{2};
@@ -129,6 +161,29 @@ TYPED_TEST(AsyncSuite, AwaitNoSuspend) {
     EXPECT_EQ(0, counter);
   }
   std::ignore = std::move(outer_future).Get();
+  EXPECT_EQ(2, counter);
+}
+
+TYPED_TEST(AsyncSuite, AwaitSingleNoSuspend) {
+  int counter = 0;
+
+  auto coro = [&]() -> typename TestFixture::Type {
+    counter = 1;
+    auto future = yaclib::MakeFuture();
+
+    co_await std::move(future);
+    counter = 2;
+    co_return{};
+  };
+
+  auto outer_future = coro();
+  if constexpr (TestFixture::kIsFuture) {
+    EXPECT_EQ(2, counter);
+  } else {
+    EXPECT_EQ(0, counter);
+  }
+  std::ignore = std::move(outer_future).Get();
+  EXPECT_EQ(2, counter);
 }
 
 TYPED_TEST(AsyncSuite, CheckCallback) {
@@ -182,6 +237,17 @@ TEST(CoroFuture, WhenAny) {
   tp.Wait();
 }
 
+TEST(CoroFuture, CheckCoAwaitCoro) {
+  auto coro = []() -> yaclib::Future<int> {
+    auto coro1 = []() -> yaclib::Future<int> {
+      co_return 42;
+    };
+
+    co_return co_await coro1();
+  };
+  EXPECT_EQ(coro().Get().Ok(), 42);
+}
+
 TEST(CoroTask, Check) {
   auto coro = []() -> yaclib::Task<int> {
     auto task = yaclib::MakeTask(10);
@@ -189,6 +255,25 @@ TEST(CoroTask, Check) {
     co_return std::as_const(task).Touch();
   };
   EXPECT_EQ(coro().Get().Ok(), 10);
+}
+
+TEST(CoroTask, CheckCoAwait) {
+  auto coro = []() -> yaclib::Task<int> {
+    auto task = yaclib::MakeTask(10);
+    co_return co_await std::move(task);
+  };
+  EXPECT_EQ(coro().Get().Ok(), 10);
+}
+
+TEST(CoroTask, CheckCoAwaitCoro) {
+  auto coro = []() -> yaclib::Task<int> {
+    auto coro1 = []() -> yaclib::Task<int> {
+      co_return 42;
+    };
+
+    co_return co_await coro1();
+  };
+  EXPECT_EQ(coro().Get().Ok(), 42);
 }
 
 TEST(Future, WhenAllCoro) {
