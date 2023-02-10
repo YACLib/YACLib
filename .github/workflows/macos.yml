@@ -37,7 +37,7 @@ jobs:
         run: |
           # Install oldest compiler that possible
           if [[ "${{ matrix.os }}" == "12" ]]; then
-            brew install ninja llvm@9 gcc@7
+            brew install ninja llvm@10 gcc@7
           else
             brew install ninja
           fi
@@ -47,7 +47,7 @@ jobs:
           if [[ "${{ matrix.os }}" == "12" ]]; then
             export SYSTEM_VERSION_COMPAT=1
             compiler_names=(clang) # TODO gnu
-            llvm=/usr/local/opt/llvm@9
+            llvm=/usr/local/opt/llvm@10
             cxx_compilers=("$llvm/bin/clang++" g++-7)
             stdlib_names=(libcxx libstdcxx default)
             link_options=(
