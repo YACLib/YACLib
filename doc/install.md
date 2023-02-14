@@ -67,5 +67,5 @@ In POSIX-compliant shell:
 git clone git@github.com:YACLib/YACLib.git
 cd YACLib
 cmake -S . -B ./build -GNinja -DYACLIB_TEST=ON
-cmake --build ./build - --parallel
+cmake --build ./build --parallel
 ```
