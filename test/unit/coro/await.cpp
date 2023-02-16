@@ -7,6 +7,7 @@
 #include <yaclib/async/when_all.hpp>
 #include <yaclib/async/when_any.hpp>
 #include <yaclib/coro/await.hpp>
+#include <yaclib/coro/await_on.hpp>
 #include <yaclib/coro/future.hpp>
 #include <yaclib/coro/on.hpp>
 #include <yaclib/coro/task.hpp>
@@ -202,6 +203,100 @@ TYPED_TEST(AsyncSuite, CheckCallback) {
   EXPECT_EQ(counter, 2);
 }
 
+TYPED_TEST(AsyncSuite, AwaitOnSingle) {
+  yaclib::FairThreadPool tp{1};
+  yaclib::FairThreadPool tp1{1};
+  auto main_thread = yaclib_std::this_thread::get_id();
+  auto coro = [&]() -> std::conditional_t<TestFixture::kIsFuture, yaclib::Future<int>, yaclib::Task<int>> {
+    auto f1 = yaclib::Run(tp, [] {
+      yaclib_std::this_thread::sleep_for(50ms * YACLIB_CI_SLOWDOWN);
+      return 1;
+    });
+    co_await AwaitOn(tp1, f1);
+    auto other_thread = yaclib_std::this_thread::get_id();
+    EXPECT_NE(main_thread, other_thread);
+    co_return std::move(f1).Touch().Ok();
+  };
+  auto future = coro();
+  EXPECT_EQ(std::move(future).Get().Ok(), 1);
+  tp.HardStop();
+  tp.Wait();
+  tp1.HardStop();
+  tp1.Wait();
+}
+
+TYPED_TEST(AsyncSuite, AwaitOnMulti) {
+  yaclib::FairThreadPool tp{2};
+  yaclib::FairThreadPool tp1{1};
+  auto main_thread = yaclib_std::this_thread::get_id();
+  auto coro = [&]() -> std::conditional_t<TestFixture::kIsFuture, yaclib::Future<int>, yaclib::Task<int>> {
+    auto f1 = yaclib::Run(tp, [] {
+      yaclib_std::this_thread::sleep_for(50ms * YACLIB_CI_SLOWDOWN);
+      return 1;
+    });
+    auto f2 = yaclib::Run(tp, [] {
+      return 2;
+    });
+    co_await AwaitOn(tp1, f1, f2);
+    auto other_thread = yaclib_std::this_thread::get_id();
+    EXPECT_NE(main_thread, other_thread);
+    co_return std::move(f1).Touch().Ok() + std::move(f2).Touch().Ok();
+  };
+  auto future = coro();
+  EXPECT_EQ(std::move(future).Get().Ok(), 3);
+  tp.HardStop();
+  tp.Wait();
+  tp1.HardStop();
+  tp1.Wait();
+}
+
+TYPED_TEST(AsyncSuite, AwaitOnSingleReady) {
+  yaclib::FairThreadPool tp{1};
+  yaclib::FairThreadPool tp1{1};
+  auto main_thread = yaclib_std::this_thread::get_id();
+  auto coro = [&]() -> std::conditional_t<TestFixture::kIsFuture, yaclib::Future<int>, yaclib::Task<int>> {
+    auto f1 = yaclib::Run(tp, [] {
+      return 1;
+    });
+    Wait(f1);
+    co_await AwaitOn(tp1, f1);
+    auto other_thread = yaclib_std::this_thread::get_id();
+    EXPECT_NE(main_thread, other_thread);
+    co_return std::move(f1).Touch().Ok();
+  };
+  auto future = coro();
+  EXPECT_EQ(std::move(future).Get().Ok(), 1);
+  tp.HardStop();
+  tp.Wait();
+  tp1.HardStop();
+  tp1.Wait();
+}
+
+TYPED_TEST(AsyncSuite, AwaitOnMultiReady) {
+  yaclib::FairThreadPool tp{2};
+  yaclib::FairThreadPool tp1{1};
+  auto main_thread = yaclib_std::this_thread::get_id();
+  auto coro = [&]() -> std::conditional_t<TestFixture::kIsFuture, yaclib::Future<int>, yaclib::Task<int>> {
+    auto f1 = yaclib::Run(tp, [] {
+      return 1;
+    });
+    auto f2 = yaclib::Run(tp, [] {
+      return 2;
+    });
+    Wait(f1, f2);
+    co_await AwaitOn(tp1, f1, f2);
+    auto other_thread = yaclib_std::this_thread::get_id();
+    EXPECT_NE(main_thread, other_thread);
+    co_return std::move(f1).Touch().Ok() + std::move(f2).Touch().Ok();
+  };
+  auto future = coro();
+  EXPECT_EQ(std::move(future).Get().Ok(), 3);
+  tp.HardStop();
+  tp.Wait();
+  tp1.HardStop();
+  tp1.Wait();
+}
+
 TEST(CoroFuture, WhenAll) {
   yaclib::FairThreadPool tp{1};
 
@@ -246,6 +341,99 @@ TEST(CoroFuture, CheckCoAwaitCoro) {
     co_return co_await coro1();
   };
   EXPECT_EQ(coro().Get().Ok(), 42);
+}
+
+TEST(CoroFuture, CheckAwaitOnCoro) {
+  yaclib::FairThreadPool tp{1};
+  yaclib::FairThreadPool tp1{1};
+  auto main_thread = yaclib_std::this_thread::get_id();
+  auto coro = [&]() -> yaclib::Future<int> {
+    auto coro1 = [&]() -> yaclib::Future<int> {
+      co_await On(tp);
+      yaclib_std::this_thread::sleep_for(50ms * YACLIB_CI_SLOWDOWN);
+      co_return 42;
+    };
+    auto f = coro1();
+    co_await AwaitOn(tp1, f);
+    auto other_thread = yaclib_std::this_thread::get_id();
+    EXPECT_NE(main_thread, other_thread);
+    co_return std::move(f).Get().Ok();
+  };
+  EXPECT_EQ(coro().Get().Ok(), 42);
+  tp.HardStop();
+  tp.Wait();
+  tp1.HardStop();
+  tp1.Wait();
+}
+
+TEST(CoroFuture, CheckAwaitOnCoroReady) {
+  yaclib::FairThreadPool tp{1};
+  auto main_thread = yaclib_std::this_thread::get_id();
+  auto coro = [&]() -> yaclib::Future<int> {
+    auto coro1 = []() -> yaclib::Future<int> {
+      co_return 42;
+    };
+    auto f = coro1();
+    Wait(f);
+    co_await AwaitOn(tp, f);
+    auto other_thread = yaclib_std::this_thread::get_id();
+    EXPECT_NE(main_thread, other_thread);
+    co_return std::move(f).Get().Ok();
+  };
+  EXPECT_EQ(coro().Get().Ok(), 42);
+  tp.HardStop();
+  tp.Wait();
+}
+
+TEST(CoroFuture, CheckAwaitOnCoroMulti) {
+  yaclib::FairThreadPool tp{2};
+  yaclib::FairThreadPool tp1{1};
+  auto main_thread = yaclib_std::this_thread::get_id();
+  auto coro = [&]() -> yaclib::Future<int> {
+    auto coro1 = [&]() -> yaclib::Future<int> {
+      co_await On(tp);
+      yaclib_std::this_thread::sleep_for(50ms * YACLIB_CI_SLOWDOWN);
+      co_return 41;
+    };
+    auto coro2 = [&]() -> yaclib::Future<int> {
+      co_await On(tp);
+      co_return 1;
+    };
+    auto f1 = coro1();
+    auto f2 = coro2();
+    co_await AwaitOn(tp1, f1, f2);
+    auto other_thread = yaclib_std::this_thread::get_id();
+    EXPECT_NE(main_thread, other_thread);
+    co_return std::move(f1).Get().Ok() + std::move(f2).Get().Ok();
+  };
+  EXPECT_EQ(coro().Get().Ok(), 42);
+  tp.HardStop();
+  tp.Wait();
+  tp1.HardStop();
+  tp1.Wait();
+}
+
+TEST(CoroFuture, CheckAwaitOnCoroMultiReady) {
+  yaclib::FairThreadPool tp{1};
+  auto main_thread = yaclib_std::this_thread::get_id();
+  auto coro = [&]() -> yaclib::Future<int> {
+    auto coro1 = []() -> yaclib::Future<int> {
+      co_return 41;
+    };
+    auto coro2 = []() -> yaclib::Future<int> {
+      co_return 1;
+    };
+    auto f1 = coro1();
+    auto f2 = coro2();
+    Wait(f1, f2);
+    co_await AwaitOn(tp, f1, f2);
+    auto other_thread = yaclib_std::this_thread::get_id();
+    EXPECT_NE(main_thread, other_thread);
+    co_return std::move(f1).Get().Ok() + std::move(f2).Get().Ok();
+  };
+  EXPECT_EQ(coro().Get().Ok(), 42);
+  tp.HardStop();
+  tp.Wait();
 }
 
 TEST(CoroTask, Check) {
