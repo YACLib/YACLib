@@ -46,10 +46,9 @@ jobs:
       - name: Configure CMake
         run: |
           if [[ "${{ matrix.os }}" == "12" ]]; then
-            export SYSTEM_VERSION_COMPAT=1
-            compiler_names=(clang) # TODO gnu
+            compiler_names=(clang gnu apple_clang)
             llvm=/usr/local/opt/llvm@14
-            cxx_compilers=("$llvm/bin/clang++" g++-12)
+            cxx_compilers=("$llvm/bin/clang++" g++-12 clang++)
             stdlib_names=(libcxx libstdcxx default)
             link_options=(
               "-L$llvm/lib;-Wl,-rpath,$llvm/lib"
