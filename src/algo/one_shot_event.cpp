@@ -48,7 +48,10 @@ void OneShotEvent::Set() noexcept {
 }
 
 void OneShotEvent::Reset() noexcept {
-  YACLIB_ASSERT(_head.load(std::memory_order_relaxed) == kAllDone);
+#ifdef YACLIB_LOG_DEBUG
+  auto head = _head.load(std::memory_order_relaxed);
+  YACLIB_ASSERT(head == kEmpty || head == kAllDone);
+#endif
   _head.store(kEmpty, std::memory_order_relaxed);
 }
 
