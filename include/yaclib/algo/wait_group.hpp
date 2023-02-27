@@ -17,7 +17,7 @@ namespace yaclib {
 template <typename Event = OneShotEvent>
 class WaitGroup final {
  public:
-  explicit WaitGroup(std::size_t count = 0) : _event{count} {
+  explicit WaitGroup(std::size_t count = 0) noexcept : _event{count} {
   }
 
   /**
@@ -147,27 +147,33 @@ class WaitGroup final {
 
 #if YACLIB_CORO != 0
   /**
-   * TODO
-   */
-  YACLIB_INLINE auto operator co_await() noexcept {
-    return Await();
-  }
-
-  /**
-   * TODO
+   * See OneShotEvent::Await
    */
   YACLIB_INLINE auto Await() noexcept {
     return _event.Await();
   }
 
   /**
-   * TODO
-   *
-   * \param e TODO
-   * \return TODO
+   * See OneShotEvent::Await
+   */
+  YACLIB_INLINE auto AwaitSticky() noexcept {
+    return _event.AwaitSticky();
+  }
+
+  /**
+   * See OneShotEvent::AwaitOn
    */
   YACLIB_INLINE auto AwaitOn(IExecutor& e) noexcept {
     return _event.AwaitOn(e);
+  }
+
+  /**
+   * just shortcut for co_await wait_group.Await();
+   *
+   * TODO(MBkkt) move all shortcut to AwaitSticky
+   */
+  YACLIB_INLINE auto operator co_await() noexcept {
+    return Await();
   }
 #endif
 
