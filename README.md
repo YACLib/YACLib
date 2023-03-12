@@ -180,18 +180,18 @@ tp.Wait();
 #### Strand, Serial executor
 
 ```cpp
-yaclib::FairThreadPool tp{/*threads=*/4};
-// decorated thread pool by serializing tasks:
+yaclib::FairThreadPool cpu_tp{4};  // thread pool for cpu tasks
+yaclib::FairThreadPool io_tp{1};   // thread pool for io tasks
 auto strand = yaclib::MakeStrand(&tp);
 
-std::size_t counter = 0;
 for (std::size_t i = 0; i < 100; ++i) {
-  Submit(tp, [&] {
-    Submit(*strand, [&] {
-      // serialized by Strand, no data race!
-      ++counter; 
-    });
-  });
+  yaclib::Run(cpu_tp, [] {
+    // ... parallel computations ...
+  }).Then(strand, [](auto result) {
+    // ... critical section ...
+  }).Then(io_tp, [] {
+    // ... io tasks ...
+  }).Detach();
 }
 ```
 
@@ -204,21 +204,21 @@ And also the implementation of strand is lock-free and efficient, without additi
 #### Mutex
 
 ```cpp
-yaclib::FairThreadPool tp{4};
+yaclib::FairThreadPool cpu_tp{4};  // thread pool for cpu tasks
+yaclib::FairThreadPool io_tp{1};   // thread pool for io tasks
 yaclib::Mutex<> m;
 
-std::size_t counter = 0;
-
-auto compute = [&] (std::size_t index) -> yaclib::Future<> {
+auto compute = [&] () -> yaclib::Future<> {
   co_await On(tp);
-  // ... some computation with index ...
-  auto guard = co_await m.Guard();
-  // ... co_await On(other thread pool) ...
-  counter += index;
+  // ... parallel computations ...
+  auto guard = co_await m.Lock();
+  // ... critical section ...
+  co_await guard.UnlockOn(io_tp);
+  // ... io tasks ...
 };
 
 for (std::size_t i = 0; i < 100; ++i) {
-  compute(i);
+  compute().Detach();
 }
 ```
 
