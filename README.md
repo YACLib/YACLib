@@ -211,10 +211,9 @@ yaclib::Mutex<> m;
 auto compute = [&] () -> yaclib::Future<> {
   co_await On(tp);
   // ... parallel computations ...
-  auto guard = co_await m.Guard();
+  auto guard = co_await m.Lock();
   // ... critical section ...
-  co_await guard.Unlock();
-  co_await On(io_tp); // Can be optimized via guard.UnlockOn 
+  co_await guard.UnlockOn(io_tp);
   // ... io tasks ...
 };
 
