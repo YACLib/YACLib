@@ -69,6 +69,7 @@ if (YACLIB_CORO_NEED)
     unit/coro/await_group_stress
     unit/coro/async_mutex
     unit/coro/async_mutex_stress
+    unit/coro/channel
     unit/coro/future_coro_traits
     unit/coro/stress
     unit/coro/on
