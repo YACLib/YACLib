@@ -29,6 +29,7 @@ yaclib::ChannelPtr MakeChannel(size_t n) {
 // 6. SPMC -- optimize
 
 // Feature
+// 0. Think about interface Close/Cancel?, TryPop/Push, maybe better naming: Send/Receive or Consume/Produce
 // 1. Select(ch1, ch2) -- just simple locking mutex
 // 2. Select(ch1...) -- templates implementation, few channels, different T
 // 3. Select fair -- needs random
