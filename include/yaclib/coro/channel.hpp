@@ -19,36 +19,45 @@ namespace yaclib {
  * */
 template <typename T>
 class BoundedChannel {
-
   class PushAwaiter : public detail::Node {
-  public: 
+   public:
     PushAwaiter() = default;
-    template<typename... Args>
-    explicit PushAwaiter(BoundedChannel& channel, Args&&... args) : _channel{&channel}, _value{std::forward<Args>(args)...} {}
 
-    bool await_ready() {
-      return _channel != nullptr;
+    template <typename... Args>
+    explicit PushAwaiter(std::unique_lock<std::mutex>& lock, BoundedChannel& channel, Args&&... args)
+      : _channel{&channel}, _value{std::forward<Args>(args)...} {
+      lock.release();
     }
 
-    template<typename Promise>
+    bool await_ready() noexcept {
+      return _channel == nullptr;
+    }
+
+    template <typename Promise>
     void await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
       _core = &handle.promise();
       _channel->_senders.PushFront(*this);
       _channel->_mutex.unlock();
     }
 
-    void await_resume() {
+    constexpr void await_resume() noexcept {
     }
 
-    void GetValue(T& value) {
+    void Resume(T& value) {
       value = std::move(_value);
       _core->_executor->Submit(*_core);
     }
-  private:
 
-    T _value;
-    detail::BaseCore* _core{nullptr};
+    void Resume(std::unique_lock<std::mutex>& lock) {
+      _channel->_queue.push(std::move(_value));
+      lock.unlock();
+      _core->_executor->Submit(*_core);
+    }
+
+   private:
     BoundedChannel* _channel{nullptr};
+    detail::BaseCore* _core{nullptr};
+    T _value;
   };
 
   class PopAwaiter : public detail::Node {
@@ -58,19 +67,22 @@ class BoundedChannel {
 
     bool await_ready() {
       std::unique_lock lock{_channel._mutex};
-      if (!_channel._senders.Empty()) {
-        auto& s = _channel._senders.PopFront();
-        lock.unlock();
-        auto& pa = static_cast<PushAwaiter&>(s);
-        pa.GetValue(_value);
-        return false;
-      }
       if (_channel._queue.empty()) {
-        lock.release();
-        return false;
+        if (_channel._senders.Empty()) {
+          lock.release();
+          return false;
+        }
+        auto& sender = _channel._senders.PopFront();
+        lock.unlock();
+        static_cast<PushAwaiter&>(sender).Resume(_value);
+      } else {
+        _value = std::move(_channel._queue.front());
+        _channel._queue.pop();
+        if (!_channel._senders.Empty()) {
+          auto& sender = _channel._senders.PopFront();
+          static_cast<PushAwaiter&>(sender).Resume(lock);
+        }
       }
-      _value = std::move(_channel._queue.front());
-      _channel._queue.pop();
       return true;
     }
 
@@ -92,28 +104,28 @@ class BoundedChannel {
     }
 
    private:
-    detail::BaseCore* _core{};
     BoundedChannel& _channel;
+    detail::BaseCore* _core{};
     T _value;
   };
 
  public:
-  BoundedChannel(size_t size) : _size{size} {}
+  BoundedChannel(size_t size) : _size{size} {
+  }
 
   template <typename... Args>
   PushAwaiter Push(Args&&... args) {
     std::unique_lock lock{_mutex};
     if (_receivers.Empty()) {
       if (_queue.size() == _size) {
-        lock.release(); // TODO handle exception in T constructor
-        return PushAwaiter{*this, std::forward<Args>(args)...};
+        return PushAwaiter{lock, *this, std::forward<Args>(args)...};
       }
       _queue.emplace(std::forward<Args>(args)...);
     } else {
       YACLIB_ASSERT(_queue.empty());
-      auto& consumer = _receivers.PopFront();
+      auto& receiver = _receivers.PopFront();
       lock.unlock();
-      static_cast<PopAwaiter&>(consumer).Produce(std::forward<Args>(args)...);
+      static_cast<PopAwaiter&>(receiver).Produce(std::forward<Args>(args)...);
     }
     return {};
   }
