@@ -15,6 +15,26 @@
 namespace yaclib {
 
 /*
+yaclib::ChannelPtr MakeChannel(size_t n) {
+  new ... Channel + buffer T
+}
+*/
+
+// 0. copy and write tests
+// 1. get rid of queue
+// 2. get rid of default ctor requirement and move assignment
+// 3. try Vyukov implementation and bench: folly channel vs naive impl vs Vyukov vs go vs kotlin
+// 4. T -- void/Unit
+// 5. MPSC/SPSC -- optimize
+// 6. SPMC -- optimize
+
+// Feature
+// 1. Select(ch1, ch2) -- just simple locking mutex
+// 2. Select(ch1...) -- templates implementation, few channels, different T
+// 3. Select fair -- needs random
+// 4. Channel -- PromiseType, Channel return type of coroutine
+
+/*
  * Bounded MPMC channel
  * */
 template <typename T>

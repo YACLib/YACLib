@@ -44,6 +44,27 @@ TEST(Channel, Simple) {
   tp.Wait();
 }
 
+/*
+yaclib::Channel<int> produceShit() {
+  for (int i = 0; i != 10; ++i) {
+    // co_await some_compute;
+    co_yield 10;
+  }
+  co_return {};
+}
+
+ static yaclib::Channel<int> ch;
+
+ yaclib::Future<> produceShit(yaclib::Channel<int>& ch){
+   for (int i = 0; i != 10; ++i) {
+     // co_await some_compute;
+     co_await ch.Push(10);
+   }
+   co_return {};
+ }
+ produceShit().Detach();
+*/
+
 TEST(Channel, SimpleBounded) {
   yaclib::FairThreadPool tp{2};
   yaclib::BoundedChannel<int> ch{25};
