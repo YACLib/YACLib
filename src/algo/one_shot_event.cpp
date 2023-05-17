@@ -3,7 +3,7 @@
 namespace yaclib {
 namespace {
 
-void SetImpl(yaclib_std::atomic_uintptr_t& self, uint64_t value) {
+void SetImpl(yaclib_std::atomic_uintptr_t& self, std::uintptr_t value) {
   auto head = self.exchange(value, std::memory_order_acq_rel);
   auto* job = reinterpret_cast<Job*>(head);
   while (job != nullptr) {
@@ -16,8 +16,8 @@ void SetImpl(yaclib_std::atomic_uintptr_t& self, uint64_t value) {
 }  // namespace
 
 bool OneShotEvent::TryAdd(Job& job) noexcept {
-  std::uint64_t head = _head.load(std::memory_order_acquire);
-  std::uint64_t node = reinterpret_cast<std::uint64_t>(&job);
+  auto head = _head.load(std::memory_order_acquire);
+  auto node = reinterpret_cast<std::uintptr_t>(&job);
   while (head != OneShotEvent::kAllDone) {
     job.next = reinterpret_cast<Job*>(head);
     if (_head.compare_exchange_weak(head, node, std::memory_order_release, std::memory_order_acquire)) {
