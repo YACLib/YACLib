@@ -3,6 +3,7 @@
 #include <yaclib/algo/wait_group.hpp>
 #include <yaclib/async/run.hpp>
 #include <yaclib/coro/await.hpp>
+#include <yaclib/coro/current_executor.hpp>
 #include <yaclib/coro/future.hpp>
 #include <yaclib/coro/on.hpp>
 #include <yaclib/exe/manual.hpp>
@@ -40,6 +41,60 @@ TEST(AwaitGroup, JustWorks) {
   };
   auto f = coro();
   EXPECT_EQ(std::move(f).Get().Ok(), 3);
+  tp.HardStop();
+  tp.Wait();
+}
+
+TEST(AwaitGroup, JustWorks2) {
+  yaclib::FairThreadPool tp1{1};
+  yaclib::FairThreadPool tp2{1};
+
+  yaclib::WaitGroup<> wg{1};
+  auto coro1 = [&]() -> yaclib::Future<> {
+    co_await On(tp1);
+    auto* current1 = &co_await yaclib::CurrentExecutor();
+    EXPECT_EQ(current1, &tp1);
+    co_await wg.AwaitSticky();
+    auto* current2 = &co_await yaclib::CurrentExecutor();
+    EXPECT_EQ(current1, &tp1);
+    co_return{};
+  };
+  auto coro2 = [&]() -> yaclib::Future<> {
+    co_await On(tp2);
+    yaclib_std::this_thread::sleep_for(10ms);
+    wg.Done();
+    co_return{};
+  };
+
+  coro1().Detach();
+  coro2().Detach();
+
+  tp1.HardStop();
+  tp1.Wait();
+  tp2.HardStop();
+  tp2.Wait();
+}
+
+TEST(AwaitEvent, JustCall) {
+  // Safe only with fair thread pool
+  yaclib::FairThreadPool tp{1};
+  yaclib::OneShotEvent event;
+
+  auto coro1 = [&]() -> yaclib::Future<> {
+    co_await On(tp);
+    co_await event;
+    co_return{};
+  };
+  auto coro2 = [&]() -> yaclib::Future<> {
+    co_await On(tp);
+    event.Call();
+    co_return{};
+  };
+
+  auto f1 = coro1();
+  auto f2 = coro2();
+  yaclib::Wait(f1, f2);
+
   tp.HardStop();
   tp.Wait();
 }

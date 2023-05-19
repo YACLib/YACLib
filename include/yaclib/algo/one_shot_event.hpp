@@ -14,32 +14,41 @@
 namespace yaclib {
 
 class OneShotEventAwait;
+class OneShotEventAwaitSticky;
 class OneShotEventAwaitOn;
 
 /**
- * TODO
+ * This class useful to wait or co_await some event.
+ *
+ * In general it's MPSC pattern:
+ * Multi threads can call TryAdd/Wait/Await*
+ * Single thread can call Call or Set
  */
 class OneShotEvent {
  public:
-  OneShotEvent() noexcept;
-
   /**
-   * TODO
+   * Add job to the MPSC event queue.
+   * When Call or Set will be called also will be called job->Call
+   *
+   * But only if TryAdd return true.
+   * It can return false if on Event already was called Set
    */
-  bool TryAdd(Job* job) noexcept;
+  bool TryAdd(Job& job) noexcept;
 
   /**
-   * TODO
+   * was or not Set
    */
   bool Ready() noexcept;
 
   /**
-   * TODO
+   * Wait Call or Set
+   * immediately return if Event is Ready
    */
   void Wait() noexcept;
 
   /**
-   * TODO
+   * WaitFor Call or Set
+   * immediately return if Event is Ready
    */
   template <typename Rep, typename Period>
   YACLIB_INLINE bool WaitFor(const std::chrono::duration<Rep, Period>& timeout_duration) {
@@ -47,7 +56,8 @@ class OneShotEvent {
   }
 
   /**
-   * TODO
+   * WaitUntil Call or Set
+   * immediately return if Event is Ready
    */
   template <typename Clock, typename Duration>
   YACLIB_INLINE bool WaitUntil(const std::chrono::time_point<Clock, Duration>& timeout_time) {
@@ -55,43 +65,176 @@ class OneShotEvent {
   }
 
 #if YACLIB_CORO != 0
+ private:
+  struct BaseAwaiter {
+    explicit BaseAwaiter(OneShotEvent& event) noexcept : _event{event} {
+    }
+
+    constexpr void await_resume() const noexcept {
+    }
+
+   protected:
+    OneShotEvent& _event;
+  };
+
+  struct ExtendedAwaiter : Job, BaseAwaiter {
+    using BaseAwaiter::BaseAwaiter;
+
+   protected:
+    void Call() noexcept final {
+      _core->_executor->Submit(*_core);
+    }
+
+    union {
+      IExecutor* _executor;
+      detail::BaseCore* _core;
+    };
+  };
+
+  class [[nodiscard]] Awaiter final : public BaseAwaiter {
+   public:
+    using BaseAwaiter::BaseAwaiter;
+
+    YACLIB_INLINE bool await_ready() const noexcept {
+      return _event.Ready();
+    }
+
+    template <typename Promise>
+    YACLIB_INLINE bool await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
+      return _event.TryAdd(handle.promise());
+    }
+  };
+
+  class [[nodiscard]] StickyAwaiter final : public ExtendedAwaiter {
+   public:
+    using ExtendedAwaiter::ExtendedAwaiter;
+
+    YACLIB_INLINE bool await_ready() const noexcept {
+      return _event.Ready();
+    }
+
+    template <typename Promise>
+    YACLIB_INLINE bool await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
+      _core = &handle.promise();
+      return _event.TryAdd(*this);
+    }
+  };
+
+  class [[nodiscard]] OnAwaiter final : public ExtendedAwaiter {
+   public:
+    explicit OnAwaiter(OneShotEvent& event, IExecutor& executor) noexcept : ExtendedAwaiter{event} {
+      _executor = &executor;
+    }
+
+    constexpr bool await_ready() const noexcept {
+      return false;
+    }
+
+    template <typename Promise>
+    YACLIB_INLINE void await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
+      auto& core = handle.promise();
+      core._executor = _executor;
+      _core = &core;
+      if (!_event.TryAdd(*this)) {
+        Call();
+      }
+    }
+  };
+
+ public:
   /**
-   * TODO
+   * co_await Call or Set
+   * resume will be called inline
+   *
+   * immediately return if Event is Ready
    */
-  OneShotEventAwait operator co_await() noexcept;
+  YACLIB_INLINE Awaiter Await() noexcept {
+    return Awaiter{*this};
+  }
 
   /**
-   * TODO
+   * co_await Call or Set
+   * resume will be called on this coroutine executor
+   *
+   * immediately return if Event is Ready
    */
-  OneShotEventAwait Await() noexcept;
+  YACLIB_INLINE StickyAwaiter AwaitSticky() noexcept {
+    return StickyAwaiter{*this};
+  }
 
   /**
-   * TODO
+   * optimization for code like:
+   * co_await event.Await();
+   * co_await On(executor);
    */
-  OneShotEventAwaitOn AwaitOn(IExecutor& executor) noexcept;
+  YACLIB_INLINE OnAwaiter AwaitOn(IExecutor& executor) noexcept {
+    return OnAwaiter{*this, executor};
+  }
+
+  /**
+   * just shortcut for co_await event.Await();
+   *
+   * TODO(MBkkt) move all shortcut to AwaitSticky
+   */
+  YACLIB_INLINE Awaiter operator co_await() noexcept {
+    return Await();
+  }
 #endif
 
   /**
-   * TODO
+   * Get all jobs and Call them.
+   */
+  void Call() noexcept;
+
+  /**
+   * Prevent pushing new jobs and Call()
    */
   void Set() noexcept;
 
   /**
-   * TODO
+   * Reinitializes OneShotEvent, semantically the same as `*this = {};`
+   *
+   * If you don't explicitly call this method,
+   * then after the first one, Wait will always return immediately.
+   *
+   * \note Not thread-safe!
    */
   void Reset() noexcept;
+
+  /**
+   * Waiter is public for advanced users.
+   * Sometimes we don't want to recreate Waiter on every Wait call (it's created on stack).
+   *
+   * So we make Waiter public for such users, and they can write code like:
+   *
+   * Waiter _waiter;
+   * OneShotEvent _event;
+   * // code like OneShotEvent::Wait() but with our own _waiter
+   * _event.Set();
+   * // code like OneShotEvent::Wait() but with our own _waiter
+   */
+  struct Waiter : Job, detail::DefaultEvent {
+    void Call() noexcept final {
+      Set();
+    }
+  };
+
+  /**
+   * Public only because Waiter is public
+   */
+  struct TimedWaiter : Job, detail::MutexEvent {
+    void Call() noexcept final {
+      // TODO(MBkkt) Possible optimization: call Set() only if ref count != 1?
+      Set();
+      DecRef();
+    }
+  };
 
  private:
   template <typename Timeout>
   bool TimedWait(const Timeout& timeout) {
-    struct OneShotTimedEventWaiter : Job, detail::MutexEvent {
-      void Call() noexcept final {
-        Set();  // under condition? Only if ref count != 1
-        DecRef();
-      }
-    };
-    auto waiter = MakeShared<OneShotTimedEventWaiter>(2);
-    if (TryAdd(waiter.Get())) {
+    auto waiter = MakeShared<TimedWaiter>(2);
+    if (TryAdd(*waiter)) {
       auto token = waiter->Make();
       return waiter->Wait(token, timeout);
     } else {
@@ -100,76 +243,10 @@ class OneShotEvent {
     }
   }
 
-  static constexpr std::uint64_t kEmpty = 0;
-  static constexpr std::uint64_t kAllDone = 1;
+  static constexpr auto kEmpty = std::uintptr_t{0};
+  static constexpr auto kAllDone = std::numeric_limits<std::uintptr_t>::max();
 
-  yaclib_std::atomic_uint64_t _head;
+  yaclib_std::atomic_uintptr_t _head = kEmpty;
 };
-
-#if YACLIB_CORO != 0
-
-class [[nodiscard]] OneShotEventAwait : public Job {
- public:
-  explicit OneShotEventAwait(OneShotEvent& event) noexcept : _event{event} {
-  }
-
-  YACLIB_INLINE bool await_ready() const noexcept {
-    return _event.Ready();
-  }
-
-  template <typename Promise>
-  YACLIB_INLINE bool await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
-    _core = &handle.promise();
-    return _event.TryAdd(this);
-  }
-
-  constexpr void await_resume() const noexcept {
-  }
-
- protected:
-  void Call() noexcept final {
-    _core->_executor->Submit(*_core);
-  }
-
-  detail::BaseCore* _core = nullptr;
-  OneShotEvent& _event;
-};
-
-class [[nodiscard]] OneShotEventAwaitOn final : public OneShotEventAwait {
- public:
-  explicit OneShotEventAwaitOn(OneShotEvent& event, IExecutor& executor) noexcept
-    : OneShotEventAwait{event}, _executor{executor} {
-  }
-
-  YACLIB_INLINE bool await_ready() const noexcept {
-    return false;
-  }
-
-  template <typename Promise>
-  YACLIB_INLINE void await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
-    _core = &handle.promise();
-    _core->_executor = &_executor;
-    if (!_event.TryAdd(this)) {
-      Call();
-    }
-  }
-
- private:
-  IExecutor& _executor;
-};
-
-YACLIB_INLINE OneShotEventAwait OneShotEvent::operator co_await() noexcept {
-  return Await();
-}
-
-YACLIB_INLINE OneShotEventAwait OneShotEvent::Await() noexcept {
-  return OneShotEventAwait{*this};
-}
-
-YACLIB_INLINE OneShotEventAwaitOn OneShotEvent::AwaitOn(IExecutor& executor) noexcept {
-  return OneShotEventAwaitOn{*this, executor};
-}
-
-#endif
 
 }  // namespace yaclib
