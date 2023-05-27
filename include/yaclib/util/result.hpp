@@ -134,10 +134,19 @@ class Result final {
   void Error() & = delete;
   void Error() const&& = delete;
 
-  [[nodiscard]] V&& Ok() && {
+  [[nodiscard]] std::enable_if_t<!std::is_same_v<V, Unit>, V&&> Ok() && {
     return Get(std::move(*this));
   }
-  [[nodiscard]] const V& Ok() const& {
+
+  [[nodiscard]] std::enable_if_t<!std::is_same_v<V, Unit>, const V&> Ok() const& {
+    return Get(*this);
+  }
+
+  std::enable_if_t<std::is_same_v<V, Unit>, V&&> Ok() && {
+    return Get(std::move(*this));
+  }
+
+  std::enable_if_t<std::is_same_v<V, Unit>, const V&> Ok() const& {
     return Get(*this);
   }
 
