@@ -134,19 +134,23 @@ class Result final {
   void Error() & = delete;
   void Error() const&& = delete;
 
-  [[nodiscard]] std::enable_if_t<!std::is_same_v<V, Unit>, V&&> Ok() && {
+  template <typename T = V>
+  [[nodiscard]] std::enable_if_t<!std::is_same_v<T, Unit>, T&&> Ok() && {
     return Get(std::move(*this));
   }
 
-  [[nodiscard]] std::enable_if_t<!std::is_same_v<V, Unit>, const V&> Ok() const& {
+  template <typename T = V>
+  [[nodiscard]] std::enable_if_t<!std::is_same_v<T, Unit>, const T&> Ok() const& {
     return Get(*this);
   }
 
-  std::enable_if_t<std::is_same_v<V, Unit>, V&&> Ok() && {
+  template <typename T = V>
+  std::enable_if_t<std::is_same_v<T, Unit>, T&&> Ok() && {
     return Get(std::move(*this));
   }
 
-  std::enable_if_t<std::is_same_v<V, Unit>, const V&> Ok() const& {
+  template <typename T = V>
+  std::enable_if_t<std::is_same_v<T, Unit>, const T&> Ok() const& {
     return Get(*this);
   }
 
