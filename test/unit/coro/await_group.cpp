@@ -1,3 +1,4 @@
+#include <util/helpers.hpp>
 #include <util/time.hpp>
 
 #include <yaclib/algo/wait_group.hpp>
@@ -60,9 +61,11 @@ TEST(AwaitGroup, JustWorks2) {
     co_return{};
   };
   auto coro2 = [&]() -> yaclib::Future<> {
+    Finally done = [&]() noexcept {
+      wg.Done();
+    };
     co_await On(tp2);
     yaclib_std::this_thread::sleep_for(10ms);
-    wg.Done();
     co_return{};
   };
 
