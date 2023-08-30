@@ -1,3 +1,4 @@
+#include <util/helpers.hpp>
 #include <util/time.hpp>
 
 #include <yaclib/algo/wait_group.hpp>
@@ -92,9 +93,11 @@ class Goer {
 
  private:
   yaclib::Future<> NextStep() {
+    Finally done = [&]() noexcept {
+      wg_.Done();
+    };
     co_await On(scheduler_);
     Step();
-    wg_.Done();
     co_return{};
   }
 

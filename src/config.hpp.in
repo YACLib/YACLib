@@ -148,7 +148,10 @@
 #endif
 // clang-format on
 
-#if YACLIB_HAS_ATTRIBUTE(no_unique_address)
+#if defined(_MSC_FULL_VER) && _MSC_FULL_VER >= 192829913
+#  define YACLIB_NO_UNIQUE_ADDRESS [[msvc::no_unique_address]]
+#elif YACLIB_HAS_ATTRIBUTE(no_unique_address)
+// works starts from gcc 9 and clang 9
 #  define YACLIB_NO_UNIQUE_ADDRESS [[no_unique_address]]
 #else
 #  define YACLIB_NO_UNIQUE_ADDRESS
