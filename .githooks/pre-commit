@@ -49,8 +49,11 @@ def fix_format():
         return
     for file in output.split('\n'):
         path = f'./{file}'
-        fix_last_line(path)
-        fix_clang_format(path)
+        try:
+            fix_last_line(path)
+            fix_clang_format(path)
+        except Exception:
+            pass
     subprocess.Popen(['git', 'add'] + output.split('\n')).communicate()
 
 
