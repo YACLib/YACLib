@@ -123,9 +123,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install ninja-build googletest                                                                  \
                                gcc-12 g++-12 libstdc++-12-dev                                                          \
-                               clang-14 lld-14 libc++-14-dev libc++abi-14-dev libclang-common-14-dev
+                               clang-15 lld-15 libc++-15-dev libc++abi-15-dev libclang-common-15-dev
           # We use lld because it faster than ld and gold and don't have strange issues like mold
-          sudo ln -sf /usr/bin/lld-14 /usr/local/bin/ld
+          sudo ln -sf /usr/bin/lld-15 /usr/local/bin/ld
 
           sudo update-alternatives                                                                                     \
             --install /usr/bin/gcc        gcc        /usr/bin/gcc-12        200                                        \
@@ -146,7 +146,7 @@ jobs:
         if: ${{ matrix.os == 'macos-12' }}
         run: |
           brew update
-          brew install ninja llvm@14 gcc@12
+          brew install ninja llvm@15 gcc@12
 
       - name: Configure CMake Posix
         if: ${{ matrix.os != 'windows-2022' }}
@@ -157,7 +157,7 @@ jobs:
           stdlib_names=(libcxx libstdcxx default)
           linker=""
           if [[ ${{ matrix.os }} == "macos-12" ]]; then
-            llvm=/usr/local/opt/llvm@14
+            llvm=/usr/local/opt/llvm@15
             # TODO(myannyax?) FIBER
             YACLIB_FAULT=(OFF THREAD)
             cxx_compilers=("$llvm/bin/clang++" g++-12 clang++)
@@ -173,7 +173,7 @@ jobs:
             )
             slowdown=8
           else
-            cxx_compilers=(clang++-14 g++)
+            cxx_compilers=(clang++-15 g++)
             link_options=(
               "-stdlib=libc++;-lc++abi"
               "-stdlib=libstdc++"
@@ -183,7 +183,7 @@ jobs:
               "-stdlib=libstdc++"
             )
             slowdown=1
-            linker="-fuse-ld=lld-14"
+            linker="-fuse-ld=lld-15"
           fi
 
           if [[ "$flags" == "TSAN" ]]; then

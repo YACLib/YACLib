@@ -15,7 +15,6 @@ jobs:
   # TODO(MBkkt) Add clang-5.0, clang-6.0, clang-7
   #             Fucking cppreference liars, clang doesn't support simple variant usage, before clang-8!
   #             We can only support this when we remove the variant from the Result
-  # TODO(MBkkt) Add clang-15 when it release
   # TODO(MBkkt) Add other compilers, like Intel C++?
   # TODO(MBkkt) libstdc++-7-dev, libc++ old version
 
@@ -25,15 +24,21 @@ jobs:
       fail-fast: false
       matrix:
         os: [ 20.04, 22.04 ]
-        compiler: [ clang-8, clang-9, clang-10, clang-11, clang-12, clang-13, clang-14,
+        compiler: [ clang-8, clang-9, clang-10, clang-11, clang-12, clang-13, clang-14, clang-15,
                     gcc-7, gcc-8, gcc-9, gcc-10, gcc-11, gcc-12 ]
         isPR:
           - ${{ github.event_name == 'pull_request' }}
         exclude:
           - isPR: true
             os: 20.04
+            compiler: clang-15
+          - isPR: true
+            os: 20.04
             compiler: gcc-12
 
+          - isPR: false
+            os: 20.04
+            compiler: clang-15
           - isPR: false
             os: 20.04
             compiler: gcc-12
