@@ -25,23 +25,23 @@ jobs:
       matrix:
         os: [ 20.04, 22.04 ]
         compiler: [ clang-8, clang-9, clang-10, clang-11, clang-12, clang-13, clang-14, clang-15,
-                    gcc-7, gcc-8, gcc-9, gcc-10, gcc-11, gcc-12, gcc-13 ]
+                    gcc-7, gcc-8, gcc-9, gcc-10, gcc-11, gcc-12 ]
         isPR:
           - ${{ github.event_name == 'pull_request' }}
         exclude:
           - isPR: true
             os: 20.04
-            compiler: gcc-12
+            compiler: clang-15
           - isPR: true
             os: 20.04
-            compiler: gcc-13
+            compiler: gcc-12
 
           - isPR: false
             os: 20.04
-            compiler: gcc-12
+            compiler: clang-15
           - isPR: false
             os: 20.04
-            compiler: gcc-13
+            compiler: gcc-12
 
           - isPR: true
             os: 22.04
