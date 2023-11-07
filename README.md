@@ -28,9 +28,13 @@ https://coveralls.io/github/YACLib/YACLib?branch=main)
 [![Test coverage: codecov](
 https://codecov.io/gh/YACLib/YACLib/branch/main/graph/badge.svg)](
 https://codecov.io/gh/YACLib/YACLib)
+
+<!-- 
+Codacy doesn't work for some reason
 [![Codacy Badge](
 https://app.codacy.com/project/badge/Grade/4113686840a645a8950abdf1197611bd)](
 https://www.codacy.com/gh/YACLib/YACLib/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=YACLib/YACLib&amp;utm_campaign=Badge_Grade)
+-->
 
 [![Discord](
 https://discordapp.com/api/guilds/898966884471423026/widget.png)](

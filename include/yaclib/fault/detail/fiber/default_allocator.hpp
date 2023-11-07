@@ -3,6 +3,7 @@
 #include <yaclib/fault/detail/fiber/stack_allocator.hpp>
 #include <yaclib/log.hpp>
 
+#include <cstdint>
 #include <vector>
 
 namespace yaclib::detail::fiber {
