@@ -20,9 +20,9 @@ bool BaseCore::SetCallback(InlineCore& callback) noexcept {
   YACLIB_ASSERT(reinterpret_cast<std::uintptr_t>(&callback) != kEmpty);
   YACLIB_ASSERT(reinterpret_cast<std::uintptr_t>(&callback) != kResult);
   std::uintptr_t expected = kEmpty;
-  return _callback.load(std::memory_order_acquire) == expected &&
-         _callback.compare_exchange_strong(expected, reinterpret_cast<std::uintptr_t>(&callback),
-                                           std::memory_order_release, std::memory_order_acquire);
+  return  //_callback.load(std::memory_order_acquire) == expected &&
+    _callback.compare_exchange_strong(expected, reinterpret_cast<std::uintptr_t>(&callback), std::memory_order_release,
+                                      std::memory_order_acquire);
 }
 
 bool BaseCore::Reset() noexcept {

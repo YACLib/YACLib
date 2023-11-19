@@ -22,8 +22,8 @@ void List::PushFront(Node& node) noexcept {
 }
 
 void List::PushBack(Node& node) noexcept {
+  YACLIB_DEBUG(node.next != nullptr, "Try to push not single node");
   // for circular should be node.next = _tail->next;
-  YACLIB_DEBUG(_tail->next != nullptr, "Try to push not single node");
   node.next = nullptr;
   _tail->next = &node;
   _tail = &node;
@@ -38,7 +38,7 @@ Node& List::PopFront() noexcept {
   YACLIB_ASSERT(!Empty());
   auto* node = _head.next;
   _head.next = node->next;
-  if (node->next == nullptr) {  // valid only for linear
+  if (Empty()) {
     _tail = &_head;
   }
   return *node;

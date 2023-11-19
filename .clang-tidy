@@ -24,7 +24,15 @@ Checks: '*,
          -google-explicit-constructor,
          -hicpp-explicit-conversions,
          -llvm-header-guard,
-         -cppcoreguidelines-owning-memory'
+         -cppcoreguidelines-owning-memory
+         -cppcoreguidelines-avoid-do-while
+         -modernize-use-nodiscard
+         -cppcoreguidelines-special-member-functions
+         -hicpp-special-member-functions
+         -cppcoreguidelines-pro-type-reinterpret-cast
+         -cppcoreguidelines-non-private-member-variables-in-classes
+         -misc-non-private-member-variables-in-classes
+         -performance-no-int-to-ptr'
 
 WarningsAsErrors: '*'
 
