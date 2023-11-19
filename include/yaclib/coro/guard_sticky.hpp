@@ -1,60 +1,32 @@
 #pragma once
 
-#include <yaclib/coro/guard_unique.hpp>
-#include <yaclib/coro/mutex.hpp>
+#include <yaclib/config.hpp>
+#include <yaclib/coro/coro.hpp>
+#include <yaclib/coro/guard.hpp>
+#include <yaclib/exe/executor.hpp>
 
 namespace yaclib {
 namespace detail {
 
-template <bool FIFO, std::uint8_t BatchHere>
-class [[nodiscard]] UnlockStickyAwaiter {
+template <typename Mutex>
+class [[nodiscard]] LockStickyAwaiter {
  public:
-  UnlockStickyAwaiter(MutexImpl& m, IExecutor* e) noexcept : _mutex{m}, _executor{e} {
+  explicit LockStickyAwaiter(Mutex& m, IExecutor*& e) noexcept : _mutex{m}, _executor{e} {
   }
 
   YACLIB_INLINE bool await_ready() noexcept {
-    if (_executor) {
-      return false;
-    }
-    _mutex.UnlockHereImpl<FIFO>();
-    return true;
-  }
-
-  template <typename Promise>
-  YACLIB_INLINE auto await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
-    YACLIB_ASSERT(_executor != nullptr);
-    return _mutex.UnlockOnImpl<FIFO, BatchHere>(handle.promise(), *_executor);
-  }
-
-  constexpr void await_resume() noexcept {
-  }
-
- private:
-  MutexImpl& _mutex;
-  IExecutor* _executor;
-};
-
-}  // namespace detail
-
-template <bool DefaultFIFO, std::uint8_t DefaultBatchHere>
-class [[nodiscard]] Mutex<DefaultFIFO, DefaultBatchHere>::LockStickyAwaiter {
- public:
-  explicit LockStickyAwaiter(GuardSticky& g) noexcept : _guard{g} {
-  }
-
-  YACLIB_INLINE bool await_ready() noexcept {
-    _guard.executor = nullptr;
-    return _guard._mutex->TryLock();
+    _executor = nullptr;
+    return _mutex.TryLockAwait();
   }
 
   template <typename Promise>
   YACLIB_INLINE bool await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
     auto& promise = handle.promise();
-    _guard.executor = promise._executor.Get();
-    if (static_cast<detail::MutexImpl*>(_guard._mutex)->Lock(promise)) {
-      return true;  // suspend
+    _executor = promise._executor.Get();
+    if (_mutex.AwaitLock(promise)) {
+      return true;
     }
-    _guard.executor = nullptr;
+    _executor = nullptr;
     return false;
   }
 
@@ -62,67 +34,112 @@ class [[nodiscard]] Mutex<DefaultFIFO, DefaultBatchHere>::LockStickyAwaiter {
   }
 
  protected:
-  GuardSticky& _guard;
+  Mutex& _mutex;
+  IExecutor*& _executor;
 };
 
-template <bool DefaultFIFO, std::uint8_t DefaultBatchHere>
-class [[nodiscard]] Mutex<DefaultFIFO, DefaultBatchHere>::GuardSticky : public GuardUnique {
+template <typename Mutex>
+class [[nodiscard]] UnlockStickyAwaiter {
  public:
-  using GuardUnique::GuardUnique;
-
-  GuardSticky(GuardSticky&& other) noexcept : GuardUnique{std::move(other)}, executor{other.executor} {
+  explicit UnlockStickyAwaiter(Mutex& m, IExecutor* e) noexcept : _mutex{m}, _executor{e} {
   }
 
-  GuardSticky& operator=(GuardSticky&& other) noexcept {
+  YACLIB_INLINE bool await_ready() noexcept {
+    if (_executor != nullptr) {
+      return false;
+    }
+    _mutex.UnlockHere();
+    return true;
+  }
+
+  template <typename Promise>
+  YACLIB_INLINE auto await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
+    YACLIB_ASSERT(_executor != nullptr);
+    return _mutex.AwaitUnlockOn(handle.promise(), *_executor);
+  }
+
+  constexpr void await_resume() noexcept {
+  }
+
+ private:
+  Mutex& _mutex;
+  IExecutor* _executor;
+};
+
+template <typename>
+class GuardStickyAwaiter;
+;
+}  // namespace detail
+
+template <typename Mutex>
+class [[nodiscard]] StickyGuard : public detail::Guard<Mutex, false> {
+  using Base = detail::Guard<Mutex, false>;
+
+ public:
+  using MutexType = Mutex;
+  using Base::Base;
+
+  StickyGuard(StickyGuard&& other) noexcept : Base{std::move(other)}, _executor{other._executor} {
+  }
+
+  StickyGuard& operator=(StickyGuard&& other) noexcept {
     Swap(other);
     return *this;
   }
 
   auto Lock() noexcept {
-    YACLIB_ERROR(this->_owns, "Cannot LockSticky already locked mutex");
-    this->_owns = true;
-    return LockStickyAwaiter{*this};
+    auto* m = static_cast<Mutex*>(Base::LockState());
+    auto& mutex_impl = Mutex::template Cast<typename Mutex::Base>(*m);
+    return detail::LockStickyAwaiter{mutex_impl, _executor};
   }
 
-  template <bool FIFO = DefaultFIFO, std::uint8_t BatchHere = DefaultBatchHere>
   auto Unlock() noexcept {
-    YACLIB_ERROR(!this->_owns, "Cannot UnlockSticky not locked mutex");
-    this->_owns = false;
-    return detail::UnlockStickyAwaiter<FIFO, BatchHere>{*this->_mutex, executor};
+    auto* m = static_cast<Mutex*>(Base::UnlockState());
+    auto& mutex_impl = Mutex::template Cast<typename Mutex::Base>(*m);
+    return detail::UnlockStickyAwaiter{mutex_impl, _executor};
   }
 
-  void Swap(GuardSticky& other) noexcept {
-    GuardUnique::Swap(other);
-    std::swap(executor, other._executor);
+  void Swap(StickyGuard& other) noexcept {
+    Base::Swap(other);
+    std::swap(_executor, other._executor);
   }
 
-  IExecutor* executor = nullptr;
+ private:
+  IExecutor* _executor = nullptr;
+
+  template <typename>
+  friend class detail::GuardStickyAwaiter;
 };
 
-template <bool DefaultFIFO, std::uint8_t DefaultBatchHere>
-class [[nodiscard]] Mutex<DefaultFIFO, DefaultBatchHere>::GuardStickyAwaiter {
+namespace detail {
+
+template <typename Mutex>
+class [[nodiscard]] GuardStickyAwaiter {
  public:
   explicit GuardStickyAwaiter(Mutex& m) : _guard{m, std::adopt_lock} {
   }
 
   YACLIB_INLINE bool await_ready() noexcept {
-    LockStickyAwaiter awaiter{_guard};
+    auto& mutex_impl = Mutex::template Cast<typename Mutex::Base>(*_guard.Mutex());
+    LockStickyAwaiter awaiter{mutex_impl, _guard._executor};
     return awaiter.await_ready();
   }
 
   template <typename Promise>
   YACLIB_INLINE bool await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
-    LockStickyAwaiter awaiter{_guard};
+    auto& mutex_impl = Mutex::template Cast<typename Mutex::Base>(*_guard.Mutex());
+    LockStickyAwaiter awaiter{mutex_impl, _guard._executor};
     return awaiter.await_suspend(handle);
   }
 
-  YACLIB_INLINE GuardSticky await_resume() noexcept {
-    YACLIB_ASSERT(_guard.OwnsLock());
+  YACLIB_INLINE auto await_resume() noexcept {
+    YACLIB_ASSERT(_guard);
     return std::move(_guard);
   }
 
  private:
-  GuardSticky _guard;
+  StickyGuard<Mutex> _guard;
 };
 
+}  // namespace detail
 }  // namespace yaclib

@@ -25,16 +25,16 @@ struct SharedMutexImpl {
            _state.compare_exchange_strong(s, s + kWriter, std::memory_order_acquire, std::memory_order_relaxed);
   }
 
-  [[nodiscard]] bool AwaitLockShared(BaseCore& new_state) noexcept {
+  [[nodiscard]] bool AwaitLockShared(BaseCore& curr) noexcept {
     _lock.lock();
     if (_state.load(std::memory_order_relaxed) / kWriter == 0) {
       return false;
     }
-    _readers.PushBack(new_state);
+    _readers.PushBack(curr);
     return true;
   }
 
-  [[nodiscard]] bool AwaitLock(BaseCore& new_state) noexcept {
+  [[nodiscard]] bool AwaitLock(BaseCore& curr) noexcept {
     std::lock_guard lock{_lock};
     auto s = _state.fetch_add(kWriter, std::memory_order_relaxed);
     if (s / kWriter == 0) {
@@ -42,7 +42,7 @@ struct SharedMutexImpl {
         return false;
       }
     }
-    _writers.PushBack(new_state);
+    _writers.PushBack(curr);
     if constexpr (FIFO) {
       _stats.size += 1;
       _stats.prio += static_cast<std::uint32_t>(_readers.Empty());
@@ -202,6 +202,12 @@ class SharedMutex final : protected detail::SharedMutexImpl<FIFO, ReadersFIFO> {
 
   auto GuardShared() noexcept {
     return detail::GuardAwaiter<SharedGuard, SharedMutex, true>{*this};
+  }
+
+  // Helper for Awaiter implementation
+  // TODO(MBkkt) get rid of it?
+  static SharedMutex& DownCast(Base& base) noexcept {
+    return static_cast<SharedMutex&>(*base);
   }
 };
 

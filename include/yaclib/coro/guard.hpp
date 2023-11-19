@@ -33,7 +33,7 @@ class Guard : protected detail::GuardState {
   }
 
   auto Lock() noexcept {
-    M* m = LockState();
+    auto* m = static_cast<M*>(LockState());
     if constexpr (Shared) {
       return m->LockShared();
     } else {
@@ -42,7 +42,7 @@ class Guard : protected detail::GuardState {
   }
 
   bool TryLock() noexcept {
-    M* m = LockState();
+    auto* m = static_cast<M*>(LockState());
     if constexpr (Shared) {
       if (m->TryLockShared()) {
         return true;
@@ -57,7 +57,7 @@ class Guard : protected detail::GuardState {
   }
 
   auto Unlock() noexcept {
-    M* m = UnlockState();
+    auto* m = static_cast<M*>(UnlockState());
     if constexpr (Shared) {
       return m->UnlockShared();
     } else {
@@ -66,7 +66,7 @@ class Guard : protected detail::GuardState {
   }
 
   auto UnlockOn(IExecutor& e) noexcept {
-    M* m = UnlockState();
+    auto* m = static_cast<M*>(UnlockState());
     if constexpr (Shared) {
       return m->UnlockOnShared(e);
     } else {
@@ -75,7 +75,7 @@ class Guard : protected detail::GuardState {
   }
 
   void UnlockHere() noexcept {
-    M* m = UnlockState();
+    auto* m = static_cast<M*>(UnlockState());
     if constexpr (Shared) {
       m->UnlockHereShared();
     } else {
@@ -88,11 +88,11 @@ class Guard : protected detail::GuardState {
   }
 
   M* Release() noexcept {
-    return ReleaseState();
+    return static_cast<M*>(ReleaseState());
   }
 
   M* Mutex() const noexcept {
-    return Ptr();
+    return static_cast<M*>(Ptr());
   }
 
   [[nodiscard]] bool OwnsLock() const noexcept {

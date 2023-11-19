@@ -43,7 +43,7 @@ class [[nodiscard]] GuardAwaiter : public LockAwaiter<typename Mutex::Base, Shar
   using LockAwaiter<typename Mutex::Base, Shared>::LockAwaiter;
 
   YACLIB_INLINE auto await_resume() noexcept {
-    return Guard{static_cast<Mutex&>(this->_mutex), std::adopt_lock};
+    return Guard<Mutex>{Mutex::template Cast<Mutex>(this->_mutex), std::adopt_lock};
   }
 };
 
