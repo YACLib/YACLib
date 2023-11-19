@@ -22,7 +22,6 @@ void List::PushFront(Node& node) noexcept {
 }
 
 void List::PushBack(Node& node) noexcept {
-  YACLIB_DEBUG(node.next != nullptr, "Try to push not single node");
   // for circular should be node.next = _tail->next;
   node.next = nullptr;
   _tail->next = &node;
