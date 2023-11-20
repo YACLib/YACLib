@@ -16,7 +16,7 @@ class Guard : protected detail::GuardState {
   }
   explicit Guard(M& m, std::defer_lock_t) noexcept : GuardState{&m, false} {
   }
-  explicit Guard(M& m, std::try_to_lock_t) noexcept : GuardState{&m, m.TryLock()} {
+  explicit Guard(M& m, std::try_to_lock_t) noexcept : GuardState{&m, TryLockImpl(m)} {
   }
   explicit Guard(M& m, std::adopt_lock_t) noexcept : GuardState{&m, true} {
   }
@@ -43,14 +43,8 @@ class Guard : protected detail::GuardState {
 
   bool TryLock() noexcept {
     auto* m = static_cast<M*>(LockState());
-    if constexpr (Shared) {
-      if (m->TryLockShared()) {
-        return true;
-      }
-    } else {
-      if (m->TryLock()) {
-        return true;
-      }
+    if (TryLockImpl(*m)) {
+      return true;
     }
     UnlockState();
     return false;
@@ -101,6 +95,15 @@ class Guard : protected detail::GuardState {
 
   [[nodiscard]] explicit operator bool() const noexcept {
     return OwnsLock();
+  }
+
+ private:
+  static bool TryLockImpl(M& m) {
+    if constexpr (Shared) {
+      return m.TryLockShared();
+    } else {
+      return m.TryLock();
+    }
   }
 };
 

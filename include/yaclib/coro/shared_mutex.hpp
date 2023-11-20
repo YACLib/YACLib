@@ -26,11 +26,12 @@ struct SharedMutexImpl {
   }
 
   [[nodiscard]] bool AwaitLockShared(BaseCore& curr) noexcept {
-    _lock.lock();
+    std::lock_guard lock{_lock};
     if (_state.load(std::memory_order_relaxed) / kWriter == 0) {
       return false;
     }
     _readers.PushBack(curr);
+    ++_readers_size;
     return true;
   }
 
@@ -38,7 +39,7 @@ struct SharedMutexImpl {
     std::lock_guard lock{_lock};
     auto s = _state.fetch_add(kWriter, std::memory_order_relaxed);
     if (s / kWriter == 0) {
-      if (s %= kWriter; s == 0 || _wait.fetch_add(s, std::memory_order_acquire) + s == 0) {
+      if (s %= kWriter; s == 0 || _readers_wait.fetch_add(s, std::memory_order_relaxed) + s == 0) {
         return false;
       }
     }
@@ -68,7 +69,7 @@ struct SharedMutexImpl {
   void UnlockHereShared() noexcept {
     if (auto s = _state.fetch_sub(kReader, std::memory_order_release); s >= kWriter) {
       // at least one writer waiting lock, so noone can acquire lock
-      if (_wait.fetch_sub(kReader, std::memory_order_release) == kReader) {
+      if (_readers_wait.fetch_sub(1, std::memory_order_release) == 1) {
         // last active reader will run writer
         _lock.lock();
         RunWriter();
@@ -100,9 +101,15 @@ struct SharedMutexImpl {
     core._executor->Submit(core);
   }
 
-  void RunReaders() noexcept {
-    List readers = std::move(_readers);
-    _stats.prio = _stats.size;
+  void RunReaders(std::uint64_t s) noexcept {
+    auto readers = std::move(_readers);
+    if constexpr (FIFO) {
+      _stats.prio = _stats.size;
+    }
+    if (s / kWriter != 1) {
+      _readers_wait.fetch_add(_readers_size, std::memory_order_relaxed);
+    }
+    _readers_size = 0;
     _lock.unlock();
 
     do {
@@ -113,14 +120,14 @@ struct SharedMutexImpl {
 
   void SlowUnlock() noexcept {
     _lock.lock();
-    _state.fetch_sub(kWriter, std::memory_order_relaxed);
+    auto s = _state.fetch_sub(kWriter, std::memory_order_relaxed);
     if constexpr (FIFO) {
       if (_stats.prio != 0) {
         return RunWriter();
       }
     }
     if (!_readers.Empty()) {
-      return RunReaders();
+      return RunReaders(s);
     }
     if constexpr (!FIFO) {
       if (!_writers.Empty()) {
@@ -132,13 +139,14 @@ struct SharedMutexImpl {
 
   yaclib_std::atomic_uint64_t _state = 0;
   std::conditional_t<ReadersFIFO, List, Stack> _readers;
-  yaclib_std::atomic_uint32_t _wait = 0;
   List _writers;  // TODO(MBkkt) optional batched LIFO, see Mutex
   struct Stats {
     std::uint32_t size = 0;
     std::uint32_t prio = 0;
   };
   YACLIB_NO_UNIQUE_ADDRESS std::conditional_t<FIFO, Stats, Unit> _stats;
+  yaclib_std::atomic_uint32_t _readers_wait = 0;
+  std::uint32_t _readers_size = 0;
   Spinlock<std::uint32_t> _lock;
 };
 
@@ -189,11 +197,11 @@ class SharedMutex final : protected detail::SharedMutexImpl<FIFO, ReadersFIFO> {
   }
 
   auto TryGuard() noexcept {
-    return UniqueGuard{*this, std::try_to_lock};
+    return UniqueGuard<SharedMutex>{*this, std::try_to_lock};
   }
 
   auto TryGuardShared() noexcept {
-    return SharedGuard{*this, std::try_to_lock};
+    return SharedGuard<SharedMutex>{*this, std::try_to_lock};
   }
 
   auto Guard() noexcept {
@@ -206,8 +214,9 @@ class SharedMutex final : protected detail::SharedMutexImpl<FIFO, ReadersFIFO> {
 
   // Helper for Awaiter implementation
   // TODO(MBkkt) get rid of it?
-  static SharedMutex& DownCast(Base& base) noexcept {
-    return static_cast<SharedMutex&>(*base);
+  template <typename To, typename From>
+  static auto& Cast(From& from) noexcept {
+    return static_cast<To&>(from);
   }
 };
 

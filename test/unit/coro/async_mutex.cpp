@@ -11,6 +11,7 @@
 #include <yaclib/coro/guard_sticky.hpp>
 #include <yaclib/coro/mutex.hpp>
 #include <yaclib/coro/on.hpp>
+#include <yaclib/coro/shared_mutex.hpp>
 #include <yaclib/coro/task.hpp>
 #include <yaclib/exe/manual.hpp>
 #include <yaclib/exe/submit.hpp>
@@ -394,6 +395,7 @@ TEST(Mutex, StickyGuard) {
   GTEST_SKIP();  // Doesn't work for Win32 or Debug, I think its probably because bad symmetric transfer implementation
   // TODO(kononovk) Try to confirm problem and localize it with ifdefs
 #endif
+  yaclib::SharedMutex<> sm;
   yaclib::Mutex<> m;
   std::uint64_t counter = 0;
   yaclib::FairThreadPool tp1{1};
