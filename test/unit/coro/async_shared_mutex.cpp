@@ -16,6 +16,7 @@
 #include <yaclib/coro/yield.hpp>
 #include <yaclib/exe/manual.hpp>
 #include <yaclib/exe/submit.hpp>
+#include <yaclib/fault/inject.hpp>
 #include <yaclib/runtime/fair_thread_pool.hpp>
 #include <yaclib/util/detail/intrusive_list.hpp>
 
@@ -72,18 +73,21 @@ yaclib::Task<> Writer(yaclib::SharedMutex<>& m, volatile int& x) {
 
 void TestParallelReaders(std::size_t num_readers, std::size_t threads) {
   yaclib::FairThreadPool tp{threads};
+  yaclib::WaitGroup<> wg{1};
   yaclib::SharedMutex<> m;
   yaclib_std::atomic_size_t counter = 0;
   volatile int x = 2;
   auto writer = Writer(m, x);
   for (std::size_t i = 0; i != num_readers; ++i) {
-    ParallelReader(m, counter, x).Detach(tp);
+    wg.Consume(ParallelReader(m, counter, x).ToFuture(tp));
   }
   while (counter.load(std::memory_order_relaxed) != 2 * num_readers) {
   }
   counter.store(1, std::memory_order_relaxed);
   std::ignore = std::move(writer).Get();
 
+  wg.Done();
+  wg.Wait();
   tp.Stop();
   tp.Wait();
 }
@@ -95,45 +99,54 @@ TEST(SharedMutex, TestParallelReaders) {
   TestParallelReaders(4, 2);
 }
 
-yaclib::Task<> Reader(yaclib::SharedMutex<>& rmw, std::size_t num_iterations, std::int32_t& activity) {
+yaclib::Task<> Reader(yaclib::SharedMutex<>& rmw, std::size_t num_iterations, std::int32_t& activity, size_t index) {
   for (std::size_t i = 0; i != num_iterations; ++i) {
     auto guard = co_await rmw.GuardShared();
+    yaclib::InjectFault();
     for (std::size_t j = 0; j != 100; j += 1) {
       EXPECT_EQ(activity, 0);
     }
+    yaclib::InjectFault();
+    guard.UnlockHere();
   }
   co_return{};
 }
 
-yaclib::Task<> Writer(yaclib::SharedMutex<>& rmw, std::size_t num_iterations, std::int32_t& activity) {
+yaclib::Task<> Writer(yaclib::SharedMutex<>& rmw, std::size_t num_iterations, std::int32_t& activity, size_t index) {
   for (std::size_t i = 0; i != num_iterations; ++i) {
     auto guard = co_await rmw.Guard();
     EXPECT_EQ(activity, 0);
     activity += 10000;
+    yaclib::InjectFault();
     for (std::size_t j = 0; j != 100; j += 1) {
       EXPECT_EQ(activity, 10000);
     }
+    yaclib::InjectFault();
     activity -= 10000;
     EXPECT_EQ(activity, 0);
+    guard.UnlockHere();
   }
   co_return{};
 }
 
 void HammerRWMutex(std::size_t threads, std::size_t num_readers, std::size_t num_iterations) {
   yaclib::FairThreadPool tp{threads};
+  yaclib::WaitGroup<> wg{1};
   std::int32_t activity = 0;
   yaclib::SharedMutex<> rmw;
   // Number of active readers + 10000 * number of active writers.
-  Writer(rmw, num_iterations, activity).Detach(tp);
+  wg.Consume(Writer(rmw, num_iterations, activity, 0).ToFuture(tp));
   std::size_t i = 0;
   for (; i != num_readers / 2; ++i) {
-    Reader(rmw, num_iterations, activity).Detach(tp);
+    wg.Consume(Reader(rmw, num_iterations, activity, i).ToFuture(tp));
   }
-  Writer(rmw, num_iterations, activity).Detach(tp);
+  wg.Consume(Writer(rmw, num_iterations, activity, 1).ToFuture(tp));
   for (; i != num_readers; ++i) {
-    Reader(rmw, num_iterations, activity).Detach(tp);
+    wg.Consume(Reader(rmw, num_iterations, activity, i).ToFuture(tp));
   }
 
+  wg.Done();
+  wg.Wait();
   tp.Stop();
   tp.Wait();
 }

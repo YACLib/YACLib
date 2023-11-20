@@ -2,10 +2,10 @@
 
 namespace yaclib::detail {
 
-static std::uint32_t sSeed{1239};
+static std::uint32_t sSeed = 1239;
 
 #if YACLIB_FAULT == 2
-static std::uint64_t sRandCount{0};
+static std::uint64_t sRandCount = 0;
 #endif
 
 static thread_local std::mt19937_64 eng{sSeed};

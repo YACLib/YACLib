@@ -13,20 +13,20 @@
 namespace yaclib {
 
 void SetFaultFrequency(std::uint32_t freq) noexcept {
-  yaclib::detail::Injector::SetFrequency(freq);
+  detail::Injector::SetFrequency(freq);
 }
 
 void SetFaultSleepTime(std::uint32_t ns) noexcept {
-  yaclib::detail::Injector::SetSleepTime(ns);
+  detail::Injector::SetSleepTime(ns);
 }
 
 std::uint32_t GetFaultSleepTime() noexcept {
-  return yaclib::detail::Injector::GetSleepTime();
+  return detail::Injector::GetSleepTime();
 }
 
 void SetAtomicFailFrequency([[maybe_unused]] std::uint32_t k) noexcept {
 #if YACLIB_FAULT != 0
-  yaclib::detail::SetAtomicWeakFailFrequency(k);
+  detail::SetAtomicWeakFailFrequency(k);
 #endif
 }
 
@@ -44,25 +44,25 @@ void SetFaultTickLength([[maybe_unused]] std::uint32_t ns) noexcept {
 
 void SetFaultRandomListPick([[maybe_unused]] std::uint32_t k) noexcept {
 #if YACLIB_FAULT == 2
-  fault::Scheduler::SetRandomListPick(k);
+  detail::fiber::SetRandomListPick(k);
 #endif
 }
 
 void SetStackSize([[maybe_unused]] std::uint32_t pages) noexcept {
 #if YACLIB_FAULT == 2
-  yaclib::detail::fiber::FiberBase::GetAllocator().SetMinStackSize(pages);
+  detail::fiber::FiberBase::GetAllocator().SetMinStackSize(pages);
 #endif
 }
 
 void SetStackCacheSize([[maybe_unused]] std::uint32_t c) noexcept {
 #if YACLIB_FAULT == 2
-  yaclib::detail::fiber::DefaultAllocator::SetCacheSize(c);
+  detail::fiber::DefaultAllocator::SetCacheSize(c);
 #endif
 }
 
 void SetHardwareConcurrency([[maybe_unused]] std::uint32_t c) noexcept {
 #if YACLIB_FAULT == 2
-  yaclib::detail::fiber::Thread::SetHardwareConcurrency(c);
+  detail::fiber::Thread::SetHardwareConcurrency(c);
 #endif
 }
 
@@ -76,7 +76,7 @@ void ForwardToFaultRandomCount(std::uint64_t random_count) noexcept {
 
 std::uint32_t GetInjectorState() noexcept {
 #if YACLIB_FAULT != 0
-  return yaclib::GetInjector()->GetState();
+  return GetInjector()->GetState();
 #else
   return 0;
 #endif
@@ -84,7 +84,7 @@ std::uint32_t GetInjectorState() noexcept {
 
 void SetInjectorState([[maybe_unused]] std::uint32_t state) noexcept {
 #if YACLIB_FAULT != 0
-  yaclib::GetInjector()->SetState(state);
+  GetInjector()->SetState(state);
 #endif
 }
 

@@ -19,7 +19,7 @@ class Thread {
   using native_handle_type = void*;
 
   template <typename... Args>
-  explicit Thread(Args&&... args) : _impl(new Fiber<Args...>(std::forward<Args>(args)...)) {
+  explicit Thread(Args&&... args) : _impl{new Fiber<Args...>(std::forward<Args>(args)...)} {
     fault::Scheduler::GetScheduler()->Schedule(_impl);
   }
 
@@ -39,13 +39,12 @@ class Thread {
 
   static unsigned int hardware_concurrency() noexcept;
 
-  static void SetHardwareConcurrency(unsigned int h_c) noexcept;
+  static void SetHardwareConcurrency(unsigned int hardware_concurrency) noexcept;
 
  private:
   void AfterJoinOrDetach();
 
   FiberBase* _impl{nullptr};
-  bool _joined_or_detached{false};
 };
 
 }  // namespace yaclib::detail::fiber

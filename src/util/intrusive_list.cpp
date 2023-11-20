@@ -37,7 +37,7 @@ Node& List::PopFront() noexcept {
   YACLIB_ASSERT(!Empty());
   auto* node = _head.next;
   _head.next = node->next;
-  if (Empty()) {
+  if (_head.next == nullptr) {
     _tail = &_head;
   }
   return *node;

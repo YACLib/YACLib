@@ -28,7 +28,7 @@ class Stack final {
   }
 
   [[nodiscard]] bool Empty() const noexcept {
-    return _head != nullptr;
+    return _head == nullptr;
   }
 
   [[nodiscard]] Node& PopFront() noexcept {

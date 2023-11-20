@@ -14,34 +14,32 @@ namespace yaclib::detail::fiber {
 
 class FiberQueue;
 
+void SetRandomListPick(std::uint32_t k) noexcept;
+
+Node* PollRandomElementFromList(BiList& list);
+
 }  // namespace yaclib::detail::fiber
 namespace yaclib::fault {
 
 class Scheduler final {
  public:
-  Scheduler() noexcept = default;
+  static void SetTickLength(std::uint32_t tick) noexcept;
+
+  [[nodiscard]] bool IsRunning() const noexcept;
+
+  [[nodiscard]] std::uint64_t GetTimeNs() const noexcept;
 
   void Schedule(detail::fiber::FiberBase* fiber);
 
-  [[nodiscard]] bool IsRunning() const noexcept;
+  static void RescheduleCurrent();
 
   void Sleep(std::uint64_t ns);
 
   void SleepPreemptive(std::uint64_t ns);
 
-  [[nodiscard]] std::uint64_t GetTimeNs() const noexcept;
-
   static detail::fiber::FiberBase* Current() noexcept;
 
   static detail::fiber::FiberBase::Id GetId();
-
-  static void RescheduleCurrent();
-
-  static void SetTickLength(std::uint32_t tick) noexcept;
-
-  static void SetRandomListPick(std::uint32_t k) noexcept;
-
-  void Stop();
 
   static Scheduler* GetScheduler() noexcept;
 
@@ -60,6 +58,8 @@ class Scheduler final {
 
   void WakeUpNeeded() noexcept;
 
+  std::uint32_t _random_list_pick = 10;
+
   // TODO(myannyax) priority queue?
   std::map<std::uint64_t, detail::fiber::BiList> _sleep_list;
   // TODO(myannyax) priority queue?
@@ -69,9 +69,3 @@ class Scheduler final {
 };
 
 }  // namespace yaclib::fault
-
-namespace yaclib::detail::fiber {
-
-Node* PollRandomElementFromList(BiList& list);
-
-}  // namespace yaclib::detail::fiber

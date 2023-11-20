@@ -1,12 +1,13 @@
 #include <yaclib/fault/detail/fiber/fiber_base.hpp>
 
+#include <cstdio>
 #include <utility>
 
 namespace yaclib::detail::fiber {
 
-static FiberBase::Id sNextId{0L};
+static FiberBase::Id sNextId = 1;
 
-DefaultAllocator FiberBase::sAllocator{};
+static DefaultAllocator sAllocator;
 
 FiberBase::FiberBase() : _stack{sAllocator}, _id{++sNextId} {
 }
@@ -40,7 +41,7 @@ void FiberBase::Start() {
 
 void FiberBase::Exit() {
   _state = Completed;
-  if (_joining_fiber != nullptr && _threadlike_instance_alive) {
+  if (_joining_fiber != nullptr && _thread_alive) {
     ScheduleFiber(_joining_fiber);
   }
   _context.Exit(_caller_context);
@@ -54,24 +55,23 @@ void FiberBase::SetJoiningFiber(FiberBase* joining_fiber) noexcept {
   _joining_fiber = joining_fiber;
 }
 
-void FiberBase::SetThreadlikeInstanceDead() noexcept {
-  _threadlike_instance_alive = false;
+void FiberBase::SetThreadDead() noexcept {
+  _thread_alive = false;
 }
 
-bool FiberBase::IsThreadlikeInstanceAlive() const noexcept {
-  return _threadlike_instance_alive;
+bool FiberBase::IsThreadAlive() const noexcept {
+  return _thread_alive;
 }
 
-void* FiberBase::GetTls(std::uint64_t id, std::unordered_map<std::uint64_t, void*>& defaults) {
+void* FiberBase::GetTLS(std::uint64_t id, std::unordered_map<std::uint64_t, void*>& defaults) {
   auto it = _tls.find(id);
-  if (it == _tls.end()) {
+  if (it != _tls.end()) {
     return defaults[id];
-  } else {
-    return it->second;
   }
+  return it->second;
 }
 
-void FiberBase::SetTls(std::uint64_t id, void* value) {
+void FiberBase::SetTLS(std::uint64_t id, void* value) {
   _tls[id] = value;
 }
 

@@ -6,15 +6,15 @@
 
 namespace yaclib::detail {
 
-std::uint32_t Injector::sYieldFrequency = 16;
-std::uint32_t Injector::sSleepTime = 100;
-std::uint64_t Injector::sInjectedCount = 0;
+static std::uint32_t sYieldFrequency = 16;
+static std::uint32_t sSleepTime = 100;
+static std::uint64_t sInjectedCount = 0;
 
 void Injector::MaybeInject() noexcept {
   if (NeedInject()) {
 #if YACLIB_FAULT == 2
+    ++sInjectedCount;
     yaclib_std::this_thread::yield();
-    sInjectedCount += 1;
 #elif defined(_MSC_VER)
     yaclib_std::this_thread::yield();
 #else
@@ -27,7 +27,7 @@ bool Injector::NeedInject() noexcept {
   if (_pause) {
     return false;
   }
-  if (++_count >= sYieldFrequency) {
+  if (_count.fetch_add(1, std::memory_order_relaxed) >= sYieldFrequency) {
     Reset();
     return true;
   }
@@ -55,11 +55,11 @@ std::uint64_t Injector::GetInjectedCount() noexcept {
 }
 
 std::uint32_t Injector::GetState() const noexcept {
-  return _count;
+  return _count.load(std::memory_order_relaxed);
 }
 
 void Injector::SetState(std::uint32_t state) noexcept {
-  _count = state;
+  _count.store(state, std::memory_order_relaxed);
 }
 
 void Injector::Disable() noexcept {

@@ -20,7 +20,7 @@ class BiNodeWaitQueue : public Node {};
 enum FiberState {
   Running,
   Suspended,
-  Waiting,
+  Waiting,  // TODO(MBkkt) remove, looks useless
   Completed,
 };
 
@@ -42,13 +42,13 @@ class FiberBase : public BiNodeScheduler, public BiNodeWaitQueue {
 
   void SetState(FiberState state) noexcept;
 
-  void SetThreadlikeInstanceDead() noexcept;
+  void SetThreadDead() noexcept;
 
-  [[nodiscard]] bool IsThreadlikeInstanceAlive() const noexcept;
+  [[nodiscard]] bool IsThreadAlive() const noexcept;
 
-  void* GetTls(std::uint64_t id, std::unordered_map<std::uint64_t, void*>& defaults);
+  void* GetTLS(std::uint64_t id, std::unordered_map<std::uint64_t, void*>& defaults);
 
-  void SetTls(std::uint64_t id, void* value);
+  void SetTLS(std::uint64_t id, void* value);
 
   static IStackAllocator& GetAllocator() noexcept;
 
@@ -63,13 +63,12 @@ class FiberBase : public BiNodeScheduler, public BiNodeWaitQueue {
   std::exception_ptr _exception;
 
  private:
-  static DefaultAllocator sAllocator;
   ExecutionContext _caller_context{};
   std::unordered_map<std::uint64_t, void*> _tls;
-  FiberBase* _joining_fiber{nullptr};
+  FiberBase* _joining_fiber = nullptr;
   Id _id;
-  FiberState _state{Suspended};
-  bool _threadlike_instance_alive{true};
+  FiberState _state = Suspended;
+  bool _thread_alive = true;
 };
 
 }  // namespace yaclib::detail::fiber
