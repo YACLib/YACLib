@@ -2,6 +2,7 @@
 #include <yaclib/log.hpp>
 
 #include <cstdio>
+#include <system_error>
 #include <utility>
 
 namespace yaclib::detail::fiber {
