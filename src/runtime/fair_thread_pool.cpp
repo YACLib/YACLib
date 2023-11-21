@@ -78,7 +78,7 @@ void FairThreadPool::Loop() noexcept {
       lock.lock();
       _jobs_count -= 4;  // Pop job
     }
-    if (WantStop()) {
+    if (NoJobs() && WantStop()) {
       return Stop(std::move(lock));
     }
     if (WasStop()) {

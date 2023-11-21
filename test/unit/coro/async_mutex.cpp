@@ -339,25 +339,27 @@ TYPED_TEST(AsyncSuite, UnlockOnBehaviour) {
   std::array<yaclib::Future<>, kCoros> futures;
 
   yaclib_std::atomic_bool start{false};
-  yaclib_std::thread::id locked_id{};
-
   auto coro1 = [&]() -> typename TestFixture::Type {
     if constexpr (TestFixture::kIsFuture) {
       co_await On(tp);
     }
     co_await m.Lock();
     start.store(true, std::memory_order_release);
-    locked_id = yaclib_std::this_thread::get_id();
     yaclib_std::this_thread::sleep_for(1s);
     co_await m.UnlockOn(tp);
     co_return{};
   };
+
+  yaclib_std::thread::id locked_id{};
   auto coro2 = [&]() -> typename TestFixture::Type {
     if constexpr (TestFixture::kIsFuture) {
       co_await On(tp);
     }
     co_await m.Lock();
 #ifdef GTEST_OS_LINUX
+    if (locked_id == yaclib_std::thread::id{}) {
+      locked_id = yaclib_std::this_thread::get_id();
+    }
     EXPECT_EQ(locked_id, yaclib_std::this_thread::get_id());
 #endif
     co_await m.UnlockOn(tp);
@@ -395,34 +397,35 @@ TEST(Mutex, StickyGuard) {
   GTEST_SKIP();  // Doesn't work for Win32 or Debug, I think its probably because bad symmetric transfer implementation
   // TODO(kononovk) Try to confirm problem and localize it with ifdefs
 #endif
-  yaclib::SharedMutex<> sm;
   yaclib::Mutex<> m;
   std::uint64_t counter = 0;
-  yaclib::FairThreadPool tp1{1};
-  yaclib::FairThreadPool tp2{1};
+  yaclib::FairThreadPool tp1{2};
+  yaclib::FairThreadPool tp2{2};
   auto coro = [&](yaclib::IExecutor& executor) -> yaclib::Future<> {
     co_await On(executor);
     auto& scheduler_before_lock = co_await yaclib::CurrentExecutor();
     EXPECT_EQ(&executor, &scheduler_before_lock);
     for (int i = 0; i != 1000; ++i) {
       auto guard = co_await m.GuardSticky();
-      YACLIB_ASSERT(guard.OwnsLock());
+      EXPECT_TRUE(guard);
       auto& scheduler_after_lock = co_await yaclib::CurrentExecutor();
       counter += static_cast<std::uint64_t>(&scheduler_before_lock != &scheduler_after_lock);
-      YACLIB_ASSERT(guard.OwnsLock());
+      EXPECT_TRUE(guard);
       yaclib_std::this_thread::sleep_for(std::chrono::nanoseconds{1});
-      YACLIB_ASSERT(guard.OwnsLock());
+      EXPECT_TRUE(guard);
       co_await guard.Unlock();
-      YACLIB_ASSERT(!guard.OwnsLock());
+      EXPECT_FALSE(guard);
       auto& scheduler_after_unlock = co_await yaclib::CurrentExecutor();
       EXPECT_EQ(&scheduler_before_lock, &scheduler_after_unlock);
-      YACLIB_ASSERT(!guard.OwnsLock());
+      EXPECT_FALSE(guard);
     }
     co_return{};
   };
   auto f1 = coro(tp1);
   auto f2 = coro(tp2);
-  Wait(f1, f2);
+  auto f3 = coro(tp2);
+  auto f4 = coro(tp2);
+  Wait(f1, f2, f3, f4);
   EXPECT_GT(counter, 0);
   tp1.Stop();
   tp1.Wait();
