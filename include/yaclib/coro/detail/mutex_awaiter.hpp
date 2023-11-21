@@ -7,10 +7,10 @@
 
 namespace yaclib::detail {
 
-template <typename Mutex, bool Shared = false>
+template <typename M, bool Shared = false>
 class [[nodiscard]] LockAwaiter {
  public:
-  explicit LockAwaiter(Mutex& m) noexcept : _mutex{m} {
+  explicit LockAwaiter(M& m) noexcept : _mutex{m} {
   }
 
   YACLIB_INLINE bool await_ready() noexcept {
@@ -34,16 +34,16 @@ class [[nodiscard]] LockAwaiter {
   }
 
  protected:
-  Mutex& _mutex;
+  M& _mutex;
 };
 
-template <template <typename> typename Guard, typename Mutex, bool Shared = false>
-class [[nodiscard]] GuardAwaiter : public LockAwaiter<typename Mutex::Base, Shared> {
+template <template <typename> typename Guard, typename M, bool Shared = false>
+class [[nodiscard]] GuardAwaiter : public LockAwaiter<typename M::Base, Shared> {
  public:
-  using LockAwaiter<typename Mutex::Base, Shared>::LockAwaiter;
+  using LockAwaiter<typename M::Base, Shared>::LockAwaiter;
 
   YACLIB_INLINE auto await_resume() noexcept {
-    return Guard<Mutex>{Mutex::template Cast<Mutex>(this->_mutex), std::adopt_lock};
+    return Guard<M>{M::template Cast<M>(this->_mutex), std::adopt_lock};
   }
 };
 

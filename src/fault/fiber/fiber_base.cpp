@@ -65,7 +65,7 @@ bool FiberBase::IsThreadAlive() const noexcept {
 
 void* FiberBase::GetTLS(std::uint64_t id, std::unordered_map<std::uint64_t, void*>& defaults) {
   auto it = _tls.find(id);
-  if (it != _tls.end()) {
+  if (it == _tls.end()) {
     return defaults[id];
   }
   return it->second;

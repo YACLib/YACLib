@@ -109,18 +109,18 @@ class Guard : protected detail::GuardState {
 
 }  // namespace detail
 
-template <typename Mutex>
-class [[nodiscard]] UniqueGuard : public detail::Guard<Mutex, false> {
+template <typename M>
+class [[nodiscard]] UniqueGuard : public detail::Guard<M, false> {
  public:
-  using MutexType = Mutex;
-  using detail::Guard<Mutex, false>::Guard;
+  using MutexType = M;
+  using detail::Guard<M, false>::Guard;
 };
 
-template <typename Mutex>
-class [[nodiscard]] SharedGuard : public detail::Guard<Mutex, true> {
+template <typename M>
+class [[nodiscard]] SharedGuard : public detail::Guard<M, true> {
  public:
-  using MutexType = Mutex;
-  using detail::Guard<Mutex, true>::Guard;
+  using MutexType = M;
+  using detail::Guard<M, true>::Guard;
 };
 
 }  // namespace yaclib

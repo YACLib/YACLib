@@ -13,11 +13,13 @@ static auto& GetMap() {
 
 void* GetImpl(std::uint64_t i) {
   auto* fiber = fault::Scheduler::Current();
+  YACLIB_ASSERT(fiber);
   return fiber->GetTLS(i, GetMap());
 }
 
 void Set(void* new_value, std::uint64_t i) {
   auto* fiber = fault::Scheduler::Current();
+  YACLIB_ASSERT(fiber);
   fiber->SetTLS(i, new_value);
 }
 

@@ -8,10 +8,10 @@
 namespace yaclib {
 namespace detail {
 
-template <typename Mutex>
+template <typename M>
 class [[nodiscard]] LockStickyAwaiter {
  public:
-  explicit LockStickyAwaiter(Mutex& m, IExecutor*& e) noexcept : _mutex{m}, _executor{e} {
+  explicit LockStickyAwaiter(M& m, IExecutor*& e) noexcept : _mutex{m}, _executor{e} {
   }
 
   YACLIB_INLINE bool await_ready() noexcept {
@@ -34,14 +34,14 @@ class [[nodiscard]] LockStickyAwaiter {
   }
 
  protected:
-  Mutex& _mutex;
+  M& _mutex;
   IExecutor*& _executor;
 };
 
-template <typename Mutex>
+template <typename M>
 class [[nodiscard]] UnlockStickyAwaiter {
  public:
-  explicit UnlockStickyAwaiter(Mutex& m, IExecutor* e) noexcept : _mutex{m}, _executor{e} {
+  explicit UnlockStickyAwaiter(M& m, IExecutor* e) noexcept : _mutex{m}, _executor{e} {
   }
 
   YACLIB_INLINE bool await_ready() noexcept {
@@ -62,7 +62,7 @@ class [[nodiscard]] UnlockStickyAwaiter {
   }
 
  private:
-  Mutex& _mutex;
+  M& _mutex;
   IExecutor* _executor;
 };
 
@@ -71,12 +71,12 @@ class GuardStickyAwaiter;
 ;
 }  // namespace detail
 
-template <typename Mutex>
-class [[nodiscard]] StickyGuard : public detail::Guard<Mutex, false> {
-  using Base = detail::Guard<Mutex, false>;
+template <typename M>
+class [[nodiscard]] StickyGuard : public detail::Guard<M, false> {
+  using Base = detail::Guard<M, false>;
 
  public:
-  using MutexType = Mutex;
+  using MutexType = M;
   using Base::Base;
 
   StickyGuard(StickyGuard&& other) noexcept : Base{std::move(other)}, _executor{other._executor} {
@@ -88,15 +88,15 @@ class [[nodiscard]] StickyGuard : public detail::Guard<Mutex, false> {
   }
 
   auto Lock() noexcept {
-    auto* m = static_cast<Mutex*>(Base::LockState());
-    auto& mutex_impl = Mutex::template Cast<typename Mutex::Base>(*m);
-    return detail::LockStickyAwaiter{mutex_impl, _executor};
+    auto* m = static_cast<M*>(Base::LockState());
+    auto& base = M::template Cast<typename M::Base>(*m);
+    return detail::LockStickyAwaiter{base, _executor};
   }
 
   auto Unlock() noexcept {
-    auto* m = static_cast<Mutex*>(Base::UnlockState());
-    auto& mutex_impl = Mutex::template Cast<typename Mutex::Base>(*m);
-    return detail::UnlockStickyAwaiter{mutex_impl, _executor};
+    auto* m = static_cast<M*>(Base::UnlockState());
+    auto& base = M::template Cast<typename M::Base>(*m);
+    return detail::UnlockStickyAwaiter{base, _executor};
   }
 
   void Swap(StickyGuard& other) noexcept {
@@ -113,21 +113,21 @@ class [[nodiscard]] StickyGuard : public detail::Guard<Mutex, false> {
 
 namespace detail {
 
-template <typename Mutex>
+template <typename M>
 class [[nodiscard]] GuardStickyAwaiter {
  public:
-  explicit GuardStickyAwaiter(Mutex& m) : _guard{m, std::adopt_lock} {
+  explicit GuardStickyAwaiter(M& m) : _guard{m, std::adopt_lock} {
   }
 
   YACLIB_INLINE bool await_ready() noexcept {
-    auto& mutex_impl = Mutex::template Cast<typename Mutex::Base>(*_guard.Mutex());
+    auto& mutex_impl = M::template Cast<typename M::Base>(*_guard.Mutex());
     LockStickyAwaiter awaiter{mutex_impl, _guard._executor};
     return awaiter.await_ready();
   }
 
   template <typename Promise>
   YACLIB_INLINE bool await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
-    auto& mutex_impl = Mutex::template Cast<typename Mutex::Base>(*_guard.Mutex());
+    auto& mutex_impl = M::template Cast<typename M::Base>(*_guard.Mutex());
     LockStickyAwaiter awaiter{mutex_impl, _guard._executor};
     return awaiter.await_suspend(handle);
   }
@@ -138,7 +138,7 @@ class [[nodiscard]] GuardStickyAwaiter {
   }
 
  private:
-  StickyGuard<Mutex> _guard;
+  StickyGuard<M> _guard;
 };
 
 }  // namespace detail

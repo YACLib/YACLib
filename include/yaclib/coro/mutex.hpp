@@ -133,10 +133,10 @@ struct MutexImpl {
   BaseCore* _receiver = nullptr;
 };
 
-template <typename Mutex>
+template <typename M>
 class [[nodiscard]] UnlockAwaiter final {
  public:
-  explicit UnlockAwaiter(Mutex& m) noexcept : _mutex{m} {
+  explicit UnlockAwaiter(M& m) noexcept : _mutex{m} {
   }
 
   YACLIB_INLINE bool await_ready() noexcept {
@@ -159,13 +159,13 @@ class [[nodiscard]] UnlockAwaiter final {
   }
 
  private:
-  Mutex& _mutex;
+  M& _mutex;
 };
 
-template <typename Mutex>
+template <typename M>
 class [[nodiscard]] UnlockOnAwaiter final {
  public:
-  explicit UnlockOnAwaiter(Mutex& m, IExecutor& e) noexcept : _mutex{m}, _executor{e} {
+  explicit UnlockOnAwaiter(M& m, IExecutor& e) noexcept : _mutex{m}, _executor{e} {
   }
 
   constexpr bool await_ready() noexcept {
@@ -181,7 +181,7 @@ class [[nodiscard]] UnlockOnAwaiter final {
   }
 
  private:
-  Mutex& _mutex;
+  M& _mutex;
   IExecutor& _executor;
 };
 
