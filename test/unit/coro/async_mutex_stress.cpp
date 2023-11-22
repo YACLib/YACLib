@@ -3,7 +3,7 @@
 #include <yaclib/async/wait.hpp>
 #include <yaclib/coro/await.hpp>
 #include <yaclib/coro/future.hpp>
-#include <yaclib/coro/guard_unique.hpp>
+#include <yaclib/coro/guard.hpp>
 #include <yaclib/coro/mutex.hpp>
 #include <yaclib/coro/on.hpp>
 #include <yaclib/runtime/fair_thread_pool.hpp>
@@ -16,17 +16,17 @@
 namespace test {
 namespace {
 
-void Stress1(const std::size_t kCoros, test::util::Duration dur) {
+void Stress1(const std::size_t coros, test::util::Duration dur) {
   yaclib::FairThreadPool tp;
   yaclib::Mutex<> m;
-  std::vector<yaclib::Future<>> futures(kCoros);
+  std::vector<yaclib::Future<>> futures(coros);
   std::uint64_t cs = 0;
   test::util::StopWatch sw;
 
   auto coro = [&]() -> yaclib::Future<> {
     co_await On(tp);
     while (sw.Elapsed() < dur) {
-      auto g = co_await m.UniqueGuard();
+      auto g = co_await m.Guard();
       ++cs;
       if (cs == 7) {
         co_await On(tp);
@@ -35,7 +35,7 @@ void Stress1(const std::size_t kCoros, test::util::Duration dur) {
     co_return{};
   };
 
-  for (std::size_t i = 0; i < kCoros; ++i) {
+  for (std::size_t i = 0; i < coros; ++i) {
     futures[i] = coro();
   }
 
@@ -45,11 +45,11 @@ void Stress1(const std::size_t kCoros, test::util::Duration dur) {
   tp.Wait();
 }
 
-void Stress2(const std::size_t kCoros, test::util::Duration dur) {
+void Stress2(const std::size_t coros, test::util::Duration dur) {
   yaclib::FairThreadPool tp;
   yaclib::Mutex<> m;
-  std::vector<yaclib::Future<>> futures(kCoros);
-  std::uint64_t cs;
+  std::vector<yaclib::Future<>> futures(coros);
+  std::uint64_t cs = 0;
   test::util::StopWatch sw;
 
   auto coro = [&]() -> yaclib::Future<> {
@@ -62,11 +62,11 @@ void Stress2(const std::size_t kCoros, test::util::Duration dur) {
 
   while (sw.Elapsed() < dur) {
     cs = 0;
-    for (std::size_t i = 0; i < kCoros; ++i) {
+    for (std::size_t i = 0; i < coros; ++i) {
       futures[i] = coro();
     }
     Wait(futures.begin(), futures.end());
-    ASSERT_GE(cs, kCoros);
+    ASSERT_GE(cs, coros);
   }
   tp.HardStop();
   tp.Wait();

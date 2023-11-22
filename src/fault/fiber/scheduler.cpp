@@ -3,14 +3,13 @@
 #include <yaclib/fault/config.hpp>
 #include <yaclib/fault/detail/fiber/scheduler.hpp>
 
+#include <cstdio>
+
 namespace yaclib::fault {
 
 static Scheduler* sCurrentScheduler = nullptr;
-
-static thread_local detail::fiber::FiberBase* sCurrent;
-
+static thread_local detail::fiber::FiberBase* sCurrent = nullptr;
 static std::uint32_t sTickLength = 10;
-static std::uint32_t sRandomListPick = 10;
 
 detail::fiber::FiberBase* Scheduler::GetNext() {
   YACLIB_DEBUG(_queue.Empty(), "Queue can't be empty");
@@ -24,12 +23,8 @@ bool Scheduler::IsRunning() const noexcept {
 
 void Scheduler::Suspend() {
   auto* fiber = sCurrent;
+  YACLIB_ASSERT(fiber != nullptr);
   fiber->Suspend();
-}
-
-void Scheduler::Stop() {
-  Scheduler::Set(nullptr);
-  YACLIB_DEBUG(_running, "Scheduler still running on stop");
 }
 
 Scheduler* Scheduler::GetScheduler() noexcept {
@@ -43,7 +38,7 @@ void Scheduler::Set(Scheduler* scheduler) noexcept {
 void Scheduler::Schedule(detail::fiber::FiberBase* fiber) {
   fiber->SetState(detail::fiber::Waiting);
   _queue.PushBack(static_cast<detail::fiber::BiNodeScheduler*>(fiber));
-  if (!IsRunning()) {
+  if (!_running) {
     _running = true;
     RunLoop();
     _running = false;
@@ -55,8 +50,7 @@ detail::fiber::FiberBase* Scheduler::Current() noexcept {
 }
 
 detail::fiber::FiberBase::Id Scheduler::GetId() {
-  YACLIB_ASSERT(sCurrent != nullptr);
-  return sCurrent->GetId();
+  return sCurrent != nullptr ? sCurrent->GetId() : detail::fiber::FiberBase::Id{static_cast<std::uint64_t>(-1)};
 }
 
 void Scheduler::TickTime() noexcept {
@@ -98,7 +92,7 @@ void Scheduler::RunLoop() {
     sCurrent = next;
     TickTime();
     next->Resume();
-    if (next->GetState() == detail::fiber::Completed && !next->IsThreadlikeInstanceAlive()) {
+    if (next->GetState() == detail::fiber::Completed && !next->IsThreadAlive()) {
       delete next;
     }
   }
@@ -116,10 +110,6 @@ void Scheduler::RescheduleCurrent() {
 
 void Scheduler::SetTickLength(std::uint32_t tick) noexcept {
   sTickLength = tick;
-}
-
-void Scheduler::SetRandomListPick(std::uint32_t k) noexcept {
-  sRandomListPick = k;
 }
 
 void Scheduler::Sleep(std::uint64_t ns) {
@@ -146,15 +136,20 @@ void Scheduler::SleepPreemptive(std::uint64_t ns) {
 }
 
 }  // namespace yaclib::fault
-
 namespace yaclib::detail::fiber {
 
+static std::uint32_t sRandomListPick = 10;
+
+void SetRandomListPick(std::uint32_t k) noexcept {
+  sRandomListPick = k;
+}
+
 Node* PollRandomElementFromList(BiList& list) {
-  auto rand_pos = detail::GetRandNumber(2 * fault::sRandomListPick);
+  auto rand_pos = detail::GetRandNumber(2 * sRandomListPick);
   auto reversed = false;
-  if (rand_pos >= fault::sRandomListPick) {
+  if (rand_pos >= sRandomListPick) {
     reversed = true;
-    rand_pos -= fault::sRandomListPick;
+    rand_pos -= sRandomListPick;
   }
   auto* next = list.GetElement(rand_pos, reversed);
   next->Erase();

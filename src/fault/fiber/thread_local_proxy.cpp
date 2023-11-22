@@ -6,21 +6,21 @@
 
 namespace yaclib::detail::fiber {
 
-std::uint64_t sNextFreeIndex = 0;
-
-static std::unordered_map<std::uint64_t, void*>& GetMap() {
+static auto& GetMap() {
   static std::unordered_map<std::uint64_t, void*> sDefaults;
   return sDefaults;
 }
 
 void* GetImpl(std::uint64_t i) {
   auto* fiber = fault::Scheduler::Current();
-  return fiber->GetTls(i, GetMap());
+  YACLIB_ASSERT(fiber);
+  return fiber->GetTLS(i, GetMap());
 }
 
 void Set(void* new_value, std::uint64_t i) {
   auto* fiber = fault::Scheduler::Current();
-  fiber->SetTls(i, new_value);
+  YACLIB_ASSERT(fiber);
+  fiber->SetTLS(i, new_value);
 }
 
 void SetDefault(void* new_value, std::uint64_t i) {

@@ -1,14 +1,13 @@
 #pragma once
 
 #include <atomic>
+#include <cstdint>
 
 namespace yaclib::detail {
 
 // TODO(myannyax) Add metrics, refactor this shit
 class Injector final {
  public:
-  explicit Injector() noexcept = default;
-
   void MaybeInject() noexcept;
 
   std::uint32_t GetState() const noexcept;
@@ -29,10 +28,6 @@ class Injector final {
  private:
   bool NeedInject() noexcept;
   void Reset() noexcept;
-
-  static std::uint32_t sYieldFrequency;
-  static std::uint32_t sSleepTime;
-  static std::uint64_t sInjectedCount;
 
   std::atomic_uint32_t _count{0};
   bool _pause{false};

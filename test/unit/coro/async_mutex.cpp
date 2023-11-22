@@ -7,10 +7,11 @@
 #include <yaclib/coro/await.hpp>
 #include <yaclib/coro/current_executor.hpp>
 #include <yaclib/coro/future.hpp>
+#include <yaclib/coro/guard.hpp>
 #include <yaclib/coro/guard_sticky.hpp>
-#include <yaclib/coro/guard_unique.hpp>
 #include <yaclib/coro/mutex.hpp>
 #include <yaclib/coro/on.hpp>
+#include <yaclib/coro/shared_mutex.hpp>
 #include <yaclib/coro/task.hpp>
 #include <yaclib/exe/manual.hpp>
 #include <yaclib/exe/submit.hpp>
@@ -31,7 +32,7 @@ TYPED_TEST(AsyncSuite, JustWorks) {
   yaclib::Mutex<> m;
   yaclib::FairThreadPool tp;
 
-  const std::size_t kCoros = 10'000;
+  static constexpr std::size_t kCoros = 10'000;
 
   std::array<yaclib::Future<>, kCoros> futures;
   std::size_t cs = 0;
@@ -69,8 +70,8 @@ TYPED_TEST(AsyncSuite, Counter) {
   yaclib::Mutex<true> m;
   yaclib::FairThreadPool tp;
 
-  const std::size_t kCoros = 20;
-  const std::size_t kCSperCoro = 2000;
+  static constexpr std::size_t kCoros = 20;
+  static constexpr std::size_t kCSperCoro = 2000;
   std::array<yaclib::Future<>, kCoros> futures;
   std::size_t cs = 0;
 
@@ -187,7 +188,7 @@ TYPED_TEST(AsyncSuite, ScopedLockAsync) {
     if constexpr (TestFixture::kIsFuture) {
       co_await On(*manual);
     }
-    auto guard = co_await m.UniqueGuard();
+    auto guard = co_await m.Guard();
     value++;
     co_await Await(future);
     value++;
@@ -232,8 +233,8 @@ TYPED_TEST(AsyncSuite, GuardRelease) {
   yaclib::Mutex<> m;
   yaclib::FairThreadPool tp{2};
 
-  const std::size_t kCoros = 20;
-  const std::size_t kCSperCoro = 200;
+  static constexpr std::size_t kCoros = 20;
+  static constexpr std::size_t kCSperCoro = 200;
 
   std::array<yaclib::Future<int>, kCoros> futures;
   std::size_t cs = 0;
@@ -243,8 +244,8 @@ TYPED_TEST(AsyncSuite, GuardRelease) {
       if constexpr (TestFixture::kIsFuture) {
         co_await On(tp);
       }
-      auto g = co_await m.UniqueGuard();
-      auto another = yaclib::Mutex<>::GuardUnique{*g.Release(), std::adopt_lock};
+      auto g = co_await m.Guard();
+      auto another = yaclib::UniqueGuard<yaclib::Mutex<>>{*g.Release(), std::adopt_lock};
       ++cs;
       co_await another.UnlockOn(tp);
     }
@@ -338,25 +339,27 @@ TYPED_TEST(AsyncSuite, UnlockOnBehaviour) {
   std::array<yaclib::Future<>, kCoros> futures;
 
   yaclib_std::atomic_bool start{false};
-  yaclib_std::thread::id locked_id{};
-
   auto coro1 = [&]() -> typename TestFixture::Type {
     if constexpr (TestFixture::kIsFuture) {
       co_await On(tp);
     }
     co_await m.Lock();
     start.store(true, std::memory_order_release);
-    locked_id = yaclib_std::this_thread::get_id();
     yaclib_std::this_thread::sleep_for(1s);
     co_await m.UnlockOn(tp);
     co_return{};
   };
+
+  yaclib_std::thread::id locked_id{};
   auto coro2 = [&]() -> typename TestFixture::Type {
     if constexpr (TestFixture::kIsFuture) {
       co_await On(tp);
     }
     co_await m.Lock();
 #ifdef GTEST_OS_LINUX
+    if (locked_id == yaclib_std::thread::id{}) {
+      locked_id = yaclib_std::this_thread::get_id();
+    }
     EXPECT_EQ(locked_id, yaclib_std::this_thread::get_id());
 #endif
     co_await m.UnlockOn(tp);
@@ -396,31 +399,33 @@ TEST(Mutex, StickyGuard) {
 #endif
   yaclib::Mutex<> m;
   std::uint64_t counter = 0;
-  yaclib::FairThreadPool tp1{1};
-  yaclib::FairThreadPool tp2{1};
+  yaclib::FairThreadPool tp1{2};
+  yaclib::FairThreadPool tp2{2};
   auto coro = [&](yaclib::IExecutor& executor) -> yaclib::Future<> {
     co_await On(executor);
-    auto& schedulerBeforeLock = co_await yaclib::CurrentExecutor();
-    EXPECT_EQ(&executor, &schedulerBeforeLock);
+    auto& scheduler_before_lock = co_await yaclib::CurrentExecutor();
+    EXPECT_EQ(&executor, &scheduler_before_lock);
     for (int i = 0; i != 1000; ++i) {
-      auto guard = co_await m.StickyGuard();
-      YACLIB_ASSERT(guard.OwnsLock());
-      auto& schedulerAfterLock = co_await yaclib::CurrentExecutor();
-      counter += &schedulerBeforeLock != &schedulerAfterLock;
-      YACLIB_ASSERT(guard.OwnsLock());
+      auto guard = co_await m.GuardSticky();
+      EXPECT_TRUE(guard);
+      auto& scheduler_after_lock = co_await yaclib::CurrentExecutor();
+      counter += static_cast<std::uint64_t>(&scheduler_before_lock != &scheduler_after_lock);
+      EXPECT_TRUE(guard);
       yaclib_std::this_thread::sleep_for(std::chrono::nanoseconds{1});
-      YACLIB_ASSERT(guard.OwnsLock());
+      EXPECT_TRUE(guard);
       co_await guard.Unlock();
-      YACLIB_ASSERT(!guard.OwnsLock());
-      auto& schedulerAfterUnlock = co_await yaclib::CurrentExecutor();
-      EXPECT_EQ(&schedulerBeforeLock, &schedulerAfterUnlock);
-      YACLIB_ASSERT(!guard.OwnsLock());
+      EXPECT_FALSE(guard);
+      auto& scheduler_after_unlock = co_await yaclib::CurrentExecutor();
+      EXPECT_EQ(&scheduler_before_lock, &scheduler_after_unlock);
+      EXPECT_FALSE(guard);
     }
     co_return{};
   };
   auto f1 = coro(tp1);
   auto f2 = coro(tp2);
-  Wait(f1, f2);
+  auto f3 = coro(tp2);
+  auto f4 = coro(tp2);
+  Wait(f1, f2, f3, f4);
   EXPECT_GT(counter, 0);
   tp1.Stop();
   tp1.Wait();

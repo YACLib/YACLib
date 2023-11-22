@@ -24,7 +24,18 @@ Checks: '*,
          -google-explicit-constructor,
          -hicpp-explicit-conversions,
          -llvm-header-guard,
-         -cppcoreguidelines-owning-memory'
+         -cppcoreguidelines-owning-memory
+         -cppcoreguidelines-avoid-do-while
+         -modernize-use-nodiscard
+         -cppcoreguidelines-special-member-functions
+         -hicpp-special-member-functions
+         -cppcoreguidelines-pro-type-reinterpret-cast
+         -cppcoreguidelines-non-private-member-variables-in-classes
+         -misc-non-private-member-variables-in-classes
+         -performance-no-int-to-ptr
+         -cppcoreguidelines-avoid-const-or-ref-data-members
+         -cppcoreguidelines-pro-bounds-constant-array-index
+         -cppcoreguidelines-avoid-reference-coroutine-parameters'
 
 WarningsAsErrors: '*'
 
@@ -43,6 +54,8 @@ CheckOptions: # TODO(Ri7ay) Setup all options
     value: CamelCase
   - key: readability-identifier-naming.FunctionCase
     value: CamelCase
+  - key: readability-identifier-naming.FunctionIgnoredRegexp
+    value: 'await_ready|await_suspend|await_resume'
   - key: readability-identifier-naming.ParameterCase
     value: lower_case
   - key: readability-identifier-naming.VariableCase
