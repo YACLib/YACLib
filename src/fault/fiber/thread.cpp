@@ -36,8 +36,11 @@ void Thread::join() {
 }
 
 void Thread::detach() {
+  if (_impl == nullptr) {
+    throw std::system_error{std::make_error_code(std::errc::no_such_process)};
+  }
   if (!joinable()) {
-    throw std::system_error{};
+    throw std::system_error{std::make_error_code(std::errc::resource_deadlock_would_occur)};
   }
   AfterJoinOrDetach();
 }

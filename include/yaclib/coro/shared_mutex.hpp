@@ -87,7 +87,7 @@ struct SharedMutexImpl {
  private:
   // 32 bit writers | 32 bit readers
   static constexpr auto kReader = std::uint64_t{1};
-  static constexpr auto kWriter = kReader << 30U;
+  static constexpr auto kWriter = kReader << std::uint64_t{32};
 
   void RunWriter() noexcept {
     if constexpr (FIFO) {
