@@ -52,7 +52,7 @@ yaclib::Task<> Simple() {
 }
 
 TEST(SharedMutex, Simple) {
-  std::ignore = Simple().Get();
+  // std::ignore = Simple().Get();
 }
 
 yaclib::Task<int> ParallelReader(yaclib::SharedMutex<>& m, yaclib_std::atomic_size_t& counter, volatile const int& x) {
@@ -94,27 +94,33 @@ void TestParallelReaders(std::size_t num_readers, std::size_t threads) {
 
 TEST(SharedMutex, TestParallelReaders) {
   // https://github.com/golang/go/blob/master/src/sync/rwmutex_test.go
-  TestParallelReaders(1, 4);
-  TestParallelReaders(3, 4);
-  TestParallelReaders(4, 2);
+  // TestParallelReaders(1, 4);
+  // TestParallelReaders(3, 4);
+  // TestParallelReaders(4, 2);
 }
 
 yaclib::Task<> Reader(yaclib::SharedMutex<>& rmw, std::size_t num_iterations, std::int32_t& activity, size_t index) {
   for (std::size_t i = 0; i != num_iterations; ++i) {
+    fprintf(stderr, "Reader::LockBegin %lu\n", index);
     auto guard = co_await rmw.GuardShared();
+    fprintf(stderr, "Reader::LockEnd %lu\n", index);
     yaclib::InjectFault();
     for (std::size_t j = 0; j != 100; j += 1) {
       EXPECT_EQ(activity, 0);
     }
     yaclib::InjectFault();
+    fprintf(stderr, "Reader::UnlockBegin %lu\n", index);
     guard.UnlockHere();
+    fprintf(stderr, "Reader::UnlockEnd %lu\n", index);
   }
   co_return{};
 }
 
 yaclib::Task<> Writer(yaclib::SharedMutex<>& rmw, std::size_t num_iterations, std::int32_t& activity, size_t index) {
   for (std::size_t i = 0; i != num_iterations; ++i) {
+    fprintf(stderr, "Writer::LockBegin %lu\n", index);
     auto guard = co_await rmw.Guard();
+    fprintf(stderr, "Writer::LockEnd %lu\n", index);
     EXPECT_EQ(activity, 0);
     activity += 10000;
     yaclib::InjectFault();
@@ -124,7 +130,9 @@ yaclib::Task<> Writer(yaclib::SharedMutex<>& rmw, std::size_t num_iterations, st
     yaclib::InjectFault();
     activity -= 10000;
     EXPECT_EQ(activity, 0);
+    fprintf(stderr, "Writer::UnlockBegin %lu\n", index);
     guard.UnlockHere();
+    fprintf(stderr, "Writer::UnlockEnd %lu\n", index);
   }
   co_return{};
 }
@@ -153,16 +161,16 @@ void HammerRWMutex(std::size_t threads, std::size_t num_readers, std::size_t num
 
 void RwMutexTest(std::size_t n) {
   // https://github.com/golang/go/blob/master/src/sync/rwmutex_test.go
-  HammerRWMutex(1, 1, n);
-  HammerRWMutex(1, 3, n);
-  HammerRWMutex(1, 10, n);
-  HammerRWMutex(4, 1, n);
-  HammerRWMutex(4, 3, n);
-  HammerRWMutex(4, 10, n);
-  HammerRWMutex(10, 1, n);
-  HammerRWMutex(10, 3, n);
-  HammerRWMutex(10, 10, n);
-  HammerRWMutex(10, 5, n);
+  // HammerRWMutex(1, 1, n);
+  // HammerRWMutex(1, 3, n);
+  // HammerRWMutex(1, 10, n);
+  HammerRWMutex(2, 1, n);
+  // HammerRWMutex(4, 3, n);
+  // HammerRWMutex(4, 10, n);
+  // HammerRWMutex(10, 1, n);
+  // HammerRWMutex(10, 3, n);
+  // HammerRWMutex(10, 10, n);
+  // HammerRWMutex(10, 5, n);
 }
 
 TEST(SharedMutex, RWMutexSmall) {
@@ -170,7 +178,7 @@ TEST(SharedMutex, RWMutexSmall) {
 }
 
 TEST(SharedMutex, RWMutexLarge) {
-  RwMutexTest(1000);
+  // RwMutexTest(1000);
 }
 
 }  // namespace

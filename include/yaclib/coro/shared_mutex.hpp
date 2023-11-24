@@ -9,49 +9,36 @@
 #include <yaclib/util/detail/spinlock.hpp>
 
 #include <yaclib_std/atomic>
+#include <yaclib_std/thread>
 
 namespace yaclib {
 namespace detail {
 
-template <bool FIFO, bool ReadersFIFO>
+template <bool FIFO, bool WritersFIFO, bool ReadersFIFO>
 struct SharedMutexImpl {
   [[nodiscard]] bool TryLockSharedAwait() noexcept {
     return _state.fetch_add(kReader, std::memory_order_acq_rel) / kWriter == 0;
   }
 
   [[nodiscard]] bool TryLockAwait() noexcept {
-    std::uint64_t s = 0;
-    return _state.load(std::memory_order_relaxed) == s &&
-           _state.compare_exchange_strong(s, s + kWriter, std::memory_order_acq_rel, std::memory_order_relaxed);
+    // TODO(MBkkt) instead of TryLock we can do fetch_add, but needs to keep result for await_suspend
+    return TryLock();
   }
 
   [[nodiscard]] bool AwaitLockShared(BaseCore& curr) noexcept {
-    std::lock_guard lock{_lock};
-    if (_readers_pass != 0) {
-      --_readers_pass;
-      return false;
-    }
-    YACLIB_ASSERT(_state.load(std::memory_order_relaxed) / kWriter != 0);
-    _readers.PushBack(curr);
-    ++_readers_size;
-    return true;
+    fprintf(stderr, "Push readers\n");
+    return Suspend(_readers_tail, curr);
   }
 
   [[nodiscard]] bool AwaitLock(BaseCore& curr) noexcept {
-    curr.next = nullptr;
-    std::lock_guard lock{_lock};
     auto s = _state.fetch_add(kWriter, std::memory_order_acq_rel);
-    if (s / kWriter == 0) {
-      std::uint32_t r = s % kWriter;
-      _writers_first = &curr;
-      return r != 0 && _readers_wait.fetch_add(r, std::memory_order_acq_rel) != -r;
+    if (s / kWriter != 0) {
+      fprintf(stderr, "Push writers\n");
+      return Suspend(_writers_tail, curr);
     }
-    _writers_tail->next = &curr;
-    _writers_tail = &curr;
-    if constexpr (FIFO) {
-      _writers_prio += static_cast<std::uint32_t>(_readers.Empty());
-    }
-    return true;
+    _writer_reader = &curr;
+    std::uint32_t r = s % kWriter;
+    return r != 0 && _readers_wait.fetch_add(r, std::memory_order_acq_rel) != -r;
   }
 
   [[nodiscard]] bool TryLockShared() noexcept {
@@ -65,7 +52,8 @@ struct SharedMutexImpl {
   }
 
   [[nodiscard]] bool TryLock() noexcept {
-    return TryLockAwait();
+    auto s = _state.load(std::memory_order_relaxed);
+    return s == 0 && _state.compare_exchange_strong(s, kWriter, std::memory_order_acq_rel, std::memory_order_relaxed);
   }
 
   void UnlockHereShared() noexcept {
@@ -73,14 +61,54 @@ struct SharedMutexImpl {
       // at least one writer waiting lock, so noone can acquire lock
       if (_readers_wait.fetch_sub(1, std::memory_order_acq_rel) == 1) {
         // last active reader will run writer
-        Run(_writers_first);
+        _writer_reader->_executor->Submit(*_writer_reader);
       }
     }
   }
 
   void UnlockHere() noexcept {
-    if (auto s = kWriter; !_state.compare_exchange_strong(s, 0, std::memory_order_acq_rel, std::memory_order_relaxed)) {
-      SlowUnlock();
+    auto s = _state.fetch_sub(kWriter, std::memory_order_acq_rel) - kWriter;
+    if (s == 0) {
+      return;
+    }
+    if (s / kWriter == 0) {
+      std::uint32_t r = s % kWriter;
+      // We need to run exactly r readers from readers queue
+      while (true) {
+        while (_readers_head != nullptr) {
+          Run(_readers_head);
+          if (--r == 0) {
+            return;
+          }
+        }
+        fprintf(stderr, "Wait readers r=%u\n", r);
+        Wait(_readers_tail);
+        _readers_head = PopAll<ReadersFIFO>(_readers_tail);
+        fprintf(stderr, "Pop readers 1\n");
+      }
+    }
+    if (FIFO && _writers_head != nullptr) {
+      // We need to run writer from current write batch
+      return RunWriter();
+    }
+    // We want to run all readers from current readers queue
+    auto r = RunReaders();
+    _readers_head = PopAll<ReadersFIFO>(_readers_tail);
+    fprintf(stderr, "Pop readers 2\n");
+    r += RunReaders();
+    if (FIFO || _writers_head == nullptr) {
+      YACLIB_ASSERT(_writers_head == nullptr);
+      // We need to wait at least single writer from writers queue
+      fprintf(stderr, "Wait writers, r=%u, sr=%lu, sw=%lu\n", r, s % kWriter, s / kWriter);
+      Wait(_writers_tail);
+      _writers_head = PopAll<WritersFIFO>(_writers_tail);
+      fprintf(stderr, "Pop writers\n");
+    }
+    YACLIB_ASSERT(_writers_head != nullptr);
+    _writer_reader = _writers_head;
+    _writers_head = static_cast<BaseCore*>(_writers_head->next);
+    if (r == 0 || _readers_wait.fetch_add(r, std::memory_order_acq_rel) == -r) {
+      _writer_reader->_executor->Submit(*_writer_reader);
     }
   }
 
@@ -95,84 +123,69 @@ struct SharedMutexImpl {
     core._executor->Submit(core);
   }
 
-  void RunWriter() noexcept {
-    if constexpr (FIFO) {
-      YACLIB_ASSERT(_writers_prio != 0);
-      --_writers_prio;
-    }
-    auto* node = _writers_head.next;
-    _writers_head.next = node->next;
-    if (_writers_head.next == nullptr) {
-      _writers_tail = &_writers_head;
-    }
-    _lock.unlock();
-
-    Run(node);
-  }
-
-  void PassReaders(std::uint64_t s) noexcept {
-    YACLIB_ASSERT(s / kWriter == 1);
-    std::uint32_t r = s % kWriter;
-    YACLIB_ASSERT(r >= _readers_size);
-    _readers_pass += r - _readers_size;
-  }
-
-  void RunReaders(std::uint64_t s) noexcept {
-    if (std::uint32_t w = s / kWriter; w != 1) {
-      _readers_wait.store(_readers_size, std::memory_order_relaxed);
-      auto* node = _writers_head.next;
-      _writers_head.next = node->next;
-      if (_writers_head.next == nullptr) {
-        _writers_tail = &_writers_head;
-      }
-      _writers_first = node;
-      if constexpr (FIFO) {
-        _writers_prio = w - 2;
-      }
-    } else {
-      PassReaders(s);
-    }
-    auto readers = std::move(_readers);
-    _readers_size = 0;
-    _lock.unlock();
-
+  static bool Suspend(yaclib_std::atomic<BaseCore*>& list, BaseCore& curr) noexcept {
+    auto* head = list.load(std::memory_order_relaxed);
     do {
-      Run(&readers.PopFront());
-    } while (!readers.Empty());
+      curr.next = head;
+    } while (list.compare_exchange_weak(head, &curr, std::memory_order_release, std::memory_order_relaxed));
+    return true;
   }
 
-  void SlowUnlock() noexcept {
-    _lock.lock();
-    auto s = _state.fetch_sub(kWriter, std::memory_order_acq_rel);
-    if constexpr (FIFO) {
-      if (_writers_prio != 0) {
-        YACLIB_ASSERT(s / kWriter > 1);
-        return RunWriter();
-      }
+  static void Wait(const yaclib_std::atomic<BaseCore*>& list) noexcept {
+    while (list.load(std::memory_order_relaxed) == nullptr) {
+      // yaclib_std::this_thread::sleep_for(std::chrono::nanoseconds{100});
     }
-    if (!_readers.Empty()) {
-      return RunReaders(s);
-    }
-    if constexpr (!FIFO) {
-      if (s / kWriter != 1) {
-        return RunWriter();
-      }
-    }
-    PassReaders(s);
-    _lock.unlock();
   }
+
+  template <bool Reverse>
+  static BaseCore* PopAll(yaclib_std::atomic<BaseCore*>& list) noexcept {
+    auto* tail = list.exchange(nullptr, std::memory_order_acquire);
+    if constexpr (Reverse) {
+      Node* node = tail;
+      Node* prev = nullptr;
+      while (node != nullptr) {
+        auto* next = node->next;
+        node->next = prev;
+        prev = node;
+        node = next;
+      }
+      return static_cast<BaseCore*>(prev);
+    } else {
+      return tail;
+    }
+  }
+
+  static void Run(BaseCore*& head) noexcept {
+    YACLIB_ASSERT(head != nullptr);
+    auto* node = head;
+    head = static_cast<BaseCore*>(head->next);
+    auto& core = static_cast<BaseCore&>(*node);
+    core._executor->Submit(core);
+  }
+
+  void RunWriter() noexcept {
+    Run(_writers_head);
+  }
+
+  std::uint32_t RunReaders() noexcept {
+    std::uint32_t r = 0;
+    while (_readers_head != nullptr) {
+      Run(_readers_head);
+      ++r;
+    }
+    return r;
+  }
+
+  static constexpr auto kLockedNoWaiters = std::uintptr_t{0};
+  static constexpr auto kNotLocked = std::numeric_limits<std::uintptr_t>::max();
 
   yaclib_std::atomic_uint64_t _state = 0;  // TODO(MBkkt) think about relax memory orders
-  std::conditional_t<ReadersFIFO, List, Stack> _readers;
-  // TODO(MBkkt) add option for batched LIFO, see Mutex
-  Node* _writers_first = nullptr;
-  Node _writers_head;
-  Node* _writers_tail = &_writers_head;
-  std::uint32_t _writers_prio = 0;
+  yaclib_std::atomic<BaseCore*> _writers_tail = nullptr;
+  BaseCore* _writers_head = nullptr;
+  yaclib_std::atomic<BaseCore*> _readers_tail = nullptr;
+  BaseCore* _readers_head = nullptr;
   yaclib_std::atomic_uint32_t _readers_wait = 0;
-  std::uint32_t _readers_size = 0;
-  std::uint32_t _readers_pass = 0;
-  Spinlock<std::uint32_t> _lock;
+  BaseCore* _writer_reader = nullptr;
 };
 
 }  // namespace detail
@@ -198,10 +211,10 @@ struct SharedMutexImpl {
  *  1 1 -- cares in first priority about order of critical sections
  *  0 1 -- opposite to default, but it's usefullness is doubtful
  */
-template <bool FIFO = true, bool ReadersFIFO = false>
-class SharedMutex final : protected detail::SharedMutexImpl<FIFO, ReadersFIFO> {
+template <bool FIFO = true, bool WritersFIFO = false, bool ReadersFIFO = false>
+class SharedMutex final : protected detail::SharedMutexImpl<FIFO, WritersFIFO, ReadersFIFO> {
  public:
-  using Base = detail::SharedMutexImpl<FIFO, ReadersFIFO>;
+  using Base = detail::SharedMutexImpl<FIFO, WritersFIFO, ReadersFIFO>;
 
   using Base::Base;
 

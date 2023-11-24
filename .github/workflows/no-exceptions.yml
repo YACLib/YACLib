@@ -1,0 +1,170 @@
+name: Linux
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths: [ '**.cpp', '**.hpp*', '**.cmake', 'include/yaclib_std/*', '**/CMakeLists.txt' ]
+  pull_request:
+    branches: [ main ]
+    paths: [ '**.cpp', '**.hpp*', '**.cmake', 'include/yaclib_std/*', '**/CMakeLists.txt' ]
+  schedule:
+    - cron: '0 12 * * 1-5'
+
+jobs:
+  main:
+    runs-on: 'ubuntu-${{ matrix.os }}'
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ 22.04 ]
+        compiler: [ clang-14,
+                    gcc-12 ]
+
+
+    env:
+      BUILD_TYPE: 'Debug RelWithDebInfo'
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Update dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install ninja-build googletest libunwind-dev
+
+      - name: Install dependencies clang
+        if: 1 && !startsWith(matrix.compiler, 'gcc')
+        run: |
+          sudo wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+          if [[ ${{ matrix.os }} == "18.04" ]]; then
+            ubuntu="bionic"
+            gcc_version=7
+            llvm_version=9          
+          elif [[ ${{ matrix.os }} == "20.04" ]]; then
+            ubuntu="focal"
+            gcc_version=7
+            llvm_version=9
+          else
+            ubuntu="jammy"
+            gcc_version=9
+            llvm_version=13
+          fi
+          compiler=${{ matrix.compiler }}
+          clang_version=${compiler:6}
+          if [[ $clang_version -ge $llvm_version ]]; then
+            sudo add-apt-repository "deb http://apt.llvm.org/$ubuntu/ llvm-toolchain-$ubuntu-${clang_version} main"
+          fi
+          sudo apt-get update
+          sudo apt-get install clang-${clang_version} libc++-${clang_version}-dev libc++abi-${clang_version}-dev       \
+                               gcc-${gcc_version} g++-${gcc_version} libstdc++-${gcc_version}-dev
+
+          sudo update-alternatives                                                                                     \
+            --install /usr/bin/gcc        gcc        /usr/bin/gcc-${gcc_version}        200                            \
+            --slave   /usr/bin/g++        g++        /usr/bin/g++-${gcc_version}                                       \
+            --slave   /usr/bin/gcc-ar     gcc-ar     /usr/bin/gcc-ar-${gcc_version}                                    \
+            --slave   /usr/bin/gcc-nm     gcc-nm     /usr/bin/gcc-nm-${gcc_version}                                    \
+            --slave   /usr/bin/gcc-ranlib gcc-ranlib /usr/bin/gcc-ranlib-${gcc_version}                                \
+            --slave   /usr/bin/gcov       gcov       /usr/bin/gcov-${gcc_version}                                      \
+            --slave   /usr/bin/gcov-tool  gcov-tool  /usr/bin/gcov-tool-${gcc_version}                                 \
+            --slave   /usr/bin/gcov-dump  gcov-dump  /usr/bin/gcov-dump-${gcc_version}
+          sudo update-alternatives --auto gcc
+
+          sudo update-alternatives                                                                                     \
+            --install /usr/bin/cpp        cpp        /usr/bin/cpp-${gcc_version}        200
+          sudo update-alternatives --auto cpp
+
+      - name: Install dependencies gcc
+        if: startsWith(matrix.compiler, 'gcc')
+        run: |
+          compiler=${{ matrix.compiler }}
+          version=${compiler:4}
+          sudo apt-get install gcc-$version g++-$version libstdc++-$version-dev
+          sudo update-alternatives                                                                                     \
+            --install /usr/bin/gcc        gcc        /usr/bin/gcc-$version        200                                  \
+            --slave   /usr/bin/g++        g++        /usr/bin/g++-$version                                             \
+            --slave   /usr/bin/gcc-ar     gcc-ar     /usr/bin/gcc-ar-$version                                          \
+            --slave   /usr/bin/gcc-nm     gcc-nm     /usr/bin/gcc-nm-$version                                          \
+            --slave   /usr/bin/gcc-ranlib gcc-ranlib /usr/bin/gcc-ranlib-$version                                      \
+            --slave   /usr/bin/gcov       gcov       /usr/bin/gcov-$version                                            \
+            --slave   /usr/bin/gcov-tool  gcov-tool  /usr/bin/gcov-tool-$version                                       \
+            --slave   /usr/bin/gcov-dump  gcov-dump  /usr/bin/gcov-dump-$version
+          sudo update-alternatives --auto gcc
+
+          sudo update-alternatives                                                                                     \
+            --install /usr/bin/cpp        cpp        /usr/bin/cpp-$version        200
+          sudo update-alternatives --auto cpp
+
+      - name: Configure CMake
+        run: |
+          compiler=${{ matrix.compiler }}
+          if [[ "$compiler" == gcc* ]]; then
+            version=${compiler:4}
+            compiler="g++"
+            standard=17; flags=""
+            if [[ $version -ge 10 ]]; then
+              standard=20; flags="CORO"
+            fi
+          else
+            version=${compiler:6}
+            compiler="clang++-$version"
+          fi
+
+          stdlib_names=(libcxx libstdcxx)
+          link_options=(
+            "-stdlib=libc++;-lc++abi"
+            "-stdlib=libstdc++"
+          )
+          compile_options=(
+            "-stdlib=libc++"
+            "-stdlib=libstdc++"
+          )
+
+          for (( j=0; j<${#stdlib_names[*]}; j+=1 )); do
+            for build_type in ${BUILD_TYPE[*]}; do
+              link_option=""; compile_option=""
+              if [[ "$compiler" == "g++" ]]; then
+                if [[ "${stdlib_names[$j]}" != "libstdcxx" ]]; then
+                  continue  # TODO(MBkkt) I dunno how to get GNU GCC to work with other stdlibs
+                fi
+              else
+                link_option=${link_options[$j]}; compile_option=${compile_options[$j]}
+                if [[ "${stdlib_names[$j]}" == "libstdcxx" ]]; then
+                  # TODO(MBkkt) I know how to enable CORO here, but it's a dirty hack, do we want to check it in CI?
+                  standard=17; flags=""
+                elif [[ $version -ge 9 ]]; then
+                  standard=20; flags="CORO"
+                else
+                  standard=17; flags=""
+                fi
+              fi
+
+              dir="build_${compiler}_${stdlib_names[$j]}_${build_type}"
+              echo $dir
+
+              cmake -S . -B $dir                                                                                       \
+                -DCMAKE_BUILD_TYPE="$build_type"                                                                       \
+                -DYACLIB_CXX_STANDARD="$standard"                                                                      \
+                -DYACLIB_TEST=SINGLE                                                                                   \
+                -DYACLIB_FLAGS="$flags"                                                                                \
+                -DCMAKE_CXX_COMPILER="$compiler"                                                                       \
+                -G"Ninja"                                                                                              \
+                -DYACLIB_LINK_OPTIONS="$link_option"                                                                   \
+                -DYACLIB_LOG="ERROR;DEBUG"                                                                             \
+                -DYACLIB_COMPILE_OPTIONS="$compile_option -fno-exceptions"
+            done
+          done
+
+      - name: Build
+        run: |
+          for dir in build*/; do
+            ninja -C $dir
+          done
+
+      - name: Test
+        run: |
+          for dir in build*/; do
+            cd $dir
+            ctest --output-on-failure -V
+            cd ..
+          done
