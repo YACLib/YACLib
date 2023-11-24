@@ -41,9 +41,9 @@ struct SharedMutexImpl {
     std::lock_guard lock{_lock};
     auto s = _state.fetch_add(kWriter, std::memory_order_acq_rel);
     if (s / kWriter == 0) {
-      if (std::uint32_t r = s % kWriter; r == 0 || _readers_wait.fetch_add(r, std::memory_order_acq_rel) == -r) {
-        return false;
-      }
+      std::uint32_t r = s % kWriter;
+      _first_writer = &curr;
+      return r != 0 && _readers_wait.fetch_add(r, std::memory_order_acq_rel) != -r;
     }
     _writers.PushBack(curr);
     if constexpr (FIFO) {
@@ -72,14 +72,15 @@ struct SharedMutexImpl {
       // at least one writer waiting lock, so noone can acquire lock
       if (_readers_wait.fetch_sub(1, std::memory_order_acq_rel) == 1) {
         // last active reader will run writer
-        _lock.lock();
-        RunWriter();
+        YACLIB_ASSERT(_first_writer != nullptr);
+        auto& core = static_cast<BaseCore&>(*_first_writer);
+        core._executor->Submit(core);
       }
     }
   }
 
   void UnlockHere() noexcept {
-    if (auto s = kWriter; !_state.compare_exchange_strong(s, 0, std::memory_order_release, std::memory_order_relaxed)) {
+    if (auto s = kWriter; !_state.compare_exchange_strong(s, 0, std::memory_order_acq_rel, std::memory_order_relaxed)) {
       SlowUnlock();
     }
   }
@@ -112,6 +113,11 @@ struct SharedMutexImpl {
   void RunReaders(std::uint64_t s) noexcept {
     if (s / kWriter != 1) {
       _readers_wait.store(_readers_size, std::memory_order_relaxed);
+      if constexpr (FIFO) {
+        YACLIB_ASSERT(_stats.size != 0);
+        --_stats.size;
+      }
+      _first_writer = &_writers.PopFront();
     } else {
       PassReaders(s);
     }
@@ -150,8 +156,9 @@ struct SharedMutexImpl {
     _lock.unlock();
   }
 
-  yaclib_std::atomic_uint64_t _state = 0;
+  yaclib_std::atomic_uint64_t _state = 0;  // TODO(MBkkt) think about relax memory orders
   std::conditional_t<ReadersFIFO, List, Stack> _readers;
+  Node* _first_writer = nullptr;
   List _writers;  // TODO(MBkkt) add option for batched LIFO, see Mutex
   struct Stats {
     std::uint32_t size = 0;
