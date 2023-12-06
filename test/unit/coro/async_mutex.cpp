@@ -422,7 +422,7 @@ TEST(Mutex, StickyGuard) {
     co_return{};
   };
   auto f1 = coro(tp1);
-  auto f2 = coro(tp2);
+  auto f2 = coro(tp1);
   auto f3 = coro(tp2);
   auto f4 = coro(tp2);
   Wait(f1, f2, f3, f4);
