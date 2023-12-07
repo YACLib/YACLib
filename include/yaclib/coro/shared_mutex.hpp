@@ -38,17 +38,18 @@ struct SharedMutexImpl {
   }
 
   [[nodiscard]] bool AwaitLock(BaseCore& curr) noexcept {
+    curr.next = nullptr;
     std::lock_guard lock{_lock};
     auto s = _state.fetch_add(kWriter, std::memory_order_acq_rel);
     if (s / kWriter == 0) {
-      if (std::uint32_t r = s % kWriter; r == 0 || _readers_wait.fetch_add(r, std::memory_order_acq_rel) == -r) {
-        return false;
-      }
+      std::uint32_t r = s % kWriter;
+      _writers_first = &curr;
+      return r != 0 && _readers_wait.fetch_add(r, std::memory_order_acq_rel) != -r;
     }
-    _writers.PushBack(curr);
+    _writers_tail->next = &curr;
+    _writers_tail = &curr;
     if constexpr (FIFO) {
-      _stats.size += 1;
-      _stats.prio += static_cast<std::uint32_t>(_readers.Empty());
+      _writers_prio += static_cast<std::uint32_t>(_readers.Empty());
     }
     return true;
   }
@@ -72,14 +73,13 @@ struct SharedMutexImpl {
       // at least one writer waiting lock, so noone can acquire lock
       if (_readers_wait.fetch_sub(1, std::memory_order_acq_rel) == 1) {
         // last active reader will run writer
-        _lock.lock();
-        RunWriter();
+        Run(_writers_first);
       }
     }
   }
 
   void UnlockHere() noexcept {
-    if (auto s = kWriter; !_state.compare_exchange_strong(s, 0, std::memory_order_release, std::memory_order_relaxed)) {
+    if (auto s = kWriter; !_state.compare_exchange_strong(s, 0, std::memory_order_acq_rel, std::memory_order_relaxed)) {
       SlowUnlock();
     }
   }
@@ -89,42 +89,55 @@ struct SharedMutexImpl {
   static constexpr auto kReader = std::uint64_t{1};
   static constexpr auto kWriter = kReader << std::uint64_t{32};
 
+  void Run(Node* node) noexcept {
+    YACLIB_ASSERT(node != nullptr);
+    auto& core = static_cast<BaseCore&>(*node);
+    core._executor->Submit(core);
+  }
+
   void RunWriter() noexcept {
     if constexpr (FIFO) {
-      YACLIB_ASSERT(_stats.size != 0);
-      YACLIB_ASSERT(_stats.prio != 0);
-      --_stats.size;
-      --_stats.prio;
+      YACLIB_ASSERT(_writers_prio != 0);
+      --_writers_prio;
     }
-    auto& core = static_cast<BaseCore&>(_writers.PopFront());
+    auto* node = _writers_head.next;
+    _writers_head.next = node->next;
+    if (_writers_head.next == nullptr) {
+      _writers_tail = &_writers_head;
+    }
     _lock.unlock();
 
-    core._executor->Submit(core);
+    Run(node);
   }
 
   void PassReaders(std::uint64_t s) noexcept {
     YACLIB_ASSERT(s / kWriter == 1);
-    std::uint32_t w = s % kWriter;
-    YACLIB_ASSERT(w >= _readers_size);
-    _readers_pass += w - _readers_size;
+    std::uint32_t r = s % kWriter;
+    YACLIB_ASSERT(r >= _readers_size);
+    _readers_pass += r - _readers_size;
   }
 
   void RunReaders(std::uint64_t s) noexcept {
-    if (s / kWriter != 1) {
+    if (std::uint32_t w = s / kWriter; w != 1) {
       _readers_wait.store(_readers_size, std::memory_order_relaxed);
+      auto* node = _writers_head.next;
+      _writers_head.next = node->next;
+      if (_writers_head.next == nullptr) {
+        _writers_tail = &_writers_head;
+      }
+      _writers_first = node;
+      if constexpr (FIFO) {
+        _writers_prio = w - 2;
+      }
     } else {
       PassReaders(s);
     }
     auto readers = std::move(_readers);
     _readers_size = 0;
-    if constexpr (FIFO) {
-      _stats.prio = _stats.size;
-    }
     _lock.unlock();
 
     do {
-      auto& core = static_cast<BaseCore&>(readers.PopFront());
-      core._executor->Submit(core);
+      Run(&readers.PopFront());
     } while (!readers.Empty());
   }
 
@@ -132,7 +145,7 @@ struct SharedMutexImpl {
     _lock.lock();
     auto s = _state.fetch_sub(kWriter, std::memory_order_acq_rel);
     if constexpr (FIFO) {
-      if (_stats.prio != 0) {
+      if (_writers_prio != 0) {
         YACLIB_ASSERT(s / kWriter > 1);
         return RunWriter();
       }
@@ -141,8 +154,7 @@ struct SharedMutexImpl {
       return RunReaders(s);
     }
     if constexpr (!FIFO) {
-      if (!_writers.Empty()) {
-        YACLIB_ASSERT(s / kWriter > 1);
+      if (s / kWriter != 1) {
         return RunWriter();
       }
     }
@@ -150,14 +162,13 @@ struct SharedMutexImpl {
     _lock.unlock();
   }
 
-  yaclib_std::atomic_uint64_t _state = 0;
+  yaclib_std::atomic_uint64_t _state = 0;  // TODO(MBkkt) think about relax memory orders
   std::conditional_t<ReadersFIFO, List, Stack> _readers;
-  List _writers;  // TODO(MBkkt) add option for batched LIFO, see Mutex
-  struct Stats {
-    std::uint32_t size = 0;
-    std::uint32_t prio = 0;
-  };
-  YACLIB_NO_UNIQUE_ADDRESS std::conditional_t<FIFO, Stats, Unit> _stats;
+  // TODO(MBkkt) add option for batched LIFO, see Mutex
+  Node* _writers_first = nullptr;
+  Node _writers_head;
+  Node* _writers_tail = &_writers_head;
+  std::uint32_t _writers_prio = 0;
   yaclib_std::atomic_uint32_t _readers_wait = 0;
   std::uint32_t _readers_size = 0;
   std::uint32_t _readers_pass = 0;
