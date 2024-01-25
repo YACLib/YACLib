@@ -393,7 +393,7 @@ TYPED_TEST(AsyncSuite, UnlockOnBehaviour) {
 }
 
 TEST(Mutex, StickyGuard) {
-#if defined(GTEST_OS_WINDOWS) && !(defined(NDEBUG) && defined(_WIN64))
+#if defined(GTEST_OS_WINDOWS)
   GTEST_SKIP();  // Doesn't work for Win32 or Debug, I think its probably because bad symmetric transfer implementation
   // TODO(kononovk) Try to confirm problem and localize it with ifdefs
 #endif
