@@ -31,7 +31,7 @@ jobs:
             build_type: RelWithDebInfo
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Update deps on macOS
         run: |
