@@ -1,0 +1,14 @@
+<map id="yaclib::detail::fiber::AtomicWait&lt; T &gt;" name="yaclib::detail::fiber::AtomicWait&lt; T &gt;">
+<area shape="rect" id="node1" title=" " alt="" coords="5,167,131,209"/>
+<area shape="rect" id="node2" href="$classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html" title=" " alt="" coords="234,93,363,134"/>
+<area shape="rect" id="node10" href="$classyaclib_1_1detail_1_1fiber_1_1AtomicWait.html" title=" " alt="" coords="231,167,366,209"/>
+<area shape="rect" id="node11" href="$classyaclib_1_1detail_1_1fiber_1_1AtomicWait.html" title=" " alt="" coords="228,233,369,274"/>
+<area shape="rect" id="node3" href="$classyaclib_1_1detail_1_1fiber_1_1AtomicFloatingBase.html" title=" " alt="" coords="461,5,607,61"/>
+<area shape="rect" id="node6" href="$classyaclib_1_1detail_1_1fiber_1_1AtomicFloatingBase_3_01T_00_01true_01_4.html" title=" " alt="" coords="461,85,607,141"/>
+<area shape="rect" id="node8" href="$classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html" title=" " alt="" coords="465,166,603,207"/>
+<area shape="rect" id="node4" href="$classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase.html" title=" " alt="" coords="656,5,799,61"/>
+<area shape="rect" id="node5" href="$classyaclib_1_1detail_1_1fiber_1_1Atomic.html" title=" " alt="" coords="848,13,971,54"/>
+<area shape="rect" id="node7" href="$classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase_3_01T_00_01true_01_4.html" title=" " alt="" coords="656,85,799,141"/>
+<area shape="rect" id="node9" href="$classyaclib_1_1detail_1_1fiber_1_1Atomic_3_01U_01_5_01_4.html" title=" " alt="" coords="666,166,789,207"/>
+<area shape="rect" id="node12" href="$classyaclib_1_1detail_1_1fiber_1_1AtomicFlag.html" title=" " alt="" coords="473,233,595,274"/>
+</map>

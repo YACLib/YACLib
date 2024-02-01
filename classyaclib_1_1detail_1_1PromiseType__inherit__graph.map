@@ -1,0 +1,13 @@
+<map id="yaclib::detail::PromiseType&lt; V, E, Lazy &gt;" name="yaclib::detail::PromiseType&lt; V, E, Lazy &gt;">
+<area shape="rect" id="node1" title=" " alt="" coords="1487,66,1661,107"/>
+<area shape="rect" id="node2" href="$structyaclib_1_1detail_1_1OneCounter.html" title=" " alt="" coords="1211,59,1437,115"/>
+<area shape="rect" id="node3" href="$classyaclib_1_1detail_1_1ResultCore.html" title=" " alt="" coords="862,33,1025,74"/>
+<area shape="rect" id="node4" href="$classyaclib_1_1detail_1_1BaseCore.html" title=" " alt="" coords="656,40,811,67"/>
+<area shape="rect" id="node5" href="$classyaclib_1_1detail_1_1InlineCore.html" title=" " alt="" coords="451,40,607,67"/>
+<area shape="rect" id="node6" href="$classyaclib_1_1Job.html" title="Callable that can be executed in an IExecutor." alt="" coords="319,40,401,67"/>
+<area shape="rect" id="node7" href="$classyaclib_1_1IFunc.html" title="Callable interface." alt="" coords="157,5,252,32"/>
+<area shape="rect" id="node8" href="$classyaclib_1_1IRef.html" title="Reference counting interface." alt="" coords="5,5,91,32"/>
+<area shape="rect" id="node9" href="$structyaclib_1_1detail_1_1Node.html" title="Node class, used in intrusive data structure." alt="" coords="140,56,269,83"/>
+<area shape="rect" id="node10" href="$structyaclib_1_1detail_1_1OneCounter.html" title=" " alt="" coords="860,98,1027,139"/>
+<area shape="rect" id="node11" href="$classCounterBase.html" title=" " alt="" coords="685,105,782,132"/>
+</map>

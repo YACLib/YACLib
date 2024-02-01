@@ -1,0 +1,5 @@
+<map id="yaclib::FutureBase&lt; V, E &gt;" name="yaclib::FutureBase&lt; V, E &gt;">
+<area shape="rect" id="node1" title="Provides a mechanism to access the result of async operations." alt="" coords="101,5,229,47"/>
+<area shape="rect" id="node2" href="$classyaclib_1_1Future.html" title="Provides a mechanism to access the result of async operations." alt="" coords="5,95,149,121"/>
+<area shape="rect" id="node3" href="$classyaclib_1_1FutureOn.html" title="Provides a mechanism to access the result of async operations." alt="" coords="174,95,335,121"/>
+</map>

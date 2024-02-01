@@ -1,0 +1,7 @@
+<map id="yaclib::detail::fiber::FiberBase" name="yaclib::detail::fiber::FiberBase">
+<area shape="rect" id="node1" title=" " alt="" coords="86,184,209,225"/>
+<area shape="rect" id="node5" href="$classyaclib_1_1detail_1_1fiber_1_1Fiber.html" title=" " alt="" coords="86,273,209,315"/>
+<area shape="rect" id="node2" href="$classyaclib_1_1detail_1_1fiber_1_1BiNodeScheduler.html" title=" " alt="" coords="5,95,135,136"/>
+<area shape="rect" id="node3" href="$structyaclib_1_1detail_1_1fiber_1_1Node.html" title=" " alt="" coords="86,5,209,47"/>
+<area shape="rect" id="node4" href="$classyaclib_1_1detail_1_1fiber_1_1BiNodeWaitQueue.html" title=" " alt="" coords="159,95,293,136"/>
+</map>

@@ -1,0 +1,52 @@
+<map id="include/yaclib/coro/future.hpp" name="include/yaclib/coro/future.hpp">
+<area shape="rect" id="node1" title=" " alt="" coords="1775,5,1904,47"/>
+<area shape="rect" id="node2" href="$async_2future_8hpp.html" title=" " alt="" coords="1762,169,1917,196"/>
+<area shape="rect" id="node46" href="$promise__type_8hpp.html" title=" " alt="" coords="1599,423,1725,464"/>
+<area shape="rect" id="node48" href="$lazy_2task_8hpp.html" title=" " alt="" coords="1949,95,2084,121"/>
+<area shape="rect" id="node3" href="$result__core_8hpp.html" title=" " alt="" coords="1852,512,1971,553"/>
+<area shape="rect" id="node15" href="$executor_8hpp.html" title=" " alt="" coords="1787,787,1943,814"/>
+<area shape="rect" id="node19" href="$fwd_8hpp.html" title=" " alt="" coords="2233,877,2337,903"/>
+<area shape="rect" id="node24" href="$type__traits_8hpp.html" title=" " alt="" coords="2460,698,2624,725"/>
+<area shape="rect" id="node28" href="$helper_8hpp.html" title=" " alt="" coords="1385,430,1523,457"/>
+<area shape="rect" id="node33" href="$future__impl_8hpp.html" title=" " alt="" coords="1542,244,1670,285"/>
+<area shape="rect" id="node4" href="$base__core_8hpp.html" title=" " alt="" coords="857,601,976,643"/>
+<area shape="rect" id="node14" title=" " alt="" coords="2779,1048,2831,1075"/>
+<area shape="rect" id="node16" href="$intrusive__ptr_8hpp.html" title=" " alt="" coords="1583,869,1712,911"/>
+<area shape="rect" id="node23" href="$result_8hpp.html" title=" " alt="" coords="2253,609,2389,635"/>
+<area shape="rect" id="node5" href="$inline__core_8hpp.html" title=" " alt="" coords="587,691,705,732"/>
+<area shape="rect" id="node6" title=" " alt="" coords="974,787,1091,814"/>
+<area shape="rect" id="node8" href="$log_8hpp.html" title=" " alt="" coords="927,1048,1027,1075"/>
+<area shape="rect" id="node12" href="$ref_8hpp.html" title=" " alt="" coords="555,1048,673,1075"/>
+<area shape="rect" id="node18" href="$inline_8hpp.html" title=" " alt="" coords="1857,698,1995,725"/>
+<area shape="rect" id="node20" title=" " alt="" coords="831,698,893,725"/>
+<area shape="rect" id="node21" title=" " alt="" coords="917,698,970,725"/>
+<area shape="rect" id="node22" title=" " alt="" coords="1197,698,1319,725"/>
+<area shape="rect" id="node7" href="$job_8hpp.html" title=" " alt="" coords="1744,877,1868,903"/>
+<area shape="rect" id="node10" href="$node_8hpp.html" title=" " alt="" coords="1751,959,1861,1000"/>
+<area shape="rect" id="node11" href="$func_8hpp.html" title=" " alt="" coords="1975,966,2104,993"/>
+<area shape="rect" id="node9" title=" " alt="" coords="933,1123,1021,1149"/>
+<area shape="rect" id="node13" title=" " alt="" coords="2453,1048,2535,1075"/>
+<area shape="rect" id="node17" href="$intrusive__ptr__impl_8hpp.html" title=" " alt="" coords="1350,959,1502,1000"/>
+<area shape="rect" id="node26" title=" " alt="" coords="2170,787,2247,814"/>
+<area shape="rect" id="node27" title=" " alt="" coords="2222,698,2283,725"/>
+<area shape="rect" id="node25" href="$type__traits__impl_8hpp.html" title=" " alt="" coords="2423,780,2565,821"/>
+<area shape="rect" id="node29" href="$atomic__counter_8hpp.html" title=" " alt="" coords="1222,512,1361,553"/>
+<area shape="rect" id="node32" href="$unique__counter_8hpp.html" title=" " alt="" coords="1385,512,1523,553"/>
+<area shape="rect" id="node30" href="$default__deleter_8hpp.html" title=" " alt="" coords="1293,601,1428,643"/>
+<area shape="rect" id="node31" title=" " alt="" coords="1000,609,1065,635"/>
+<area shape="rect" id="node34" href="$core_8hpp.html" title=" " alt="" coords="1544,333,1663,375"/>
+<area shape="rect" id="node36" href="$wait_8hpp.html" title=" " alt="" coords="960,341,1105,367"/>
+<area shape="rect" id="node35" href="$func__core_8hpp.html" title=" " alt="" coords="2648,691,2767,732"/>
+<area shape="rect" id="node37" href="$wait__impl_8hpp.html" title=" " alt="" coords="918,423,1046,464"/>
+<area shape="rect" id="node40" href="$default__event_8hpp.html" title=" " alt="" coords="535,512,663,553"/>
+<area shape="rect" id="node38" href="$wait__event_8hpp.html" title=" " alt="" coords="825,512,944,553"/>
+<area shape="rect" id="node39" href="$set__deleter_8hpp.html" title=" " alt="" coords="718,601,833,643"/>
+<area shape="rect" id="node45" title=" " alt="" coords="739,519,801,546"/>
+<area shape="rect" id="node41" href="$mutex__event_8hpp.html" title=" " alt="" coords="157,601,281,643"/>
+<area shape="rect" id="node42" title=" " alt="" coords="189,698,250,725"/>
+<area shape="rect" id="node43" title=" " alt="" coords="274,691,410,732"/>
+<area shape="rect" id="node44" title=" " alt="" coords="45,698,164,725"/>
+<area shape="rect" id="node47" href="$coro_8hpp.html" title=" " alt="" coords="1452,609,1589,635"/>
+<area shape="rect" id="node49" href="$task__impl_8hpp.html" title=" " alt="" coords="2396,333,2512,375"/>
+<area shape="rect" id="node50" href="$promise__core_8hpp.html" title=" " alt="" coords="2694,423,2822,464"/>
+</map>

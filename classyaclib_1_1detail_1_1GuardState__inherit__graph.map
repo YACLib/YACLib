@@ -1,0 +1,9 @@
+<map id="yaclib::detail::GuardState" name="yaclib::detail::GuardState">
+<area shape="rect" id="node1" title=" " alt="" coords="5,58,169,85"/>
+<area shape="rect" id="node2" href="$classyaclib_1_1detail_1_1Guard.html" title=" " alt="" coords="472,5,605,47"/>
+<area shape="rect" id="node4" href="$classyaclib_1_1detail_1_1Guard.html" title=" " alt="" coords="472,100,605,141"/>
+<area shape="rect" id="node7" href="$classyaclib_1_1detail_1_1Guard.html" title=" " alt="" coords="219,51,352,92"/>
+<area shape="rect" id="node3" href="$classyaclib_1_1SharedGuard.html" title=" " alt="" coords="655,13,825,39"/>
+<area shape="rect" id="node5" href="$classyaclib_1_1StickyGuard.html" title=" " alt="" coords="657,127,823,154"/>
+<area shape="rect" id="node6" href="$classyaclib_1_1UniqueGuard.html" title=" " alt="" coords="655,77,825,103"/>
+</map>

@@ -1,0 +1,12 @@
+<map id="yaclib::detail::AwaitEvent" name="yaclib::detail::AwaitEvent">
+<area shape="rect" id="node1" title=" " alt="" coords="949,65,1113,92"/>
+<area shape="rect" id="node2" href="$classyaclib_1_1detail_1_1InlineCore.html" title=" " alt="" coords="730,35,886,61"/>
+<area shape="rect" id="node3" href="$classyaclib_1_1Job.html" title="Callable that can be executed in an IExecutor." alt="" coords="369,35,452,61"/>
+<area shape="rect" id="node4" href="$classyaclib_1_1IFunc.html" title="Callable interface." alt="" coords="157,5,252,32"/>
+<area shape="rect" id="node5" href="$classyaclib_1_1IRef.html" title="Reference counting interface." alt="" coords="5,5,91,32"/>
+<area shape="rect" id="node6" href="$structyaclib_1_1detail_1_1Node.html" title="Node class, used in intrusive data structure." alt="" coords="140,56,269,83"/>
+<area shape="rect" id="node7" href="$structyaclib_1_1detail_1_1AtomicCounter.html" title=" " alt="" coords="716,86,900,127"/>
+<area shape="rect" id="node8" href="$structyaclib_1_1detail_1_1NopeBase.html" title=" " alt="" coords="331,89,490,116"/>
+<area shape="rect" id="node9" href="$structyaclib_1_1detail_1_1AtomicCounter.html" title=" " alt="" coords="319,141,503,182"/>
+<area shape="rect" id="node10" href="$classCounterBase.html" title=" " alt="" coords="156,148,253,175"/>
+</map>

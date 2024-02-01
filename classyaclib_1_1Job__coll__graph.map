@@ -1,0 +1,6 @@
+<map id="yaclib::Job" name="yaclib::Job">
+<area shape="rect" id="node1" title="Callable that can be executed in an IExecutor." alt="" coords="78,157,161,184"/>
+<area shape="rect" id="node2" href="$classyaclib_1_1IFunc.html" title="Callable interface." alt="" coords="5,81,100,108"/>
+<area shape="rect" id="node3" href="$classyaclib_1_1IRef.html" title="Reference counting interface." alt="" coords="10,5,95,32"/>
+<area shape="rect" id="node4" href="$structyaclib_1_1detail_1_1Node.html" title="Node class, used in intrusive data structure." alt="" coords="124,81,253,108"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="yaclib::detail::fiber::AtomicFloatingBase&lt; T, IsFloating &gt;" name="yaclib::detail::fiber::AtomicFloatingBase&lt; T, IsFloating &gt;">
+<area shape="rect" id="node1" title=" " alt="" coords="5,184,151,240"/>
+<area shape="rect" id="node4" href="$classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase.html" title=" " alt="" coords="7,288,149,344"/>
+<area shape="rect" id="node2" href="$classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html" title=" " alt="" coords="13,95,143,136"/>
+<area shape="rect" id="node3" href="$classyaclib_1_1detail_1_1fiber_1_1AtomicWait.html" title=" " alt="" coords="15,5,141,47"/>
+<area shape="rect" id="node5" href="$classyaclib_1_1detail_1_1fiber_1_1Atomic.html" title=" " alt="" coords="17,392,139,433"/>
+</map>

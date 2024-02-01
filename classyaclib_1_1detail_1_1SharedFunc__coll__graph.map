@@ -1,0 +1,6 @@
+<map id="yaclib::detail::SharedFunc&lt; Func &gt;" name="yaclib::detail::SharedFunc&lt; Func &gt;">
+<area shape="rect" id="node1" title=" " alt="" coords="41,169,209,211"/>
+<area shape="rect" id="node2" href="$classyaclib_1_1IFunc.html" title="Callable interface." alt="" coords="5,87,100,114"/>
+<area shape="rect" id="node3" href="$classyaclib_1_1IRef.html" title="Reference counting interface." alt="" coords="10,5,95,32"/>
+<area shape="rect" id="node4" href="$classyaclib_1_1detail_1_1SafeCall.html" title=" " alt="" coords="125,80,271,121"/>
+</map>

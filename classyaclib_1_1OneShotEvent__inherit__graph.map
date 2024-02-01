@@ -1,0 +1,5 @@
+<map id="yaclib::OneShotEvent" name="yaclib::OneShotEvent">
+<area shape="rect" id="node1" title="This class useful to wait or co_await some event." alt="" coords="5,35,151,61"/>
+<area shape="rect" id="node2" href="$structyaclib_1_1detail_1_1AtomicCounter.html" title=" " alt="" coords="199,27,395,69"/>
+<area shape="rect" id="node3" href="$structyaclib_1_1detail_1_1MultiEvent.html" title=" " alt="" coords="443,5,628,91"/>
+</map>

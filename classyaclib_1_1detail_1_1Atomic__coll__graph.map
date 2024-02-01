@@ -1,0 +1,8 @@
+<map id="yaclib::detail::Atomic&lt; Impl, T &gt;" name="yaclib::detail::Atomic&lt; Impl, T &gt;">
+<area shape="rect" id="node1" title=" " alt="" coords="29,437,167,479"/>
+<area shape="rect" id="node2" href="$classyaclib_1_1detail_1_1AtomicIntegralBase.html" title=" " alt="" coords="7,348,189,389"/>
+<area shape="rect" id="node3" href="$classyaclib_1_1detail_1_1AtomicFloatingBase.html" title=" " alt="" coords="5,259,191,300"/>
+<area shape="rect" id="node4" href="$classyaclib_1_1detail_1_1AtomicBase.html" title=" " alt="" coords="13,169,183,211"/>
+<area shape="rect" id="node5" href="$classyaclib_1_1detail_1_1AtomicWait.html" title=" " alt="" coords="15,80,181,121"/>
+<area shape="rect" id="node6" title=" " alt="" coords="75,5,121,32"/>
+</map>

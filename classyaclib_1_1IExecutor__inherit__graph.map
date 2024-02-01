@@ -1,0 +1,7 @@
+<map id="yaclib::IExecutor" name="yaclib::IExecutor">
+<area shape="rect" id="node1" title=" " alt="" coords="199,80,313,107"/>
+<area shape="rect" id="node3" href="$classyaclib_1_1FairThreadPool.html" title="TODO(kononovk) Doxygen docs." alt="" coords="5,155,155,181"/>
+<area shape="rect" id="node4" href="$classyaclib_1_1ManualExecutor.html" title="TODO(mkornaukhov03) Doxygen." alt="" coords="179,155,333,181"/>
+<area shape="rect" id="node5" href="$classyaclib_1_1Strand.html" title=" " alt="" coords="357,155,456,181"/>
+<area shape="rect" id="node2" href="$classyaclib_1_1IRef.html" title="Reference counting interface." alt="" coords="213,5,299,32"/>
+</map>

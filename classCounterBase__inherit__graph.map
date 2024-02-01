@@ -1,0 +1,11 @@
+<map id="CounterBase" name="CounterBase">
+<area shape="rect" id="node1" title=" " alt="" coords="5,123,103,150"/>
+<area shape="rect" id="node2" href="$structyaclib_1_1detail_1_1AtomicCounter.html" title=" " alt="" coords="152,79,336,120"/>
+<area shape="rect" id="node7" href="$structyaclib_1_1detail_1_1OneCounter.html" title=" " alt="" coords="161,148,327,189"/>
+<area shape="rect" id="node3" href="$structyaclib_1_1detail_1_1AtomicCounter.html" title=" " alt="" coords="583,5,767,47"/>
+<area shape="rect" id="node5" href="$structyaclib_1_1detail_1_1AtomicCounter.html" title=" " alt="" coords="577,79,773,120"/>
+<area shape="rect" id="node4" href="$classyaclib_1_1detail_1_1AwaitEvent.html" title=" " alt="" coords="848,6,1012,33"/>
+<area shape="rect" id="node6" href="$structyaclib_1_1detail_1_1MultiEvent.html" title=" " alt="" coords="837,57,1023,142"/>
+<area shape="rect" id="node8" href="$structyaclib_1_1detail_1_1OneCounter.html" title=" " alt="" coords="561,155,788,211"/>
+<area shape="rect" id="node9" href="$classyaclib_1_1detail_1_1PromiseType.html" title=" " alt="" coords="843,167,1017,208"/>
+</map>

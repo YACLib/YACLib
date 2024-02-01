@@ -1,0 +1,17 @@
+<map id="include/yaclib/coro/guard.hpp" name="include/yaclib/coro/guard.hpp">
+<area shape="rect" id="node1" title=" " alt="" coords="161,5,291,47"/>
+<area shape="rect" id="node2" href="$guard__state_8hpp.html" title=" " alt="" coords="5,95,124,136"/>
+<area shape="rect" id="node6" href="$executor_8hpp.html" title=" " alt="" coords="148,102,304,129"/>
+<area shape="rect" id="node15" title=" " alt="" coords="328,102,385,129"/>
+<area shape="rect" id="node3" href="$log_8hpp.html" title=" " alt="" coords="9,363,109,389"/>
+<area shape="rect" id="node5" title=" " alt="" coords="46,191,107,218"/>
+<area shape="rect" id="node4" title=" " alt="" coords="15,437,103,464"/>
+<area shape="rect" id="node7" href="$job_8hpp.html" title=" " alt="" coords="153,191,277,218"/>
+<area shape="rect" id="node13" href="$intrusive__ptr_8hpp.html" title=" " alt="" coords="407,184,536,225"/>
+<area shape="rect" id="node8" href="$node_8hpp.html" title=" " alt="" coords="97,273,208,315"/>
+<area shape="rect" id="node9" href="$func_8hpp.html" title=" " alt="" coords="409,281,539,307"/>
+<area shape="rect" id="node10" href="$ref_8hpp.html" title=" " alt="" coords="444,363,563,389"/>
+<area shape="rect" id="node11" title=" " alt="" coords="586,363,669,389"/>
+<area shape="rect" id="node12" title=" " alt="" coords="368,363,420,389"/>
+<area shape="rect" id="node14" href="$intrusive__ptr__impl_8hpp.html" title=" " alt="" coords="233,273,385,315"/>
+</map>

@@ -1,0 +1,23 @@
+<map id="yaclib::detail::PromiseCore&lt; V, E, Func &gt;" name="yaclib::detail::PromiseCore&lt; V, E, Func &gt;">
+<area shape="rect" id="node1" title=" " alt="" coords="1527,217,1700,258"/>
+<area shape="rect" id="node2" href="$classyaclib_1_1detail_1_1ResultCore.html" title=" " alt="" coords="1315,177,1477,218"/>
+<area shape="rect" id="node3" href="$classyaclib_1_1detail_1_1BaseCore.html" title=" " alt="" coords="1069,184,1224,211"/>
+<area shape="rect" id="node4" href="$classyaclib_1_1detail_1_1InlineCore.html" title=" " alt="" coords="757,184,913,211"/>
+<area shape="rect" id="node5" href="$classyaclib_1_1Job.html" title="Callable that can be executed in an IExecutor." alt="" coords="443,184,526,211"/>
+<area shape="rect" id="node6" href="$classyaclib_1_1IFunc.html" title="Callable interface." alt="" coords="235,196,329,223"/>
+<area shape="rect" id="node7" href="$classyaclib_1_1IRef.html" title="Reference counting interface." alt="" coords="5,140,91,167"/>
+<area shape="rect" id="node15" href="$structyaclib_1_1detail_1_1Callback.html" title=" " alt="" coords="208,56,356,83"/>
+<area shape="rect" id="node8" href="$structyaclib_1_1detail_1_1Node.html" title="Node class, used in intrusive data structure." alt="" coords="217,145,347,172"/>
+<area shape="rect" id="node9" title=" " alt="" coords="758,235,913,261"/>
+<area shape="rect" id="node10" title=" " alt="" coords="454,235,515,261"/>
+<area shape="rect" id="node11" href="$classyaclib_1_1IntrusivePtr.html" title=" " alt="" coords="771,118,899,159"/>
+<area shape="rect" id="node12" href="$classyaclib_1_1IntrusivePtr.html" title="A intrusive pointer to objects with an embedded reference count." alt="" coords="405,125,564,152"/>
+<area shape="rect" id="node13" href="$classyaclib_1_1Result.html" title=" " alt="" coords="1075,263,1219,289"/>
+<area shape="rect" id="node14" href="$classyaclib_1_1Result.html" title="Encapsulated return value from caller." alt="" coords="747,285,923,312"/>
+<area shape="rect" id="node16" title=" " alt="" coords="25,56,71,83"/>
+<area shape="rect" id="node17" title=" " alt="" coords="1091,5,1203,32"/>
+<area shape="rect" id="node18" href="$classyaclib_1_1detail_1_1FuncCore.html" title=" " alt="" coords="1319,249,1473,290"/>
+<area shape="rect" id="node19" href="$unionyaclib_1_1detail_1_1FuncCore_1_1State.html" title=" " alt="" coords="1069,337,1224,378"/>
+<area shape="rect" id="node20" title=" " alt="" coords="709,403,961,429"/>
+<area shape="rect" id="node21" title=" " alt="" coords="723,337,948,378"/>
+</map>

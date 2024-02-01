@@ -1,0 +1,4 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$classyaclib_1_1detail_1_1fiber_1_1IStackAllocator.html" title="Passed to coroutine/fiber constructor, specifies the way in which memory for Stack is Allocated and R..." alt="" coords="5,5,128,47"/>
+<area shape="rect" id="node2" href="$classyaclib_1_1detail_1_1fiber_1_1DefaultAllocator.html" title="Allocator used by default." alt="" coords="176,5,299,47"/>
+</map>

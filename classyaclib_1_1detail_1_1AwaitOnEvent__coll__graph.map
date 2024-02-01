@@ -1,0 +1,14 @@
+<map id="yaclib::detail::AwaitOnEvent&lt; Single &gt;" name="yaclib::detail::AwaitOnEvent&lt; Single &gt;">
+<area shape="rect" id="node1" title=" " alt="" coords="317,440,499,481"/>
+<area shape="rect" id="node2" href="$classyaclib_1_1detail_1_1InlineCore.html" title=" " alt="" coords="337,254,493,281"/>
+<area shape="rect" id="node8" href="$classyaclib_1_1detail_1_1BaseCore.html" title=" " alt="" coords="203,351,357,377"/>
+<area shape="rect" id="node3" href="$classyaclib_1_1Job.html" title="Callable that can be executed in an IExecutor." alt="" coords="373,157,456,184"/>
+<area shape="rect" id="node4" href="$classyaclib_1_1IFunc.html" title="Callable interface." alt="" coords="287,81,382,108"/>
+<area shape="rect" id="node5" href="$classyaclib_1_1IRef.html" title="Reference counting interface." alt="" coords="292,5,377,32"/>
+<area shape="rect" id="node6" href="$structyaclib_1_1detail_1_1Node.html" title="Node class, used in intrusive data structure." alt="" coords="406,81,535,108"/>
+<area shape="rect" id="node7" title=" " alt="" coords="446,351,629,377"/>
+<area shape="rect" id="node9" title=" " alt="" coords="5,254,160,281"/>
+<area shape="rect" id="node10" title=" " alt="" coords="52,157,113,184"/>
+<area shape="rect" id="node11" href="$classyaclib_1_1IntrusivePtr.html" title=" " alt="" coords="184,247,312,288"/>
+<area shape="rect" id="node12" href="$classyaclib_1_1IntrusivePtr.html" title="A intrusive pointer to objects with an embedded reference count." alt="" coords="169,157,327,184"/>
+</map>
