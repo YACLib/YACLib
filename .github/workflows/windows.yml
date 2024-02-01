@@ -41,7 +41,7 @@ jobs:
             build_type: RelWithDebInfo
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       # TODO(MBkkt) https://github.com/msys2/setup-msys2?
       # TODO(MBkkt) Run tests with MinGW
