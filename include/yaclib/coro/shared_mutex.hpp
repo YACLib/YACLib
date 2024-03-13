@@ -26,18 +26,16 @@ struct SharedMutexImpl {
   }
 
   [[nodiscard]] bool AwaitLockShared(BaseCore& curr) noexcept {
-    fprintf(stderr, "Push readers\n");
     return Suspend(_readers_tail, curr);
   }
 
   [[nodiscard]] bool AwaitLock(BaseCore& curr) noexcept {
     auto s = _state.fetch_add(kWriter, std::memory_order_acq_rel);
     if (s / kWriter != 0) {
-      fprintf(stderr, "Push writers\n");
       return Suspend(_writers_tail, curr);
     }
-    _writer_reader = &curr;
     std::uint32_t r = s % kWriter;
+    _writers_first = &curr;
     return r != 0 && _readers_wait.fetch_add(r, std::memory_order_acq_rel) != -r;
   }
 
@@ -61,7 +59,7 @@ struct SharedMutexImpl {
       // at least one writer waiting lock, so noone can acquire lock
       if (_readers_wait.fetch_sub(1, std::memory_order_acq_rel) == 1) {
         // last active reader will run writer
-        _writer_reader->_executor->Submit(*_writer_reader);
+        _writers_first->_executor->Submit(*_writers_first);
       }
     }
   }
@@ -81,10 +79,8 @@ struct SharedMutexImpl {
             return;
           }
         }
-        fprintf(stderr, "Wait readers r=%u\n", r);
         Wait(_readers_tail);
         _readers_head = PopAll<ReadersFIFO>(_readers_tail);
-        fprintf(stderr, "Pop readers 1\n");
       }
     }
     if (FIFO && _writers_head != nullptr) {
@@ -94,21 +90,18 @@ struct SharedMutexImpl {
     // We want to run all readers from current readers queue
     auto r = RunReaders();
     _readers_head = PopAll<ReadersFIFO>(_readers_tail);
-    fprintf(stderr, "Pop readers 2\n");
     r += RunReaders();
     if (FIFO || _writers_head == nullptr) {
       YACLIB_ASSERT(_writers_head == nullptr);
       // We need to wait at least single writer from writers queue
-      fprintf(stderr, "Wait writers, r=%u, sr=%lu, sw=%lu\n", r, s % kWriter, s / kWriter);
       Wait(_writers_tail);
       _writers_head = PopAll<WritersFIFO>(_writers_tail);
-      fprintf(stderr, "Pop writers\n");
     }
     YACLIB_ASSERT(_writers_head != nullptr);
-    _writer_reader = _writers_head;
+    _writers_first = _writers_head;
     _writers_head = static_cast<BaseCore*>(_writers_head->next);
     if (r == 0 || _readers_wait.fetch_add(r, std::memory_order_acq_rel) == -r) {
-      _writer_reader->_executor->Submit(*_writer_reader);
+      _writers_first->_executor->Submit(*_writers_first);
     }
   }
 
@@ -185,7 +178,7 @@ struct SharedMutexImpl {
   yaclib_std::atomic<BaseCore*> _readers_tail = nullptr;
   BaseCore* _readers_head = nullptr;
   yaclib_std::atomic_uint32_t _readers_wait = 0;
-  BaseCore* _writer_reader = nullptr;
+  BaseCore* _writers_first = nullptr;
 };
 
 }  // namespace detail
