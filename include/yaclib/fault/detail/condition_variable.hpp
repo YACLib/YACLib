@@ -20,7 +20,9 @@ template <typename Impl>
 class ConditionVariable : private Impl {
  public:
   using Impl::Impl;
+#ifndef _MSC_VER
   using Impl::native_handle;
+#endif
 
   void notify_one() noexcept {
     YACLIB_INJECT_FAULT(Impl::notify_one());
