@@ -11,7 +11,7 @@ on:
 
 jobs:
   main:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
 
     env:
       YACLIB_FAULT: 'OFF THREAD FIBER'
@@ -26,19 +26,19 @@ jobs:
           sudo add-apt-repository "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-14 main"
           sudo apt update
           sudo apt install ninja-build lcov googletest                                                             \
-                           gcc-14 g++-14 libstdc++-14-dev lld-18
+                           gcc-12 g++-12 libstdc++-12-dev lld-18
           #                llvm-18 clang-18 libc++-18-dev libc++abi-18-dev
           sudo ln -sf /usr/bin/lld-18 /usr/local/bin/ld
 
           sudo update-alternatives                                                                                     \
-            --install /usr/bin/gcc        gcc        /usr/bin/gcc-14        200                                        \
-            --slave   /usr/bin/g++        g++        /usr/bin/g++-14                                                   \
-            --slave   /usr/bin/gcc-ar     gcc-ar     /usr/bin/gcc-ar-14                                                \
-            --slave   /usr/bin/gcc-nm     gcc-nm     /usr/bin/gcc-nm-14                                                \
-            --slave   /usr/bin/gcc-ranlib gcc-ranlib /usr/bin/gcc-ranlib-14                                            \
-            --slave   /usr/bin/gcov       gcov       /usr/bin/gcov-14                                                  \
-            --slave   /usr/bin/gcov-tool  gcov-tool  /usr/bin/gcov-tool-14                                             \
-            --slave   /usr/bin/gcov-dump  gcov-dump  /usr/bin/gcov-dump-14
+            --install /usr/bin/gcc        gcc        /usr/bin/gcc-12        200                                        \
+            --slave   /usr/bin/g++        g++        /usr/bin/g++-12                                                   \
+            --slave   /usr/bin/gcc-ar     gcc-ar     /usr/bin/gcc-ar-12                                                \
+            --slave   /usr/bin/gcc-nm     gcc-nm     /usr/bin/gcc-nm-12                                                \
+            --slave   /usr/bin/gcc-ranlib gcc-ranlib /usr/bin/gcc-ranlib-12                                            \
+            --slave   /usr/bin/gcov       gcov       /usr/bin/gcov-12                                                  \
+            --slave   /usr/bin/gcov-tool  gcov-tool  /usr/bin/gcov-tool-12                                             \
+            --slave   /usr/bin/gcov-dump  gcov-dump  /usr/bin/gcov-dump-12
           sudo update-alternatives --auto gcc
 
           gcc --version; gcov --version
@@ -60,7 +60,7 @@ jobs:
                 -DYACLIB_TEST=SINGLE                                                                                   \
                 -DYACLIB_FLAGS="COVERAGE;CORO;$wait_type"                                                              \
                 -DYACLIB_CXX_STANDARD=20                                                                               \
-                -DYACLIB_COMPILE_OPTIONS="-Og;-fno-inline;-fprofile-update=atomic"
+                -DYACLIB_COMPILE_OPTIONS="-Og;-fno-inline"
 
               lcov --zerocounters --directory .
 

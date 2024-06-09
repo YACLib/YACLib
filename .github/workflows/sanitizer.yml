@@ -244,8 +244,10 @@ jobs:
                 # I think ClangCL with ASAN should be possible
               fi
               if [[ "${names[$i]}" == "MSVC" ]]; then
+                cxx_standard=23
                 coroutine_option="CORO"
               else
+                cxx_standard=17
                 coroutine_option=""
               fi
 
@@ -253,7 +255,7 @@ jobs:
               echo $dir
 
               cmake -S . -B $dir                                                                                       \
-                -DYACLIB_CXX_STANDARD=20                                                                               \
+                -DYACLIB_CXX_STANDARD=${cxx_standard}                                                                  \
                 -DYACLIB_TEST=SINGLE                                                                                   \
                 -DYACLIB_FLAGS="$coroutine_option;$flags"                                                              \
                 -DYACLIB_FAULT=$yaclib_fault                                                                           \
