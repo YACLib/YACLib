@@ -10,14 +10,13 @@ on:
     paths: [ '**.cpp', '**.hpp' ]
 
 jobs:
-  # TODO(MBkkt) clang-format 14, now this extension doesn't work, because clang-14 not really released yet
   # TODO(MBkkt) Use our own script instead of github action, same as in /.githooks
   # TODO(MBkkt) Check cmake format?
   # TODO(MBkkt) Check markdown format?
   # TODO(MBkkt) Add option or workflow for reformat
 
   main:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -27,7 +26,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Run clang-format style check
-        uses: jidicula/clang-format-action@v4.9.0
+        uses: jidicula/clang-format-action@v4.13.0
         with:
-          clang-format-version: 13
+          clang-format-version: 18
           check-path: ${{ matrix.path }}

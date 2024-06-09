@@ -23,82 +23,88 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ 20.04, 22.04 ]
-        compiler: [ clang-8, clang-9, clang-10, clang-11, clang-12, clang-13, clang-14, clang-15,
-                    gcc-7, gcc-8, gcc-9, gcc-10, gcc-11, gcc-12 ]
-        isPR:
-          - ${{ github.event_name == 'pull_request' }}
+        os: [ 20.04, 22.04, 24.04 ]
+        compiler: [ 
+                    clang-8, clang-9, clang-10, # 20.04
+                    clang-11, clang-12, clang-13, # 22.04
+                    clang-14, clang-15, clang-16, clang-17, clang-18, # 24.04
+                    gcc-7, gcc-8, # 20.04
+                    gcc-9, gcc-10, gcc-11, gcc-12 # 24.04
+                  ]
         exclude:
-          - isPR: true
-            os: 20.04
-            compiler: clang-15
-          - isPR: true
-            os: 20.04
-            compiler: gcc-12
-
-          - isPR: false
-            os: 20.04
-            compiler: clang-15
-          - isPR: false
-            os: 20.04
-            compiler: gcc-12
-
-          - isPR: true
-            os: 22.04
-            compiler: clang-8
-          - isPR: true
-            os: 22.04
-            compiler: clang-9
-          - isPR: true
-            os: 22.04
-            compiler: clang-10
-          - isPR: true
-            os: 22.04
+          - os: 20.04
             compiler: clang-11
-          - isPR: true
-            os: 22.04
+          - os: 20.04
             compiler: clang-12
-          - isPR: true
-            os: 22.04
+          - os: 20.04
             compiler: clang-13
-          - isPR: true
-            os: 22.04
+          - os: 20.04
             compiler: clang-14
-
-          - isPR: true
-            os: 22.04
-            compiler: gcc-7
-          - isPR: true
-            os: 22.04
-            compiler: gcc-8
-          - isPR: true
-            os: 22.04
+          - os: 20.04
+            compiler: clang-15
+          - os: 20.04
+            compiler: clang-16
+          - os: 20.04
+            compiler: clang-17
+          - os: 20.04
+            compiler: clang-18
+          - os: 20.04
             compiler: gcc-9
-          - isPR: true
-            os: 22.04
+          - os: 20.04
             compiler: gcc-10
-          - isPR: true
-            os: 22.04
+          - os: 20.04
             compiler: gcc-11
-          - isPR: true
-            os: 22.04
-            compiler: gcc-12
+          - os: 20.04
+            compiler: gcc-13
+          - os: 20.04
+            compiler: gcc-14
 
-          - isPR: false
-            os: 22.04
+          - os: 22.04
             compiler: clang-8
-          - isPR: false
-            os: 22.04
+          - os: 22.04
             compiler: clang-9
-          - isPR: false
-            os: 22.04
+          - os: 22.04
             compiler: clang-10
-
-          - isPR: false
-            os: 22.04
+          - os: 22.04
+            compiler: clang-14
+          - os: 22.04
+            compiler: clang-15
+          - os: 22.04
+            compiler: clang-16
+          - os: 22.04
+            compiler: clang-17
+          - os: 22.04
+            compiler: clang-18
+          - os: 22.04
             compiler: gcc-7
-          - isPR: false
-            os: 22.04
+          - os: 22.04
+            compiler: gcc-8
+          - os: 22.04
+            compiler: gcc-9
+          - os: 22.04
+            compiler: gcc-10
+          - os: 22.04
+            compiler: gcc-11
+          - os: 22.04
+            compiler: gcc-13
+          - os: 22.04
+            compiler: gcc-14
+
+          - os: 24.04
+            compiler: clang-8
+          - os: 24.04
+            compiler: clang-9
+          - os: 24.04
+            compiler: clang-10
+          - os: 24.04
+            compiler: clang-11
+          - os: 24.04
+            compiler: clang-12
+          - os: 24.04
+            compiler: clang-13
+          - os: 24.04
+            compiler: gcc-7
+          - os: 24.04
             compiler: gcc-8
 
 
@@ -110,34 +116,24 @@ jobs:
 
       - name: Update dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install ninja-build googletest libunwind-dev
+          sudo apt update
+          sudo apt install ninja-build googletest libunwind-dev
 
       - name: Install dependencies clang
         if: 1 && !startsWith(matrix.compiler, 'gcc')
         run: |
-          sudo wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-          if [[ ${{ matrix.os }} == "18.04" ]]; then
-            ubuntu="bionic"
+          if [[ ${{ matrix.os }} == "20.04" ]]; then
             gcc_version=7
-            llvm_version=9          
-          elif [[ ${{ matrix.os }} == "20.04" ]]; then
-            ubuntu="focal"
-            gcc_version=7
-            llvm_version=9
-          else
-            ubuntu="jammy"
+          elif [[ ${{ matrix.os }} == "22.04" ]]; then
             gcc_version=9
-            llvm_version=13
+          elif [[ ${{ matrix.os }} == "24.04" ]]; then
+            gcc_version=9
           fi
           compiler=${{ matrix.compiler }}
           clang_version=${compiler:6}
-          if [[ $clang_version -ge $llvm_version ]]; then
-            sudo add-apt-repository "deb http://apt.llvm.org/$ubuntu/ llvm-toolchain-$ubuntu-${clang_version} main"
-          fi
-          sudo apt-get update
-          sudo apt-get install clang-${clang_version} libc++-${clang_version}-dev libc++abi-${clang_version}-dev       \
-                               gcc-${gcc_version} g++-${gcc_version} libstdc++-${gcc_version}-dev
+          sudo apt update
+          sudo apt install clang-${clang_version} libc++-${clang_version}-dev libc++abi-${clang_version}-dev       \
+                           gcc-${gcc_version} g++-${gcc_version} libstdc++-${gcc_version}-dev
 
           sudo update-alternatives                                                                                     \
             --install /usr/bin/gcc        gcc        /usr/bin/gcc-${gcc_version}        200                            \
@@ -158,21 +154,21 @@ jobs:
         if: startsWith(matrix.compiler, 'gcc')
         run: |
           compiler=${{ matrix.compiler }}
-          version=${compiler:4}
-          sudo apt-get install gcc-$version g++-$version libstdc++-$version-dev
+          gcc_version=${compiler:4}
+          sudo apt install gcc-${gcc_version} g++-${gcc_version} libstdc++-${gcc_version}-dev
           sudo update-alternatives                                                                                     \
-            --install /usr/bin/gcc        gcc        /usr/bin/gcc-$version        200                                  \
-            --slave   /usr/bin/g++        g++        /usr/bin/g++-$version                                             \
-            --slave   /usr/bin/gcc-ar     gcc-ar     /usr/bin/gcc-ar-$version                                          \
-            --slave   /usr/bin/gcc-nm     gcc-nm     /usr/bin/gcc-nm-$version                                          \
-            --slave   /usr/bin/gcc-ranlib gcc-ranlib /usr/bin/gcc-ranlib-$version                                      \
-            --slave   /usr/bin/gcov       gcov       /usr/bin/gcov-$version                                            \
-            --slave   /usr/bin/gcov-tool  gcov-tool  /usr/bin/gcov-tool-$version                                       \
-            --slave   /usr/bin/gcov-dump  gcov-dump  /usr/bin/gcov-dump-$version
+            --install /usr/bin/gcc        gcc        /usr/bin/gcc-${gcc_version}        200                            \
+            --slave   /usr/bin/g++        g++        /usr/bin/g++-${gcc_version}                                       \
+            --slave   /usr/bin/gcc-ar     gcc-ar     /usr/bin/gcc-ar-${gcc_version}                                    \
+            --slave   /usr/bin/gcc-nm     gcc-nm     /usr/bin/gcc-nm-${gcc_version}                                    \
+            --slave   /usr/bin/gcc-ranlib gcc-ranlib /usr/bin/gcc-ranlib-${gcc_version}                                \
+            --slave   /usr/bin/gcov       gcov       /usr/bin/gcov-${gcc_version}                                      \
+            --slave   /usr/bin/gcov-tool  gcov-tool  /usr/bin/gcov-tool-${gcc_version}                                 \
+            --slave   /usr/bin/gcov-dump  gcov-dump  /usr/bin/gcov-dump-${gcc_version}
           sudo update-alternatives --auto gcc
 
           sudo update-alternatives                                                                                     \
-            --install /usr/bin/cpp        cpp        /usr/bin/cpp-$version        200
+            --install /usr/bin/cpp        cpp        /usr/bin/cpp-${gcc_version}        200
           sudo update-alternatives --auto cpp
 
       - name: Configure CMake
