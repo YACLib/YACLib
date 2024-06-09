@@ -60,7 +60,7 @@ jobs:
                 -DYACLIB_TEST=SINGLE                                                                                   \
                 -DYACLIB_FLAGS="COVERAGE;CORO;$wait_type"                                                              \
                 -DYACLIB_CXX_STANDARD=20                                                                               \
-                -DYACLIB_COMPILE_OPTIONS="-Og;-fno-inline"
+                -DYACLIB_COMPILE_OPTIONS="-Og;-fno-inline;-fprofile-update=atomic"
 
               lcov --zerocounters --directory .
 

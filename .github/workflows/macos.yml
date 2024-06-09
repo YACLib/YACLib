@@ -45,7 +45,7 @@ jobs:
           elif [[ ${{ matrix.os }} == "13" ]]; then
             brew install ninja llvm@14 gcc@14
           elif [[ ${{ matrix.os }} == "14" ]]; then
-            brew install ninja llvm@14 gcc@14
+            brew install ninja llvm@18 gcc@14
           fi
 
       - name: Configure CMake
@@ -53,12 +53,15 @@ jobs:
           if [[ "${{ matrix.os }}" == "12" ]]; then
             llvm=/usr/local/opt/llvm@14
             cxx_compilers=("$llvm/bin/clang++" g++-12 clang++)
+            gnu_link_options=""
           elif [[ ${{ matrix.os }} == "13" ]]; then
             llvm=/usr/local/opt/llvm@14
             cxx_compilers=("$llvm/bin/clang++" g++-14 clang++)
+            gnu_link_options="-Wl,-ld_classic"
           elif [[ ${{ matrix.os }} == "14" ]]; then
-            llvm=/opt/homebrew/opt/llvm@14
+            llvm=/opt/homebrew/opt/llvm@18
             cxx_compilers=("$llvm/bin/clang++" g++-14 clang++)
+            gnu_link_options="-Wl,-ld_classic"
           fi
           compiler_names=(clang gnu apple_clang)
           stdlib_names=(libcxx libstdcxx default)
@@ -92,7 +95,7 @@ jobs:
                 fi
               fi
               if [[ "${compiler_names[$i]}" == "gnu" ]]; then
-                link_option="${link_option};-Wl,-ld_classic"
+                link_option="${link_option};${gnu_link_options}"
               fi
 
               dir="build_${compiler_names[$i]}_${stdlib_names[$j]}"
