@@ -127,7 +127,7 @@ jobs:
         if: ${{ matrix.os == 'macos-14' }}
         run: |
           brew update
-          brew install ninja llvm@18 gcc@14
+          brew install ninja llvm@17 gcc@14
 
       - name: Configure CMake Posix
         if: ${{ matrix.os != 'windows-2022' }}
@@ -138,7 +138,7 @@ jobs:
           stdlib_names=(libcxx libstdcxx default)
           linker=""
           if [[ ${{ matrix.os }} == "macos-14" ]]; then
-            llvm=/opt/homebrew/opt/llvm@18
+            llvm=/opt/homebrew/opt/llvm@17
             # TODO(myannyax?) FIBER
             YACLIB_FAULT=(OFF THREAD)
             cxx_compilers=("$llvm/bin/clang++" g++-14 clang++)
