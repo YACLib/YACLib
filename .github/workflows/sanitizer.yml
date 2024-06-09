@@ -138,7 +138,7 @@ jobs:
           stdlib_names=(libcxx libstdcxx default)
           linker=""
           if [[ ${{ matrix.os }} == "macos-14" ]]; then
-            llvm=/usr/local/opt/llvm@18
+            llvm=/opt/homebrew/opt/llvm@18
             # TODO(myannyax?) FIBER
             YACLIB_FAULT=(OFF THREAD)
             cxx_compilers=("$llvm/bin/clang++" g++-14 clang++)
