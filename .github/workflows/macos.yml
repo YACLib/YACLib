@@ -54,11 +54,11 @@ jobs:
             llvm=/usr/local/opt/llvm@14
             cxx_compilers=("$llvm/bin/clang++" g++-12 clang++)
             gnu_link_options=""
-          elif [[ ${{ matrix.os }} == "13" ]]; then
+          elif [[ "${{ matrix.os }}" == "13" ]]; then
             llvm=/usr/local/opt/llvm@14
             cxx_compilers=("$llvm/bin/clang++" g++-14 clang++)
             gnu_link_options="-Wl,-ld_classic"
-          elif [[ ${{ matrix.os }} == "14" ]]; then
+          elif [[ "${{ matrix.os }}" == "14" ]]; then
             llvm=/opt/homebrew/opt/llvm@18
             cxx_compilers=("$llvm/bin/clang++" g++-14 clang++)
             gnu_link_options="-Wl,-ld_classic"
@@ -91,6 +91,9 @@ jobs:
                   continue  # TODO(MBkkt) Specify path to libstdcxx
                 fi
                 if [[ "${stdlib_names[$j]}" == "default" ]]; then
+                  if [[ "${{ matrix.os }}" == "14" ]]; then
+                    continue
+                  fi
                   link_option=""; compile_option="-stdlib=libc++"
                 fi
               fi
