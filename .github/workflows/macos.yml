@@ -18,16 +18,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ 11, 12 ]
+        os: [ 12, 13, 14 ]
         build_type: [ Debug, RelWithDebInfo ]
         isPR:
           - ${{ github.event_name == 'pull_request' }}
         exclude:
           - isPR: true
-            os: 11
+            os: 12
             build_type: RelWithDebInfo
           - isPR: true
-            os: 12
+            os: 13
+            build_type: RelWithDebInfo
+          - isPR: true
+            os: 14
             build_type: RelWithDebInfo
 
     steps:
@@ -36,37 +39,25 @@ jobs:
       - name: Update deps on macOS
         run: |
           # Install oldest compiler that possible
-          if [[ "${{ matrix.os }}" == "12" ]]; then
-            brew update
-            brew install ninja llvm@14 gcc@12
-          else
-            brew install ninja
-          fi
+          brew update
+          brew install ninja llvm@14 gcc@12
 
       - name: Configure CMake
         run: |
-          if [[ "${{ matrix.os }}" == "12" ]]; then
-            compiler_names=(clang gnu apple_clang)
-            llvm=/usr/local/opt/llvm@14
-            cxx_compilers=("$llvm/bin/clang++" g++-12 clang++)
-            stdlib_names=(libcxx libstdcxx default)
-            link_options=(
-              "-L$llvm/lib;-Wl,-rpath,$llvm/lib"
-              "-stdlib=libstdc++"
-              ""
-            )
-            compile_options=(
-              "-I$llvm/include;-I$llvm/include/c++/v1/"
-              "-stdlib=libstdc++"
-              ""
-            )
-          else
-            compiler_names=(apple_clang)
-            cxx_compilers=(clang++)
-            stdlib_names=(default)
-            link_options=("")
-            compile_options=("")
-          fi
+          compiler_names=(clang gnu apple_clang)
+          llvm=/usr/local/opt/llvm@14
+          cxx_compilers=("$llvm/bin/clang++" g++-12 clang++)
+          stdlib_names=(libcxx libstdcxx default)
+          link_options=(
+            "-L$llvm/lib;-Wl,-rpath,$llvm/lib"
+            "-stdlib=libstdc++"
+            ""
+          )
+          compile_options=(
+            "-I$llvm/include;-I$llvm/include/c++/v1/"
+            "-stdlib=libstdc++"
+            ""
+          )
 
           for (( i=0; i<${#compiler_names[*]}; i+=1 )); do
             for (( j=0; j<${#stdlib_names[*]}; j+=1 )); do
