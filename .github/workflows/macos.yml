@@ -64,7 +64,7 @@ jobs:
           stdlib_names=(libcxx libstdcxx default)
           link_options=(
             "-L$llvm/lib;-Wl,-rpath,$llvm/lib"
-            "-stdlib=libstdc++;-Wl,-ld_classic"
+            "-stdlib=libstdc++"
             ""
           )
           compile_options=(
@@ -90,6 +90,9 @@ jobs:
                 if [[ "${stdlib_names[$j]}" == "default" ]]; then
                   link_option=""; compile_option="-stdlib=libc++"
                 fi
+              fi
+              if [[ "${compiler_names[$i]}" == "gnu" ]]; then
+                link_option="${link_option};-Wl,-ld_classic"
               fi
 
               dir="build_${compiler_names[$i]}_${stdlib_names[$j]}"
