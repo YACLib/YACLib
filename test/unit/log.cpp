@@ -46,12 +46,6 @@ TEST_F(LoggingTest, NullCallbacks) {
 }
 
 TEST_F(LoggingTest, SepareteCallbacks) {
-  auto error_callback = [](std::string_view file, std::size_t line, std::string_view function,
-                           std::string_view condition, std::string_view message) noexcept {
-    std::ofstream log_file{"log_file_error", std::ios_base::out | std::ios_base::app};
-    log_file << "[ " << file << ":" << line << " in " << function << " ] Failed error condition: '" << condition
-             << "' with message '" << message << "'\n";
-  };
   auto info_callback = [](std::string_view file, std::size_t line, std::string_view function,
                           std::string_view condition, std::string_view message) noexcept {
     std::ofstream log_file{"log_file_info", std::ios_base::out | std::ios_base::app};

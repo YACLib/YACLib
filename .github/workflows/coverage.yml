@@ -55,12 +55,12 @@ jobs:
               cmake -S . -B $dir                                                                                       \
                 -G "Ninja"                                                                                             \
                 -DCMAKE_BUILD_TYPE=Debug                                                                               \
-                -DCMAKE_CXX_COMPILER="${compilers[$i]}"                                                              \
+                -DCMAKE_CXX_COMPILER="${compilers[$i]}"                                                                \
                 -DYACLIB_FAULT="$yaclib_fault"                                                                         \
                 -DYACLIB_TEST=SINGLE                                                                                   \
                 -DYACLIB_FLAGS="COVERAGE;CORO;$wait_type"                                                              \
                 -DYACLIB_CXX_STANDARD=20                                                                               \
-                -DYACLIB_COMPILE_OPTIONS="-Og;-fno-inline"
+                -DYACLIB_COMPILE_OPTIONS="-Og;-fno-inline;-fprofile-update=atomic"
 
               lcov --zerocounters --directory .
 
