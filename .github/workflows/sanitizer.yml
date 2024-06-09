@@ -185,8 +185,7 @@ jobs:
                     continue
                   fi
                   if [[ "${compiler_names[$i]}" == "gnu" ]]; then
-                    # TODO https://stackoverflow.com/questions/73714336/xcode-update-to-version-2395-ld-compile-problem-occurs-computedatomcount-m
-                    continue  # Link error
+                    link_option="${link_option};-Wl,-ld_classic"
                   fi
                 fi
                 if [[ "${compiler_names[$i]}" != "clang" && "${stdlib_names[$j]}" != "default" ]]; then
