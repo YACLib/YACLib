@@ -29,14 +29,20 @@ class Promise final {
   /**
    * If Promise is \ref Valid then set \ref StopTag
    */
-  ~Promise() noexcept;
+  ~Promise() noexcept {
+    if (Valid()) {
+      std::move(*this).Set(StopTag{});
+    }
+  }
 
   /**
    * Check if this \ref Promise has \ref Future
    *
    * \return false if this \ref Promise is default-constructed or moved to, otherwise true
    */
-  [[nodiscard]] bool Valid() const& noexcept;
+  [[nodiscard]] bool Valid() const& noexcept {
+    return _core != nullptr;
+  }
 
   /**
    * Set \ref Promise result
@@ -45,13 +51,26 @@ class Promise final {
    * \param args arguments
    */
   template <typename... Args>
-  void Set(Args&&... args) &&;
+  void Set(Args&&... args) && {
+    YACLIB_ASSERT(Valid());
+    if constexpr (sizeof...(Args) == 0) {
+      _core->Store(std::in_place);
+    } else {
+      _core->Store(std::forward<Args>(args)...);
+    }
+    auto* core = _core.Release();
+    detail::Loop(core, core->template SetResult<false>());
+  }
 
   /**
    * Part of unsafe but internal API
    */
-  explicit Promise(detail::ResultCorePtr<V, E> core) noexcept;
-  [[nodiscard]] detail::ResultCorePtr<V, E>& GetCore() noexcept;
+  explicit Promise(detail::ResultCorePtr<V, E> core) noexcept : _core{std::move(core)} {
+  }
+
+  [[nodiscard]] detail::ResultCorePtr<V, E>& GetCore() noexcept {
+    return _core;
+  }
 
  private:
   detail::ResultCorePtr<V, E> _core;
@@ -60,5 +79,3 @@ class Promise final {
 extern template class Promise<>;
 
 }  // namespace yaclib
-
-#include <yaclib/async/detail/promise_impl.hpp>

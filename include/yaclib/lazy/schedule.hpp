@@ -3,6 +3,24 @@
 #include <yaclib/lazy/task.hpp>
 
 namespace yaclib {
+namespace detail {
+
+template <typename V, typename E, typename Func>
+YACLIB_INLINE auto Schedule(IExecutor& e, Func&& f) {
+  auto* core = [&] {
+    if constexpr (std::is_same_v<V, Unit>) {
+      return MakeCore<CoreType::Run, true, void, E>(std::forward<Func>(f));
+    } else {
+      return MakeUnique<PromiseCore<V, E, Func&&>>(std::forward<Func>(f)).Release();
+    }
+  }();
+  e.IncRef();
+  core->_executor.Reset(NoRefTag{}, &e);
+  using ResultCoreT = typename std::remove_reference_t<decltype(*core)>::Base;
+  return Task{IntrusivePtr<ResultCoreT>{NoRefTag{}, core}};
+}
+
+}  // namespace detail
 
 /**
  * Execute Callable func on Inline executor

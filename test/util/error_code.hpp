@@ -16,6 +16,10 @@ struct LikeErrorCode : std::error_code {
   LikeErrorCode(const LikeErrorCode&) noexcept = default;
   LikeErrorCode& operator=(LikeErrorCode&&) noexcept = default;
   LikeErrorCode& operator=(const LikeErrorCode&) noexcept = default;
+
+  const char* What() const noexcept {
+    return this->category().name();
+  }
 };
 
 }  // namespace test

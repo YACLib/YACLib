@@ -55,6 +55,8 @@ jobs:
           - os: 20.04
             compiler: gcc-11
           - os: 20.04
+            compiler: gcc-12
+          - os: 20.04
             compiler: gcc-13
           - os: 20.04
             compiler: gcc-14
@@ -85,6 +87,8 @@ jobs:
             compiler: gcc-10
           - os: 22.04
             compiler: gcc-11
+          - os: 22.04
+            compiler: gcc-12
           - os: 22.04
             compiler: gcc-13
           - os: 22.04
@@ -146,9 +150,7 @@ jobs:
             --slave   /usr/bin/gcov-dump  gcov-dump  /usr/bin/gcov-dump-${gcc_version}
           sudo update-alternatives --auto gcc
 
-          sudo update-alternatives                                                                                     \
-            --install /usr/bin/cpp        cpp        /usr/bin/cpp-${gcc_version}        200
-          sudo update-alternatives --auto cpp
+          gcc --version; gcov --version
 
       - name: Install dependencies gcc
         if: startsWith(matrix.compiler, 'gcc')
@@ -167,9 +169,7 @@ jobs:
             --slave   /usr/bin/gcov-dump  gcov-dump  /usr/bin/gcov-dump-${gcc_version}
           sudo update-alternatives --auto gcc
 
-          sudo update-alternatives                                                                                     \
-            --install /usr/bin/cpp        cpp        /usr/bin/cpp-${gcc_version}        200
-          sudo update-alternatives --auto cpp
+          gcc --version; gcov --version
 
       - name: Configure CMake
         run: |
@@ -226,7 +226,7 @@ jobs:
                 -DCMAKE_CXX_COMPILER="$compiler"                                                                       \
                 -G"Ninja"                                                                                              \
                 -DYACLIB_LINK_OPTIONS="$link_option"                                                                   \
-                -DYACLIB_LOG="ERROR;DEBUG"                                                                             \
+                -DYACLIB_LOG="DEBUG"                                                                             \
                 -DYACLIB_COMPILE_OPTIONS="$compile_option"
             done
           done

@@ -121,21 +121,19 @@ class AllCombinator : public InlineCore, protected AllCombinatorBase<O, R> {
  private:
   template <bool SymmetricTransfer>
   [[nodiscard]] YACLIB_INLINE auto Impl(InlineCore& caller) noexcept {
-    auto& core = static_cast<ResultCore<V, E>&>(caller);
+    auto& core = DownCast<ResultCore<V, E>>(caller);
     if constexpr (std::is_same_v<R, V>) {
       if (!this->_done.load(std::memory_order_acquire) && CombineValue(std::move(core.Get()))) {
         auto* callback = _core.Release();
         Done(core);
-        return callback->template SetResult<SymmetricTransfer>();
-      } else {
-        Done(core);
+        return WhenSetResult<SymmetricTransfer>(callback);
       }
     } else {
       const auto ticket = this->_ticket.fetch_add(1, std::memory_order_acq_rel);
       this->_results[ticket].~R();
       new (&this->_results[ticket]) R{std::move(core.Get())};
-      Done(core);
     }
+    Done(core);
     return Noop<SymmetricTransfer>();
   }
   [[nodiscard]] InlineCore* Here(InlineCore& caller) noexcept final {
@@ -228,8 +226,8 @@ class AllCombinator<OrderPolicy::Same, R, E> : public InlineCore, public AllComb
       _callers = {};
       _core->Store(std::move(results));
     }
-    auto* core = _core.Release();
-    Loop(core, core->template SetResult<false>());
+    auto* callback = _core.Release();
+    Loop(callback, callback->template SetResult<false>());
   }
 
   explicit AllCombinator(ResultPtr&& core, std::size_t count) : _core{std::move(core)} {
@@ -239,18 +237,15 @@ class AllCombinator<OrderPolicy::Same, R, E> : public InlineCore, public AllComb
  private:
   template <bool SymmetricTransfer>
   [[nodiscard]] YACLIB_INLINE auto Impl(InlineCore& caller) noexcept {
-    auto& core = static_cast<ResultCore<V, E>&>(caller);
+    auto& core = DownCast<ResultCore<V, E>>(caller);
     if constexpr (std::is_same_v<R, V>) {
       if (!this->_done.load(std::memory_order_acquire) && CombineValue(std::move(core.Get()))) {
         auto* callback = _core.Release();
         DecRef();
-        return callback->template SetResult<SymmetricTransfer>();
-      } else {
-        DecRef();
+        return WhenSetResult<SymmetricTransfer>(callback);
       }
-    } else {
-      DecRef();
     }
+    DecRef();
     return Noop<SymmetricTransfer>();
   }
   [[nodiscard]] InlineCore* Here(InlineCore& caller) noexcept final {

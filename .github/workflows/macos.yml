@@ -40,13 +40,27 @@ jobs:
         run: |
           # Install oldest compiler that possible
           brew update
-          brew install ninja llvm@14 gcc@12
+          if [[ "${{ matrix.os }}" == "12" ]]; then
+            brew install ninja llvm@14 gcc@12
+          elif [[ ${{ matrix.os }} == "13" ]]; then
+            brew install ninja llvm@14 gcc@14
+          elif [[ ${{ matrix.os }} == "14" ]]; then
+            brew install ninja llvm@16 gcc@14
+          fi
 
       - name: Configure CMake
         run: |
+          if [[ "${{ matrix.os }}" == "12" ]]; then
+            llvm=/usr/local/opt/llvm@14
+            cxx_compilers=("$llvm/bin/clang++" g++-12 clang++)
+          elif [[ ${{ matrix.os }} == "13" ]]; then
+            llvm=/usr/local/opt/llvm@14
+            cxx_compilers=("$llvm/bin/clang++" g++-14 clang++)
+          elif [[ ${{ matrix.os }} == "14" ]]; then
+            llvm=/usr/local/opt/llvm@16
+            cxx_compilers=("$llvm/bin/clang++" g++-14 clang++)
+          fi
           compiler_names=(clang gnu apple_clang)
-          llvm=/usr/local/opt/llvm@14
-          cxx_compilers=("$llvm/bin/clang++" g++-12 clang++)
           stdlib_names=(libcxx libstdcxx default)
           link_options=(
             "-L$llvm/lib;-Wl,-rpath,$llvm/lib"
@@ -90,7 +104,7 @@ jobs:
                 -G"Ninja"                                                                                              \
                 -DYACLIB_LINK_OPTIONS="$link_option"                                                                   \
                 -DYACLIB_COMPILE_OPTIONS="$compile_option"                                                             \
-                -DYACLIB_LOG="ERROR;DEBUG"                                                                             \
+                -DYACLIB_LOG="DEBUG"                                                                             \
                 -DYACLIB_DEFINITIONS="YACLIB_CI_SLOWDOWN=8"
 
             done

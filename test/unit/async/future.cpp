@@ -644,7 +644,7 @@ TEST(Simple, SetAndGetRequiresOnlyMove) {
     MoveCtorOnly(MoveCtorOnly&&) = default;
     [[maybe_unused]] MoveCtorOnly& operator=(MoveCtorOnly&&) = default;
     MoveCtorOnly(const MoveCtorOnly&) = delete;
-    MoveCtorOnly& operator=(MoveCtorOnly const&) = delete;
+    MoveCtorOnly& operator=(const MoveCtorOnly&) = delete;
     int id_;
   };
   auto f = yaclib::MakeFuture<MoveCtorOnly>(MoveCtorOnly(42));

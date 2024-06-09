@@ -35,12 +35,9 @@ constexpr bool kEverythingFine = false;
 constexpr bool kSomeError = true;
 
 TEST_F(LoggingTest, NullCallbacks) {
-  YACLIB_INIT_ERROR(nullptr);
   YACLIB_INIT_WARN(nullptr);
   YACLIB_INIT_DEBUG(nullptr);
   ASSERT_NO_FATAL_FAILURE({
-    YACLIB_ERROR(kEverythingFine, "You use API incorrect");
-    YACLIB_ERROR(kSomeError, "You use API incorrect");
     YACLIB_WARN(kEverythingFine, "You use API incorrect");
     YACLIB_WARN(kSomeError, "You use API incorrect");
     YACLIB_DEBUG(kEverythingFine, "You use API incorrect");
@@ -67,16 +64,10 @@ TEST_F(LoggingTest, SepareteCallbacks) {
     log_file << "[ " << file << ":" << line << " in " << function << " ] Failed debug condition: '" << condition
              << "' with message '" << message << "'\n";
   };
-  YACLIB_INIT_ERROR(error_callback);
   YACLIB_INIT_WARN(info_callback);
   YACLIB_INIT_DEBUG(debug_callback);
-  std::stringstream expected_output_error;
   std::stringstream expected_output_info;
   std::stringstream expected_output_debug;
-  YACLIB_ERROR(kEverythingFine, "You use API incorrect");
-  YACLIB_ERROR(kSomeError, "You use API incorrect");
-  expected_output_error << "[ " << __FILE__ << ":" << __LINE__ - 1 << " in " << YACLIB_FUNC_NAME
-                        << " ] Failed error condition: 'kSomeError' with message 'You use API incorrect'\n";
   YACLIB_WARN(kEverythingFine, "You use API incorrect");
   YACLIB_WARN(kSomeError, "You use API incorrect");
   expected_output_info << "[ " << __FILE__ << ":" << __LINE__ - 1 << " in " << YACLIB_FUNC_NAME
@@ -93,7 +84,6 @@ TEST_F(LoggingTest, SepareteCallbacks) {
     log_output << log_file.rdbuf();
     ASSERT_EQ(log_output.str(), expected_output.str());
   };
-  check(log_file_error, expected_output_error);
   check(log_file_info, expected_output_info);
   check(log_file_debug, expected_output_debug);
 }
@@ -105,14 +95,9 @@ TEST_F(LoggingTest, SharedCallbacks) {
     log_file << "[ " << file << ":" << line << " in " << function << " ] Failed some condition: '" << condition
              << "' with message '" << message << "'\n";
   };
-  YACLIB_INIT_ERROR(callback);
   YACLIB_INIT_WARN(callback);
   YACLIB_INIT_DEBUG(callback);
   std::stringstream expected_output_shared;
-  YACLIB_ERROR(kEverythingFine, "You use API incorrect");
-  YACLIB_ERROR(kSomeError, "You use API incorrect");
-  expected_output_shared << "[ " << __FILE__ << ":" << __LINE__ - 1 << " in " << YACLIB_FUNC_NAME
-                         << " ] Failed some condition: 'kSomeError' with message 'You use API incorrect'\n";
   YACLIB_WARN(kEverythingFine, "You use API incorrect");
   YACLIB_WARN(kSomeError, "You use API incorrect");
   expected_output_shared << "[ " << __FILE__ << ":" << __LINE__ - 1 << " in " << YACLIB_FUNC_NAME

@@ -37,13 +37,13 @@ class GuardState {
   }
 
   void* LockState() noexcept {
-    YACLIB_ERROR(Owns(), "Cannot lock locked guard");
+    YACLIB_DEBUG(Owns(), "Cannot lock locked guard");
     _state |= 1U;
     return Ptr();
   }
 
   void* UnlockState() noexcept {
-    YACLIB_ERROR(!Owns(), "Cannot unlock not locked guard");
+    YACLIB_DEBUG(!Owns(), "Cannot unlock not locked guard");
     _state &= kMask;
     return Ptr();
   }

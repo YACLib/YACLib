@@ -16,7 +16,8 @@ namespace yaclib {
  */
 template <typename Event = detail::DefaultEvent, typename... V, typename... E>
 YACLIB_INLINE void Wait(FutureBase<V, E>&... fs) noexcept {
-  detail::WaitCore<Event>(detail::NoTimeoutTag{}, static_cast<detail::BaseCore&>(*fs.GetCore())...);
+  YACLIB_ASSERT(... && fs.Valid());
+  detail::WaitCore<Event>(detail::NoTimeoutTag{}, UpCast<detail::BaseCore>(*fs.GetCore())...);
 }
 
 /**

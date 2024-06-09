@@ -2,6 +2,7 @@
 
 #include <yaclib/algo/detail/result_core.hpp>
 #include <yaclib/coro/coro.hpp>
+#include <yaclib/util/cast.hpp>
 #include <yaclib/util/detail/unique_counter.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 
@@ -106,7 +107,7 @@ class PromiseType final : public OneCounter<ResultCore<V, E>, PromiseTypeDeleter
   }
 
   YACLIB_INLINE void Impl(InlineCore& caller) noexcept {
-    this->_executor = std::move(static_cast<BaseCore&>(caller)._executor);
+    this->_executor = std::move(DownCast<BaseCore>(caller)._executor);
     YACLIB_ASSERT(this->_executor != nullptr);
   }
   [[nodiscard]] InlineCore* Here(InlineCore& caller) noexcept final {
@@ -131,7 +132,7 @@ class PromiseType final : public OneCounter<ResultCore<V, E>, PromiseTypeDeleter
 template <bool Lazy>
 template <typename V, typename E>
 void PromiseTypeDeleter<Lazy>::Delete(ResultCore<V, E>& core) noexcept {
-  auto& promise = static_cast<PromiseType<V, E, Lazy>&>(core);
+  auto& promise = DownCast<PromiseType<V, E, Lazy>>(core);
   auto handle = promise.Handle();
   handle.destroy();
 }

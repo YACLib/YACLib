@@ -14,7 +14,6 @@ namespace detail {
 enum class LogLevel : unsigned char {
   Debug = 0,
   Warn = 1,
-  Error = 2,
   Count = 3,
 };
 
@@ -65,14 +64,6 @@ void LogMessage(LogLevel level, std::string_view file, std::size_t line, std::st
         (void)(second);                                                                                                \
       }                                                                                                                \
     } while (false)
-#endif
-
-#ifdef YACLIB_LOG_ERROR
-#  define YACLIB_INIT_ERROR(callback) YACLIB_SET_CALLBACK(::yaclib::detail::LogLevel::Error, callback)
-#  define YACLIB_ERROR(cond, message) YACLIB_LOG_MESSAGE(::yaclib::detail::LogLevel::Error, cond, message)
-#else
-#  define YACLIB_INIT_ERROR(callback) YACLIB_STUB1(callback)
-#  define YACLIB_ERROR(cond, message) YACLIB_STUB2(cond, message)
 #endif
 
 #ifdef YACLIB_LOG_WARN

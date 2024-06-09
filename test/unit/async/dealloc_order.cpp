@@ -75,7 +75,7 @@ struct Log {
 };
 
 template <std::size_t N>
-std::ostream& operator<<(std::ostream& out, Log<N> const& log) {
+std::ostream& operator<<(std::ostream& out, const Log<N>& log) {
   auto was_enabled = std::exchange(log.enabled, false);
   out << "length: " << log.position << "\n";
   for (std::size_t i = 0; i != log.position; ++i) {

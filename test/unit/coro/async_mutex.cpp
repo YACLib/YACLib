@@ -393,10 +393,6 @@ TYPED_TEST(AsyncSuite, UnlockOnBehaviour) {
 }
 
 TEST(Mutex, StickyGuard) {
-#if defined(GTEST_OS_WINDOWS)
-  GTEST_SKIP();  // Doesn't work for Win32 or Debug, I think its probably because bad symmetric transfer implementation
-  // TODO(kononovk) Try to confirm problem and localize it with ifdefs
-#endif
   yaclib::Mutex<> m;
   std::uint64_t counter = 0;
   yaclib::FairThreadPool tp1{2};
@@ -411,7 +407,7 @@ TEST(Mutex, StickyGuard) {
       auto& scheduler_after_lock = co_await yaclib::CurrentExecutor();
       counter += static_cast<std::uint64_t>(&scheduler_before_lock != &scheduler_after_lock);
       EXPECT_TRUE(guard);
-      yaclib_std::this_thread::sleep_for(std::chrono::nanoseconds{1});
+      test::util::Reschedule();
       EXPECT_TRUE(guard);
       co_await guard.Unlock();
       EXPECT_FALSE(guard);

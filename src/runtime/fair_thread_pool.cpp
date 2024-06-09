@@ -13,7 +13,7 @@ FairThreadPool::FairThreadPool(std::uint64_t threads) : _jobs_count{0} {
 }
 
 FairThreadPool::~FairThreadPool() noexcept {
-  YACLIB_ERROR(!_workers.empty(), "You need explicitly join ThreadPool");
+  YACLIB_DEBUG(!_workers.empty(), "You need explicitly join ThreadPool");
 }
 
 IExecutor::Type FairThreadPool::Tag() const noexcept {

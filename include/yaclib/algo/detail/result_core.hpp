@@ -9,21 +9,25 @@
 namespace yaclib::detail {
 
 struct Callback {
-  IRef* caller;
-  char unwrapping;
+  IRef* caller = nullptr;
+  char unwrapping = 0;
 };
 
 template <typename V, typename E>
 class ResultCore : public BaseCore {
- public:
-  [[nodiscard]] InlineCore* Here(InlineCore& /*caller*/) noexcept override {
+  template <bool SymmetricTransfer>
+  [[nodiscard]] YACLIB_INLINE auto Impl(InlineCore& /*caller*/) noexcept {
     YACLIB_PURE_VIRTUAL();
-    return nullptr;
+    return Noop<SymmetricTransfer>();
+  }
+
+ public:
+  [[nodiscard]] InlineCore* Here(InlineCore& caller) noexcept override {
+    return Impl<false>(caller);
   }
 #if YACLIB_SYMMETRIC_TRANSFER != 0
-  [[nodiscard]] yaclib_std::coroutine_handle<> Next(InlineCore& /*caller*/) noexcept override {
-    YACLIB_PURE_VIRTUAL();
-    return yaclib_std::noop_coroutine();
+  [[nodiscard]] yaclib_std::coroutine_handle<> Next(InlineCore& caller) noexcept override {
+    return Impl<true>(caller);
   }
 #endif
 

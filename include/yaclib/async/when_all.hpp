@@ -62,14 +62,14 @@ YACLIB_INLINE auto WhenAll(It begin, It end) {
  * \param futures two or more futures to combine
  * \return Future<std::array<T>>
  */
-template <FailPolicy F = FailPolicy::FirstFail, OrderPolicy O = OrderPolicy::Fifo, typename E, typename... V>
+template <FailPolicy F = FailPolicy::FirstFail, OrderPolicy O = OrderPolicy::Fifo, typename V, typename... E>
 auto WhenAll(FutureBase<V, E>&&... futures) {
   static_assert(F != FailPolicy::LastFail, "TODO(Ri7ay, MBkkt) Add other policy for WhenAll");
-  constexpr std::size_t kSize = sizeof...(V);
+  constexpr std::size_t kSize = sizeof...(E);
   static_assert(kSize >= 2, "WhenAll wants at least two futures");
-  using Head = head_t<V...>;
-  using R = std::conditional_t<F == FailPolicy::None, Result<Head, E>, Head>;
-  auto [future_core, combinator] = detail::AllCombinator<O, R, E>::Make(kSize);
+  using Error = head_t<E...>;
+  using R = std::conditional_t<F == FailPolicy::None, Result<V, Error>, V>;
+  auto [future_core, combinator] = detail::AllCombinator<O, R, Error>::Make(kSize);
   detail::WhenImpl(*combinator, std::move(futures)...);
   return Future{std::move(future_core)};
 }

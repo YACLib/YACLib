@@ -92,15 +92,24 @@ void TestOk(Result&& result, yaclib::ResultState state) {
     } break;
     case yaclib::ResultState::Error: {
       result = yaclib::StopTag{};
-      EXPECT_THROW(std::ignore = std::as_const(result).Ok(),
-                   yaclib::ResultError<yaclib::result_error_t<std::decay_t<Result>>>);
+      try {
+        std::ignore = std::as_const(result).Ok();
+      } catch (const yaclib::ResultError<yaclib::StopError>& e) {
+        EXPECT_STREQ(e.what(), "yaclib::StopError");
+      } catch (const yaclib::ResultError<LikeErrorCode>& e) {
+        EXPECT_STREQ(e.what(), "generic");
+      }
     } break;
     case yaclib::ResultState::Exception: {
       result = std::make_exception_ptr(std::runtime_error{""});
       EXPECT_THROW(std::ignore = std::as_const(result).Ok(), std::runtime_error);
     } break;
     case yaclib::ResultState::Empty: {
-      EXPECT_THROW(std::ignore = std::as_const(result).Ok(), yaclib::ResultEmpty);
+      try {
+        std::ignore = std::as_const(result).Ok();
+      } catch (const yaclib::ResultEmpty& e) {
+        EXPECT_STREQ(e.what(), "yaclib::ResultEmpty");
+      }
     } break;
   }
   EXPECT_EQ(result.State(), state);

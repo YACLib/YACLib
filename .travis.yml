@@ -31,7 +31,7 @@ script:
     -DYACLIB_CXX_STANDARD=20    \
     -DYACLIB_TEST=SINGLE        \
     -DYACLIB_FLAGS="CORO"       \
-    -DYACLIB_LOG="ERROR;DEBUG"
+    -DYACLIB_LOG="DEBUG"
   - cmake --build $dir --config Debug --parallel
   - cd build
   - ctest --output-on-failure -V
@@ -41,7 +41,7 @@ script:
     -DYACLIB_CXX_STANDARD=20           \
     -DYACLIB_TEST=SINGLE               \
     -DYACLIB_FLAGS="CORO"              \
-    -DYACLIB_LOG="ERROR;DEBUG"
+    -DYACLIB_LOG="DEBUG"
   - cmake --build $dir --config RelWithDebInfo --parallel
   - cd build
   - ctest --output-on-failure -V

@@ -38,9 +38,8 @@ void InitLog() noexcept {
                             std::string_view /*condition*/, std::string_view message) noexcept {
     GTEST_MESSAGE_AT_(file.data(), line, message.data(), ::testing::TestPartResult::kFatalFailure);
   };
-  YACLIB_INIT_ERROR(assert_callback);
-  YACLIB_INIT_WARN(nullptr);
   YACLIB_INIT_DEBUG(assert_callback);
+  YACLIB_INIT_WARN(nullptr);
 }
 
 void InitFault() {
@@ -129,7 +128,7 @@ int main(int argc, char** argv) {
     result = RUN_ALL_TESTS();
   });
   tests.join();
-  YACLIB_ERROR(scheduler.IsRunning(), "scheduler is still running when tests are finished");
+  YACLIB_DEBUG(scheduler.IsRunning(), "scheduler is still running when tests are finished");
 #else
   result = RUN_ALL_TESTS();
 #endif

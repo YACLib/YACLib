@@ -121,9 +121,7 @@ jobs:
             --slave   /usr/bin/gcov-dump  gcov-dump  /usr/bin/gcov-dump-14
           sudo update-alternatives --auto gcc
 
-          sudo update-alternatives                                                                                     \
-            --install /usr/bin/cpp        cpp        /usr/bin/cpp-14        200
-          sudo update-alternatives --auto cpp
+          gcc --version; gcov --version
 
       - name: Update deps on macOS
         if: ${{ matrix.os == 'macos-14' }}
@@ -221,7 +219,7 @@ jobs:
                   -DYACLIB_LINK_OPTIONS="$link_option;$linker"                                                         \
                   -DYACLIB_COMPILE_OPTIONS="$compile_option"                                                           \
                   -DYACLIB_FAULT=$yaclib_fault                                                                         \
-                  -DYACLIB_LOG="ERROR;DEBUG"                                                                           \
+                  -DYACLIB_LOG="DEBUG"                                                                           \
                   -DYACLIB_DEFINITIONS="YACLIB_CI_SLOWDOWN=$slowdown"
 
               done
@@ -260,7 +258,7 @@ jobs:
                 -DYACLIB_TEST=SINGLE                                                                                   \
                 -DYACLIB_FLAGS="$coroutine_option;$flags"                                                              \
                 -DYACLIB_FAULT=$yaclib_fault                                                                           \
-                -DYACLIB_LOG="ERROR;DEBUG"                                                                             \
+                -DYACLIB_LOG="DEBUG"                                                                             \
                 -G"${generators[$i]}"                                                                                  \
                 ${options[$i]}
 
