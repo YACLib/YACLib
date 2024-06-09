@@ -1,6 +1,7 @@
 #pragma once
 
 #include <yaclib/algo/detail/base_core.hpp>
+#include <yaclib/util/cast.hpp>
 #include <yaclib/util/detail/set_deleter.hpp>
 
 namespace yaclib::detail {
@@ -14,7 +15,7 @@ struct CallCallback : InlineCore {
  private:
   template <bool SymmetricTransfer>
   [[nodiscard]] YACLIB_INLINE auto Impl() noexcept {
-    static_cast<Derived&>(*this).Sub(1);
+    DownCast<Derived>(*this).Sub(1);
     return Noop<SymmetricTransfer>();
   }
   [[nodiscard]] InlineCore* Here(InlineCore& /*caller*/) noexcept final {
@@ -37,7 +38,7 @@ struct DropCallback : InlineCore {
   template <bool SymmetricTransfer>
   [[nodiscard]] YACLIB_INLINE auto Impl(InlineCore& caller) noexcept {
     caller.DecRef();
-    static_cast<Derived&>(*this).Sub(1);
+    DownCast<Derived>(*this).Sub(1);
     return Noop<SymmetricTransfer>();
   }
   [[nodiscard]] InlineCore* Here(InlineCore& caller) noexcept final {

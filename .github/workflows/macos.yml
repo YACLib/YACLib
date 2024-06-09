@@ -40,13 +40,30 @@ jobs:
         run: |
           # Install oldest compiler that possible
           brew update
-          brew install ninja llvm@14 gcc@12
+          if [[ "${{ matrix.os }}" == "12" ]]; then
+            brew install ninja llvm@14 gcc@12
+          elif [[ ${{ matrix.os }} == "13" ]]; then
+            brew install ninja llvm@14 gcc@14
+          elif [[ ${{ matrix.os }} == "14" ]]; then
+            brew install ninja llvm@17 gcc@14
+          fi
 
       - name: Configure CMake
         run: |
+          if [[ "${{ matrix.os }}" == "12" ]]; then
+            llvm=/usr/local/opt/llvm@14
+            cxx_compilers=("$llvm/bin/clang++" g++-12 clang++)
+            gnu_link_options=""
+          elif [[ "${{ matrix.os }}" == "13" ]]; then
+            llvm=/usr/local/opt/llvm@14
+            cxx_compilers=("$llvm/bin/clang++" g++-14 clang++)
+            gnu_link_options="-Wl,-ld_classic"
+          elif [[ "${{ matrix.os }}" == "14" ]]; then
+            llvm=/opt/homebrew/opt/llvm@17
+            cxx_compilers=("$llvm/bin/clang++" g++-14 clang++)
+            gnu_link_options="-Wl,-ld_classic"
+          fi
           compiler_names=(clang gnu apple_clang)
-          llvm=/usr/local/opt/llvm@14
-          cxx_compilers=("$llvm/bin/clang++" g++-12 clang++)
           stdlib_names=(libcxx libstdcxx default)
           link_options=(
             "-L$llvm/lib;-Wl,-rpath,$llvm/lib"
@@ -77,6 +94,9 @@ jobs:
                   link_option=""; compile_option="-stdlib=libc++"
                 fi
               fi
+              if [[ "${compiler_names[$i]}" == "gnu" ]]; then
+                link_option="${link_option};${gnu_link_options}"
+              fi
 
               dir="build_${compiler_names[$i]}_${stdlib_names[$j]}"
               echo $dir
@@ -90,7 +110,7 @@ jobs:
                 -G"Ninja"                                                                                              \
                 -DYACLIB_LINK_OPTIONS="$link_option"                                                                   \
                 -DYACLIB_COMPILE_OPTIONS="$compile_option"                                                             \
-                -DYACLIB_LOG="ERROR;DEBUG"                                                                             \
+                -DYACLIB_LOG="DEBUG"                                                                             \
                 -DYACLIB_DEFINITIONS="YACLIB_CI_SLOWDOWN=8"
 
             done

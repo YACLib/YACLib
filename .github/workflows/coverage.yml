@@ -11,7 +11,7 @@ on:
 
 jobs:
   main:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
 
     env:
       YACLIB_FAULT: 'OFF THREAD FIBER'
@@ -26,24 +26,20 @@ jobs:
           sudo add-apt-repository "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-14 main"
           sudo apt update
           sudo apt install ninja-build lcov googletest                                                             \
-                           gcc-14 g++-14 libstdc++-14-dev lld-18
+                           gcc-12 g++-12 libstdc++-12-dev lld-18
           #                llvm-18 clang-18 libc++-18-dev libc++abi-18-dev
           sudo ln -sf /usr/bin/lld-18 /usr/local/bin/ld
 
           sudo update-alternatives                                                                                     \
-            --install /usr/bin/gcc        gcc        /usr/bin/gcc-14        200                                        \
-            --slave   /usr/bin/g++        g++        /usr/bin/g++-14                                                   \
-            --slave   /usr/bin/gcc-ar     gcc-ar     /usr/bin/gcc-ar-14                                                \
-            --slave   /usr/bin/gcc-nm     gcc-nm     /usr/bin/gcc-nm-14                                                \
-            --slave   /usr/bin/gcc-ranlib gcc-ranlib /usr/bin/gcc-ranlib-14                                            \
-            --slave   /usr/bin/gcov       gcov       /usr/bin/gcov-14                                                  \
-            --slave   /usr/bin/gcov-tool  gcov-tool  /usr/bin/gcov-tool-14                                             \
-            --slave   /usr/bin/gcov-dump  gcov-dump  /usr/bin/gcov-dump-14
+            --install /usr/bin/gcc        gcc        /usr/bin/gcc-12        200                                        \
+            --slave   /usr/bin/g++        g++        /usr/bin/g++-12                                                   \
+            --slave   /usr/bin/gcc-ar     gcc-ar     /usr/bin/gcc-ar-12                                                \
+            --slave   /usr/bin/gcc-nm     gcc-nm     /usr/bin/gcc-nm-12                                                \
+            --slave   /usr/bin/gcc-ranlib gcc-ranlib /usr/bin/gcc-ranlib-12                                            \
+            --slave   /usr/bin/gcov       gcov       /usr/bin/gcov-12                                                  \
+            --slave   /usr/bin/gcov-tool  gcov-tool  /usr/bin/gcov-tool-12                                             \
+            --slave   /usr/bin/gcov-dump  gcov-dump  /usr/bin/gcov-dump-12
           sudo update-alternatives --auto gcc
-
-          sudo update-alternatives                                                                                     \
-            --install /usr/bin/cpp        cpp        /usr/bin/cpp-14        200
-          sudo update-alternatives --auto cpp
 
           gcc --version; gcov --version
 
@@ -59,7 +55,7 @@ jobs:
               cmake -S . -B $dir                                                                                       \
                 -G "Ninja"                                                                                             \
                 -DCMAKE_BUILD_TYPE=Debug                                                                               \
-                -DCMAKE_CXX_COMPILER="${compilers[$i]}"                                                              \
+                -DCMAKE_CXX_COMPILER="${compilers[$i]}"                                                                \
                 -DYACLIB_FAULT="$yaclib_fault"                                                                         \
                 -DYACLIB_TEST=SINGLE                                                                                   \
                 -DYACLIB_FLAGS="COVERAGE;CORO;$wait_type"                                                              \
@@ -105,9 +101,9 @@ jobs:
               fi
 
               cd $dir
-              lcov --rc lcov_branch_coverage=1 --gcov-tool "$gcov_tool" -d . -c -o lcov.info
+              lcov --rc branch_coverage=1 --rc geninfo_unexecuted_blocks=1 --gcov-tool "$gcov_tool" -d . -c -o lcov.info
               # TODO(myannyax) remove '-r lcov.info "*/fault/*"'
-              lcov --rc lcov_branch_coverage=1                                                                         \
+              lcov --rc branch_coverage=1                                                                         \
                 -r lcov.info "/usr/*"                                                                                  \
                 -r lcov.info "*/_deps/*"                                                                               \
                 -r lcov.info "*/test/*"                                                                                \
@@ -118,15 +114,15 @@ jobs:
             done
           done
 
-          lcov --rc lcov_branch_coverage=1                                                                             \
+          lcov --rc branch_coverage=1                                                                             \
             --add-tracefile ./build_g++_fault_OFF/lcov.info                                                            \
             --add-tracefile ./build_g++_fault_THREAD/lcov.info                                                         \
             --add-tracefile ./build_g++_fault_FIBER/lcov.info                                                          \
             --output-file   ./total.info
 
-          lcov --rc lcov_branch_coverage=0 -r ./total.info -o ./total_without_branch.info
+          lcov --rc branch_coverage=0 -r ./total.info -o ./total_without_branch.info
 
-          lcov --rc lcov_branch_coverage=1 --list ./total.info
+          lcov --rc branch_coverage=1 --list ./total.info
 
       - name: Coveralls
         uses: coverallsapp/github-action@1.1.3

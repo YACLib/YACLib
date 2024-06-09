@@ -23,7 +23,7 @@ class AwaitOnEvent final : public InlineCore, public AwaitOnCounterT<Single> {
 
  private:
   template <bool SymmetricTransfer>
-  [[nodiscard]] YACLIB_INLINE auto Impl(InlineCore& caller) noexcept {
+  [[nodiscard]] YACLIB_INLINE auto Impl(InlineCore& /*caller*/) noexcept {
     if constexpr (Single) {
       job->_executor->Submit(*job);
     } else {

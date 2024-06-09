@@ -112,12 +112,9 @@
 #      define YACLIB_FINAL_SUSPEND_TRANSFER 0
 #    endif
 #  elif defined(_MSC_VER) && !defined(__clang__)
+//   MSVC buggy with symmetric transfer
 #    undef YACLIB_SYMMETRIC_TRANSFER
-#    if YACLIB_CORO == 2
-#      define YACLIB_SYMMETRIC_TRANSFER 1
-#    else
-#      define YACLIB_SYMMETRIC_TRANSFER 0
-#    endif
+#    define YACLIB_SYMMETRIC_TRANSFER 0
 //   MSVC doesn't seem to like symmetric transfer in final_suspend, runtime segfault or complile time error:
 //   https://developercommunity.visualstudio.com/t/coroutine-compilation-resulting-in-error-c4737-una/1510427
 #    undef YACLIB_FINAL_SUSPEND_TRANSFER

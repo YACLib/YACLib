@@ -555,7 +555,23 @@ TYPED_TEST(AsyncSuite, CoroTaskUnwrapping) {
   EXPECT_EQ(std::move(f).Get().Ok(), 8);
 }
 
-TEST(Coro, WhenAllCoAwait) {
+TEST(Future, WhenAnyManual) {
+  yaclib::ManualExecutor e;
+  auto f1 = yaclib::Run(e, [] {
+    return 42;
+  });
+  auto f2 = yaclib::Run(e, [] {
+    return 42;
+  });
+  auto f3 = yaclib::WhenAny(std::move(f1), std::move(f2));
+  auto f4 = std::move(f3).ThenInline([](int x) {
+    return x;
+  });
+  std::ignore = e.Drain();
+  EXPECT_EQ(std::move(f4).Get().Ok(), 42);
+}
+
+TEST(Coro, WhenAnyManual) {
   yaclib::ManualExecutor e;
   auto coro = [&]() -> yaclib::Future<> {
     co_await On(e);
@@ -571,6 +587,33 @@ TEST(Coro, WhenAllCoAwait) {
   auto f = coro2();
   std::ignore = e.Drain();
   EXPECT_EQ(std::move(f).Get().Ok(), 42);
+}
+
+TEST(Coro, WhenAnyMultipleManual) {
+  yaclib::ManualExecutor e;
+  auto coro = [&](int x) -> yaclib::Future<int> {
+    co_await On(e);
+    co_return x;
+  };
+  auto coro2 = [&]() -> yaclib::Future<int> {
+    auto f1 = coro(1);
+    auto f2 = coro(2);
+    auto f3 = yaclib::WhenAny(std::move(f1), std::move(f2)).ThenInline([](int x) {
+      return x * 3;
+    });
+    auto f4 = coro(4);
+    auto f5 = coro(5);
+    auto f6 = yaclib::WhenAny(std::move(f4), std::move(f5)).ThenInline([](int x) {
+      return x * 6;
+    });
+    co_await Await(f3, f6);
+    co_return std::move(f3).Touch().Ok() + std::move(f6).Touch().Ok();
+  };
+  auto f = coro2().ThenInline([](int x) {
+    return x * 2;
+  });
+  std::ignore = e.Drain();
+  EXPECT_EQ(std::move(f).Get().Ok(), (1 * 3 + 4 * 6) * 2);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

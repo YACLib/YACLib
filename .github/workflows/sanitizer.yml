@@ -121,15 +121,13 @@ jobs:
             --slave   /usr/bin/gcov-dump  gcov-dump  /usr/bin/gcov-dump-14
           sudo update-alternatives --auto gcc
 
-          sudo update-alternatives                                                                                     \
-            --install /usr/bin/cpp        cpp        /usr/bin/cpp-14        200
-          sudo update-alternatives --auto cpp
+          gcc --version; gcov --version
 
       - name: Update deps on macOS
         if: ${{ matrix.os == 'macos-14' }}
         run: |
           brew update
-          brew install ninja llvm@18 gcc@14
+          brew install ninja llvm@17 gcc@14
 
       - name: Configure CMake Posix
         if: ${{ matrix.os != 'windows-2022' }}
@@ -140,7 +138,7 @@ jobs:
           stdlib_names=(libcxx libstdcxx default)
           linker=""
           if [[ ${{ matrix.os }} == "macos-14" ]]; then
-            llvm=/usr/local/opt/llvm@18
+            llvm=/opt/homebrew/opt/llvm@17
             # TODO(myannyax?) FIBER
             YACLIB_FAULT=(OFF THREAD)
             cxx_compilers=("$llvm/bin/clang++" g++-14 clang++)
@@ -187,8 +185,7 @@ jobs:
                     continue
                   fi
                   if [[ "${compiler_names[$i]}" == "gnu" ]]; then
-                    # TODO https://stackoverflow.com/questions/73714336/xcode-update-to-version-2395-ld-compile-problem-occurs-computedatomcount-m
-                    continue  # Link error
+                    link_option="${link_option};-Wl,-ld_classic"
                   fi
                 fi
                 if [[ "${compiler_names[$i]}" != "clang" && "${stdlib_names[$j]}" != "default" ]]; then
@@ -221,7 +218,7 @@ jobs:
                   -DYACLIB_LINK_OPTIONS="$link_option;$linker"                                                         \
                   -DYACLIB_COMPILE_OPTIONS="$compile_option"                                                           \
                   -DYACLIB_FAULT=$yaclib_fault                                                                         \
-                  -DYACLIB_LOG="ERROR;DEBUG"                                                                           \
+                  -DYACLIB_LOG="DEBUG"                                                                           \
                   -DYACLIB_DEFINITIONS="YACLIB_CI_SLOWDOWN=$slowdown"
 
               done
@@ -247,8 +244,10 @@ jobs:
                 # I think ClangCL with ASAN should be possible
               fi
               if [[ "${names[$i]}" == "MSVC" ]]; then
+                cxx_standard=23
                 coroutine_option="CORO"
               else
+                cxx_standard=17
                 coroutine_option=""
               fi
 
@@ -256,11 +255,11 @@ jobs:
               echo $dir
 
               cmake -S . -B $dir                                                                                       \
-                -DYACLIB_CXX_STANDARD=23                                                                               \
+                -DYACLIB_CXX_STANDARD=${cxx_standard}                                                                  \
                 -DYACLIB_TEST=SINGLE                                                                                   \
                 -DYACLIB_FLAGS="$coroutine_option;$flags"                                                              \
                 -DYACLIB_FAULT=$yaclib_fault                                                                           \
-                -DYACLIB_LOG="ERROR;DEBUG"                                                                             \
+                -DYACLIB_LOG="DEBUG"                                                                                   \
                 -G"${generators[$i]}"                                                                                  \
                 ${options[$i]}
 

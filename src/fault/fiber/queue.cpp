@@ -27,7 +27,7 @@ void FiberQueue::NotifyOne() {
 }
 
 FiberQueue::~FiberQueue() {
-  YACLIB_ERROR(!_queue.Empty(), "queue must be empty on destruction - potentially deadlock");
+  YACLIB_DEBUG(!_queue.Empty(), "queue must be empty on destruction - potentially deadlock");
 }
 
 FiberQueue& FiberQueue::operator=(FiberQueue&& other) noexcept {

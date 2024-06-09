@@ -1,41 +1,50 @@
-Checks: '*,
-         -abseil-*,
-         -altera-*,
-         -android-*,
-         -boost-*,
-         -google-objc-*,
-         -linuxkernel-*,
-         -llvmlibc-*,
-         -mpi-*,
-         -objc-*,
-         -openmp-*,
+Checks: '*
+         -mpi-*
+         -objc-*
+         -boost-*
+         -abseil-*
+         -altera-*
+         -openmp-*
+         -android-*
+         -llvmlibc-*
+         -google-objc-*
+         -linuxkernel-*
+         -fuchsia-default-arguments-*
 
-         -cert-err58-cpp,
-         -cppcoreguidelines-pro-type-static-cast-downcast,
-         -fuchsia-default-arguments-*,
-         -google-build-using-namespace,
-         -modernize-use-trailing-return-type,
-         -readability-identifier-length,
-         -fuchsia-overloaded-operator,
-         -cppcoreguidelines-pro-type-union-access,
-         -hicpp-named-parameter,
-         -modernize-use-default-member-init,
-         -readability-named-parameter,
-         -google-explicit-constructor,
-         -hicpp-explicit-conversions,
-         -llvm-header-guard,
+         -cert-err58-cpp
+         -llvm-header-guard
+         -fuchsia-overloaded-operator
+         -misc-non-private-member-variables-in-classes
+
+         -google-explicit-constructor
+         -google-build-using-namespace
+
+         -readability-named-parameter
+         -readability-identifier-length
+
+         -performance-avoid-endl
+         -performance-no-int-to-ptr
+
+         -hicpp-no-array-decay
+         -hicpp-named-parameter
+         -hicpp-explicit-conversions
+         -hicpp-special-member-functions
+
+         -modernize-use-nodiscard
+         -modernize-use-default-member-init
+         -modernize-use-trailing-return-type
+
          -cppcoreguidelines-owning-memory
          -cppcoreguidelines-avoid-do-while
-         -modernize-use-nodiscard
+         -cppcoreguidelines-pro-type-union-access
          -cppcoreguidelines-special-member-functions
-         -hicpp-special-member-functions
          -cppcoreguidelines-pro-type-reinterpret-cast
-         -cppcoreguidelines-non-private-member-variables-in-classes
-         -misc-non-private-member-variables-in-classes
-         -performance-no-int-to-ptr
+         -cppcoreguidelines-pro-type-static-cast-downcast
          -cppcoreguidelines-avoid-const-or-ref-data-members
          -cppcoreguidelines-pro-bounds-constant-array-index
-         -cppcoreguidelines-avoid-reference-coroutine-parameters'
+         -cppcoreguidelines-pro-bounds-array-to-pointer-decay
+         -cppcoreguidelines-avoid-reference-coroutine-parameters
+         -cppcoreguidelines-non-private-member-variables-in-classes'
 
 WarningsAsErrors: '*'
 
@@ -54,6 +63,8 @@ CheckOptions: # TODO(Ri7ay) Setup all options
     value: CamelCase
   - key: readability-identifier-naming.FunctionCase
     value: CamelCase
+  - key: readability-identifier-naming.MethodIgnoredRegexp
+    value: '^await_(ready|suspend|resume)|get_return_object|(initial|final)_suspend|unhandled_exception|return_value|what$'
   - key: readability-identifier-naming.FunctionIgnoredRegexp
     value: 'await_ready|await_suspend|await_resume'
   - key: readability-identifier-naming.ParameterCase

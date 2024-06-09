@@ -22,6 +22,7 @@ namespace yaclib {
 template <typename Event = detail::MutexEvent, typename Clock, typename Duration, typename... V, typename... E>
 YACLIB_INLINE bool WaitUntil(const std::chrono::time_point<Clock, Duration>& timeout_time,
                              FutureBase<V, E>&... fs) noexcept {
+  YACLIB_ASSERT(... && fs.Valid());
   return detail::WaitCore<Event>(timeout_time, static_cast<detail::BaseCore&>(*fs.GetCore())...);
 }
 

@@ -1,5 +1,7 @@
 #pragma once
+
 #include <yaclib_std/chrono>
+#include <yaclib_std/thread>
 
 namespace test::util {
 
@@ -31,5 +33,16 @@ class StopWatch {
  private:
   TimePoint start_;
 };
+
+inline void Reschedule() {
+  // TODO(MBkkt) deduplicate this code
+#if YACLIB_FAULT == 2
+  yaclib_std::this_thread::yield();
+#elif defined(_MSC_VER)
+  yaclib_std::this_thread::yield();
+#else
+  yaclib_std::this_thread::sleep_for(std::chrono::nanoseconds{1});
+#endif
+}
 
 }  // namespace test::util

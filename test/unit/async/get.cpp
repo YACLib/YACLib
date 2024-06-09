@@ -14,6 +14,7 @@
 
 namespace test {
 namespace {
+using namespace std::chrono_literals;
 
 TEST(Get, FulFill) {
   {
@@ -30,7 +31,7 @@ TEST(Get, PromiseFuture) {
   {
     auto [f, p] = yaclib::MakeContract<int>();
     auto t = yaclib_std::thread([p = std::move(p)]() mutable {
-      yaclib_std::this_thread::sleep_for(std::chrono::milliseconds(1));
+      yaclib_std::this_thread::sleep_for(1ms);
       std::move(p).Set(43);
     });
     EXPECT_EQ(43, std::move(f).Get().Ok());

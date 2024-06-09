@@ -13,7 +13,7 @@ namespace yaclib {
  * Result states \see Result
  * \enum Value, Exception, Error, Empty
  */
-enum class [[nodiscard]] ResultState : unsigned char{
+enum class [[nodiscard]] ResultState : unsigned char {
   Value = 0,
   Exception = 1,
   Error = 2,
@@ -30,6 +30,10 @@ struct [[nodiscard]] StopError final {
   constexpr StopError(const StopError&) noexcept = default;
   constexpr StopError& operator=(StopError&&) noexcept = default;
   constexpr StopError& operator=(const StopError&) noexcept = default;
+
+  static const char* What() noexcept {
+    return "yaclib::StopError";
+  }
 };
 
 YACLIB_DEFINE_VOID_COMPARE(StopError)
@@ -58,6 +62,10 @@ class [[nodiscard]] ResultError final : public std::exception {
     return _error;
   }
 
+  const char* what() const noexcept final {
+    return _error.What();
+  }
+
  private:
   Error _error;
 };
@@ -66,7 +74,11 @@ class [[nodiscard]] ResultError final : public std::exception {
  * \class Exception for Empty, invalid state
  * \see Result
  */
-struct ResultEmpty final : std::exception {};
+struct ResultEmpty final : std::exception {
+  const char* what() const noexcept final {
+    return "yaclib::ResultEmpty";
+  }
+};
 
 /**
  * Encapsulated return value from caller

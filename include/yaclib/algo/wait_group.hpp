@@ -51,7 +51,7 @@ class WaitGroup final {
    */
   template <bool NeedAdd = true, typename... V, typename... E>
   YACLIB_INLINE void Consume(FutureBase<V, E>&&... futures) noexcept {
-    InsertCore<true, NeedAdd>(static_cast<detail::BaseCore&>(*futures.GetCore().Release())...);
+    InsertCore<true, NeedAdd>(UpCast<detail::BaseCore>(*futures.GetCore().Release())...);
   }
 
   /**
@@ -92,7 +92,7 @@ class WaitGroup final {
    */
   template <bool NeedAdd = true, typename... V, typename... E>
   YACLIB_INLINE void Attach(FutureBase<V, E>&... futures) noexcept {
-    InsertCore<false, NeedAdd>(static_cast<detail::BaseCore&>(*futures.GetCore())...);
+    InsertCore<false, NeedAdd>(UpCast<detail::BaseCore>(*futures.GetCore())...);
   }
 
   /**

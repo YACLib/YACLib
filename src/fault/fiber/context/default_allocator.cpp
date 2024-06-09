@@ -21,9 +21,9 @@ Allocation DefaultAllocator::Allocate() {
   std::size_t size = _stack_size_pages * kPageSize;
 
   void* start = mmap(nullptr, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-  YACLIB_ERROR(start == MAP_FAILED, "mmap for stack failed");
+  YACLIB_DEBUG(start == MAP_FAILED, "mmap for stack failed");
   auto status = mprotect(static_cast<void*>(start), kPageSize, PROT_NONE);
-  YACLIB_ERROR(status == -1, "mprotect for stack failed");
+  YACLIB_DEBUG(status == -1, "mprotect for stack failed");
 
   auto allocation = Allocation{static_cast<char*>(start), size};
   return allocation;
@@ -38,7 +38,7 @@ void DefaultAllocator::Release(Allocation allocation) {
     }
 
     auto status = munmap(static_cast<void*>(allocation.start), allocation.size);
-    YACLIB_ERROR(status == -1, "munmap for stack failed");
+    YACLIB_DEBUG(status == -1, "munmap for stack failed");
   }
 }
 

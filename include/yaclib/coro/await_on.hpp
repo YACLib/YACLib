@@ -9,7 +9,7 @@ namespace yaclib {
 
 template <typename... V, typename... E>
 YACLIB_INLINE auto AwaitOn(IExecutor& e, FutureBase<V, E>&... fs) noexcept {
-  return detail::AwaitOnAwaiter<sizeof...(fs) == 1>{e, static_cast<detail::BaseCore&>(*fs.GetCore())...};
+  return detail::AwaitOnAwaiter<sizeof...(fs) == 1>{e, UpCast<detail::BaseCore>(*fs.GetCore())...};
 }
 
 /**

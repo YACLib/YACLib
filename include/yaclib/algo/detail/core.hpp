@@ -3,6 +3,7 @@
 #include <yaclib/algo/detail/func_core.hpp>
 #include <yaclib/algo/detail/result_core.hpp>
 #include <yaclib/config.hpp>
+#include <yaclib/util/cast.hpp>
 #include <yaclib/util/detail/atomic_counter.hpp>
 #include <yaclib/util/detail/unique_counter.hpp>
 #include <yaclib/util/helper.hpp>
@@ -33,6 +34,7 @@ template <CoreType Type, typename V, typename E>
 using ResultCoreT = std::conditional_t<Type == CoreType::Detach, NoResultCore, ResultCore<V, E>>;
 
 YACLIB_INLINE BaseCore* MoveToCaller(BaseCore* head) noexcept {
+  YACLIB_ASSERT(head);
   while (head->next != nullptr) {
     auto* next = static_cast<BaseCore*>(head->next);
     head->next = nullptr;
@@ -53,7 +55,7 @@ class Core : public ResultCoreT<Type, Ret, E>, public FuncCore<Func> {
   using Base = ResultCoreT<Type, Ret, E>;
 
   explicit Core(Func&& f) : F{std::forward<Func>(f)} {
-    this->_self = Callback{nullptr, 0};
+    this->_self = {};
   }
 
  private:
@@ -68,7 +70,7 @@ class Core : public ResultCoreT<Type, Ret, E>, public FuncCore<Func> {
       }
     } else {
       YACLIB_ASSERT(this->_self.caller != this);
-      auto& core = static_cast<ResultCore<Arg, E>&>(*this->_self.caller);
+      auto& core = DownCast<ResultCore<Arg, E>>(*this->_self.caller);
       Loop(this, CallImpl<false>(std::move(core.Get())));
     }
   }
@@ -81,7 +83,7 @@ class Core : public ResultCoreT<Type, Ret, E>, public FuncCore<Func> {
   [[nodiscard]] YACLIB_INLINE auto Impl([[maybe_unused]] InlineCore& caller) noexcept {
     auto async_done = [&] {
       YACLIB_ASSERT(&caller == this || &caller == this->_self.caller);
-      auto& core = static_cast<ResultCore<Ret, E>&>(*this->_self.caller);
+      auto& core = DownCast<ResultCore<Ret, E>>(*this->_self.caller);
       return Done<SymmetricTransfer, true>(std::move(core.Get()));
     };
     if constexpr (Type == CoreType::Run) {
@@ -94,12 +96,12 @@ class Core : public ResultCoreT<Type, Ret, E>, public FuncCore<Func> {
       }
       YACLIB_ASSERT(this->_self.caller == nullptr);
       this->_self.caller = &caller;
-      static_cast<BaseCore&>(caller).MoveExecutorTo(*this);
+      DownCast<BaseCore>(caller).MoveExecutorTo(*this);
       if constexpr (kIsCall) {
         this->_executor->Submit(*this);
         return Noop<SymmetricTransfer>();
       } else {
-        auto& core = static_cast<ResultCore<Arg, E>&>(caller);
+        auto& core = DownCast<ResultCore<Arg, E>>(caller);
         return CallImpl<SymmetricTransfer>(std::move(core.Get()));
       }
     }
@@ -183,9 +185,8 @@ class Core : public ResultCoreT<Type, Ret, E>, public FuncCore<Func> {
       if (state == kState) {
         using T = std::conditional_t<kIsException, std::exception_ptr, E>;
         return CallResolveAsync<SymmetricTransfer>(std::get<T>(std::move(r.Internal())));
-      } else {
-        return Done<SymmetricTransfer>(std::move(r));
       }
+      return Done<SymmetricTransfer>(std::move(r));
     }
   }
 
@@ -301,6 +302,7 @@ enum class CallbackType : unsigned char {
 
 template <CoreType CoreT, CallbackType CallbackT, typename Arg, typename E, typename Func>
 auto SetCallback(ResultCorePtr<Arg, E>& core, IExecutor* executor, Func&& f) {
+  YACLIB_ASSERT(core);
   constexpr bool kIsDetach = CoreT == CoreType::Detach;
   constexpr bool kIsLazy = CallbackT == CallbackType::LazyInline || CallbackT == CallbackType::LazyOn;
   constexpr bool kIsCall = CallbackT == CallbackType::On || CallbackT == CallbackType::LazyOn;

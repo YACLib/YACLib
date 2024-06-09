@@ -67,6 +67,7 @@ bool WaitIterator(const Timeout& timeout, Iterator it, std::size_t count) noexce
   }
   if (count == 1) {
     auto range = [&](auto&& func) noexcept {
+      YACLIB_ASSERT(it->Valid());
       return static_cast<std::size_t>(func(*it->GetCore()));
     };
     return WaitRange<MultiEvent<Event, OneCounter, CallCallback>>(timeout, range, 1);
@@ -75,6 +76,7 @@ bool WaitIterator(const Timeout& timeout, Iterator it, std::size_t count) noexce
     std::size_t wait_count = 0;
     std::conditional_t<std::is_same_v<Timeout, NoTimeoutTag>, Iterator&, Iterator> range_it = it;
     for (std::size_t i = 0; i != count; ++i) {
+      YACLIB_ASSERT(range_it->Valid());
       wait_count += static_cast<std::size_t>(func(*range_it->GetCore()));
       ++range_it;
     }
