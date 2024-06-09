@@ -253,11 +253,11 @@ jobs:
               echo $dir
 
               cmake -S . -B $dir                                                                                       \
-                -DYACLIB_CXX_STANDARD=23                                                                               \
+                -DYACLIB_CXX_STANDARD=20                                                                               \
                 -DYACLIB_TEST=SINGLE                                                                                   \
                 -DYACLIB_FLAGS="$coroutine_option;$flags"                                                              \
                 -DYACLIB_FAULT=$yaclib_fault                                                                           \
-                -DYACLIB_LOG="DEBUG"                                                                             \
+                -DYACLIB_LOG="DEBUG"                                                                                   \
                 -G"${generators[$i]}"                                                                                  \
                 ${options[$i]}
 

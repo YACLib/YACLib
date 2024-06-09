@@ -101,7 +101,7 @@ jobs:
               fi
 
               cd $dir
-              lcov --rc branch_coverage=1 --gcov-tool "$gcov_tool" -d . -c -o lcov.info
+              lcov --rc branch_coverage=1 --rc geninfo_unexecuted_blocks=1 --gcov-tool "$gcov_tool" -d . -c -o lcov.info
               # TODO(myannyax) remove '-r lcov.info "*/fault/*"'
               lcov --rc branch_coverage=1                                                                         \
                 -r lcov.info "/usr/*"                                                                                  \
