@@ -43,9 +43,9 @@ jobs:
           if [[ "${{ matrix.os }}" == "12" ]]; then
             brew install ninja llvm@14 gcc@12
           elif [[ ${{ matrix.os }} == "13" ]]; then
-            brew install ninja llvm@14 gcc@13
+            brew install ninja llvm@14 gcc@14
           elif [[ ${{ matrix.os }} == "14" ]]; then
-            brew install ninja llvm@14 gcc@13
+            brew install ninja llvm@14 gcc@14
           fi
 
       - name: Configure CMake
@@ -55,10 +55,10 @@ jobs:
             cxx_compilers=("$llvm/bin/clang++" g++-12 clang++)
           elif [[ ${{ matrix.os }} == "13" ]]; then
             llvm=/usr/local/opt/llvm@14
-            cxx_compilers=("$llvm/bin/clang++" g++-13 clang++)
+            cxx_compilers=("$llvm/bin/clang++" g++-14 clang++)
           elif [[ ${{ matrix.os }} == "14" ]]; then
             llvm=/opt/homebrew/opt/llvm@14
-            cxx_compilers=("$llvm/bin/clang++" g++-13 clang++)
+            cxx_compilers=("$llvm/bin/clang++" g++-14 clang++)
           fi
           compiler_names=(clang gnu apple_clang)
           stdlib_names=(libcxx libstdcxx default)
