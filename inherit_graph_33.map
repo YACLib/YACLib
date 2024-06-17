@@ -1,0 +1,19 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" href="$classyaclib_1_1detail_1_1fiber_1_1AtomicWait.html" title=" " alt="" coords="5,45,130,86"/>
+<area shape="rect" id="Node000001" href="$classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html" title=" " alt="" coords="178,9,316,50"/>
+<area shape="poly" id="edge75_Node000000_Node000001" title=" " alt="" coords="144,48,177,41,178,46,146,53"/>
+<area shape="rect" id="Node000003" href="$classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html" title=" " alt="" coords="183,77,311,118"/>
+<area shape="poly" id="edge77_Node000000_Node000003" title=" " alt="" coords="146,77,183,84,182,89,145,82"/>
+<area shape="rect" id="Node000002" href="$classyaclib_1_1detail_1_1fiber_1_1Atomic_3_01U_01_5_01_4.html" title=" " alt="" coords="376,5,497,46"/>
+<area shape="poly" id="edge76_Node000001_Node000002" title=" " alt="" coords="332,25,375,24,375,30,332,31"/>
+<area shape="rect" id="Node000004" href="$classyaclib_1_1detail_1_1fiber_1_1AtomicFloatingBase.html" title=" " alt="" coords="364,70,508,126"/>
+<area shape="poly" id="edge78_Node000003_Node000004" title=" " alt="" coords="327,95,363,95,363,100,327,100"/>
+<area shape="rect" id="Node000007" href="$classyaclib_1_1detail_1_1fiber_1_1AtomicFloatingBase_3_01T_00_01true_01_4.html" title=" " alt="" coords="364,150,508,206"/>
+<area shape="poly" id="edge81_Node000003_Node000007" title=" " alt="" coords="312,122,370,147,368,152,310,127"/>
+<area shape="rect" id="Node000005" href="$classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase.html" title=" " alt="" coords="556,70,698,126"/>
+<area shape="poly" id="edge79_Node000004_Node000005" title=" " alt="" coords="524,95,556,95,556,100,524,100"/>
+<area shape="rect" id="Node000006" href="$classyaclib_1_1detail_1_1fiber_1_1Atomic.html" title=" " alt="" coords="746,77,867,118"/>
+<area shape="poly" id="edge80_Node000005_Node000006" title=" " alt="" coords="713,95,745,95,745,100,713,100"/>
+<area shape="rect" id="Node000008" href="$classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase_3_01T_00_01true_01_4.html" title=" " alt="" coords="556,150,698,206"/>
+<area shape="poly" id="edge82_Node000007_Node000008" title=" " alt="" coords="524,175,556,175,556,180,524,180"/>
+</map>
