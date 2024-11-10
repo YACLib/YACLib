@@ -26,8 +26,8 @@ struct AtomicCounter : CounterBase {
     }
   }
 
-  [[nodiscard]] std::size_t GetRef() const noexcept {
-    // Dangerous! Use only to sync with release or if synchronization is not needed
+  // Dangerous! Use only to sync with release with acquire or with relaxed if synchronization is not needed
+  [[nodiscard]] YACLIB_INLINE std::size_t Get(std::memory_order order) const noexcept {
     return count.load(std::memory_order_acquire);
   }
 
