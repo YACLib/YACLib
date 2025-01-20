@@ -208,7 +208,7 @@ jobs:
                 if [[ "${stdlib_names[$j]}" == "libstdcxx" ]]; then
                   # TODO(MBkkt) I know how to enable CORO here, but it's a dirty hack, do we want to check it in CI?
                   standard=17; flags=""
-                elif [[ $version -ge 9 ]]; then
+                elif [[ $version -ge 11 ]]; then
                   standard=20; flags="CORO"
                 else
                   standard=17; flags=""
