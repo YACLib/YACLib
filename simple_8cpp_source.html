@@ -1,0 +1,387 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.9.8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<!-- BEGIN opengraph metadata -->
+<meta property="og:title" content="Doxygen Awesome" />
+<meta property="og:image" content="https://repository-images.githubusercontent.com/348492097/4f16df80-88fb-11eb-9d31-4015ff22c452" />
+<meta property="og:description" content="Custom CSS theme for doxygen html-documentation with lots of customization parameters." />
+<meta property="og:url" content="https://jothepro.github.io/doxygen-awesome-css/" />
+<!-- END opengraph metadata -->
+<!-- BEGIN twitter metadata -->
+<meta name="twitter:image:src" content="https://repository-images.githubusercontent.com/348492097/4f16df80-88fb-11eb-9d31-4015ff22c452" />
+<meta name="twitter:title" content="Doxygen Awesome" />
+<meta name="twitter:description" content="Custom CSS theme for doxygen html-documentation with lots of customization parameters." />
+<!-- END twitter metadata -->
+<title>YACLib: test/example/async/simple.cpp Source File</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link rel="icon" type="image/svg+xml" href="logo.drawio.svg"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+<script type="text/javascript" src="doxygen-awesome-fragment-copy-button.js"></script>
+<script type="text/javascript" src="doxygen-awesome-paragraph-link.js"></script>
+<script type="text/javascript" src="toggle-alternative-theme.js"></script>
+<script type="text/javascript">
+    DoxygenAwesomeFragmentCopyButton.init()
+    DoxygenAwesomeDarkModeToggle.init()
+    DoxygenAwesomeParagraphLink.init()
+</script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="custom.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only-darkmode-toggle.css" rel="stylesheet" type="text/css"/>
+<link href="custom-alternative.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<!-- https://tholman.com/github-corners/ -->
+<a href="https://github.com/YACLib/YACLib" class="github-corner" title="View source on GitHub" target="_blank">
+    <svg viewBox="0 0 250 250" width="40" height="40" style="position: absolute; top: 0; border: 0; right: 0; z-index: 99;" aria-hidden="true">
+    <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
+   <div id="projectname">YACLib
+   </div>
+   <div id="projectbrief">C++ library for concurrent tasks execution</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Search');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function() { init_codefold(0); });
+/* @license-end */
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('simple_8cpp_source.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">simple.cpp</div></div>
+</div><!--header-->
+<div class="contents">
+<a href="simple_8cpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> * \example simple.cpp</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> * Simple Future examples</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span> </div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &lt;<a class="code" href="contract_8hpp.html">yaclib/async/contract.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#include &lt;<a class="code" href="async_2future_8hpp.html">yaclib/async/future.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#include &lt;<a class="code" href="promise_8hpp.html">yaclib/async/promise.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &lt;<a class="code" href="run_8hpp.html">yaclib/async/run.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &lt;<a class="code" href="executor_8hpp.html">yaclib/exe/executor.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#include &lt;<a class="code" href="strand_8hpp.html">yaclib/exe/strand.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &lt;<a class="code" href="fair__thread__pool_8hpp.html">yaclib/runtime/fair_thread_pool.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#include &lt;<a class="code" href="intrusive__ptr_8hpp.html">yaclib/util/intrusive_ptr.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#include &lt;<a class="code" href="result_8hpp.html">yaclib/util/result.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span> </div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#include &lt;chrono&gt;</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="preprocessor">#include &lt;exception&gt;</span></div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="preprocessor">#include &lt;iostream&gt;</span></div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="preprocessor">#include &lt;string&gt;</span></div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="preprocessor">#include &lt;type_traits&gt;</span></div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="preprocessor">#include &lt;utility&gt;</span></div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span> </div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="preprocessor">#include &lt;gtest/gtest.h&gt;</span></div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span> </div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="keyword">using namespace </span>std::chrono_literals;</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span> </div>
+<div class="foldopen" id="foldopen00027" data-start="{" data-end="}">
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno"><a class="line" href="simple_8cpp.html#a431850dcbba7ccc5a2e455a73d7128aa">   27</a></span><a class="code hl_function" href="simple_8cpp.html#a431850dcbba7ccc5a2e455a73d7128aa">TEST</a>(Example, HelloWorld) {</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>  <span class="keyword">auto</span> [f, p] = <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">yaclib::MakeContract&lt;int&gt;</a>();</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span> </div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>  std::move(p).Set(42);</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span> </div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>  EXPECT_TRUE(f.Ready());</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span> </div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>  <a class="code hl_class" href="classyaclib_1_1Result.html">yaclib::Result&lt;int&gt;</a> result = std::move(f).Get();</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span> </div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>  EXPECT_EQ(std::move(result).Ok(), 42);</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>}</div>
+</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span> </div>
+<div class="foldopen" id="foldopen00039" data-start="{" data-end="}">
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno"><a class="line" href="simple_8cpp.html#aba1f5e38a7642ae7ea51cc66c80e14ba">   39</a></span><a class="code hl_function" href="simple_8cpp.html#a431850dcbba7ccc5a2e455a73d7128aa">TEST</a>(Example, Detach) {</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>  <a class="code hl_class" href="classyaclib_1_1FairThreadPool.html">yaclib::FairThreadPool</a> tp{4};</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span> </div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>  <span class="keyword">auto</span> f = <a class="code hl_function" href="namespaceyaclib.html#a7a1e816f25355b1f23b01433879ed0ec">yaclib::Run</a>(tp, [] {</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>    <span class="keywordflow">return</span> 42;</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>  });</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span> </div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>  std::move(f).Detach([](<a class="code hl_class" href="classyaclib_1_1Result.html">yaclib::Result&lt;int&gt;</a> result) {</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    std::cout &lt;&lt; <span class="stringliteral">&quot;Async result from thread pool: &quot;</span> &lt;&lt; std::move(result).Ok() &lt;&lt; std::endl;</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>  });</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span> </div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>  EXPECT_TRUE(!f.Valid());</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span> </div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>  tp.SoftStop();</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>  tp.Wait();</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>}</div>
+</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span> </div>
+<div class="foldopen" id="foldopen00056" data-start="{" data-end="}">
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno"><a class="line" href="simple_8cpp.html#acb0432b14dd15be9d017350d518e030b">   56</a></span><a class="code hl_function" href="simple_8cpp.html#a431850dcbba7ccc5a2e455a73d7128aa">TEST</a>(Example, Then) {</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>  <a class="code hl_class" href="classyaclib_1_1FairThreadPool.html">yaclib::FairThreadPool</a> tp{4};</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span> </div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>  <span class="keyword">auto</span> compute = [] {</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>    <span class="keywordflow">return</span> 42;</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>  };</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span> </div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>  <span class="keyword">auto</span> process = [](<span class="keywordtype">int</span> r) {</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>    <span class="keywordflow">return</span> r + 1;</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>  };</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span> </div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>  <a class="code hl_class" href="classyaclib_1_1FutureOn.html">yaclib::FutureOn&lt;int&gt;</a> f1 = <a class="code hl_function" href="namespaceyaclib.html#a7a1e816f25355b1f23b01433879ed0ec">yaclib::Run</a>(tp, compute);</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span> </div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>  <a class="code hl_class" href="classyaclib_1_1FutureOn.html">yaclib::FutureOn&lt;int&gt;</a> f2 = std::move(f1).<a class="code hl_function" href="classyaclib_1_1FutureOn.html#ab6c0fe09106c73794d400588454f30f2">Then</a>(process);</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span> </div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>  EXPECT_TRUE(!f1.<a class="code hl_function" href="classyaclib_1_1FutureBase.html#a5ee96890a14dd007f7da1db7c3eccf31">Valid</a>());</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span> </div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>  std::cout &lt;&lt; <span class="stringliteral">&quot;process(compute()) -&gt; &quot;</span> &lt;&lt; std::move(f2).Get().Ok() &lt;&lt; std::endl;</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span> </div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>  tp.SoftStop();</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>  tp.Wait();</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>}</div>
+</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span> </div>
+<div class="foldopen" id="foldopen00079" data-start="{" data-end="}">
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno"><a class="line" href="simple_8cpp.html#a73496dc16027574e6fa6462ee7fa2247">   79</a></span><a class="code hl_function" href="simple_8cpp.html#a431850dcbba7ccc5a2e455a73d7128aa">TEST</a>(Example, Pipeline) {</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>  <a class="code hl_class" href="classyaclib_1_1FairThreadPool.html">yaclib::FairThreadPool</a> tp{4};</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span> </div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>  <span class="comment">// Pipeline stages:</span></div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span> </div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>  <span class="keyword">auto</span> first = []() -&gt; <span class="keywordtype">int</span> {</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>    <span class="keywordflow">return</span> 42;</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>  };</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span> </div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>  <span class="keyword">auto</span> second = [](<span class="keywordtype">int</span> r) {</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>    <span class="keywordflow">return</span> r * 2;</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>  };</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span> </div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>  <span class="keyword">auto</span> third = [](<span class="keywordtype">int</span> r) {</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>    <span class="keywordflow">return</span> r + 1;</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>  };</div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span> </div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>  <span class="keyword">auto</span> fourth = [](<span class="keywordtype">int</span> r) {</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>    <span class="keywordflow">return</span> std::to_string(r);</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>  };</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span> </div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>  <span class="keyword">auto</span> last = [](<a class="code hl_class" href="classyaclib_1_1Result.html">yaclib::Result&lt;std::string&gt;</a> r) {</div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>    std::cout &lt;&lt; <span class="stringliteral">&quot;Pipeline result: &lt;&quot;</span> &lt;&lt; std::move(r).Ok() &lt;&lt; <span class="stringliteral">&quot;&gt;&quot;</span> &lt;&lt; std::endl;</div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>  };</div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span> </div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>  <span class="comment">// Chain pipeline stages and run them in thread pool</span></div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>  <a class="code hl_function" href="namespaceyaclib.html#a7a1e816f25355b1f23b01433879ed0ec">yaclib::Run</a>(tp, first).Then(second).Then(third).Then(fourth).Detach(last);</div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span> </div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>  tp.SoftStop();</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>  tp.Wait();</div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>}</div>
+</div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span> </div>
+<div class="foldopen" id="foldopen00111" data-start="{" data-end="};">
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno"><a class="line" href="classCalculatorService.html">  111</a></span><span class="keyword">class </span><a class="code hl_class" href="classCalculatorService.html">CalculatorService</a> {</div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span> <span class="keyword">public</span>:</div>
+<div class="foldopen" id="foldopen00113" data-start="{" data-end="}">
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno"><a class="line" href="classCalculatorService.html#aa4a66d24fd6c3f98582c097db4cca4ec">  113</a></span>  <span class="keyword">explicit</span> <a class="code hl_function" href="classCalculatorService.html#aa4a66d24fd6c3f98582c097db4cca4ec">CalculatorService</a>(<a class="code hl_class" href="classyaclib_1_1IntrusivePtr.html">yaclib::IExecutorPtr</a> e) : e_(e) {</div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>  }</div>
+</div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span> </div>
+<div class="foldopen" id="foldopen00116" data-start="{" data-end="}">
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno"><a class="line" href="classCalculatorService.html#a13db61804aff7721bbc2d79ae75d7427">  116</a></span>  <a class="code hl_class" href="classyaclib_1_1FutureOn.html">yaclib::FutureOn&lt;int&gt;</a> <a class="code hl_function" href="classCalculatorService.html#a13db61804aff7721bbc2d79ae75d7427">Increment</a>(<span class="keywordtype">int</span> value) {</div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="namespaceyaclib.html#a7a1e816f25355b1f23b01433879ed0ec">yaclib::Run</a>(*e_, [value]() {</div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>      <span class="keywordflow">return</span> value + 1;</div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>    });</div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>  }</div>
+</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span> </div>
+<div class="foldopen" id="foldopen00122" data-start="{" data-end="}">
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno"><a class="line" href="classCalculatorService.html#ac73e8ceb5a21805177143576eaf95870">  122</a></span>  <a class="code hl_class" href="classyaclib_1_1FutureOn.html">yaclib::FutureOn&lt;int&gt;</a> <a class="code hl_function" href="classCalculatorService.html#ac73e8ceb5a21805177143576eaf95870">Double</a>(<span class="keywordtype">int</span> value) {</div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="namespaceyaclib.html#a7a1e816f25355b1f23b01433879ed0ec">yaclib::Run</a>(*e_, [value]() {</div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>      <span class="keywordflow">return</span> value * 2;</div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>    });</div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>  }</div>
+</div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span> </div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span> <span class="keyword">private</span>:</div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>  <a class="code hl_class" href="classyaclib_1_1IntrusivePtr.html">yaclib::IExecutorPtr</a> e_;</div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>};</div>
+</div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span> </div>
+<div class="foldopen" id="foldopen00132" data-start="{" data-end="}">
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno"><a class="line" href="simple_8cpp.html#ac243985cf3bf1e2a088023a9ed7447d3">  132</a></span><a class="code hl_function" href="simple_8cpp.html#a431850dcbba7ccc5a2e455a73d7128aa">TEST</a>(Example, AsyncPipeline) {</div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>  <a class="code hl_class" href="classyaclib_1_1FairThreadPool.html">yaclib::FairThreadPool</a> tp{4};</div>
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span> </div>
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>  <a class="code hl_class" href="classCalculatorService.html">CalculatorService</a> calculator(&amp;tp);</div>
+<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span> </div>
+<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>  calculator.<a class="code hl_function" href="classCalculatorService.html#a13db61804aff7721bbc2d79ae75d7427">Increment</a>(1)</div>
+<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span>    .Then([&amp;](<span class="keywordtype">int</span> r) {</div>
+<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span>      <span class="keywordflow">return</span> calculator.<a class="code hl_function" href="classCalculatorService.html#ac73e8ceb5a21805177143576eaf95870">Double</a>(r);</div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span>    })</div>
+<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span>    .Then([&amp;](<span class="keywordtype">int</span> r) {</div>
+<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span>      <span class="keywordflow">return</span> calculator.<a class="code hl_function" href="classCalculatorService.html#a13db61804aff7721bbc2d79ae75d7427">Increment</a>(r);</div>
+<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span>    })</div>
+<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span>    .Detach([](<a class="code hl_class" href="classyaclib_1_1Result.html">yaclib::Result&lt;int&gt;</a> r) {</div>
+<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span>      std::cout &lt;&lt; <span class="stringliteral">&quot;Result: &quot;</span> &lt;&lt; std::move(r).Ok() &lt;&lt; std::endl;</div>
+<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span>    });</div>
+<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span> </div>
+<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span>  tp.SoftStop();</div>
+<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>  tp.Wait();</div>
+<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>}</div>
+</div>
+<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span><span class="comment"></span> </div>
+<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span><span class="comment"> \todo Add WhenAny example</span></div>
+<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span> </div>
+<div class="foldopen" id="foldopen00156" data-start="{" data-end="}">
+<div class="line"><a id="l00156" name="l00156"></a><span class="lineno"><a class="line" href="simple_8cpp.html#aaf60d6ccd7061f5f734532445fe7b031">  156</a></span><a class="code hl_function" href="simple_8cpp.html#a431850dcbba7ccc5a2e455a73d7128aa">TEST</a>(Example, Race) {</div>
+<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>  <a class="code hl_class" href="classyaclib_1_1FairThreadPool.html">yaclib::FairThreadPool</a> tp{1};</div>
+<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>  <a class="code hl_class" href="classyaclib_1_1FairThreadPool.html">yaclib::FairThreadPool</a> tp2{1};</div>
+<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span> </div>
+<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>  <span class="keyword">auto</span> [f, p] = <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">yaclib::MakeContract&lt;int&gt;</a>();</div>
+<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span> </div>
+<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>  <a class="code hl_function" href="namespaceyaclib.html#a7a1e816f25355b1f23b01433879ed0ec">yaclib::Run</a>(tp, [p = std::move(p)]() <span class="keyword">mutable</span> {</div>
+<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>    std::move(p).Set(42);</div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>  }).Detach();</div>
+<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span> </div>
+<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>  std::move(f).Detach(tp2, [](<a class="code hl_class" href="classyaclib_1_1Result.html">yaclib::Result&lt;int&gt;</a> <span class="comment">/*r*/</span>) {</div>
+<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>    std::cout &lt;&lt; <span class="stringliteral">&quot;Hello from the second thread pool!&quot;</span>;</div>
+<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>  });</div>
+<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span> </div>
+<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span>  tp.SoftStop();</div>
+<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span>  tp.Wait();</div>
+<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>  tp2.SoftStop();</div>
+<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span>  tp2.Wait();</div>
+<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span>}</div>
+</div>
+<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span> </div>
+<div class="foldopen" id="foldopen00176" data-start="{" data-end="}">
+<div class="line"><a id="l00176" name="l00176"></a><span class="lineno"><a class="line" href="simple_8cpp.html#a7954b5f2e96cc226fe3d036fc33b2c55">  176</a></span><a class="code hl_function" href="simple_8cpp.html#a431850dcbba7ccc5a2e455a73d7128aa">TEST</a>(Example, StrandAsync) {</div>
+<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span>  <a class="code hl_class" href="classyaclib_1_1FairThreadPool.html">yaclib::FairThreadPool</a> tp{1};</div>
+<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span>  <span class="keyword">auto</span> strand = <a class="code hl_function" href="namespaceyaclib.html#a7f7d050cd191bf12f4b29b3f97050c83">yaclib::MakeStrand</a>(&amp;tp);</div>
+<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span> </div>
+<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span>  <span class="keyword">auto</span> first = []() {</div>
+<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span>    <span class="keywordflow">return</span> 42;</div>
+<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span>  };</div>
+<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span> </div>
+<div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span>  <span class="keyword">auto</span> second = [](<span class="keywordtype">int</span> r) {</div>
+<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span>    <span class="keywordflow">return</span> r;</div>
+<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span>  };</div>
+<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span> </div>
+<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span>  <span class="keyword">auto</span> third = [](<span class="keywordtype">int</span> r) {</div>
+<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span>    <span class="keywordflow">return</span> r + 1;</div>
+<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span>  };</div>
+<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span> </div>
+<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span>  <a class="code hl_function" href="namespaceyaclib.html#a7a1e816f25355b1f23b01433879ed0ec">yaclib::Run</a>(tp, first)</div>
+<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span>    .Then(*strand, second)  <span class="comment">// Serialized</span></div>
+<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>    .Then(tp, third)</div>
+<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>    .Detach([](<a class="code hl_class" href="classyaclib_1_1Result.html">yaclib::Result&lt;int&gt;</a> r) {</div>
+<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span>      std::cout &lt;&lt; <span class="stringliteral">&quot;Final result: &quot;</span> &lt;&lt; std::move(r).Value() &lt;&lt; std::endl;</div>
+<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span>    });</div>
+<div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span> </div>
+<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span>  tp.SoftStop();</div>
+<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span>  tp.Wait();</div>
+<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span>}</div>
+</div>
+<div class="ttc" id="aasync_2future_8hpp_html"><div class="ttname"><a href="async_2future_8hpp.html">future.hpp</a></div></div>
+<div class="ttc" id="aclassCalculatorService_html"><div class="ttname"><a href="classCalculatorService.html">CalculatorService</a></div><div class="ttdef"><b>Definition</b> <a href="simple_8cpp_source.html#l00111">simple.cpp:111</a></div></div>
+<div class="ttc" id="aclassCalculatorService_html_a13db61804aff7721bbc2d79ae75d7427"><div class="ttname"><a href="classCalculatorService.html#a13db61804aff7721bbc2d79ae75d7427">CalculatorService::Increment</a></div><div class="ttdeci">yaclib::FutureOn&lt; int &gt; Increment(int value)</div><div class="ttdef"><b>Definition</b> <a href="simple_8cpp_source.html#l00116">simple.cpp:116</a></div></div>
+<div class="ttc" id="aclassCalculatorService_html_aa4a66d24fd6c3f98582c097db4cca4ec"><div class="ttname"><a href="classCalculatorService.html#aa4a66d24fd6c3f98582c097db4cca4ec">CalculatorService::CalculatorService</a></div><div class="ttdeci">CalculatorService(yaclib::IExecutorPtr e)</div><div class="ttdef"><b>Definition</b> <a href="simple_8cpp_source.html#l00113">simple.cpp:113</a></div></div>
+<div class="ttc" id="aclassCalculatorService_html_ac73e8ceb5a21805177143576eaf95870"><div class="ttname"><a href="classCalculatorService.html#ac73e8ceb5a21805177143576eaf95870">CalculatorService::Double</a></div><div class="ttdeci">yaclib::FutureOn&lt; int &gt; Double(int value)</div><div class="ttdef"><b>Definition</b> <a href="simple_8cpp_source.html#l00122">simple.cpp:122</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1FairThreadPool_html"><div class="ttname"><a href="classyaclib_1_1FairThreadPool.html">yaclib::FairThreadPool</a></div><div class="ttdoc">TODO(kononovk) Doxygen docs.</div><div class="ttdef"><b>Definition</b> <a href="fair__thread__pool_8hpp_source.html#l00018">fair_thread_pool.hpp:18</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1FutureBase_html_a5ee96890a14dd007f7da1db7c3eccf31"><div class="ttname"><a href="classyaclib_1_1FutureBase.html#a5ee96890a14dd007f7da1db7c3eccf31">yaclib::FutureBase::Valid</a></div><div class="ttdeci">bool Valid() const &amp;noexcept</div><div class="ttdoc">Check if this Future has Promise.</div><div class="ttdef"><b>Definition</b> <a href="async_2future_8hpp_source.html#l00053">future.hpp:53</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1FutureOn_html"><div class="ttname"><a href="classyaclib_1_1FutureOn.html">yaclib::FutureOn</a></div><div class="ttdoc">Provides a mechanism to access the result of async operations.</div><div class="ttdef"><b>Definition</b> <a href="async_2future_8hpp_source.html#l00232">future.hpp:232</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1FutureOn_html_ab6c0fe09106c73794d400588454f30f2"><div class="ttname"><a href="classyaclib_1_1FutureOn.html#ab6c0fe09106c73794d400588454f30f2">yaclib::FutureOn::Then</a></div><div class="ttdeci">auto Then(Func &amp;&amp;f) &amp;&amp;</div><div class="ttdoc">Attach the continuation func to *this.</div><div class="ttdef"><b>Definition</b> <a href="async_2future_8hpp_source.html#l00273">future.hpp:273</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1IntrusivePtr_html"><div class="ttname"><a href="classyaclib_1_1IntrusivePtr.html">yaclib::IntrusivePtr&lt; IExecutor &gt;</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1Result_html"><div class="ttname"><a href="classyaclib_1_1Result.html">yaclib::Result</a></div><div class="ttdoc">Encapsulated return value from caller.</div><div class="ttdef"><b>Definition</b> <a href="result_8hpp_source.html#l00090">result.hpp:90</a></div></div>
+<div class="ttc" id="acontract_8hpp_html"><div class="ttname"><a href="contract_8hpp.html">contract.hpp</a></div></div>
+<div class="ttc" id="aexecutor_8hpp_html"><div class="ttname"><a href="executor_8hpp.html">executor.hpp</a></div></div>
+<div class="ttc" id="afair__thread__pool_8hpp_html"><div class="ttname"><a href="fair__thread__pool_8hpp.html">fair_thread_pool.hpp</a></div></div>
+<div class="ttc" id="aintrusive__ptr_8hpp_html"><div class="ttname"><a href="intrusive__ptr_8hpp.html">intrusive_ptr.hpp</a></div></div>
+<div class="ttc" id="anamespaceyaclib_html_a7a1e816f25355b1f23b01433879ed0ec"><div class="ttname"><a href="namespaceyaclib.html#a7a1e816f25355b1f23b01433879ed0ec">yaclib::Run</a></div><div class="ttdeci">auto Run(Func &amp;&amp;f)</div><div class="ttdoc">Execute Callable func on Inline executor.</div><div class="ttdef"><b>Definition</b> <a href="run_8hpp_source.html#l00038">run.hpp:38</a></div></div>
+<div class="ttc" id="anamespaceyaclib_html_a7f7d050cd191bf12f4b29b3f97050c83"><div class="ttname"><a href="namespaceyaclib.html#a7f7d050cd191bf12f4b29b3f97050c83">yaclib::MakeStrand</a></div><div class="ttdeci">IExecutorPtr MakeStrand(IExecutorPtr e)</div><div class="ttdoc">Strand is the asynchronous analogue of a mutex.</div><div class="ttdef"><b>Definition</b> <a href="src_2exe_2strand_8cpp_source.html#l00071">strand.cpp:71</a></div></div>
+<div class="ttc" id="anamespaceyaclib_html_ac918e7a0c384bcf611e0b5b4b2cd5504"><div class="ttname"><a href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">yaclib::MakeContract</a></div><div class="ttdeci">Contract&lt; V, E &gt; MakeContract()</div><div class="ttdoc">Creates related future and promise.</div><div class="ttdef"><b>Definition</b> <a href="contract_8hpp_source.html#l00025">contract.hpp:25</a></div></div>
+<div class="ttc" id="apromise_8hpp_html"><div class="ttname"><a href="promise_8hpp.html">promise.hpp</a></div></div>
+<div class="ttc" id="aresult_8hpp_html"><div class="ttname"><a href="result_8hpp.html">result.hpp</a></div></div>
+<div class="ttc" id="arun_8hpp_html"><div class="ttname"><a href="run_8hpp.html">run.hpp</a></div></div>
+<div class="ttc" id="asimple_8cpp_html_a431850dcbba7ccc5a2e455a73d7128aa"><div class="ttname"><a href="simple_8cpp.html#a431850dcbba7ccc5a2e455a73d7128aa">TEST</a></div><div class="ttdeci">TEST(Example, HelloWorld)</div><div class="ttdef"><b>Definition</b> <a href="simple_8cpp_source.html#l00027">simple.cpp:27</a></div></div>
+<div class="ttc" id="astrand_8hpp_html"><div class="ttname"><a href="strand_8hpp.html">strand.hpp</a></div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="dir_13e138d54eb8818da29c3992edef070a.html">test</a></li><li class="navelem"><a class="el" href="dir_c19ca5e3756d7ba8846e9abf743f6090.html">example</a></li><li class="navelem"><a class="el" href="dir_17cd152e3c1d3007e36290037c947489.html">async</a></li><li class="navelem"><a class="el" href="simple_8cpp.html">simple.cpp</a></li>
+    <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+  </ul>
+</div>
+</body>
+</html>

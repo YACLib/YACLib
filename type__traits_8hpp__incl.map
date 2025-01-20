@@ -1,0 +1,15 @@
+<map id="include/yaclib/util/type_traits.hpp" name="include/yaclib/util/type_traits.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="164,5,284,46"/>
+<area shape="rect" id="Node000002" href="$fwd_8hpp.html" title=" " alt="" coords="5,183,109,208"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="163,33,129,40,93,52,61,70,35,95,28,113,29,132,44,169,39,171,24,133,23,112,31,93,58,65,91,47,127,35,162,28"/>
+<area shape="rect" id="Node000003" href="$type__traits__impl_8hpp.html" title=" " alt="" coords="46,94,186,135"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="201,49,154,86,150,82,197,44"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="158,183,239,208"/>
+<area shape="poly" id="edge6_Node000001_Node000004" title=" " alt="" coords="223,47,205,168,200,167,218,46"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="262,102,338,127"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="243,45,281,88,277,92,239,48"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="362,102,413,127"/>
+<area shape="poly" id="edge7_Node000001_Node000006" title=" " alt="" coords="262,44,353,92,350,96,260,49"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="103,137,77,172,73,168,99,133"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="138,133,176,170,173,173,134,137"/>
+</map>

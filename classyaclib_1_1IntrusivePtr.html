@@ -1,0 +1,966 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.9.8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<!-- BEGIN opengraph metadata -->
+<meta property="og:title" content="Doxygen Awesome" />
+<meta property="og:image" content="https://repository-images.githubusercontent.com/348492097/4f16df80-88fb-11eb-9d31-4015ff22c452" />
+<meta property="og:description" content="Custom CSS theme for doxygen html-documentation with lots of customization parameters." />
+<meta property="og:url" content="https://jothepro.github.io/doxygen-awesome-css/" />
+<!-- END opengraph metadata -->
+<!-- BEGIN twitter metadata -->
+<meta name="twitter:image:src" content="https://repository-images.githubusercontent.com/348492097/4f16df80-88fb-11eb-9d31-4015ff22c452" />
+<meta name="twitter:title" content="Doxygen Awesome" />
+<meta name="twitter:description" content="Custom CSS theme for doxygen html-documentation with lots of customization parameters." />
+<!-- END twitter metadata -->
+<title>YACLib: yaclib::IntrusivePtr&lt; T &gt; Class Template Reference</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link rel="icon" type="image/svg+xml" href="logo.drawio.svg"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+<script type="text/javascript" src="doxygen-awesome-fragment-copy-button.js"></script>
+<script type="text/javascript" src="doxygen-awesome-paragraph-link.js"></script>
+<script type="text/javascript" src="toggle-alternative-theme.js"></script>
+<script type="text/javascript">
+    DoxygenAwesomeFragmentCopyButton.init()
+    DoxygenAwesomeDarkModeToggle.init()
+    DoxygenAwesomeParagraphLink.init()
+</script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="custom.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only-darkmode-toggle.css" rel="stylesheet" type="text/css"/>
+<link href="custom-alternative.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<!-- https://tholman.com/github-corners/ -->
+<a href="https://github.com/YACLib/YACLib" class="github-corner" title="View source on GitHub" target="_blank">
+    <svg viewBox="0 0 250 250" width="40" height="40" style="position: absolute; top: 0; border: 0; right: 0; z-index: 99;" aria-hidden="true">
+    <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
+   <div id="projectname">YACLib
+   </div>
+   <div id="projectbrief">C++ library for concurrent tasks execution</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Search');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('classyaclib_1_1IntrusivePtr.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#friends">Friends</a> &#124;
+<a href="classyaclib_1_1IntrusivePtr-members.html">List of all members</a>  </div>
+  <div class="headertitle"><div class="title">yaclib::IntrusivePtr&lt; T &gt; Class Template Reference<span class="mlabels"><span class="mlabel">final</span></span></div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>A intrusive pointer to objects with an embedded reference count.  
+ <a href="classyaclib_1_1IntrusivePtr.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="intrusive__ptr_8hpp_source.html">intrusive_ptr.hpp</a>&gt;</code></p>
+<div class="dynheader">
+Inheritance diagram for yaclib::IntrusivePtr&lt; T &gt;:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="classyaclib_1_1IntrusivePtr__inherit__graph.svg" width="455" height="183"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:acc13ce476a254f021a06d947350c8792" id="r_acc13ce476a254f021a06d947350c8792"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1IntrusivePtr.html#acc13ce476a254f021a06d947350c8792">IntrusivePtr</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:acc13ce476a254f021a06d947350c8792"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab02593717d2e3dc0a3775d91da1db2c7" id="r_ab02593717d2e3dc0a3775d91da1db2c7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1IntrusivePtr.html#ab02593717d2e3dc0a3775d91da1db2c7">IntrusivePtr</a> (T *<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">other</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:ab02593717d2e3dc0a3775d91da1db2c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a48e2675ad4c2faaf5e8f86a3150192e5" id="r_a48e2675ad4c2faaf5e8f86a3150192e5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1IntrusivePtr.html#a48e2675ad4c2faaf5e8f86a3150192e5">IntrusivePtr</a> (<a class="el" href="classyaclib_1_1IntrusivePtr.html">IntrusivePtr</a> &amp;&amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">other</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a48e2675ad4c2faaf5e8f86a3150192e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af8dd0aa4f984731812a4ec34fd159f9d" id="r_af8dd0aa4f984731812a4ec34fd159f9d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1IntrusivePtr.html#af8dd0aa4f984731812a4ec34fd159f9d">IntrusivePtr</a> (<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1IntrusivePtr.html">IntrusivePtr</a> &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">other</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:af8dd0aa4f984731812a4ec34fd159f9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae587518216aed847b09666ab37225f91" id="r_ae587518216aed847b09666ab37225f91"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classyaclib_1_1IntrusivePtr.html">IntrusivePtr</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1IntrusivePtr.html#ae587518216aed847b09666ab37225f91">operator=</a> (T *<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">other</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:ae587518216aed847b09666ab37225f91"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4c222f792e3ecd70dfb5b4e3effdc4db" id="r_a4c222f792e3ecd70dfb5b4e3effdc4db"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classyaclib_1_1IntrusivePtr.html">IntrusivePtr</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1IntrusivePtr.html#a4c222f792e3ecd70dfb5b4e3effdc4db">operator=</a> (<a class="el" href="classyaclib_1_1IntrusivePtr.html">IntrusivePtr</a> &amp;&amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">other</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a4c222f792e3ecd70dfb5b4e3effdc4db"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae90a449e590e9cea43a6e518f71626c5" id="r_ae90a449e590e9cea43a6e518f71626c5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classyaclib_1_1IntrusivePtr.html">IntrusivePtr</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1IntrusivePtr.html#ae90a449e590e9cea43a6e518f71626c5">operator=</a> (<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1IntrusivePtr.html">IntrusivePtr</a> &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">other</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:ae90a449e590e9cea43a6e518f71626c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2f80111438cb1cdd564461586addb4a5" id="r_a2f80111438cb1cdd564461586addb4a5"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </td></tr>
+<tr class="memitem:a2f80111438cb1cdd564461586addb4a5"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classyaclib_1_1IntrusivePtr.html#a2f80111438cb1cdd564461586addb4a5">IntrusivePtr</a> (<a class="el" href="classyaclib_1_1IntrusivePtr.html">IntrusivePtr</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; &amp;&amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">other</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a2f80111438cb1cdd564461586addb4a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9d6872ce4dbe3d6a6e905068d1dca94d" id="r_a9d6872ce4dbe3d6a6e905068d1dca94d"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </td></tr>
+<tr class="memitem:a9d6872ce4dbe3d6a6e905068d1dca94d"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classyaclib_1_1IntrusivePtr.html#a9d6872ce4dbe3d6a6e905068d1dca94d">IntrusivePtr</a> (<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1IntrusivePtr.html">IntrusivePtr</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">other</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a9d6872ce4dbe3d6a6e905068d1dca94d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1ae560bc9bbb3f69f15b7f38cc15ad40" id="r_a1ae560bc9bbb3f69f15b7f38cc15ad40"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </td></tr>
+<tr class="memitem:a1ae560bc9bbb3f69f15b7f38cc15ad40"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classyaclib_1_1IntrusivePtr.html">IntrusivePtr</a> &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classyaclib_1_1IntrusivePtr.html#a1ae560bc9bbb3f69f15b7f38cc15ad40">operator=</a> (<a class="el" href="classyaclib_1_1IntrusivePtr.html">IntrusivePtr</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; &amp;&amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">other</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a1ae560bc9bbb3f69f15b7f38cc15ad40"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8ec4496b2b5ca141b668067e01aa40de" id="r_a8ec4496b2b5ca141b668067e01aa40de"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </td></tr>
+<tr class="memitem:a8ec4496b2b5ca141b668067e01aa40de"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classyaclib_1_1IntrusivePtr.html">IntrusivePtr</a> &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classyaclib_1_1IntrusivePtr.html#a8ec4496b2b5ca141b668067e01aa40de">operator=</a> (<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1IntrusivePtr.html">IntrusivePtr</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">other</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a8ec4496b2b5ca141b668067e01aa40de"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af6e6904dd723614433d7e5c15d4fc477" id="r_af6e6904dd723614433d7e5c15d4fc477"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1IntrusivePtr.html#af6e6904dd723614433d7e5c15d4fc477">~IntrusivePtr</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:af6e6904dd723614433d7e5c15d4fc477"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab375de1a0ee5bdcd9e83f0723d2ca1f3" id="r_ab375de1a0ee5bdcd9e83f0723d2ca1f3"><td class="memItemLeft" align="right" valign="top">T *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1IntrusivePtr.html#ab375de1a0ee5bdcd9e83f0723d2ca1f3">Get</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:ab375de1a0ee5bdcd9e83f0723d2ca1f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2b7cac90549fb93ef3134d044d8ad27e" id="r_a2b7cac90549fb93ef3134d044d8ad27e"><td class="memItemLeft" align="right" valign="top">T *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1IntrusivePtr.html#a2b7cac90549fb93ef3134d044d8ad27e">Release</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a2b7cac90549fb93ef3134d044d8ad27e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2cfc2d12e9ef2d51d07289d8d21a809a" id="r_a2cfc2d12e9ef2d51d07289d8d21a809a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1IntrusivePtr.html#a2cfc2d12e9ef2d51d07289d8d21a809a">operator bool</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a2cfc2d12e9ef2d51d07289d8d21a809a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a73dd63aeb4782fe998623b3b6e9d10b9" id="r_a73dd63aeb4782fe998623b3b6e9d10b9"><td class="memItemLeft" align="right" valign="top">T &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1IntrusivePtr.html#a73dd63aeb4782fe998623b3b6e9d10b9">operator*</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a73dd63aeb4782fe998623b3b6e9d10b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7c35e8a21e28d55d6462841df594e6e4" id="r_a7c35e8a21e28d55d6462841df594e6e4"><td class="memItemLeft" align="right" valign="top">T *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1IntrusivePtr.html#a7c35e8a21e28d55d6462841df594e6e4">operator-&gt;</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a7c35e8a21e28d55d6462841df594e6e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa772d552d559a3258c9545011d9b2b65" id="r_aa772d552d559a3258c9545011d9b2b65"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1IntrusivePtr.html#aa772d552d559a3258c9545011d9b2b65">Swap</a> (<a class="el" href="classyaclib_1_1IntrusivePtr.html">IntrusivePtr</a> &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">other</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:aa772d552d559a3258c9545011d9b2b65"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a29d2e87ada1fada979179b787df50d09" id="r_a29d2e87ada1fada979179b787df50d09"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1IntrusivePtr.html#a29d2e87ada1fada979179b787df50d09">IntrusivePtr</a> (<a class="el" href="structyaclib_1_1NoRefTag.html">NoRefTag</a>, T *<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">other</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a29d2e87ada1fada979179b787df50d09"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4d32ef6c0268ea50c8ac55798785ece7" id="r_a4d32ef6c0268ea50c8ac55798785ece7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1IntrusivePtr.html#a4d32ef6c0268ea50c8ac55798785ece7">Reset</a> (<a class="el" href="structyaclib_1_1NoRefTag.html">NoRefTag</a>, T *<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">other</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a4d32ef6c0268ea50c8ac55798785ece7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2d2f2fd165e55dbfcdc0d462adfc5b3d" id="r_a2d2f2fd165e55dbfcdc0d462adfc5b3d"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </td></tr>
+<tr class="memitem:a2d2f2fd165e55dbfcdc0d462adfc5b3d"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classyaclib_1_1IntrusivePtr.html">IntrusivePtr</a>&lt; T &gt; &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classyaclib_1_1IntrusivePtr.html#a2d2f2fd165e55dbfcdc0d462adfc5b3d">operator=</a> (<a class="el" href="classyaclib_1_1IntrusivePtr.html">IntrusivePtr</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; &amp;&amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">other</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a2d2f2fd165e55dbfcdc0d462adfc5b3d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad39ef1192d1ac148a0b4ebbfac68b6c8" id="r_ad39ef1192d1ac148a0b4ebbfac68b6c8"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </td></tr>
+<tr class="memitem:ad39ef1192d1ac148a0b4ebbfac68b6c8"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classyaclib_1_1IntrusivePtr.html">IntrusivePtr</a>&lt; T &gt; &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classyaclib_1_1IntrusivePtr.html#ad39ef1192d1ac148a0b4ebbfac68b6c8">operator=</a> (<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1IntrusivePtr.html">IntrusivePtr</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">other</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:ad39ef1192d1ac148a0b4ebbfac68b6c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="friends" name="friends"></a>
+Friends</h2></td></tr>
+<tr class="memitem:a04a374ecab2499e81653198fd49ff15e" id="r_a04a374ecab2499e81653198fd49ff15e"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </td></tr>
+<tr class="memitem:a04a374ecab2499e81653198fd49ff15e"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">class</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classyaclib_1_1IntrusivePtr.html#a04a374ecab2499e81653198fd49ff15e">IntrusivePtr</a></td></tr>
+<tr class="separator:a04a374ecab2499e81653198fd49ff15e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><div class="compoundTemplParams">template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T&gt;<br />
+class yaclib::IntrusivePtr&lt; T &gt;</div><p>A intrusive pointer to objects with an embedded reference count. </p>
+<p><a href="https://www.boost.org/doc/libs/1_77_0/libs/smart_ptr/doc/html/smart_ptr.html#intrusive_ptr">https://www.boost.org/doc/libs/1_77_0/libs/smart_ptr/doc/html/smart_ptr.html#intrusive_ptr</a> </p>
+
+<p class="definition">Definition at line <a class="el" href="intrusive__ptr_8hpp_source.html#l00017">17</a> of file <a class="el" href="intrusive__ptr_8hpp_source.html">intrusive_ptr.hpp</a>.</p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="acc13ce476a254f021a06d947350c8792" name="acc13ce476a254f021a06d947350c8792"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acc13ce476a254f021a06d947350c8792">&#9670;&#160;</a></span>IntrusivePtr() <span class="overload">[1/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classyaclib_1_1IntrusivePtr.html">yaclib::IntrusivePtr</a>&lt; T &gt;::IntrusivePtr </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="intrusive__ptr__impl_8hpp_source.html#l00008">8</a> of file <a class="el" href="intrusive__ptr__impl_8hpp_source.html">intrusive_ptr_impl.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ab02593717d2e3dc0a3775d91da1db2c7" name="ab02593717d2e3dc0a3775d91da1db2c7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab02593717d2e3dc0a3775d91da1db2c7">&#9670;&#160;</a></span>IntrusivePtr() <span class="overload">[2/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classyaclib_1_1IntrusivePtr.html">yaclib::IntrusivePtr</a>&lt; T &gt;::IntrusivePtr </td>
+          <td>(</td>
+          <td class="paramtype">T *&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="intrusive__ptr__impl_8hpp_source.html#l00012">12</a> of file <a class="el" href="intrusive__ptr__impl_8hpp_source.html">intrusive_ptr_impl.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="a48e2675ad4c2faaf5e8f86a3150192e5" name="a48e2675ad4c2faaf5e8f86a3150192e5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a48e2675ad4c2faaf5e8f86a3150192e5">&#9670;&#160;</a></span>IntrusivePtr() <span class="overload">[3/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classyaclib_1_1IntrusivePtr.html">yaclib::IntrusivePtr</a>&lt; T &gt;::IntrusivePtr </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classyaclib_1_1IntrusivePtr.html">IntrusivePtr</a>&lt; T &gt; &amp;&amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="intrusive__ptr__impl_8hpp_source.html#l00019">19</a> of file <a class="el" href="intrusive__ptr__impl_8hpp_source.html">intrusive_ptr_impl.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="af8dd0aa4f984731812a4ec34fd159f9d" name="af8dd0aa4f984731812a4ec34fd159f9d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af8dd0aa4f984731812a4ec34fd159f9d">&#9670;&#160;</a></span>IntrusivePtr() <span class="overload">[4/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classyaclib_1_1IntrusivePtr.html">yaclib::IntrusivePtr</a>&lt; T &gt;::IntrusivePtr </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1IntrusivePtr.html">IntrusivePtr</a>&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="intrusive__ptr__impl_8hpp_source.html#l00024">24</a> of file <a class="el" href="intrusive__ptr__impl_8hpp_source.html">intrusive_ptr_impl.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="a2f80111438cb1cdd564461586addb4a5" name="a2f80111438cb1cdd564461586addb4a5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2f80111438cb1cdd564461586addb4a5">&#9670;&#160;</a></span>IntrusivePtr() <span class="overload">[5/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classyaclib_1_1IntrusivePtr.html">yaclib::IntrusivePtr</a>&lt; T &gt;::IntrusivePtr </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classyaclib_1_1IntrusivePtr.html">IntrusivePtr</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; &amp;&amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="intrusive__ptr__impl_8hpp_source.html#l00048">48</a> of file <a class="el" href="intrusive__ptr__impl_8hpp_source.html">intrusive_ptr_impl.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="a9d6872ce4dbe3d6a6e905068d1dca94d" name="a9d6872ce4dbe3d6a6e905068d1dca94d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9d6872ce4dbe3d6a6e905068d1dca94d">&#9670;&#160;</a></span>IntrusivePtr() <span class="overload">[6/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classyaclib_1_1IntrusivePtr.html">yaclib::IntrusivePtr</a>&lt; T &gt;::IntrusivePtr </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1IntrusivePtr.html">IntrusivePtr</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="intrusive__ptr__impl_8hpp_source.html#l00054">54</a> of file <a class="el" href="intrusive__ptr__impl_8hpp_source.html">intrusive_ptr_impl.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="af6e6904dd723614433d7e5c15d4fc477" name="af6e6904dd723614433d7e5c15d4fc477"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af6e6904dd723614433d7e5c15d4fc477">&#9670;&#160;</a></span>~IntrusivePtr()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classyaclib_1_1IntrusivePtr.html">yaclib::IntrusivePtr</a>&lt; T &gt;::~<a class="el" href="classyaclib_1_1IntrusivePtr.html">IntrusivePtr</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="intrusive__ptr__impl_8hpp_source.html#l00071">71</a> of file <a class="el" href="intrusive__ptr__impl_8hpp_source.html">intrusive_ptr_impl.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a29d2e87ada1fada979179b787df50d09" name="a29d2e87ada1fada979179b787df50d09"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a29d2e87ada1fada979179b787df50d09">&#9670;&#160;</a></span>IntrusivePtr() <span class="overload">[7/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classyaclib_1_1IntrusivePtr.html">yaclib::IntrusivePtr</a>&lt; T &gt;::IntrusivePtr </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structyaclib_1_1NoRefTag.html">NoRefTag</a>&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T *&#160;</td>
+          <td class="paramname"><em>other</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="intrusive__ptr__impl_8hpp_source.html#l00114">114</a> of file <a class="el" href="intrusive__ptr__impl_8hpp_source.html">intrusive_ptr_impl.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="ab375de1a0ee5bdcd9e83f0723d2ca1f3" name="ab375de1a0ee5bdcd9e83f0723d2ca1f3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab375de1a0ee5bdcd9e83f0723d2ca1f3">&#9670;&#160;</a></span>Get()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">T * <a class="el" href="classyaclib_1_1IntrusivePtr.html">yaclib::IntrusivePtr</a>&lt; T &gt;::Get </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="intrusive__ptr__impl_8hpp_source.html#l00078">78</a> of file <a class="el" href="intrusive__ptr__impl_8hpp_source.html">intrusive_ptr_impl.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="intrusive__ptr_8hpp_source.html#l00064">yaclib::operator==()</a>.</p>
+
+</div>
+</div>
+<a id="a2cfc2d12e9ef2d51d07289d8d21a809a" name="a2cfc2d12e9ef2d51d07289d8d21a809a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2cfc2d12e9ef2d51d07289d8d21a809a">&#9670;&#160;</a></span>operator bool()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classyaclib_1_1IntrusivePtr.html">yaclib::IntrusivePtr</a>&lt; T &gt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">::operator</a> <a class="el" href="classbool.html">bool</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">explicit</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="intrusive__ptr__impl_8hpp_source.html#l00090">90</a> of file <a class="el" href="intrusive__ptr__impl_8hpp_source.html">intrusive_ptr_impl.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a73dd63aeb4782fe998623b3b6e9d10b9" name="a73dd63aeb4782fe998623b3b6e9d10b9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a73dd63aeb4782fe998623b3b6e9d10b9">&#9670;&#160;</a></span>operator*()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">T &amp; <a class="el" href="classyaclib_1_1IntrusivePtr.html">yaclib::IntrusivePtr</a>&lt; T &gt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">::operator</a>* </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="intrusive__ptr__impl_8hpp_source.html#l00095">95</a> of file <a class="el" href="intrusive__ptr__impl_8hpp_source.html">intrusive_ptr_impl.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="log_8hpp_source.html#l00085">YACLIB_ASSERT</a>.</p>
+
+</div>
+</div>
+<a id="a7c35e8a21e28d55d6462841df594e6e4" name="a7c35e8a21e28d55d6462841df594e6e4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7c35e8a21e28d55d6462841df594e6e4">&#9670;&#160;</a></span>operator-&gt;()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">T * <a class="el" href="classyaclib_1_1IntrusivePtr.html">yaclib::IntrusivePtr</a>&lt; T &gt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">::operator</a>-&gt; </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="intrusive__ptr__impl_8hpp_source.html#l00101">101</a> of file <a class="el" href="intrusive__ptr__impl_8hpp_source.html">intrusive_ptr_impl.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="log_8hpp_source.html#l00085">YACLIB_ASSERT</a>.</p>
+
+</div>
+</div>
+<a id="ae90a449e590e9cea43a6e518f71626c5" name="ae90a449e590e9cea43a6e518f71626c5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae90a449e590e9cea43a6e518f71626c5">&#9670;&#160;</a></span>operator=() <span class="overload">[1/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classyaclib_1_1IntrusivePtr.html">IntrusivePtr</a>&lt; T &gt; &amp; <a class="el" href="classyaclib_1_1IntrusivePtr.html">yaclib::IntrusivePtr</a>&lt; T &gt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">::operator</a>= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1IntrusivePtr.html">IntrusivePtr</a>&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="intrusive__ptr__impl_8hpp_source.html#l00042">42</a> of file <a class="el" href="intrusive__ptr__impl_8hpp_source.html">intrusive_ptr_impl.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ad39ef1192d1ac148a0b4ebbfac68b6c8" name="ad39ef1192d1ac148a0b4ebbfac68b6c8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad39ef1192d1ac148a0b4ebbfac68b6c8">&#9670;&#160;</a></span>operator=() <span class="overload">[2/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classyaclib_1_1IntrusivePtr.html">IntrusivePtr</a>&lt; T &gt; &amp; <a class="el" href="classyaclib_1_1IntrusivePtr.html">yaclib::IntrusivePtr</a>&lt; T &gt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">::operator</a>= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1IntrusivePtr.html">IntrusivePtr</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="intrusive__ptr__impl_8hpp_source.html#l00066">66</a> of file <a class="el" href="intrusive__ptr__impl_8hpp_source.html">intrusive_ptr_impl.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="a8ec4496b2b5ca141b668067e01aa40de" name="a8ec4496b2b5ca141b668067e01aa40de"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8ec4496b2b5ca141b668067e01aa40de">&#9670;&#160;</a></span>operator=() <span class="overload">[3/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classyaclib_1_1IntrusivePtr.html">IntrusivePtr</a> &amp; <a class="el" href="classyaclib_1_1IntrusivePtr.html">yaclib::IntrusivePtr</a>&lt; T &gt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">::operator</a>= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1IntrusivePtr.html">IntrusivePtr</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a4c222f792e3ecd70dfb5b4e3effdc4db" name="a4c222f792e3ecd70dfb5b4e3effdc4db"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4c222f792e3ecd70dfb5b4e3effdc4db">&#9670;&#160;</a></span>operator=() <span class="overload">[4/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classyaclib_1_1IntrusivePtr.html">IntrusivePtr</a>&lt; T &gt; &amp; <a class="el" href="classyaclib_1_1IntrusivePtr.html">yaclib::IntrusivePtr</a>&lt; T &gt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">::operator</a>= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classyaclib_1_1IntrusivePtr.html">IntrusivePtr</a>&lt; T &gt; &amp;&amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="intrusive__ptr__impl_8hpp_source.html#l00036">36</a> of file <a class="el" href="intrusive__ptr__impl_8hpp_source.html">intrusive_ptr_impl.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="a2d2f2fd165e55dbfcdc0d462adfc5b3d" name="a2d2f2fd165e55dbfcdc0d462adfc5b3d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2d2f2fd165e55dbfcdc0d462adfc5b3d">&#9670;&#160;</a></span>operator=() <span class="overload">[5/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classyaclib_1_1IntrusivePtr.html">IntrusivePtr</a>&lt; T &gt; &amp; <a class="el" href="classyaclib_1_1IntrusivePtr.html">yaclib::IntrusivePtr</a>&lt; T &gt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">::operator</a>= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classyaclib_1_1IntrusivePtr.html">IntrusivePtr</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; &amp;&amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="intrusive__ptr__impl_8hpp_source.html#l00059">59</a> of file <a class="el" href="intrusive__ptr__impl_8hpp_source.html">intrusive_ptr_impl.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>, and <a class="el" href="intrusive__ptr__impl_8hpp_source.html#l00107">yaclib::IntrusivePtr&lt; T &gt;::Swap()</a>.</p>
+
+</div>
+</div>
+<a id="a1ae560bc9bbb3f69f15b7f38cc15ad40" name="a1ae560bc9bbb3f69f15b7f38cc15ad40"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1ae560bc9bbb3f69f15b7f38cc15ad40">&#9670;&#160;</a></span>operator=() <span class="overload">[6/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classyaclib_1_1IntrusivePtr.html">IntrusivePtr</a> &amp; <a class="el" href="classyaclib_1_1IntrusivePtr.html">yaclib::IntrusivePtr</a>&lt; T &gt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">::operator</a>= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classyaclib_1_1IntrusivePtr.html">IntrusivePtr</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; &amp;&amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae587518216aed847b09666ab37225f91" name="ae587518216aed847b09666ab37225f91"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae587518216aed847b09666ab37225f91">&#9670;&#160;</a></span>operator=() <span class="overload">[7/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classyaclib_1_1IntrusivePtr.html">IntrusivePtr</a>&lt; T &gt; &amp; <a class="el" href="classyaclib_1_1IntrusivePtr.html">yaclib::IntrusivePtr</a>&lt; T &gt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">::operator</a>= </td>
+          <td>(</td>
+          <td class="paramtype">T *&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="intrusive__ptr__impl_8hpp_source.html#l00028">28</a> of file <a class="el" href="intrusive__ptr__impl_8hpp_source.html">intrusive_ptr_impl.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a2b7cac90549fb93ef3134d044d8ad27e" name="a2b7cac90549fb93ef3134d044d8ad27e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2b7cac90549fb93ef3134d044d8ad27e">&#9670;&#160;</a></span>Release()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">T * <a class="el" href="classyaclib_1_1IntrusivePtr.html">yaclib::IntrusivePtr</a>&lt; T &gt;::Release </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="intrusive__ptr__impl_8hpp_source.html#l00083">83</a> of file <a class="el" href="intrusive__ptr__impl_8hpp_source.html">intrusive_ptr_impl.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="when__all__impl_8hpp_source.html#l00101">yaclib::detail::AllCombinator&lt; O, R, E &gt;::~AllCombinator()</a>, and <a class="el" href="when__all__impl_8hpp_source.html#l00207">yaclib::detail::AllCombinator&lt; OrderPolicy::Same, R, E &gt;::~AllCombinator()</a>.</p>
+
+</div>
+</div>
+<a id="a4d32ef6c0268ea50c8ac55798785ece7" name="a4d32ef6c0268ea50c8ac55798785ece7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4d32ef6c0268ea50c8ac55798785ece7">&#9670;&#160;</a></span>Reset()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a> <a class="el" href="classyaclib_1_1IntrusivePtr.html">yaclib::IntrusivePtr</a>&lt; T &gt;::Reset </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structyaclib_1_1NoRefTag.html">NoRefTag</a>&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T *&#160;</td>
+          <td class="paramname"><em>other</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="intrusive__ptr__impl_8hpp_source.html#l00118">118</a> of file <a class="el" href="intrusive__ptr__impl_8hpp_source.html">intrusive_ptr_impl.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="aa772d552d559a3258c9545011d9b2b65" name="aa772d552d559a3258c9545011d9b2b65"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa772d552d559a3258c9545011d9b2b65">&#9670;&#160;</a></span>Swap()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a> <a class="el" href="classyaclib_1_1IntrusivePtr.html">yaclib::IntrusivePtr</a>&lt; T &gt;::Swap </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classyaclib_1_1IntrusivePtr.html">IntrusivePtr</a>&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="intrusive__ptr__impl_8hpp_source.html#l00107">107</a> of file <a class="el" href="intrusive__ptr__impl_8hpp_source.html">intrusive_ptr_impl.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="coro_2mutex_8hpp_source.html#l00063">yaclib::detail::MutexImpl&lt; FIFO, Batching &gt;::AwaitUnlock()</a>, <a class="el" href="intrusive__ptr__impl_8hpp_source.html#l00042">yaclib::IntrusivePtr&lt; V, E &gt;::operator=()</a>, and <a class="el" href="intrusive__ptr__impl_8hpp_source.html#l00059">yaclib::IntrusivePtr&lt; T &gt;::operator=()</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Friends And Related Symbol Documentation</h2>
+<a id="a04a374ecab2499e81653198fd49ff15e" name="a04a374ecab2499e81653198fd49ff15e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a04a374ecab2499e81653198fd49ff15e">&#9670;&#160;</a></span>IntrusivePtr</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">friend</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">class</a> <a class="el" href="classyaclib_1_1IntrusivePtr.html">IntrusivePtr</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="intrusive__ptr_8hpp_source.html#l00058">58</a> of file <a class="el" href="intrusive__ptr_8hpp_source.html">intrusive_ptr.hpp</a>.</p>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following files:<ul>
+<li>include/yaclib/util/<a class="el" href="intrusive__ptr_8hpp_source.html">intrusive_ptr.hpp</a></li>
+<li>include/yaclib/util/detail/<a class="el" href="intrusive__ptr__impl_8hpp_source.html">intrusive_ptr_impl.hpp</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="namespaceyaclib.html">yaclib</a></li><li class="navelem"><a class="el" href="classyaclib_1_1IntrusivePtr.html">IntrusivePtr</a></li>
+    <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+  </ul>
+</div>
+</body>
+</html>

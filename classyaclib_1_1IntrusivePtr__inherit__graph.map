@@ -1,0 +1,9 @@
+<map id="yaclib::IntrusivePtr&lt; T &gt;" name="yaclib::IntrusivePtr&lt; T &gt;">
+<area shape="rect" id="Node000001" title="A intrusive pointer to objects with an embedded reference count." alt="" coords="5,78,163,104"/>
+<area shape="rect" id="Node000002" href="$classyaclib_1_1IntrusivePtr.html" title=" " alt="" coords="321,5,449,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="161,72,320,37,321,42,162,77"/>
+<area shape="rect" id="Node000003" href="$classyaclib_1_1IntrusivePtr.html" title=" " alt="" coords="321,71,449,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="179,88,321,88,321,94,179,94"/>
+<area shape="rect" id="Node000004" href="$classyaclib_1_1IntrusivePtr.html" title=" " alt="" coords="321,136,449,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="162,105,321,140,320,145,161,110"/>
+</map>

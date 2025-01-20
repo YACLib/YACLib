@@ -1,0 +1,15 @@
+<map id="yaclib::detail::Mutex&lt; Impl &gt;" name="yaclib::detail::Mutex&lt; Impl &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="100,71,232,111"/>
+<area shape="rect" id="Node000003" href="$classyaclib_1_1detail_1_1RecursiveMutex.html" title=" " alt="" coords="289,5,444,46"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="244,63,301,44,303,49,245,68"/>
+<area shape="rect" id="Node000004" href="$classyaclib_1_1detail_1_1SharedMutex.html" title=" " alt="" coords="280,71,453,111"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="248,88,279,88,279,94,248,94"/>
+<area shape="rect" id="Node000006" href="$classyaclib_1_1detail_1_1TimedMutex.html" title=" " alt="" coords="283,136,451,177"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="245,114,303,133,301,138,244,119"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,78,52,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="67,88,99,88,99,94,67,94"/>
+<area shape="rect" id="Node000005" href="$classyaclib_1_1detail_1_1SharedTimedMutex.html" title=" " alt="" coords="501,71,676,111"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="469,88,501,88,501,94,469,94"/>
+<area shape="rect" id="Node000007" href="$classyaclib_1_1detail_1_1RecursiveTimedMutex.html" title=" " alt="" coords="511,136,666,177"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="467,154,510,154,510,159,467,159"/>
+</map>

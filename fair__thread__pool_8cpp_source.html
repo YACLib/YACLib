@@ -1,0 +1,295 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.9.8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<!-- BEGIN opengraph metadata -->
+<meta property="og:title" content="Doxygen Awesome" />
+<meta property="og:image" content="https://repository-images.githubusercontent.com/348492097/4f16df80-88fb-11eb-9d31-4015ff22c452" />
+<meta property="og:description" content="Custom CSS theme for doxygen html-documentation with lots of customization parameters." />
+<meta property="og:url" content="https://jothepro.github.io/doxygen-awesome-css/" />
+<!-- END opengraph metadata -->
+<!-- BEGIN twitter metadata -->
+<meta name="twitter:image:src" content="https://repository-images.githubusercontent.com/348492097/4f16df80-88fb-11eb-9d31-4015ff22c452" />
+<meta name="twitter:title" content="Doxygen Awesome" />
+<meta name="twitter:description" content="Custom CSS theme for doxygen html-documentation with lots of customization parameters." />
+<!-- END twitter metadata -->
+<title>YACLib: src/runtime/fair_thread_pool.cpp Source File</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link rel="icon" type="image/svg+xml" href="logo.drawio.svg"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+<script type="text/javascript" src="doxygen-awesome-fragment-copy-button.js"></script>
+<script type="text/javascript" src="doxygen-awesome-paragraph-link.js"></script>
+<script type="text/javascript" src="toggle-alternative-theme.js"></script>
+<script type="text/javascript">
+    DoxygenAwesomeFragmentCopyButton.init()
+    DoxygenAwesomeDarkModeToggle.init()
+    DoxygenAwesomeParagraphLink.init()
+</script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="custom.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only-darkmode-toggle.css" rel="stylesheet" type="text/css"/>
+<link href="custom-alternative.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<!-- https://tholman.com/github-corners/ -->
+<a href="https://github.com/YACLib/YACLib" class="github-corner" title="View source on GitHub" target="_blank">
+    <svg viewBox="0 0 250 250" width="40" height="40" style="position: absolute; top: 0; border: 0; right: 0; z-index: 99;" aria-hidden="true">
+    <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
+   <div id="projectname">YACLib
+   </div>
+   <div id="projectbrief">C++ library for concurrent tasks execution</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Search');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function() { init_codefold(0); });
+/* @license-end */
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('fair__thread__pool_8cpp_source.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">fair_thread_pool.cpp</div></div>
+</div><!--header-->
+<div class="contents">
+<a href="fair__thread__pool_8cpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#include &lt;<a class="code" href="fair__thread__pool_8hpp.html">yaclib/runtime/fair_thread_pool.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#include &lt;<a class="code" href="helper_8hpp.html">yaclib/util/helper.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span> </div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespaceyaclib.html">yaclib</a> {</div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span> </div>
+<div class="foldopen" id="foldopen00006" data-start="{" data-end="}">
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno"><a class="line" href="classyaclib_1_1FairThreadPool.html#a4b09a90a50a751845f10dd80961d06ce">    6</a></span><a class="code hl_enumvalue" href="classyaclib_1_1IExecutor.html#afb1e19ea39472133ccc78e4690e8a434ab960b6348dcd1d057aae0a4b0b290b2a">FairThreadPool::FairThreadPool</a>(std::uint64_t <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">threads</a>) : _jobs_count{0} {</div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span>  _workers.reserve(<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">threads</a>);</div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span>  <span class="keywordflow">for</span> (std::uint64_t <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">i</a> = 0; <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">i</a> != <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">threads</a>; ++<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">i</a>) {</div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>    _workers.emplace_back([&amp;] {</div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>      Loop();</div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>    });</div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>  }</div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>}</div>
+</div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span> </div>
+<div class="foldopen" id="foldopen00015" data-start="{" data-end="}">
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno"><a class="line" href="classyaclib_1_1FairThreadPool.html#a8d250a30a1e5d2db5fe59c1ba99535c6">   15</a></span><a class="code hl_function" href="classyaclib_1_1FairThreadPool.html#a8d250a30a1e5d2db5fe59c1ba99535c6">FairThreadPool::~FairThreadPool</a>() <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a> {</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>  <a class="code hl_define" href="log_8hpp.html#a639dcbb24c47e6f97e3e96246d2a667f">YACLIB_DEBUG</a>(!_workers.empty(), <span class="stringliteral">&quot;You need explicitly join ThreadPool&quot;</span>);</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>}</div>
+</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span> </div>
+<div class="foldopen" id="foldopen00019" data-start="{" data-end="}">
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno"><a class="line" href="classyaclib_1_1FairThreadPool.html#a280fe23907eea22ba460fe4732a0806b">   19</a></span><a class="code hl_enumeration" href="classyaclib_1_1IExecutor.html#afb1e19ea39472133ccc78e4690e8a434">IExecutor::Type</a> <a class="code hl_function" href="classyaclib_1_1FairThreadPool.html#a280fe23907eea22ba460fe4732a0806b">FairThreadPool::Tag</a>() <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a> {</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>  <span class="keywordflow">return</span> <a class="code hl_enumvalue" href="classyaclib_1_1IExecutor.html#afb1e19ea39472133ccc78e4690e8a434ab960b6348dcd1d057aae0a4b0b290b2a">Type::FairThreadPool</a>;</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>}</div>
+</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span> </div>
+<div class="foldopen" id="foldopen00023" data-start="{" data-end="}">
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno"><a class="line" href="classyaclib_1_1FairThreadPool.html#a2710c070408e61e1f024da647fab4a77">   23</a></span><span class="keywordtype">bool</span> <a class="code hl_function" href="classyaclib_1_1FairThreadPool.html#a2710c070408e61e1f024da647fab4a77">FairThreadPool::Alive</a>() <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a> {</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>  std::lock_guard lock{_m};</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>  <span class="keywordflow">return</span> !WasStop();</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>}</div>
+</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span> </div>
+<div class="foldopen" id="foldopen00028" data-start="{" data-end="}">
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno"><a class="line" href="classyaclib_1_1FairThreadPool.html#a07cdef2ea7bf58e62c79158c18419414">   28</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classyaclib_1_1FairThreadPool.html#a07cdef2ea7bf58e62c79158c18419414">FairThreadPool::Submit</a>(<a class="code hl_class" href="classyaclib_1_1Job.html">Job</a>&amp; job) <span class="keyword">noexcept</span> {</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>  std::unique_lock lock{_m};</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>  <span class="keywordflow">if</span> (WasStop()) {</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>    lock.unlock();</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>    job.Drop();</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>    <span class="keywordflow">return</span>;</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>  }</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>  _jobs.PushBack(job);</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>  _jobs_count += 4;  <span class="comment">// Add Job</span></div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>  lock.unlock();</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>  _idle.notify_one();</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>}</div>
+</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span> </div>
+<div class="foldopen" id="foldopen00041" data-start="{" data-end="}">
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno"><a class="line" href="classyaclib_1_1FairThreadPool.html#a4a2bbc61b5cccaef6b874d1fbe6b1eeb">   41</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classyaclib_1_1FairThreadPool.html#a4a2bbc61b5cccaef6b874d1fbe6b1eeb">FairThreadPool::SoftStop</a>() <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a> {</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>  std::unique_lock lock{_m};</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>  <span class="keywordflow">if</span> (NoJobs()) {</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>    <a class="code hl_function" href="classyaclib_1_1FairThreadPool.html#a07e294ce95aab08a5836ff8de8e78af7">Stop</a>(std::move(lock));</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>  } <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    _jobs_count |= 2U;  <span class="comment">// Want Stop</span></div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>  }</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>}</div>
+</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span> </div>
+<div class="foldopen" id="foldopen00050" data-start="{" data-end="}">
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno"><a class="line" href="classyaclib_1_1FairThreadPool.html#a07e294ce95aab08a5836ff8de8e78af7">   50</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classyaclib_1_1FairThreadPool.html#a07e294ce95aab08a5836ff8de8e78af7">FairThreadPool::Stop</a>() <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a> {</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>  <a class="code hl_function" href="classyaclib_1_1FairThreadPool.html#a07e294ce95aab08a5836ff8de8e78af7">Stop</a>(std::unique_lock{_m});</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>}</div>
+</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span> </div>
+<div class="foldopen" id="foldopen00054" data-start="{" data-end="}">
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno"><a class="line" href="classyaclib_1_1FairThreadPool.html#a351088e3e81925e3f6dbe007dc26278a">   54</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classyaclib_1_1FairThreadPool.html#a351088e3e81925e3f6dbe007dc26278a">FairThreadPool::HardStop</a>() <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a> {</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>  std::unique_lock lock{_m};</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>  <a class="code hl_class" href="classyaclib_1_1detail_1_1List.html">detail::List</a> <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">jobs</a>{std::move(_jobs)};</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>  <a class="code hl_function" href="classyaclib_1_1FairThreadPool.html#a07e294ce95aab08a5836ff8de8e78af7">Stop</a>(std::move(lock));</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>  <span class="keywordflow">while</span> (!<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">jobs</a>.Empty()) {</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>    <span class="keyword">auto</span>&amp; job = <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">jobs</a>.PopFront();</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>    <span class="keyword">static_cast&lt;</span><a class="code hl_class" href="classyaclib_1_1Job.html">Job</a>&amp;<span class="keyword">&gt;</span>(job).Drop();</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>  }</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>}</div>
+</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span> </div>
+<div class="foldopen" id="foldopen00064" data-start="{" data-end="}">
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno"><a class="line" href="classyaclib_1_1FairThreadPool.html#a8ff8cd2e14dcfb1158a13410ade21ef3">   64</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classyaclib_1_1FairThreadPool.html#a8ff8cd2e14dcfb1158a13410ade21ef3">FairThreadPool::Wait</a>() <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a> {</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>  <span class="keywordflow">for</span> (<span class="keyword">auto</span>&amp; <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">worker</a> : _workers) {</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>    <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">worker</a>.join();</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>  }</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>  _workers.clear();</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>}</div>
+</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span> </div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span><span class="keywordtype">void</span> FairThreadPool::Loop() <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a> {</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>  std::unique_lock lock{_m};</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>  <span class="keywordflow">while</span> (<span class="keyword">true</span>) {</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>    <span class="keywordflow">while</span> (!_jobs.<a class="code hl_function" href="classyaclib_1_1detail_1_1List.html#a01f98232fcacfcedc1f4bade240e743d">Empty</a>()) {</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>      <span class="keyword">auto</span>&amp; job = _jobs.<a class="code hl_function" href="classyaclib_1_1detail_1_1List.html#a3d2c5c3609fb58b580c50c50e10054ce">PopFront</a>();</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>      lock.unlock();</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>      <span class="keyword">static_cast&lt;</span>Job&amp;<span class="keyword">&gt;</span>(job).Call();</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>      lock.lock();</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>      _jobs_count -= 4;  <span class="comment">// Pop job</span></div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>    }</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>    <span class="keywordflow">if</span> (NoJobs() &amp;&amp; WantStop()) {</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="classyaclib_1_1FairThreadPool.html#a07e294ce95aab08a5836ff8de8e78af7">Stop</a>(std::move(lock));</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>    }</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>    <span class="keywordflow">if</span> (WasStop()) {</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>      <span class="keywordflow">return</span>;</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>    }</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>    _idle.wait(lock);</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>  }</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>}</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span> </div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span><span class="keywordtype">bool</span> FairThreadPool::WasStop() <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a> {</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>  <span class="keywordflow">return</span> (_jobs_count &amp; 1U) != 0;</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>}</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span> </div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span><span class="keywordtype">bool</span> FairThreadPool::WantStop() <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a> {</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>  <span class="keywordflow">return</span> (_jobs_count &amp; 2U) != 0;</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>}</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span> </div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span><span class="keywordtype">bool</span> FairThreadPool::NoJobs() <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a> {</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>  <span class="keywordflow">return</span> (_jobs_count &gt;&gt; 2U) == 0;</div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>}</div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span> </div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span><span class="keywordtype">void</span> <a class="code hl_function" href="classyaclib_1_1FairThreadPool.html#a07e294ce95aab08a5836ff8de8e78af7">FairThreadPool::Stop</a>(std::unique_lock&lt;yaclib_std::mutex&gt;&amp;&amp; lock) <span class="keyword">noexcept</span> {</div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>  _jobs_count |= 1U;</div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>  lock.unlock();</div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>  _idle.notify_all();</div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>}</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span> </div>
+<div class="foldopen" id="foldopen00109" data-start="{" data-end="}">
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno"><a class="line" href="namespaceyaclib.html#aa404b2f6a57775fc939429df718b57ff">  109</a></span><a class="code hl_class" href="classyaclib_1_1IntrusivePtr.html">IntrusivePtr&lt;FairThreadPool&gt;</a> <a class="code hl_function" href="namespaceyaclib.html#aa404b2f6a57775fc939429df718b57ff">MakeFairThreadPool</a>(std::uint64_t <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">threads</a>) {</div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>  <span class="keywordflow">return</span> <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">MakeShared&lt;FairThreadPool&gt;</a>(1, <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">threads</a>);</div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>}</div>
+</div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span> </div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>}  <span class="comment">// namespace yaclib</span></div>
+<div class="ttc" id="aclassyaclib_1_1FairThreadPool_html_a07cdef2ea7bf58e62c79158c18419414"><div class="ttname"><a href="classyaclib_1_1FairThreadPool.html#a07cdef2ea7bf58e62c79158c18419414">yaclib::FairThreadPool::Submit</a></div><div class="ttdeci">void Submit(Job &amp;task) noexcept final</div><div class="ttdoc">Submit given job.</div><div class="ttdef"><b>Definition</b> <a href="fair__thread__pool_8cpp_source.html#l00028">fair_thread_pool.cpp:28</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1FairThreadPool_html_a07e294ce95aab08a5836ff8de8e78af7"><div class="ttname"><a href="classyaclib_1_1FairThreadPool.html#a07e294ce95aab08a5836ff8de8e78af7">yaclib::FairThreadPool::Stop</a></div><div class="ttdeci">void Stop() noexcept</div><div class="ttdef"><b>Definition</b> <a href="fair__thread__pool_8cpp_source.html#l00050">fair_thread_pool.cpp:50</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1FairThreadPool_html_a2710c070408e61e1f024da647fab4a77"><div class="ttname"><a href="classyaclib_1_1FairThreadPool.html#a2710c070408e61e1f024da647fab4a77">yaclib::FairThreadPool::Alive</a></div><div class="ttdeci">bool Alive() const noexcept final</div><div class="ttdoc">Return true if executor still alive, that means job passed to submit will be Call.</div><div class="ttdef"><b>Definition</b> <a href="fair__thread__pool_8cpp_source.html#l00023">fair_thread_pool.cpp:23</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1FairThreadPool_html_a280fe23907eea22ba460fe4732a0806b"><div class="ttname"><a href="classyaclib_1_1FairThreadPool.html#a280fe23907eea22ba460fe4732a0806b">yaclib::FairThreadPool::Tag</a></div><div class="ttdeci">Type Tag() const noexcept final</div><div class="ttdoc">Return type of this executor.</div><div class="ttdef"><b>Definition</b> <a href="fair__thread__pool_8cpp_source.html#l00019">fair_thread_pool.cpp:19</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1FairThreadPool_html_a351088e3e81925e3f6dbe007dc26278a"><div class="ttname"><a href="classyaclib_1_1FairThreadPool.html#a351088e3e81925e3f6dbe007dc26278a">yaclib::FairThreadPool::HardStop</a></div><div class="ttdeci">void HardStop() noexcept</div><div class="ttdef"><b>Definition</b> <a href="fair__thread__pool_8cpp_source.html#l00054">fair_thread_pool.cpp:54</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1FairThreadPool_html_a4a2bbc61b5cccaef6b874d1fbe6b1eeb"><div class="ttname"><a href="classyaclib_1_1FairThreadPool.html#a4a2bbc61b5cccaef6b874d1fbe6b1eeb">yaclib::FairThreadPool::SoftStop</a></div><div class="ttdeci">void SoftStop() noexcept</div><div class="ttdef"><b>Definition</b> <a href="fair__thread__pool_8cpp_source.html#l00041">fair_thread_pool.cpp:41</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1FairThreadPool_html_a8d250a30a1e5d2db5fe59c1ba99535c6"><div class="ttname"><a href="classyaclib_1_1FairThreadPool.html#a8d250a30a1e5d2db5fe59c1ba99535c6">yaclib::FairThreadPool::~FairThreadPool</a></div><div class="ttdeci">~FairThreadPool() noexcept override</div><div class="ttdef"><b>Definition</b> <a href="fair__thread__pool_8cpp_source.html#l00015">fair_thread_pool.cpp:15</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1FairThreadPool_html_a8ff8cd2e14dcfb1158a13410ade21ef3"><div class="ttname"><a href="classyaclib_1_1FairThreadPool.html#a8ff8cd2e14dcfb1158a13410ade21ef3">yaclib::FairThreadPool::Wait</a></div><div class="ttdeci">void Wait() noexcept</div><div class="ttdoc">TODO(kononovk) Rename to Join.</div><div class="ttdef"><b>Definition</b> <a href="fair__thread__pool_8cpp_source.html#l00064">fair_thread_pool.cpp:64</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1IExecutor_html_afb1e19ea39472133ccc78e4690e8a434"><div class="ttname"><a href="classyaclib_1_1IExecutor.html#afb1e19ea39472133ccc78e4690e8a434">yaclib::IExecutor::Type</a></div><div class="ttdeci">Type</div><div class="ttdef"><b>Definition</b> <a href="executor_8hpp_source.html#l00023">executor.hpp:23</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1IExecutor_html_afb1e19ea39472133ccc78e4690e8a434ab960b6348dcd1d057aae0a4b0b290b2a"><div class="ttname"><a href="classyaclib_1_1IExecutor.html#afb1e19ea39472133ccc78e4690e8a434ab960b6348dcd1d057aae0a4b0b290b2a">yaclib::IExecutor::Type::FairThreadPool</a></div><div class="ttdeci">@ FairThreadPool</div></div>
+<div class="ttc" id="aclassyaclib_1_1IntrusivePtr_html"><div class="ttname"><a href="classyaclib_1_1IntrusivePtr.html">yaclib::IntrusivePtr</a></div><div class="ttdoc">A intrusive pointer to objects with an embedded reference count.</div><div class="ttdef"><b>Definition</b> <a href="intrusive__ptr_8hpp_source.html#l00017">intrusive_ptr.hpp:17</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1Job_html"><div class="ttname"><a href="classyaclib_1_1Job.html">yaclib::Job</a></div><div class="ttdoc">Callable that can be executed in an IExecutor.</div><div class="ttdef"><b>Definition</b> <a href="job_8hpp_source.html#l00012">job.hpp:12</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1List_html"><div class="ttname"><a href="classyaclib_1_1detail_1_1List.html">yaclib::detail::List</a></div><div class="ttdef"><b>Definition</b> <a href="intrusive__list_8hpp_source.html#l00007">intrusive_list.hpp:7</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1List_html_a01f98232fcacfcedc1f4bade240e743d"><div class="ttname"><a href="classyaclib_1_1detail_1_1List.html#a01f98232fcacfcedc1f4bade240e743d">yaclib::detail::List::Empty</a></div><div class="ttdeci">bool Empty() const noexcept</div><div class="ttdef"><b>Definition</b> <a href="intrusive__list_8cpp_source.html#l00031">intrusive_list.cpp:31</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1List_html_a3d2c5c3609fb58b580c50c50e10054ce"><div class="ttname"><a href="classyaclib_1_1detail_1_1List.html#a3d2c5c3609fb58b580c50c50e10054ce">yaclib::detail::List::PopFront</a></div><div class="ttdeci">Node &amp; PopFront() noexcept</div><div class="ttdef"><b>Definition</b> <a href="intrusive__list_8cpp_source.html#l00036">intrusive_list.cpp:36</a></div></div>
+<div class="ttc" id="afair__thread__pool_8hpp_html"><div class="ttname"><a href="fair__thread__pool_8hpp.html">fair_thread_pool.hpp</a></div></div>
+<div class="ttc" id="ahelper_8hpp_html"><div class="ttname"><a href="helper_8hpp.html">helper.hpp</a></div></div>
+<div class="ttc" id="alog_8hpp_html_a639dcbb24c47e6f97e3e96246d2a667f"><div class="ttname"><a href="log_8hpp.html#a639dcbb24c47e6f97e3e96246d2a667f">YACLIB_DEBUG</a></div><div class="ttdeci">#define YACLIB_DEBUG(cond, message)</div><div class="ttdef"><b>Definition</b> <a href="log_8hpp_source.html#l00084">log.hpp:84</a></div></div>
+<div class="ttc" id="anamespaceyaclib_html"><div class="ttname"><a href="namespaceyaclib.html">yaclib</a></div><div class="ttdef"><b>Definition</b> <a href="base__core_8hpp_source.html#l00018">base_core.hpp:18</a></div></div>
+<div class="ttc" id="anamespaceyaclib_html_aa404b2f6a57775fc939429df718b57ff"><div class="ttname"><a href="namespaceyaclib.html#aa404b2f6a57775fc939429df718b57ff">yaclib::MakeFairThreadPool</a></div><div class="ttdeci">IntrusivePtr&lt; FairThreadPool &gt; MakeFairThreadPool(std::uint64_t threads=yaclib_std::thread::hardware_concurrency())</div><div class="ttdef"><b>Definition</b> <a href="fair__thread__pool_8cpp_source.html#l00109">fair_thread_pool.cpp:109</a></div></div>
+<div class="ttc" id="anamespaceyaclib_html_ac918e7a0c384bcf611e0b5b4b2cd5504"><div class="ttname"><a href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">yaclib::MakeContract</a></div><div class="ttdeci">Contract&lt; V, E &gt; MakeContract()</div><div class="ttdoc">Creates related future and promise.</div><div class="ttdef"><b>Definition</b> <a href="contract_8hpp_source.html#l00025">contract.hpp:25</a></div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_bf9f26469d00835ba20ff8d80ee5a804.html">runtime</a></li><li class="navelem"><a class="el" href="fair__thread__pool_8cpp.html">fair_thread_pool.cpp</a></li>
+    <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+  </ul>
+</div>
+</body>
+</html>

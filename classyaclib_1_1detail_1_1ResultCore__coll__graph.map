@@ -1,0 +1,35 @@
+<map id="yaclib::detail::ResultCore&lt; V, E &gt;" name="yaclib::detail::ResultCore&lt; V, E &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="1231,140,1393,181"/>
+<area shape="rect" id="Node000002" href="$classyaclib_1_1detail_1_1BaseCore.html" title=" " alt="" coords="987,126,1141,152"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1157,144,1231,151,1230,156,1157,150"/>
+<area shape="rect" id="Node000003" href="$classyaclib_1_1detail_1_1InlineCore.html" title=" " alt="" coords="715,184,870,209"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="871,177,999,150,1000,155,872,182"/>
+<area shape="rect" id="Node000004" href="$classyaclib_1_1Job.html" title="Callable that can be executed in an IExecutor." alt="" coords="441,177,523,203"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="538,188,714,192,714,197,538,194"/>
+<area shape="rect" id="Node000005" href="$classyaclib_1_1IFunc.html" title="Callable interface." alt="" coords="234,177,327,203"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="343,187,441,187,441,192,343,192"/>
+<area shape="rect" id="Node000006" href="$classyaclib_1_1IRef.html" title="Reference counting interface." alt="" coords="5,93,90,119"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="97,122,208,163,238,174,237,179,206,168,96,127"/>
+<area shape="rect" id="Node000014" href="$structyaclib_1_1detail_1_1Callback.html" title=" " alt="" coords="207,24,354,49"/>
+<area shape="poly" id="edge15_Node000014_Node000006" title=" " alt="" coords="104,86,234,47,235,52,105,91"/>
+<area shape="rect" id="Node000007" href="$structyaclib_1_1detail_1_1Node.html" title="Node class, used in intrusive data structure." alt="" coords="216,128,345,153"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="352,155,442,177,440,182,350,160"/>
+<area shape="poly" id="edge7_Node000007_Node000007" title=" " alt="" coords="261,110,268,104,280,101,292,103,299,110,301,119,298,128,293,126,296,118,295,112,290,108,280,106,270,108,265,114"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="716,69,869,95"/>
+<area shape="poly" id="edge8_Node000002_Node000008" title=" " alt="" coords="872,96,1000,123,999,128,871,101"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="452,69,512,95"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="527,79,715,79,715,84,527,84"/>
+<area shape="rect" id="Node000010" href="$classyaclib_1_1IntrusivePtr.html" title=" " alt="" coords="729,119,856,159"/>
+<area shape="poly" id="edge10_Node000002_Node000010" title=" " alt="" coords="871,136,987,136,987,142,871,142"/>
+<area shape="rect" id="Node000011" href="$classyaclib_1_1IntrusivePtr.html" title="A intrusive pointer to objects with an embedded reference count." alt="" coords="403,126,561,152"/>
+<area shape="poly" id="edge11_Node000010_Node000011" title=" " alt="" coords="576,136,728,136,728,142,576,142"/>
+<area shape="rect" id="Node000012" href="$classyaclib_1_1Result.html" title=" " alt="" coords="993,176,1136,201"/>
+<area shape="poly" id="edge12_Node000001_Node000012" title=" " alt="" coords="1151,176,1231,167,1231,172,1152,181"/>
+<area shape="rect" id="Node000013" href="$classyaclib_1_1Result.html" title="Encapsulated return value from caller." alt="" coords="705,233,880,259"/>
+<area shape="poly" id="edge13_Node000012_Node000013" title=" " alt="" coords="871,227,999,199,1000,204,872,232"/>
+<area shape="poly" id="edge14_Node000001_Node000014" title=" " alt="" coords="369,24,481,18,1066,18,1101,21,1136,31,1170,45,1201,63,1255,103,1293,138,1289,142,1251,107,1198,68,1167,50,1135,36,1100,26,1065,23,481,23,369,29"/>
+<area shape="rect" id="Node000015" title=" " alt="" coords="24,24,71,49"/>
+<area shape="poly" id="edge16_Node000014_Node000015" title=" " alt="" coords="86,34,206,34,206,39,86,39"/>
+<area shape="rect" id="Node000016" title=" " alt="" coords="1009,225,1120,251"/>
+<area shape="poly" id="edge17_Node000001_Node000016" title=" " alt="" coords="1131,218,1207,195,1255,179,1257,184,1208,201,1133,223"/>
+</map>
