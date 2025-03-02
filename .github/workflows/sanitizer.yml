@@ -22,7 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-24.04, ubuntu-24.04-arm, windows-2025 ] # TODO(mbkkt) add macos-15
+        os: [ ubuntu-24.04, ubuntu-24.04-arm, windows-2025, macos-15 ] 
         flags: [ WARN, UBSAN, ASAN, TSAN, LSAN ]
         build_type: [ Debug, RelWithDebInfo ]
         isPR:
@@ -31,35 +31,35 @@ jobs:
           # GitHub Actions provides a maximum of 5 parallel macOS machines for free.
           # So in pr we don't run all configurations.
           - isPR: true
-            os: macos-14
+            os: macos-15
             flags: UBSAN
             build_type: Debug
           - isPR: true
-            os: macos-14
+            os: macos-15
             flags: UBSAN
             build_type: RelWithDebInfo
           - isPR: true
-            os: macos-14
+            os: macos-15
             flags: ASAN
             build_type: Debug
           - isPR: true
-            os: macos-14
+            os: macos-15
             flags: ASAN
             build_type: RelWithDebInfo
           - isPR: true
-            os: macos-14
+            os: macos-15
             flags: TSAN
             build_type: Debug
           - isPR: true
-            os: macos-14
+            os: macos-15
             flags: TSAN
             build_type: RelWithDebInfo
           - isPR: true
-            os: macos-14
+            os: macos-15
             flags: LSAN
             build_type: Debug
           - isPR: true
-            os: macos-14
+            os: macos-15
             flags: LSAN
             build_type: RelWithDebInfo
 
@@ -124,10 +124,10 @@ jobs:
           gcc --version; gcov --version
 
       - name: Update deps on macOS
-        if: ${{ matrix.os == 'macos-14' }}
+        if: ${{ matrix.os == 'macos-15' }}
         run: |
           brew update
-          brew install ninja llvm@17 gcc@14
+          brew install ninja llvm@19 gcc@14
 
       - name: Configure CMake Posix
         if: ${{ matrix.os != 'windows-2025' }}
@@ -137,8 +137,8 @@ jobs:
           compiler_names=(clang gnu apple_clang)
           stdlib_names=(libcxx libstdcxx default)
           linker=""
-          if [[ ${{ matrix.os }} == "macos-14" ]]; then
-            llvm=/opt/homebrew/opt/llvm@17
+          if [[ ${{ matrix.os }} == "macos-15" ]]; then
+            llvm=/opt/homebrew/opt/llvm@19
             # TODO(myannyax?) FIBER
             YACLIB_FAULT=(OFF THREAD)
             cxx_compilers=("$llvm/bin/clang++" g++-14 clang++)
@@ -175,7 +175,7 @@ jobs:
             for (( j=0; j<${#link_options[*]}; j+=1 )); do
               for yaclib_fault in ${YACLIB_FAULT[*]}; do
                 link_option=${link_options[$j]}; compile_option=${compile_options[$j]}
-                if [[ ${{ matrix.os }} == "macos-14" ]]; then # macOS workarounds
+                if [[ ${{ matrix.os }} == "macos-15" ]]; then # macOS workarounds
                   if [[ "${compiler_names[$i]}" != "gnu" && "$flags" == "LSAN" ]]; then
                     # AppleClang doesn't support LSAN.
                     # But also random crash with LLVM CLang LSAN. TODO(myannyax) Try to debug and create issue to LLVM CLang LSAN.
@@ -196,7 +196,7 @@ jobs:
                   continue
                 fi
                 if [[ "${compiler_names[$i]}" == "clang" ]]; then
-                  if [[ ${{ matrix.os }} == "macos-14" && "${stdlib_names[$j]}" == "libstdcxx" ]]; then
+                  if [[ ${{ matrix.os }} == "macos-15" && "${stdlib_names[$j]}" == "libstdcxx" ]]; then
                     continue  # TODO(MBkkt) Specify path to libstdcxx
                   fi
                   if [[ "${stdlib_names[$j]}" == "default" ]]; then
