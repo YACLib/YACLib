@@ -22,7 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-24.04 ] # TODO(mbkkt) revert back macos-14, windows-2022
+        os: [ ubuntu-24.04, ubuntu-24.04-arm, windows-2025 ] # TODO(mbkkt) add macos-15
         flags: [ WARN, UBSAN, ASAN, TSAN, LSAN ]
         build_type: [ Debug, RelWithDebInfo ]
         isPR:
@@ -64,10 +64,10 @@ jobs:
             build_type: RelWithDebInfo
 
           #  Doesn't build with ClanCL ASAN. Random crash on start before main() with MSVC ASAN. THANKS TO THE BEST OS.
-          - os: windows-2022
+          - os: windows-2025
             flags: ASAN
             build_type: Debug
-          - os: windows-2022
+          - os: windows-2025
             flags: ASAN
             build_type: RelWithDebInfo
           # Best OS doesn't support unnecessary things like UBSAN, LSAN, TSAN.
@@ -75,22 +75,22 @@ jobs:
           # I also have a conspiracy theory that Windows is just an unnecessary abstraction over Linux.
           # See how well WSL works. Or how quickly they made the analog of io_uring.
           # And who cares if the virtual machine falls? I think this explains everything.
-          - os: windows-2022
+          - os: windows-2025
             flags: UBSAN
             build_type: Debug
-          - os: windows-2022
+          - os: windows-2025
             flags: UBSAN
             build_type: RelWithDebInfo
-          - os: windows-2022
+          - os: windows-2025
             flags: LSAN
             build_type: Debug
-          - os: windows-2022
+          - os: windows-2025
             flags: LSAN
             build_type: RelWithDebInfo
-          - os: windows-2022
+          - os: windows-2025
             flags: TSAN
             build_type: Debug
-          - os: windows-2022
+          - os: windows-2025
             flags: TSAN
             build_type: RelWithDebInfo
 
@@ -101,7 +101,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Update deps on Linux
-        if: ${{ matrix.os == 'ubuntu-24.04' }}
+        if: ${{ matrix.os == 'ubuntu-24.04' || matrix.os == 'ubuntu-24.04-arm' }}
         run: |
           sudo apt update
           sudo apt install ninja-build googletest                                                                  \
@@ -130,7 +130,7 @@ jobs:
           brew install ninja llvm@17 gcc@14
 
       - name: Configure CMake Posix
-        if: ${{ matrix.os != 'windows-2022' }}
+        if: ${{ matrix.os != 'windows-2025' }}
         run: |
           flags=${{ matrix.flags }}
           build_type=${{ matrix.build_type }}
@@ -218,7 +218,7 @@ jobs:
                   -DYACLIB_LINK_OPTIONS="$link_option;$linker"                                                         \
                   -DYACLIB_COMPILE_OPTIONS="$compile_option"                                                           \
                   -DYACLIB_FAULT=$yaclib_fault                                                                         \
-                  -DYACLIB_LOG="DEBUG"                                                                           \
+                  -DYACLIB_LOG="DEBUG"                                                                                 \
                   -DYACLIB_DEFINITIONS="YACLIB_CI_SLOWDOWN=$slowdown"
 
               done
@@ -226,7 +226,7 @@ jobs:
           done
 
       - name: Configure CMake Windows
-        if: ${{ matrix.os == 'windows-2022' }}
+        if: ${{ matrix.os == 'windows-2025' }}
         shell: bash
         run: |
           flags=${{ matrix.flags }}
