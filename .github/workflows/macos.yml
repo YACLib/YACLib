@@ -18,16 +18,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ 13, 14, 15 ]
+        os: [ 13, 15 ]
         build_type: [ Debug, RelWithDebInfo ]
         isPR:
           - ${{ github.event_name == 'pull_request' }}
         exclude:
           - isPR: true
             os: 13
-            build_type: RelWithDebInfo
-          - isPR: true
-            os: 14
             build_type: RelWithDebInfo
           - isPR: true
             os: 15
@@ -42,8 +39,6 @@ jobs:
           brew update
           if [[ ${{ matrix.os }} == "13" ]]; then
             brew install ninja llvm@14 gcc@14
-          elif [[ ${{ matrix.os }} == "14" ]]; then
-            brew install ninja llvm@19 gcc@14
           elif [[ ${{ matrix.os }} == "15" ]]; then
             brew install ninja llvm@19 gcc@14
           fi
@@ -52,10 +47,6 @@ jobs:
         run: |
           if [[ "${{ matrix.os }}" == "13" ]]; then
             llvm=/usr/local/opt/llvm@14
-            cxx_compilers=("$llvm/bin/clang++" g++-14 clang++)
-            gnu_link_options="-Wl,-ld_classic"
-          elif [[ "${{ matrix.os }}" == "14" ]]; then
-            llvm=/opt/homebrew/opt/llvm@19
             cxx_compilers=("$llvm/bin/clang++" g++-14 clang++)
             gnu_link_options="-Wl,-ld_classic"
           elif [[ "${{ matrix.os }}" == "15" ]]; then
@@ -92,9 +83,6 @@ jobs:
                 fi
                 if [[ "${stdlib_names[$j]}" == "default" ]]; then
                   link_option=""; compile_option="-stdlib=libc++"
-                  if [[ "${{ matrix.os }}" == "14" ]]; then
-                    continue  # TODO(MBkkt) Some linking error related to arm apple libc++ from macos 14 is incompatible with llvm clang-19 
-                  fi
                 fi
               fi
               if [[ "${compiler_names[$i]}" == "gnu" ]]; then
