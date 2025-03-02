@@ -92,6 +92,9 @@ jobs:
                 fi
                 if [[ "${stdlib_names[$j]}" == "default" ]]; then
                   link_option=""; compile_option="-stdlib=libc++"
+                  if [[ "${{ matrix.os }}" == "14" ]]; then
+                    continue  # TODO(MBkkt) Some linking error related to arm apple libc++ from macos 14 is incompatible with llvm clang-19 
+                  fi
                 fi
               fi
               if [[ "${compiler_names[$i]}" == "gnu" ]]; then
