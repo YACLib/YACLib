@@ -18,28 +18,11 @@ jobs:
       fail-fast: false
       matrix:
         arch: [ Win32, x64 ]
-        os: [ 2019, 2022, 2025 ]
+        os: [ 2019, 2025 ]  # 2022 works same way as 2025
         build_type: [ Debug, RelWithDebInfo ]
         isPR:
           - ${{ github.event_name == 'pull_request' }}
         exclude:
-          - isPR: true
-            arch: Win32
-            os: 2022
-            build_type: Debug
-          - isPR: true
-            arch: Win32
-            os: 2022
-            build_type: RelWithDebInfo
-          - isPR: true
-            arch: x64
-            os: 2022
-            build_type: Debug
-          - isPR: true
-            arch: x64
-            os: 2022
-            build_type: RelWithDebInfo
-
           - isPR: true
             arch: Win32
             os: 2025
