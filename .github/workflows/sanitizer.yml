@@ -185,6 +185,9 @@ jobs:
                     continue
                   fi
                   if [[ "${compiler_names[$i]}" == "gnu" ]]; then
+                    if [[ "$flags" == "UBSAN" || "$flags" == "ASAN" || "$flags" == "TSAN" ]]; then
+                      continue  # TODO(MBkkt) gcc doesn't have macos arm sanitizers  
+                    fi
                     link_option="${link_option};-Wl,-ld_classic"
                   fi
                 fi
