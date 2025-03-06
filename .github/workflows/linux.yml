@@ -23,7 +23,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ 20.04, 22.04, 24.04 ]
+        os: [ 20.04, 22.04, 24.04, 22.04-arm, 24.04-arm ]
         compiler: [ 
                     clang-8, clang-9, clang-10, # 20.04
                     clang-11, clang-12, clang-13, # 22.04
@@ -94,6 +94,39 @@ jobs:
           - os: 22.04
             compiler: gcc-14
 
+          - os: 22.04-arm
+            compiler: clang-8
+          - os: 22.04-arm
+            compiler: clang-9
+          - os: 22.04-arm
+            compiler: clang-10
+          - os: 22.04-arm
+            compiler: clang-14
+          - os: 22.04-arm
+            compiler: clang-15
+          - os: 22.04-arm
+            compiler: clang-16
+          - os: 22.04-arm
+            compiler: clang-17
+          - os: 22.04-arm
+            compiler: clang-18
+          - os: 22.04-arm
+            compiler: gcc-7
+          - os: 22.04-arm
+            compiler: gcc-8
+          - os: 22.04-arm
+            compiler: gcc-9
+          - os: 22.04-arm
+            compiler: gcc-10
+          - os: 22.04-arm
+            compiler: gcc-11
+          - os: 22.04-arm
+            compiler: gcc-12
+          - os: 22.04-arm
+            compiler: gcc-13
+          - os: 22.04-arm
+            compiler: gcc-14
+
           - os: 24.04
             compiler: clang-8
           - os: 24.04
@@ -109,6 +142,23 @@ jobs:
           - os: 24.04
             compiler: gcc-7
           - os: 24.04
+            compiler: gcc-8
+
+          - os: 24.04-arm
+            compiler: clang-8
+          - os: 24.04-arm
+            compiler: clang-9
+          - os: 24.04-arm
+            compiler: clang-10
+          - os: 24.04-arm
+            compiler: clang-11
+          - os: 24.04-arm
+            compiler: clang-12
+          - os: 24.04-arm
+            compiler: clang-13
+          - os: 24.04-arm
+            compiler: gcc-7
+          - os: 24.04-arm
             compiler: gcc-8
 
 
@@ -128,9 +178,7 @@ jobs:
         run: |
           if [[ ${{ matrix.os }} == "20.04" ]]; then
             gcc_version=7
-          elif [[ ${{ matrix.os }} == "22.04" ]]; then
-            gcc_version=9
-          elif [[ ${{ matrix.os }} == "24.04" ]]; then
+          else
             gcc_version=9
           fi
           compiler=${{ matrix.compiler }}

@@ -693,8 +693,8 @@ yaclib::Future<int> recursiveEagerCoro(int x) {
 }
 
 static constexpr int kLazyRecursion = 1'000'000;
-static constexpr int kEagerRecursion = 100;
-static constexpr int kBadFactor = 10;
+// 100 doesn't work for some debug builds with sanitizers
+static constexpr int kEagerRecursion = 10;
 
 TEST(Recursion, LazyFunc) {
   EXPECT_EQ(recursiveLazyFunc(kLazyRecursion).Get().Ok(), 42);
@@ -709,22 +709,20 @@ TEST(Recursion, EagerNotReadyFunc) {
 
 TEST(Recursion, EagerFunc) {
   // honest recursion, in debug produce recursion * 10 (helper functions) frames, in release * 2
-  EXPECT_EQ(recursiveEagerFunc(kEagerRecursion / kBadFactor).Get().Ok(), 42);
+  EXPECT_EQ(recursiveEagerFunc(kEagerRecursion).Get().Ok(), 42);
 }
 
 TEST(Recursion, EagerFuncStupid) {
   // honest recursion, in debug produce recursion * 10 (helper functions) frames, in release * 3
-  EXPECT_EQ(recursiveEagerFuncStupid(kEagerRecursion / kBadFactor).Get().Ok(), 42);
+  EXPECT_EQ(recursiveEagerFuncStupid(kEagerRecursion).Get().Ok(), 42);
 }
 
 #if YACLIB_FINAL_SUSPEND_TRANSFER != 0 && defined(__clang__) && defined(__linux__)
 // GCC Debug bad in symmetric transfer
 // I'm also not sure about llvm clang on apple, apple clang, and clangcl
 static constexpr int kLazyCoroRecursion = kLazyRecursion;
-static constexpr int kEagerCoroRecursion = kEagerRecursion;
 #else
-static constexpr int kLazyCoroRecursion = kEagerRecursion / kBadFactor;
-static constexpr int kEagerCoroRecursion = kEagerRecursion / kBadFactor;
+static constexpr int kLazyCoroRecursion = kEagerRecursion;
 #endif
 
 TEST(Recursion, LazyCoro) {
@@ -733,7 +731,7 @@ TEST(Recursion, LazyCoro) {
 
 TEST(Recursion, EagerCoro) {
   // honest recursion, in clang debug/release produce recursion frames
-  EXPECT_EQ(recursiveEagerCoro(kEagerCoroRecursion).Get().Ok(), 42);
+  EXPECT_EQ(recursiveEagerCoro(kEagerRecursion).Get().Ok(), 42);
 }
 
 }  // namespace
