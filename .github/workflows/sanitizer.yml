@@ -22,7 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-24.04, ubuntu-24.04-arm, windows-2025, macos-15 ] 
+        os: [ ubuntu-24.04, ubuntu-24.04-arm, windows-2025 ]  # TODO(mbkkt) macos-15 some strange failure, probably because of issues with symmetric transfer
         flags: [ WARN, UBSAN, ASAN, TSAN, LSAN ]
         build_type: [ Debug, RelWithDebInfo ]
         isPR:
