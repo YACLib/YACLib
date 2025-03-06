@@ -1,0 +1,1003 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.9.8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<!-- BEGIN opengraph metadata -->
+<meta property="og:title" content="Doxygen Awesome" />
+<meta property="og:image" content="https://repository-images.githubusercontent.com/348492097/4f16df80-88fb-11eb-9d31-4015ff22c452" />
+<meta property="og:description" content="Custom CSS theme for doxygen html-documentation with lots of customization parameters." />
+<meta property="og:url" content="https://jothepro.github.io/doxygen-awesome-css/" />
+<!-- END opengraph metadata -->
+<!-- BEGIN twitter metadata -->
+<meta name="twitter:image:src" content="https://repository-images.githubusercontent.com/348492097/4f16df80-88fb-11eb-9d31-4015ff22c452" />
+<meta name="twitter:title" content="Doxygen Awesome" />
+<meta name="twitter:description" content="Custom CSS theme for doxygen html-documentation with lots of customization parameters." />
+<!-- END twitter metadata -->
+<title>YACLib: yaclib::FutureBase&lt; V, E &gt; Class Template Reference</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link rel="icon" type="image/svg+xml" href="logo.drawio.svg"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+<script type="text/javascript" src="doxygen-awesome-fragment-copy-button.js"></script>
+<script type="text/javascript" src="doxygen-awesome-paragraph-link.js"></script>
+<script type="text/javascript" src="toggle-alternative-theme.js"></script>
+<script type="text/javascript">
+    DoxygenAwesomeFragmentCopyButton.init()
+    DoxygenAwesomeDarkModeToggle.init()
+    DoxygenAwesomeParagraphLink.init()
+</script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="custom.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only-darkmode-toggle.css" rel="stylesheet" type="text/css"/>
+<link href="custom-alternative.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<!-- https://tholman.com/github-corners/ -->
+<a href="https://github.com/YACLib/YACLib" class="github-corner" title="View source on GitHub" target="_blank">
+    <svg viewBox="0 0 250 250" width="40" height="40" style="position: absolute; top: 0; border: 0; right: 0; z-index: 99;" aria-hidden="true">
+    <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
+   <div id="projectname">YACLib
+   </div>
+   <div id="projectbrief">C++ library for concurrent tasks execution</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Search');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('classyaclib_1_1FutureBase.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pro-methods">Protected Member Functions</a> &#124;
+<a href="#pro-attribs">Protected Attributes</a> &#124;
+<a href="classyaclib_1_1FutureBase-members.html">List of all members</a>  </div>
+  <div class="headertitle"><div class="title">yaclib::FutureBase&lt; V, E &gt; Class Template Reference</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>Provides a mechanism to access the result of async operations.  
+ <a href="classyaclib_1_1FutureBase.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="async_2future_8hpp_source.html">future.hpp</a>&gt;</code></p>
+<div class="dynheader">
+Inheritance diagram for yaclib::FutureBase&lt; V, E &gt;:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="classyaclib_1_1FutureBase__inherit__graph.svg" width="339" height="126"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
+<div class="dynheader">
+Collaboration diagram for yaclib::FutureBase&lt; V, E &gt;:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="classyaclib_1_1FutureBase__coll__graph.svg" width="168" height="244"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:ab73e623113120d2b8ab2dd0e2b7d24bf" id="r_ab73e623113120d2b8ab2dd0e2b7d24bf"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1FutureBase.html#ab73e623113120d2b8ab2dd0e2b7d24bf">FutureBase</a> (<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1FutureBase.html">FutureBase</a> &amp;)=<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">delete</a></td></tr>
+<tr class="separator:ab73e623113120d2b8ab2dd0e2b7d24bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4167f9f7d59dfc1f3c7ca637ad295823" id="r_a4167f9f7d59dfc1f3c7ca637ad295823"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classyaclib_1_1FutureBase.html">FutureBase</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1FutureBase.html#a4167f9f7d59dfc1f3c7ca637ad295823">operator=</a> (<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1FutureBase.html">FutureBase</a> &amp;)=<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">delete</a></td></tr>
+<tr class="separator:a4167f9f7d59dfc1f3c7ca637ad295823"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8ec3f1a6e257ad63d036049fad4cdcee" id="r_a8ec3f1a6e257ad63d036049fad4cdcee"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1FutureBase.html#a8ec3f1a6e257ad63d036049fad4cdcee">FutureBase</a> (<a class="el" href="classyaclib_1_1FutureBase.html">FutureBase</a> &amp;&amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">other</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a>=<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">default</a></td></tr>
+<tr class="separator:a8ec3f1a6e257ad63d036049fad4cdcee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac474baf87064f5e99d011c1f207205fa" id="r_ac474baf87064f5e99d011c1f207205fa"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classyaclib_1_1FutureBase.html">FutureBase</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1FutureBase.html#ac474baf87064f5e99d011c1f207205fa">operator=</a> (<a class="el" href="classyaclib_1_1FutureBase.html">FutureBase</a> &amp;&amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">other</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a>=<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">default</a></td></tr>
+<tr class="separator:ac474baf87064f5e99d011c1f207205fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a996b279a2056c2074a40aa86dce981b5" id="r_a996b279a2056c2074a40aa86dce981b5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1FutureBase.html#a996b279a2056c2074a40aa86dce981b5">FutureBase</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a>=<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">default</a></td></tr>
+<tr class="memdesc:a996b279a2056c2074a40aa86dce981b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">The default constructor creates not a <a class="el" href="classyaclib_1_1FutureBase.html#a5ee96890a14dd007f7da1db7c3eccf31">Valid</a> <a class="el" href="classyaclib_1_1Future.html" title="Provides a mechanism to access the result of async operations.">Future</a>.  <br /></td></tr>
+<tr class="separator:a996b279a2056c2074a40aa86dce981b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a59f5a93c177b4da035ea1160051429d2" id="r_a59f5a93c177b4da035ea1160051429d2"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1FutureBase.html#a59f5a93c177b4da035ea1160051429d2">~FutureBase</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="memdesc:a59f5a93c177b4da035ea1160051429d2"><td class="mdescLeft">&#160;</td><td class="mdescRight">If <a class="el" href="classyaclib_1_1Future.html" title="Provides a mechanism to access the result of async operations.">Future</a> is <a class="el" href="classyaclib_1_1FutureBase.html#a5ee96890a14dd007f7da1db7c3eccf31">Valid</a> then call Stop.  <br /></td></tr>
+<tr class="separator:a59f5a93c177b4da035ea1160051429d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5ee96890a14dd007f7da1db7c3eccf31" id="r_a5ee96890a14dd007f7da1db7c3eccf31"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1FutureBase.html#a5ee96890a14dd007f7da1db7c3eccf31">Valid</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="memdesc:a5ee96890a14dd007f7da1db7c3eccf31"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if this <a class="el" href="classyaclib_1_1Future.html">Future</a> has <a class="el" href="classyaclib_1_1Promise.html">Promise</a>.  <br /></td></tr>
+<tr class="separator:a5ee96890a14dd007f7da1db7c3eccf31"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afc3b6a42975ba1247fe53d3ace812137" id="r_afc3b6a42975ba1247fe53d3ace812137"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1FutureBase.html#afc3b6a42975ba1247fe53d3ace812137">Ready</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="memdesc:afc3b6a42975ba1247fe53d3ace812137"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check that <a class="el" href="classyaclib_1_1Result.html">Result</a> that corresponds to this <a class="el" href="classyaclib_1_1Future.html">Future</a> is computed.  <br /></td></tr>
+<tr class="separator:afc3b6a42975ba1247fe53d3ace812137"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a96e17cfe7e0097c76de16fca91e08f40" id="r_a96e17cfe7e0097c76de16fca91e08f40"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1FutureBase.html#a96e17cfe7e0097c76de16fca91e08f40">Get</a> () &amp;=<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">delete</a></td></tr>
+<tr class="separator:a96e17cfe7e0097c76de16fca91e08f40"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aff906fc11c5b3ebd0ab29fb36933a3ad" id="r_aff906fc11c5b3ebd0ab29fb36933a3ad"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1FutureBase.html#aff906fc11c5b3ebd0ab29fb36933a3ad">Get</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> &amp;&amp;=<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">delete</a></td></tr>
+<tr class="separator:aff906fc11c5b3ebd0ab29fb36933a3ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5febfef194a8c0358713d1fb22e14bd9" id="r_a5febfef194a8c0358713d1fb22e14bd9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1FutureBase.html#a5febfef194a8c0358713d1fb22e14bd9">Touch</a> () &amp;=<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">delete</a></td></tr>
+<tr class="separator:a5febfef194a8c0358713d1fb22e14bd9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a809a4be4cd99c1cc440daa4ca5baa68f" id="r_a809a4be4cd99c1cc440daa4ca5baa68f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1FutureBase.html#a809a4be4cd99c1cc440daa4ca5baa68f">Touch</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> &amp;&amp;=<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">delete</a></td></tr>
+<tr class="separator:a809a4be4cd99c1cc440daa4ca5baa68f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abbd079a93430a47573f54a53bd165afd" id="r_abbd079a93430a47573f54a53bd165afd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1Result.html">Result</a>&lt; V, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1FutureBase.html#abbd079a93430a47573f54a53bd165afd">Get</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="memdesc:abbd079a93430a47573f54a53bd165afd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return copy of <a class="el" href="classyaclib_1_1Result.html">Result</a> from <a class="el" href="classyaclib_1_1Future.html">Future</a>.  <br /></td></tr>
+<tr class="separator:abbd079a93430a47573f54a53bd165afd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a38360af7ef90638968bdcc6d65a8c027" id="r_a38360af7ef90638968bdcc6d65a8c027"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classyaclib_1_1Result.html">Result</a>&lt; V, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1FutureBase.html#a38360af7ef90638968bdcc6d65a8c027">Get</a> () &amp;&amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a38360af7ef90638968bdcc6d65a8c027"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adcdba5c1aec0c4d0e6c017f87fe8758a" id="r_adcdba5c1aec0c4d0e6c017f87fe8758a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1Result.html">Result</a>&lt; V, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1FutureBase.html#adcdba5c1aec0c4d0e6c017f87fe8758a">Touch</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:adcdba5c1aec0c4d0e6c017f87fe8758a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a64c47494a0e47bd8159fd294b173240b" id="r_a64c47494a0e47bd8159fd294b173240b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classyaclib_1_1Result.html">Result</a>&lt; V, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1FutureBase.html#a64c47494a0e47bd8159fd294b173240b">Touch</a> () &amp;&amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a64c47494a0e47bd8159fd294b173240b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa016601f9cb088789d9122e187c4101e" id="r_aa016601f9cb088789d9122e187c4101e"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Func</a> &gt; </td></tr>
+<tr class="memitem:aa016601f9cb088789d9122e187c4101e"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">auto</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classyaclib_1_1FutureBase.html#aa016601f9cb088789d9122e187c4101e">Then</a> (<a class="el" href="classyaclib_1_1IExecutor.html">IExecutor</a> &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">e</a>, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Func</a> &amp;&amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">f</a>) &amp;&amp;</td></tr>
+<tr class="memdesc:aa016601f9cb088789d9122e187c4101e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attach the continuation func to *this.  <br /></td></tr>
+<tr class="separator:aa016601f9cb088789d9122e187c4101e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a99532e37b37c31cd11a428a1f83138a3" id="r_a99532e37b37c31cd11a428a1f83138a3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1FutureBase.html#a99532e37b37c31cd11a428a1f83138a3">Detach</a> () &amp;&amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="memdesc:a99532e37b37c31cd11a428a1f83138a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disable calling Stop in destructor.  <br /></td></tr>
+<tr class="separator:a99532e37b37c31cd11a428a1f83138a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a36f1089e841fc7176b7a077ca8f948fb" id="r_a36f1089e841fc7176b7a077ca8f948fb"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Func</a> &gt; </td></tr>
+<tr class="memitem:a36f1089e841fc7176b7a077ca8f948fb"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classyaclib_1_1FutureBase.html#a36f1089e841fc7176b7a077ca8f948fb">DetachInline</a> (<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Func</a> &amp;&amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">f</a>) &amp;&amp;</td></tr>
+<tr class="memdesc:a36f1089e841fc7176b7a077ca8f948fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attach the final continuation func to *this and <a class="el" href="classyaclib_1_1FutureBase.html#a99532e37b37c31cd11a428a1f83138a3">Detach</a> *this.  <br /></td></tr>
+<tr class="separator:a36f1089e841fc7176b7a077ca8f948fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9a4d47afba2d1dc2d41b72d02c54ddba" id="r_a9a4d47afba2d1dc2d41b72d02c54ddba"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Func</a> &gt; </td></tr>
+<tr class="memitem:a9a4d47afba2d1dc2d41b72d02c54ddba"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classyaclib_1_1FutureBase.html#a9a4d47afba2d1dc2d41b72d02c54ddba">Detach</a> (<a class="el" href="classyaclib_1_1IExecutor.html">IExecutor</a> &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">e</a>, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Func</a> &amp;&amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">f</a>) &amp;&amp;</td></tr>
+<tr class="memdesc:a9a4d47afba2d1dc2d41b72d02c54ddba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attach the final continuation func to *this and <a class="el" href="classyaclib_1_1FutureBase.html#a99532e37b37c31cd11a428a1f83138a3">Detach</a> *this.  <br /></td></tr>
+<tr class="separator:a9a4d47afba2d1dc2d41b72d02c54ddba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a45cc92fc3f3e022a542c40e1d1072f71" id="r_a45cc92fc3f3e022a542c40e1d1072f71"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib_1_1detail.html#a4cc9b29a6fbfa258db565638264d77fd">detail::ResultCorePtr</a>&lt; V, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1FutureBase.html#a45cc92fc3f3e022a542c40e1d1072f71">GetCore</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="memdesc:a45cc92fc3f3e022a542c40e1d1072f71"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method that get internal Core state.  <br /></td></tr>
+<tr class="separator:a45cc92fc3f3e022a542c40e1d1072f71"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-methods" name="pro-methods"></a>
+Protected Member Functions</h2></td></tr>
+<tr class="memitem:a7c34018d25cf000924be57508dbdded6" id="r_a7c34018d25cf000924be57508dbdded6"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1FutureBase.html#a7c34018d25cf000924be57508dbdded6">FutureBase</a> (<a class="el" href="namespaceyaclib_1_1detail.html#a4cc9b29a6fbfa258db565638264d77fd">detail::ResultCorePtr</a>&lt; V, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">core</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a7c34018d25cf000924be57508dbdded6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
+Protected Attributes</h2></td></tr>
+<tr class="memitem:aa3ee2af5092bd241ac098bbaa7f265ab" id="r_aa3ee2af5092bd241ac098bbaa7f265ab"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib_1_1detail.html#a4cc9b29a6fbfa258db565638264d77fd">detail::ResultCorePtr</a>&lt; V, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1FutureBase.html#aa3ee2af5092bd241ac098bbaa7f265ab">_core</a></td></tr>
+<tr class="separator:aa3ee2af5092bd241ac098bbaa7f265ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><div class="compoundTemplParams">template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> V, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a>&gt;<br />
+class yaclib::FutureBase&lt; V, E &gt;</div><p>Provides a mechanism to access the result of async operations. </p>
+<p><a class="el" href="classyaclib_1_1Future.html" title="Provides a mechanism to access the result of async operations.">Future</a> and <a class="el" href="classyaclib_1_1Promise.html">Promise</a> are like a Single Producer/Single Consumer one-shot one-element channel. Use the <a class="el" href="classyaclib_1_1Promise.html">Promise</a> to fulfill the <a class="el" href="classyaclib_1_1Future.html">Future</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="async_2future_8hpp_source.html#l00020">20</a> of file <a class="el" href="async_2future_8hpp_source.html">future.hpp</a>.</p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="ab73e623113120d2b8ab2dd0e2b7d24bf" name="ab73e623113120d2b8ab2dd0e2b7d24bf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab73e623113120d2b8ab2dd0e2b7d24bf">&#9670;&#160;</a></span>FutureBase() <span class="overload">[1/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> V , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classyaclib_1_1FutureBase.html">yaclib::FutureBase</a>&lt; V, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt;::FutureBase </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1FutureBase.html">FutureBase</a>&lt; V, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt; &amp;&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">delete</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a8ec3f1a6e257ad63d036049fad4cdcee" name="a8ec3f1a6e257ad63d036049fad4cdcee"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8ec3f1a6e257ad63d036049fad4cdcee">&#9670;&#160;</a></span>FutureBase() <span class="overload">[2/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> V , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classyaclib_1_1FutureBase.html">yaclib::FutureBase</a>&lt; V, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt;::FutureBase </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classyaclib_1_1FutureBase.html">FutureBase</a>&lt; V, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt; &amp;&amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">default</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a996b279a2056c2074a40aa86dce981b5" name="a996b279a2056c2074a40aa86dce981b5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a996b279a2056c2074a40aa86dce981b5">&#9670;&#160;</a></span>FutureBase() <span class="overload">[3/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> V , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classyaclib_1_1FutureBase.html">yaclib::FutureBase</a>&lt; V, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt;::FutureBase </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">default</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The default constructor creates not a <a class="el" href="classyaclib_1_1FutureBase.html#a5ee96890a14dd007f7da1db7c3eccf31">Valid</a> <a class="el" href="classyaclib_1_1Future.html" title="Provides a mechanism to access the result of async operations.">Future</a>. </p>
+<p>Needed only for usability, e.g. instead of std::optional&lt;Future&lt;T&gt;&gt; in containers. </p>
+
+</div>
+</div>
+<a id="a59f5a93c177b4da035ea1160051429d2" name="a59f5a93c177b4da035ea1160051429d2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a59f5a93c177b4da035ea1160051429d2">&#9670;&#160;</a></span>~FutureBase()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> V , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classyaclib_1_1FutureBase.html">yaclib::FutureBase</a>&lt; V, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt;::~<a class="el" href="classyaclib_1_1FutureBase.html">FutureBase</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>If <a class="el" href="classyaclib_1_1Future.html" title="Provides a mechanism to access the result of async operations.">Future</a> is <a class="el" href="classyaclib_1_1FutureBase.html#a5ee96890a14dd007f7da1db7c3eccf31">Valid</a> then call Stop. </p>
+
+<p class="definition">Definition at line <a class="el" href="async_2future_8hpp_source.html#l00042">42</a> of file <a class="el" href="async_2future_8hpp_source.html">future.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="async_2future_8hpp_source.html#l00141">yaclib::FutureBase&lt; V, E &gt;::Detach()</a>, and <a class="el" href="async_2future_8hpp_source.html#l00053">yaclib::FutureBase&lt; V, E &gt;::Valid()</a>.</p>
+
+</div>
+</div>
+<a id="a7c34018d25cf000924be57508dbdded6" name="a7c34018d25cf000924be57508dbdded6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7c34018d25cf000924be57508dbdded6">&#9670;&#160;</a></span>FutureBase() <span class="overload">[4/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> V , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classyaclib_1_1FutureBase.html">yaclib::FutureBase</a>&lt; V, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt;::FutureBase </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib_1_1detail.html#a4cc9b29a6fbfa258db565638264d77fd">detail::ResultCorePtr</a>&lt; V, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt;&#160;</td>
+          <td class="paramname"><em>core</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">explicit</span><span class="mlabel">protected</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="async_2future_8hpp_source.html#l00184">184</a> of file <a class="el" href="async_2future_8hpp_source.html">future.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="a99532e37b37c31cd11a428a1f83138a3" name="a99532e37b37c31cd11a428a1f83138a3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a99532e37b37c31cd11a428a1f83138a3">&#9670;&#160;</a></span>Detach() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> V , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a> <a class="el" href="classyaclib_1_1FutureBase.html">yaclib::FutureBase</a>&lt; V, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt;::Detach </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> &amp;&amp;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Disable calling Stop in destructor. </p>
+
+<p class="definition">Definition at line <a class="el" href="async_2future_8hpp_source.html#l00141">141</a> of file <a class="el" href="async_2future_8hpp_source.html">future.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="async_2future_8hpp_source.html#l00187">yaclib::FutureBase&lt; V, E &gt;::_core</a>, <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>, and <a class="el" href="result__core_8cpp_source.html#l00029">yaclib::detail::MakeDrop()</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="async_2future_8hpp_source.html#l00042">yaclib::FutureBase&lt; V, E &gt;::~FutureBase()</a>.</p>
+
+</div>
+</div>
+<a id="a9a4d47afba2d1dc2d41b72d02c54ddba" name="a9a4d47afba2d1dc2d41b72d02c54ddba"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9a4d47afba2d1dc2d41b72d02c54ddba">&#9670;&#160;</a></span>Detach() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> V , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt; </div>
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Func</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a> <a class="el" href="classyaclib_1_1FutureBase.html">yaclib::FutureBase</a>&lt; V, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt;::Detach </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classyaclib_1_1IExecutor.html">IExecutor</a> &amp;&#160;</td>
+          <td class="paramname"><em>e</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Func</a> &amp;&amp;&#160;</td>
+          <td class="paramname"><em>f</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> &amp;&amp;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Attach the final continuation func to *this and <a class="el" href="classyaclib_1_1FutureBase.html#a99532e37b37c31cd11a428a1f83138a3">Detach</a> *this. </p>
+<p>The func will be executed on the specified executor. </p><dl class="section note"><dt>Note</dt><dd>The behavior is undefined if <a class="el" href="classyaclib_1_1FutureBase.html#a5ee96890a14dd007f7da1db7c3eccf31">Valid</a> is false before the call to this function. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">e</td><td>Executor which will <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Execute</a> the continuation </td></tr>
+    <tr><td class="paramname">f</td><td>A continuation to be attached </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="async_2future_8hpp_source.html#l00168">168</a> of file <a class="el" href="async_2future_8hpp_source.html">future.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="async_2future_8hpp_source.html#l00187">yaclib::FutureBase&lt; V, E &gt;::_core</a>, <a class="el" href="classyaclib_1_1IExecutor.html#afb1e19ea39472133ccc78e4690e8a434a0125cf5f3ca38b312ca5d3b511c45a13">yaclib::IExecutor::Inline</a>, <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>, and <a class="el" href="log_8hpp_source.html#l00074">YACLIB_WARN</a>.</p>
+
+</div>
+</div>
+<a id="a36f1089e841fc7176b7a077ca8f948fb" name="a36f1089e841fc7176b7a077ca8f948fb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a36f1089e841fc7176b7a077ca8f948fb">&#9670;&#160;</a></span>DetachInline()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> V , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt; </div>
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Func</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a> <a class="el" href="classyaclib_1_1FutureBase.html">yaclib::FutureBase</a>&lt; V, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt;::DetachInline </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Func</a> &amp;&amp;&#160;</td>
+          <td class="paramname"><em>f</em></td><td>)</td>
+          <td> &amp;&amp;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Attach the final continuation func to *this and <a class="el" href="classyaclib_1_1FutureBase.html#a99532e37b37c31cd11a428a1f83138a3">Detach</a> *this. </p>
+<p>The func will be executed on Inline executor. </p><dl class="section note"><dt>Note</dt><dd>The behavior is undefined if <a class="el" href="classyaclib_1_1FutureBase.html#a5ee96890a14dd007f7da1db7c3eccf31">Valid</a> is false before the call to this function. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">f</td><td>A continuation to be attached </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="async_2future_8hpp_source.html#l00155">155</a> of file <a class="el" href="async_2future_8hpp_source.html">future.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="async_2future_8hpp_source.html#l00187">yaclib::FutureBase&lt; V, E &gt;::_core</a>, and <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="a38360af7ef90638968bdcc6d65a8c027" name="a38360af7ef90638968bdcc6d65a8c027"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a38360af7ef90638968bdcc6d65a8c027">&#9670;&#160;</a></span>Get() <span class="overload">[1/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> V , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classyaclib_1_1Result.html">Result</a>&lt; V, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt; <a class="el" href="classyaclib_1_1FutureBase.html">yaclib::FutureBase</a>&lt; V, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt;::Get </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> &amp;&amp;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="async_2future_8hpp_source.html#l00092">92</a> of file <a class="el" href="async_2future_8hpp_source.html">future.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="async_2future_8hpp_source.html#l00187">yaclib::FutureBase&lt; V, E &gt;::_core</a>, <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>, and <a class="el" href="wait_8hpp_source.html#l00018">yaclib::Wait()</a>.</p>
+
+</div>
+</div>
+<a id="a96e17cfe7e0097c76de16fca91e08f40" name="a96e17cfe7e0097c76de16fca91e08f40"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a96e17cfe7e0097c76de16fca91e08f40">&#9670;&#160;</a></span>Get() <span class="overload">[2/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> V , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a> <a class="el" href="classyaclib_1_1FutureBase.html">yaclib::FutureBase</a>&lt; V, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt;::Get </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> &amp;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">delete</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aff906fc11c5b3ebd0ab29fb36933a3ad" name="aff906fc11c5b3ebd0ab29fb36933a3ad"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aff906fc11c5b3ebd0ab29fb36933a3ad">&#9670;&#160;</a></span>Get() <span class="overload">[3/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> V , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a> <a class="el" href="classyaclib_1_1FutureBase.html">yaclib::FutureBase</a>&lt; V, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt;::Get </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const &amp;&amp;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">delete</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="abbd079a93430a47573f54a53bd165afd" name="abbd079a93430a47573f54a53bd165afd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abbd079a93430a47573f54a53bd165afd">&#9670;&#160;</a></span>Get() <span class="overload">[4/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> V , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1Result.html">Result</a>&lt; V, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt; * <a class="el" href="classyaclib_1_1FutureBase.html">yaclib::FutureBase</a>&lt; V, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt;::Get </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const &amp;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Return copy of <a class="el" href="classyaclib_1_1Result.html">Result</a> from <a class="el" href="classyaclib_1_1Future.html">Future</a>. </p>
+<p>If <a class="el" href="classyaclib_1_1FutureBase.html#afc3b6a42975ba1247fe53d3ace812137">Ready</a> is false return an empty <a class="el" href="classyaclib_1_1Result.html">Result</a>. This method is thread-safe and can be called multiple times. </p><dl class="section note"><dt>Note</dt><dd>The behavior is undefined if <a class="el" href="classyaclib_1_1FutureBase.html#a5ee96890a14dd007f7da1db7c3eccf31">Valid</a> is false before the call to this function. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="classyaclib_1_1Result.html">Result</a> stored in the shared state </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="async_2future_8hpp_source.html#l00079">79</a> of file <a class="el" href="async_2future_8hpp_source.html">future.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="async_2future_8hpp_source.html#l00187">yaclib::FutureBase&lt; V, E &gt;::_core</a>, and <a class="el" href="async_2future_8hpp_source.html#l00062">yaclib::FutureBase&lt; V, E &gt;::Ready()</a>.</p>
+
+</div>
+</div>
+<a id="a45cc92fc3f3e022a542c40e1d1072f71" name="a45cc92fc3f3e022a542c40e1d1072f71"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a45cc92fc3f3e022a542c40e1d1072f71">&#9670;&#160;</a></span>GetCore()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> V , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib_1_1detail.html#a4cc9b29a6fbfa258db565638264d77fd">detail::ResultCorePtr</a>&lt; V, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt; &amp; <a class="el" href="classyaclib_1_1FutureBase.html">yaclib::FutureBase</a>&lt; V, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt;::GetCore </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Method that get internal Core state. </p>
+<dl class="section return"><dt>Returns</dt><dd>internal Core state ptr </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="async_2future_8hpp_source.html#l00179">179</a> of file <a class="el" href="async_2future_8hpp_source.html">future.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="async_2future_8hpp_source.html#l00187">yaclib::FutureBase&lt; V, E &gt;::_core</a>.</p>
+
+</div>
+</div>
+<a id="a4167f9f7d59dfc1f3c7ca637ad295823" name="a4167f9f7d59dfc1f3c7ca637ad295823"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4167f9f7d59dfc1f3c7ca637ad295823">&#9670;&#160;</a></span>operator=() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> V , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classyaclib_1_1FutureBase.html">FutureBase</a> &amp; <a class="el" href="classyaclib_1_1FutureBase.html">yaclib::FutureBase</a>&lt; V, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">::operator</a>= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1FutureBase.html">FutureBase</a>&lt; V, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt; &amp;&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">delete</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac474baf87064f5e99d011c1f207205fa" name="ac474baf87064f5e99d011c1f207205fa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac474baf87064f5e99d011c1f207205fa">&#9670;&#160;</a></span>operator=() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> V , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classyaclib_1_1FutureBase.html">FutureBase</a> &amp; <a class="el" href="classyaclib_1_1FutureBase.html">yaclib::FutureBase</a>&lt; V, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">::operator</a>= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classyaclib_1_1FutureBase.html">FutureBase</a>&lt; V, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt; &amp;&amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">default</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="afc3b6a42975ba1247fe53d3ace812137" name="afc3b6a42975ba1247fe53d3ace812137"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afc3b6a42975ba1247fe53d3ace812137">&#9670;&#160;</a></span>Ready()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> V , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classbool.html">bool</a> <a class="el" href="classyaclib_1_1FutureBase.html">yaclib::FutureBase</a>&lt; V, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt;::Ready </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const &amp;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Check that <a class="el" href="classyaclib_1_1Result.html">Result</a> that corresponds to this <a class="el" href="classyaclib_1_1Future.html">Future</a> is computed. </p>
+<dl class="section return"><dt>Returns</dt><dd>false if the <a class="el" href="classyaclib_1_1Result.html">Result</a> of this <a class="el" href="classyaclib_1_1Future.html">Future</a> is not computed yet, otherwise true </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="async_2future_8hpp_source.html#l00062">62</a> of file <a class="el" href="async_2future_8hpp_source.html">future.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="async_2future_8hpp_source.html#l00187">yaclib::FutureBase&lt; V, E &gt;::_core</a>, <a class="el" href="async_2future_8hpp_source.html#l00053">yaclib::FutureBase&lt; V, E &gt;::Valid()</a>, and <a class="el" href="log_8hpp_source.html#l00085">YACLIB_ASSERT</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="async_2future_8hpp_source.html#l00079">yaclib::FutureBase&lt; V, E &gt;::Get()</a>, <a class="el" href="async_2future_8hpp_source.html#l00116">yaclib::FutureBase&lt; V, E &gt;::Touch()</a>, and <a class="el" href="async_2future_8hpp_source.html#l00105">yaclib::FutureBase&lt; V, E &gt;::Touch()</a>.</p>
+
+</div>
+</div>
+<a id="aa016601f9cb088789d9122e187c4101e" name="aa016601f9cb088789d9122e187c4101e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa016601f9cb088789d9122e187c4101e">&#9670;&#160;</a></span>Then()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> V , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt; </div>
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Func</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">auto</a> <a class="el" href="classyaclib_1_1FutureBase.html">yaclib::FutureBase</a>&lt; V, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt;::Then </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classyaclib_1_1IExecutor.html">IExecutor</a> &amp;&#160;</td>
+          <td class="paramname"><em>e</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Func</a> &amp;&amp;&#160;</td>
+          <td class="paramname"><em>f</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> &amp;&amp;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Attach the continuation func to *this. </p>
+<p>The func will be executed on the specified executor. </p><dl class="section note"><dt>Note</dt><dd>The behavior is undefined if <a class="el" href="classyaclib_1_1FutureBase.html#a5ee96890a14dd007f7da1db7c3eccf31">Valid</a> is false before the call to this function. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">e</td><td>Executor which will <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Execute</a> the continuation </td></tr>
+    <tr><td class="paramname">f</td><td>A continuation to be attached </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>New <a class="el" href="classyaclib_1_1FutureOn.html">FutureOn</a> object associated with the func result </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="async_2future_8hpp_source.html#l00132">132</a> of file <a class="el" href="async_2future_8hpp_source.html">future.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="async_2future_8hpp_source.html#l00187">yaclib::FutureBase&lt; V, E &gt;::_core</a>, <a class="el" href="classyaclib_1_1IExecutor.html#afb1e19ea39472133ccc78e4690e8a434a0125cf5f3ca38b312ca5d3b511c45a13">yaclib::IExecutor::Inline</a>, <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>, and <a class="el" href="log_8hpp_source.html#l00074">YACLIB_WARN</a>.</p>
+
+</div>
+</div>
+<a id="a64c47494a0e47bd8159fd294b173240b" name="a64c47494a0e47bd8159fd294b173240b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a64c47494a0e47bd8159fd294b173240b">&#9670;&#160;</a></span>Touch() <span class="overload">[1/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> V , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classyaclib_1_1Result.html">Result</a>&lt; V, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt; <a class="el" href="classyaclib_1_1FutureBase.html">yaclib::FutureBase</a>&lt; V, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt;::Touch </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> &amp;&amp;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="async_2future_8hpp_source.html#l00116">116</a> of file <a class="el" href="async_2future_8hpp_source.html">future.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="async_2future_8hpp_source.html#l00187">yaclib::FutureBase&lt; V, E &gt;::_core</a>, <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>, <a class="el" href="async_2future_8hpp_source.html#l00062">yaclib::FutureBase&lt; V, E &gt;::Ready()</a>, and <a class="el" href="log_8hpp_source.html#l00085">YACLIB_ASSERT</a>.</p>
+
+</div>
+</div>
+<a id="a5febfef194a8c0358713d1fb22e14bd9" name="a5febfef194a8c0358713d1fb22e14bd9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5febfef194a8c0358713d1fb22e14bd9">&#9670;&#160;</a></span>Touch() <span class="overload">[2/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> V , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a> <a class="el" href="classyaclib_1_1FutureBase.html">yaclib::FutureBase</a>&lt; V, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt;::Touch </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> &amp;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">delete</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a809a4be4cd99c1cc440daa4ca5baa68f" name="a809a4be4cd99c1cc440daa4ca5baa68f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a809a4be4cd99c1cc440daa4ca5baa68f">&#9670;&#160;</a></span>Touch() <span class="overload">[3/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> V , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a> <a class="el" href="classyaclib_1_1FutureBase.html">yaclib::FutureBase</a>&lt; V, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt;::Touch </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const &amp;&amp;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">delete</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="adcdba5c1aec0c4d0e6c017f87fe8758a" name="adcdba5c1aec0c4d0e6c017f87fe8758a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adcdba5c1aec0c4d0e6c017f87fe8758a">&#9670;&#160;</a></span>Touch() <span class="overload">[4/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> V , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1Result.html">Result</a>&lt; V, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt; &amp; <a class="el" href="classyaclib_1_1FutureBase.html">yaclib::FutureBase</a>&lt; V, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt;::Touch </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const &amp;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="async_2future_8hpp_source.html#l00105">105</a> of file <a class="el" href="async_2future_8hpp_source.html">future.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="async_2future_8hpp_source.html#l00187">yaclib::FutureBase&lt; V, E &gt;::_core</a>, <a class="el" href="async_2future_8hpp_source.html#l00062">yaclib::FutureBase&lt; V, E &gt;::Ready()</a>, and <a class="el" href="log_8hpp_source.html#l00085">YACLIB_ASSERT</a>.</p>
+
+</div>
+</div>
+<a id="a5ee96890a14dd007f7da1db7c3eccf31" name="a5ee96890a14dd007f7da1db7c3eccf31"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5ee96890a14dd007f7da1db7c3eccf31">&#9670;&#160;</a></span>Valid()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> V , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classbool.html">bool</a> <a class="el" href="classyaclib_1_1FutureBase.html">yaclib::FutureBase</a>&lt; V, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt;::Valid </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const &amp;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Check if this <a class="el" href="classyaclib_1_1Future.html">Future</a> has <a class="el" href="classyaclib_1_1Promise.html">Promise</a>. </p>
+<dl class="section return"><dt>Returns</dt><dd>false if this <a class="el" href="classyaclib_1_1Future.html">Future</a> is default-constructed or moved to, otherwise true </dd></dl>
+<dl class="section examples"><dt>Examples</dt><dd><a class="el" href="simple_8cpp-example.html#a8">simple.cpp</a>.</dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="async_2future_8hpp_source.html#l00053">53</a> of file <a class="el" href="async_2future_8hpp_source.html">future.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="async_2future_8hpp_source.html#l00187">yaclib::FutureBase&lt; V, E &gt;::_core</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="async_2future_8hpp_source.html#l00062">yaclib::FutureBase&lt; V, E &gt;::Ready()</a>, <a class="el" href="simple_8cpp_source.html#l00056">TEST()</a>, and <a class="el" href="async_2future_8hpp_source.html#l00042">yaclib::FutureBase&lt; V, E &gt;::~FutureBase()</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Data Documentation</h2>
+<a id="aa3ee2af5092bd241ac098bbaa7f265ab" name="aa3ee2af5092bd241ac098bbaa7f265ab"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa3ee2af5092bd241ac098bbaa7f265ab">&#9670;&#160;</a></span>_core</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> V , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib_1_1detail.html#a4cc9b29a6fbfa258db565638264d77fd">detail::ResultCorePtr</a>&lt;V, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a>&gt; <a class="el" href="classyaclib_1_1FutureBase.html">yaclib::FutureBase</a>&lt; V, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">E</a> &gt;::_core</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="async_2future_8hpp_source.html#l00187">187</a> of file <a class="el" href="async_2future_8hpp_source.html">future.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="async_2future_8hpp_source.html#l00141">yaclib::FutureBase&lt; V, E &gt;::Detach()</a>, <a class="el" href="async_2future_8hpp_source.html#l00168">yaclib::FutureBase&lt; V, E &gt;::Detach()</a>, <a class="el" href="async_2future_8hpp_source.html#l00155">yaclib::FutureBase&lt; V, E &gt;::DetachInline()</a>, <a class="el" href="async_2future_8hpp_source.html#l00092">yaclib::FutureBase&lt; V, E &gt;::Get()</a>, <a class="el" href="async_2future_8hpp_source.html#l00079">yaclib::FutureBase&lt; V, E &gt;::Get()</a>, <a class="el" href="async_2future_8hpp_source.html#l00179">yaclib::FutureBase&lt; V, E &gt;::GetCore()</a>, <a class="el" href="async_2future_8hpp_source.html#l00062">yaclib::FutureBase&lt; V, E &gt;::Ready()</a>, <a class="el" href="async_2future_8hpp_source.html#l00132">yaclib::FutureBase&lt; V, E &gt;::Then()</a>, <a class="el" href="async_2future_8hpp_source.html#l00116">yaclib::FutureBase&lt; V, E &gt;::Touch()</a>, <a class="el" href="async_2future_8hpp_source.html#l00105">yaclib::FutureBase&lt; V, E &gt;::Touch()</a>, and <a class="el" href="async_2future_8hpp_source.html#l00053">yaclib::FutureBase&lt; V, E &gt;::Valid()</a>.</p>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following file:<ul>
+<li>include/yaclib/async/<a class="el" href="async_2future_8hpp_source.html">future.hpp</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="namespaceyaclib.html">yaclib</a></li><li class="navelem"><a class="el" href="classyaclib_1_1FutureBase.html">FutureBase</a></li>
+    <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+  </ul>
+</div>
+</body>
+</html>

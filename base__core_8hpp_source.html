@@ -1,0 +1,256 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.9.8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<!-- BEGIN opengraph metadata -->
+<meta property="og:title" content="Doxygen Awesome" />
+<meta property="og:image" content="https://repository-images.githubusercontent.com/348492097/4f16df80-88fb-11eb-9d31-4015ff22c452" />
+<meta property="og:description" content="Custom CSS theme for doxygen html-documentation with lots of customization parameters." />
+<meta property="og:url" content="https://jothepro.github.io/doxygen-awesome-css/" />
+<!-- END opengraph metadata -->
+<!-- BEGIN twitter metadata -->
+<meta name="twitter:image:src" content="https://repository-images.githubusercontent.com/348492097/4f16df80-88fb-11eb-9d31-4015ff22c452" />
+<meta name="twitter:title" content="Doxygen Awesome" />
+<meta name="twitter:description" content="Custom CSS theme for doxygen html-documentation with lots of customization parameters." />
+<!-- END twitter metadata -->
+<title>YACLib: include/yaclib/algo/detail/base_core.hpp Source File</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link rel="icon" type="image/svg+xml" href="logo.drawio.svg"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+<script type="text/javascript" src="doxygen-awesome-fragment-copy-button.js"></script>
+<script type="text/javascript" src="doxygen-awesome-paragraph-link.js"></script>
+<script type="text/javascript" src="toggle-alternative-theme.js"></script>
+<script type="text/javascript">
+    DoxygenAwesomeFragmentCopyButton.init()
+    DoxygenAwesomeDarkModeToggle.init()
+    DoxygenAwesomeParagraphLink.init()
+</script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="custom.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only-darkmode-toggle.css" rel="stylesheet" type="text/css"/>
+<link href="custom-alternative.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<!-- https://tholman.com/github-corners/ -->
+<a href="https://github.com/YACLib/YACLib" class="github-corner" title="View source on GitHub" target="_blank">
+    <svg viewBox="0 0 250 250" width="40" height="40" style="position: absolute; top: 0; border: 0; right: 0; z-index: 99;" aria-hidden="true">
+    <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
+   <div id="projectname">YACLib
+   </div>
+   <div id="projectbrief">C++ library for concurrent tasks execution</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Search');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function() { init_codefold(0); });
+/* @license-end */
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('base__core_8hpp_source.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">base_core.hpp</div></div>
+</div><!--header-->
+<div class="contents">
+<a href="base__core_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span> </div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &lt;<a class="code" href="inline__core_8hpp.html">yaclib/algo/detail/inline_core.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &lt;yaclib/config.hpp&gt;</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &lt;<a class="code" href="executor_8hpp.html">yaclib/exe/executor.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &lt;<a class="code" href="inline_8hpp.html">yaclib/exe/inline.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#include &lt;<a class="code" href="log_8hpp.html">yaclib/log.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#include &lt;<a class="code" href="ref_8hpp.html">yaclib/util/ref.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#if YACLIB_CORO != 0</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#  include &lt;<a class="code" href="coro_8hpp.html">yaclib/coro/coro.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#include &lt;cstdint&gt;</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">#include &lt;limits&gt;</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#include &lt;yaclib_std/atomic&gt;</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
+<div class="foldopen" id="foldopen00018" data-start="{" data-end="}">
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno"><a class="line" href="namespaceyaclib.html">   18</a></span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespaceyaclib_1_1detail.html">yaclib::detail</a> {</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span> </div>
+<div class="foldopen" id="foldopen00020" data-start="{" data-end="};">
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno"><a class="line" href="classyaclib_1_1detail_1_1BaseCore.html">   20</a></span><span class="keyword">class </span><a class="code hl_class" href="classyaclib_1_1detail_1_1BaseCore.html">BaseCore</a> : <span class="keyword">public</span> <a class="code hl_class" href="classyaclib_1_1detail_1_1InlineCore.html">InlineCore</a> {</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span> <span class="keyword">public</span>:</div>
+<div class="foldopen" id="foldopen00022" data-start="{" data-end="};">
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno"><a class="line" href="classyaclib_1_1detail_1_1BaseCore.html#a2581af07669ba2909fdc1f66789d8265">   22</a></span>  <span class="keyword">enum</span> <a class="code hl_enumeration" href="classyaclib_1_1detail_1_1BaseCore.html#a2581af07669ba2909fdc1f66789d8265">State</a> : std::uintptr_t {</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno"><a class="line" href="classyaclib_1_1detail_1_1BaseCore.html#a2581af07669ba2909fdc1f66789d8265a04e7bf18da187558b08209162647d6c4">   23</a></span>    <a class="code hl_enumvalue" href="classyaclib_1_1detail_1_1BaseCore.html#a2581af07669ba2909fdc1f66789d8265a04e7bf18da187558b08209162647d6c4">kEmpty</a> = std::uintptr_t{0},</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno"><a class="line" href="classyaclib_1_1detail_1_1BaseCore.html#a2581af07669ba2909fdc1f66789d8265a2e3141020851d2693698cab45b69d3cb">   24</a></span>    <a class="code hl_enumvalue" href="classyaclib_1_1detail_1_1BaseCore.html#a2581af07669ba2909fdc1f66789d8265a2e3141020851d2693698cab45b69d3cb">kResult</a> = std::numeric_limits&lt;std::uintptr_t&gt;::max(),</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>  };</div>
+</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span> </div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>  <span class="keywordtype">void</span> <a class="code hl_function" href="classyaclib_1_1detail_1_1BaseCore.html#a0a7dbaeabd6aca727a6ffb8fcf9bd377">StoreCallback</a>(<a class="code hl_class" href="classyaclib_1_1detail_1_1InlineCore.html">InlineCore</a>&amp; <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">callback</a>) <span class="keyword">noexcept</span>;</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span> </div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>  [[<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">nodiscard</a>]] <span class="keywordtype">bool</span> <a class="code hl_function" href="classyaclib_1_1detail_1_1BaseCore.html#a9bcd7333f6c0314a8b00e60515158650">Empty</a>() <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a>;</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span> </div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>  [[<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">nodiscard</a>]] <span class="keywordtype">bool</span> <a class="code hl_function" href="classyaclib_1_1detail_1_1BaseCore.html#a5bcd46170b2d1abbe41690ccfd750521">SetCallback</a>(<a class="code hl_class" href="classyaclib_1_1detail_1_1InlineCore.html">InlineCore</a>&amp; <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">callback</a>) <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a>;</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span> </div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>  [[<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">nodiscard</a>]] <span class="keywordtype">bool</span> <a class="code hl_function" href="classyaclib_1_1detail_1_1BaseCore.html#a880e2724903b697614b94781f13b9886">Reset</a>() <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a>;</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span> </div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>  <span class="comment">// sometimes we know it will be last callback in cycle, so we want call it right now, instead of SetInline</span></div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>  <span class="keywordtype">void</span> <a class="code hl_function" href="classyaclib_1_1detail_1_1BaseCore.html#addd843c950afa857410b4d319a16aed4">CallInline</a>(<a class="code hl_class" href="classyaclib_1_1detail_1_1InlineCore.html">InlineCore</a>&amp; <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">callback</a>) <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a>;</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span> </div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>  <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">template</a> &lt;<span class="keywordtype">bool</span> <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">SymmetricTransfer</a>&gt;</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span><span class="preprocessor">#if YACLIB_SYMMETRIC_TRANSFER != 0</span></div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>  <span class="keyword">using </span><a class="code hl_typedef" href="classyaclib_1_1detail_1_1BaseCore.html#a456b37b91ed456333c1bdf688dde50db">Transfer</a> = std::conditional_t&lt;SymmetricTransfer, yaclib_std::coroutine_handle&lt;&gt;, <a class="code hl_class" href="classyaclib_1_1detail_1_1InlineCore.html">InlineCore</a>*&gt;;</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span><span class="preprocessor">#else</span></div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno"><a class="line" href="classyaclib_1_1detail_1_1BaseCore.html#a456b37b91ed456333c1bdf688dde50db">   42</a></span>  <span class="keyword">using </span><a class="code hl_class" href="classyaclib_1_1detail_1_1InlineCore.html">Transfer</a> = <a class="code hl_class" href="classyaclib_1_1detail_1_1InlineCore.html">InlineCore</a>*;</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span> </div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>  <span class="keyword">template</span> &lt;<span class="keywordtype">bool</span> SymmetricTransfer&gt;</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>  [[<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">nodiscard</a>]] <a class="code hl_class" href="classyaclib_1_1detail_1_1InlineCore.html">Transfer&lt;SymmetricTransfer&gt;</a> <a class="code hl_function" href="classyaclib_1_1detail_1_1BaseCore.html#a256f9ba95b35716b07ac630709b1a806">SetInline</a>(<a class="code hl_class" href="classyaclib_1_1detail_1_1InlineCore.html">InlineCore</a>&amp; <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">callback</a>) <span class="keyword">noexcept</span>;</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span> </div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>  <span class="keyword">template</span> &lt;<span class="keywordtype">bool</span> SymmetricTransfer&gt;</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>  [[<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">nodiscard</a>]] <a class="code hl_class" href="classyaclib_1_1detail_1_1InlineCore.html">Transfer&lt;SymmetricTransfer&gt;</a> <a class="code hl_function" href="classyaclib_1_1detail_1_1BaseCore.html#ac5c2a57404d62579c83cbcbe3e9efd33">SetResult</a>() <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a>;</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span> </div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span><span class="preprocessor">#if YACLIB_CORO != 0                                                      </span><span class="comment">// Compiler inline this call in tests</span></div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>  [[<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">nodiscard</a>]] <span class="keyword">virtual</span> yaclib_std::coroutine_handle&lt;&gt; Curr() <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a> {  <span class="comment">// LCOV_EXCL_LINE</span></div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    <a class="code hl_define" href="log_8hpp.html#af0901bb53ae728866ef8b10dcbbc9028">YACLIB_PURE_VIRTUAL</a>();                                                <span class="comment">// LCOV_EXCL_LINE</span></div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>    <span class="keywordflow">return</span> {};                                                            <span class="comment">// LCOV_EXCL_LINE</span></div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>  }                                                                       <span class="comment">// LCOV_EXCL_LINE</span></div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span> </div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span> <span class="keyword">protected</span>:</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>  <span class="keyword">explicit</span> <a class="code hl_class" href="classyaclib_1_1detail_1_1BaseCore.html">BaseCore</a>(<a class="code hl_enumeration" href="classyaclib_1_1detail_1_1BaseCore.html#a2581af07669ba2909fdc1f66789d8265">State</a> <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">callback</a>) <span class="keyword">noexcept</span>;</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span> </div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno"><a class="line" href="classyaclib_1_1detail_1_1BaseCore.html#a6c53253230e1e36b5c2e0ff4a902ea0a">   61</a></span>  <a class="code hl_typedef" href="namespaceyaclib__std.html#ae8aac2eab59490c78d6dc70add185cc6">yaclib_std::atomic_uintptr_t</a> <a class="code hl_variable" href="classyaclib_1_1detail_1_1BaseCore.html#a6c53253230e1e36b5c2e0ff4a902ea0a">_callback</a>;</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span> </div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span> <span class="keyword">public</span>:</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno"><a class="line" href="classyaclib_1_1detail_1_1BaseCore.html#aa3d44a40cbc3ea238650ae835ae79c36">   64</a></span>  <a class="code hl_class" href="classyaclib_1_1IntrusivePtr.html">IExecutorPtr</a> <a class="code hl_variable" href="classyaclib_1_1detail_1_1BaseCore.html#aa3d44a40cbc3ea238650ae835ae79c36">_executor</a>{<a class="code hl_struct" href="structyaclib_1_1NoRefTag.html">NoRefTag</a>{}, &amp;<a class="code hl_function" href="namespaceyaclib.html#aa8af5a9e84597d87efe863329f4324fc">MakeInline</a>()};</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span> </div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>  <span class="keywordtype">void</span> <a class="code hl_function" href="classyaclib_1_1detail_1_1BaseCore.html#a38a9e56a40af44d7aa00fecb4c46f74b">MoveExecutorTo</a>(<a class="code hl_class" href="classyaclib_1_1detail_1_1BaseCore.html">BaseCore</a>&amp; <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">callback</a>) <span class="keyword">noexcept</span>;</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>};</div>
+</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span> </div>
+<div class="foldopen" id="foldopen00069" data-start="{" data-end="}">
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno"><a class="line" href="namespaceyaclib_1_1detail.html#ac94a6eb23748fb429356cb936a39d8b4">   69</a></span><a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">YACLIB_INLINE</a> <span class="keywordtype">void</span> <a class="code hl_function" href="namespaceyaclib_1_1detail.html#ac94a6eb23748fb429356cb936a39d8b4">Loop</a>(<a class="code hl_class" href="classyaclib_1_1detail_1_1InlineCore.html">InlineCore</a>* prev, <a class="code hl_class" href="classyaclib_1_1detail_1_1InlineCore.html">InlineCore</a>* <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">curr</a>) <span class="keyword">noexcept</span> {</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>  <span class="keywordflow">while</span> (<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">curr</a> != <span class="keyword">nullptr</span>) {</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>    <span class="keyword">auto</span>* next = <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">curr</a>-&gt;Here(*prev);</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>    prev = <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">curr</a>;</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>    <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">curr</a> = next;</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>  }</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>}</div>
+</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span> </div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>}  <span class="comment">// namespace yaclib::detail</span></div>
+</div>
+<div class="ttc" id="aclassyaclib_1_1IntrusivePtr_html"><div class="ttname"><a href="classyaclib_1_1IntrusivePtr.html">yaclib::IntrusivePtr&lt; IExecutor &gt;</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1BaseCore_html"><div class="ttname"><a href="classyaclib_1_1detail_1_1BaseCore.html">yaclib::detail::BaseCore</a></div><div class="ttdef"><b>Definition</b> <a href="base__core_8hpp_source.html#l00020">base_core.hpp:20</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1BaseCore_html_a0a7dbaeabd6aca727a6ffb8fcf9bd377"><div class="ttname"><a href="classyaclib_1_1detail_1_1BaseCore.html#a0a7dbaeabd6aca727a6ffb8fcf9bd377">yaclib::detail::BaseCore::StoreCallback</a></div><div class="ttdeci">void StoreCallback(InlineCore &amp;callback) noexcept</div><div class="ttdef"><b>Definition</b> <a href="base__core_8cpp_source.html#l00008">base_core.cpp:8</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1BaseCore_html_a256f9ba95b35716b07ac630709b1a806"><div class="ttname"><a href="classyaclib_1_1detail_1_1BaseCore.html#a256f9ba95b35716b07ac630709b1a806">yaclib::detail::BaseCore::SetInline</a></div><div class="ttdeci">Transfer&lt; SymmetricTransfer &gt; SetInline(InlineCore &amp;callback) noexcept</div><div class="ttdef"><b>Definition</b> <a href="base__core_8cpp_source.html#l00041">base_core.cpp:41</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1BaseCore_html_a2581af07669ba2909fdc1f66789d8265"><div class="ttname"><a href="classyaclib_1_1detail_1_1BaseCore.html#a2581af07669ba2909fdc1f66789d8265">yaclib::detail::BaseCore::State</a></div><div class="ttdeci">State</div><div class="ttdef"><b>Definition</b> <a href="base__core_8hpp_source.html#l00022">base_core.hpp:22</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1BaseCore_html_a2581af07669ba2909fdc1f66789d8265a04e7bf18da187558b08209162647d6c4"><div class="ttname"><a href="classyaclib_1_1detail_1_1BaseCore.html#a2581af07669ba2909fdc1f66789d8265a04e7bf18da187558b08209162647d6c4">yaclib::detail::BaseCore::kEmpty</a></div><div class="ttdeci">@ kEmpty</div><div class="ttdef"><b>Definition</b> <a href="base__core_8hpp_source.html#l00023">base_core.hpp:23</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1BaseCore_html_a2581af07669ba2909fdc1f66789d8265a2e3141020851d2693698cab45b69d3cb"><div class="ttname"><a href="classyaclib_1_1detail_1_1BaseCore.html#a2581af07669ba2909fdc1f66789d8265a2e3141020851d2693698cab45b69d3cb">yaclib::detail::BaseCore::kResult</a></div><div class="ttdeci">@ kResult</div><div class="ttdef"><b>Definition</b> <a href="base__core_8hpp_source.html#l00024">base_core.hpp:24</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1BaseCore_html_a38a9e56a40af44d7aa00fecb4c46f74b"><div class="ttname"><a href="classyaclib_1_1detail_1_1BaseCore.html#a38a9e56a40af44d7aa00fecb4c46f74b">yaclib::detail::BaseCore::MoveExecutorTo</a></div><div class="ttdeci">void MoveExecutorTo(BaseCore &amp;callback) noexcept</div><div class="ttdef"><b>Definition</b> <a href="base__core_8cpp_source.html#l00063">base_core.cpp:63</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1BaseCore_html_a456b37b91ed456333c1bdf688dde50db"><div class="ttname"><a href="classyaclib_1_1detail_1_1BaseCore.html#a456b37b91ed456333c1bdf688dde50db">yaclib::detail::BaseCore::Transfer</a></div><div class="ttdeci">InlineCore * Transfer</div><div class="ttdef"><b>Definition</b> <a href="base__core_8hpp_source.html#l00042">base_core.hpp:42</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1BaseCore_html_a5bcd46170b2d1abbe41690ccfd750521"><div class="ttname"><a href="classyaclib_1_1detail_1_1BaseCore.html#a5bcd46170b2d1abbe41690ccfd750521">yaclib::detail::BaseCore::SetCallback</a></div><div class="ttdeci">bool SetCallback(InlineCore &amp;callback) noexcept</div><div class="ttdef"><b>Definition</b> <a href="base__core_8cpp_source.html#l00019">base_core.cpp:19</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1BaseCore_html_a6c53253230e1e36b5c2e0ff4a902ea0a"><div class="ttname"><a href="classyaclib_1_1detail_1_1BaseCore.html#a6c53253230e1e36b5c2e0ff4a902ea0a">yaclib::detail::BaseCore::_callback</a></div><div class="ttdeci">yaclib_std::atomic_uintptr_t _callback</div><div class="ttdef"><b>Definition</b> <a href="base__core_8hpp_source.html#l00061">base_core.hpp:61</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1BaseCore_html_a880e2724903b697614b94781f13b9886"><div class="ttname"><a href="classyaclib_1_1detail_1_1BaseCore.html#a880e2724903b697614b94781f13b9886">yaclib::detail::BaseCore::Reset</a></div><div class="ttdeci">bool Reset() noexcept</div><div class="ttdef"><b>Definition</b> <a href="base__core_8cpp_source.html#l00028">base_core.cpp:28</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1BaseCore_html_a9bcd7333f6c0314a8b00e60515158650"><div class="ttname"><a href="classyaclib_1_1detail_1_1BaseCore.html#a9bcd7333f6c0314a8b00e60515158650">yaclib::detail::BaseCore::Empty</a></div><div class="ttdeci">bool Empty() const noexcept</div><div class="ttdef"><b>Definition</b> <a href="base__core_8cpp_source.html#l00013">base_core.cpp:13</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1BaseCore_html_aa3d44a40cbc3ea238650ae835ae79c36"><div class="ttname"><a href="classyaclib_1_1detail_1_1BaseCore.html#aa3d44a40cbc3ea238650ae835ae79c36">yaclib::detail::BaseCore::_executor</a></div><div class="ttdeci">IExecutorPtr _executor</div><div class="ttdef"><b>Definition</b> <a href="base__core_8hpp_source.html#l00064">base_core.hpp:64</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1BaseCore_html_ac5c2a57404d62579c83cbcbe3e9efd33"><div class="ttname"><a href="classyaclib_1_1detail_1_1BaseCore.html#ac5c2a57404d62579c83cbcbe3e9efd33">yaclib::detail::BaseCore::SetResult</a></div><div class="ttdeci">Transfer&lt; SymmetricTransfer &gt; SetResult() noexcept</div><div class="ttdef"><b>Definition</b> <a href="base__core_8cpp_source.html#l00049">base_core.cpp:49</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1BaseCore_html_addd843c950afa857410b4d319a16aed4"><div class="ttname"><a href="classyaclib_1_1detail_1_1BaseCore.html#addd843c950afa857410b4d319a16aed4">yaclib::detail::BaseCore::CallInline</a></div><div class="ttdeci">void CallInline(InlineCore &amp;callback) noexcept</div><div class="ttdef"><b>Definition</b> <a href="base__core_8cpp_source.html#l00033">base_core.cpp:33</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1InlineCore_html"><div class="ttname"><a href="classyaclib_1_1detail_1_1InlineCore.html">yaclib::detail::InlineCore</a></div><div class="ttdef"><b>Definition</b> <a href="inline__core_8hpp_source.html#l00013">inline_core.hpp:13</a></div></div>
+<div class="ttc" id="acoro_8hpp_html"><div class="ttname"><a href="coro_8hpp.html">coro.hpp</a></div></div>
+<div class="ttc" id="aexecutor_8hpp_html"><div class="ttname"><a href="executor_8hpp.html">executor.hpp</a></div></div>
+<div class="ttc" id="ainline_8hpp_html"><div class="ttname"><a href="inline_8hpp.html">inline.hpp</a></div></div>
+<div class="ttc" id="ainline__core_8hpp_html"><div class="ttname"><a href="inline__core_8hpp.html">inline_core.hpp</a></div></div>
+<div class="ttc" id="alog_8hpp_html"><div class="ttname"><a href="log_8hpp.html">log.hpp</a></div></div>
+<div class="ttc" id="alog_8hpp_html_af0901bb53ae728866ef8b10dcbbc9028"><div class="ttname"><a href="log_8hpp.html#af0901bb53ae728866ef8b10dcbbc9028">YACLIB_PURE_VIRTUAL</a></div><div class="ttdeci">#define YACLIB_PURE_VIRTUAL()</div><div class="ttdef"><b>Definition</b> <a href="log_8hpp_source.html#l00086">log.hpp:86</a></div></div>
+<div class="ttc" id="anamespaceyaclib_1_1detail_html"><div class="ttname"><a href="namespaceyaclib_1_1detail.html">yaclib::detail</a></div><div class="ttdef"><b>Definition</b> <a href="base__core_8hpp_source.html#l00018">base_core.hpp:18</a></div></div>
+<div class="ttc" id="anamespaceyaclib_1_1detail_html_ac94a6eb23748fb429356cb936a39d8b4"><div class="ttname"><a href="namespaceyaclib_1_1detail.html#ac94a6eb23748fb429356cb936a39d8b4">yaclib::detail::Loop</a></div><div class="ttdeci">YACLIB_INLINE void Loop(InlineCore *prev, InlineCore *curr) noexcept</div><div class="ttdef"><b>Definition</b> <a href="base__core_8hpp_source.html#l00069">base_core.hpp:69</a></div></div>
+<div class="ttc" id="anamespaceyaclib__std_html_ae8aac2eab59490c78d6dc70add185cc6"><div class="ttname"><a href="namespaceyaclib__std.html#ae8aac2eab59490c78d6dc70add185cc6">yaclib_std::atomic_uintptr_t</a></div><div class="ttdeci">atomic&lt; std::uintptr_t &gt; atomic_uintptr_t</div><div class="ttdef"><b>Definition</b> <a href="std_2detail_2atomic_8hpp_source.html#l00085">atomic.hpp:85</a></div></div>
+<div class="ttc" id="anamespaceyaclib_html_aa8af5a9e84597d87efe863329f4324fc"><div class="ttname"><a href="namespaceyaclib.html#aa8af5a9e84597d87efe863329f4324fc">yaclib::MakeInline</a></div><div class="ttdeci">IExecutor &amp; MakeInline() noexcept</div><div class="ttdoc">Get Inline executor singleton object.</div><div class="ttdef"><b>Definition</b> <a href="inline_8cpp_source.html#l00034">inline.cpp:34</a></div></div>
+<div class="ttc" id="anamespaceyaclib_html_ac918e7a0c384bcf611e0b5b4b2cd5504"><div class="ttname"><a href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">yaclib::MakeContract</a></div><div class="ttdeci">Contract&lt; V, E &gt; MakeContract()</div><div class="ttdoc">Creates related future and promise.</div><div class="ttdef"><b>Definition</b> <a href="contract_8hpp_source.html#l00025">contract.hpp:25</a></div></div>
+<div class="ttc" id="aref_8hpp_html"><div class="ttname"><a href="ref_8hpp.html">ref.hpp</a></div></div>
+<div class="ttc" id="astructyaclib_1_1NoRefTag_html"><div class="ttname"><a href="structyaclib_1_1NoRefTag.html">yaclib::NoRefTag</a></div><div class="ttdef"><b>Definition</b> <a href="intrusive__ptr_8hpp_source.html#l00009">intrusive_ptr.hpp:9</a></div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_5202e9473254619c80971b7f5a23629e.html">yaclib</a></li><li class="navelem"><a class="el" href="dir_b9c60d6ac2345286a03f7e9bdef04560.html">algo</a></li><li class="navelem"><a class="el" href="dir_9039413c522f41ada5cc655e104f9ea8.html">detail</a></li><li class="navelem"><a class="el" href="base__core_8hpp.html">base_core.hpp</a></li>
+    <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+  </ul>
+</div>
+</body>
+</html>

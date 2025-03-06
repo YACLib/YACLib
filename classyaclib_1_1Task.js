@@ -1,0 +1,27 @@
+var classyaclib_1_1Task =
+[
+    [ "Task", "classyaclib_1_1Task.html#aec6409c80737efea812f8af27c866e95", null ],
+    [ "Task", "classyaclib_1_1Task.html#ab4ea0c163eb3c9e53119122f2063c25e", null ],
+    [ "Task", "classyaclib_1_1Task.html#a866551cd09b1c5930d879b47ce0035e7", null ],
+    [ "~Task", "classyaclib_1_1Task.html#acc40785d12a337845a4dd649b73f8e6a", null ],
+    [ "Task", "classyaclib_1_1Task.html#af6cb63e15509bab93cfb023e0f158f05", null ],
+    [ "Cancel", "classyaclib_1_1Task.html#a8cda6b908dee58d486c8b95cfb0058ca", null ],
+    [ "Detach", "classyaclib_1_1Task.html#a878b53b8eb7d4eb6bbbba13fc1445945", null ],
+    [ "Detach", "classyaclib_1_1Task.html#abebd74397c88966d9bca8a2bb800e478", null ],
+    [ "Get", "classyaclib_1_1Task.html#ac721b7092d0a2a652d2a70f994792950", null ],
+    [ "GetCore", "classyaclib_1_1Task.html#a20077fa203d33f3e34d7788ddb015ee2", null ],
+    [ "On", "classyaclib_1_1Task.html#a7bc193dccfb271071fae960b526a769d", null ],
+    [ "operator=", "classyaclib_1_1Task.html#a0ab022fcba22b8658df7fa0f345e3466", null ],
+    [ "operator=", "classyaclib_1_1Task.html#af3d9904e5747864d16de6da78fcc52a4", null ],
+    [ "Ready", "classyaclib_1_1Task.html#a2ba5533d883e817a8dd921badb15de0b", null ],
+    [ "Then", "classyaclib_1_1Task.html#a722744b2399d88dbceb240ac74037352", null ],
+    [ "Then", "classyaclib_1_1Task.html#acca609abfc6f92305725386ac020fa70", null ],
+    [ "ThenInline", "classyaclib_1_1Task.html#a25dc11bfab1a1d745c61f162bbf315db", null ],
+    [ "ToFuture", "classyaclib_1_1Task.html#ac6c5e1375ac2f48cbbd4ecc5ab8cc343", null ],
+    [ "ToFuture", "classyaclib_1_1Task.html#aee7e7ed53dd54fe4a47eaeb1b40e80ae", null ],
+    [ "Touch", "classyaclib_1_1Task.html#a21f719429acc9b8bc5cddf347ca4effe", null ],
+    [ "Touch", "classyaclib_1_1Task.html#afab1c712b9c1e9a88dfec0a6988bd16b", null ],
+    [ "Touch", "classyaclib_1_1Task.html#a3de4346ad60be9d93b2fa377c02445cd", null ],
+    [ "Touch", "classyaclib_1_1Task.html#a2e00a58d1f444833b7411e8229117819", null ],
+    [ "Valid", "classyaclib_1_1Task.html#ac0990209c9d49ae6fd5274fac4ca1c54", null ]
+];

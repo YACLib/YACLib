@@ -1,0 +1,43 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,177,52,203"/>
+<area shape="rect" id="Node000001" href="$classyaclib_1_1detail_1_1AtomicWait.html" title=" " alt="" coords="100,5,264,46"/>
+<area shape="poly" id="edge4_Node000000_Node000001" title=" " alt="" coords="36,161,59,109,76,81,98,57,116,44,119,49,101,61,80,85,64,111,41,163"/>
+<area shape="rect" id="Node000002" href="$classyaclib_1_1detail_1_1AtomicWait.html" title=" " alt="" coords="100,71,264,111"/>
+<area shape="poly" id="edge5_Node000000_Node000002" title=" " alt="" coords="49,164,72,142,98,122,121,109,124,114,101,127,75,146,53,168"/>
+<area shape="rect" id="Node000004" href="$classyaclib_1_1detail_1_1AtomicWait.html" title=" " alt="" coords="100,136,264,177"/>
+<area shape="poly" id="edge7_Node000000_Node000004" title=" " alt="" coords="66,179,99,172,100,177,67,184"/>
+<area shape="rect" id="Node000013" href="$classyaclib_1_1detail_1_1ConditionVariable.html" title=" " alt="" coords="106,201,258,242"/>
+<area shape="poly" id="edge16_Node000000_Node000013" title=" " alt="" coords="68,195,106,203,105,208,66,200"/>
+<area shape="rect" id="Node000014" href="$classyaclib_1_1detail_1_1ConditionVariableAny.html" title=" " alt="" coords="106,267,258,307"/>
+<area shape="poly" id="edge17_Node000000_Node000014" title=" " alt="" coords="54,212,76,232,101,251,124,264,121,268,98,256,73,237,50,216"/>
+<area shape="rect" id="Node000015" href="$classyaclib_1_1detail_1_1Mutex.html" title=" " alt="" coords="116,332,248,373"/>
+<area shape="poly" id="edge18_Node000000_Node000015" title=" " alt="" coords="41,216,64,267,81,294,101,317,119,329,116,334,98,321,76,297,59,270,36,218"/>
+<area shape="rect" id="Node000003" href="$classyaclib_1_1detail_1_1AtomicFlag.html" title=" " alt="" coords="317,71,480,111"/>
+<area shape="poly" id="edge6_Node000002_Node000003" title=" " alt="" coords="279,88,317,88,317,94,279,94"/>
+<area shape="rect" id="Node000005" href="$classyaclib_1_1detail_1_1AtomicBase.html" title=" " alt="" coords="315,136,483,177"/>
+<area shape="poly" id="edge8_Node000004_Node000005" title=" " alt="" coords="279,154,314,154,314,159,279,159"/>
+<area shape="rect" id="Node000007" href="$classyaclib_1_1detail_1_1AtomicBase.html" title=" " alt="" coords="315,201,483,242"/>
+<area shape="poly" id="edge10_Node000004_Node000007" title=" " alt="" coords="266,179,329,198,328,203,265,184"/>
+<area shape="rect" id="Node000006" href="$classyaclib_1_1detail_1_1Atomic_3_01Impl_00_01U_01_5_01_4.html" title=" " alt="" coords="556,136,695,177"/>
+<area shape="poly" id="edge9_Node000005_Node000006" title=" " alt="" coords="499,154,556,154,556,159,499,159"/>
+<area shape="rect" id="Node000008" href="$classyaclib_1_1detail_1_1AtomicFloatingBase.html" title=" " alt="" coords="533,201,718,242"/>
+<area shape="poly" id="edge11_Node000007_Node000008" title=" " alt="" coords="499,219,533,219,533,224,499,224"/>
+<area shape="rect" id="Node000011" href="$classyaclib_1_1detail_1_1AtomicFloatingBase_3_01Impl_00_01T_00_01true_01_4.html" title=" " alt="" coords="533,267,718,307"/>
+<area shape="poly" id="edge14_Node000007_Node000011" title=" " alt="" coords="486,244,553,263,551,269,485,249"/>
+<area shape="rect" id="Node000009" href="$classyaclib_1_1detail_1_1AtomicIntegralBase.html" title=" " alt="" coords="766,201,947,242"/>
+<area shape="poly" id="edge12_Node000008_Node000009" title=" " alt="" coords="733,219,765,219,765,224,733,224"/>
+<area shape="rect" id="Node000010" href="$classyaclib_1_1detail_1_1Atomic.html" title=" " alt="" coords="995,201,1133,242"/>
+<area shape="poly" id="edge13_Node000009_Node000010" title=" " alt="" coords="963,219,995,219,995,224,963,224"/>
+<area shape="rect" id="Node000012" href="$classyaclib_1_1detail_1_1AtomicIntegralBase_3_01Impl_00_01T_00_01true_01_4.html" title=" " alt="" coords="766,267,947,307"/>
+<area shape="poly" id="edge15_Node000011_Node000012" title=" " alt="" coords="733,284,765,284,765,290,733,290"/>
+<area shape="rect" id="Node000016" href="$classyaclib_1_1detail_1_1RecursiveMutex.html" title=" " alt="" coords="321,267,476,307"/>
+<area shape="poly" id="edge19_Node000015_Node000016" title=" " alt="" coords="262,325,328,305,329,311,264,330"/>
+<area shape="rect" id="Node000017" href="$classyaclib_1_1detail_1_1SharedMutex.html" title=" " alt="" coords="312,332,485,373"/>
+<area shape="poly" id="edge20_Node000015_Node000017" title=" " alt="" coords="264,350,311,350,311,355,264,355"/>
+<area shape="rect" id="Node000019" href="$classyaclib_1_1detail_1_1TimedMutex.html" title=" " alt="" coords="315,397,483,438"/>
+<area shape="poly" id="edge22_Node000015_Node000019" title=" " alt="" coords="264,374,329,394,328,399,262,379"/>
+<area shape="rect" id="Node000018" href="$classyaclib_1_1detail_1_1SharedTimedMutex.html" title=" " alt="" coords="538,332,713,373"/>
+<area shape="poly" id="edge21_Node000017_Node000018" title=" " alt="" coords="500,350,538,350,538,355,500,355"/>
+<area shape="rect" id="Node000020" href="$classyaclib_1_1detail_1_1RecursiveTimedMutex.html" title=" " alt="" coords="548,397,703,438"/>
+<area shape="poly" id="edge23_Node000019_Node000020" title=" " alt="" coords="498,415,547,415,547,420,498,420"/>
+</map>
