@@ -1,0 +1,9 @@
+<map id="yaclib::detail::AtomicCounter&lt; CounterBase, Deleter &gt;" name="yaclib::detail::AtomicCounter&lt; CounterBase, Deleter &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,80,189,121"/>
+<area shape="rect" id="Node000003" href="$structyaclib_1_1detail_1_1AtomicCounter.html" title=" " alt="" coords="5,184,189,225"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="100,137,100,184,94,184,94,137"/>
+<area shape="rect" id="Node000002" href="$classCounterBase.html" title=" " alt="" coords="49,5,145,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="100,47,100,80,94,80,94,47"/>
+<area shape="rect" id="Node000004" href="$classyaclib_1_1detail_1_1AwaitEvent.html" title=" " alt="" coords="15,274,179,300"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="100,240,100,274,94,274,94,240"/>
+</map>

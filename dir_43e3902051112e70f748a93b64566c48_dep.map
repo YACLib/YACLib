@@ -1,0 +1,30 @@
+<map id="include/yaclib/coro" name="include/yaclib/coro">
+<area shape="rect" id="node1" href="dir_3e0ac571b2b9edbddc4070ffe47eeb4b.html" title="exe" alt="" coords="27,210,69,236"/>
+<area shape="rect" id="node2" href="dir_4063a9e34a1302ac947dfe60cb383789.html" title="async" alt="" coords="92,210,148,236"/>
+<area shape="rect" id="node3" href="dir_8b7266e503a55d0488796d9ff22e7799.html" title="lazy" alt="" coords="241,210,284,236"/>
+<area shape="rect" id="node4" href="dir_9463e03d191b6d61661112ff0fb64dc7.html" title="util" alt="" coords="309,210,347,236"/>
+<area shape="rect" id="node5" href="dir_b9c60d6ac2345286a03f7e9bdef04560.html" title="algo" alt="" coords="172,210,217,236"/>
+<area shape="poly" id="edge1" href="dir_000006_000016.html" alt="" coords="185,90,135,139,72,201,68,198,131,135,181,87"/>
+<area shape="rect" id="edge1-headlabel" href="dir_000006_000016.html" title="7" alt="" coords="75,196,82,211"/>
+<area shape="poly" id="edge2" href="dir_000006_000002.html" alt="" coords="189,90,158,138,132,197,127,195,154,135,184,87"/>
+<area shape="rect" id="edge2-headlabel" href="dir_000006_000002.html" title="5" alt="" coords="135,189,142,204"/>
+<area shape="poly" id="edge3" href="dir_000006_000024.html" alt="" coords="206,87,236,135,258,194,253,196,231,138,201,90"/>
+<area shape="rect" id="edge3-headlabel" href="dir_000006_000024.html" title="4" alt="" coords="259,183,266,198"/>
+<area shape="poly" id="edge4" href="dir_000006_000030.html" alt="" coords="207,87,309,197,305,200,203,90"/>
+<area shape="rect" id="edge4-headlabel" href="dir_000006_000030.html" title="13" alt="" coords="304,183,318,198"/>
+<area shape="rect" id="node7" href="dir_de2d2685ff6e0de622e21344174ace46.html" title="detail" alt="" coords="169,137,221,162"/>
+<area shape="poly" id="edge5" href="dir_000006_000009.html" alt="" coords="197,88,197,121,192,121,192,88"/>
+<area shape="rect" id="edge5-headlabel" href="dir_000006_000009.html" title="11" alt="" coords="196,111,210,126"/>
+<area shape="poly" id="edge6" href="dir_000009_000016.html" alt="" coords="180,165,164,175,84,211,82,207,161,171,177,161"/>
+<area shape="rect" id="edge6-headlabel" href="dir_000009_000016.html" title="2" alt="" coords="86,208,93,223"/>
+<area shape="poly" id="edge7" href="dir_000009_000002.html" alt="" coords="184,165,145,202,141,198,180,161"/>
+<area shape="rect" id="edge7-headlabel" href="dir_000009_000002.html" title="2" alt="" coords="148,196,155,211"/>
+<area shape="poly" id="edge8" href="dir_000009_000024.html" alt="" coords="208,161,243,197,239,201,204,164"/>
+<area shape="rect" id="edge8-headlabel" href="dir_000009_000024.html" title="2" alt="" coords="241,183,248,198"/>
+<area shape="poly" id="edge9" href="dir_000009_000030.html" alt="" coords="212,160,228,171,296,205,294,210,225,175,209,165"/>
+<area shape="rect" id="edge9-headlabel" href="dir_000009_000030.html" title="8" alt="" coords="292,191,299,206"/>
+<area shape="poly" id="edge10" href="dir_000009_000000.html" alt="" coords="197,163,197,195,192,195,192,163"/>
+<area shape="rect" id="edge10-headlabel" href="dir_000009_000000.html" title="1" alt="" coords="200,184,207,199"/>
+<area shape="rect" id="clust2" href="dir_43e3902051112e70f748a93b64566c48.html" alt="" coords="157,52,232,173"/>
+<area shape="rect" id="clust1" href="dir_5202e9473254619c80971b7f5a23629e.html" title="yaclib" alt="" coords="16,16,357,247"/>
+</map>

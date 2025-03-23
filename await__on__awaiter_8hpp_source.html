@@ -1,0 +1,323 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.9.8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<!-- BEGIN opengraph metadata -->
+<meta property="og:title" content="Doxygen Awesome" />
+<meta property="og:image" content="https://repository-images.githubusercontent.com/348492097/4f16df80-88fb-11eb-9d31-4015ff22c452" />
+<meta property="og:description" content="Custom CSS theme for doxygen html-documentation with lots of customization parameters." />
+<meta property="og:url" content="https://jothepro.github.io/doxygen-awesome-css/" />
+<!-- END opengraph metadata -->
+<!-- BEGIN twitter metadata -->
+<meta name="twitter:image:src" content="https://repository-images.githubusercontent.com/348492097/4f16df80-88fb-11eb-9d31-4015ff22c452" />
+<meta name="twitter:title" content="Doxygen Awesome" />
+<meta name="twitter:description" content="Custom CSS theme for doxygen html-documentation with lots of customization parameters." />
+<!-- END twitter metadata -->
+<title>YACLib: include/yaclib/coro/detail/await_on_awaiter.hpp Source File</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link rel="icon" type="image/svg+xml" href="logo.drawio.svg"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+<script type="text/javascript" src="doxygen-awesome-fragment-copy-button.js"></script>
+<script type="text/javascript" src="doxygen-awesome-paragraph-link.js"></script>
+<script type="text/javascript" src="toggle-alternative-theme.js"></script>
+<script type="text/javascript">
+    DoxygenAwesomeFragmentCopyButton.init()
+    DoxygenAwesomeDarkModeToggle.init()
+    DoxygenAwesomeParagraphLink.init()
+</script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="custom.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only-darkmode-toggle.css" rel="stylesheet" type="text/css"/>
+<link href="custom-alternative.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<!-- https://tholman.com/github-corners/ -->
+<a href="https://github.com/YACLib/YACLib" class="github-corner" title="View source on GitHub" target="_blank">
+    <svg viewBox="0 0 250 250" width="40" height="40" style="position: absolute; top: 0; border: 0; right: 0; z-index: 99;" aria-hidden="true">
+    <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
+   <div id="projectname">YACLib
+   </div>
+   <div id="projectbrief">C++ library for concurrent tasks execution</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Search');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function() { init_codefold(0); });
+/* @license-end */
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('await__on__awaiter_8hpp_source.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">await_on_awaiter.hpp</div></div>
+</div><!--header-->
+<div class="contents">
+<a href="await__on__awaiter_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span> </div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &lt;<a class="code" href="async_2future_8hpp.html">yaclib/async/future.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &lt;<a class="code" href="coro_8hpp.html">yaclib/coro/coro.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &lt;<a class="code" href="lazy_2task_8hpp.html">yaclib/lazy/task.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &lt;<a class="code" href="atomic__counter_8hpp.html">yaclib/util/detail/atomic_counter.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#include &lt;<a class="code" href="unique__counter_8hpp.html">yaclib/util/detail/unique_counter.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#include &lt;<a class="code" href="type__traits_8hpp.html">yaclib/util/type_traits.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespaceyaclib_1_1detail.html">yaclib::detail</a> {</div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="keyword">template</span> &lt;<span class="keywordtype">bool</span> Single&gt;</div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno"><a class="line" href="namespaceyaclib_1_1detail.html#aefcb8c0186402b51c91da432ffdcb294">   13</a></span><span class="keyword">using </span><a class="code hl_typedef" href="namespaceyaclib_1_1detail.html#aefcb8c0186402b51c91da432ffdcb294">AwaitOnCounterT</a> =</div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>  std::conditional_t&lt;Single, OneCounter&lt;NopeBase, NopeDeleter&gt;, <a class="code hl_struct" href="structyaclib_1_1detail_1_1AtomicCounter.html">AtomicCounter&lt;NopeBase, NopeDeleter&gt;</a>&gt;;</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span> </div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="keyword">template</span> &lt;<span class="keywordtype">bool</span> Single&gt;</div>
+<div class="foldopen" id="foldopen00017" data-start="{" data-end="};">
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno"><a class="line" href="classyaclib_1_1detail_1_1AwaitOnEvent.html">   17</a></span><span class="keyword">class </span><a class="code hl_class" href="classyaclib_1_1detail_1_1AwaitOnEvent.html">AwaitOnEvent</a> <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">final</a> : <span class="keyword">public</span> <a class="code hl_class" href="classyaclib_1_1detail_1_1InlineCore.html">InlineCore</a>, <span class="keyword">public</span> <a class="code hl_typedef" href="namespaceyaclib_1_1detail.html#aefcb8c0186402b51c91da432ffdcb294">AwaitOnCounterT</a>&lt;Single&gt; {</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span> <span class="keyword">public</span>:</div>
+<div class="foldopen" id="foldopen00019" data-start="{" data-end="}">
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno"><a class="line" href="classyaclib_1_1detail_1_1AwaitOnEvent.html#a0eb2cb4ae5325d8e2c7d730f279333e8">   19</a></span>  <span class="keyword">explicit</span> <a class="code hl_function" href="classyaclib_1_1detail_1_1AwaitOnEvent.html#a0eb2cb4ae5325d8e2c7d730f279333e8">AwaitOnEvent</a>(std::size_t <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">n</a>) <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a> : <a class="code hl_typedef" href="namespaceyaclib_1_1detail.html#aefcb8c0186402b51c91da432ffdcb294">AwaitOnCounterT&lt;Single&gt;</a>{<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">n</a>} {</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>  }</div>
+</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span> </div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno"><a class="line" href="classyaclib_1_1detail_1_1AwaitOnEvent.html#a85e72a49b610400c5b1b1a28c72e4cc5">   22</a></span>  <a class="code hl_class" href="classyaclib_1_1detail_1_1BaseCore.html">BaseCore</a>* <a class="code hl_variable" href="classyaclib_1_1detail_1_1AwaitOnEvent.html#a85e72a49b610400c5b1b1a28c72e4cc5">job</a>{<span class="keyword">nullptr</span>};</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span> </div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span> <span class="keyword">private</span>:</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>  <span class="keyword">template</span> &lt;<span class="keywordtype">bool</span> SymmetricTransfer&gt;</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>  [[<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">nodiscard</a>]] <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">YACLIB_INLINE</a> <span class="keyword">auto</span> Impl(<a class="code hl_class" href="classyaclib_1_1detail_1_1InlineCore.html">InlineCore</a>&amp; <span class="comment">/*caller*/</span>) <span class="keyword">noexcept</span> {</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>    <span class="keywordflow">if</span> <span class="keyword">constexpr</span> (<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Single</a>) {</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>      <a class="code hl_variable" href="classyaclib_1_1detail_1_1AwaitOnEvent.html#a85e72a49b610400c5b1b1a28c72e4cc5">job</a>-&gt;<a class="code hl_variable" href="classyaclib_1_1detail_1_1BaseCore.html#aa3d44a40cbc3ea238650ae835ae79c36">_executor</a>-&gt;<a class="code hl_function" href="classyaclib_1_1IExecutor.html#af4a14e61f988eb3fdf60b7a7def0fd74">Submit</a>(*<a class="code hl_variable" href="classyaclib_1_1detail_1_1AwaitOnEvent.html#a85e72a49b610400c5b1b1a28c72e4cc5">job</a>);</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>    } <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>      <span class="keywordflow">if</span> (this-&gt;SubEqual(1)) {</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>        <a class="code hl_define" href="log_8hpp.html#ab933fe23356887a2f98cc201fb1a241d">YACLIB_ASSERT</a>(<a class="code hl_variable" href="classyaclib_1_1detail_1_1AwaitOnEvent.html#a85e72a49b610400c5b1b1a28c72e4cc5">job</a> != <span class="keyword">nullptr</span>);</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>        <a class="code hl_variable" href="classyaclib_1_1detail_1_1AwaitOnEvent.html#a85e72a49b610400c5b1b1a28c72e4cc5">job</a>-&gt;<a class="code hl_variable" href="classyaclib_1_1detail_1_1BaseCore.html#aa3d44a40cbc3ea238650ae835ae79c36">_executor</a>-&gt;<a class="code hl_function" href="classyaclib_1_1IExecutor.html#af4a14e61f988eb3fdf60b7a7def0fd74">Submit</a>(*<a class="code hl_variable" href="classyaclib_1_1detail_1_1AwaitOnEvent.html#a85e72a49b610400c5b1b1a28c72e4cc5">job</a>);</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>      }</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>    }</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Noop&lt;SymmetricTransfer&gt;</a>();</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>  }</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>  [[<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">nodiscard</a>]] InlineCore* Here(InlineCore&amp; caller) <span class="keyword">noexcept</span> <span class="keyword">final</span> {</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Impl&lt;false&gt;</a>(caller);</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>  }</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span><span class="preprocessor">#if YACLIB_SYMMETRIC_TRANSFER != 0</span></div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>  [[<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">nodiscard</a>]] yaclib_std::coroutine_handle&lt;&gt; <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Next</a>(InlineCore&amp; caller) <span class="keyword">noexcept</span> <span class="keyword">final</span> {</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Impl&lt;true&gt;</a>(caller);</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>  }</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>};</div>
+</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span> </div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span><span class="keyword">template</span> &lt;<span class="keywordtype">bool</span> Single&gt;</div>
+<div class="foldopen" id="foldopen00048" data-start="{" data-end="};">
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1AwaitOnAwaiter.html">   48</a></span><span class="keyword">struct </span>[[<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">nodiscard</a>]] <a class="code hl_struct" href="structyaclib_1_1detail_1_1AwaitOnAwaiter.html">AwaitOnAwaiter</a> <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">final</a> {</div>
+<div class="foldopen" id="foldopen00049" data-start="{" data-end="}">
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1AwaitOnAwaiter.html#aac1af3a525cf9f18299621eb1d2af5d0">   49</a></span>  <span class="keyword">explicit</span> <a class="code hl_function" href="structyaclib_1_1detail_1_1AwaitOnAwaiter.html#aac1af3a525cf9f18299621eb1d2af5d0">AwaitOnAwaiter</a>(<a class="code hl_class" href="classyaclib_1_1IExecutor.html">IExecutor</a>&amp; e, <a class="code hl_class" href="classyaclib_1_1detail_1_1BaseCore.html">BaseCore</a>&amp; caller) noexcept : _executor{e}, _event{1} {</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>    _event.job = &amp;caller;</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>  }</div>
+</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span> </div>
+<div class="foldopen" id="foldopen00053" data-start="{" data-end="}">
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1AwaitOnAwaiter.html#ac2b790e96391330cb7c43a8a94253f44">   53</a></span>  <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="structyaclib_1_1detail_1_1AwaitOnAwaiter.html#ac2b790e96391330cb7c43a8a94253f44">await_ready</a>() const noexcept {</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>  }</div>
+</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span> </div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>  <span class="keyword">template</span> &lt;<span class="keyword">typename</span> Promise&gt;</div>
+<div class="foldopen" id="foldopen00058" data-start="{" data-end="}">
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1AwaitOnAwaiter.html#a737beff9c68788a70c37f726e5c456e5">   58</a></span>  YACLIB_INLINE <span class="keywordtype">void</span> <a class="code hl_function" href="structyaclib_1_1detail_1_1AwaitOnAwaiter.html#a737beff9c68788a70c37f726e5c456e5">await_suspend</a>(yaclib_std::coroutine_handle&lt;Promise&gt; handle) <span class="keyword">noexcept</span> {</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>    <span class="keyword">auto</span>&amp; core = handle.promise();</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>    core._executor = &amp;_executor;</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>    <span class="keyword">auto</span>* caller = _event.job;</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    _event.job = &amp;core;</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span> </div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>    <span class="keywordflow">if</span> (!caller-&gt;SetCallback(_event)) {</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>      _executor.Submit(core);</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>    }</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>  }</div>
+</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span> </div>
+<div class="foldopen" id="foldopen00069" data-start="{" data-end="}">
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1AwaitOnAwaiter.html#a7312a9c25321efcb58b8d05fb2f05aa9">   69</a></span>  <span class="keyword">constexpr</span> <span class="keywordtype">void</span> <a class="code hl_function" href="structyaclib_1_1detail_1_1AwaitOnAwaiter.html#a7312a9c25321efcb58b8d05fb2f05aa9">await_resume</a>() const noexcept {</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>  }</div>
+</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span> </div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span> <span class="keyword">private</span>:</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>  <a class="code hl_class" href="classyaclib_1_1IExecutor.html">IExecutor</a>&amp; _executor;</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>  <a class="code hl_class" href="classyaclib_1_1detail_1_1AwaitOnEvent.html">AwaitOnEvent&lt;true&gt;</a> _event;</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>};</div>
+</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span> </div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span><span class="keyword">template</span> &lt;&gt;</div>
+<div class="foldopen" id="foldopen00078" data-start="{" data-end="};">
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno"><a class="line" href="classyaclib_1_1detail_1_1AwaitOnAwaiter_3_01false_01_4.html">   78</a></span><span class="keyword">class </span>[[<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">nodiscard</a>]] <a class="code hl_struct" href="structyaclib_1_1detail_1_1AwaitOnAwaiter.html">AwaitOnAwaiter</a>&lt;<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">false</a>&gt; <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">final</a> {</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span> <span class="keyword">public</span>:</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>  <span class="keyword">template</span> &lt;<span class="keyword">typename</span>... Cores&gt;</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>  <span class="keyword">explicit</span> <a class="code hl_struct" href="structyaclib_1_1detail_1_1AwaitOnAwaiter.html">AwaitOnAwaiter</a>(<a class="code hl_class" href="classyaclib_1_1IExecutor.html">IExecutor</a>&amp; e, Cores&amp;... cores) <span class="keyword">noexcept</span>;</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span> </div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>  <span class="keyword">template</span> &lt;<span class="keyword">typename</span> It&gt;</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>  <span class="keyword">explicit</span> <a class="code hl_struct" href="structyaclib_1_1detail_1_1AwaitOnAwaiter.html">AwaitOnAwaiter</a>(<a class="code hl_class" href="classyaclib_1_1IExecutor.html">IExecutor</a>&amp; e, It it, std::size_t count) <span class="keyword">noexcept</span>;</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span> </div>
+<div class="foldopen" id="foldopen00086" data-start="{" data-end="}">
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno"><a class="line" href="classyaclib_1_1detail_1_1AwaitOnAwaiter_3_01false_01_4.html#ac88099cae6f9dbe335b8c4288a905412">   86</a></span>  <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="classyaclib_1_1detail_1_1AwaitOnAwaiter_3_01false_01_4.html#ac88099cae6f9dbe335b8c4288a905412">await_ready</a>() const noexcept {</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>  }</div>
+</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span> </div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>  <span class="keyword">template</span> &lt;<span class="keyword">typename</span> Promise&gt;</div>
+<div class="foldopen" id="foldopen00091" data-start="{" data-end="}">
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno"><a class="line" href="classyaclib_1_1detail_1_1AwaitOnAwaiter_3_01false_01_4.html#ab7dad272214e981f16e2a5e4953e0956">   91</a></span>  YACLIB_INLINE <span class="keywordtype">void</span> <a class="code hl_function" href="classyaclib_1_1detail_1_1AwaitOnAwaiter_3_01false_01_4.html#ab7dad272214e981f16e2a5e4953e0956">await_suspend</a>(yaclib_std::coroutine_handle&lt;Promise&gt; handle) <span class="keyword">noexcept</span> {</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>    <span class="keyword">auto</span>&amp; core = handle.promise();</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>    core._executor = &amp;_executor;</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>    _event.job = &amp;core;</div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span> </div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>    <span class="keywordflow">if</span> (_event.SubEqual(1)) {</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>      _executor.Submit(core);</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>    }</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>  }</div>
+</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span> </div>
+<div class="foldopen" id="foldopen00101" data-start="{" data-end="}">
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno"><a class="line" href="classyaclib_1_1detail_1_1AwaitOnAwaiter_3_01false_01_4.html#aba8b1de4f0f5cfe578241df47ea9905b">  101</a></span>  <span class="keyword">constexpr</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classyaclib_1_1detail_1_1AwaitOnAwaiter_3_01false_01_4.html#aba8b1de4f0f5cfe578241df47ea9905b">await_resume</a>() const noexcept {</div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>  }</div>
+</div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span> </div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span> <span class="keyword">private</span>:</div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>  <a class="code hl_class" href="classyaclib_1_1IExecutor.html">IExecutor</a>&amp; _executor;</div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>  <a class="code hl_class" href="classyaclib_1_1detail_1_1AwaitOnEvent.html">AwaitOnEvent&lt;false&gt;</a> _event;</div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>};</div>
+</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span> </div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span>... <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Cores</a>&gt;</div>
+<div class="foldopen" id="foldopen00110" data-start="{" data-end="}">
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno"><a class="line" href="classyaclib_1_1detail_1_1AwaitOnAwaiter_3_01false_01_4.html#ab76d5b0f8e9689bcba9d81e62640687b">  110</a></span><a class="code hl_function" href="structyaclib_1_1detail_1_1AwaitOnAwaiter.html#aac1af3a525cf9f18299621eb1d2af5d0">AwaitOnAwaiter&lt;false&gt;::AwaitOnAwaiter</a>(<a class="code hl_class" href="classyaclib_1_1IExecutor.html">IExecutor</a>&amp; <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">e</a>, <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Cores</a>&amp;... <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">cores</a>) <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>  : _executor{<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">e</a>}, _event{<span class="keyword">sizeof</span>...(cores) + 1} {</div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>  <span class="keyword">static_assert</span>(<span class="keyword">sizeof</span>...(cores) &gt;= 2, <span class="stringliteral">&quot;Number of futures must be at least two&quot;</span>);</div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>  <span class="keyword">static_assert</span>((... &amp;&amp; std::is_same_v&lt;BaseCore, Cores&gt;), <span class="stringliteral">&quot;Futures must be Future in Wait function&quot;</span>);</div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>  <span class="keyword">const</span> <span class="keyword">auto</span> <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">wait_count</a> = (... + <span class="keyword">static_cast&lt;</span>std::size_t<span class="keyword">&gt;</span>(<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">cores</a>.SetCallback(_event)));</div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>  _event.count.fetch_sub(<span class="keyword">sizeof</span>...(<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">cores</a>) - <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">wait_count</a>, std::memory_order_relaxed);</div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>}</div>
+</div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span> </div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> It&gt;</div>
+<div class="foldopen" id="foldopen00119" data-start="{" data-end="}">
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno"><a class="line" href="classyaclib_1_1detail_1_1AwaitOnAwaiter_3_01false_01_4.html#abf347d936a9f5c94fd70e3d829cfcd42">  119</a></span><a class="code hl_function" href="structyaclib_1_1detail_1_1AwaitOnAwaiter.html#aac1af3a525cf9f18299621eb1d2af5d0">AwaitOnAwaiter&lt;false&gt;::AwaitOnAwaiter</a>(<a class="code hl_class" href="classyaclib_1_1IExecutor.html">IExecutor</a>&amp; <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">e</a>, <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">It</a> <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">it</a>, std::size_t count) <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>  : _executor{<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">e</a>}, _event{count + 1} {</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>  std::size_t <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">wait_count</a> = 0;</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>  <span class="keywordflow">for</span> (std::size_t <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">i</a> = 0; <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">i</a> != count; ++<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">i</a>) {</div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>    <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">wait_count</a> += <span class="keyword">static_cast&lt;</span>std::size_t<span class="keyword">&gt;</span>(<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">it</a>-&gt;GetCore()-&gt;SetCallback(_event));</div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>    ++<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">it</a>;</div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>  }</div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>  _event.count.fetch_sub(count - <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">wait_count</a>, std::memory_order_relaxed);</div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>}</div>
+</div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span> </div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>}  <span class="comment">// namespace yaclib::detail</span></div>
+<div class="ttc" id="aasync_2future_8hpp_html"><div class="ttname"><a href="async_2future_8hpp.html">future.hpp</a></div></div>
+<div class="ttc" id="aatomic__counter_8hpp_html"><div class="ttname"><a href="atomic__counter_8hpp.html">atomic_counter.hpp</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1IExecutor_html"><div class="ttname"><a href="classyaclib_1_1IExecutor.html">yaclib::IExecutor</a></div><div class="ttdef"><b>Definition</b> <a href="executor_8hpp_source.html#l00008">executor.hpp:8</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1IExecutor_html_af4a14e61f988eb3fdf60b7a7def0fd74"><div class="ttname"><a href="classyaclib_1_1IExecutor.html#af4a14e61f988eb3fdf60b7a7def0fd74">yaclib::IExecutor::Submit</a></div><div class="ttdeci">virtual void Submit(Job &amp;job) noexcept=0</div><div class="ttdoc">Submit given job.</div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1AwaitOnAwaiter_3_01false_01_4_html_ab7dad272214e981f16e2a5e4953e0956"><div class="ttname"><a href="classyaclib_1_1detail_1_1AwaitOnAwaiter_3_01false_01_4.html#ab7dad272214e981f16e2a5e4953e0956">yaclib::detail::AwaitOnAwaiter&lt; false &gt;::await_suspend</a></div><div class="ttdeci">YACLIB_INLINE void await_suspend(yaclib_std::coroutine_handle&lt; Promise &gt; handle) noexcept</div><div class="ttdef"><b>Definition</b> <a href="await__on__awaiter_8hpp_source.html#l00091">await_on_awaiter.hpp:91</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1AwaitOnAwaiter_3_01false_01_4_html_aba8b1de4f0f5cfe578241df47ea9905b"><div class="ttname"><a href="classyaclib_1_1detail_1_1AwaitOnAwaiter_3_01false_01_4.html#aba8b1de4f0f5cfe578241df47ea9905b">yaclib::detail::AwaitOnAwaiter&lt; false &gt;::await_resume</a></div><div class="ttdeci">constexpr void await_resume() const noexcept</div><div class="ttdef"><b>Definition</b> <a href="await__on__awaiter_8hpp_source.html#l00101">await_on_awaiter.hpp:101</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1AwaitOnAwaiter_3_01false_01_4_html_ac88099cae6f9dbe335b8c4288a905412"><div class="ttname"><a href="classyaclib_1_1detail_1_1AwaitOnAwaiter_3_01false_01_4.html#ac88099cae6f9dbe335b8c4288a905412">yaclib::detail::AwaitOnAwaiter&lt; false &gt;::await_ready</a></div><div class="ttdeci">constexpr bool await_ready() const noexcept</div><div class="ttdef"><b>Definition</b> <a href="await__on__awaiter_8hpp_source.html#l00086">await_on_awaiter.hpp:86</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1AwaitOnEvent_html"><div class="ttname"><a href="classyaclib_1_1detail_1_1AwaitOnEvent.html">yaclib::detail::AwaitOnEvent</a></div><div class="ttdef"><b>Definition</b> <a href="await__on__awaiter_8hpp_source.html#l00017">await_on_awaiter.hpp:17</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1AwaitOnEvent_html_a0eb2cb4ae5325d8e2c7d730f279333e8"><div class="ttname"><a href="classyaclib_1_1detail_1_1AwaitOnEvent.html#a0eb2cb4ae5325d8e2c7d730f279333e8">yaclib::detail::AwaitOnEvent::AwaitOnEvent</a></div><div class="ttdeci">AwaitOnEvent(std::size_t n) noexcept</div><div class="ttdef"><b>Definition</b> <a href="await__on__awaiter_8hpp_source.html#l00019">await_on_awaiter.hpp:19</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1AwaitOnEvent_html_a85e72a49b610400c5b1b1a28c72e4cc5"><div class="ttname"><a href="classyaclib_1_1detail_1_1AwaitOnEvent.html#a85e72a49b610400c5b1b1a28c72e4cc5">yaclib::detail::AwaitOnEvent::job</a></div><div class="ttdeci">BaseCore * job</div><div class="ttdef"><b>Definition</b> <a href="await__on__awaiter_8hpp_source.html#l00022">await_on_awaiter.hpp:22</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1BaseCore_html"><div class="ttname"><a href="classyaclib_1_1detail_1_1BaseCore.html">yaclib::detail::BaseCore</a></div><div class="ttdef"><b>Definition</b> <a href="base__core_8hpp_source.html#l00020">base_core.hpp:20</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1BaseCore_html_aa3d44a40cbc3ea238650ae835ae79c36"><div class="ttname"><a href="classyaclib_1_1detail_1_1BaseCore.html#aa3d44a40cbc3ea238650ae835ae79c36">yaclib::detail::BaseCore::_executor</a></div><div class="ttdeci">IExecutorPtr _executor</div><div class="ttdef"><b>Definition</b> <a href="base__core_8hpp_source.html#l00064">base_core.hpp:64</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1InlineCore_html"><div class="ttname"><a href="classyaclib_1_1detail_1_1InlineCore.html">yaclib::detail::InlineCore</a></div><div class="ttdef"><b>Definition</b> <a href="inline__core_8hpp_source.html#l00013">inline_core.hpp:13</a></div></div>
+<div class="ttc" id="acoro_8hpp_html"><div class="ttname"><a href="coro_8hpp.html">coro.hpp</a></div></div>
+<div class="ttc" id="alazy_2task_8hpp_html"><div class="ttname"><a href="lazy_2task_8hpp.html">task.hpp</a></div></div>
+<div class="ttc" id="alog_8hpp_html_ab933fe23356887a2f98cc201fb1a241d"><div class="ttname"><a href="log_8hpp.html#ab933fe23356887a2f98cc201fb1a241d">YACLIB_ASSERT</a></div><div class="ttdeci">#define YACLIB_ASSERT(cond)</div><div class="ttdef"><b>Definition</b> <a href="log_8hpp_source.html#l00085">log.hpp:85</a></div></div>
+<div class="ttc" id="anamespaceyaclib_1_1detail_html"><div class="ttname"><a href="namespaceyaclib_1_1detail.html">yaclib::detail</a></div><div class="ttdef"><b>Definition</b> <a href="base__core_8hpp_source.html#l00018">base_core.hpp:18</a></div></div>
+<div class="ttc" id="anamespaceyaclib_1_1detail_html_aefcb8c0186402b51c91da432ffdcb294"><div class="ttname"><a href="namespaceyaclib_1_1detail.html#aefcb8c0186402b51c91da432ffdcb294">yaclib::detail::AwaitOnCounterT</a></div><div class="ttdeci">std::conditional_t&lt; Single, OneCounter&lt; NopeBase, NopeDeleter &gt;, AtomicCounter&lt; NopeBase, NopeDeleter &gt; &gt; AwaitOnCounterT</div><div class="ttdef"><b>Definition</b> <a href="await__on__awaiter_8hpp_source.html#l00013">await_on_awaiter.hpp:14</a></div></div>
+<div class="ttc" id="anamespaceyaclib_html_ac918e7a0c384bcf611e0b5b4b2cd5504"><div class="ttname"><a href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">yaclib::MakeContract</a></div><div class="ttdeci">Contract&lt; V, E &gt; MakeContract()</div><div class="ttdoc">Creates related future and promise.</div><div class="ttdef"><b>Definition</b> <a href="contract_8hpp_source.html#l00025">contract.hpp:25</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1AtomicCounter_html"><div class="ttname"><a href="structyaclib_1_1detail_1_1AtomicCounter.html">yaclib::detail::AtomicCounter</a></div><div class="ttdef"><b>Definition</b> <a href="atomic__counter_8hpp_source.html#l00013">atomic_counter.hpp:13</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1AwaitOnAwaiter_html"><div class="ttname"><a href="structyaclib_1_1detail_1_1AwaitOnAwaiter.html">yaclib::detail::AwaitOnAwaiter</a></div><div class="ttdef"><b>Definition</b> <a href="await__on__awaiter_8hpp_source.html#l00048">await_on_awaiter.hpp:48</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1AwaitOnAwaiter_html_a7312a9c25321efcb58b8d05fb2f05aa9"><div class="ttname"><a href="structyaclib_1_1detail_1_1AwaitOnAwaiter.html#a7312a9c25321efcb58b8d05fb2f05aa9">yaclib::detail::AwaitOnAwaiter::await_resume</a></div><div class="ttdeci">constexpr void await_resume() const noexcept</div><div class="ttdef"><b>Definition</b> <a href="await__on__awaiter_8hpp_source.html#l00069">await_on_awaiter.hpp:69</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1AwaitOnAwaiter_html_a737beff9c68788a70c37f726e5c456e5"><div class="ttname"><a href="structyaclib_1_1detail_1_1AwaitOnAwaiter.html#a737beff9c68788a70c37f726e5c456e5">yaclib::detail::AwaitOnAwaiter::await_suspend</a></div><div class="ttdeci">YACLIB_INLINE void await_suspend(yaclib_std::coroutine_handle&lt; Promise &gt; handle) noexcept</div><div class="ttdef"><b>Definition</b> <a href="await__on__awaiter_8hpp_source.html#l00058">await_on_awaiter.hpp:58</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1AwaitOnAwaiter_html_aac1af3a525cf9f18299621eb1d2af5d0"><div class="ttname"><a href="structyaclib_1_1detail_1_1AwaitOnAwaiter.html#aac1af3a525cf9f18299621eb1d2af5d0">yaclib::detail::AwaitOnAwaiter::AwaitOnAwaiter</a></div><div class="ttdeci">AwaitOnAwaiter(IExecutor &amp;e, BaseCore &amp;caller) noexcept</div><div class="ttdef"><b>Definition</b> <a href="await__on__awaiter_8hpp_source.html#l00049">await_on_awaiter.hpp:49</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1AwaitOnAwaiter_html_ac2b790e96391330cb7c43a8a94253f44"><div class="ttname"><a href="structyaclib_1_1detail_1_1AwaitOnAwaiter.html#ac2b790e96391330cb7c43a8a94253f44">yaclib::detail::AwaitOnAwaiter::await_ready</a></div><div class="ttdeci">constexpr bool await_ready() const noexcept</div><div class="ttdef"><b>Definition</b> <a href="await__on__awaiter_8hpp_source.html#l00053">await_on_awaiter.hpp:53</a></div></div>
+<div class="ttc" id="atype__traits_8hpp_html"><div class="ttname"><a href="type__traits_8hpp.html">type_traits.hpp</a></div></div>
+<div class="ttc" id="aunique__counter_8hpp_html"><div class="ttname"><a href="unique__counter_8hpp.html">unique_counter.hpp</a></div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_5202e9473254619c80971b7f5a23629e.html">yaclib</a></li><li class="navelem"><a class="el" href="dir_43e3902051112e70f748a93b64566c48.html">coro</a></li><li class="navelem"><a class="el" href="dir_de2d2685ff6e0de622e21344174ace46.html">detail</a></li><li class="navelem"><a class="el" href="await__on__awaiter_8hpp.html">await_on_awaiter.hpp</a></li>
+    <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+  </ul>
+</div>
+</body>
+</html>

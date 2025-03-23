@@ -1,0 +1,11 @@
+<map id="yaclib::detail::fiber::SharedTimedMutex" name="yaclib::detail::fiber::SharedTimedMutex">
+<area shape="rect" id="Node000001" title=" " alt="" coords="134,214,273,255"/>
+<area shape="rect" id="Node000002" href="$classyaclib_1_1detail_1_1fiber_1_1SharedMutex.html" title=" " alt="" coords="143,124,264,165"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="206,180,206,214,201,214,201,180"/>
+<area shape="rect" id="Node000003" href="$classyaclib_1_1detail_1_1fiber_1_1FiberQueue.html" title=" " alt="" coords="5,5,127,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="74,60,82,80,94,98,117,115,143,127,141,132,114,120,90,102,77,83,69,62"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="170,13,237,39"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="206,54,206,124,201,124,201,54"/>
+<area shape="rect" id="Node000005" href="$classbool.html" title=" " alt="" coords="349,13,394,39"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="369,55,360,79,344,102,306,126,265,139,264,133,304,121,340,98,355,77,364,53"/>
+</map>

@@ -1,0 +1,14 @@
+<map id="yaclib::detail::fiber::AtomicFlag" name="yaclib::detail::fiber::AtomicFlag">
+<area shape="rect" id="Node000001" title=" " alt="" coords="154,288,276,328"/>
+<area shape="rect" id="Node000002" href="$classyaclib_1_1detail_1_1fiber_1_1AtomicWait.html" title=" " alt="" coords="145,198,285,238"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="218,254,218,287,212,287,212,254"/>
+<area shape="rect" id="Node000003" href="$classstatic_01constexpr_01bool.html" title=" " alt="" coords="5,102,145,127"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="72,143,73,158,79,172,92,186,108,196,145,209,143,214,106,201,88,190,74,175,67,160,67,143"/>
+<area shape="rect" id="Node000004" href="$classbool.html" title=" " alt="" coords="214,5,259,31"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="235,47,229,94,219,197,214,197,223,94,230,46"/>
+<area shape="rect" id="Node000005" href="$classyaclib_1_1detail_1_1fiber_1_1AtomicWait.html" title=" " alt="" coords="280,94,404,135"/>
+<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="244,45,257,68,288,91,285,96,253,72,240,48"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="307,147,241,199,238,195,304,142"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="390,5,429,31"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="399,46,382,72,363,95,359,92,378,68,394,43"/>
+</map>

@@ -1,0 +1,13 @@
+<map id="include/yaclib/fault/detail/mutex.hpp" name="include/yaclib/fault/detail/mutex.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="227,5,355,46"/>
+<area shape="rect" id="Node000002" href="$fault_2detail_2recursive__mutex_8hpp.html" title=" " alt="" coords="5,94,185,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="234,55,141,96,139,91,232,50"/>
+<area shape="rect" id="Node000003" href="$fault_2detail_2shared__mutex_8hpp.html" title=" " alt="" coords="208,94,374,135"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="294,62,294,94,288,94,288,62"/>
+<area shape="rect" id="Node000005" href="$fault_2detail_2timed__mutex_8hpp.html" title=" " alt="" coords="397,94,556,135"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="348,50,436,91,433,96,346,55"/>
+<area shape="rect" id="Node000004" href="$fault_2detail_2shared__timed__mutex_8hpp.html" title=" " alt="" coords="222,183,360,238"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="294,150,294,182,288,182,288,150"/>
+<area shape="rect" id="Node000006" href="$fault_2detail_2recursive__timed__mutex_8hpp.html" title=" " alt="" coords="400,183,553,238"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="479,150,479,182,474,182,474,150"/>
+</map>

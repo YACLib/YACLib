@@ -1,0 +1,19 @@
+<map id="yaclib::detail::fiber::AtomicBase&lt; T &gt;" name="yaclib::detail::fiber::AtomicBase&lt; T &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="179,93,307,134"/>
+<area shape="rect" id="Node000003" href="$classyaclib_1_1detail_1_1fiber_1_1AtomicFloatingBase.html" title=" " alt="" coords="398,5,543,61"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="316,85,397,56,399,61,318,90"/>
+<area shape="rect" id="Node000006" href="$classyaclib_1_1detail_1_1fiber_1_1AtomicFloatingBase_3_01T_00_01true_01_4.html" title=" " alt="" coords="398,85,543,141"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="323,111,398,111,398,116,323,116"/>
+<area shape="rect" id="Node000008" href="$classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html" title=" " alt="" coords="401,165,540,206"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="323,136,405,162,403,167,321,141"/>
+<area shape="rect" id="Node000002" href="$classyaclib_1_1detail_1_1fiber_1_1AtomicWait.html" title=" " alt="" coords="5,93,130,134"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="145,111,179,111,179,116,145,116"/>
+<area shape="rect" id="Node000004" href="$classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase.html" title=" " alt="" coords="592,5,733,61"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="558,31,592,31,592,36,558,36"/>
+<area shape="rect" id="Node000005" href="$classyaclib_1_1detail_1_1fiber_1_1Atomic.html" title=" " alt="" coords="783,13,904,54"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="749,31,782,31,782,36,749,36"/>
+<area shape="rect" id="Node000007" href="$classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase_3_01T_00_01true_01_4.html" title=" " alt="" coords="592,85,733,141"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="558,111,592,111,592,116,558,116"/>
+<area shape="rect" id="Node000009" href="$classyaclib_1_1detail_1_1fiber_1_1Atomic_3_01U_01_5_01_4.html" title=" " alt="" coords="602,165,723,206"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="555,183,602,183,602,188,555,188"/>
+</map>
