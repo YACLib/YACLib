@@ -101,6 +101,8 @@ jobs:
           - os: 22.04-arm
             compiler: clang-10
           - os: 22.04-arm
+            compiler: clang-13  # some bug with ubuntu packages
+          - os: 22.04-arm
             compiler: clang-14
           - os: 22.04-arm
             compiler: clang-15
