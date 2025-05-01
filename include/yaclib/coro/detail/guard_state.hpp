@@ -12,7 +12,8 @@ class GuardState {
  public:
   GuardState() noexcept = default;
 
-  explicit GuardState(void* ptr, bool owns) noexcept : _state{reinterpret_cast<std::uintptr_t>(ptr) | owns} {
+  explicit GuardState(void* ptr, bool owns) noexcept
+    : _state{reinterpret_cast<std::uintptr_t>(ptr) | static_cast<std::uintptr_t>(owns)} {
   }
 
   GuardState(GuardState&& other) noexcept : _state{other._state} {
