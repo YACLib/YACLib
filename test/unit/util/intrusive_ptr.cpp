@@ -60,7 +60,7 @@ TEST(ctor, pointer) {
   EXPECT_EQ(Core::sInstances, 0);
   {
     auto* p = new CounterX{1};
-    EXPECT_EQ(p->GetRef(), 1);
+    EXPECT_EQ(p->Get(std::memory_order_relaxed), 1);
 
     EXPECT_EQ(Core::sInstances, 1);
 
@@ -68,23 +68,23 @@ TEST(ctor, pointer) {
     EXPECT_EQ(px.Get(), p);
     EXPECT_EQ(px, p);
     EXPECT_EQ(p, px);
-    EXPECT_EQ(p->GetRef(), 1);
+    EXPECT_EQ(p->Get(std::memory_order_relaxed), 1);
   }
   EXPECT_EQ(Core::sInstances, 0);
   {
     auto* p = new CounterX{1};
-    EXPECT_EQ(p->GetRef(), 1);
+    EXPECT_EQ(p->Get(std::memory_order_relaxed), 1);
 
     p->IncRef();
-    EXPECT_EQ(p->GetRef(), 2);
+    EXPECT_EQ(p->Get(std::memory_order_relaxed), 2);
 
     yaclib::IntrusivePtr<Core> pb{yaclib::NoRefTag{}, p};
     {
       yaclib::IntrusivePtr<CounterX> pc{yaclib::NoRefTag{}, p};
       EXPECT_EQ(pb, pc);
-      EXPECT_EQ(p->GetRef(), 2);
+      EXPECT_EQ(p->Get(std::memory_order_relaxed), 2);
     }
-    EXPECT_EQ(p->GetRef(), 1);
+    EXPECT_EQ(p->Get(std::memory_order_relaxed), 1);
   }
   EXPECT_EQ(Core::sInstances, 0);
 }
@@ -131,14 +131,14 @@ TEST(dtor, simple) {
   {
     auto* x = new CounterX{1};
     yaclib::IntrusivePtr<X> px1{yaclib::NoRefTag{}, x};
-    EXPECT_EQ(x->GetRef(), 1);
+    EXPECT_EQ(x->Get(std::memory_order_relaxed), 1);
     EXPECT_EQ(Core::sInstances, 1);
     {
       yaclib::IntrusivePtr<X> px2{x};
-      EXPECT_EQ(x->GetRef(), 2);
+      EXPECT_EQ(x->Get(std::memory_order_relaxed), 2);
       EXPECT_EQ(Core::sInstances, 1);
     }
-    EXPECT_EQ(x->GetRef(), 1);
+    EXPECT_EQ(x->Get(std::memory_order_relaxed), 1);
     EXPECT_EQ(Core::sInstances, 1);
   }
   EXPECT_EQ(Core::sInstances, 0);
@@ -185,13 +185,13 @@ TEST(assign, copy) {
 
     EXPECT_EQ(p1, p4);
 
-    EXPECT_EQ(static_cast<CounterX&>(*p1).GetRef(), 2);
+    EXPECT_EQ(static_cast<CounterX&>(*p1).Get(std::memory_order_relaxed), 2);
 
     p1 = p2;
 
     EXPECT_EQ(p1, p2);
     EXPECT_EQ(Core::sInstances, 1);
-    EXPECT_EQ(static_cast<CounterX&>(*p4).GetRef(), 1);
+    EXPECT_EQ(static_cast<CounterX&>(*p4).Get(std::memory_order_relaxed), 1);
 
     p4 = p3;
 
@@ -218,10 +218,10 @@ TEST(assign, conversation) {
     yaclib::IntrusivePtr<Y> p4 = MakeIntrusive<Y>();
 
     EXPECT_EQ(Core::sInstances, 1);
-    EXPECT_EQ(static_cast<CounterY&>(*p4).GetRef(), 1);
+    EXPECT_EQ(static_cast<CounterY&>(*p4).Get(std::memory_order_relaxed), 1);
 
     yaclib::IntrusivePtr<X> p5(p4);
-    EXPECT_EQ(static_cast<CounterY&>(*p4).GetRef(), 2);
+    EXPECT_EQ(static_cast<CounterY&>(*p4).Get(std::memory_order_relaxed), 2);
 
     p1 = p4;
 
@@ -229,14 +229,14 @@ TEST(assign, conversation) {
 
     EXPECT_EQ(p1, p4);
 
-    EXPECT_EQ(static_cast<CounterY&>(*p1).GetRef(), 3);
-    EXPECT_EQ(static_cast<CounterY&>(*p4).GetRef(), 3);
+    EXPECT_EQ(static_cast<CounterY&>(*p1).Get(std::memory_order_relaxed), 3);
+    EXPECT_EQ(static_cast<CounterY&>(*p4).Get(std::memory_order_relaxed), 3);
 
     p1 = p2;
 
     EXPECT_EQ(p1, p2);
     EXPECT_EQ(Core::sInstances, 1);
-    EXPECT_EQ(static_cast<CounterY&>(*p4).GetRef(), 2);
+    EXPECT_EQ(static_cast<CounterY&>(*p4).Get(std::memory_order_relaxed), 2);
 
     p4 = p2;
     p5 = p2;
@@ -288,7 +288,7 @@ TEST(assign, pointer) {
 
     EXPECT_EQ(p1, p4);
 
-    EXPECT_EQ(static_cast<CounterX&>(*p1).GetRef(), 2);
+    EXPECT_EQ(static_cast<CounterX&>(*p1).Get(std::memory_order_relaxed), 2);
 
     p1 = p2.Get();
 
@@ -317,10 +317,10 @@ TEST(assign, pointer) {
     yaclib::IntrusivePtr<Y> p4 = MakeIntrusive<Y>();
 
     EXPECT_EQ(Core::sInstances, 1);
-    EXPECT_EQ(static_cast<CounterY&>(*p4).GetRef(), 1);
+    EXPECT_EQ(static_cast<CounterY&>(*p4).Get(std::memory_order_relaxed), 1);
 
     yaclib::IntrusivePtr<X> p5(p4);
-    EXPECT_EQ(static_cast<CounterY&>(*p4).GetRef(), 2);
+    EXPECT_EQ(static_cast<CounterY&>(*p4).Get(std::memory_order_relaxed), 2);
 
     p1 = p4.Get();
 
@@ -328,14 +328,14 @@ TEST(assign, pointer) {
 
     EXPECT_EQ(p1, p4);
 
-    EXPECT_EQ(static_cast<CounterY&>(*p1).GetRef(), 3);
-    EXPECT_EQ(static_cast<CounterY&>(*p4).GetRef(), 3);
+    EXPECT_EQ(static_cast<CounterY&>(*p1).Get(std::memory_order_relaxed), 3);
+    EXPECT_EQ(static_cast<CounterY&>(*p4).Get(std::memory_order_relaxed), 3);
 
     p1 = p2.Get();
 
     EXPECT_EQ(p1, p2);
     EXPECT_EQ(Core::sInstances, 1);
-    EXPECT_EQ(static_cast<CounterY&>(*p4).GetRef(), 2);
+    EXPECT_EQ(static_cast<CounterY&>(*p4).Get(std::memory_order_relaxed), 2);
 
     p4 = p2.Get();
     p5 = p2.Get();

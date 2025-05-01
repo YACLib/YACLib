@@ -125,7 +125,7 @@ class [[nodiscard]] AwaitAwaiter<false> final {
   explicit AwaitAwaiter(It it, std::size_t count) noexcept;
 
   YACLIB_INLINE bool await_ready() const noexcept {
-    return _event.GetRef() == 1;
+    return _event.Get(std::memory_order_acquire) == 1;
   }
 
   template <typename Promise>
