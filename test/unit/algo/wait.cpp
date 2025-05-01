@@ -214,7 +214,7 @@ TEST(Wait, ResetWait) {
   fs.reserve(1000 * yaclib_std::thread::hardware_concurrency());
   for (std::size_t i = 0; i != 1000 * yaclib_std::thread::hardware_concurrency(); ++i) {
     fs.push_back(yaclib::Run(tp, [i] {
-      yaclib_std::this_thread::sleep_for(1ns);
+      test::util::Reschedule();
       return i;
     }));
   }

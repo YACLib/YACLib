@@ -18,26 +18,26 @@ jobs:
       fail-fast: false
       matrix:
         arch: [ Win32, x64 ]
-        os: [ 2019, 2022 ]
+        os: [ 2019, 2025 ]  # 2022 works same way as 2025
         build_type: [ Debug, RelWithDebInfo ]
         isPR:
           - ${{ github.event_name == 'pull_request' }}
         exclude:
           - isPR: true
             arch: Win32
-            os: 2022
+            os: 2025
             build_type: Debug
           - isPR: true
             arch: Win32
-            os: 2022
+            os: 2025
             build_type: RelWithDebInfo
           - isPR: true
             arch: x64
-            os: 2022
+            os: 2025
             build_type: Debug
           - isPR: true
             arch: x64
-            os: 2022
+            os: 2025
             build_type: RelWithDebInfo
 
     steps:
@@ -60,10 +60,10 @@ jobs:
       - name: Configure CMake
         shell: bash
         run: |
-          if [[ ${{ matrix.os }} == "2022" ]]; then
-            msvc="17 2022"
-          else
+          if [[ ${{ matrix.os }} == "2019" ]]; then
             msvc="16 2019"
+          else
+            msvc="17 2022"
           fi
           arch=${{ matrix.arch }}
           if [[ "$arch" == "Win32" ]]; then
@@ -88,7 +88,7 @@ jobs:
               -DYACLIB_CXX_STANDARD=17                                                                                 \
               -DYACLIB_FLAGS="$coroutine_option"                                                                       \
               -DYACLIB_TEST=SINGLE                                                                                     \
-              -DYACLIB_LOG="ERROR;DEBUG"                                                                               \
+              -DYACLIB_LOG="DEBUG"                                                                                     \
               -G"${generators[$i]}"                                                                                    \
               ${options[$i]}                                                                                           \
               -DYACLIB_DEFINITIONS="YACLIB_CI_SLOWDOWN=$slowdown"

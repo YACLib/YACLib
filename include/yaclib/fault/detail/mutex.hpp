@@ -8,7 +8,9 @@ template <typename Impl>
 class Mutex : protected Impl {
  public:
   using Impl::Impl;
+#ifndef _MSC_VER
   using Impl::native_handle;
+#endif
 
   void lock() {
     YACLIB_INJECT_FAULT(Impl::lock());

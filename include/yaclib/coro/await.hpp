@@ -12,7 +12,8 @@ namespace yaclib {
  */
 template <typename V, typename E>
 YACLIB_INLINE auto Await(Task<V, E>& task) noexcept {
-  return detail::TransferAwaiter{static_cast<detail::BaseCore&>(*task.GetCore())};
+  YACLIB_ASSERT(task.Valid());
+  return detail::TransferAwaiter{UpCast<detail::BaseCore>(*task.GetCore())};
 }
 
 /**
@@ -20,7 +21,8 @@ YACLIB_INLINE auto Await(Task<V, E>& task) noexcept {
  */
 template <typename... V, typename... E>
 YACLIB_INLINE auto Await(FutureBase<V, E>&... fs) noexcept {
-  return detail::AwaitAwaiter<sizeof...(fs) == 1>{static_cast<detail::BaseCore&>(*fs.GetCore())...};
+  YACLIB_ASSERT(... && fs.Valid());
+  return detail::AwaitAwaiter<sizeof...(fs) == 1>{UpCast<detail::BaseCore>(*fs.GetCore())...};
 }
 
 /**
@@ -45,11 +47,13 @@ YACLIB_INLINE auto Await(Iterator begin, Iterator end) noexcept
 
 template <typename V, typename E>
 YACLIB_INLINE auto operator co_await(FutureBase<V, E>&& future) noexcept {
+  YACLIB_ASSERT(future.Valid());
   return detail::AwaitSingleAwaiter{std::move(future.GetCore())};
 }
 
 template <typename V, typename E>
 YACLIB_INLINE auto operator co_await(Task<V, E>&& task) noexcept {
+  YACLIB_ASSERT(task.Valid());
   return detail::TransferSingleAwaiter{std::move(task.GetCore())};
 }
 

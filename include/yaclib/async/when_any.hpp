@@ -65,11 +65,11 @@ YACLIB_INLINE auto WhenAny(It begin, It end) {
  * \param futures two or more futures to combine
  * \return Future<T>
  */
-template <FailPolicy P = FailPolicy::LastFail, typename E, typename... V>
+template <FailPolicy P = FailPolicy::LastFail, typename V, typename... E>
 auto WhenAny(FutureBase<V, E>&&... futures) {
-  constexpr std::size_t kSize = sizeof...(V);
+  constexpr std::size_t kSize = sizeof...(E);
   static_assert(kSize >= 2, "WhenAny wants at least two futures");
-  auto [future_core, combinator] = detail::AnyCombinator<head_t<V...>, E, P>::Make(kSize);
+  auto [future_core, combinator] = detail::AnyCombinator<V, head_t<E...>, P>::Make(kSize);
   detail::WhenImpl(*combinator, std::move(futures)...);
   return Future{std::move(future_core)};
 }

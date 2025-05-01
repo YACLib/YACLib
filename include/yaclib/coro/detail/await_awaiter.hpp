@@ -95,7 +95,13 @@ class AwaitEvent final : public InlineCore, public AtomicCounter<NopeBase, NopeD
   template <bool SymmetricTransfer>
   [[nodiscard]] YACLIB_INLINE auto Impl(InlineCore& caller) noexcept {
     if (this->SubEqual(1)) {
-      return Step<SymmetricTransfer, true>(caller, *static_cast<InlineCore*>(next));
+      auto* curr = static_cast<InlineCore*>(next);
+      if constexpr (SymmetricTransfer) {
+        return Step<true>(caller, *curr);
+      } else {
+        curr = curr->Here(caller);
+        YACLIB_ASSERT(curr == nullptr);
+      }
     }
     return Noop<SymmetricTransfer>();
   }
@@ -147,6 +153,7 @@ template <typename It>
 AwaitAwaiter<false>::AwaitAwaiter(It it, std::size_t count) noexcept : _event{count + 1} {
   std::size_t wait_count = 0;
   for (std::size_t i = 0; i != count; ++i) {
+    YACLIB_ASSERT(it->Valid());
     wait_count += static_cast<std::size_t>(it->GetCore()->SetCallback(_event));
     ++it;
   }

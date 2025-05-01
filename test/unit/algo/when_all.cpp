@@ -108,7 +108,7 @@ void JustWorks() {
   }
 
   EXPECT_TRUE(all.Ready());
-  auto const expected = [] {
+  const auto expected = [] {
     if constexpr (O == yaclib::OrderPolicy::Fifo) {
       return std::vector{7, 3, 5};
     } else {
@@ -118,7 +118,7 @@ void JustWorks() {
   if constexpr (F == yaclib::FailPolicy::None) {
     auto values = std::move(all).Touch().Value();
     size_t i = 0;
-    for (auto const& v : values) {
+    for (const auto& v : values) {
       if constexpr (is_void) {
         EXPECT_EQ(v.Ok(), yaclib::Unit{});
       } else {

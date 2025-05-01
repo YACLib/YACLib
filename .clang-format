@@ -4,6 +4,7 @@ Standard: c++17
 UseTab: Never
 DerivePointerAlignment: false
 PointerAlignment: Left
+QualifierAlignment: Left
 ColumnLimit: 120
 
 AllowShortLambdasOnASingleLine: None

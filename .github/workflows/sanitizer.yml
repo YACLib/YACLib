@@ -13,7 +13,7 @@ on:
     - cron: '0 12 * * 1-5'
 
 jobs:
-  # TODO(MBkkt) Add MEMSAN?
+  # TODO(MBkkt) Add Memory, HWASAN, DataFlow, etc?
   # TODO(MBkkt) Maybe better merge undefined, address, leak?
   # TODO(MBkkt) Other not google sanitizers?
 
@@ -22,7 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-22.04, macos-12, windows-2022 ]
+        os: [ ubuntu-24.04, ubuntu-24.04-arm, windows-2025 ]  # TODO(mbkkt) macos-15 some strange failure, probably because of issues with symmetric transfer
         flags: [ WARN, UBSAN, ASAN, TSAN, LSAN ]
         build_type: [ Debug, RelWithDebInfo ]
         isPR:
@@ -31,60 +31,43 @@ jobs:
           # GitHub Actions provides a maximum of 5 parallel macOS machines for free.
           # So in pr we don't run all configurations.
           - isPR: true
-            os: macos-12
+            os: macos-15
             flags: UBSAN
             build_type: Debug
           - isPR: true
-            os: macos-12
+            os: macos-15
             flags: UBSAN
             build_type: RelWithDebInfo
-
-          # TODO enable when they fix compiler crash
-          - isPR: false
-            os: macos-12
-            flags: UBSAN
-            build_type: RelWithDebInfo
-
           - isPR: true
-            os: macos-12
+            os: macos-15
             flags: ASAN
             build_type: Debug
           - isPR: true
-            os: macos-12
+            os: macos-15
             flags: ASAN
             build_type: RelWithDebInfo
           - isPR: true
-            os: macos-12
+            os: macos-15
             flags: TSAN
             build_type: Debug
           - isPR: true
-            os: macos-12
+            os: macos-15
             flags: TSAN
             build_type: RelWithDebInfo
           - isPR: true
-            os: macos-12
+            os: macos-15
             flags: LSAN
             build_type: Debug
           - isPR: true
-            os: macos-12
-            flags: LSAN
-            build_type: RelWithDebInfo
-
-          # TODO enable when xcode ld for gcc will be fixed
-          - isPR: false
-            os: macos-12
-            flags: LSAN
-            build_type: Debug
-          - isPR: false
-            os: macos-12
+            os: macos-15
             flags: LSAN
             build_type: RelWithDebInfo
 
           #  Doesn't build with ClanCL ASAN. Random crash on start before main() with MSVC ASAN. THANKS TO THE BEST OS.
-          - os: windows-2022
+          - os: windows-2025
             flags: ASAN
             build_type: Debug
-          - os: windows-2022
+          - os: windows-2025
             flags: ASAN
             build_type: RelWithDebInfo
           # Best OS doesn't support unnecessary things like UBSAN, LSAN, TSAN.
@@ -92,22 +75,22 @@ jobs:
           # I also have a conspiracy theory that Windows is just an unnecessary abstraction over Linux.
           # See how well WSL works. Or how quickly they made the analog of io_uring.
           # And who cares if the virtual machine falls? I think this explains everything.
-          - os: windows-2022
+          - os: windows-2025
             flags: UBSAN
             build_type: Debug
-          - os: windows-2022
+          - os: windows-2025
             flags: UBSAN
             build_type: RelWithDebInfo
-          - os: windows-2022
+          - os: windows-2025
             flags: LSAN
             build_type: Debug
-          - os: windows-2022
+          - os: windows-2025
             flags: LSAN
             build_type: RelWithDebInfo
-          - os: windows-2022
+          - os: windows-2025
             flags: TSAN
             build_type: Debug
-          - os: windows-2022
+          - os: windows-2025
             flags: TSAN
             build_type: RelWithDebInfo
 
@@ -118,49 +101,47 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Update deps on Linux
-        if: ${{ matrix.os == 'ubuntu-22.04' }}
+        if: ${{ matrix.os == 'ubuntu-24.04' || matrix.os == 'ubuntu-24.04-arm' }}
         run: |
-          sudo apt-get update
-          sudo apt-get install ninja-build googletest                                                                  \
-                               gcc-12 g++-12 libstdc++-12-dev                                                          \
-                               clang-15 lld-15 libc++-15-dev libc++abi-15-dev libclang-common-15-dev
+          sudo apt update
+          sudo apt install ninja-build googletest                                                                  \
+                           gcc-14 g++-14 libstdc++-14-dev                                                          \
+                           clang-18 lld-18 libc++-18-dev libc++abi-18-dev libclang-common-18-dev
           # We use lld because it faster than ld and gold and don't have strange issues like mold
-          sudo ln -sf /usr/bin/lld-15 /usr/local/bin/ld
+          sudo ln -sf /usr/bin/lld-18 /usr/local/bin/ld
 
           sudo update-alternatives                                                                                     \
-            --install /usr/bin/gcc        gcc        /usr/bin/gcc-12        200                                        \
-            --slave   /usr/bin/g++        g++        /usr/bin/g++-12                                                   \
-            --slave   /usr/bin/gcc-ar     gcc-ar     /usr/bin/gcc-ar-12                                                \
-            --slave   /usr/bin/gcc-nm     gcc-nm     /usr/bin/gcc-nm-12                                                \
-            --slave   /usr/bin/gcc-ranlib gcc-ranlib /usr/bin/gcc-ranlib-12                                            \
-            --slave   /usr/bin/gcov       gcov       /usr/bin/gcov-12                                                  \
-            --slave   /usr/bin/gcov-tool  gcov-tool  /usr/bin/gcov-tool-12                                             \
-            --slave   /usr/bin/gcov-dump  gcov-dump  /usr/bin/gcov-dump-12
+            --install /usr/bin/gcc        gcc        /usr/bin/gcc-14        200                                        \
+            --slave   /usr/bin/g++        g++        /usr/bin/g++-14                                                   \
+            --slave   /usr/bin/gcc-ar     gcc-ar     /usr/bin/gcc-ar-14                                                \
+            --slave   /usr/bin/gcc-nm     gcc-nm     /usr/bin/gcc-nm-14                                                \
+            --slave   /usr/bin/gcc-ranlib gcc-ranlib /usr/bin/gcc-ranlib-14                                            \
+            --slave   /usr/bin/gcov       gcov       /usr/bin/gcov-14                                                  \
+            --slave   /usr/bin/gcov-tool  gcov-tool  /usr/bin/gcov-tool-14                                             \
+            --slave   /usr/bin/gcov-dump  gcov-dump  /usr/bin/gcov-dump-14
           sudo update-alternatives --auto gcc
 
-          sudo update-alternatives                                                                                     \
-            --install /usr/bin/cpp        cpp        /usr/bin/cpp-12        200
-          sudo update-alternatives --auto cpp
+          gcc --version; gcov --version
 
       - name: Update deps on macOS
-        if: ${{ matrix.os == 'macos-12' }}
+        if: ${{ matrix.os == 'macos-15' }}
         run: |
           brew update
-          brew install ninja llvm@15 gcc@12
+          brew install ninja llvm@19 gcc@14
 
       - name: Configure CMake Posix
-        if: ${{ matrix.os != 'windows-2022' }}
+        if: ${{ matrix.os != 'windows-2025' }}
         run: |
           flags=${{ matrix.flags }}
           build_type=${{ matrix.build_type }}
           compiler_names=(clang gnu apple_clang)
           stdlib_names=(libcxx libstdcxx default)
           linker=""
-          if [[ ${{ matrix.os }} == "macos-12" ]]; then
-            llvm=/usr/local/opt/llvm@15
+          if [[ ${{ matrix.os }} == "macos-15" ]]; then
+            llvm=/opt/homebrew/opt/llvm@19
             # TODO(myannyax?) FIBER
             YACLIB_FAULT=(OFF THREAD)
-            cxx_compilers=("$llvm/bin/clang++" g++-12 clang++)
+            cxx_compilers=("$llvm/bin/clang++" g++-14 clang++)
             link_options=(
               "-L$llvm/lib;-Wl,-rpath,$llvm/lib"
               "-stdlib=libstdc++"
@@ -173,7 +154,7 @@ jobs:
             )
             slowdown=8
           else
-            cxx_compilers=(clang++-15 g++)
+            cxx_compilers=(clang++-18 g++)
             link_options=(
               "-stdlib=libc++;-lc++abi"
               "-stdlib=libstdc++"
@@ -183,7 +164,7 @@ jobs:
               "-stdlib=libstdc++"
             )
             slowdown=1
-            linker="-fuse-ld=lld-15"
+            linker="-fuse-ld=lld-18"
           fi
 
           if [[ "$flags" == "TSAN" ]]; then
@@ -194,7 +175,7 @@ jobs:
             for (( j=0; j<${#link_options[*]}; j+=1 )); do
               for yaclib_fault in ${YACLIB_FAULT[*]}; do
                 link_option=${link_options[$j]}; compile_option=${compile_options[$j]}
-                if [[ ${{ matrix.os }} == "macos-12" ]]; then # macOS workarounds
+                if [[ ${{ matrix.os }} == "macos-15" ]]; then # macOS workarounds
                   if [[ "${compiler_names[$i]}" != "gnu" && "$flags" == "LSAN" ]]; then
                     # AppleClang doesn't support LSAN.
                     # But also random crash with LLVM CLang LSAN. TODO(myannyax) Try to debug and create issue to LLVM CLang LSAN.
@@ -204,8 +185,10 @@ jobs:
                     continue
                   fi
                   if [[ "${compiler_names[$i]}" == "gnu" ]]; then
-                    # TODO https://stackoverflow.com/questions/73714336/xcode-update-to-version-2395-ld-compile-problem-occurs-computedatomcount-m
-                    continue  # Link error
+                    if [[ "$flags" == "UBSAN" || "$flags" == "ASAN" || "$flags" == "TSAN" ]]; then
+                      continue  # TODO(MBkkt) gcc doesn't have macos arm sanitizers  
+                    fi
+                    link_option="${link_option};-Wl,-ld_classic"
                   fi
                 fi
                 if [[ "${compiler_names[$i]}" != "clang" && "${stdlib_names[$j]}" != "default" ]]; then
@@ -216,7 +199,7 @@ jobs:
                   continue
                 fi
                 if [[ "${compiler_names[$i]}" == "clang" ]]; then
-                  if [[ ${{ matrix.os }} == "macos-12" && "${stdlib_names[$j]}" == "libstdcxx" ]]; then
+                  if [[ ${{ matrix.os }} == "macos-15" && "${stdlib_names[$j]}" == "libstdcxx" ]]; then
                     continue  # TODO(MBkkt) Specify path to libstdcxx
                   fi
                   if [[ "${stdlib_names[$j]}" == "default" ]]; then
@@ -230,7 +213,7 @@ jobs:
 
                 cmake -S . -B $dir                                                                                     \
                   -DCMAKE_BUILD_TYPE=$build_type                                                                       \
-                  -DYACLIB_CXX_STANDARD=20                                                                             \
+                  -DYACLIB_CXX_STANDARD=23                                                                             \
                   -DYACLIB_TEST=SINGLE                                                                                 \
                   -DYACLIB_FLAGS="CORO;$flags"                                                                         \
                   -DCMAKE_CXX_COMPILER=${cxx_compilers[$i]}                                                            \
@@ -238,7 +221,7 @@ jobs:
                   -DYACLIB_LINK_OPTIONS="$link_option;$linker"                                                         \
                   -DYACLIB_COMPILE_OPTIONS="$compile_option"                                                           \
                   -DYACLIB_FAULT=$yaclib_fault                                                                         \
-                  -DYACLIB_LOG="ERROR;DEBUG"                                                                           \
+                  -DYACLIB_LOG="DEBUG"                                                                                 \
                   -DYACLIB_DEFINITIONS="YACLIB_CI_SLOWDOWN=$slowdown"
 
               done
@@ -246,7 +229,7 @@ jobs:
           done
 
       - name: Configure CMake Windows
-        if: ${{ matrix.os == 'windows-2022' }}
+        if: ${{ matrix.os == 'windows-2025' }}
         shell: bash
         run: |
           flags=${{ matrix.flags }}
@@ -264,8 +247,10 @@ jobs:
                 # I think ClangCL with ASAN should be possible
               fi
               if [[ "${names[$i]}" == "MSVC" ]]; then
+                cxx_standard=23
                 coroutine_option="CORO"
               else
+                cxx_standard=17
                 coroutine_option=""
               fi
 
@@ -273,11 +258,11 @@ jobs:
               echo $dir
 
               cmake -S . -B $dir                                                                                       \
-                -DYACLIB_CXX_STANDARD=20                                                                               \
+                -DYACLIB_CXX_STANDARD=${cxx_standard}                                                                  \
                 -DYACLIB_TEST=SINGLE                                                                                   \
-                -DYACLIB_FLAGS="$coroutine_option;$flags"                                                                           \
+                -DYACLIB_FLAGS="$coroutine_option;$flags"                                                              \
                 -DYACLIB_FAULT=$yaclib_fault                                                                           \
-                -DYACLIB_LOG="ERROR;DEBUG"                                                                             \
+                -DYACLIB_LOG="DEBUG"                                                                                   \
                 -G"${generators[$i]}"                                                                                  \
                 ${options[$i]}
 

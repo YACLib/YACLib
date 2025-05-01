@@ -12,7 +12,8 @@ class GuardState {
  public:
   GuardState() noexcept = default;
 
-  explicit GuardState(void* ptr, bool owns) noexcept : _state{reinterpret_cast<std::uintptr_t>(ptr) | owns} {
+  explicit GuardState(void* ptr, bool owns) noexcept
+    : _state{reinterpret_cast<std::uintptr_t>(ptr) | static_cast<std::uintptr_t>(owns)} {
   }
 
   GuardState(GuardState&& other) noexcept : _state{other._state} {
@@ -37,13 +38,13 @@ class GuardState {
   }
 
   void* LockState() noexcept {
-    YACLIB_ERROR(Owns(), "Cannot lock locked guard");
+    YACLIB_DEBUG(Owns(), "Cannot lock locked guard");
     _state |= 1U;
     return Ptr();
   }
 
   void* UnlockState() noexcept {
-    YACLIB_ERROR(!Owns(), "Cannot unlock not locked guard");
+    YACLIB_DEBUG(!Owns(), "Cannot unlock not locked guard");
     _state &= kMask;
     return Ptr();
   }

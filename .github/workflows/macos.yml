@@ -18,16 +18,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ 11, 12 ]
+        os: [ 13, 15 ]  # 14 works same as 15
         build_type: [ Debug, RelWithDebInfo ]
         isPR:
           - ${{ github.event_name == 'pull_request' }}
         exclude:
           - isPR: true
-            os: 11
+            os: 13
             build_type: RelWithDebInfo
           - isPR: true
-            os: 12
+            os: 15
             build_type: RelWithDebInfo
 
     steps:
@@ -36,37 +36,36 @@ jobs:
       - name: Update deps on macOS
         run: |
           # Install oldest compiler that possible
-          if [[ "${{ matrix.os }}" == "12" ]]; then
-            brew update
-            brew install ninja llvm@14 gcc@12
-          else
-            brew install ninja
+          brew update
+          if [[ ${{ matrix.os }} == "13" ]]; then
+            brew install ninja llvm@14 gcc@14
+          elif [[ ${{ matrix.os }} == "15" ]]; then
+            brew install ninja llvm@19 gcc@14
           fi
 
       - name: Configure CMake
         run: |
-          if [[ "${{ matrix.os }}" == "12" ]]; then
-            compiler_names=(clang gnu apple_clang)
+          if [[ "${{ matrix.os }}" == "13" ]]; then
             llvm=/usr/local/opt/llvm@14
-            cxx_compilers=("$llvm/bin/clang++" g++-12 clang++)
-            stdlib_names=(libcxx libstdcxx default)
-            link_options=(
-              "-L$llvm/lib;-Wl,-rpath,$llvm/lib"
-              "-stdlib=libstdc++"
-              ""
-            )
-            compile_options=(
-              "-I$llvm/include;-I$llvm/include/c++/v1/"
-              "-stdlib=libstdc++"
-              ""
-            )
-          else
-            compiler_names=(apple_clang)
-            cxx_compilers=(clang++)
-            stdlib_names=(default)
-            link_options=("")
-            compile_options=("")
+            cxx_compilers=("$llvm/bin/clang++" g++-14 clang++)
+            gnu_link_options="-Wl,-ld_classic"
+          elif [[ "${{ matrix.os }}" == "15" ]]; then
+            llvm=/opt/homebrew/opt/llvm@19
+            cxx_compilers=("$llvm/bin/clang++" g++-14 clang++)
+            gnu_link_options="-Wl,-ld_classic"
           fi
+          compiler_names=(clang gnu apple_clang)
+          stdlib_names=(libcxx libstdcxx default)
+          link_options=(
+            "-L$llvm/lib;-Wl,-rpath,$llvm/lib"
+            "-stdlib=libstdc++"
+            ""
+          )
+          compile_options=(
+            "-I$llvm/include;-I$llvm/include/c++/v1/"
+            "-stdlib=libstdc++"
+            ""
+          )
 
           for (( i=0; i<${#compiler_names[*]}; i+=1 )); do
             for (( j=0; j<${#stdlib_names[*]}; j+=1 )); do
@@ -86,6 +85,9 @@ jobs:
                   link_option=""; compile_option="-stdlib=libc++"
                 fi
               fi
+              if [[ "${compiler_names[$i]}" == "gnu" ]]; then
+                link_option="${link_option};${gnu_link_options}"
+              fi
 
               dir="build_${compiler_names[$i]}_${stdlib_names[$j]}"
               echo $dir
@@ -99,7 +101,7 @@ jobs:
                 -G"Ninja"                                                                                              \
                 -DYACLIB_LINK_OPTIONS="$link_option"                                                                   \
                 -DYACLIB_COMPILE_OPTIONS="$compile_option"                                                             \
-                -DYACLIB_LOG="ERROR;DEBUG"                                                                             \
+                -DYACLIB_LOG="DEBUG"                                                                             \
                 -DYACLIB_DEFINITIONS="YACLIB_CI_SLOWDOWN=8"
 
             done

@@ -20,7 +20,9 @@ template <typename Impl>
 class ConditionVariable : private Impl {
  public:
   using Impl::Impl;
+#ifndef _MSC_VER
   using Impl::native_handle;
+#endif
 
   void notify_one() noexcept {
     YACLIB_INJECT_FAULT(Impl::notify_one());
@@ -78,14 +80,14 @@ class ConditionVariable : private Impl {
 
  private:
   static auto From(std::unique_lock<yaclib_std::mutex>& lock) {
-    YACLIB_ERROR(!lock.owns_lock(), "Trying to call wait on not owned lock");
+    YACLIB_DEBUG(!lock.owns_lock(), "Trying to call wait on not owned lock");
     auto* mutex = lock.release();
     // type is specified since some old compilers like clang 8 aren't able to calculate it
     return std::tuple<yaclib_std::mutex*, std::unique_lock<yaclib_std::mutex::impl_t>>{
       mutex, std::unique_lock{mutex->GetImpl(), std::adopt_lock}};
   }
   static auto From(yaclib_std::mutex* mutex, std::unique_lock<yaclib_std::mutex::impl_t>& lock_impl) {
-    YACLIB_ERROR(!lock_impl.owns_lock(), "After call wait on not owned lock");
+    YACLIB_DEBUG(!lock_impl.owns_lock(), "After call wait on not owned lock");
     std::ignore = lock_impl.release();
     return std::unique_lock{*mutex, std::adopt_lock};
   }

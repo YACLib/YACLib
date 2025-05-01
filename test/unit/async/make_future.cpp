@@ -56,7 +56,7 @@ TEST(MakeReadyFuture, Void) {
 
 struct Default {
   Default() = default;
-  Default(Default const&) = delete;
+  Default(const Default&) = delete;
   Default(Default&&) = delete;
 };
 

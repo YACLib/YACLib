@@ -237,10 +237,9 @@ class OneShotEvent {
     if (TryAdd(*waiter)) {
       auto token = waiter->Make();
       return waiter->Wait(token, timeout);
-    } else {
-      delete waiter.Release();
-      return true;
     }
+    delete waiter.Release();
+    return true;
   }
 
   static constexpr auto kEmpty = std::uintptr_t{0};

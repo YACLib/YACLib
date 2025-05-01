@@ -555,7 +555,23 @@ TYPED_TEST(AsyncSuite, CoroTaskUnwrapping) {
   EXPECT_EQ(std::move(f).Get().Ok(), 8);
 }
 
-TEST(Coro, WhenAllCoAwait) {
+TEST(Future, WhenAnyManual) {
+  yaclib::ManualExecutor e;
+  auto f1 = yaclib::Run(e, [] {
+    return 42;
+  });
+  auto f2 = yaclib::Run(e, [] {
+    return 42;
+  });
+  auto f3 = yaclib::WhenAny(std::move(f1), std::move(f2));
+  auto f4 = std::move(f3).ThenInline([](int x) {
+    return x;
+  });
+  std::ignore = e.Drain();
+  EXPECT_EQ(std::move(f4).Get().Ok(), 42);
+}
+
+TEST(Coro, WhenAnyManual) {
   yaclib::ManualExecutor e;
   auto coro = [&]() -> yaclib::Future<> {
     co_await On(e);
@@ -571,6 +587,33 @@ TEST(Coro, WhenAllCoAwait) {
   auto f = coro2();
   std::ignore = e.Drain();
   EXPECT_EQ(std::move(f).Get().Ok(), 42);
+}
+
+TEST(Coro, WhenAnyMultipleManual) {
+  yaclib::ManualExecutor e;
+  auto coro = [&](int x) -> yaclib::Future<int> {
+    co_await On(e);
+    co_return x;
+  };
+  auto coro2 = [&]() -> yaclib::Future<int> {
+    auto f1 = coro(1);
+    auto f2 = coro(2);
+    auto f3 = yaclib::WhenAny(std::move(f1), std::move(f2)).ThenInline([](int x) {
+      return x * 3;
+    });
+    auto f4 = coro(4);
+    auto f5 = coro(5);
+    auto f6 = yaclib::WhenAny(std::move(f4), std::move(f5)).ThenInline([](int x) {
+      return x * 6;
+    });
+    co_await Await(f3, f6);
+    co_return std::move(f3).Touch().Ok() + std::move(f6).Touch().Ok();
+  };
+  auto f = coro2().ThenInline([](int x) {
+    return x * 2;
+  });
+  std::ignore = e.Drain();
+  EXPECT_EQ(std::move(f).Get().Ok(), (1 * 3 + 4 * 6) * 2);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -650,8 +693,8 @@ yaclib::Future<int> recursiveEagerCoro(int x) {
 }
 
 static constexpr int kLazyRecursion = 1'000'000;
-static constexpr int kEagerRecursion = 100;
-static constexpr int kBadFactor = 10;
+// 100 doesn't work for some debug builds with sanitizers
+static constexpr int kEagerRecursion = 10;
 
 TEST(Recursion, LazyFunc) {
   EXPECT_EQ(recursiveLazyFunc(kLazyRecursion).Get().Ok(), 42);
@@ -666,22 +709,20 @@ TEST(Recursion, EagerNotReadyFunc) {
 
 TEST(Recursion, EagerFunc) {
   // honest recursion, in debug produce recursion * 10 (helper functions) frames, in release * 2
-  EXPECT_EQ(recursiveEagerFunc(kEagerRecursion / kBadFactor).Get().Ok(), 42);
+  EXPECT_EQ(recursiveEagerFunc(kEagerRecursion).Get().Ok(), 42);
 }
 
 TEST(Recursion, EagerFuncStupid) {
   // honest recursion, in debug produce recursion * 10 (helper functions) frames, in release * 3
-  EXPECT_EQ(recursiveEagerFuncStupid(kEagerRecursion / kBadFactor).Get().Ok(), 42);
+  EXPECT_EQ(recursiveEagerFuncStupid(kEagerRecursion).Get().Ok(), 42);
 }
 
 #if YACLIB_FINAL_SUSPEND_TRANSFER != 0 && defined(__clang__) && defined(__linux__)
 // GCC Debug bad in symmetric transfer
 // I'm also not sure about llvm clang on apple, apple clang, and clangcl
 static constexpr int kLazyCoroRecursion = kLazyRecursion;
-static constexpr int kEagerCoroRecursion = kEagerRecursion;
 #else
-static constexpr int kLazyCoroRecursion = kEagerRecursion / kBadFactor;
-static constexpr int kEagerCoroRecursion = kEagerRecursion / kBadFactor;
+static constexpr int kLazyCoroRecursion = kEagerRecursion;
 #endif
 
 TEST(Recursion, LazyCoro) {
@@ -690,7 +731,7 @@ TEST(Recursion, LazyCoro) {
 
 TEST(Recursion, EagerCoro) {
   // honest recursion, in clang debug/release produce recursion frames
-  EXPECT_EQ(recursiveEagerCoro(kEagerCoroRecursion).Get().Ok(), 42);
+  EXPECT_EQ(recursiveEagerCoro(kEagerRecursion).Get().Ok(), 42);
 }
 
 }  // namespace

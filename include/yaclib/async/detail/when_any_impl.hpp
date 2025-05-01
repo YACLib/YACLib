@@ -151,14 +151,13 @@ class AnyCombinator : public InlineCore, public AnyCombinatorBase<V, E, P> {
  private:
   template <bool SymmetricTransfer>
   [[nodiscard]] YACLIB_INLINE auto Impl(InlineCore& caller) noexcept {
-    if (this->Combine(static_cast<ResultCore<V, E>&>(caller))) {
+    if (this->Combine(DownCast<ResultCore<V, E>>(caller))) {
       auto* callback = this->_core.Release();
       DecRef();
-      return callback->template SetResult<SymmetricTransfer>();
-    } else {
-      DecRef();
-      return Noop<SymmetricTransfer>();
+      return WhenSetResult<SymmetricTransfer>(callback);
     }
+    DecRef();
+    return Noop<SymmetricTransfer>();
   }
   [[nodiscard]] InlineCore* Here(InlineCore& caller) noexcept final {
     return Impl<false>(caller);

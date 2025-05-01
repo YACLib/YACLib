@@ -11,7 +11,7 @@ bool ManualExecutor::Alive() const noexcept {
   return true;
 }
 
-void ManualExecutor::Submit(yaclib::Job& f) noexcept {
+void ManualExecutor::Submit(Job& f) noexcept {
   _tasks.PushBack(f);
 }
 
@@ -20,7 +20,7 @@ std::size_t ManualExecutor::Drain() noexcept {
   while (!_tasks.Empty()) {
     ++done;
     auto& task = _tasks.PopFront();
-    static_cast<yaclib::Job&>(task).Call();
+    static_cast<Job&>(task).Call();
   }
   return done;
 }

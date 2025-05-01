@@ -19,7 +19,7 @@ bool RecursiveMutex::try_lock() noexcept {
 }
 
 void RecursiveMutex::unlock() noexcept {
-  YACLIB_ERROR(_occupied_count == 0, "unlock on not locked recursive mutex");
+  YACLIB_DEBUG(_occupied_count == 0, "unlock on not locked recursive mutex");
   _occupied_count--;
   if (_occupied_count == 0) {
     _owner_id = 0;

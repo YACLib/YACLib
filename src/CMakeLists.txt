@@ -46,7 +46,7 @@ if (WARN IN_LIST YACLIB_FLAGS)
   message("YACLib/library warnings: ${YACLIB_WARN}")
 endif ()
 target_compile_options(yaclib PRIVATE ${YACLIB_COMPILE_OPTIONS} ${YACLIB_WARN})
-target_compile_definitions(yaclib PRIVATE ${YACLIB_DEFINITIONS})
+target_compile_definitions(yaclib PUBLIC ${YACLIB_DEFINITIONS})
 
 find_package(Threads REQUIRED)
 target_link_libraries(yaclib PUBLIC Threads::Threads)
