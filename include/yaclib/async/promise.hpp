@@ -54,7 +54,7 @@ class Promise final {
   void Set(Args&&... args) && {
     YACLIB_ASSERT(Valid());
     if constexpr (sizeof...(Args) == 0) {
-      _core->Store(std::in_place);
+      _core->Store();
     } else {
       _core->Store(std::forward<Args>(args)...);
     }

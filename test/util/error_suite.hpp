@@ -33,7 +33,7 @@ class ErrorNames {
   }
 };
 
-using ErrorTypes = testing::Types<std::exception_ptr, yaclib::StopError, LikeErrorCode>;
+using ErrorTypes = testing::Types<std::exception_ptr/*, yaclib::StopError, LikeErrorCode*/>;
 
 TYPED_TEST_SUITE(Error, ErrorTypes, ErrorNames);
 

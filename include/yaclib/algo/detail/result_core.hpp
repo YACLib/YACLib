@@ -21,6 +21,8 @@ class ResultCore : public BaseCore {
     return Noop<SymmetricTransfer>();
   }
 
+  using Result = E::template Result<V>;
+
  public:
   [[nodiscard]] InlineCore* Here(InlineCore& caller) noexcept override {
     return Impl<false>(caller);
@@ -35,30 +37,30 @@ class ResultCore : public BaseCore {
   }
 
   template <typename... Args>
-  explicit ResultCore(Args&&... args) noexcept(std::is_nothrow_constructible_v<Result<V, E>, Args&&...>)
-    : BaseCore{kResult}, _result{std::forward<Args>(args)...} {
+  YACLIB_INLINE explicit ResultCore(Unit, Args&&... args) : BaseCore{kResult} {
+    Store(std::forward<Args>(args)...);
   }
 
   ~ResultCore() noexcept override {
-    _result.~Result<V, E>();
+    _result.~Result();
   }
 
   template <typename... Args>
-  void Store(Args&&... args) noexcept(std::is_nothrow_constructible_v<Result<V, E>, Args&&...>) {
-    new (&_result) Result<V, E>{std::forward<Args>(args)...};
+  YACLIB_INLINE void Store(Args&&... args) {
+    new (&_result) Result{E::template MakeResult<V>(std::forward<Args>(args)...)};
   }
 
-  [[nodiscard]] Result<V, E>& Get() noexcept {
+  [[nodiscard]] Result& Get() noexcept {
     return _result;
   }
 
   union {
-    Result<V, E> _result;
+    Result _result;
     Callback _self;
   };
 };
 
-extern template class ResultCore<void, StopError>;
+extern template class ResultCore<void, DefaultTrait>;
 
 template <typename V, typename E>
 using ResultCorePtr = IntrusivePtr<ResultCore<V, E>>;

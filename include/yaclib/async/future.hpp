@@ -18,6 +18,8 @@ namespace yaclib {
  */
 template <typename V, typename E>
 class FutureBase {
+  using Result = E::template Result<V>;
+
  public:
   static_assert(Check<V>(), "V should be valid");
   static_assert(Check<E>(), "E should be valid");
@@ -76,7 +78,7 @@ class FutureBase {
    * \note The behavior is undefined if \ref Valid is false before the call to this function.
    * \return \ref Result stored in the shared state
    */
-  [[nodiscard]] const Result<V, E>* Get() const& noexcept {
+  [[nodiscard]] const Result* Get() const& noexcept {
     if (Ready()) {  // TODO(MBkkt) Maybe we want likely
       return &_core->Get();
     }
@@ -89,7 +91,7 @@ class FutureBase {
    * \note The behavior is undefined if \ref Valid is false before the call to this function.
    * \return The \ref Result that Future received
    */
-  [[nodiscard]] Result<V, E> Get() && noexcept {
+  [[nodiscard]] Result Get() && noexcept {
     Wait(*this);
     auto core = std::exchange(_core, nullptr);
     return std::move(core->Get());
@@ -102,7 +104,7 @@ class FutureBase {
    * \note The behavior is undefined if \ref Valid or Ready is false before the call to this function.
    * \return The \ref Result stored in the shared state
    */
-  [[nodiscard]] const Result<V, E>& Touch() const& noexcept {
+  [[nodiscard]] const Result& Touch() const& noexcept {
     YACLIB_ASSERT(Ready());
     return _core->Get();
   }
@@ -113,7 +115,7 @@ class FutureBase {
    * \note The behavior is undefined if \ref Valid or Ready is false before the call to this function.
    * \return The \ref Result that Future received
    */
-  [[nodiscard]] Result<V, E> Touch() && noexcept {
+  [[nodiscard]] Result Touch() && noexcept {
     YACLIB_ASSERT(Ready());
     auto core = std::exchange(_core, nullptr);
     return std::move(core->Get());
@@ -187,7 +189,7 @@ class FutureBase {
   detail::ResultCorePtr<V, E> _core;
 };
 
-extern template class FutureBase<void, StopError>;
+extern template class FutureBase<void, DefaultTrait>;
 
 /**
  * Provides a mechanism to access the result of async operations

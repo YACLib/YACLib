@@ -106,7 +106,7 @@ void JustWork() {
 
 template <Result R, Container C, yaclib::FailPolicy P, typename V, bool UseDefault = false>
 void Fail() {
-  auto f1 = yaclib::StopError{yaclib::StopTag{}};
+  auto f1 = yaclib::StopTag{};
   auto f2 = std::make_exception_ptr(std::runtime_error{""});
   constexpr int kSize = 3;
   std::array<yaclib::Promise<V>, kSize> promises;
@@ -131,7 +131,7 @@ void Fail() {
   using ExceptionType =
     std::conditional_t<(P == yaclib::FailPolicy::LastFail && R == Result::Exception) ||
                          ((P == yaclib::FailPolicy::None || P == yaclib::FailPolicy::FirstFail) && R == Result::Error),
-                       yaclib::ResultError<yaclib::StopError>, std::runtime_error>;
+                       yaclib::StopException, std::runtime_error>;
   EXPECT_THROW(std::ignore = std::move(any).Get().Ok(), ExceptionType);
 }
 

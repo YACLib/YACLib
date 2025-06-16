@@ -21,18 +21,19 @@ namespace yaclib {
  * \param args for fulfill Future
  * \return Ready Future
  */
-template <typename V = Unit, typename E = StopError, typename... Args>
+template <typename V = Unit, typename E = DefaultTrait, typename... Args>
 /*Future*/ auto MakeFuture(Args&&... args) {
   if constexpr (sizeof...(Args) == 0) {
     using T = std::conditional_t<std::is_same_v<V, Unit>, void, V>;
-    return Future{detail::ResultCorePtr<T, E>{MakeUnique<detail::ResultCore<T, E>>(std::in_place)}};
+    return Future{detail::ResultCorePtr<T, E>{MakeUnique<detail::ResultCore<T, E>>(Unit{})}};
   } else if constexpr (std::is_same_v<V, Unit>) {
     using T0 = std::decay_t<head_t<Args&&...>>;
     using T = std::conditional_t<std::is_same_v<T0, Unit>, void, T0>;
     return Future{
-      detail::ResultCorePtr<T, E>{MakeUnique<detail::ResultCore<T, E>>(std::in_place, std::forward<Args>(args)...)}};
+      detail::ResultCorePtr<T, E>{MakeUnique<detail::ResultCore<T, E>>(Unit{}, std::forward<Args>(args)...)}};
   } else {
-    return Future{detail::ResultCorePtr<V, E>{MakeUnique<detail::ResultCore<V, E>>(std::forward<Args>(args)...)}};
+    return Future{
+      detail::ResultCorePtr<V, E>{MakeUnique<detail::ResultCore<V, E>>(Unit{}, std::forward<Args>(args)...)}};
   }
 }
 

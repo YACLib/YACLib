@@ -10,7 +10,7 @@
 namespace yaclib {
 namespace detail {
 
-template <typename V = Unit, typename E = StopError, typename Func>
+template <typename V = Unit, typename E = DefaultTrait, typename Func>
 YACLIB_INLINE auto Run(IExecutor& e, Func&& f) {
   auto* core = [&] {
     if constexpr (std::is_same_v<V, Unit>) {
@@ -34,7 +34,7 @@ YACLIB_INLINE auto Run(IExecutor& e, Func&& f) {
  * \param f func to execute
  * \return \ref Future corresponding f return value
  */
-template <typename E = StopError, typename Func>
+template <typename E = DefaultTrait, typename Func>
 /*Future*/ auto Run(Func&& f) {
   return detail::Run<Unit, E>(MakeInline(), std::forward<Func>(f)).On(nullptr);
 }
@@ -46,7 +46,7 @@ template <typename E = StopError, typename Func>
  * \param f func to execute
  * \return \ref FutureOn corresponding f return value
  */
-template <typename E = StopError, typename Func>
+template <typename E = DefaultTrait, typename Func>
 /*FutureOn*/ auto Run(IExecutor& e, Func&& f) {
   YACLIB_WARN(e.Tag() == IExecutor::Type::Inline,
               "better way is call func explicit and use MakeFuture to create Future with func result"
@@ -60,7 +60,7 @@ template <typename E = StopError, typename Func>
  * \param f func to execute
  * \return \ref Future corresponding f return value
  */
-template <typename V = void, typename E = StopError, typename Func>
+template <typename V = void, typename E = DefaultTrait, typename Func>
 /*Future*/ auto AsyncContract(Func&& f) {
   return detail::Run<V, E>(MakeInline(), std::forward<Func>(f)).On(nullptr);
 }
@@ -72,7 +72,7 @@ template <typename V = void, typename E = StopError, typename Func>
  * \param f func to execute
  * \return \ref FutureOn corresponding f return value
  */
-template <typename V = void, typename E = StopError, typename Func>
+template <typename V = void, typename E = DefaultTrait, typename Func>
 /*FutureOn*/ auto AsyncContract(IExecutor& e, Func&& f) {
   YACLIB_WARN(e.Tag() == IExecutor::Type::Inline,
               "better way is call func explicit and use MakeFuture to create Future with func result"

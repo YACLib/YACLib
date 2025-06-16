@@ -28,7 +28,7 @@ YACLIB_INLINE auto Schedule(IExecutor& e, Func&& f) {
  * \param f func to execute
  * \return \ref Future corresponding f return value
  */
-template <typename E = StopError, typename Func>
+template <typename E = DefaultTrait, typename Func>
 /*Task*/ auto Schedule(Func&& f) {
   return detail::Schedule<Unit, E>(MakeInline(), std::forward<Func>(f));
 }
@@ -40,7 +40,7 @@ template <typename E = StopError, typename Func>
  * \param f func to execute
  * \return \ref FutureOn corresponding f return value
  */
-template <typename E = StopError, typename Func>
+template <typename E = DefaultTrait, typename Func>
 /*Task*/ auto Schedule(IExecutor& e, Func&& f) {
   YACLIB_WARN(e.Tag() == IExecutor::Type::Inline,
               "better way is call func explicit and use MakeTask to create Task with func result"
@@ -54,7 +54,7 @@ template <typename E = StopError, typename Func>
  * \param f func to execute
  * \return \ref Future corresponding f return value
  */
-template <typename V = void, typename E = StopError, typename Func>
+template <typename V = void, typename E = DefaultTrait, typename Func>
 /*Task*/ auto LazyContract(Func&& f) {
   return detail::Schedule<V, E>(MakeInline(), std::forward<Func>(f)).On(nullptr);
 }
@@ -66,7 +66,7 @@ template <typename V = void, typename E = StopError, typename Func>
  * \param f func to execute
  * \return \ref Task corresponding f return value
  */
-template <typename V = void, typename E = StopError, typename Func>
+template <typename V = void, typename E = DefaultTrait, typename Func>
 /*Task*/ auto LazyContract(IExecutor& e, Func&& f) {
   YACLIB_WARN(e.Tag() == IExecutor::Type::Inline, "better way is use LazyContract(func)");
   return detail::Schedule<V, E>(e, std::forward<Func>(f));

@@ -20,7 +20,7 @@ namespace yaclib {
  * \tparam It type of passed iterator
  * \tparam T type of all passed futures
  * \param begin , count the range of futures to combine
- * \return Future<std::vector<future_value_t<T>>, future_error_t<T>>
+ * \return Future<std::vector<future_value_t<T>>, future_trait_t<T>>
  */
 template <FailPolicy F = FailPolicy::FirstFail, OrderPolicy O = OrderPolicy::Fifo, typename It,
           typename T = typename std::iterator_traits<It>::value_type>
@@ -29,8 +29,8 @@ auto WhenAll(It begin, std::size_t count) {
   static_assert(is_future_base_v<T>, "WhenAll function Iterator must be point to some Future");
   YACLIB_WARN(count < 2, "Don't use combinators for one or zero futures");
   using V = future_base_value_t<T>;
-  using E = future_base_error_t<T>;
-  using R = std::conditional_t<F == FailPolicy::None, Result<V, E>, V>;
+  using E = future_base_trait_t<T>;
+  using R = std::conditional_t<F == FailPolicy::None, typename E::template Result<V>, V>;
   auto [future_core, combinator] = detail::AllCombinator<O, R, E>::Make(count);
   detail::WhenImpl(combinator, begin, count);
   return Future{std::move(future_core)};
@@ -42,7 +42,7 @@ auto WhenAll(It begin, std::size_t count) {
  * \tparam It type of passed iterator
  * \tparam T type of all passed futures
  * \param begin , end the range of futures to combine
- * \return Future<std::vector<future_value_t<T>>, future_error_t<T>>
+ * \return Future<std::vector<future_value_t<T>>, future_trait_t<T>>
  */
 template <FailPolicy F = FailPolicy::FirstFail, OrderPolicy O = OrderPolicy::Fifo, typename It,
           typename T = typename std::iterator_traits<It>::value_type>
@@ -68,7 +68,7 @@ auto WhenAll(FutureBase<V, E>&&... futures) {
   constexpr std::size_t kSize = sizeof...(E);
   static_assert(kSize >= 2, "WhenAll wants at least two futures");
   using Error = head_t<E...>;
-  using R = std::conditional_t<F == FailPolicy::None, Result<V, Error>, V>;
+  using R = std::conditional_t<F == FailPolicy::None, typename Error::template Result<V>, V>;
   auto [future_core, combinator] = detail::AllCombinator<O, R, Error>::Make(kSize);
   detail::WhenImpl(*combinator, std::move(futures)...);
   return Future{std::move(future_core)};

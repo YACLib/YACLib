@@ -115,7 +115,7 @@ TEST(ThenInline, Simple) {
 template <typename TestType, bool Inline>
 void ErrorThenInline() {
   static constexpr bool kIsError = !std::is_same_v<TestType, std::exception_ptr>;
-  using ErrorType = std::conditional_t<kIsError, TestType, yaclib::StopError>;
+  using ErrorType = std::conditional_t<kIsError, TestType, yaclib::StopTag>;
 
   auto f = yaclib::MakeFuture<int, ErrorType>(32);
   auto f_async = InlineThen<Inline>(std::move(f), [](TestType) {

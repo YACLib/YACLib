@@ -47,37 +47,43 @@ struct IsInstantiationOf<Instance, Instance<Args...>> final {
 template <template <typename...> typename Instance, typename T>
 struct InstantiationTypes final {
   using Value = T;
-  using Error = T;
+  using Trait = T;
 };
 
-template <template <typename...> typename Instance, typename V, typename E>
-struct InstantiationTypes<Instance, Instance<V, E>> final {
+template <template <typename...> typename Instance, typename V>
+struct InstantiationTypes<Instance, Instance<V>> final {
   using Value = V;
-  using Error = E;
+  using Trait = void;
+};
+
+template <template <typename...> typename Instance, typename V, typename T>
+struct InstantiationTypes<Instance, Instance<V, T>> final {
+  using Value = V;
+  using Trait = T;
 };
 
 template <typename T>
 struct FutureBaseTypes final {
   using Value = T;
+  using Trait = T;
+};
+
+template <typename V, typename T>
+struct FutureBaseTypes<FutureBase<V, T>> final {
+  using Value = V;
   using Error = T;
 };
 
-template <typename V, typename E>
-struct FutureBaseTypes<FutureBase<V, E>> final {
+template <typename V, typename T>
+struct FutureBaseTypes<Future<V, T>> final {
   using Value = V;
-  using Error = E;
+  using Trait = T;
 };
 
-template <typename V, typename E>
-struct FutureBaseTypes<Future<V, E>> final {
+template <typename V, typename T>
+struct FutureBaseTypes<FutureOn<V, T>> final {
   using Value = V;
-  using Error = E;
-};
-
-template <typename V, typename E>
-struct FutureBaseTypes<FutureOn<V, E>> final {
-  using Value = V;
-  using Error = E;
+  using Trait = T;
 };
 
 }  // namespace yaclib::detail

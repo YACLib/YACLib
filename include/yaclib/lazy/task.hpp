@@ -23,6 +23,8 @@ void Start(BaseCore* head) noexcept;
  */
 template <typename V, typename E>
 class Task final {
+  using Result = E::template Result<V>;
+
  public:
   static_assert(Check<V>(), "V should be valid");
   static_assert(Check<E>(), "E should be valid");
@@ -105,7 +107,7 @@ class Task final {
     return {std::move(_core)};
   }
 
-  Result<V, E> Get() && noexcept {
+  Result Get() && noexcept {
     // TODO(MBkkt) make it better: we can remove concurrent atomic changes from here
     return std::move(*this).ToFuture().Get();
   }
@@ -113,11 +115,11 @@ class Task final {
   void Touch() & = delete;
   void Touch() const&& = delete;
 
-  const Result<V, E>& Touch() const& noexcept {
+  const Result& Touch() const& noexcept {
     YACLIB_ASSERT(Ready());
     return _core->Get();
   }
-  Result<V, E> Touch() && noexcept {
+  Result Touch() && noexcept {
     YACLIB_ASSERT(Ready());
     auto core = std::exchange(_core, nullptr);
     return std::move(core->Get());

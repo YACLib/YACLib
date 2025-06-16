@@ -53,6 +53,7 @@ class Core : public ResultCoreT<Type, Ret, E>, public FuncCore<Func> {
 
  public:
   using Base = ResultCoreT<Type, Ret, E>;
+  using ResultArg = typename E::template Result<Arg>;
 
   explicit Core(Func&& f) : F{std::forward<Func>(f)} {
     this->_self = {};
@@ -66,7 +67,7 @@ class Core : public ResultCoreT<Type, Ret, E>, public FuncCore<Func> {
       if constexpr (is_invocable_v<Invoke>) {
         Loop(this, CallImpl<false>(Unit{}));  // optimization
       } else {
-        Loop(this, CallImpl<false>(Result<Arg, E>{Unit{}}));
+        Loop(this, CallImpl<false>(E::template MakeResult<Arg>(Unit{})));
       }
     } else {
       YACLIB_ASSERT(this->_self.caller != this);
@@ -76,7 +77,7 @@ class Core : public ResultCoreT<Type, Ret, E>, public FuncCore<Func> {
   }
 
   void Drop() noexcept final {
-    Loop(this, CallImpl<false>(Result<Arg, E>{StopTag{}}));
+    Loop(this, CallImpl<false>(E::template MakeResult<Arg>(StopTag{})));
   }
 
   template <bool SymmetricTransfer>
@@ -117,7 +118,7 @@ class Core : public ResultCoreT<Type, Ret, E>, public FuncCore<Func> {
 
   template <bool SymmetricTransfer, typename T>
   [[nodiscard]] YACLIB_INLINE auto CallImpl(T&& r) noexcept try {
-    if constexpr (std::is_same_v<T, Unit> || is_invocable_v<Invoke, Result<Arg, E>>) {
+    if constexpr (std::is_same_v<T, Unit> || is_invocable_v<Invoke, ResultArg>) {
       return CallResolveAsync<SymmetricTransfer>(std::forward<T>(r));
     } else {
       return CallResolveState<SymmetricTransfer>(std::forward<T>(r));
@@ -150,16 +151,12 @@ class Core : public ResultCoreT<Type, Ret, E>, public FuncCore<Func> {
   }
 
   template <bool SymmetricTransfer>
-  [[nodiscard]] YACLIB_INLINE auto CallResolveState(Result<Arg, E>&& r) {
-    const auto state = r.State();
+  [[nodiscard]] YACLIB_INLINE auto CallResolveState(ResultArg&& r) {
     if constexpr (is_invocable_v<Invoke, Arg> || (std::is_void_v<Arg> && is_invocable_v<Invoke, Unit>)) {
-      if (state == ResultState::Value) {
-        return CallResolveAsync<SymmetricTransfer>(std::move(r).Value());
-      } else if (state == ResultState::Exception) {
-        return Done<SymmetricTransfer>(std::move(r).Exception());
+      if (E::Ok(r)) {
+        return CallResolveAsync<SymmetricTransfer>(E::MoveValue(std::move(r)));
       } else {
-        YACLIB_ASSERT(state == ResultState::Error);
-        return Done<SymmetricTransfer>(std::move(r).Error());
+        return Done<SymmetricTransfer>(E::MoveError(std::move(r)));
       }
     } else {
       /**
@@ -178,15 +175,13 @@ class Core : public ResultCoreT<Type, Ret, E>, public FuncCore<Func> {
        *     return 1;
        *   });
        */
-      constexpr bool kIsException = is_invocable_v<Invoke, std::exception_ptr>;
-      constexpr bool kIsError = is_invocable_v<Invoke, E>;
-      static_assert(kIsException ^ kIsError, "Recovery callback should be invokable with std::exception_ptr or E");
-      constexpr auto kState = kIsException ? ResultState::Exception : ResultState::Error;
-      if (state == kState) {
-        using T = std::conditional_t<kIsException, std::exception_ptr, E>;
-        return CallResolveAsync<SymmetricTransfer>(std::get<T>(std::move(r.Internal())));
+      static_assert(is_invocable_v<Invoke, typename E::template Error<Arg>>,
+                    "Recovery callback should be invokable with E::Error<V> type");
+      if (!E::Ok(r)) {
+        return CallResolveAsync<SymmetricTransfer>(E::GetError(std::move(r)));
+      } else {
+        return Done<SymmetricTransfer>(std::move(r));
       }
-      return Done<SymmetricTransfer>(std::move(r));
     }
   }
 
@@ -234,16 +229,14 @@ class Core : public ResultCoreT<Type, Ret, E>, public FuncCore<Func> {
 
 template <typename V, typename E, typename Func>
 constexpr char Tag() noexcept {
-  if constexpr (is_invocable_v<Func, Result<V, E>>) {
+  if constexpr (is_invocable_v<Func, typename E::template Result<V>>) {
     return 1;
   } else if constexpr (is_invocable_v<Func, V>) {
     return 2;
-  } else if constexpr (is_invocable_v<Func, E>) {
+  } else if constexpr (is_invocable_v<Func, typename E::template Error<V>>) {
     return 3;
-  } else if constexpr (is_invocable_v<Func, std::exception_ptr>) {
-    return 4;
   } else if constexpr (is_invocable_v<Func, Unit>) {
-    return 5;
+    return 4;
   } else {
     return 0;
   }
@@ -254,7 +247,7 @@ struct Return;
 
 template <typename V, typename E, typename Func>
 struct Return<V, E, Func, 1> final {
-  using Type = invoke_t<Func, Result<V, E>>;
+  using Type = invoke_t<Func, typename E::template Result<V>>;
 };
 
 template <typename V, typename E, typename Func>
@@ -264,16 +257,11 @@ struct Return<V, E, Func, 2> final {
 
 template <typename V, typename E, typename Func>
 struct Return<V, E, Func, 3> final {
-  using Type = invoke_t<Func, E>;
+  using Type = invoke_t<Func, typename E::template Error<V>>;
 };
 
 template <typename V, typename E, typename Func>
 struct Return<V, E, Func, 4> final {
-  using Type = invoke_t<Func, std::exception_ptr>;
-};
-
-template <typename V, typename E, typename Func>
-struct Return<V, E, Func, 5> final {
   using Type = invoke_t<Func, Unit>;
 };
 
@@ -281,10 +269,10 @@ template <CoreType CoreT, bool kIsCall, typename Arg, typename E, typename Func>
 auto* MakeCore(Func&& f) {
   static_assert(CoreT != CoreType::Run || std::is_void_v<Arg>,
                 "It makes no sense to receive some value in first pipeline step");
-  using AsyncRet = result_value_t<typename detail::Return<Arg, E, Func&&>::Type>;
+  using AsyncRet = E::template Value<typename detail::Return<Arg, E, Func&&>::Type>;
   static_assert(CoreT != CoreType::Detach || std::is_void_v<AsyncRet>,
                 "It makes no sense to return some value in Detach, since no one will be able to use it");
-  using Ret0 = result_value_t<future_base_value_t<task_value_t<AsyncRet>>>;
+  using Ret0 = E::template Value<future_base_value_t<task_value_t<AsyncRet>>>;
   using Ret = std::conditional_t<std::is_same_v<Ret0, Unit>, void, Ret0>;
   constexpr bool kIsAsync = is_future_base_v<AsyncRet> || is_task_v<AsyncRet>;
   // TODO(MBkkt) Think about inline/detach optimization

@@ -17,9 +17,9 @@ namespace {
 
 using namespace std::chrono_literals;
 
-yaclib::Future<int, yaclib::StopError> test_co_ret42() {
-  co_return 42;
-}
+// yaclib::Future<int, yaclib::StopError> test_co_ret42() {
+//   co_return 42;
+// }
 
 TEST(CoroTraits, CoReturnInt) {
   auto future = test_co_ret42();

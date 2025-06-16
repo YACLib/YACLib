@@ -29,24 +29,21 @@ namespace yaclib {
 YACLIB_DEFINE_VOID_TYPE(Unit);
 YACLIB_DEFINE_VOID_TYPE(StopTag);
 
-struct [[nodiscard]] StopError;
+struct DefaultTrait;
 
-template <typename V = void, typename E = StopError>
-class [[nodiscard]] Result;
-
-template <typename V = void, typename E = StopError>
+template <typename V = void, typename E = DefaultTrait>
 class [[nodiscard]] Task;
 
 template <typename V, typename E>
 class FutureBase;
 
-template <typename V = void, typename E = StopError>
+template <typename V = void, typename E = DefaultTrait>
 class [[nodiscard]] Future;
 
-template <typename V = void, typename E = StopError>
+template <typename V = void, typename E = DefaultTrait>
 class [[nodiscard]] FutureOn;
 
-template <typename V = void, typename E = StopError>
+template <typename V = void, typename E = DefaultTrait>
 class [[nodiscard]] Promise;
 
 }  // namespace yaclib

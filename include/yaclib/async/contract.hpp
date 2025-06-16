@@ -21,7 +21,7 @@ using ContractOn = std::pair<FutureOn<V, E>, Promise<V, E>>;
  *
  * \return a \see Contract object with new future and promise
  */
-template <typename V = void, typename E = StopError>
+template <typename V = void, typename E = DefaultTrait>
 [[nodiscard]] Contract<V, E> MakeContract() {
   auto core = MakeUnique<detail::ResultCore<V, E>>();
   Future<V, E> future{detail::ResultCorePtr<V, E>{NoRefTag{}, core.Get()}};
@@ -29,7 +29,7 @@ template <typename V = void, typename E = StopError>
   return {std::move(future), std::move(promise)};
 }
 
-template <typename V = void, typename E = StopError>
+template <typename V = void, typename E = DefaultTrait>
 [[nodiscard]] ContractOn<V, E> MakeContractOn(IExecutor& e) {
   auto core = MakeUnique<detail::ResultCore<V, E>>();
   e.IncRef();

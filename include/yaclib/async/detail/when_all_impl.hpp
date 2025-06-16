@@ -28,8 +28,8 @@ struct AllCombinatorBase {
 };
 
 template <typename V, typename E>
-struct AllCombinatorBase<OrderPolicy::Same, Result<V, E>> {
-  using FutureValue = std::vector<Result<V, E>>;
+struct AllCombinatorBase<OrderPolicy::Same, typename E::template Result<V>> {
+  using FutureValue = std::vector<typename E::template Result<V>>;
 };
 
 template <>
@@ -51,8 +51,8 @@ struct AllCombinatorBase<OrderPolicy::Fifo, V> {
 };
 
 template <typename V, typename E>
-struct AllCombinatorBase<OrderPolicy::Fifo, Result<V, E>> {
-  using FutureValue = std::vector<Result<V, E>>;
+struct AllCombinatorBase<OrderPolicy::Fifo, typename E::template Result<V>> {
+  using FutureValue = std::vector<typename E::template Result<V>>;
 
   yaclib_std::atomic_size_t _ticket = 0;
   FutureValue _results;
@@ -76,7 +76,7 @@ struct AllCombinatorBase<OrderPolicy::Fifo, void> {
 
 template <OrderPolicy O /*= Any*/, typename R, typename E>
 class AllCombinator : public InlineCore, protected AllCombinatorBase<O, R> {
-  using V = result_value_t<R>;
+  using V = E::template Value<R>;
   using FutureValue = typename AllCombinatorBase<O, R>::FutureValue;
   using ResultPtr = ResultCorePtr<FutureValue, E>;
 
@@ -103,7 +103,7 @@ class AllCombinator : public InlineCore, protected AllCombinatorBase<O, R> {
       return;
     }
     if constexpr (std::is_void_v<R>) {
-      _core->Store(std::in_place);
+      _core->Store(Unit{});
     } else {
       _core->Store(std::move(this->_results));
     }
@@ -145,20 +145,14 @@ class AllCombinator : public InlineCore, protected AllCombinatorBase<O, R> {
   }
 #endif
 
-  bool CombineValue(Result<V, E>&& result) noexcept {
-    const auto state = result.State();
-    if (state == ResultState::Value) {
+  bool CombineValue(E::template Result<V>&& result) noexcept {
+    if (E::Ok(result)) {
       if constexpr (!std::is_void_v<V>) {
         const auto ticket = this->_ticket.fetch_add(1, std::memory_order_acq_rel);
         this->_results[ticket] = std::move(result).Value();
       }
     } else if (!this->_done.exchange(true, std::memory_order_acq_rel)) {
-      if (state == ResultState::Exception) {
-        _core->Store(std::move(result).Exception());
-      } else {
-        YACLIB_ASSERT(state == ResultState::Error);
-        _core->Store(std::move(result).Error());
-      }
+      _core->Store(std::move(result).Error());
       return true;
     }
     return false;
@@ -174,7 +168,7 @@ class AllCombinator : public InlineCore, protected AllCombinatorBase<O, R> {
 
 template <typename R, typename E>
 class AllCombinator<OrderPolicy::Same, R, E> : public InlineCore, public AllCombinatorBase<OrderPolicy::Same, R> {
-  using V = result_value_t<R>;
+  using V = E::template Value<R>;
   using FutureValue = typename AllCombinatorBase<OrderPolicy::Same, R>::FutureValue;
   using ResultPtr = ResultCorePtr<FutureValue, E>;
 
@@ -211,7 +205,7 @@ class AllCombinator<OrderPolicy::Same, R, E> : public InlineCore, public AllComb
     }
     if constexpr (std::is_void_v<R>) {
       Clear();
-      _core->Store(std::in_place);
+      _core->Store(Unit{});
     } else {
       std::vector<R> results;
       results.reserve(_callers.size());
@@ -257,15 +251,9 @@ class AllCombinator<OrderPolicy::Same, R, E> : public InlineCore, public AllComb
   }
 #endif
 
-  bool CombineValue(Result<V, E>&& result) noexcept {
-    const auto state = result.State();
-    if (state != ResultState::Value && !this->_done.exchange(true, std::memory_order_acq_rel)) {
-      if (state == ResultState::Exception) {
-        _core->Store(std::move(result).Exception());
-      } else {
-        YACLIB_ASSERT(state == ResultState::Error);
-        _core->Store(std::move(result).Error());
-      }
+  bool CombineValue(E::template Result<V>&& result) noexcept {
+    if (!E::Ok(result) && !this->_done.exchange(true, std::memory_order_acq_rel)) {
+      _core->Store(std::move(result).Error());
       return true;
     }
     return false;

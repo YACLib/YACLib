@@ -17,7 +17,8 @@ if (NOT GTEST_FOUND)
   set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)   # May be enabled later
   # For Windows: Prevent overriding the parent project's compiler/linker settings
   set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-  FetchContent_MakeAvailable(googletest)
+  #FetchContent_MakeAvailable(googletest)
+  add_subdirectory(${CMAKE_BINARY_DIR}/_deps/googletest-src ${CMAKE_BINARY_DIR}/_deps/googletest-build)
 endif ()
 
 set(TEST_UTIL_INCLUDES

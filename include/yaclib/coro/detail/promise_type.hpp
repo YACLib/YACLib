@@ -73,12 +73,12 @@ class PromiseType final : public OneCounter<ResultCore<V, E>, PromiseTypeDeleter
   }
 
   template <typename Value>
-  void return_value(Value&& value) noexcept(std::is_nothrow_constructible_v<Result<V, E>, Value&&>) {
+  void return_value(Value&& value) {
     this->Store(std::forward<Value>(value));
   }
 
-  void return_value(Unit) noexcept {
-    this->Store(std::in_place);
+  void return_value(Unit) {
+    this->Store();
   }
 
   [[nodiscard]] auto Handle() noexcept {
