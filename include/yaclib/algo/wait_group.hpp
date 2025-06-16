@@ -41,6 +41,10 @@ class WaitGroup final {
     _event.Sub(count);
   }
 
+  YACLIB_INLINE std::size_t Count(std::memory_order order = std::memory_order_relaxed) const noexcept {
+    return _event.Get(order);
+  }
+
   /**
    * Consume \ref Future by WaitGroup with auto Done
    *

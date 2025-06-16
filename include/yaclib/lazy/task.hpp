@@ -66,20 +66,23 @@ class Task final {
 
   template <typename Func>
   /*Task*/ auto Then(IExecutor& e, Func&& f) && {
+    YACLIB_ASSERT(!Ready());
     return detail::SetCallback<detail::CoreType::Then, detail::CallbackType::LazyOn>(_core, &e, std::forward<Func>(f));
   }
   template <typename Func>
   /*Task*/ auto ThenInline(Func&& f) && {
+    YACLIB_ASSERT(!Ready());
     return detail::SetCallback<detail::CoreType::Then, detail::CallbackType::LazyInline>(_core, nullptr,
                                                                                          std::forward<Func>(f));
   }
   template <typename Func>
   /*Task*/ auto Then(Func&& f) && {
+    YACLIB_ASSERT(!Ready());
     return detail::SetCallback<detail::CoreType::Then, detail::CallbackType::LazyOn>(_core, nullptr,
                                                                                      std::forward<Func>(f));
   }
 
-  void Cancel() && {
+  void Cancel() && noexcept {
     std::move(*this).Detach(MakeInline(StopTag{}));
   }
 
@@ -97,10 +100,12 @@ class Task final {
   }
 
   Future<V, E> ToFuture() && noexcept {
+    YACLIB_ASSERT(Valid());
     detail::Start(_core.Get());
     return {std::move(_core)};
   }
   FutureOn<V, E> ToFuture(IExecutor& e) && noexcept {
+    YACLIB_ASSERT(Valid());
     detail::Start(_core.Get(), e);
     return {std::move(_core)};
   }

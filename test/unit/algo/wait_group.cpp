@@ -68,9 +68,11 @@ void TestJustWorks() {
 
   EXPECT_FALSE(f.Ready());
   wg.Attach(f);
+  EXPECT_EQ(wg.Count(), 1);
   EXPECT_LE(timer.Elapsed(), 20ms * YACLIB_CI_SLOWDOWN);
   wg.Wait();
   EXPECT_TRUE(f.Ready());
+  EXPECT_EQ(wg.Count(std::memory_order_acquire), 0);
 
   EXPECT_LE(timer.Elapsed(), 100ms * YACLIB_CI_SLOWDOWN);
 

@@ -10,6 +10,7 @@ namespace yaclib::detail {
 
 struct [[nodiscard]] TransferAwaiter final {
   explicit TransferAwaiter(BaseCore& caller) noexcept : _caller{caller} {
+    YACLIB_ASSERT(caller.Empty());
   }
 
   constexpr bool await_ready() const noexcept {
@@ -38,6 +39,7 @@ template <typename V, typename E>
 struct [[nodiscard]] TransferSingleAwaiter final {
   explicit TransferSingleAwaiter(ResultCorePtr<V, E>&& result) noexcept : _result{std::move(result)} {
     YACLIB_ASSERT(_result != nullptr);
+    YACLIB_ASSERT(_result->Empty());
   }
 
   constexpr bool await_ready() const noexcept {
@@ -125,7 +127,7 @@ class [[nodiscard]] AwaitAwaiter<false> final {
   explicit AwaitAwaiter(It it, std::size_t count) noexcept;
 
   YACLIB_INLINE bool await_ready() const noexcept {
-    return _event.GetRef() == 1;
+    return _event.Get(std::memory_order_acquire) == 1;
   }
 
   template <typename Promise>
