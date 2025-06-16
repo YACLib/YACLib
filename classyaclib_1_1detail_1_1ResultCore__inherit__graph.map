@@ -1,0 +1,23 @@
+<map id="yaclib::detail::ResultCore&lt; V, E &gt;" name="yaclib::detail::ResultCore&lt; V, E &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="849,85,1010,126"/>
+<area shape="rect" id="Node000008" href="$structyaclib_1_1detail_1_1OneCounter.html" title=" " alt="" coords="1058,5,1284,61"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="1013,78,1075,59,1076,64,1015,83"/>
+<area shape="rect" id="Node000010" href="$classyaclib_1_1detail_1_1PromiseCore.html" title=" " alt="" coords="1085,85,1257,126"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="1026,103,1084,103,1084,108,1026,108"/>
+<area shape="rect" id="Node000011" href="$classyaclib_1_1detail_1_1ReadyCore.html" title=" " alt="" coords="1091,150,1251,191"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="1022,127,1094,147,1092,152,1021,133"/>
+<area shape="rect" id="Node000002" href="$classyaclib_1_1detail_1_1BaseCore.html" title=" " alt="" coords="647,92,801,118"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="816,103,849,103,849,108,816,108"/>
+<area shape="rect" id="Node000003" href="$classyaclib_1_1detail_1_1InlineCore.html" title=" " alt="" coords="443,92,599,118"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="614,103,646,103,646,108,614,108"/>
+<area shape="rect" id="Node000004" href="$classyaclib_1_1Job.html" title="Callable that can be executed in an IExecutor." alt="" coords="314,92,395,118"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="411,103,443,103,443,108,411,108"/>
+<area shape="rect" id="Node000005" href="$classyaclib_1_1IFunc.html" title="Callable interface." alt="" coords="155,67,249,93"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="265,87,314,96,313,101,264,93"/>
+<area shape="rect" id="Node000006" href="$classyaclib_1_1IRef.html" title="Reference counting interface." alt="" coords="5,67,90,93"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="105,77,155,77,155,83,105,83"/>
+<area shape="rect" id="Node000007" href="$structyaclib_1_1detail_1_1Node.html" title="Node class, used in intrusive data structure." alt="" coords="138,116,266,142"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="281,114,313,109,314,114,282,119"/>
+<area shape="rect" id="Node000009" href="$classyaclib_1_1detail_1_1PromiseType.html" title=" " alt="" coords="1332,13,1505,54"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="1299,31,1331,31,1331,36,1299,36"/>
+</map>
