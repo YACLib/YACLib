@@ -439,7 +439,9 @@ TEST(CoroFuture, CheckAwaitOnCoroMultiReady) {
 TEST(CoroTask, Check) {
   auto coro = []() -> yaclib::Task<int> {
     auto task = yaclib::MakeTask(10);
+    EXPECT_FALSE(task.Ready());
     co_await Await(task);
+    EXPECT_TRUE(task.Ready());
     co_return std::as_const(task).Touch();
   };
   EXPECT_EQ(coro().Get().Ok(), 10);
@@ -453,15 +455,24 @@ TEST(CoroTask, CheckCoAwait) {
   EXPECT_EQ(coro().Get().Ok(), 10);
 }
 
-TEST(CoroTask, CheckCoAwaitCoro) {
-  auto coro = []() -> yaclib::Task<int> {
+TEST(CoroTask, CheckReady) {
+  auto coro = [](bool wait) -> yaclib::Task<int> {
     auto coro1 = []() -> yaclib::Task<int> {
       co_return 42;
     };
 
-    co_return co_await coro1();
+    auto t = coro1();
+    EXPECT_FALSE(t.Ready());
+    if (wait) {
+      co_await Await(t);
+      EXPECT_TRUE(t.Ready());
+      co_return std::move(t).Touch().Ok();
+    } else {
+      co_return co_await std::move(t);
+    }
   };
-  EXPECT_EQ(coro().Get().Ok(), 42);
+  EXPECT_EQ(coro(false).Get().Ok(), 42);
+  EXPECT_EQ(coro(true).Get().Ok(), 42);
 }
 
 TEST(Future, WhenAllCoro) {

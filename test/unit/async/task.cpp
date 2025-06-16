@@ -26,6 +26,7 @@ TEST(Task, Simple) {
 
   yaclib::FairThreadPool tp{1};
   EXPECT_TRUE(task.Valid());
+  EXPECT_FALSE(task.Ready());
   yaclib::FutureOn<> future = std::move(task).ToFuture(tp);
   EXPECT_FALSE(task.Valid());
   std::ignore = std::move(future).Get();
