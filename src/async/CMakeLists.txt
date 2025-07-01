@@ -4,6 +4,9 @@ list(APPEND YACLIB_INCLUDES
   ${YACLIB_INCLUDE_DIR}/async/make.hpp
   ${YACLIB_INCLUDE_DIR}/async/promise.hpp
   ${YACLIB_INCLUDE_DIR}/async/run.hpp
+  ${YACLIB_INCLUDE_DIR}/async/shared_contract.hpp
+  ${YACLIB_INCLUDE_DIR}/async/shared_future.hpp
+  ${YACLIB_INCLUDE_DIR}/async/shared_promise.hpp
   ${YACLIB_INCLUDE_DIR}/async/wait.hpp
   ${YACLIB_INCLUDE_DIR}/async/wait_for.hpp
   ${YACLIB_INCLUDE_DIR}/async/wait_until.hpp
@@ -11,6 +14,7 @@ list(APPEND YACLIB_INCLUDES
   ${YACLIB_INCLUDE_DIR}/async/when_any.hpp
   )
 list(APPEND YACLIB_HEADERS
+  ${YACLIB_INCLUDE_DIR}/async/detail/shared_core.hpp
   ${YACLIB_INCLUDE_DIR}/async/detail/wait_impl.hpp
   ${YACLIB_INCLUDE_DIR}/async/detail/when_all_impl.hpp
   ${YACLIB_INCLUDE_DIR}/async/detail/when_any_impl.hpp

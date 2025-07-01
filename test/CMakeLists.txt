@@ -57,6 +57,7 @@ set(YACLIB_UNIT_SOURCES
   unit/algo/when_any
   unit/algo/wait_group
   unit/runtime/fair_thread_pool
+  unit/async/shared_core
   unit/async/stress
   unit/exe/strand
   unit/not_implemented
