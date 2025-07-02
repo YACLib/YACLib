@@ -19,7 +19,7 @@ class SharedCore : public IRef {
   using ResultCorePtrType = detail::ResultCorePtr<V, E>;
 
  public:
-  SharedCore() noexcept : _stub{} {};
+  SharedCore() noexcept {};
 
   void Attach(Promise<V, E>&& p) {
     ResultCoreType* core = p.GetCore().Get();
@@ -58,7 +58,6 @@ class SharedCore : public IRef {
 
   yaclib_std::atomic<ResultCoreType*> _head = nullptr;
   union {
-    Unit _stub;
     Result<V, E> _result;
   };
 };
