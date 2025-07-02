@@ -13,7 +13,7 @@
 namespace test {
 namespace {
 
-constexpr int SET_VALUE = 5;
+constexpr int kSetValue = 5;
 
 TEST(SharedCore, Void) {
   auto [sf, sp] = yaclib::MakeSharedContract<>();
@@ -23,22 +23,22 @@ TEST(SharedCore, Void) {
 
 TEST(SharedCore, SetGet) {
   auto [sf, sp] = yaclib::MakeSharedContract<int>();
-  std::move(sp).Set(SET_VALUE);
-  EXPECT_EQ(sf.Get().Value(), SET_VALUE);
+  std::move(sp).Set(kSetValue);
+  EXPECT_EQ(sf.Get().Value(), kSetValue);
 }
 
 TEST(SharedCore, SetGetFuture) {
   auto [sf, sp] = yaclib::MakeSharedContract<int>();
-  std::move(sp).Set(SET_VALUE);
+  std::move(sp).Set(kSetValue);
   auto f = sf.GetFuture();
-  EXPECT_EQ(std::move(f).Get().Value(), SET_VALUE);
+  EXPECT_EQ(std::move(f).Get().Value(), kSetValue);
 }
 
 TEST(SharedCore, GetFutureSet) {
   auto [sf, sp] = yaclib::MakeSharedContract<int>();
   auto f = sf.GetFuture();
-  std::move(sp).Set(SET_VALUE);
-  EXPECT_EQ(std::move(f).Get().Value(), SET_VALUE);
+  std::move(sp).Set(kSetValue);
+  EXPECT_EQ(std::move(f).Get().Value(), kSetValue);
 }
 
 TEST(SharedCore, GetFutureOn) {
@@ -47,10 +47,10 @@ TEST(SharedCore, GetFutureOn) {
   auto [sf, sp] = yaclib::MakeSharedContract<int>();
   auto f = sf.GetFutureOn(tp);
   std::move(f).Detach([](int value) {
-    EXPECT_EQ(value, SET_VALUE);
+    EXPECT_EQ(value, kSetValue);
   });
 
-  std::move(sp).Set(SET_VALUE);
+  std::move(sp).Set(kSetValue);
 
   tp.SoftStop();
   tp.Wait();
@@ -61,12 +61,12 @@ TEST(SharedCore, PromiseDtor) {
 
   {
     auto [sf_internal, sp_internal] = yaclib::MakeSharedContract<int>();
-    std::move(sp_internal).Set(SET_VALUE);
+    std::move(sp_internal).Set(kSetValue);
     sf = sf_internal;
   }
 
   auto f1 = sf.GetFuture();
-  EXPECT_EQ(std::move(f1).Get().Value(), SET_VALUE);
+  EXPECT_EQ(std::move(f1).Get().Value(), kSetValue);
 
   {
     auto [sf_internal, sp_internal] = yaclib::MakeSharedContract<int>();
@@ -81,9 +81,9 @@ TEST(SharedCore, PromiseAttach) {
   auto [f, p] = yaclib::MakeContract<int>();
 
   sf.Attach(std::move(p));
-  std::move(sp).Set(SET_VALUE);
+  std::move(sp).Set(kSetValue);
 
-  EXPECT_EQ(std::move(f).Get().Value(), SET_VALUE);
+  EXPECT_EQ(std::move(f).Get().Value(), kSetValue);
 }
 
 TEST(SharedCore, Concurrent) {
@@ -94,13 +94,13 @@ TEST(SharedCore, Concurrent) {
   for (size_t i = 0; i < 10; ++i) {
     yaclib::Submit(tp, [&sf = sf, &tp]() {
       sf.GetFuture().Detach(tp, [](int value) {
-        EXPECT_EQ(value, SET_VALUE);
+        EXPECT_EQ(value, kSetValue);
       });
     });
   }
 
   yaclib::Submit(tp, [sp = std::move(sp)]() mutable {
-    std::move(sp).Set(SET_VALUE);
+    std::move(sp).Set(kSetValue);
   });
 
   tp.SoftStop();
@@ -124,8 +124,8 @@ TEST(SharedCore, FuturesOutliveShared) {
     f = sf.GetFuture();
   }
 
-  std::move(sp).Set(SET_VALUE);
-  EXPECT_EQ(std::move(f).Get().Value(), SET_VALUE);
+  std::move(sp).Set(kSetValue);
+  EXPECT_EQ(std::move(f).Get().Value(), kSetValue);
 }
 
 TEST(SharedCore, CopySharedFuture) {
@@ -139,10 +139,10 @@ TEST(SharedCore, CopySharedFuture) {
   auto f1 = sf1.GetFuture();
   auto f2 = sf2.GetFuture();
 
-  std::move(sp).Set(SET_VALUE);
+  std::move(sp).Set(kSetValue);
 
-  ASSERT_EQ(std::move(f1).Get().Value(), SET_VALUE);
-  ASSERT_EQ(std::move(f2).Get().Value(), SET_VALUE);
+  ASSERT_EQ(std::move(f1).Get().Value(), kSetValue);
+  ASSERT_EQ(std::move(f2).Get().Value(), kSetValue);
 }
 
 TEST(SharedCore, MoveSharedFuture) {
@@ -153,8 +153,8 @@ TEST(SharedCore, MoveSharedFuture) {
   ASSERT_EQ(sf1.Valid(), false);
   ASSERT_EQ(sf2.Valid(), true);
 
-  std::move(sp).Set(SET_VALUE);
-  ASSERT_EQ(sf2.Get().Value(), SET_VALUE);
+  std::move(sp).Set(kSetValue);
+  ASSERT_EQ(sf2.Get().Value(), kSetValue);
 }
 
 TEST(SharedCore, MoveSharedPromise) {
@@ -165,19 +165,19 @@ TEST(SharedCore, MoveSharedPromise) {
   ASSERT_EQ(sp1.Valid(), false);
   ASSERT_EQ(sp2.Valid(), true);
 
-  std::move(sp2).Set(SET_VALUE);
-  ASSERT_EQ(sf.Get().Value(), SET_VALUE);
+  std::move(sp2).Set(kSetValue);
+  ASSERT_EQ(sf.Get().Value(), kSetValue);
 }
 
 TEST(SharedCore, SharedFutureGet) {
   yaclib::FairThreadPool tp;
   auto [sf, sp] = yaclib::MakeSharedContract<int>();
   yaclib::Submit(tp, [sp = std::move(sp)]() mutable {
-    std::move(sp).Set(SET_VALUE);
+    std::move(sp).Set(kSetValue);
   });
 
-  ASSERT_EQ(sf.Get().Value(), SET_VALUE);
-  ASSERT_EQ(sf.GetFuture().Get().Value(), SET_VALUE);
+  ASSERT_EQ(sf.Get().Value(), kSetValue);
+  ASSERT_EQ(sf.GetFuture().Get().Value(), kSetValue);
 
   tp.SoftStop();
   tp.Wait();
@@ -187,13 +187,13 @@ TEST(SharedCore, SharedFutureConcurrentGet) {
   yaclib::FairThreadPool tp;
   auto [sf, sp] = yaclib::MakeSharedContract<int>();
   yaclib::Submit(tp, [sp = std::move(sp)]() mutable {
-    std::move(sp).Set(SET_VALUE);
+    std::move(sp).Set(kSetValue);
   });
 
   yaclib::FairThreadPool tp2;
   for (size_t i = 0; i < 10; ++i) {
     yaclib::Submit(tp2, [&sf = sf]() mutable {
-      ASSERT_EQ(sf.Get().Value(), SET_VALUE);
+      ASSERT_EQ(sf.Get().Value(), kSetValue);
     });
   }
 

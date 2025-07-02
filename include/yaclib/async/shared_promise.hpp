@@ -1,16 +1,18 @@
 #pragma once
 
-#include <yaclib/async/detail/shared_core.hpp>
+#include <yaclib/algo/detail/shared_core.hpp>
 
 namespace yaclib {
 
 template <typename V, typename E>
 class SharedPromise final {
+  static_assert(Check<V>(), "V should be valid");
+  static_assert(Check<E>(), "E should be valid");
+  static_assert(!std::is_same_v<V, E>, "Future cannot be instantiated with same V and E, because it's ambiguous");
+  static_assert(std::is_copy_constructible_v<Result<V, E>>, "Result should be copyable");
+
  public:
   SharedPromise() noexcept = default;
-
-  explicit SharedPromise(detail::SharedCorePtr<V, E> core) noexcept : _core(std::move(core)) {
-  }
 
   SharedPromise(const SharedPromise& other) = delete;
   SharedPromise& operator=(const SharedPromise& other) = delete;
@@ -37,6 +39,12 @@ class SharedPromise final {
     if (Valid()) {
       std::move(*this).Set(StopTag{});
     }
+  }
+
+  /**
+   * Part of unsafe but internal API
+   */
+  explicit SharedPromise(detail::SharedCorePtr<V, E> core) noexcept : _core(std::move(core)) {
   }
 
  private:

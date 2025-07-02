@@ -14,7 +14,6 @@ list(APPEND YACLIB_INCLUDES
   ${YACLIB_INCLUDE_DIR}/async/when_any.hpp
   )
 list(APPEND YACLIB_HEADERS
-  ${YACLIB_INCLUDE_DIR}/async/detail/shared_core.hpp
   ${YACLIB_INCLUDE_DIR}/async/detail/wait_impl.hpp
   ${YACLIB_INCLUDE_DIR}/async/detail/when_all_impl.hpp
   ${YACLIB_INCLUDE_DIR}/async/detail/when_any_impl.hpp

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "yaclib/fwd.hpp"
+
 #include <yaclib/algo/detail/result_core.hpp>
 #include <yaclib/async/future.hpp>
 #include <yaclib/async/promise.hpp>
@@ -17,24 +19,7 @@ class SharedCore : public IRef {
   using ResultCorePtrType = detail::ResultCorePtr<V, E>;
 
  public:
-  SharedCore() : _head(nullptr) {
-  }
-
-  Result<V, E> Get() {
-    return GetFuture().Get();
-  }
-
-  Future<V, E> GetFuture() {
-    auto [f, p] = MakeContract<V, E>();
-    Attach(std::move(p));
-    return std::move(f);
-  }
-
-  FutureOn<V, E> GetFutureOn(IExecutor& e) {
-    auto [f, p] = MakeContractOn<V, E>(e);
-    Attach(std::move(p));
-    return std::move(f);
-  };
+  SharedCore() noexcept : _stub{} {};
 
   void Attach(Promise<V, E>&& p) {
     ResultCoreType* core = p.GetCore().Get();
@@ -64,15 +49,16 @@ class SharedCore : public IRef {
   }
 
   ~SharedCore() {
-    YACLIB_ASSERT(reinterpret_cast<std::uintptr_t>(_head.load(std::memory_order_acquire)) == kSet);
+    YACLIB_ASSERT(reinterpret_cast<std::uintptr_t>(_head.load(std::memory_order_relaxed)) == kSet);
     _result.~Result<V, E>();
   }
 
  private:
   static constexpr std::uintptr_t kSet = std::numeric_limits<std::uintptr_t>::max();
 
-  yaclib_std::atomic<ResultCoreType*> _head;
+  yaclib_std::atomic<ResultCoreType*> _head = nullptr;
   union {
+    Unit _stub;
     Result<V, E> _result;
   };
 };

@@ -7,6 +7,7 @@ list(APPEND YACLIB_HEADERS
   ${YACLIB_INCLUDE_DIR}/algo/detail/core.hpp
   ${YACLIB_INCLUDE_DIR}/algo/detail/inline_core.hpp
   ${YACLIB_INCLUDE_DIR}/algo/detail/result_core.hpp
+  ${YACLIB_INCLUDE_DIR}/algo/detail/shared_core.hpp
   ${YACLIB_INCLUDE_DIR}/algo/detail/wait_event.hpp
   )
 list(APPEND YACLIB_SOURCES
