@@ -1,11 +1,10 @@
 #pragma once
 
-#include "yaclib/fwd.hpp"
-
 #include <yaclib/algo/detail/result_core.hpp>
 #include <yaclib/async/future.hpp>
 #include <yaclib/async/promise.hpp>
 #include <yaclib/exe/executor.hpp>
+#include <yaclib/fwd.hpp>
 #include <yaclib/util/ref.hpp>
 
 #include <atomic>
@@ -54,7 +53,7 @@ class SharedCore : public IRef {
   }
 
  private:
-  static constexpr std::uintptr_t kSet = std::numeric_limits<std::uintptr_t>::max();
+  static constexpr auto kSet = std::numeric_limits<std::uintptr_t>::max();
 
   yaclib_std::atomic<ResultCoreType*> _head = nullptr;
   union {
