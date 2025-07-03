@@ -15,10 +15,9 @@ namespace detail {
 template <typename V, typename E>
 class SharedCore : public IRef {
   using ResultCoreType = ResultCore<V, E>;
-  using ResultCorePtrType = detail::ResultCorePtr<V, E>;
 
  public:
-  SharedCore() noexcept {};
+  SharedCore() noexcept {}
 
   void Attach(Promise<V, E>&& p) {
     ResultCoreType* core = p.GetCore().Get();
