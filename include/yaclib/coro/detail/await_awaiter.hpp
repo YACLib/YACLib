@@ -34,9 +34,9 @@ struct [[nodiscard]] TransferAwaiter final {
   BaseCore& _caller;
 };
 
-template <typename V, typename E>
+template <typename V, typename T>
 struct [[nodiscard]] TransferSingleAwaiter final {
-  explicit TransferSingleAwaiter(ResultCorePtr<V, E>&& result) noexcept : _result{std::move(result)} {
+  explicit TransferSingleAwaiter(ResultCorePtr<V, T>&& result) noexcept : _result{std::move(result)} {
     YACLIB_ASSERT(_result != nullptr);
   }
 
@@ -60,7 +60,7 @@ struct [[nodiscard]] TransferSingleAwaiter final {
   }
 
  private:
-  ResultCorePtr<V, E> _result;
+  ResultCorePtr<V, T> _result;
 };
 
 /**
@@ -160,10 +160,10 @@ AwaitAwaiter<false>::AwaitAwaiter(It it, std::size_t count) noexcept : _event{co
   _event.count.fetch_sub(count - wait_count, std::memory_order_relaxed);
 }
 
-template <typename V, typename E>
+template <typename V, typename T>
 class [[nodiscard]] AwaitSingleAwaiter final {
  public:
-  explicit AwaitSingleAwaiter(ResultCorePtr<V, E>&& result) noexcept : _result{std::move(result)} {
+  explicit AwaitSingleAwaiter(ResultCorePtr<V, T>&& result) noexcept : _result{std::move(result)} {
     YACLIB_ASSERT(_result != nullptr);
   }
 
@@ -181,7 +181,7 @@ class [[nodiscard]] AwaitSingleAwaiter final {
   }
 
  private:
-  ResultCorePtr<V, E> _result;
+  ResultCorePtr<V, T> _result;
 };
 
 }  // namespace yaclib::detail

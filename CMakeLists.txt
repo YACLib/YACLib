@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.3)
+cmake_minimum_required(VERSION 3.10)
 
 project(yaclib
   LANGUAGES CXX
@@ -6,6 +6,7 @@ project(yaclib
 
 set(YACLIB_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(YACLIB_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
+set(CMAKE_COLOR_DIAGNOSTICS ON)
 
 # Include guards
 if (YACLIB_SOURCE_DIR STREQUAL YACLIB_BINARY_DIR)

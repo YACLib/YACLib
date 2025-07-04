@@ -6,11 +6,13 @@
 namespace yaclib {
 namespace detail {
 
-template <typename V, typename E>
-class ReadyCore : public ResultCore<V, E> {
+template <typename V, typename T>
+class ReadyCore : public ResultCore<V, T> {
+  using Result = typename T::template Result<V>;
+
  public:
   template <typename... Args>
-  ReadyCore(Args&&... args) noexcept(std::is_nothrow_constructible_v<Result<V, E>, Args&&...>) {
+  YACLIB_INLINE explicit ReadyCore(Unit, Args&&... args) {
     this->Store(std::forward<Args>(args)...);
   }
 
@@ -19,7 +21,7 @@ class ReadyCore : public ResultCore<V, E> {
   }
 
   void Drop() noexcept final {
-    this->_result.~Result<V, E>();
+    this->_result.~Result();
     this->Store(StopTag{});
     Call();
   }
@@ -39,18 +41,18 @@ class ReadyCore : public ResultCore<V, E> {
 /**
  * TODO(MBkkt) add description
  */
-template <typename V = Unit, typename E = StopError, typename... Args>
+template <typename V = Unit, typename T = DefaultTrait, typename... Args>
 /*Task*/ auto MakeTask(Args&&... args) {
   if constexpr (sizeof...(Args) == 0) {
-    using T = std::conditional_t<std::is_same_v<V, Unit>, void, V>;
-    return Task{detail::ResultCorePtr<T, E>{MakeUnique<detail::ReadyCore<T, E>>(std::in_place)}};
+    using Value = std::conditional_t<std::is_same_v<V, Unit>, void, V>;
+    return Task{detail::ResultCorePtr<Value, T>{MakeUnique<detail::ReadyCore<Value, T>>(Unit{})}};
   } else if constexpr (std::is_same_v<V, Unit>) {
     using T0 = std::decay_t<head_t<Args&&...>>;
-    using T = std::conditional_t<std::is_same_v<T0, Unit>, void, T0>;
+    using Value = std::conditional_t<std::is_same_v<T0, Unit>, void, T0>;
     return Task{
-      detail::ResultCorePtr<T, E>{MakeUnique<detail::ReadyCore<T, E>>(std::in_place, std::forward<Args>(args)...)}};
+      detail::ResultCorePtr<Value, T>{MakeUnique<detail::ReadyCore<Value, T>>(Unit{}, std::forward<Args>(args)...)}};
   } else {
-    return Task{detail::ResultCorePtr<V, E>{MakeUnique<detail::ReadyCore<V, E>>(std::forward<Args>(args)...)}};
+    return Task{detail::ResultCorePtr<V, T>{MakeUnique<detail::ReadyCore<V, T>>(Unit{}, std::forward<Args>(args)...)}};
   }
 }
 

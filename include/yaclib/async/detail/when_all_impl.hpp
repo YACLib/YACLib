@@ -20,6 +20,9 @@ namespace yaclib::detail {
 
 // TODO(MBkkt) Unify different OrderPolicy implementation
 
+template <typename V, typename T>
+using ResultType = typename T::template Result<V>;
+
 template <OrderPolicy O /*= Same*/, typename V>
 struct AllCombinatorBase {
   using FutureValue = std::vector<V>;
@@ -27,10 +30,10 @@ struct AllCombinatorBase {
   yaclib_std::atomic_bool _done = false;
 };
 
-template <typename V, typename E>
-struct AllCombinatorBase<OrderPolicy::Same, Result<V, E>> {
-  using FutureValue = std::vector<Result<V, E>>;
-};
+// template <typename V, typename T>
+// struct AllCombinatorBase<OrderPolicy::Same, ResultType<V, T>> {
+//   using FutureValue = std::vector<ResultType<V, T>>;
+// };
 
 template <>
 struct AllCombinatorBase<OrderPolicy::Same, void> {
@@ -50,13 +53,13 @@ struct AllCombinatorBase<OrderPolicy::Fifo, V> {
   FutureValue _results;
 };
 
-template <typename V, typename E>
-struct AllCombinatorBase<OrderPolicy::Fifo, Result<V, E>> {
-  using FutureValue = std::vector<Result<V, E>>;
+// template <typename V, typename T>
+// struct AllCombinatorBase<OrderPolicy::Fifo, ResultType<V, T>> {
+//   using FutureValue = std::vector<ResultType<V, T>>;
 
-  yaclib_std::atomic_size_t _ticket = 0;
-  FutureValue _results;
-};
+//   yaclib_std::atomic_size_t _ticket = 0;
+//   FutureValue _results;
+// };
 
 template <>
 struct AllCombinatorBase<OrderPolicy::Fifo, bool> {
@@ -74,11 +77,11 @@ struct AllCombinatorBase<OrderPolicy::Fifo, void> {
   yaclib_std::atomic_bool _done = false;
 };
 
-template <OrderPolicy O /*= Any*/, typename R, typename E>
+template <OrderPolicy O /*= Any*/, typename R, typename T>
 class AllCombinator : public InlineCore, protected AllCombinatorBase<O, R> {
-  using V = result_value_t<R>;
+  using V = T::template Value<R>;
   using FutureValue = typename AllCombinatorBase<O, R>::FutureValue;
-  using ResultPtr = ResultCorePtr<FutureValue, E>;
+  using ResultPtr = ResultCorePtr<FutureValue, T>;
 
  public:
   static std::pair<ResultPtr, AllCombinator*> Make(std::size_t count) {
@@ -86,14 +89,14 @@ class AllCombinator : public InlineCore, protected AllCombinatorBase<O, R> {
       return {nullptr, nullptr};
     }
     // TODO(MBkkt) Maybe single allocation instead of two?
-    auto combine_core = MakeUnique<ResultCore<FutureValue, E>>();
+    auto combine_core = MakeUnique<ResultCore<FutureValue, T>>();
     auto* raw_core = combine_core.Get();
     auto combinator = MakeShared<AllCombinator>(count, std::move(combine_core), count);
     ResultPtr future_core{NoRefTag{}, raw_core};
     return {std::move(future_core), combinator.Release()};
   }
 
-  void AddInput(ResultCore<V, E>& input) noexcept {
+  void AddInput(ResultCore<V, T>& input) noexcept {
     input.CallInline(*this);
   }
 
@@ -103,7 +106,7 @@ class AllCombinator : public InlineCore, protected AllCombinatorBase<O, R> {
       return;
     }
     if constexpr (std::is_void_v<R>) {
-      _core->Store(std::in_place);
+      _core->Store();
     } else {
       _core->Store(std::move(this->_results));
     }
@@ -121,7 +124,7 @@ class AllCombinator : public InlineCore, protected AllCombinatorBase<O, R> {
  private:
   template <bool SymmetricTransfer>
   [[nodiscard]] YACLIB_INLINE auto Impl(InlineCore& caller) noexcept {
-    auto& core = DownCast<ResultCore<V, E>>(caller);
+    auto& core = DownCast<ResultCore<V, T>>(caller);
     if constexpr (std::is_same_v<R, V>) {
       if (!this->_done.load(std::memory_order_acquire) && CombineValue(std::move(core.Get()))) {
         auto* callback = _core.Release();
@@ -145,26 +148,20 @@ class AllCombinator : public InlineCore, protected AllCombinatorBase<O, R> {
   }
 #endif
 
-  bool CombineValue(Result<V, E>&& result) noexcept {
-    const auto state = result.State();
-    if (state == ResultState::Value) {
+  bool CombineValue(T::template Result<V>&& result) noexcept {
+    if (T::Ok(result)) {
       if constexpr (!std::is_void_v<V>) {
         const auto ticket = this->_ticket.fetch_add(1, std::memory_order_acq_rel);
         this->_results[ticket] = std::move(result).Value();
       }
     } else if (!this->_done.exchange(true, std::memory_order_acq_rel)) {
-      if (state == ResultState::Exception) {
-        _core->Store(std::move(result).Exception());
-      } else {
-        YACLIB_ASSERT(state == ResultState::Error);
-        _core->Store(std::move(result).Error());
-      }
+      _core->Store(std::move(result).Error());
       return true;
     }
     return false;
   }
 
-  void Done(ResultCore<V, E>& caller) noexcept {
+  void Done(ResultCore<V, T>& caller) noexcept {
     caller.DecRef();
     DecRef();
   }
@@ -172,11 +169,11 @@ class AllCombinator : public InlineCore, protected AllCombinatorBase<O, R> {
   ResultPtr _core;
 };
 
-template <typename R, typename E>
-class AllCombinator<OrderPolicy::Same, R, E> : public InlineCore, public AllCombinatorBase<OrderPolicy::Same, R> {
-  using V = result_value_t<R>;
+template <typename R, typename T>
+class AllCombinator<OrderPolicy::Same, R, T> : public InlineCore, public AllCombinatorBase<OrderPolicy::Same, R> {
+  using V = T::template Value<R>;
   using FutureValue = typename AllCombinatorBase<OrderPolicy::Same, R>::FutureValue;
-  using ResultPtr = ResultCorePtr<FutureValue, E>;
+  using ResultPtr = ResultCorePtr<FutureValue, T>;
 
  public:
   static std::pair<ResultPtr, AllCombinator*> Make(std::size_t count) {
@@ -184,14 +181,14 @@ class AllCombinator<OrderPolicy::Same, R, E> : public InlineCore, public AllComb
       return {nullptr, nullptr};
     }
     // TODO(MBkkt) Maybe single allocation instead of two?
-    auto combine_core = MakeUnique<ResultCore<FutureValue, E>>();
+    auto combine_core = MakeUnique<ResultCore<FutureValue, T>>();
     auto* raw_core = combine_core.Get();
     auto combinator = MakeShared<AllCombinator>(count, std::move(combine_core), count);
     ResultPtr future_core{NoRefTag{}, raw_core};
     return {std::move(future_core), combinator.Release()};
   }
 
-  void AddInput(ResultCore<V, E>& input) noexcept {
+  void AddInput(ResultCore<V, T>& input) noexcept {
     _callers.push_back(&input);  // we made reserve in ctor, so noexcept
     input.CallInline(*this);
   }
@@ -211,7 +208,7 @@ class AllCombinator<OrderPolicy::Same, R, E> : public InlineCore, public AllComb
     }
     if constexpr (std::is_void_v<R>) {
       Clear();
-      _core->Store(std::in_place);
+      _core->Store();
     } else {
       std::vector<R> results;
       results.reserve(_callers.size());
@@ -237,7 +234,7 @@ class AllCombinator<OrderPolicy::Same, R, E> : public InlineCore, public AllComb
  private:
   template <bool SymmetricTransfer>
   [[nodiscard]] YACLIB_INLINE auto Impl(InlineCore& caller) noexcept {
-    auto& core = DownCast<ResultCore<V, E>>(caller);
+    auto& core = DownCast<ResultCore<V, T>>(caller);
     if constexpr (std::is_same_v<R, V>) {
       if (!this->_done.load(std::memory_order_acquire) && CombineValue(std::move(core.Get()))) {
         auto* callback = _core.Release();
@@ -257,21 +254,15 @@ class AllCombinator<OrderPolicy::Same, R, E> : public InlineCore, public AllComb
   }
 #endif
 
-  bool CombineValue(Result<V, E>&& result) noexcept {
-    const auto state = result.State();
-    if (state != ResultState::Value && !this->_done.exchange(true, std::memory_order_acq_rel)) {
-      if (state == ResultState::Exception) {
-        _core->Store(std::move(result).Exception());
-      } else {
-        YACLIB_ASSERT(state == ResultState::Error);
-        _core->Store(std::move(result).Error());
-      }
+  bool CombineValue(T::template Result<V>&& result) noexcept {
+    if (!T::Ok(result) && !this->_done.exchange(true, std::memory_order_acq_rel)) {
+      _core->Store(T::MoveError(std::move(result)));
       return true;
     }
     return false;
   }
 
-  std::vector<ResultCore<V, E>*> _callers;
+  std::vector<ResultCore<V, T>*> _callers;
   ResultPtr _core;
 };
 

@@ -6,11 +6,9 @@
 
 namespace yaclib {
 
-template <typename V, typename E>
+template <typename V, typename T>
 class Promise final {
   static_assert(Check<V>(), "V should be valid");
-  static_assert(Check<E>(), "E should be valid");
-  static_assert(!std::is_same_v<V, E>, "Promise cannot be instantiated with same V and E, because it's ambiguous");
 
  public:
   Promise(const Promise& other) = delete;
@@ -54,7 +52,7 @@ class Promise final {
   void Set(Args&&... args) && {
     YACLIB_ASSERT(Valid());
     if constexpr (sizeof...(Args) == 0) {
-      _core->Store(std::in_place);
+      _core->Store();
     } else {
       _core->Store(std::forward<Args>(args)...);
     }
@@ -65,15 +63,15 @@ class Promise final {
   /**
    * Part of unsafe but internal API
    */
-  explicit Promise(detail::ResultCorePtr<V, E> core) noexcept : _core{std::move(core)} {
+  explicit Promise(detail::ResultCorePtr<V, T> core) noexcept : _core{std::move(core)} {
   }
 
-  [[nodiscard]] detail::ResultCorePtr<V, E>& GetCore() noexcept {
+  [[nodiscard]] detail::ResultCorePtr<V, T>& GetCore() noexcept {
     return _core;
   }
 
  private:
-  detail::ResultCorePtr<V, E> _core;
+  detail::ResultCorePtr<V, T> _core;
 };
 
 extern template class Promise<>;

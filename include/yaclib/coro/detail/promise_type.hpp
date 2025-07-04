@@ -10,7 +10,7 @@
 
 namespace yaclib::detail {
 
-template <typename V, typename E, bool Lazy>
+template <typename V, typename T, bool Lazy>
 class PromiseType;
 
 struct Destroy final {
@@ -36,13 +36,13 @@ struct Destroy final {
 
 template <bool Lazy>
 struct PromiseTypeDeleter final {
-  template <typename V, typename E>
-  static void Delete(ResultCore<V, E>& core) noexcept;
+  template <typename V, typename T>
+  static void Delete(ResultCore<V, T>& core) noexcept;
 };
 
-template <typename V, typename E, bool Lazy>
-class PromiseType final : public OneCounter<ResultCore<V, E>, PromiseTypeDeleter<Lazy>> {
-  using Base = OneCounter<ResultCore<V, E>, PromiseTypeDeleter<Lazy>>;
+template <typename V, typename T, bool Lazy>
+class PromiseType final : public OneCounter<ResultCore<V, T>, PromiseTypeDeleter<Lazy>> {
+  using Base = OneCounter<ResultCore<V, T>, PromiseTypeDeleter<Lazy>>;
 
  public:
   PromiseType() noexcept : Base{0} {
@@ -50,9 +50,9 @@ class PromiseType final : public OneCounter<ResultCore<V, E>, PromiseTypeDeleter
 
   auto get_return_object() noexcept {
     if constexpr (Lazy) {
-      return Task<V, E>{ResultCorePtr<V, E>{NoRefTag{}, this}};
+      return Task<V, T>{ResultCorePtr<V, T>{NoRefTag{}, this}};
     } else {
-      return Future<V, E>{ResultCorePtr<V, E>{NoRefTag{}, this}};
+      return Future<V, T>{ResultCorePtr<V, T>{NoRefTag{}, this}};
     }
   }
 
@@ -73,12 +73,12 @@ class PromiseType final : public OneCounter<ResultCore<V, E>, PromiseTypeDeleter
   }
 
   template <typename Value>
-  void return_value(Value&& value) noexcept(std::is_nothrow_constructible_v<Result<V, E>, Value&&>) {
+  void return_value(Value&& value) {
     this->Store(std::forward<Value>(value));
   }
 
-  void return_value(Unit) noexcept {
-    this->Store(std::in_place);
+  void return_value(Unit) {
+    this->Store();
   }
 
   [[nodiscard]] auto Handle() noexcept {
@@ -130,9 +130,9 @@ class PromiseType final : public OneCounter<ResultCore<V, E>, PromiseTypeDeleter
 };
 
 template <bool Lazy>
-template <typename V, typename E>
-void PromiseTypeDeleter<Lazy>::Delete(ResultCore<V, E>& core) noexcept {
-  auto& promise = DownCast<PromiseType<V, E, Lazy>>(core);
+template <typename V, typename T>
+void PromiseTypeDeleter<Lazy>::Delete(ResultCore<V, T>& core) noexcept {
+  auto& promise = DownCast<PromiseType<V, T, Lazy>>(core);
   auto handle = promise.Handle();
   handle.destroy();
 }

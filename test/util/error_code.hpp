@@ -6,20 +6,22 @@
 
 namespace test {
 
-struct LikeErrorCode : std::error_code {
-  using std::error_code::error_code;
+// struct LikeErrorCode : std::error_code {
+//   using std::error_code::error_code;
 
-  LikeErrorCode(yaclib::StopTag /*tag*/) : std::error_code{std::make_error_code(std::errc::operation_canceled)} {
-  }
+//   LikeErrorCode(yaclib::StopTag /*tag*/) : std::error_code{std::make_error_code(std::errc::operation_canceled)} {
+//   }
 
-  LikeErrorCode(LikeErrorCode&&) noexcept = default;
-  LikeErrorCode(const LikeErrorCode&) noexcept = default;
-  LikeErrorCode& operator=(LikeErrorCode&&) noexcept = default;
-  LikeErrorCode& operator=(const LikeErrorCode&) noexcept = default;
+//   LikeErrorCode(LikeErrorCode&&) noexcept = default;
+//   LikeErrorCode(const LikeErrorCode&) noexcept = default;
+//   LikeErrorCode& operator=(LikeErrorCode&&) noexcept = default;
+//   LikeErrorCode& operator=(const LikeErrorCode&) noexcept = default;
 
-  const char* What() const noexcept {
-    return this->category().name();
-  }
-};
+//   const char* What() const noexcept {
+//     return this->category().name();
+//   }
+// };
+
+struct LikeErrorCode : yaclib::ResultTrait {};
 
 }  // namespace test

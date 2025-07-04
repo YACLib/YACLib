@@ -26,15 +26,15 @@ template <FailPolicy P = FailPolicy::LastFail, typename It, typename T = typenam
 auto WhenAny(It begin, std::size_t count) {
   static_assert(is_future_base_v<T>, "WhenAny function Iterator must be point to some Future");
   using V = future_base_value_t<T>;
-  using E = future_base_error_t<T>;
+  using Trait = future_base_trait_t<T>;
   YACLIB_WARN(count < 2, "Don't use combinators for zero or one futures");
   if (count == 0) {
-    return Future<V, E>{};
+    return Future<V, Trait>{};
   }
   if (count == 1) {
-    return Future<V, E>{std::exchange(begin->GetCore(), nullptr)};
+    return Future<V, Trait>{std::exchange(begin->GetCore(), nullptr)};
   }
-  auto [future_core, combinator] = detail::AnyCombinator<V, E, P>::Make(count);
+  auto [future_core, combinator] = detail::AnyCombinator<V, Trait, P>::Make(count);
   detail::WhenImpl(combinator, begin, count);
   return Future{std::move(future_core)};
 }
@@ -61,15 +61,15 @@ YACLIB_INLINE auto WhenAny(It begin, It end) {
  *
  * \tparam P policy WhenAny errors
  * \tparam V type of value all passed futures
- * \tparam E type of error all passed futures
+ * \tparam T type of trait all passed futures
  * \param futures two or more futures to combine
- * \return Future<T>
+ * \return Future<V>
  */
-template <FailPolicy P = FailPolicy::LastFail, typename V, typename... E>
-auto WhenAny(FutureBase<V, E>&&... futures) {
-  constexpr std::size_t kSize = sizeof...(E);
+template <FailPolicy P = FailPolicy::LastFail, typename V, typename... T>
+auto WhenAny(FutureBase<V, T>&&... futures) {
+  constexpr std::size_t kSize = sizeof...(T);
   static_assert(kSize >= 2, "WhenAny wants at least two futures");
-  auto [future_core, combinator] = detail::AnyCombinator<V, head_t<E...>, P>::Make(kSize);
+  auto [future_core, combinator] = detail::AnyCombinator<V, head_t<T...>, P>::Make(kSize);
   detail::WhenImpl(*combinator, std::move(futures)...);
   return Future{std::move(future_core)};
 }

@@ -10,8 +10,8 @@ namespace yaclib {
 /**
  * TODO(mkornaukhov03) Add doxygen docs
  */
-template <typename V, typename E>
-YACLIB_INLINE auto Await(Task<V, E>& task) noexcept {
+template <typename V, typename T>
+YACLIB_INLINE auto Await(Task<V, T>& task) noexcept {
   YACLIB_ASSERT(task.Valid());
   return detail::TransferAwaiter{UpCast<detail::BaseCore>(*task.GetCore())};
 }
@@ -19,8 +19,8 @@ YACLIB_INLINE auto Await(Task<V, E>& task) noexcept {
 /**
  * TODO(mkornaukhov03) Add doxygen docs
  */
-template <typename... V, typename... E>
-YACLIB_INLINE auto Await(FutureBase<V, E>&... fs) noexcept {
+template <typename... V, typename... T>
+YACLIB_INLINE auto Await(FutureBase<V, T>&... fs) noexcept {
   YACLIB_ASSERT(... && fs.Valid());
   return detail::AwaitAwaiter<sizeof...(fs) == 1>{UpCast<detail::BaseCore>(*fs.GetCore())...};
 }
@@ -45,14 +45,14 @@ YACLIB_INLINE auto Await(Iterator begin, Iterator end) noexcept
   return Await(begin, static_cast<std::size_t>(end - begin));
 }
 
-template <typename V, typename E>
-YACLIB_INLINE auto operator co_await(FutureBase<V, E>&& future) noexcept {
+template <typename V, typename T>
+YACLIB_INLINE auto operator co_await(FutureBase<V, T>&& future) noexcept {
   YACLIB_ASSERT(future.Valid());
   return detail::AwaitSingleAwaiter{std::move(future.GetCore())};
 }
 
-template <typename V, typename E>
-YACLIB_INLINE auto operator co_await(Task<V, E>&& task) noexcept {
+template <typename V, typename T>
+YACLIB_INLINE auto operator co_await(Task<V, T>&& task) noexcept {
   YACLIB_ASSERT(task.Valid());
   return detail::TransferSingleAwaiter{std::move(task.GetCore())};
 }

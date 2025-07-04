@@ -9,21 +9,21 @@
 
 namespace yaclib::detail {
 
-template <typename V, typename E, typename Func>
-class PromiseCore : public ResultCore<V, E>, public FuncCore<Func> {
+template <typename V, typename T, typename Func>
+class PromiseCore : public ResultCore<V, T>, public FuncCore<Func> {
   using F = FuncCore<Func>;
   using Invoke = typename F::Invoke;
   using Storage = typename F::Storage;
 
  public:
-  using Base = ResultCore<V, E>;
+  using Base = ResultCore<V, T>;
 
   explicit PromiseCore(Func&& f) : F{std::forward<Func>(f)} {
   }
 
  private:
   void Call() noexcept final {
-    Promise<V, E> promise{ResultCorePtr<V, E>{NoRefTag{}, this}};
+    Promise<V, T> promise{ResultCorePtr<V, T>{NoRefTag{}, this}};
     try {
       // We need to move func with capture on stack, because promise can be Set before func return
       static_assert(std::is_nothrow_move_constructible_v<Storage>);

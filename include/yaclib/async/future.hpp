@@ -16,12 +16,12 @@ namespace yaclib {
  * Future and \ref Promise are like a Single Producer/Single Consumer one-shot one-element channel.
  * Use the \ref Promise to fulfill the \ref Future.
  */
-template <typename V, typename E>
+template <typename V, typename T>
 class FutureBase {
+  using Result = T::template Result<V>;
+
  public:
   static_assert(Check<V>(), "V should be valid");
-  static_assert(Check<E>(), "E should be valid");
-  static_assert(!std::is_same_v<V, E>, "Future cannot be instantiated with same V and E, because it's ambiguous");
 
   FutureBase(const FutureBase&) = delete;
   FutureBase& operator=(const FutureBase&) = delete;
@@ -76,7 +76,7 @@ class FutureBase {
    * \note The behavior is undefined if \ref Valid is false before the call to this function.
    * \return \ref Result stored in the shared state
    */
-  [[nodiscard]] const Result<V, E>* Get() const& noexcept {
+  [[nodiscard]] const Result* Get() const& noexcept {
     if (Ready()) {  // TODO(MBkkt) Maybe we want likely
       return &_core->Get();
     }
@@ -89,7 +89,7 @@ class FutureBase {
    * \note The behavior is undefined if \ref Valid is false before the call to this function.
    * \return The \ref Result that Future received
    */
-  [[nodiscard]] Result<V, E> Get() && noexcept {
+  [[nodiscard]] Result Get() && noexcept {
     Wait(*this);
     auto core = std::exchange(_core, nullptr);
     return std::move(core->Get());
@@ -102,7 +102,7 @@ class FutureBase {
    * \note The behavior is undefined if \ref Valid or Ready is false before the call to this function.
    * \return The \ref Result stored in the shared state
    */
-  [[nodiscard]] const Result<V, E>& Touch() const& noexcept {
+  [[nodiscard]] const Result& Touch() const& noexcept {
     YACLIB_ASSERT(Ready());
     return _core->Get();
   }
@@ -113,7 +113,7 @@ class FutureBase {
    * \note The behavior is undefined if \ref Valid or Ready is false before the call to this function.
    * \return The \ref Result that Future received
    */
-  [[nodiscard]] Result<V, E> Touch() && noexcept {
+  [[nodiscard]] Result Touch() && noexcept {
     YACLIB_ASSERT(Ready());
     auto core = std::exchange(_core, nullptr);
     return std::move(core->Get());
@@ -176,18 +176,18 @@ class FutureBase {
    *
    * \return internal Core state ptr
    */
-  [[nodiscard]] detail::ResultCorePtr<V, E>& GetCore() noexcept {
+  [[nodiscard]] detail::ResultCorePtr<V, T>& GetCore() noexcept {
     return _core;
   }
 
  protected:
-  explicit FutureBase(detail::ResultCorePtr<V, E> core) noexcept : _core{std::move(core)} {
+  explicit FutureBase(detail::ResultCorePtr<V, T> core) noexcept : _core{std::move(core)} {
   }
 
-  detail::ResultCorePtr<V, E> _core;
+  detail::ResultCorePtr<V, T> _core;
 };
 
-extern template class FutureBase<void, StopError>;
+extern template class FutureBase<void, DefaultTrait>;
 
 /**
  * Provides a mechanism to access the result of async operations
@@ -195,14 +195,14 @@ extern template class FutureBase<void, StopError>;
  * Future and \ref Promise are like a Single Producer/Single Consumer one-shot one-element channel.
  * Use the \ref Promise to fulfill the \ref Future.
  */
-template <typename V, typename E>
-class Future final : public FutureBase<V, E> {
-  using Base = FutureBase<V, E>;
+template <typename V, typename T>
+class Future final : public FutureBase<V, T> {
+  using Base = FutureBase<V, T>;
 
  public:
   using Base::Base;
 
-  Future(detail::ResultCorePtr<V, E> core) noexcept : Base{std::move(core)} {
+  Future(detail::ResultCorePtr<V, T> core) noexcept : Base{std::move(core)} {
   }
 
   /**
@@ -228,23 +228,23 @@ extern template class Future<>;
  * Future and \ref Promise are like a Single Producer/Single Consumer one-shot one-element channel.
  * Use the \ref Promise to fulfill the \ref Future.
  */
-template <typename V, typename E>
-class FutureOn final : public FutureBase<V, E> {
-  using Base = FutureBase<V, E>;
+template <typename V, typename T>
+class FutureOn final : public FutureBase<V, T> {
+  using Base = FutureBase<V, T>;
 
  public:
   using Base::Base;
   using Base::Detach;
   using Base::Then;
 
-  FutureOn(detail::ResultCorePtr<V, E> core) noexcept : Base{std::move(core)} {
+  FutureOn(detail::ResultCorePtr<V, T> core) noexcept : Base{std::move(core)} {
   }
 
   /**
    * Specify executor for continuation.
    * Make FutureOn -- Future with executor
    */
-  [[nodiscard]] Future<V, E> On(std::nullptr_t) && noexcept {
+  [[nodiscard]] Future<V, T> On(std::nullptr_t) && noexcept {
     return {std::move(this->_core)};
   }
 

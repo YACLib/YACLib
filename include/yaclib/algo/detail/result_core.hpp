@@ -13,13 +13,15 @@ struct Callback {
   char unwrapping = 0;
 };
 
-template <typename V, typename E>
+template <typename V, typename T>
 class ResultCore : public BaseCore {
   template <bool SymmetricTransfer>
   [[nodiscard]] YACLIB_INLINE auto Impl(InlineCore& /*caller*/) noexcept {
     YACLIB_PURE_VIRTUAL();
     return Noop<SymmetricTransfer>();
   }
+
+  using Result = T::template Result<V>;
 
  public:
   [[nodiscard]] InlineCore* Here(InlineCore& caller) noexcept override {
@@ -35,32 +37,32 @@ class ResultCore : public BaseCore {
   }
 
   template <typename... Args>
-  explicit ResultCore(Args&&... args) noexcept(std::is_nothrow_constructible_v<Result<V, E>, Args&&...>)
-    : BaseCore{kResult}, _result{std::forward<Args>(args)...} {
+  YACLIB_INLINE explicit ResultCore(Unit, Args&&... args) : BaseCore{kResult} {
+    Store(std::forward<Args>(args)...);
   }
 
   ~ResultCore() noexcept override {
-    _result.~Result<V, E>();
+    _result.~Result();
   }
 
   template <typename... Args>
-  void Store(Args&&... args) noexcept(std::is_nothrow_constructible_v<Result<V, E>, Args&&...>) {
-    new (&_result) Result<V, E>{std::forward<Args>(args)...};
+  YACLIB_INLINE void Store(Args&&... args) {
+    new (&_result) Result{T::template MakeResult<V>(std::forward<Args>(args)...)};
   }
 
-  [[nodiscard]] Result<V, E>& Get() noexcept {
+  [[nodiscard]] Result& Get() noexcept {
     return _result;
   }
 
   union {
-    Result<V, E> _result;
+    Result _result;
     Callback _self;
   };
 };
 
-extern template class ResultCore<void, StopError>;
+extern template class ResultCore<void, DefaultTrait>;
 
-template <typename V, typename E>
-using ResultCorePtr = IntrusivePtr<ResultCore<V, E>>;
+template <typename V, typename T>
+using ResultCorePtr = IntrusivePtr<ResultCore<V, T>>;
 
 }  // namespace yaclib::detail

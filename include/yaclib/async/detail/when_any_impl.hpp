@@ -19,18 +19,18 @@
 
 namespace yaclib::detail {
 
-template <typename V, typename E, FailPolicy P /*None*/>
+template <typename V, typename T, FailPolicy P /*None*/>
 class AnyCombinatorBase {
   yaclib_std::atomic_bool _done;
 
  protected:
-  ResultCorePtr<V, E> _core;
+  ResultCorePtr<V, T> _core;
 
-  explicit AnyCombinatorBase(std::size_t /*count*/, ResultCorePtr<V, E>&& core) noexcept
+  explicit AnyCombinatorBase(std::size_t /*count*/, ResultCorePtr<V, T>&& core) noexcept
     : _done{false}, _core{std::move(core)} {
   }
 
-  bool Combine(ResultCore<V, E>& caller) noexcept {
+  bool Combine(ResultCore<V, T>& caller) noexcept {
     if (!_done.load(std::memory_order_acquire) && !_done.exchange(true, std::memory_order_acq_rel)) {
       _core->Store(std::move(caller.Get()));
       caller.DecRef();
@@ -41,8 +41,8 @@ class AnyCombinatorBase {
   }
 };
 
-template <typename V, typename E>
-class AnyCombinatorBase<V, E, FailPolicy::LastFail> {
+template <typename V, typename T>
+class AnyCombinatorBase<V, T, FailPolicy::LastFail> {
   static bool DoneImpl(std::size_t value) noexcept {
     return (value & 1U) != 0;
   }
@@ -50,13 +50,13 @@ class AnyCombinatorBase<V, E, FailPolicy::LastFail> {
   yaclib_std::atomic_size_t _state;
 
  protected:
-  ResultCorePtr<V, E> _core;
+  ResultCorePtr<V, T> _core;
 
-  explicit AnyCombinatorBase(std::size_t count, ResultCorePtr<V, E>&& core) noexcept
+  explicit AnyCombinatorBase(std::size_t count, ResultCorePtr<V, T>&& core) noexcept
     : _state{2 * count}, _core{std::move(core)} {
   }
 
-  bool Combine(ResultCore<V, E>& caller) noexcept {
+  bool Combine(ResultCore<V, T>& caller) noexcept {
     if (!DoneImpl(_state.load(std::memory_order_acquire))) {
       auto& result = caller.Get();
       if (result) {
@@ -76,16 +76,16 @@ class AnyCombinatorBase<V, E, FailPolicy::LastFail> {
   }
 };
 
-template <typename V, typename E>
-class AnyCombinatorBase<V, E, FailPolicy::FirstFail> {
+template <typename V, typename T>
+class AnyCombinatorBase<V, T, FailPolicy::FirstFail> {
   static constexpr auto kDoneImpl = std::numeric_limits<std::uintptr_t>::max();
 
   yaclib_std::atomic_uintptr_t _state;
 
  protected:
-  ResultCorePtr<V, E> _core;
+  ResultCorePtr<V, T> _core;
 
-  explicit AnyCombinatorBase(std::size_t /*count*/, ResultCorePtr<V, E>&& core) : _state{0}, _core{std::move(core)} {
+  explicit AnyCombinatorBase(std::size_t /*count*/, ResultCorePtr<V, T>&& core) : _state{0}, _core{std::move(core)} {
   }
 
   ~AnyCombinatorBase() noexcept {
@@ -95,14 +95,14 @@ class AnyCombinatorBase<V, E, FailPolicy::FirstFail> {
       return;
     }
     YACLIB_ASSERT(state != 0);
-    auto& fail = *reinterpret_cast<ResultCore<V, E>*>(state);
+    auto& fail = *reinterpret_cast<ResultCore<V, T>*>(state);
     _core->Store(std::move(fail.Get()));
     fail.DecRef();
     auto* core = _core.Release();
     Loop(core, core->template SetResult<false>());
   }
 
-  bool Combine(ResultCore<V, E>& caller) noexcept {
+  bool Combine(ResultCore<V, T>& caller) noexcept {
     auto state = _state.load(std::memory_order_acquire);
     if (state != kDoneImpl) {
       auto& result = caller.Get();
@@ -116,7 +116,7 @@ class AnyCombinatorBase<V, E, FailPolicy::FirstFail> {
       state = _state.exchange(kDoneImpl, std::memory_order_acq_rel);
       if (state != kDoneImpl) {
         if (state != 0) {
-          auto& fail = *reinterpret_cast<ResultCore<V, E>*>(state);
+          auto& fail = *reinterpret_cast<ResultCore<V, T>*>(state);
           fail.DecRef();
         }
         _core->Store(std::move(caller.Get()));
@@ -129,29 +129,29 @@ class AnyCombinatorBase<V, E, FailPolicy::FirstFail> {
   }
 };
 
-template <typename V, typename E, FailPolicy P>
-class AnyCombinator : public InlineCore, public AnyCombinatorBase<V, E, P> {
-  using Base = AnyCombinatorBase<V, E, P>;
+template <typename V, typename T, FailPolicy P>
+class AnyCombinator : public InlineCore, public AnyCombinatorBase<V, T, P> {
+  using Base = AnyCombinatorBase<V, T, P>;
   using Base::Base;
 
  public:
   static auto Make(std::size_t count) {
     // TODO(MBkkt) Maybe single allocation instead of two?
-    auto combine_core = MakeUnique<ResultCore<V, E>>();
+    auto combine_core = MakeUnique<ResultCore<V, T>>();
     auto* raw_core = combine_core.Get();
-    auto combinator = MakeShared<AnyCombinator<V, E, P>>(count, count, std::move(combine_core));
-    ResultCorePtr<V, E> future_core{NoRefTag{}, raw_core};
+    auto combinator = MakeShared<AnyCombinator<V, T, P>>(count, count, std::move(combine_core));
+    ResultCorePtr<V, T> future_core{NoRefTag{}, raw_core};
     return std::pair{std::move(future_core), combinator.Release()};
   }
 
-  void AddInput(ResultCore<V, E>& input) noexcept {
+  void AddInput(ResultCore<V, T>& input) noexcept {
     input.CallInline(*this);
   }
 
  private:
   template <bool SymmetricTransfer>
   [[nodiscard]] YACLIB_INLINE auto Impl(InlineCore& caller) noexcept {
-    if (this->Combine(DownCast<ResultCore<V, E>>(caller))) {
+    if (this->Combine(DownCast<ResultCore<V, T>>(caller))) {
       auto* callback = this->_core.Release();
       DecRef();
       return WhenSetResult<SymmetricTransfer>(callback);

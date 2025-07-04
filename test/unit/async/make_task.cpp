@@ -185,80 +185,80 @@ TEST(MakeExceptionTask, NonTrivial) {
 
 TEST(MakeErrorTask, Void) {
   {
-    yaclib::Task<> f = yaclib::MakeTask<void>(yaclib::StopError{yaclib::StopTag{}});
+    yaclib::Task<> f = yaclib::MakeTask<void>(yaclib::StopTag{});
     EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
-    EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::ResultError<yaclib::StopError>);
+    EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::StopException);
   }
-  {
-    yaclib::Task<void, LikeErrorCode> f = yaclib::MakeTask<void, LikeErrorCode>(LikeErrorCode{});
-    EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
-    EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::ResultError<LikeErrorCode>);
-  }
+  // {
+  //   yaclib::Task<void, LikeErrorCode> f = yaclib::MakeTask<void, LikeErrorCode>(LikeErrorCode{});
+  //   EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
+  //   EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::ResultError<LikeErrorCode>);
+  // }
 }
 
 TEST(MakeErrorTask, Int) {
   {
-    yaclib::Task<int> f = yaclib::MakeTask<int>(yaclib::StopError{yaclib::StopTag{}});
+    yaclib::Task<int> f = yaclib::MakeTask<int>(yaclib::StopTag{});
     EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
-    EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::ResultError<yaclib::StopError>);
+    EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::StopException);
   }
-  {
-    yaclib::Task<int, LikeErrorCode> f = yaclib::MakeTask<int, LikeErrorCode>(LikeErrorCode{});
-    EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
-    EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::ResultError<LikeErrorCode>);
-  }
+  // {
+  //   yaclib::Task<int, LikeErrorCode> f = yaclib::MakeTask<int, LikeErrorCode>(LikeErrorCode{});
+  //   EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
+  //   EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::ResultError<LikeErrorCode>);
+  // }
 }
 
 TEST(MakeErrorTask, NonTrivial) {
   {
-    yaclib::Task<Kek> f = yaclib::MakeTask<Kek>(yaclib::StopError{yaclib::StopTag{}});
+    yaclib::Task<Kek> f = yaclib::MakeTask<Kek>(yaclib::StopTag{});
     EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
-    EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::ResultError<yaclib::StopError>);
+    EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::StopException);
   }
-  {
-    yaclib::Task<Kek, LikeErrorCode> f = yaclib::MakeTask<Kek, LikeErrorCode>(LikeErrorCode{});
-    EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
-    EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::ResultError<LikeErrorCode>);
-  }
+  // {
+  //   yaclib::Task<Kek, LikeErrorCode> f = yaclib::MakeTask<Kek, LikeErrorCode>(LikeErrorCode{});
+  //   EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
+  //   EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::ResultError<LikeErrorCode>);
+  // }
 }
 
 TEST(MakeStoppedTask, Void) {
   {
     yaclib::Task<> f = yaclib::MakeTask<void>(yaclib::StopTag{});
     EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
-    EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::ResultError<yaclib::StopError>);
+    EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::StopException);
   }
-  {
-    yaclib::Task<void, LikeErrorCode> f = yaclib::MakeTask<void, LikeErrorCode>(yaclib::StopTag{});
-    EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
-    EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::ResultError<LikeErrorCode>);
-  }
+  // {
+  //   yaclib::Task<void, LikeErrorCode> f = yaclib::MakeTask<void, LikeErrorCode>(yaclib::StopTag{});
+  //   EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
+  //   EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::ResultError<LikeErrorCode>);
+  // }
 }
 
 TEST(MakeStoppedTask, Int) {
   {
     yaclib::Task<int> f = yaclib::MakeTask<int>(yaclib::StopTag{});
     EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
-    EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::ResultError<yaclib::StopError>);
+    EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::StopException);
   }
-  {
-    yaclib::Task<int, LikeErrorCode> f = yaclib::MakeTask<int, LikeErrorCode>(yaclib::StopTag{});
-    EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
-    EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::ResultError<LikeErrorCode>);
-  }
+  // {
+  //   yaclib::Task<int, LikeErrorCode> f = yaclib::MakeTask<int, LikeErrorCode>(yaclib::StopTag{});
+  //   EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
+  //   EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::ResultError<LikeErrorCode>);
+  // }
 }
 
 TEST(MakeStoppedTask, NonTrivial) {
   {
     yaclib::Task<Kek> f = yaclib::MakeTask<Kek>(yaclib::StopTag{});
     EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
-    EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::ResultError<yaclib::StopError>);
+    EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::StopException);
   }
-  {
-    yaclib::Task<Kek, LikeErrorCode> f = yaclib::MakeTask<Kek, LikeErrorCode>(yaclib::StopTag{});
-    EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
-    EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::ResultError<LikeErrorCode>);
-  }
+  // {
+  //   yaclib::Task<Kek, LikeErrorCode> f = yaclib::MakeTask<Kek, LikeErrorCode>(yaclib::StopTag{});
+  //   EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
+  //   EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::ResultError<LikeErrorCode>);
+  // }
 }
 
 }  // namespace

@@ -18,8 +18,8 @@ void WhenImpl(Combinator* combinator, It it, std::size_t count) noexcept {
   }
 }
 
-template <typename Combinator, typename E, typename... V>
-void WhenImpl(Combinator& combinator, FutureBase<V, E>&&... fs) noexcept {
+template <typename Combinator, typename T, typename... V>
+void WhenImpl(Combinator& combinator, FutureBase<V, T>&&... fs) noexcept {
   YACLIB_ASSERT(... && fs.Valid());
   // TODO(MBkkt) Make Impl for BaseCore's instead of futures
   (..., combinator.AddInput(*fs.GetCore().Release()));

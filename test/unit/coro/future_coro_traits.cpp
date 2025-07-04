@@ -17,7 +17,7 @@ namespace {
 
 using namespace std::chrono_literals;
 
-yaclib::Future<int, yaclib::StopError> test_co_ret42() {
+yaclib::Future<int> test_co_ret42() {
   co_return 42;
 }
 
@@ -36,16 +36,20 @@ TEST(CoroTraits, VoidCoro) {
   EXPECT_TRUE(future.Ready());
 }
 
-yaclib::Future<int> double_arg(unsigned x) {
-  co_return 2 * x;
+yaclib::Result<int> double_arg_sync(unsigned x) {
+  return static_cast<int>(2 * x);
+}
+
+yaclib::Future<int> double_arg_async(unsigned x) {
+  co_return static_cast<int>(2 * x);
 }
 
 TEST(CoroTraits, DoubleArg) {
   unsigned value = 42;
-  auto future = double_arg(42);
+  auto future = double_arg_async(42).ThenInline(double_arg_sync);
   unsigned result = std::move(future).Touch().Ok();
 
-  EXPECT_EQ(result, 2 * value);
+  EXPECT_EQ(result, 4 * value);
 }
 
 yaclib::Future<int> throw_exc_at1(int x) {
@@ -76,7 +80,7 @@ TEST(CoroTraits, ThrowExceptionVoid) {
 yaclib::Future<int> nested_intermed_coro(int x) {
   auto f = test_void_coro();
   EXPECT_TRUE(f.Ready());
-  co_return double_arg(x).Touch().Ok();
+  co_return double_arg_async(x).Touch().Ok();
 }
 
 yaclib::Future<int> nested_coro(int x) {
