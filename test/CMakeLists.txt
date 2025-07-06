@@ -41,6 +41,7 @@ set(YACLIB_EXAMPLE_SOURCES
   example/async/when_any
   )
 set(YACLIB_UNIT_SOURCES
+  unit/async/connect
   unit/async/core_size
   unit/util/intrusive_ptr
   unit/util/result
@@ -57,7 +58,7 @@ set(YACLIB_UNIT_SOURCES
   unit/algo/when_any
   unit/algo/wait_group
   unit/runtime/fair_thread_pool
-  unit/async/shared_core
+  unit/async/shared_future
   unit/async/stress
   unit/exe/strand
   unit/not_implemented

@@ -4,6 +4,8 @@
 #include <yaclib/util/detail/unique_counter.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 
+#include <cstddef>
+
 namespace yaclib {
 namespace detail {
 
@@ -18,6 +20,10 @@ class Helper final : public Counter<ObjectT, DefaultDeleter> {
 
   void DecRef() noexcept final {
     this->Sub(1);
+  }
+
+  size_t GetRef() noexcept final {
+    return this->Get();
   }
 };
 

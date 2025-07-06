@@ -14,32 +14,32 @@ class SharedFuture final {
  public:
   SharedFuture() = default;
 
-  [[nodiscard]] bool Valid() const& noexcept {
+  [[nodiscard]] bool Valid() const noexcept {
     return _core != nullptr;
   }
 
-  [[nodiscard]] Result<V, E> Get() const {
-    YACLIB_ASSERT(Valid());
-    return GetFuture().Get();
+  [[nodiscard]] bool Ready() const noexcept {
+    return _core->IsSet();
   }
 
-  Future<V, E> GetFuture() const {
+  [[nodiscard]] const Result<V, E>& Get() const noexcept {
     YACLIB_ASSERT(Valid());
-    auto [f, p] = MakeContract<V, E>();
-    _core->Attach(std::move(p));
-    return std::move(f);
+    Wait(*this);
+    return _core->Get();
   }
 
-  FutureOn<V, E> GetFutureOn(IExecutor& e) const {
+  [[nodiscard]] const Result<V, E>& Touch() const noexcept {
     YACLIB_ASSERT(Valid());
-    auto [f, p] = MakeContractOn<V, E>(e);
-    _core->Attach(std::move(p));
-    return std::move(f);
+    YACLIB_ASSERT(Ready());
+    return _core->Get();
   }
 
-  void Attach(Promise<V, E>&& p) const {
-    YACLIB_ASSERT(Valid());
-    _core->Attach(std::move(p));
+  [[nodiscard]] const detail::SharedCorePtr<V, E>& GetCore() const noexcept {
+    return _core;
+  }
+
+  [[nodiscard]] detail::SharedBaseCore* GetBaseCore() const noexcept {
+    return _core.Get();
   }
 
   /**

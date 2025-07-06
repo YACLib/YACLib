@@ -1,6 +1,8 @@
 #pragma once
 
 #include <yaclib/algo/detail/base_core.hpp>
+#include <yaclib/algo/detail/core_util.hpp>
+#include <yaclib/fwd.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 #include <yaclib/util/result.hpp>
 
@@ -16,9 +18,22 @@ struct Callback {
 template <typename V, typename E>
 class ResultCore : public BaseCore {
   template <bool SymmetricTransfer>
-  [[nodiscard]] YACLIB_INLINE auto Impl(InlineCore& /*caller*/) noexcept {
-    YACLIB_PURE_VIRTUAL();
-    return Noop<SymmetricTransfer>();
+  [[nodiscard]] YACLIB_INLINE auto Impl(InlineCore& caller) noexcept {
+    if constexpr (std::is_move_constructible_v<Result<V, E>>) {
+      if constexpr (std::is_copy_constructible_v<Result<V, E>>) {
+        if (caller.GetRef() != 1) {
+          Store(ResultFromCore<V, E, true>(caller));
+          return SetResult<SymmetricTransfer>();
+        }
+      }
+      YACLIB_ASSERT(caller.GetRef() == 1);
+      Store(ResultFromCore<V, E, false>(caller));
+      caller.DecRef();
+      return SetResult<SymmetricTransfer>();
+    } else {
+      YACLIB_PURE_VIRTUAL();
+      return Noop<SymmetricTransfer>();
+    }
   }
 
  public:

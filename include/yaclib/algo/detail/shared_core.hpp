@@ -1,60 +1,101 @@
 #pragma once
 
-#include <yaclib/algo/detail/result_core.hpp>
-#include <yaclib/async/future.hpp>
-#include <yaclib/async/promise.hpp>
-#include <yaclib/exe/executor.hpp>
+#include <yaclib_std/detail/atomic.hpp>
+
+#include <yaclib/algo/detail/core_util.hpp>
+#include <yaclib/algo/detail/inline_core.hpp>
 #include <yaclib/fwd.hpp>
-#include <yaclib/util/ref.hpp>
+#include <yaclib/util/intrusive_ptr.hpp>
+#include <yaclib/util/result.hpp>
 
-#include <atomic>
+#include <limits>
 
-namespace yaclib {
-namespace detail {
+namespace yaclib::detail {
 
-template <typename V, typename E>
-class SharedCore : public IRef {
-  using ResultCoreType = ResultCore<V, E>;
-
+class SharedBaseCore : public InlineCore {
  public:
-  SharedCore() noexcept {}
+  static constexpr auto kSet = std::numeric_limits<std::uintptr_t>::max();
 
-  void Attach(Promise<V, E>&& p) {
-    ResultCoreType* core = p.GetCore().Get();
-    ResultCoreType* next = _head.load(std::memory_order_acquire);
+  [[nodiscard]] bool SetCallback(InlineCore& callback) noexcept {
+    auto* next = _head.load(std::memory_order_acquire);
     do {
       if (reinterpret_cast<std::uintptr_t>(next) == kSet) {
-        std::move(p).Set(_result);
-        break;
+        return false;
       }
-      core->next = next;
-    } while (!_head.compare_exchange_weak(next, core, std::memory_order_release, std::memory_order_acquire));
-    p.GetCore().Release();
+      callback.next = next;
+    } while (!_head.compare_exchange_weak(next, &callback, std::memory_order_release, std::memory_order_acquire));
+    return true;
+  }
+
+  void FulfillQueue(InlineCore* head) noexcept {
+    while (head) {
+      auto next = head->next;
+      Loop(this, head);
+      head = static_cast<InlineCore*>(next);
+    }
+    DecRef();
+    DecRef();
+  }
+
+  bool IsSet() const noexcept {
+    return reinterpret_cast<std::uintptr_t>(_head.load(std::memory_order_relaxed)) == kSet;
+  }
+
+ protected:
+  yaclib_std::atomic<InlineCore*> _head = nullptr;
+};
+
+template <typename V, typename E>
+class SharedCore : public SharedBaseCore {
+  template <bool SymmetricTransfer>
+  [[nodiscard]] YACLIB_INLINE auto Impl(InlineCore& caller) noexcept {
+    InlineCore* head = [&]() {
+      if (caller.GetRef() != 1) {
+        return Store(ResultFromCore<V, E, true>(caller));
+      } else {
+        auto head = Store(ResultFromCore<V, E, false>(caller));
+        caller.DecRef();
+        return head;
+      }
+    }();
+    FulfillQueue(head);
+    return Noop<SymmetricTransfer>();
+  }
+
+ public:
+  [[nodiscard]] InlineCore* Here(InlineCore& caller) noexcept override {
+    return Impl<false>(caller);
+  }
+#if YACLIB_SYMMETRIC_TRANSFER != 0
+  [[nodiscard]] yaclib_std::coroutine_handle<> Next(InlineCore& caller) noexcept override {
+    return Impl<true>(caller);
+  }
+#endif
+
+ public:
+  SharedCore() noexcept {
   }
 
   template <typename... Args>
-  void Set(Args&&... args) {
+  InlineCore* Store(Args&&... args) noexcept(std::is_nothrow_constructible_v<Result<V, E>, Args&&...>) {
     new (&_result) Result<V, E>{std::forward<Args>(args)...};
 
-    auto head = _head.exchange(reinterpret_cast<ResultCoreType*>(kSet), std::memory_order_acq_rel);
+    auto head = _head.exchange(reinterpret_cast<InlineCore*>(kSet), std::memory_order_acq_rel);
     YACLIB_ASSERT(reinterpret_cast<std::uintptr_t>(head) != kSet);
 
-    while (head) {
-      auto next = head->next;
-      Promise<V, E>{detail::ResultCorePtr<V, E>{NoRefTag{}, head}}.Set(_result);
-      head = static_cast<ResultCoreType*>(next);
-    }
+    return head;
   }
 
-  ~SharedCore() {
+  ~SharedCore() noexcept override {
     YACLIB_ASSERT(reinterpret_cast<std::uintptr_t>(_head.load(std::memory_order_relaxed)) == kSet);
     _result.~Result<V, E>();
   }
 
- private:
-  static constexpr auto kSet = std::numeric_limits<std::uintptr_t>::max();
+  const Result<V, E>& Get() const noexcept {
+    return _result;
+  }
 
-  yaclib_std::atomic<ResultCoreType*> _head = nullptr;
+ private:
   union {
     Result<V, E> _result;
   };
@@ -63,5 +104,4 @@ class SharedCore : public IRef {
 template <typename V, typename E>
 using SharedCorePtr = IntrusivePtr<SharedCore<V, E>>;
 
-}  // namespace detail
-}  // namespace yaclib
+}  // namespace yaclib::detail

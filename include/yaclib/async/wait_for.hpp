@@ -19,11 +19,11 @@ namespace yaclib {
  * \param fs futures to wait
  * \return The result of \ref Ready upon exiting
  */
-template <typename Event = detail::MutexEvent, typename Rep, typename Period, typename... V, typename... E>
-YACLIB_INLINE bool WaitFor(const std::chrono::duration<Rep, Period>& timeout_duration,
-                           FutureBase<V, E>&... fs) noexcept {
+template <typename Event = detail::MutexEvent, typename Rep, typename Period, typename... Waited>
+YACLIB_INLINE std::enable_if_t<(... && is_waitable_with_timeout_v<Waited>), bool> WaitFor(
+  const std::chrono::duration<Rep, Period>& timeout_duration, Waited&... fs) noexcept {
   YACLIB_ASSERT(... && fs.Valid());
-  return detail::WaitCore<Event>(timeout_duration, UpCast<detail::BaseCore>(*fs.GetCore())...);
+  return detail::WaitCore<Event>(timeout_duration, *fs.GetBaseCore()...);
 }
 
 /**
@@ -37,8 +37,8 @@ YACLIB_INLINE bool WaitFor(const std::chrono::duration<Rep, Period>& timeout_dur
  * \return The result of \ref Ready upon exiting
  */
 template <typename Event = detail::MutexEvent, typename Rep, typename Period, typename Iterator>
-YACLIB_INLINE std::enable_if_t<!is_future_base_v<Iterator>, bool> WaitFor(
-  const std::chrono::duration<Rep, Period>& timeout_duration, Iterator begin, Iterator end) noexcept {
+YACLIB_INLINE std::enable_if_t<is_waitable_with_timeout_v<typename std::iterator_traits<Iterator>::reference>, bool>
+WaitFor(const std::chrono::duration<Rep, Period>& timeout_duration, Iterator begin, Iterator end) noexcept {
   // We don't use std::distance because we want to alert the user to the fact that it can be expensive.
   // Maybe the user has the size of the range, otherwise it is suggested to call Wait*(..., begin, distance(begin, end))
   return detail::WaitIterator<Event>(timeout_duration, begin, static_cast<std::size_t>(end - begin));
@@ -55,8 +55,8 @@ YACLIB_INLINE std::enable_if_t<!is_future_base_v<Iterator>, bool> WaitFor(
  * \return The result of \ref Ready upon exiting
  */
 template <typename Event = detail::MutexEvent, typename Rep, typename Period, typename Iterator>
-YACLIB_INLINE bool WaitFor(const std::chrono::duration<Rep, Period>& timeout_duration, Iterator begin,
-                           std::size_t count) noexcept {
+YACLIB_INLINE std::enable_if_t<is_waitable_with_timeout_v<typename std::iterator_traits<Iterator>::reference>, bool>
+WaitFor(const std::chrono::duration<Rep, Period>& timeout_duration, Iterator begin, std::size_t count) noexcept {
   return detail::WaitIterator<Event>(timeout_duration, begin, count);
 }
 

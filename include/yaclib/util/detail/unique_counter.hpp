@@ -22,6 +22,10 @@ struct OneCounter : CounterBase {
   void Sub(std::size_t) noexcept {
     Deleter::Delete(*this);
   }
+
+  std::size_t Get() noexcept {
+    return 1;
+  }
 };
 
 }  // namespace yaclib::detail
