@@ -45,14 +45,14 @@ class SharedPromise final {
     }
   }
 
-  [[nodiscard]] detail::SharedCorePtr<V, E>& GetCore() noexcept {
-    return _core;
-  }
-
   /**
    * Part of unsafe but internal API
    */
   explicit SharedPromise(detail::SharedCorePtr<V, E> core) noexcept : _core(std::move(core)) {
+  }
+
+  [[nodiscard]] detail::SharedCorePtr<V, E>& GetCore() noexcept {
+    return _core;
   }
 
  private:
