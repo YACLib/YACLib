@@ -1,4 +1,6 @@
 #include <yaclib/async/contract.hpp>
+#include <yaclib/async/future.hpp>
+#include <yaclib/async/promise.hpp>
 #include <yaclib/config.hpp>
 #include <yaclib/exe/detail/unique_job.hpp>
 #include <yaclib/util/detail/default_event.hpp>
@@ -43,36 +45,6 @@ TEST(InlineCore, Drop) {
 #endif
 }
 
-void CheckHere() {
-  auto [f, p] = yaclib::MakeContract();
-  auto& core = *p.GetCore();
-  std::ignore = core.Here(core);
-}
-
-TEST(InlineCore, Here) {
-#ifndef YACLIB_LOG_DEBUG
-  CheckHere();
-#else
-  EXPECT_FATAL_FAILURE(CheckHere(), "");
-#endif
-}
-
-#if YACLIB_SYMMETRIC_TRANSFER != 0
-void CheckNext() {
-  auto [f, p] = yaclib::MakeContract();
-  auto& core = *p.GetCore();
-  std::ignore = core.Next(core);
-}
-
-TEST(InlineCore, Next) {
-#  ifndef YACLIB_LOG_DEBUG
-  CheckNext();
-#  else
-  EXPECT_FATAL_FAILURE(CheckNext(), "");
-#  endif
-}
-#endif
-
 #if YACLIB_CORO != 0
 void CheckCurr() {
   auto [f, p] = yaclib::MakeContract();
@@ -88,6 +60,29 @@ TEST(BaseCore, Curr) {
 #  endif
 }
 #endif
+
+struct NonMovable {
+  NonMovable() = default;
+  NonMovable(const NonMovable&) = delete;
+  NonMovable(NonMovable&&) = delete;
+};
+
+void CheckResultCoreImplNonMovable() {
+  auto [f1, p1] = yaclib::MakeContract<NonMovable>();
+  auto [f2, p2] = yaclib::MakeContract<NonMovable>();
+  auto f1_core = f1.GetCore().Release();
+  auto p2_core = p2.GetCore().Release();
+  std::ignore = f1_core->SetCallback(*p2_core);
+  std::move(p1).Set();
+}
+
+TEST(ResultCore, ImplNonMovable) {
+#  ifndef YACLIB_LOG_DEBUG
+  CheckResultCoreImplNonMovable();
+#  else
+  EXPECT_FATAL_FAILURE(CheckResultCoreImplNonMovable(), "");
+#  endif
+}
 
 TEST(UniqueJob, Ref) {
   auto task = yaclib::detail::MakeUniqueJob([] {

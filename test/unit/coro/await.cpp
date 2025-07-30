@@ -1,9 +1,11 @@
 #include <util/async_suite.hpp>
 #include <util/time.hpp>
 
+#include <yaclib/async/connect.hpp>
 #include <yaclib/async/contract.hpp>
 #include <yaclib/async/make.hpp>
 #include <yaclib/async/run.hpp>
+#include <yaclib/async/shared_contract.hpp>
 #include <yaclib/async/when_all.hpp>
 #include <yaclib/async/when_any.hpp>
 #include <yaclib/coro/await.hpp>
@@ -486,6 +488,34 @@ TEST(Future, WhenAllCoro) {
   auto f3 = yaclib::WhenAll<yaclib::FailPolicy::FirstFail, yaclib::OrderPolicy::Same>(std::move(f1), std::move(f2));
   std::ignore = e.Drain();
   EXPECT_EQ(std::move(f3).Get().Ok(), yaclib::Unit{});
+}
+
+TEST(Future, ConnectCoro) {
+  yaclib::ManualExecutor e;
+  auto coro = [&]() -> yaclib::Future<> {
+    co_await On(e);
+    co_return{};
+  };
+
+  auto f = coro();
+  auto [f1, p1] = yaclib::MakeContract<>();
+  Connect(std::move(f), std::move(p1));
+  std::ignore = e.Drain();
+  EXPECT_EQ(std::move(f1).Get().Ok(), yaclib::Unit{});
+}
+
+TEST(Future, ConnectCoroShared) {
+  yaclib::ManualExecutor e;
+  auto coro = [&]() -> yaclib::Future<> {
+    co_await On(e);
+    co_return{};
+  };
+
+  auto f = coro();
+  auto [f1, p1] = yaclib::MakeSharedContract<>();
+  Connect(std::move(f), std::move(p1));
+  std::ignore = e.Drain();
+  EXPECT_EQ(std::move(f1).Get().Ok(), yaclib::Unit{});
 }
 
 TEST(Coro, FutureUnwrapping) {

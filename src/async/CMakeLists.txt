@@ -1,12 +1,15 @@
 list(APPEND YACLIB_INCLUDES
+  ${YACLIB_INCLUDE_DIR}/async/connect.hpp
   ${YACLIB_INCLUDE_DIR}/async/contract.hpp
   ${YACLIB_INCLUDE_DIR}/async/future.hpp
   ${YACLIB_INCLUDE_DIR}/async/make.hpp
   ${YACLIB_INCLUDE_DIR}/async/promise.hpp
   ${YACLIB_INCLUDE_DIR}/async/run.hpp
+  ${YACLIB_INCLUDE_DIR}/async/share.hpp
   ${YACLIB_INCLUDE_DIR}/async/shared_contract.hpp
   ${YACLIB_INCLUDE_DIR}/async/shared_future.hpp
   ${YACLIB_INCLUDE_DIR}/async/shared_promise.hpp
+  ${YACLIB_INCLUDE_DIR}/async/split.hpp
   ${YACLIB_INCLUDE_DIR}/async/wait.hpp
   ${YACLIB_INCLUDE_DIR}/async/wait_for.hpp
   ${YACLIB_INCLUDE_DIR}/async/wait_until.hpp

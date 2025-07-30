@@ -1,6 +1,7 @@
 #pragma once
 
 #include <yaclib/algo/detail/base_core.hpp>
+#include <yaclib/algo/detail/shared_core.hpp>
 #include <yaclib/algo/detail/wait_event.hpp>
 #include <yaclib/util/detail/atomic_counter.hpp>
 #include <yaclib/util/detail/default_event.hpp>
@@ -20,7 +21,7 @@ template <typename Event, typename Timeout, typename Range>
 bool WaitRange(const Timeout& timeout, Range&& range, std::size_t count) noexcept {
   Event event{count + 1};
   // event ref counter = n + 1, it is optimization: we don't want to notify when return true immediately
-  const auto wait_count = range([&](BaseCore& core) noexcept {
+  const auto wait_count = range([&](auto& core) noexcept {
     return core.SetCallback(event.GetCall());
   });
   if (wait_count == 0 || event.SubEqual(count - wait_count + 1)) {
@@ -28,6 +29,8 @@ bool WaitRange(const Timeout& timeout, Range&& range, std::size_t count) noexcep
   }
   auto token = event.Make();
   std::size_t reset_count = 0;
+
+  // Not available for SharedFuture
   if constexpr (!std::is_same_v<Timeout, NoTimeoutTag>) {
     // If you have problem with TSAN here, check this link: https://github.com/google/sanitizers/issues/1259
     // TLDR: new pthread function is not supported by thread sanitizer yet.
@@ -49,7 +52,8 @@ bool WaitRange(const Timeout& timeout, Range&& range, std::size_t count) noexcep
 template <typename Event, typename Timeout, typename... Cores>
 bool WaitCore(const Timeout& timeout, Cores&... cores) noexcept {
   static_assert(sizeof...(cores) >= 1, "Number of futures must be at least one");
-  static_assert((... && std::is_same_v<BaseCore, Cores>), "Futures must be Future in Wait function");
+  static_assert((... && (std::is_same_v<BaseCore, Cores> || std::is_same_v<SharedBaseCore, Cores>)),
+                "Cores must be waitable in Wait function");
   auto range = [&](auto&& func) noexcept {
     return (... + static_cast<std::size_t>(func(cores)));
   };
@@ -60,8 +64,8 @@ bool WaitCore(const Timeout& timeout, Cores&... cores) noexcept {
 
 template <typename Event, typename Timeout, typename Iterator>
 bool WaitIterator(const Timeout& timeout, Iterator it, std::size_t count) noexcept {
-  static_assert(is_future_base_v<typename std::iterator_traits<Iterator>::value_type>,
-                "Wait function Iterator must be point to some FutureBase");
+  static_assert(is_waitable_v<typename std::iterator_traits<Iterator>::value_type>,
+                "Wait function Iterator must be point to some Waitable (Future or SharedFuture)");
   if (count == 0) {
     return true;
   }

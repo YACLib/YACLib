@@ -180,6 +180,10 @@ class FutureBase {
     return _core;
   }
 
+  [[nodiscard]] detail::BaseCore* GetBaseCore() noexcept {
+    return _core.Get();
+  }
+
  protected:
   explicit FutureBase(detail::ResultCorePtr<V, E> core) noexcept : _core{std::move(core)} {
   }

@@ -5,6 +5,7 @@ list(APPEND YACLIB_INCLUDES
 list(APPEND YACLIB_HEADERS
   ${YACLIB_INCLUDE_DIR}/algo/detail/base_core.hpp
   ${YACLIB_INCLUDE_DIR}/algo/detail/core.hpp
+  ${YACLIB_INCLUDE_DIR}/algo/detail/core_util.hpp
   ${YACLIB_INCLUDE_DIR}/algo/detail/inline_core.hpp
   ${YACLIB_INCLUDE_DIR}/algo/detail/result_core.hpp
   ${YACLIB_INCLUDE_DIR}/algo/detail/shared_core.hpp

@@ -66,12 +66,4 @@ class BaseCore : public InlineCore {
   void MoveExecutorTo(BaseCore& callback) noexcept;
 };
 
-YACLIB_INLINE void Loop(InlineCore* prev, InlineCore* curr) noexcept {
-  while (curr != nullptr) {
-    auto* next = curr->Here(*prev);
-    prev = curr;
-    curr = next;
-  }
-}
-
 }  // namespace yaclib::detail
