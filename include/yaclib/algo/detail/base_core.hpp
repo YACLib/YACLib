@@ -52,7 +52,7 @@ class BaseCore : public InlineCore {
   [[nodiscard]] virtual yaclib_std::coroutine_handle<> Curr() noexcept {  // LCOV_EXCL_LINE
     YACLIB_PURE_VIRTUAL();                                                // LCOV_EXCL_LINE
     return {};                                                            // LCOV_EXCL_LINE
-  }                                                                       // LCOV_EXCL_LINE
+  }  // LCOV_EXCL_LINE
 #endif
 
  protected:
