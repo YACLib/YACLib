@@ -1,0 +1,1020 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.9.8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<!-- BEGIN opengraph metadata -->
+<meta property="og:title" content="Doxygen Awesome" />
+<meta property="og:image" content="https://repository-images.githubusercontent.com/348492097/4f16df80-88fb-11eb-9d31-4015ff22c452" />
+<meta property="og:description" content="Custom CSS theme for doxygen html-documentation with lots of customization parameters." />
+<meta property="og:url" content="https://jothepro.github.io/doxygen-awesome-css/" />
+<!-- END opengraph metadata -->
+<!-- BEGIN twitter metadata -->
+<meta name="twitter:image:src" content="https://repository-images.githubusercontent.com/348492097/4f16df80-88fb-11eb-9d31-4015ff22c452" />
+<meta name="twitter:title" content="Doxygen Awesome" />
+<meta name="twitter:description" content="Custom CSS theme for doxygen html-documentation with lots of customization parameters." />
+<!-- END twitter metadata -->
+<title>YACLib: yaclib::detail::fiber::AtomicIntegralBase&lt; T, true &gt; Class Template Reference</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link rel="icon" type="image/svg+xml" href="logo.drawio.svg"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+<script type="text/javascript" src="doxygen-awesome-fragment-copy-button.js"></script>
+<script type="text/javascript" src="doxygen-awesome-paragraph-link.js"></script>
+<script type="text/javascript" src="toggle-alternative-theme.js"></script>
+<script type="text/javascript">
+    DoxygenAwesomeFragmentCopyButton.init()
+    DoxygenAwesomeDarkModeToggle.init()
+    DoxygenAwesomeParagraphLink.init()
+</script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="custom.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only-darkmode-toggle.css" rel="stylesheet" type="text/css"/>
+<link href="custom-alternative.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<!-- https://tholman.com/github-corners/ -->
+<a href="https://github.com/YACLib/YACLib" class="github-corner" title="View source on GitHub" target="_blank">
+    <svg viewBox="0 0 250 250" width="40" height="40" style="position: absolute; top: 0; border: 0; right: 0; z-index: 99;" aria-hidden="true">
+    <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
+   <div id="projectname">YACLib
+   </div>
+   <div id="projectbrief">C++ library for concurrent tasks execution</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Search');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase_3_01T_00_01true_01_4.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pro-attribs">Protected Attributes</a> &#124;
+<a href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase_3_01T_00_01true_01_4-members.html">List of all members</a>  </div>
+  <div class="headertitle"><div class="title">yaclib::detail::fiber::AtomicIntegralBase&lt; T, true &gt; Class Template Reference</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p><code>#include &lt;<a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html">atomic.hpp</a>&gt;</code></p>
+<div class="dynheader">
+Inheritance diagram for yaclib::detail::fiber::AtomicIntegralBase&lt; T, true &gt;:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase_3_01T_00_01true_01_4__inherit__graph.svg" width="155" height="348"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
+<div class="dynheader">
+Collaboration diagram for yaclib::detail::fiber::AtomicIntegralBase&lt; T, true &gt;:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase_3_01T_00_01true_01_4__coll__graph.svg" width="206" height="440"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:a90233868b40a2113159c84d63b3bb95c" id="r_a90233868b40a2113159c84d63b3bb95c"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase_3_01T_00_01true_01_4.html#a90233868b40a2113159c84d63b3bb95c">fetch_and</a> (T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">arg</a>, std::memory_order) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a90233868b40a2113159c84d63b3bb95c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a957c520ee4d395dde31c738180f348c3" id="r_a957c520ee4d395dde31c738180f348c3"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase_3_01T_00_01true_01_4.html#a957c520ee4d395dde31c738180f348c3">fetch_and</a> (T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">arg</a>, std::memory_order) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">volatile</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a957c520ee4d395dde31c738180f348c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae17efeef89cecde5532c2f4dbf170c20" id="r_ae17efeef89cecde5532c2f4dbf170c20"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase_3_01T_00_01true_01_4.html#ae17efeef89cecde5532c2f4dbf170c20">fetch_or</a> (T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">arg</a>, std::memory_order) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:ae17efeef89cecde5532c2f4dbf170c20"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4e927346cb79742bf9968b95a30ae99c" id="r_a4e927346cb79742bf9968b95a30ae99c"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase_3_01T_00_01true_01_4.html#a4e927346cb79742bf9968b95a30ae99c">fetch_or</a> (T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">arg</a>, std::memory_order) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">volatile</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a4e927346cb79742bf9968b95a30ae99c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a709d52d9fe4cd86cbfbeec0cb9d42545" id="r_a709d52d9fe4cd86cbfbeec0cb9d42545"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase_3_01T_00_01true_01_4.html#a709d52d9fe4cd86cbfbeec0cb9d42545">fetch_xor</a> (T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">arg</a>, std::memory_order) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a709d52d9fe4cd86cbfbeec0cb9d42545"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab03eaf8ab9e697f158c489943137c4c3" id="r_ab03eaf8ab9e697f158c489943137c4c3"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase_3_01T_00_01true_01_4.html#ab03eaf8ab9e697f158c489943137c4c3">fetch_xor</a> (T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">arg</a>, std::memory_order) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">volatile</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:ab03eaf8ab9e697f158c489943137c4c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a07b1cdb74e4eb59b5a05761d7aa71182" id="r_a07b1cdb74e4eb59b5a05761d7aa71182"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase_3_01T_00_01true_01_4.html#a07b1cdb74e4eb59b5a05761d7aa71182">operator++</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a07b1cdb74e4eb59b5a05761d7aa71182"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2250d2d3195c4d421b4030976a295551" id="r_a2250d2d3195c4d421b4030976a295551"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase_3_01T_00_01true_01_4.html#a2250d2d3195c4d421b4030976a295551">operator++</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">volatile</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a2250d2d3195c4d421b4030976a295551"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a55c33fc0c0fb4151713fc5bae7faecc2" id="r_a55c33fc0c0fb4151713fc5bae7faecc2"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase_3_01T_00_01true_01_4.html#a55c33fc0c0fb4151713fc5bae7faecc2">operator++</a> (<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">int</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a55c33fc0c0fb4151713fc5bae7faecc2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad0c28a9f19462cba0086e3ec317e4242" id="r_ad0c28a9f19462cba0086e3ec317e4242"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase_3_01T_00_01true_01_4.html#ad0c28a9f19462cba0086e3ec317e4242">operator++</a> (<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">int</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">volatile</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:ad0c28a9f19462cba0086e3ec317e4242"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae4edf7a63d41cf4e13144bb276c8bc3a" id="r_ae4edf7a63d41cf4e13144bb276c8bc3a"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase_3_01T_00_01true_01_4.html#ae4edf7a63d41cf4e13144bb276c8bc3a">operator--</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:ae4edf7a63d41cf4e13144bb276c8bc3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeb82899a6ed3b6885c4cbeadf1932a10" id="r_aeb82899a6ed3b6885c4cbeadf1932a10"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase_3_01T_00_01true_01_4.html#aeb82899a6ed3b6885c4cbeadf1932a10">operator--</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">volatile</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:aeb82899a6ed3b6885c4cbeadf1932a10"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a33153702b93655ac19d8647cf7f396d5" id="r_a33153702b93655ac19d8647cf7f396d5"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase_3_01T_00_01true_01_4.html#a33153702b93655ac19d8647cf7f396d5">operator--</a> (<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">int</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a33153702b93655ac19d8647cf7f396d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a627ffca1ee8497b74f108b87448c40eb" id="r_a627ffca1ee8497b74f108b87448c40eb"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase_3_01T_00_01true_01_4.html#a627ffca1ee8497b74f108b87448c40eb">operator--</a> (<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">int</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">volatile</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a627ffca1ee8497b74f108b87448c40eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3ef7cd5b93784b4bab249779bb57285d" id="r_a3ef7cd5b93784b4bab249779bb57285d"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase_3_01T_00_01true_01_4.html#a3ef7cd5b93784b4bab249779bb57285d">operator&amp;=</a> (T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">arg</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a3ef7cd5b93784b4bab249779bb57285d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af8f7d5874908a03f3b3548a671403c60" id="r_af8f7d5874908a03f3b3548a671403c60"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase_3_01T_00_01true_01_4.html#af8f7d5874908a03f3b3548a671403c60">operator&amp;=</a> (T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">arg</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">volatile</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:af8f7d5874908a03f3b3548a671403c60"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abbba872942b31897063db54ca31600d1" id="r_abbba872942b31897063db54ca31600d1"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase_3_01T_00_01true_01_4.html#abbba872942b31897063db54ca31600d1">operator|=</a> (T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">arg</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:abbba872942b31897063db54ca31600d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a73357ba752ac8960cb093ac1ce8c0a02" id="r_a73357ba752ac8960cb093ac1ce8c0a02"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase_3_01T_00_01true_01_4.html#a73357ba752ac8960cb093ac1ce8c0a02">operator|=</a> (T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">arg</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">volatile</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a73357ba752ac8960cb093ac1ce8c0a02"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a74980a3342290ae2a3d54c731f54e810" id="r_a74980a3342290ae2a3d54c731f54e810"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase_3_01T_00_01true_01_4.html#a74980a3342290ae2a3d54c731f54e810">operator^=</a> (T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">arg</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a74980a3342290ae2a3d54c731f54e810"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abe4cad74ef038e26a6808c82f611572f" id="r_abe4cad74ef038e26a6808c82f611572f"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase_3_01T_00_01true_01_4.html#abe4cad74ef038e26a6808c82f611572f">operator^=</a> (T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">arg</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">volatile</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:abe4cad74ef038e26a6808c82f611572f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicFloatingBase_3_01T_00_01true_01_4"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicFloatingBase_3_01T_00_01true_01_4')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicFloatingBase_3_01T_00_01true_01_4.html">yaclib::detail::fiber::AtomicFloatingBase&lt; T, true &gt;</a></td></tr>
+<tr class="memitem:afbeac1fe5db5a55b3924cb592bf6098b inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicFloatingBase_3_01T_00_01true_01_4" id="r_afbeac1fe5db5a55b3924cb592bf6098b"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicFloatingBase_3_01T_00_01true_01_4.html#afbeac1fe5db5a55b3924cb592bf6098b">fetch_add</a> (T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">arg</a>, std::memory_order) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:afbeac1fe5db5a55b3924cb592bf6098b inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicFloatingBase_3_01T_00_01true_01_4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae990b93daad76666832c0bcafaaa92ae inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicFloatingBase_3_01T_00_01true_01_4" id="r_ae990b93daad76666832c0bcafaaa92ae"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicFloatingBase_3_01T_00_01true_01_4.html#ae990b93daad76666832c0bcafaaa92ae">fetch_add</a> (T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">arg</a>, std::memory_order) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">volatile</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:ae990b93daad76666832c0bcafaaa92ae inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicFloatingBase_3_01T_00_01true_01_4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a58060c1ad95de52fcf732bca1c03663f inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicFloatingBase_3_01T_00_01true_01_4" id="r_a58060c1ad95de52fcf732bca1c03663f"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicFloatingBase_3_01T_00_01true_01_4.html#a58060c1ad95de52fcf732bca1c03663f">fetch_sub</a> (T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">arg</a>, std::memory_order) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a58060c1ad95de52fcf732bca1c03663f inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicFloatingBase_3_01T_00_01true_01_4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a23178a0c449ea1adb90f095a4102795f inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicFloatingBase_3_01T_00_01true_01_4" id="r_a23178a0c449ea1adb90f095a4102795f"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicFloatingBase_3_01T_00_01true_01_4.html#a23178a0c449ea1adb90f095a4102795f">fetch_sub</a> (T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">arg</a>, std::memory_order) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">volatile</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a23178a0c449ea1adb90f095a4102795f inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicFloatingBase_3_01T_00_01true_01_4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab25a6ce6d3ac575948cc2cd2d4ce83ef inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicFloatingBase_3_01T_00_01true_01_4" id="r_ab25a6ce6d3ac575948cc2cd2d4ce83ef"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicFloatingBase_3_01T_00_01true_01_4.html#ab25a6ce6d3ac575948cc2cd2d4ce83ef">operator+=</a> (T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">arg</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:ab25a6ce6d3ac575948cc2cd2d4ce83ef inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicFloatingBase_3_01T_00_01true_01_4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a51014d9eba1b0c35bf2c19e25f5e929f inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicFloatingBase_3_01T_00_01true_01_4" id="r_a51014d9eba1b0c35bf2c19e25f5e929f"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicFloatingBase_3_01T_00_01true_01_4.html#a51014d9eba1b0c35bf2c19e25f5e929f">operator+=</a> (T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">arg</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">volatile</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a51014d9eba1b0c35bf2c19e25f5e929f inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicFloatingBase_3_01T_00_01true_01_4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa11d36de88abe6f03da4817e4a68fa01 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicFloatingBase_3_01T_00_01true_01_4" id="r_aa11d36de88abe6f03da4817e4a68fa01"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicFloatingBase_3_01T_00_01true_01_4.html#aa11d36de88abe6f03da4817e4a68fa01">operator-=</a> (T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">arg</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:aa11d36de88abe6f03da4817e4a68fa01 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicFloatingBase_3_01T_00_01true_01_4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a459ad82563a269473aed6cf2765b79c3 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicFloatingBase_3_01T_00_01true_01_4" id="r_a459ad82563a269473aed6cf2765b79c3"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicFloatingBase_3_01T_00_01true_01_4.html#a459ad82563a269473aed6cf2765b79c3">operator-=</a> (T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">arg</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">volatile</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a459ad82563a269473aed6cf2765b79c3 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicFloatingBase_3_01T_00_01true_01_4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html">yaclib::detail::fiber::AtomicBase&lt; T &gt;</a></td></tr>
+<tr class="memitem:aa2c50fe44948129596596711a3a57d62 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase" id="r_aa2c50fe44948129596596711a3a57d62"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html#aa2c50fe44948129596596711a3a57d62">store</a> (T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">desired</a>, std::memory_order) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:aa2c50fe44948129596596711a3a57d62 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a518a544b17fd4e4b05206217642a1ffe inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase" id="r_a518a544b17fd4e4b05206217642a1ffe"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html#a518a544b17fd4e4b05206217642a1ffe">store</a> (T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">desired</a>, std::memory_order) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">volatile</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a518a544b17fd4e4b05206217642a1ffe inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4fa3c1716033cfe89664e0a63819b55b inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase" id="r_a4fa3c1716033cfe89664e0a63819b55b"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html#a4fa3c1716033cfe89664e0a63819b55b">load</a> (std::memory_order) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a4fa3c1716033cfe89664e0a63819b55b inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a848abca645828855ce211030c0efdaad inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase" id="r_a848abca645828855ce211030c0efdaad"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html#a848abca645828855ce211030c0efdaad">load</a> (std::memory_order) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">volatile</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a848abca645828855ce211030c0efdaad inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa1cd6d30413291a2006c9cc198d56793 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase" id="r_aa1cd6d30413291a2006c9cc198d56793"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html#aa1cd6d30413291a2006c9cc198d56793">operator T</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:aa1cd6d30413291a2006c9cc198d56793 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a15eea11672a151f880de55f12e4ef304 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase" id="r_a15eea11672a151f880de55f12e4ef304"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html#a15eea11672a151f880de55f12e4ef304">operator T</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">volatile</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a15eea11672a151f880de55f12e4ef304 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae8fd8e0a08d7152f0bc893771abab567 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase" id="r_ae8fd8e0a08d7152f0bc893771abab567"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html#ae8fd8e0a08d7152f0bc893771abab567">exchange</a> (T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">desired</a>, std::memory_order) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:ae8fd8e0a08d7152f0bc893771abab567 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac0e97ca4e3e00db2debefca8c68c9c2d inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase" id="r_ac0e97ca4e3e00db2debefca8c68c9c2d"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html#ac0e97ca4e3e00db2debefca8c68c9c2d">exchange</a> (T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">desired</a>, std::memory_order) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">volatile</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:ac0e97ca4e3e00db2debefca8c68c9c2d inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8f740ff39fe48d3640e913a7d3d144d8 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase" id="r_a8f740ff39fe48d3640e913a7d3d144d8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html#a8f740ff39fe48d3640e913a7d3d144d8">compare_exchange_weak</a> (T &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">expected</a>, T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">desired</a>, std::memory_order, std::memory_order) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a8f740ff39fe48d3640e913a7d3d144d8 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac1e1a04c52c488bef7c211e397242504 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase" id="r_ac1e1a04c52c488bef7c211e397242504"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html#ac1e1a04c52c488bef7c211e397242504">compare_exchange_weak</a> (T &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">expected</a>, T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">desired</a>, std::memory_order, std::memory_order) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">volatile</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:ac1e1a04c52c488bef7c211e397242504 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac97c31bed8bf6fcec9e35c6d772523d7 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase" id="r_ac97c31bed8bf6fcec9e35c6d772523d7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html#ac97c31bed8bf6fcec9e35c6d772523d7">compare_exchange_weak</a> (T &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">expected</a>, T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">desired</a>, std::memory_order) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:ac97c31bed8bf6fcec9e35c6d772523d7 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7c9d7060f0c32a5f6e44e05dcc769107 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase" id="r_a7c9d7060f0c32a5f6e44e05dcc769107"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html#a7c9d7060f0c32a5f6e44e05dcc769107">compare_exchange_weak</a> (T &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">expected</a>, T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">desired</a>, std::memory_order) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">volatile</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a7c9d7060f0c32a5f6e44e05dcc769107 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a166f23dc221a0f931e4ee96c77b6c9bb inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase" id="r_a166f23dc221a0f931e4ee96c77b6c9bb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html#a166f23dc221a0f931e4ee96c77b6c9bb">compare_exchange_strong</a> (T &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">expected</a>, T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">desired</a>, std::memory_order, std::memory_order) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a166f23dc221a0f931e4ee96c77b6c9bb inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a37bc87c803b0002c004da89d8f8b2e23 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase" id="r_a37bc87c803b0002c004da89d8f8b2e23"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html#a37bc87c803b0002c004da89d8f8b2e23">compare_exchange_strong</a> (T &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">expected</a>, T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">desired</a>, std::memory_order, std::memory_order) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">volatile</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a37bc87c803b0002c004da89d8f8b2e23 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6d71243d61bdeaa174b5b3080e2863c7 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase" id="r_a6d71243d61bdeaa174b5b3080e2863c7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html#a6d71243d61bdeaa174b5b3080e2863c7">compare_exchange_strong</a> (T &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">expected</a>, T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">desired</a>, std::memory_order) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a6d71243d61bdeaa174b5b3080e2863c7 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a42afc95946ec2f06f57bbc2bc34883fe inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase" id="r_a42afc95946ec2f06f57bbc2bc34883fe"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html#a42afc95946ec2f06f57bbc2bc34883fe">compare_exchange_strong</a> (T &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">expected</a>, T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">desired</a>, std::memory_order) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">volatile</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a42afc95946ec2f06f57bbc2bc34883fe inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4da09f6d93046f453037c3c197639bff inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase" id="r_a4da09f6d93046f453037c3c197639bff"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html#a4da09f6d93046f453037c3c197639bff">is_lock_free</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">volatile</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a4da09f6d93046f453037c3c197639bff inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a006b8c315dc7ee7cfe968ee25cc41a71 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase" id="r_a006b8c315dc7ee7cfe968ee25cc41a71"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html#a006b8c315dc7ee7cfe968ee25cc41a71">is_lock_free</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a006b8c315dc7ee7cfe968ee25cc41a71 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicWait"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicWait')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicWait.html">yaclib::detail::fiber::AtomicWait&lt; T &gt;</a></td></tr>
+<tr class="memitem:aac97cc7b5031763d6be9df0d9c9c6e9f inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicWait" id="r_aac97cc7b5031763d6be9df0d9c9c6e9f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicWait.html#aac97cc7b5031763d6be9df0d9c9c6e9f">AtomicWait</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a>=<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">default</a></td></tr>
+<tr class="separator:aac97cc7b5031763d6be9df0d9c9c6e9f inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicWait"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abf2bb597ebbbd41f2e521a459b897898 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicWait" id="r_abf2bb597ebbbd41f2e521a459b897898"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">constexpr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicWait.html#abf2bb597ebbbd41f2e521a459b897898">AtomicWait</a> (T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">desired</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:abf2bb597ebbbd41f2e521a459b897898 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicWait"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a55f61bdfc8dc5e6720b6a4c57cfca7ad inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicWait" id="r_a55f61bdfc8dc5e6720b6a4c57cfca7ad"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicWait.html#a55f61bdfc8dc5e6720b6a4c57cfca7ad">operator=</a> (T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">desired</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">volatile</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a55f61bdfc8dc5e6720b6a4c57cfca7ad inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicWait"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a399cc852ebc82642f2366df3d5f4a5d7 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicWait" id="r_a399cc852ebc82642f2366df3d5f4a5d7"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicWait.html#a399cc852ebc82642f2366df3d5f4a5d7">operator=</a> (T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">desired</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a399cc852ebc82642f2366df3d5f4a5d7 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicWait"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4da09f6d93046f453037c3c197639bff inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicWait" id="r_a4da09f6d93046f453037c3c197639bff"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicWait.html#a4da09f6d93046f453037c3c197639bff">is_lock_free</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">volatile</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a4da09f6d93046f453037c3c197639bff inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicWait"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a006b8c315dc7ee7cfe968ee25cc41a71 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicWait" id="r_a006b8c315dc7ee7cfe968ee25cc41a71"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicWait.html#a006b8c315dc7ee7cfe968ee25cc41a71">is_lock_free</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a006b8c315dc7ee7cfe968ee25cc41a71 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicWait"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
+Protected Attributes</h2></td></tr>
+<tr class="memitem:a49e4e2329382d82639bfae619a1b34d6" id="r_a49e4e2329382d82639bfae619a1b34d6"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase_3_01T_00_01true_01_4.html#a49e4e2329382d82639bfae619a1b34d6">_value</a></td></tr>
+<tr class="separator:a49e4e2329382d82639bfae619a1b34d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pro_attribs_classyaclib_1_1detail_1_1fiber_1_1AtomicFloatingBase_3_01T_00_01true_01_4"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classyaclib_1_1detail_1_1fiber_1_1AtomicFloatingBase_3_01T_00_01true_01_4')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicFloatingBase_3_01T_00_01true_01_4.html">yaclib::detail::fiber::AtomicFloatingBase&lt; T, true &gt;</a></td></tr>
+<tr class="memitem:a49e4e2329382d82639bfae619a1b34d6 inherit pro_attribs_classyaclib_1_1detail_1_1fiber_1_1AtomicFloatingBase_3_01T_00_01true_01_4" id="r_a49e4e2329382d82639bfae619a1b34d6"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicFloatingBase_3_01T_00_01true_01_4.html#a49e4e2329382d82639bfae619a1b34d6">_value</a></td></tr>
+<tr class="separator:a49e4e2329382d82639bfae619a1b34d6 inherit pro_attribs_classyaclib_1_1detail_1_1fiber_1_1AtomicFloatingBase_3_01T_00_01true_01_4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pro_attribs_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classyaclib_1_1detail_1_1fiber_1_1AtomicBase')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html">yaclib::detail::fiber::AtomicBase&lt; T &gt;</a></td></tr>
+<tr class="memitem:a49e4e2329382d82639bfae619a1b34d6 inherit pro_attribs_classyaclib_1_1detail_1_1fiber_1_1AtomicBase" id="r_a49e4e2329382d82639bfae619a1b34d6"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html#a49e4e2329382d82639bfae619a1b34d6">_value</a></td></tr>
+<tr class="separator:a49e4e2329382d82639bfae619a1b34d6 inherit pro_attribs_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pro_attribs_classyaclib_1_1detail_1_1fiber_1_1AtomicWait"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classyaclib_1_1detail_1_1fiber_1_1AtomicWait')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicWait.html">yaclib::detail::fiber::AtomicWait&lt; T &gt;</a></td></tr>
+<tr class="memitem:a49e4e2329382d82639bfae619a1b34d6 inherit pro_attribs_classyaclib_1_1detail_1_1fiber_1_1AtomicWait" id="r_a49e4e2329382d82639bfae619a1b34d6"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicWait.html#a49e4e2329382d82639bfae619a1b34d6">_value</a></td></tr>
+<tr class="separator:a49e4e2329382d82639bfae619a1b34d6 inherit pro_attribs_classyaclib_1_1detail_1_1fiber_1_1AtomicWait"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="inherited" name="inherited"></a>
+Additional Inherited Members</h2></td></tr>
+<tr class="inherit_header pub_static_attribs_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td colspan="2" onclick="javascript:toggleInherit('pub_static_attribs_classyaclib_1_1detail_1_1fiber_1_1AtomicBase')"><img src="closed.png" alt="-"/>&#160;Static Public Attributes inherited from <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html">yaclib::detail::fiber::AtomicBase&lt; T &gt;</a></td></tr>
+<tr class="memitem:a78806ff58e35a1a51765506c8446556d inherit pub_static_attribs_classyaclib_1_1detail_1_1fiber_1_1AtomicBase" id="r_a78806ff58e35a1a51765506c8446556d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">static</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">constexpr</a> <a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html#a78806ff58e35a1a51765506c8446556d">is_always_lock_free</a></td></tr>
+<tr class="separator:a78806ff58e35a1a51765506c8446556d inherit pub_static_attribs_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_static_attribs_classyaclib_1_1detail_1_1fiber_1_1AtomicWait"><td colspan="2" onclick="javascript:toggleInherit('pub_static_attribs_classyaclib_1_1detail_1_1fiber_1_1AtomicWait')"><img src="closed.png" alt="-"/>&#160;Static Public Attributes inherited from <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicWait.html">yaclib::detail::fiber::AtomicWait&lt; T &gt;</a></td></tr>
+<tr class="memitem:a78806ff58e35a1a51765506c8446556d inherit pub_static_attribs_classyaclib_1_1detail_1_1fiber_1_1AtomicWait" id="r_a78806ff58e35a1a51765506c8446556d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">static</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">constexpr</a> <a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicWait.html#a78806ff58e35a1a51765506c8446556d">is_always_lock_free</a> = <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">true</a></td></tr>
+<tr class="separator:a78806ff58e35a1a51765506c8446556d inherit pub_static_attribs_classyaclib_1_1detail_1_1fiber_1_1AtomicWait"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pro_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html">yaclib::detail::fiber::AtomicBase&lt; T &gt;</a></td></tr>
+<tr class="memitem:a8de884c64ab41d31dd60d6be28398d3c inherit pro_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase" id="r_a8de884c64ab41d31dd60d6be28398d3c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html#a8de884c64ab41d31dd60d6be28398d3c">CompareExchangeHelper</a> (T &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">expected</a>, T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">desired</a>)</td></tr>
+<tr class="separator:a8de884c64ab41d31dd60d6be28398d3c inherit pro_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><div class="compoundTemplParams">template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T&gt;<br />
+class yaclib::detail::fiber::AtomicIntegralBase&lt; T, true &gt;</div>
+<p class="definition">Definition at line <a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html#l00148">148</a> of file <a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html">atomic.hpp</a>.</p>
+</div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="a90233868b40a2113159c84d63b3bb95c" name="a90233868b40a2113159c84d63b3bb95c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a90233868b40a2113159c84d63b3bb95c">&#9670;&#160;</a></span>fetch_and() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">T <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase.html">yaclib::detail::fiber::AtomicIntegralBase</a>&lt; T, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">true</a> &gt;::fetch_and </td>
+          <td>(</td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>arg</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::memory_order&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html#l00154">154</a> of file <a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html">atomic.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="fiber_2atomic__wait_8hpp_source.html#l00063">yaclib::detail::fiber::AtomicBase&lt; T &gt;::_value</a>, and <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="a957c520ee4d395dde31c738180f348c3" name="a957c520ee4d395dde31c738180f348c3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a957c520ee4d395dde31c738180f348c3">&#9670;&#160;</a></span>fetch_and() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">T <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase.html">yaclib::detail::fiber::AtomicIntegralBase</a>&lt; T, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">true</a> &gt;::fetch_and </td>
+          <td>(</td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>arg</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::memory_order&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> volatile</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html#l00159">159</a> of file <a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html">atomic.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="fiber_2atomic__wait_8hpp_source.html#l00063">yaclib::detail::fiber::AtomicBase&lt; T &gt;::_value</a>, and <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="ae17efeef89cecde5532c2f4dbf170c20" name="ae17efeef89cecde5532c2f4dbf170c20"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae17efeef89cecde5532c2f4dbf170c20">&#9670;&#160;</a></span>fetch_or() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">T <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase.html">yaclib::detail::fiber::AtomicIntegralBase</a>&lt; T, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">true</a> &gt;::fetch_or </td>
+          <td>(</td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>arg</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::memory_order&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html#l00165">165</a> of file <a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html">atomic.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="fiber_2atomic__wait_8hpp_source.html#l00063">yaclib::detail::fiber::AtomicBase&lt; T &gt;::_value</a>, and <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="a4e927346cb79742bf9968b95a30ae99c" name="a4e927346cb79742bf9968b95a30ae99c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4e927346cb79742bf9968b95a30ae99c">&#9670;&#160;</a></span>fetch_or() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">T <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase.html">yaclib::detail::fiber::AtomicIntegralBase</a>&lt; T, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">true</a> &gt;::fetch_or </td>
+          <td>(</td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>arg</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::memory_order&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> volatile</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html#l00170">170</a> of file <a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html">atomic.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="fiber_2atomic__wait_8hpp_source.html#l00063">yaclib::detail::fiber::AtomicBase&lt; T &gt;::_value</a>, and <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="a709d52d9fe4cd86cbfbeec0cb9d42545" name="a709d52d9fe4cd86cbfbeec0cb9d42545"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a709d52d9fe4cd86cbfbeec0cb9d42545">&#9670;&#160;</a></span>fetch_xor() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">T <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase.html">yaclib::detail::fiber::AtomicIntegralBase</a>&lt; T, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">true</a> &gt;::fetch_xor </td>
+          <td>(</td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>arg</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::memory_order&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html#l00176">176</a> of file <a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html">atomic.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="fiber_2atomic__wait_8hpp_source.html#l00063">yaclib::detail::fiber::AtomicBase&lt; T &gt;::_value</a>, and <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="ab03eaf8ab9e697f158c489943137c4c3" name="ab03eaf8ab9e697f158c489943137c4c3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab03eaf8ab9e697f158c489943137c4c3">&#9670;&#160;</a></span>fetch_xor() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">T <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase.html">yaclib::detail::fiber::AtomicIntegralBase</a>&lt; T, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">true</a> &gt;::fetch_xor </td>
+          <td>(</td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>arg</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::memory_order&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> volatile</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html#l00181">181</a> of file <a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html">atomic.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="fiber_2atomic__wait_8hpp_source.html#l00063">yaclib::detail::fiber::AtomicBase&lt; T &gt;::_value</a>, and <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="a3ef7cd5b93784b4bab249779bb57285d" name="a3ef7cd5b93784b4bab249779bb57285d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3ef7cd5b93784b4bab249779bb57285d">&#9670;&#160;</a></span>operator&amp;=() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">T <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase.html">yaclib::detail::fiber::AtomicIntegralBase</a>&lt; T, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">true</a> &gt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">::operator</a>&amp;= </td>
+          <td>(</td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>arg</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html#l00215">215</a> of file <a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html">atomic.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="fiber_2atomic__wait_8hpp_source.html#l00063">yaclib::detail::fiber::AtomicBase&lt; T &gt;::_value</a>, and <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="af8f7d5874908a03f3b3548a671403c60" name="af8f7d5874908a03f3b3548a671403c60"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af8f7d5874908a03f3b3548a671403c60">&#9670;&#160;</a></span>operator&amp;=() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">T <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase.html">yaclib::detail::fiber::AtomicIntegralBase</a>&lt; T, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">true</a> &gt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">::operator</a>&amp;= </td>
+          <td>(</td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>arg</em></td><td>)</td>
+          <td> volatile</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html#l00218">218</a> of file <a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html">atomic.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="fiber_2atomic__wait_8hpp_source.html#l00063">yaclib::detail::fiber::AtomicBase&lt; T &gt;::_value</a>, and <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="a07b1cdb74e4eb59b5a05761d7aa71182" name="a07b1cdb74e4eb59b5a05761d7aa71182"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a07b1cdb74e4eb59b5a05761d7aa71182">&#9670;&#160;</a></span>operator++() <span class="overload">[1/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">T <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase.html">yaclib::detail::fiber::AtomicIntegralBase</a>&lt; T, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">true</a> &gt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">::operator</a>++ </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html#l00187">187</a> of file <a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html">atomic.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="fiber_2atomic__wait_8hpp_source.html#l00063">yaclib::detail::fiber::AtomicBase&lt; T &gt;::_value</a>.</p>
+
+</div>
+</div>
+<a id="a2250d2d3195c4d421b4030976a295551" name="a2250d2d3195c4d421b4030976a295551"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2250d2d3195c4d421b4030976a295551">&#9670;&#160;</a></span>operator++() <span class="overload">[2/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">T <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase.html">yaclib::detail::fiber::AtomicIntegralBase</a>&lt; T, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">true</a> &gt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">::operator</a>++ </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> volatile</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html#l00190">190</a> of file <a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html">atomic.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="fiber_2atomic__wait_8hpp_source.html#l00063">yaclib::detail::fiber::AtomicBase&lt; T &gt;::_value</a>.</p>
+
+</div>
+</div>
+<a id="a55c33fc0c0fb4151713fc5bae7faecc2" name="a55c33fc0c0fb4151713fc5bae7faecc2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a55c33fc0c0fb4151713fc5bae7faecc2">&#9670;&#160;</a></span>operator++() <span class="overload">[3/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">T <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase.html">yaclib::detail::fiber::AtomicIntegralBase</a>&lt; T, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">true</a> &gt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">::operator</a>++ </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">int</a>&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html#l00194">194</a> of file <a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html">atomic.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="fiber_2atomic__wait_8hpp_source.html#l00063">yaclib::detail::fiber::AtomicBase&lt; T &gt;::_value</a>.</p>
+
+</div>
+</div>
+<a id="ad0c28a9f19462cba0086e3ec317e4242" name="ad0c28a9f19462cba0086e3ec317e4242"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad0c28a9f19462cba0086e3ec317e4242">&#9670;&#160;</a></span>operator++() <span class="overload">[4/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">T <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase.html">yaclib::detail::fiber::AtomicIntegralBase</a>&lt; T, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">true</a> &gt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">::operator</a>++ </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">int</a>&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td> volatile</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html#l00197">197</a> of file <a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html">atomic.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="fiber_2atomic__wait_8hpp_source.html#l00063">yaclib::detail::fiber::AtomicBase&lt; T &gt;::_value</a>.</p>
+
+</div>
+</div>
+<a id="ae4edf7a63d41cf4e13144bb276c8bc3a" name="ae4edf7a63d41cf4e13144bb276c8bc3a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae4edf7a63d41cf4e13144bb276c8bc3a">&#9670;&#160;</a></span>operator--() <span class="overload">[1/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">T <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase.html">yaclib::detail::fiber::AtomicIntegralBase</a>&lt; T, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">true</a> &gt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">::operator</a>-- </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html#l00201">201</a> of file <a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html">atomic.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="fiber_2atomic__wait_8hpp_source.html#l00063">yaclib::detail::fiber::AtomicBase&lt; T &gt;::_value</a>.</p>
+
+</div>
+</div>
+<a id="aeb82899a6ed3b6885c4cbeadf1932a10" name="aeb82899a6ed3b6885c4cbeadf1932a10"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeb82899a6ed3b6885c4cbeadf1932a10">&#9670;&#160;</a></span>operator--() <span class="overload">[2/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">T <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase.html">yaclib::detail::fiber::AtomicIntegralBase</a>&lt; T, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">true</a> &gt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">::operator</a>-- </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> volatile</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html#l00204">204</a> of file <a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html">atomic.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="fiber_2atomic__wait_8hpp_source.html#l00063">yaclib::detail::fiber::AtomicBase&lt; T &gt;::_value</a>.</p>
+
+</div>
+</div>
+<a id="a33153702b93655ac19d8647cf7f396d5" name="a33153702b93655ac19d8647cf7f396d5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a33153702b93655ac19d8647cf7f396d5">&#9670;&#160;</a></span>operator--() <span class="overload">[3/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">T <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase.html">yaclib::detail::fiber::AtomicIntegralBase</a>&lt; T, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">true</a> &gt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">::operator</a>-- </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">int</a>&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html#l00208">208</a> of file <a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html">atomic.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="fiber_2atomic__wait_8hpp_source.html#l00063">yaclib::detail::fiber::AtomicBase&lt; T &gt;::_value</a>.</p>
+
+</div>
+</div>
+<a id="a627ffca1ee8497b74f108b87448c40eb" name="a627ffca1ee8497b74f108b87448c40eb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a627ffca1ee8497b74f108b87448c40eb">&#9670;&#160;</a></span>operator--() <span class="overload">[4/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">T <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase.html">yaclib::detail::fiber::AtomicIntegralBase</a>&lt; T, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">true</a> &gt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">::operator</a>-- </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">int</a>&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td> volatile</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html#l00211">211</a> of file <a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html">atomic.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="fiber_2atomic__wait_8hpp_source.html#l00063">yaclib::detail::fiber::AtomicBase&lt; T &gt;::_value</a>.</p>
+
+</div>
+</div>
+<a id="a74980a3342290ae2a3d54c731f54e810" name="a74980a3342290ae2a3d54c731f54e810"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a74980a3342290ae2a3d54c731f54e810">&#9670;&#160;</a></span>operator^=() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">T <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase.html">yaclib::detail::fiber::AtomicIntegralBase</a>&lt; T, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">true</a> &gt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">::operator</a>^= </td>
+          <td>(</td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>arg</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html#l00229">229</a> of file <a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html">atomic.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="fiber_2atomic__wait_8hpp_source.html#l00063">yaclib::detail::fiber::AtomicBase&lt; T &gt;::_value</a>, and <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="abe4cad74ef038e26a6808c82f611572f" name="abe4cad74ef038e26a6808c82f611572f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abe4cad74ef038e26a6808c82f611572f">&#9670;&#160;</a></span>operator^=() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">T <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase.html">yaclib::detail::fiber::AtomicIntegralBase</a>&lt; T, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">true</a> &gt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">::operator</a>^= </td>
+          <td>(</td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>arg</em></td><td>)</td>
+          <td> volatile</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html#l00232">232</a> of file <a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html">atomic.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="fiber_2atomic__wait_8hpp_source.html#l00063">yaclib::detail::fiber::AtomicBase&lt; T &gt;::_value</a>, and <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="abbba872942b31897063db54ca31600d1" name="abbba872942b31897063db54ca31600d1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abbba872942b31897063db54ca31600d1">&#9670;&#160;</a></span>operator|=() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">T <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase.html">yaclib::detail::fiber::AtomicIntegralBase</a>&lt; T, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">true</a> &gt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">::operator</a>|= </td>
+          <td>(</td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>arg</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html#l00222">222</a> of file <a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html">atomic.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="fiber_2atomic__wait_8hpp_source.html#l00063">yaclib::detail::fiber::AtomicBase&lt; T &gt;::_value</a>, and <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="a73357ba752ac8960cb093ac1ce8c0a02" name="a73357ba752ac8960cb093ac1ce8c0a02"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a73357ba752ac8960cb093ac1ce8c0a02">&#9670;&#160;</a></span>operator|=() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">T <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase.html">yaclib::detail::fiber::AtomicIntegralBase</a>&lt; T, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">true</a> &gt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">::operator</a>|= </td>
+          <td>(</td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>arg</em></td><td>)</td>
+          <td> volatile</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html#l00225">225</a> of file <a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html">atomic.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="fiber_2atomic__wait_8hpp_source.html#l00063">yaclib::detail::fiber::AtomicBase&lt; T &gt;::_value</a>, and <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Data Documentation</h2>
+<a id="a49e4e2329382d82639bfae619a1b34d6" name="a49e4e2329382d82639bfae619a1b34d6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a49e4e2329382d82639bfae619a1b34d6">&#9670;&#160;</a></span>_value</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">T <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicWait.html">yaclib::detail::fiber::AtomicWait</a>&lt; T &gt;::_value</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="fiber_2atomic__wait_8hpp_source.html#l00136">136</a> of file <a class="el" href="fiber_2atomic__wait_8hpp_source.html">atomic_wait.hpp</a>.</p>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following file:<ul>
+<li>include/yaclib/fault/detail/fiber/<a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html">atomic.hpp</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="namespaceyaclib.html">yaclib</a></li><li class="navelem"><a class="el" href="namespaceyaclib_1_1detail.html">detail</a></li><li class="navelem"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html">fiber</a></li><li class="navelem"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase_3_01T_00_01true_01_4.html">AtomicIntegralBase&lt; T, true &gt;</a></li>
+    <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+  </ul>
+</div>
+</body>
+</html>

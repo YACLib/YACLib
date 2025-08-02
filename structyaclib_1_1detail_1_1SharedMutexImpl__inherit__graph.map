@@ -1,0 +1,7 @@
+<map id="yaclib::detail::SharedMutexImpl&lt; FIFO, ReadersFIFO &gt;" name="yaclib::detail::SharedMutexImpl&lt; FIFO, ReadersFIFO &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,39,189,79"/>
+<area shape="rect" id="Node000002" href="$classyaclib_1_1SharedMutex.html" title="SharedMutex for coroutines." alt="" coords="326,5,485,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="204,45,326,32,326,37,205,50"/>
+<area shape="rect" id="Node000003" href="$structyaclib_1_1detail_1_1SharedMutexImpl.html" title=" " alt="" coords="319,71,492,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="205,67,318,79,318,85,204,73"/>
+</map>

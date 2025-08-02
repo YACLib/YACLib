@@ -1,0 +1,17 @@
+<map id="yaclib::detail::fiber::FiberBase" name="yaclib::detail::fiber::FiberBase">
+<area shape="rect" id="Node000001" title=" " alt="" coords="423,157,545,197"/>
+<area shape="rect" id="Node000002" href="$classyaclib_1_1detail_1_1fiber_1_1BiNodeScheduler.html" title=" " alt="" coords="179,26,307,67"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="301,72,312,77,401,125,449,154,447,158,398,130,309,82,299,77"/>
+<area shape="rect" id="Node000003" href="$structyaclib_1_1detail_1_1fiber_1_1Node.html" title=" " alt="" coords="5,59,127,100"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="141,63,178,56,179,61,142,68"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="50,42,56,35,66,33,76,35,82,41,84,58,78,59,77,44,73,40,66,38,58,40,54,45"/>
+<area shape="rect" id="Node000004" href="$classyaclib_1_1detail_1_1fiber_1_1BiNodeWaitQueue.html" title=" " alt="" coords="176,91,310,132"/>
+<area shape="poly" id="edge5_Node000004_Node000003" title=" " alt="" coords="142,91,176,97,175,102,141,96"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="326,131,423,158,422,163,325,136"/>
+<area shape="rect" id="Node000005" href="$classyaclib_1_1detail_1_1fiber_1_1ExecutionContext.html" title=" " alt="" coords="180,157,307,197"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="322,174,423,174,423,180,322,180"/>
+<area shape="rect" id="Node000006" href="$classyaclib_1_1detail_1_1fiber_1_1Stack.html" title="Manages stack memory." alt="" coords="183,222,304,263"/>
+<area shape="poly" id="edge7_Node000001_Node000006" title=" " alt="" coords="318,219,422,191,423,196,319,225"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="194,287,292,313"/>
+<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="293,278,309,272,355,256,398,236,456,196,459,200,401,241,357,261,311,277,295,283"/>
+</map>
