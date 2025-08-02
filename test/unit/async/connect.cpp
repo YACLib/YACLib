@@ -102,11 +102,13 @@ TEST(Connect, SetSharedAfterContract) {
 TEST(Connect, ConnectLoops) {
   auto [f1, p1] = yaclib::MakeContract<int>();
   auto [f2, p2] = yaclib::MakeContract<int>();
-  auto f3 = std::move(f2).ThenInline([](int x) {
-    return x + 1;
-  }).ThenInline([](int x) {
-    return x + 1;
-  });
+  auto f3 = std::move(f2)
+              .ThenInline([](int x) {
+                return x + 1;
+              })
+              .ThenInline([](int x) {
+                return x + 1;
+              });
   std::move(p1).Set(kSetInt);
   Connect(std::move(f1), std::move(p2));
   ASSERT_EQ(std::move(f3).Get().Value(), kSetInt + 2);

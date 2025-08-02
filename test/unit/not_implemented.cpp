@@ -77,11 +77,11 @@ void CheckResultCoreImplNonMovable() {
 }
 
 TEST(ResultCore, ImplNonMovable) {
-#  ifndef YACLIB_LOG_DEBUG
+#ifndef YACLIB_LOG_DEBUG
   CheckResultCoreImplNonMovable();
-#  else
+#else
   EXPECT_FATAL_FAILURE(CheckResultCoreImplNonMovable(), "");
-#  endif
+#endif
 }
 
 TEST(UniqueJob, Ref) {

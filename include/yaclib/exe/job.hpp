@@ -14,7 +14,7 @@ class Job : public IFunc, public detail::Node {
   // Compiler inline this call in tests
   virtual void Drop() noexcept {  // LCOV_EXCL_LINE
     YACLIB_PURE_VIRTUAL();        // LCOV_EXCL_LINE
-  }                               // LCOV_EXCL_LINE
+  }  // LCOV_EXCL_LINE
 };
 
 }  // namespace yaclib
