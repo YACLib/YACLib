@@ -24,8 +24,6 @@ static Drop kDropCore;
 
 }  // namespace
 
-template class ResultCore<void, StopError>;
-
 InlineCore& MakeDrop() noexcept {
   return kDropCore;
 }

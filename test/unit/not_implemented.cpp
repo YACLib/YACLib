@@ -72,7 +72,7 @@ void CheckResultCoreImplNonMovable() {
   auto [f2, p2] = yaclib::MakeContract<NonMovable>();
   auto* f1_core = f1.GetCore().Release();
   auto* p2_core = p2.GetCore().Get();
-  std::ignore = f1_core->SetCallback(*p2_core);
+  std::ignore = f1_core->TryAddCallback(*p2_core);
   std::move(p1).Set();
   f1_core->DecRef();
 }

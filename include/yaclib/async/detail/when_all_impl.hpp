@@ -1,7 +1,7 @@
 #pragma once
 
 #include <yaclib/algo/detail/inline_core.hpp>
-#include <yaclib/algo/detail/result_core.hpp>
+#include <yaclib/algo/detail/unique_core.hpp>
 #include <yaclib/async/detail/when_impl.hpp>
 #include <yaclib/fwd.hpp>
 #include <yaclib/log.hpp>
@@ -78,7 +78,7 @@ template <OrderPolicy O /*= Any*/, typename R, typename E>
 class AllCombinator : public InlineCore, protected AllCombinatorBase<O, R> {
   using V = result_value_t<R>;
   using FutureValue = typename AllCombinatorBase<O, R>::FutureValue;
-  using ResultPtr = ResultCorePtr<FutureValue, E>;
+  using ResultPtr = UniqueCorePtr<FutureValue, E>;
 
  public:
   static std::pair<ResultPtr, AllCombinator*> Make(std::size_t count) {
@@ -86,14 +86,14 @@ class AllCombinator : public InlineCore, protected AllCombinatorBase<O, R> {
       return {nullptr, nullptr};
     }
     // TODO(MBkkt) Maybe single allocation instead of two?
-    auto combine_core = MakeUnique<ResultCore<FutureValue, E>>();
+    auto combine_core = MakeUnique<UniqueCore<FutureValue, E>>();
     auto* raw_core = combine_core.Get();
     auto combinator = MakeShared<AllCombinator>(count, std::move(combine_core), count);
     ResultPtr future_core{NoRefTag{}, raw_core};
     return {std::move(future_core), combinator.Release()};
   }
 
-  void AddInput(ResultCore<V, E>& input) noexcept {
+  void AddInput(UniqueCore<V, E>& input) noexcept {
     input.CallInline(*this);
   }
 
@@ -121,7 +121,7 @@ class AllCombinator : public InlineCore, protected AllCombinatorBase<O, R> {
  private:
   template <bool SymmetricTransfer>
   [[nodiscard]] YACLIB_INLINE auto Impl(InlineCore& caller) noexcept {
-    auto& core = DownCast<ResultCore<V, E>>(caller);
+    auto& core = DownCast<UniqueCore<V, E>>(caller);
     if constexpr (std::is_same_v<R, V>) {
       if (!this->_done.load(std::memory_order_acquire) && CombineValue(std::move(core.Get()))) {
         auto* callback = _core.Release();
@@ -164,7 +164,7 @@ class AllCombinator : public InlineCore, protected AllCombinatorBase<O, R> {
     return false;
   }
 
-  void Done(ResultCore<V, E>& caller) noexcept {
+  void Done(UniqueCore<V, E>& caller) noexcept {
     caller.DecRef();
     DecRef();
   }
@@ -176,7 +176,7 @@ template <typename R, typename E>
 class AllCombinator<OrderPolicy::Same, R, E> : public InlineCore, public AllCombinatorBase<OrderPolicy::Same, R> {
   using V = result_value_t<R>;
   using FutureValue = typename AllCombinatorBase<OrderPolicy::Same, R>::FutureValue;
-  using ResultPtr = ResultCorePtr<FutureValue, E>;
+  using ResultPtr = UniqueCorePtr<FutureValue, E>;
 
  public:
   static std::pair<ResultPtr, AllCombinator*> Make(std::size_t count) {
@@ -184,14 +184,14 @@ class AllCombinator<OrderPolicy::Same, R, E> : public InlineCore, public AllComb
       return {nullptr, nullptr};
     }
     // TODO(MBkkt) Maybe single allocation instead of two?
-    auto combine_core = MakeUnique<ResultCore<FutureValue, E>>();
+    auto combine_core = MakeUnique<UniqueCore<FutureValue, E>>();
     auto* raw_core = combine_core.Get();
     auto combinator = MakeShared<AllCombinator>(count, std::move(combine_core), count);
     ResultPtr future_core{NoRefTag{}, raw_core};
     return {std::move(future_core), combinator.Release()};
   }
 
-  void AddInput(ResultCore<V, E>& input) noexcept {
+  void AddInput(UniqueCore<V, E>& input) noexcept {
     _callers.push_back(&input);  // we made reserve in ctor, so noexcept
     input.CallInline(*this);
   }
@@ -237,7 +237,7 @@ class AllCombinator<OrderPolicy::Same, R, E> : public InlineCore, public AllComb
  private:
   template <bool SymmetricTransfer>
   [[nodiscard]] YACLIB_INLINE auto Impl(InlineCore& caller) noexcept {
-    auto& core = DownCast<ResultCore<V, E>>(caller);
+    auto& core = DownCast<UniqueCore<V, E>>(caller);
     if constexpr (std::is_same_v<R, V>) {
       if (!this->_done.load(std::memory_order_acquire) && CombineValue(std::move(core.Get()))) {
         auto* callback = _core.Release();
@@ -271,7 +271,7 @@ class AllCombinator<OrderPolicy::Same, R, E> : public InlineCore, public AllComb
     return false;
   }
 
-  std::vector<ResultCore<V, E>*> _callers;
+  std::vector<UniqueCore<V, E>*> _callers;
   ResultPtr _core;
 };
 

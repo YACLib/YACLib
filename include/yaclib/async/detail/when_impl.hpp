@@ -27,10 +27,11 @@ void WhenImpl(Combinator& combinator, FutureBase<V, E>&&... fs) noexcept {
 
 template <bool SymmetricTransfer>
 auto WhenSetResult(BaseCore* callback) {
+  UniqueBaseHandle handle(*callback);
   if constexpr (SymmetricTransfer) {
-    return callback->template SetResult<true>();
+    return handle.SetResult<true>();
   } else {
-    Loop(callback, callback->template SetResult<false>());
+    Loop(&handle._core, handle.SetResult<false>());
     return Noop<false>();
   }
 }

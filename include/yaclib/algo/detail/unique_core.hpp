@@ -6,21 +6,28 @@
 namespace yaclib::detail {
 
 template <typename V, typename E>
-struct SharedCore : ResultCore<V, E> {
+struct UniqueCore : ResultCore<V, E> {
   using ResultCore<V, E>::ResultCore;
 
   template <bool SymmetricTransfer>
   [[nodiscard]] YACLIB_INLINE auto Impl(InlineCore& caller) noexcept {
-    if (caller.GetRef() != 1) {
-      ResultCore<V, E>::Store(DownCast<ResultCore<V, E>>(caller).Get());
-    } else {
+    if constexpr (std::is_move_constructible_v<Result<V, E>>) {
+      if constexpr (std::is_copy_constructible_v<Result<V, E>>) {
+        if (caller.GetRef() != 1) {
+          ResultCore<V, E>::Store(DownCast<ResultCore<V, E>>(caller).Get());
+          return SetResult<SymmetricTransfer>();
+        }
+      }
+      YACLIB_ASSERT(caller.GetRef() == 1);
       ResultCore<V, E>::Store(std::move(DownCast<ResultCore<V, E>>(caller).Get()));
       caller.DecRef();
+      return SetResult<SymmetricTransfer>();
+    } else {
+      YACLIB_PURE_VIRTUAL();
+      return Noop<SymmetricTransfer>();
     }
-    return SetResult<SymmetricTransfer>();
   }
 
- public:
   [[nodiscard]] InlineCore* Here(InlineCore& caller) noexcept override {
     return Impl<false>(caller);
   }
@@ -31,26 +38,34 @@ struct SharedCore : ResultCore<V, E> {
   }
 #endif
 
+  void StoreCallback(InlineCore& callback) noexcept {
+    return BaseCore::StoreCallbackImpl<false>(callback);
+  }
+
   [[nodiscard]] bool TryAddCallback(InlineCore& callback) noexcept {
-    return BaseCore::TryAddCallbackImpl<true>(callback);
+    return BaseCore::TryAddCallbackImpl<false>(callback);
+  }
+
+  [[nodiscard]] bool Reset() noexcept {
+    return BaseCore::ResetImpl<false>();
   }
 
   void CallInline(InlineCore& callback) noexcept {
-    return BaseCore::CallInlineImpl<true>(callback);
+    return BaseCore::CallInlineImpl<false>(callback);
   }
 
   template <bool SymmetricTransfer>
   [[nodiscard]] Transfer<SymmetricTransfer> SetInline(InlineCore& callback) noexcept {
-    return BaseCore::SetInlineImpl<SymmetricTransfer, true>(callback);
+    return BaseCore::SetInlineImpl<SymmetricTransfer, false>(callback);
   }
 
   template <bool SymmetricTransfer>
   [[nodiscard]] Transfer<SymmetricTransfer> SetResult() noexcept {
-    return BaseCore::SetResultImpl<SymmetricTransfer, true>();
+    return BaseCore::SetResultImpl<SymmetricTransfer, false>();
   }
 };
 
 template <typename V, typename E>
-using SharedCorePtr = IntrusivePtr<SharedCore<V, E>>;
+using UniqueCorePtr = IntrusivePtr<UniqueCore<V, E>>;
 
 }  // namespace yaclib::detail

@@ -28,15 +28,15 @@ class SharedPromise final {
   void Set(Args&&... args) && {
     YACLIB_ASSERT(Valid());
 
-    detail::InlineCore* head = nullptr;
     if constexpr (sizeof...(Args) == 0) {
-      head = _core->Store(std::in_place);
+      _core->Store(std::in_place);
     } else {
-      head = _core->Store(std::forward<Args>(args)...);
+      _core->Store(std::forward<Args>(args)...);
     }
 
     auto released = _core.Release();
-    released->FulfillQueue(head);
+    // The result will always be null
+    std::ignore = released->template SetResult<false>();
   }
 
   ~SharedPromise() {

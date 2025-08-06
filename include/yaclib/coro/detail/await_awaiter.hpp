@@ -20,7 +20,7 @@ struct [[nodiscard]] TransferAwaiter final {
   template <typename Promise>
   YACLIB_INLINE auto await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
     _caller.StoreCallback(handle.promise());
-    auto* next = MoveToCaller(&_caller);
+    auto* next = MoveToCaller(&_caller._core);
 #if YACLIB_SYMMETRIC_TRANSFER != 0
     return next->Next(handle.promise());
 #else
@@ -32,12 +32,12 @@ struct [[nodiscard]] TransferAwaiter final {
   }
 
  private:
-  BaseCore& _caller;
+  UniqueBaseHandle _caller;
 };
 
 template <typename V, typename E>
 struct [[nodiscard]] TransferSingleAwaiter final {
-  explicit TransferSingleAwaiter(ResultCorePtr<V, E>&& result) noexcept : _result{std::move(result)} {
+  explicit TransferSingleAwaiter(UniqueCorePtr<V, E>&& result) noexcept : _result{std::move(result)} {
     YACLIB_ASSERT(_result != nullptr);
     YACLIB_ASSERT(_result->Empty());
   }
@@ -62,7 +62,7 @@ struct [[nodiscard]] TransferSingleAwaiter final {
   }
 
  private:
-  ResultCorePtr<V, E> _result;
+  UniqueCorePtr<V, E> _result;
 };
 
 /**
@@ -74,19 +74,19 @@ struct [[nodiscard]] AwaitAwaiter final {
   }
 
   YACLIB_INLINE bool await_ready() const noexcept {
-    return !_caller.Empty();
+    return !_caller._core.Empty();
   }
 
   template <typename Promise>
   YACLIB_INLINE bool await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
-    return _caller.SetCallback(handle.promise());
+    return _caller.TryAddCallback(handle.promise());
   }
 
   constexpr void await_resume() const noexcept {
   }
 
  private:
-  BaseCore& _caller;
+  UniqueBaseHandle _caller;
 };
 
 class AwaitEvent final : public InlineCore, public AtomicCounter<NopeBase, NopeDeleter> {
@@ -147,7 +147,7 @@ template <typename... Cores>
 AwaitAwaiter<false>::AwaitAwaiter(Cores&... cores) noexcept : _event{sizeof...(cores) + 1} {
   static_assert(sizeof...(cores) >= 2, "Number of futures must be at least two");
   static_assert((... && std::is_same_v<BaseCore, Cores>), "Futures must be Future in Wait function");
-  const auto wait_count = (... + static_cast<std::size_t>(cores.SetCallback(_event)));
+  const auto wait_count = (... + static_cast<std::size_t>(UniqueBaseHandle(cores).TryAddCallback(_event)));
   _event.count.fetch_sub(sizeof...(cores) - wait_count, std::memory_order_relaxed);
 }
 
@@ -156,7 +156,7 @@ AwaitAwaiter<false>::AwaitAwaiter(It it, std::size_t count) noexcept : _event{co
   std::size_t wait_count = 0;
   for (std::size_t i = 0; i != count; ++i) {
     YACLIB_ASSERT(it->Valid());
-    wait_count += static_cast<std::size_t>(it->GetCore()->SetCallback(_event));
+    wait_count += static_cast<std::size_t>(it->GetBaseHandle().TryAddCallback(_event));
     ++it;
   }
   _event.count.fetch_sub(count - wait_count, std::memory_order_relaxed);
@@ -165,7 +165,7 @@ AwaitAwaiter<false>::AwaitAwaiter(It it, std::size_t count) noexcept : _event{co
 template <typename V, typename E>
 class [[nodiscard]] AwaitSingleAwaiter final {
  public:
-  explicit AwaitSingleAwaiter(ResultCorePtr<V, E>&& result) noexcept : _result{std::move(result)} {
+  explicit AwaitSingleAwaiter(UniqueCorePtr<V, E>&& result) noexcept : _result{std::move(result)} {
     YACLIB_ASSERT(_result != nullptr);
   }
 
@@ -175,7 +175,7 @@ class [[nodiscard]] AwaitSingleAwaiter final {
 
   template <typename Promise>
   YACLIB_INLINE bool await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
-    return _result->SetCallback(handle.promise());
+    return _result->TryAddCallback(handle.promise());
   }
 
   auto await_resume() {
@@ -183,7 +183,7 @@ class [[nodiscard]] AwaitSingleAwaiter final {
   }
 
  private:
-  ResultCorePtr<V, E> _result;
+  UniqueCorePtr<V, E> _result;
 };
 
 }  // namespace yaclib::detail

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <yaclib/algo/detail/result_core.hpp>
+#include <yaclib/algo/detail/unique_core.hpp>
 #include <yaclib/fwd.hpp>
 #include <yaclib/util/type_traits.hpp>
 
@@ -65,15 +65,15 @@ class Promise final {
   /**
    * Part of unsafe but internal API
    */
-  explicit Promise(detail::ResultCorePtr<V, E> core) noexcept : _core{std::move(core)} {
+  explicit Promise(detail::UniqueCorePtr<V, E> core) noexcept : _core{std::move(core)} {
   }
 
-  [[nodiscard]] detail::ResultCorePtr<V, E>& GetCore() noexcept {
+  [[nodiscard]] detail::UniqueCorePtr<V, E>& GetCore() noexcept {
     return _core;
   }
 
  private:
-  detail::ResultCorePtr<V, E> _core;
+  detail::UniqueCorePtr<V, E> _core;
 };
 
 extern template class Promise<>;

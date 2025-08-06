@@ -23,19 +23,19 @@ using ContractOn = std::pair<FutureOn<V, E>, Promise<V, E>>;
  */
 template <typename V = void, typename E = StopError>
 [[nodiscard]] Contract<V, E> MakeContract() {
-  auto core = MakeUnique<detail::ResultCore<V, E>>();
-  Future<V, E> future{detail::ResultCorePtr<V, E>{NoRefTag{}, core.Get()}};
-  Promise<V, E> promise{detail::ResultCorePtr<V, E>{NoRefTag{}, core.Release()}};
+  auto core = MakeUnique<detail::UniqueCore<V, E>>();
+  Future<V, E> future{detail::UniqueCorePtr<V, E>{NoRefTag{}, core.Get()}};
+  Promise<V, E> promise{detail::UniqueCorePtr<V, E>{NoRefTag{}, core.Release()}};
   return {std::move(future), std::move(promise)};
 }
 
 template <typename V = void, typename E = StopError>
 [[nodiscard]] ContractOn<V, E> MakeContractOn(IExecutor& e) {
-  auto core = MakeUnique<detail::ResultCore<V, E>>();
+  auto core = MakeUnique<detail::UniqueCore<V, E>>();
   e.IncRef();
   core->_executor.Reset(NoRefTag{}, &e);
-  FutureOn<V, E> future{detail::ResultCorePtr<V, E>{NoRefTag{}, core.Get()}};
-  Promise<V, E> promise{detail::ResultCorePtr<V, E>{NoRefTag{}, core.Release()}};
+  FutureOn<V, E> future{detail::UniqueCorePtr<V, E>{NoRefTag{}, core.Get()}};
+  Promise<V, E> promise{detail::UniqueCorePtr<V, E>{NoRefTag{}, core.Release()}};
   return {std::move(future), std::move(promise)};
 }
 

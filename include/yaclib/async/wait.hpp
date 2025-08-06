@@ -17,7 +17,7 @@ namespace yaclib {
 template <typename Event = detail::DefaultEvent, typename... Waited>
 YACLIB_INLINE std::enable_if_t<(... && is_waitable_v<Waited>), void> Wait(Waited&... fs) noexcept {
   YACLIB_ASSERT(... && fs.Valid());
-  detail::WaitCore<Event>(detail::NoTimeoutTag{}, *fs.GetBaseCore()...);
+  detail::WaitCore<Event>(detail::NoTimeoutTag{}, fs.GetBaseHandle()...);
 }
 
 /**

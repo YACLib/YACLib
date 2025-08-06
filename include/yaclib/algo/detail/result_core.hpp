@@ -1,12 +1,7 @@
 #pragma once
 
 #include <yaclib/algo/detail/base_core.hpp>
-#include <yaclib/algo/detail/core_util.hpp>
-#include <yaclib/fwd.hpp>
-#include <yaclib/util/intrusive_ptr.hpp>
 #include <yaclib/util/result.hpp>
-
-#include <utility>
 
 namespace yaclib::detail {
 
@@ -16,35 +11,11 @@ struct Callback {
 };
 
 template <typename V, typename E>
-class ResultCore : public BaseCore {
-  template <bool SymmetricTransfer>
-  [[nodiscard]] YACLIB_INLINE auto Impl(InlineCore& caller) noexcept {
-    if constexpr (std::is_move_constructible_v<Result<V, E>>) {
-      if constexpr (std::is_copy_constructible_v<Result<V, E>>) {
-        if (caller.GetRef() != 1) {
-          Store(ResultFromCore<V, E, true>(caller));
-          return SetResult<SymmetricTransfer>();
-        }
-      }
-      YACLIB_ASSERT(caller.GetRef() == 1);
-      Store(ResultFromCore<V, E, false>(caller));
-      caller.DecRef();
-      return SetResult<SymmetricTransfer>();
-    } else {
-      YACLIB_PURE_VIRTUAL();
-      return Noop<SymmetricTransfer>();
-    }
-  }
-
- public:
-  [[nodiscard]] InlineCore* Here(InlineCore& caller) noexcept override {
-    return Impl<false>(caller);
-  }
-#if YACLIB_SYMMETRIC_TRANSFER != 0
-  [[nodiscard]] yaclib_std::coroutine_handle<> Next(InlineCore& caller) noexcept override {
-    return Impl<true>(caller);
-  }
-#endif
+struct ResultCore : BaseCore {
+  union {
+    Result<V, E> _result;
+    Callback _self;
+  };
 
   ResultCore() noexcept : BaseCore{kEmpty} {
   }
@@ -52,10 +23,6 @@ class ResultCore : public BaseCore {
   template <typename... Args>
   explicit ResultCore(Args&&... args) noexcept(std::is_nothrow_constructible_v<Result<V, E>, Args&&...>)
     : BaseCore{kResult}, _result{std::forward<Args>(args)...} {
-  }
-
-  ~ResultCore() noexcept override {
-    _result.~Result<V, E>();
   }
 
   template <typename... Args>
@@ -67,15 +34,14 @@ class ResultCore : public BaseCore {
     return _result;
   }
 
-  union {
-    Result<V, E> _result;
-    Callback _self;
-  };
+  [[nodiscard]] const Result<V, E>& Get() const noexcept {
+    return _result;
+  }
+
+  ~ResultCore() noexcept override {
+    YACLIB_ASSERT(reinterpret_cast<std::uintptr_t>(_callback.load(std::memory_order_relaxed)) == kResult);
+    _result.~Result<V, E>();
+  }
 };
-
-extern template class ResultCore<void, StopError>;
-
-template <typename V, typename E>
-using ResultCorePtr = IntrusivePtr<ResultCore<V, E>>;
 
 }  // namespace yaclib::detail

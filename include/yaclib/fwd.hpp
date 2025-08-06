@@ -55,19 +55,4 @@ class [[nodiscard]] SharedFuture;
 template <typename V = void, typename E = StopError>
 class [[nodiscard]] SharedPromise;
 
-namespace detail {
-
-class InlineCore;
-
-template <typename V, typename E>
-class SharedCore;
-
-template <typename V, typename E>
-class ResultCore;
-
-template <typename V, typename E, bool Shared>
-decltype(auto) ResultFromCore(InlineCore& core);
-
-}  // namespace detail
-
 }  // namespace yaclib
