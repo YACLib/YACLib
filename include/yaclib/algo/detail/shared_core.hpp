@@ -1,6 +1,6 @@
 #pragma once
 
-#include <yaclib_std/detail/atomic.hpp>
+#include <yaclib_std/atomic>
 
 #include <yaclib/algo/detail/core_util.hpp>
 #include <yaclib/algo/detail/inline_core.hpp>
