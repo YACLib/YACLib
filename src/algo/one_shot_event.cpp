@@ -4,7 +4,7 @@ namespace yaclib {
 namespace {
 
 void SetImpl(yaclib_std::atomic_uintptr_t& self, std::uintptr_t value) {
-  auto head = self.exchange(value, std::memory_order_acq_rel);
+  auto head = self.exchange(value, std::memory_order_acquire);
   auto* job = reinterpret_cast<Job*>(head);
   while (job != nullptr) {
     auto* next = static_cast<Job*>(job->next);
@@ -16,11 +16,11 @@ void SetImpl(yaclib_std::atomic_uintptr_t& self, std::uintptr_t value) {
 }  // namespace
 
 bool OneShotEvent::TryAdd(Job& job) noexcept {
-  auto head = _head.load(std::memory_order_acquire);
+  auto head = _head.load(std::memory_order_relaxed);
   auto node = reinterpret_cast<std::uintptr_t>(&job);
   while (head != OneShotEvent::kAllDone) {
     job.next = reinterpret_cast<Job*>(head);
-    if (_head.compare_exchange_weak(head, node, std::memory_order_release, std::memory_order_acquire)) {
+    if (_head.compare_exchange_weak(head, node, std::memory_order_release, std::memory_order_relaxed)) {
       return true;
     }
   }
@@ -28,7 +28,7 @@ bool OneShotEvent::TryAdd(Job& job) noexcept {
 }
 
 bool OneShotEvent::Ready() noexcept {
-  return _head.load(std::memory_order_acquire) == OneShotEvent::kAllDone;
+  return _head.load(std::memory_order_relaxed) == OneShotEvent::kAllDone;
 }
 
 void OneShotEvent::Wait() noexcept {
