@@ -4,14 +4,18 @@
 #include <yaclib/exe/executor.hpp>
 #include <yaclib/exe/inline.hpp>
 
+#if YACLIB_CORO != 0
+#  include <yaclib/coro/coro.hpp>
+#endif
+
 #include <limits>
 #include <yaclib_std/atomic>
 
 namespace yaclib::detail {
 
 class BaseCore : public InlineCore {
-  friend class UniqueBaseHandle;
-  friend class SharedBaseHandle;
+  friend struct UniqueHandle;
+  friend struct SharedHandle;
 
  public:
   enum State : std::uintptr_t {
@@ -21,8 +25,6 @@ class BaseCore : public InlineCore {
 
   bool Empty() const noexcept {
     auto callback = _callback.load(std::memory_order_acquire);
-    YACLIB_DEBUG(callback != kEmpty && callback != kResult,
-                 "That means we call it on already used future or on promise");
     return callback == kEmpty;
   }
 
@@ -43,127 +45,51 @@ class BaseCore : public InlineCore {
   IExecutorPtr _executor{NoRefTag{}, &MakeInline()};
 
  protected:
-  explicit BaseCore(State state) noexcept : _callback(state) {
+  explicit BaseCore(State state) noexcept : _callback{state} {
   }
 
-  template <bool Shared>
   void StoreCallbackImpl(InlineCore& callback) noexcept {
-    static_assert(!Shared, "StoreCallback is not supported in shared cores");
-    _callback.store(reinterpret_cast<std::uintptr_t>(&callback), std::memory_order_relaxed);
+    this->_callback.store(reinterpret_cast<std::uintptr_t>(&callback), std::memory_order_relaxed);
   }
 
   template <bool Shared>
-  [[nodiscard]] bool TryAddCallbackImpl(InlineCore& callback) noexcept {
-    YACLIB_ASSERT(reinterpret_cast<std::uintptr_t>(&callback) != kEmpty);
-    YACLIB_ASSERT(reinterpret_cast<std::uintptr_t>(&callback) != kResult);
-    if constexpr (Shared) {
-      auto next = _callback.load(std::memory_order_acquire);
-      do {
-        if (next == kResult) {
-          return false;
-        }
-        callback.next = reinterpret_cast<InlineCore*>(next);
-      } while (!_callback.compare_exchange_weak(next, reinterpret_cast<std::uintptr_t>(&callback),
-                                                std::memory_order_release, std::memory_order_acquire));
-      return true;
-    } else {
-      std::uintptr_t expected = kEmpty;
-      return _callback.load(std::memory_order_acquire) == expected &&
-             _callback.compare_exchange_strong(expected, reinterpret_cast<std::uintptr_t>(&callback),
-                                               std::memory_order_release, std::memory_order_acquire);
-    }
-  }
+  [[nodiscard]] bool SetCallbackImpl(InlineCore& callback) noexcept;
 
-  template <bool Shared>
-  [[nodiscard]] bool ResetImpl() noexcept {
-    static_assert(!Shared, "Resetting a callback is not supported in shared cores");
-    auto expected = _callback.load(std::memory_order_relaxed);
-    return expected != kResult && _callback.compare_exchange_strong(expected, kEmpty, std::memory_order_relaxed);
-  }
-
-  template <bool Shared>
-  void CallInlineImpl(InlineCore& callback) noexcept {
-    if (!TryAddCallbackImpl<Shared>(callback)) {
-      auto* next = callback.Here(*this);
-      YACLIB_ASSERT(next == nullptr);
-    }
-  }
+  [[nodiscard]] bool ResetImpl() noexcept;
 
   template <bool SymmetricTransfer, bool Shared>
-  [[nodiscard]] Transfer<SymmetricTransfer> SetInlineImpl(InlineCore& callback) noexcept {
-    if (!TryAddCallbackImpl<Shared>(callback)) {
-      return Step<SymmetricTransfer>(*this, callback);
-    }
-    return Noop<SymmetricTransfer>();
-  }
-
-  template <bool SymmetricTransfer, bool Shared>
-  [[nodiscard]] Transfer<SymmetricTransfer> SetResultImpl() noexcept {
-    const auto expected = _callback.exchange(kResult, std::memory_order_acq_rel);
-    YACLIB_ASSERT(expected != kResult);
-    if constexpr (Shared) {
-      auto* const head = reinterpret_cast<InlineCore*>(expected);
-      // Need to call it even when null to release ownership
-      FulfillQueue(head);
-      return Noop<SymmetricTransfer>();
-    } else {
-      if (expected != kEmpty) {
-        auto* const callback = reinterpret_cast<InlineCore*>(expected);
-        return Step<SymmetricTransfer>(*this, *callback);
-      } else {
-        return Noop<SymmetricTransfer>();
-      }
-    }
-  }
-
-  void FulfillQueue(InlineCore* head) noexcept {
-    while (head) {
-      auto next = head->next;
-      Loop(this, head);
-      head = static_cast<InlineCore*>(next);
-    }
-    DecRef();
-    DecRef();
-  }
+  [[nodiscard]] Transfer<SymmetricTransfer> SetResultImpl() noexcept;
 
   yaclib_std::atomic_uintptr_t _callback;
 };
 
-class UniqueBaseHandle {
- public:
-  explicit UniqueBaseHandle(BaseCore& core) : _core(core) {
+struct UniqueHandle {
+  void StoreCallback(InlineCore& callback) noexcept {
+    return core.StoreCallbackImpl(callback);
   }
 
-  bool TryAddCallback(InlineCore& callback) noexcept {
-    return _core.TryAddCallbackImpl<false>(callback);
+  bool SetCallback(InlineCore& callback) noexcept {
+    return core.SetCallbackImpl<false>(callback);
   }
 
   bool Reset() noexcept {
-    return _core.ResetImpl<false>();
-  }
-
-  void StoreCallback(InlineCore& callback) noexcept {
-    return _core.StoreCallbackImpl<false>(callback);
+    return core.ResetImpl();
   }
 
   template <bool SymmetricTransfer>
   [[nodiscard]] Transfer<SymmetricTransfer> SetResult() noexcept {
-    return _core.SetResultImpl<SymmetricTransfer, false>();
+    return core.SetResultImpl<SymmetricTransfer, false>();
   }
 
-  BaseCore& _core;
+  BaseCore& core;
 };
 
-class SharedBaseHandle {
- public:
-  explicit SharedBaseHandle(BaseCore& core) : _core(core) {
+struct SharedHandle {
+  bool SetCallback(InlineCore& callback) noexcept {
+    return core.SetCallbackImpl<true>(callback);
   }
 
-  bool TryAddCallback(InlineCore& callback) noexcept {
-    return _core.TryAddCallbackImpl<true>(callback);
-  }
-
-  BaseCore& _core;
+  BaseCore& core;
 };
 
 }  // namespace yaclib::detail

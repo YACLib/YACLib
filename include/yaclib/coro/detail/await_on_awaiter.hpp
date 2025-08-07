@@ -58,10 +58,10 @@ struct [[nodiscard]] AwaitOnAwaiter final {
   YACLIB_INLINE void await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
     auto& core = handle.promise();
     core._executor = &_executor;
-    auto caller_handle = UniqueBaseHandle{*_event.job};
+    auto caller_handle = UniqueHandle{*_event.job};
     _event.job = &core;
 
-    if (!caller_handle.TryAddCallback(_event)) {
+    if (!caller_handle.SetCallback(_event)) {
       _executor.Submit(core);
     }
   }
@@ -111,7 +111,7 @@ AwaitOnAwaiter<false>::AwaitOnAwaiter(IExecutor& e, Cores&... cores) noexcept
   : _executor{e}, _event{sizeof...(cores) + 1} {
   static_assert(sizeof...(cores) >= 2, "Number of futures must be at least two");
   static_assert((... && std::is_same_v<BaseCore, Cores>), "Futures must be Future in Wait function");
-  const auto wait_count = (... + static_cast<std::size_t>(UniqueBaseHandle{cores}.TryAddCallback(_event)));
+  const auto wait_count = (... + static_cast<std::size_t>(UniqueHandle{cores}.SetCallback(_event)));
   _event.count.fetch_sub(sizeof...(cores) - wait_count, std::memory_order_relaxed);
 }
 

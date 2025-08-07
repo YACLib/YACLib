@@ -6,7 +6,7 @@
 namespace yaclib::detail {
 
 template <typename V, typename E>
-struct SharedCore : ResultCore<V, E> {
+class SharedCore : public ResultCore<V, E> {
   using ResultCore<V, E>::ResultCore;
 
   template <bool SymmetricTransfer>
@@ -31,17 +31,8 @@ struct SharedCore : ResultCore<V, E> {
   }
 #endif
 
-  [[nodiscard]] bool TryAddCallback(InlineCore& callback) noexcept {
-    return BaseCore::TryAddCallbackImpl<true>(callback);
-  }
-
-  void CallInline(InlineCore& callback) noexcept {
-    return BaseCore::CallInlineImpl<true>(callback);
-  }
-
-  template <bool SymmetricTransfer>
-  [[nodiscard]] Transfer<SymmetricTransfer> SetInline(InlineCore& callback) noexcept {
-    return BaseCore::SetInlineImpl<SymmetricTransfer, true>(callback);
+  [[nodiscard]] bool SetCallback(InlineCore& callback) noexcept {
+    return BaseCore::SetCallbackImpl<true>(callback);
   }
 
   template <bool SymmetricTransfer>
@@ -49,6 +40,8 @@ struct SharedCore : ResultCore<V, E> {
     return BaseCore::SetResultImpl<SymmetricTransfer, true>();
   }
 };
+
+extern template class SharedCore<void, StopError>;
 
 template <typename V, typename E>
 using SharedCorePtr = IntrusivePtr<SharedCore<V, E>>;

@@ -234,15 +234,15 @@ class WaitGroup final {
       Add(count);
     }
     const auto wait_count = range([&](detail::BaseCore& core) noexcept {
-      detail::UniqueBaseHandle handle(core);
+      detail::UniqueHandle handle{core};
       if constexpr (NeedMove) {
-        if (handle.TryAddCallback(_event.GetDrop())) {
+        if (handle.SetCallback(_event.GetDrop())) {
           return true;
         }
         core.DecRef();
         return false;
       } else {
-        return handle.TryAddCallback(_event.GetCall());
+        return handle.SetCallback(_event.GetCall());
       }
     });
     if (count != wait_count) {  // TODO(MBkkt) is it necessary?

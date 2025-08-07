@@ -6,7 +6,7 @@
 namespace yaclib::detail {
 
 template <typename V, typename E>
-struct UniqueCore : ResultCore<V, E> {
+class UniqueCore : public ResultCore<V, E> {
   using ResultCore<V, E>::ResultCore;
 
   template <bool SymmetricTransfer>
@@ -28,6 +28,7 @@ struct UniqueCore : ResultCore<V, E> {
     }
   }
 
+ public:
   [[nodiscard]] InlineCore* Here(InlineCore& caller) noexcept override {
     return Impl<false>(caller);
   }
@@ -39,24 +40,27 @@ struct UniqueCore : ResultCore<V, E> {
 #endif
 
   void StoreCallback(InlineCore& callback) noexcept {
-    return BaseCore::StoreCallbackImpl<false>(callback);
+    return BaseCore::StoreCallbackImpl(callback);
   }
 
-  [[nodiscard]] bool TryAddCallback(InlineCore& callback) noexcept {
-    return BaseCore::TryAddCallbackImpl<false>(callback);
+  [[nodiscard]] bool SetCallback(InlineCore& callback) noexcept {
+    return BaseCore::SetCallbackImpl<false>(callback);
   }
 
-  [[nodiscard]] bool Reset() noexcept {
-    return BaseCore::ResetImpl<false>();
-  }
-
+  // Sometimes we know it will be last callback in cycle, so we want call it right now, instead of SetInline
   void CallInline(InlineCore& callback) noexcept {
-    return BaseCore::CallInlineImpl<false>(callback);
+    if (!SetCallback(callback)) {
+      auto* next = callback.Here(*this);
+      YACLIB_ASSERT(next == nullptr);
+    }
   }
 
   template <bool SymmetricTransfer>
   [[nodiscard]] Transfer<SymmetricTransfer> SetInline(InlineCore& callback) noexcept {
-    return BaseCore::SetInlineImpl<SymmetricTransfer, false>(callback);
+    if (!SetCallback(callback)) {
+      return Step<SymmetricTransfer>(*this, callback);
+    }
+    return Noop<SymmetricTransfer>();
   }
 
   template <bool SymmetricTransfer>
@@ -64,6 +68,8 @@ struct UniqueCore : ResultCore<V, E> {
     return BaseCore::SetResultImpl<SymmetricTransfer, false>();
   }
 };
+
+extern template class UniqueCore<void, StopError>;
 
 template <typename V, typename E>
 using UniqueCorePtr = IntrusivePtr<UniqueCore<V, E>>;

@@ -180,8 +180,8 @@ class FutureBase {
     return _core;
   }
 
-  [[nodiscard]] detail::UniqueBaseHandle GetBaseHandle() noexcept {
-    return detail::UniqueBaseHandle(*_core);
+  [[nodiscard]] detail::UniqueHandle GetBaseHandle() noexcept {
+    return detail::UniqueHandle{*_core};
   }
 
  protected:

@@ -13,7 +13,7 @@ void Connect(FutureBase<V, E>&& f, Promise<V, E>&& p) {
   YACLIB_ASSERT(f.Valid());
   YACLIB_ASSERT(p.Valid());
   YACLIB_ASSERT(f.GetCore() != p.GetCore());
-  if (f.GetCore()->TryAddCallback(*p.GetCore().Get())) {
+  if (f.GetCore()->SetCallback(*p.GetCore().Get())) {
     f.GetCore().Release();
     p.GetCore().Release();
   } else {
@@ -25,7 +25,7 @@ template <typename V, typename E>
 void Connect(const SharedFuture<V, E>& f, Promise<V, E>&& p) {
   YACLIB_ASSERT(f.Valid());
   YACLIB_ASSERT(p.Valid());
-  if (f.GetCore()->TryAddCallback(*p.GetCore().Get())) {
+  if (f.GetCore()->SetCallback(*p.GetCore().Get())) {
     p.GetCore().Release();
   } else {
     std::move(p).Set(f.Touch());
@@ -36,7 +36,7 @@ template <typename V, typename E>
 void Connect(FutureBase<V, E>&& f, SharedPromise<V, E>&& p) {
   YACLIB_ASSERT(f.Valid());
   YACLIB_ASSERT(p.Valid());
-  if (f.GetCore()->TryAddCallback(*p.GetCore().Get())) {
+  if (f.GetCore()->SetCallback(*p.GetCore().Get())) {
     f.GetCore().Release();
     p.GetCore().Release();
   } else {
@@ -49,7 +49,7 @@ void Connect(const SharedFuture<V, E>& f, SharedPromise<V, E>&& p) {
   YACLIB_ASSERT(f.Valid());
   YACLIB_ASSERT(p.Valid());
   YACLIB_ASSERT(f.GetCore() != p.GetCore());
-  if (f.GetCore()->TryAddCallback(*p.GetCore().Get())) {
+  if (f.GetCore()->SetCallback(*p.GetCore().Get())) {
     p.GetCore().Release();
   } else {
     std::move(p).Set(f.Touch());

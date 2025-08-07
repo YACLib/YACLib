@@ -23,7 +23,7 @@ class NoResultCore : public BaseCore {
   }
 
   void StoreCallback(InlineCore& callback) noexcept {
-    return BaseCore::StoreCallbackImpl<false>(callback);
+    _callback.store(reinterpret_cast<std::uintptr_t>(&callback), std::memory_order_relaxed);
   }
 
   template <bool SymmetricTransfer>

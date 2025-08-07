@@ -13,8 +13,10 @@ list(APPEND YACLIB_HEADERS
   )
 list(APPEND YACLIB_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/base_core.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/one_shot_event.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/drop_core.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/one_shot_event.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/shared_core.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/unique_core.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/wait_group.cpp
   )
 

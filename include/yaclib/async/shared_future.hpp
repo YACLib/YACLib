@@ -39,8 +39,8 @@ class SharedFuture final {
     return _core;
   }
 
-  [[nodiscard]] detail::SharedBaseHandle GetBaseHandle() const noexcept {
-    return detail::SharedBaseHandle(*_core);
+  [[nodiscard]] detail::SharedHandle GetBaseHandle() const noexcept {
+    return detail::SharedHandle{*_core};
   }
 
   /**

@@ -21,7 +21,7 @@ bool WaitRange(const Timeout& timeout, Range&& range, std::size_t count) noexcep
   Event event{count + 1};
   // event ref counter = n + 1, it is optimization: we don't want to notify when return true immediately
   const auto wait_count = range([&](auto handle) noexcept {
-    return handle.TryAddCallback(event.GetCall());
+    return handle.SetCallback(event.GetCall());
   });
   if (wait_count == 0 || event.SubEqual(count - wait_count + 1)) {
     return true;
@@ -36,7 +36,7 @@ bool WaitRange(const Timeout& timeout, Range&& range, std::size_t count) noexcep
     if (event.Wait(token, timeout)) {
       return true;
     }
-    reset_count = range([](UniqueBaseHandle handle) noexcept {
+    reset_count = range([](UniqueHandle handle) noexcept {
       return handle.Reset();
     });
     if (reset_count != 0 && (reset_count == wait_count || event.SubEqual(reset_count))) {
@@ -85,5 +85,8 @@ bool WaitIterator(const Timeout& timeout, Iterator it, std::size_t count) noexce
   };
   return WaitRange<MultiEvent<Event, AtomicCounter, CallCallback>>(timeout, range, count);
 }
+
+extern template bool WaitCore<DefaultEvent, NoTimeoutTag, UniqueHandle>(const NoTimeoutTag&, UniqueHandle) noexcept;
+extern template bool WaitCore<DefaultEvent, NoTimeoutTag, SharedHandle>(const NoTimeoutTag&, SharedHandle) noexcept;
 
 }  // namespace yaclib::detail
