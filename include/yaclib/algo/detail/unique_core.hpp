@@ -20,7 +20,7 @@ class UniqueCore : public ResultCore<V, E> {
 #endif
 
   void StoreCallback(InlineCore& callback) noexcept {
-    return BaseCore::StoreCallbackImpl(callback);
+    BaseCore::StoreCallbackImpl(callback);
   }
 
   [[nodiscard]] bool SetCallback(InlineCore& callback) noexcept {

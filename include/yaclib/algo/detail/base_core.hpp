@@ -65,7 +65,7 @@ class BaseCore : public InlineCore {
 
 struct UniqueHandle {
   void StoreCallback(InlineCore& callback) noexcept {
-    return core.StoreCallbackImpl(callback);
+    core.StoreCallbackImpl(callback);
   }
 
   bool SetCallback(InlineCore& callback) noexcept {

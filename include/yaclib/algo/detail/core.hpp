@@ -23,7 +23,7 @@ class NoResultCore : public BaseCore {
   }
 
   void StoreCallback(InlineCore& callback) noexcept {
-    return BaseCore::StoreCallbackImpl(callback);
+    BaseCore::StoreCallbackImpl(callback);
   }
 
   template <bool SymmetricTransfer>
