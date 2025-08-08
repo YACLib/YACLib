@@ -58,7 +58,7 @@ struct [[nodiscard]] AwaitOnAwaiter final {
   YACLIB_INLINE void await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
     auto& core = handle.promise();
     core._executor = &_executor;
-    auto caller_handle = UniqueHandle{*_event.job};
+    UniqueHandle caller_handle{*_event.job};
     _event.job = &core;
 
     if (!caller_handle.SetCallback(_event)) {
