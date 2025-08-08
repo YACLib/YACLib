@@ -1,0 +1,16 @@
+<map id="include/yaclib/coro/detail/promise_type.hpp" name="include/yaclib/coro/detail/promise_type.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="261,5,422,46"/>
+<area shape="rect" id="Node000002" href="$on__awaiter_8hpp.html" title=" " alt="" coords="107,94,254,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="293,56,218,96,215,91,290,51"/>
+<area shape="rect" id="Node000003" href="$coro_2mutex_8hpp.html" title=" " alt="" coords="5,183,134,223"/>
+<area shape="poly" id="edge5_Node000001_Node000003" title=" " alt="" coords="246,33,206,40,166,52,129,70,97,96,83,116,76,139,71,182,66,182,70,137,79,113,93,92,126,66,164,47,205,35,245,28"/>
+<area shape="rect" id="Node000005" href="$coro_2future_8hpp.html" title=" " alt="" coords="277,94,406,135"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="344,62,344,94,339,94,339,62"/>
+<area shape="rect" id="Node000006" href="$coro_2shared__mutex_8hpp.html" title=" " alt="" coords="430,94,560,135"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="391,51,461,91,459,96,388,56"/>
+<area shape="rect" id="Node000007" href="$coro_2task_8hpp.html" title=" " alt="" coords="584,94,712,135"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="427,48,584,92,583,97,425,53"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="145,146,96,184,93,180,142,142"/>
+<area shape="rect" id="Node000004" href="$on_8hpp.html" title=" " alt="" coords="157,183,286,223"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="198,148,215,181,210,183,194,150"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="yaclib::detail::OneCounter&lt; CounterBase, Deleter &gt;" name="yaclib::detail::OneCounter&lt; CounterBase, Deleter &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="37,80,203,121"/>
+<area shape="rect" id="Node000003" href="$structyaclib_1_1detail_1_1OneCounter.html" title=" " alt="" coords="5,214,235,270"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="123,136,123,214,117,214,117,136"/>
+<area shape="rect" id="Node000002" href="$classCounterBase.html" title=" " alt="" coords="72,5,168,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="123,47,123,80,117,80,117,47"/>
+<area shape="rect" id="Node000004" href="$classyaclib_1_1detail_1_1PromiseType.html" title=" " alt="" coords="33,319,207,360"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="123,285,123,319,117,319,117,285"/>
+</map>

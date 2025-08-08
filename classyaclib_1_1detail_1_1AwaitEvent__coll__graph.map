@@ -1,0 +1,27 @@
+<map id="yaclib::detail::AwaitEvent" name="yaclib::detail::AwaitEvent">
+<area shape="rect" id="Node000001" title=" " alt="" coords="1073,112,1236,138"/>
+<area shape="rect" id="Node000002" href="$classyaclib_1_1detail_1_1InlineCore.html" title=" " alt="" coords="854,75,1010,100"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1025,100,1074,109,1073,114,1025,106"/>
+<area shape="rect" id="Node000003" href="$classyaclib_1_1Job.html" title="Callable that can be executed in an IExecutor." alt="" coords="495,57,576,83"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="592,70,854,81,854,87,592,75"/>
+<area shape="rect" id="Node000004" href="$classyaclib_1_1IFunc.html" title="Callable interface." alt="" coords="244,5,338,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="353,28,495,59,494,64,352,34"/>
+<area shape="rect" id="Node000005" href="$classyaclib_1_1IRef.html" title="Reference counting interface." alt="" coords="5,5,90,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="105,16,244,16,244,21,105,21"/>
+<area shape="rect" id="Node000006" href="$structyaclib_1_1detail_1_1Node.html" title="Node class, used in intrusive data structure." alt="" coords="227,95,355,120"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="370,93,494,74,495,79,370,98"/>
+<area shape="poly" id="edge6_Node000006_Node000006" title=" " alt="" coords="269,78,277,71,291,68,304,70,312,77,314,86,311,95,306,93,309,86,308,80,302,75,291,73,279,76,273,81"/>
+<area shape="rect" id="Node000007" href="$structyaclib_1_1detail_1_1AtomicCounter.html" title=" " alt="" coords="840,133,1024,173"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="1039,137,1072,132,1073,138,1040,142"/>
+<area shape="rect" id="Node000008" href="$structyaclib_1_1detail_1_1NopeBase.html" title=" " alt="" coords="457,107,615,132"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="631,123,817,138,840,140,840,146,816,143,630,129"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="221,209,361,235"/>
+<area shape="poly" id="edge9_Node000007_Node000009" title=" " alt="" coords="376,221,444,221,536,225,576,225,627,221,752,199,861,171,862,176,753,204,628,226,576,231,536,230,444,226,376,226"/>
+<area shape="rect" id="Node000011" href="$structyaclib_1_1detail_1_1AtomicCounter.html" title=" " alt="" coords="444,157,627,197"/>
+<area shape="poly" id="edge13_Node000011_Node000009" title=" " alt="" coords="376,204,443,191,444,196,377,209"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="17,209,78,235"/>
+<area shape="poly" id="edge10_Node000009_Node000010" title=" " alt="" coords="93,220,220,220,220,225,93,225"/>
+<area shape="poly" id="edge11_Node000007_Node000011" title=" " alt="" coords="643,168,840,156,840,161,643,173"/>
+<area shape="rect" id="Node000012" href="$classCounterBase.html" title=" " alt="" coords="243,145,339,171"/>
+<area shape="poly" id="edge12_Node000011_Node000012" title=" " alt="" coords="355,160,444,167,443,172,355,166"/>
+</map>

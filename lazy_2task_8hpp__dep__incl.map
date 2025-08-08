@@ -1,0 +1,22 @@
+<map id="include/yaclib/lazy/task.hpp" name="include/yaclib/lazy/task.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="557,5,682,46"/>
+<area shape="rect" id="Node000002" href="$await__awaiter_8hpp.html" title=" " alt="" coords="5,94,170,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="542,40,376,65,181,97,170,99,169,93,180,91,375,59,541,35"/>
+<area shape="rect" id="Node000004" href="$await__on__awaiter_8hpp.html" title=" " alt="" coords="194,94,379,135"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="542,50,363,96,361,91,541,45"/>
+<area shape="rect" id="Node000006" href="$coro_2future_8hpp.html" title=" " alt="" coords="403,94,532,135"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="573,56,503,96,501,91,571,51"/>
+<area shape="rect" id="Node000007" href="$coro_2task_8hpp.html" title=" " alt="" coords="555,94,684,135"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="622,62,622,94,617,94,617,62"/>
+<area shape="rect" id="Node000008" href="$lazy_2make_8hpp.html" title=" " alt="" coords="708,183,833,223"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="658,54,697,92,734,139,761,181,757,184,729,142,694,96,654,58"/>
+<area shape="rect" id="Node000009" href="$schedule_8hpp.html" title=" " alt="" coords="758,94,884,135"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="680,50,776,91,774,96,678,55"/>
+<area shape="rect" id="Node000010" href="$task__impl_8cpp.html" title=" " alt="" coords="908,102,1057,127"/>
+<area shape="poly" id="edge10_Node000001_Node000010" title=" " alt="" coords="698,43,932,98,931,104,697,48"/>
+<area shape="rect" id="Node000003" href="$await_8hpp.html" title=" " alt="" coords="23,183,152,223"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="90,150,90,182,85,182,85,150"/>
+<area shape="rect" id="Node000005" href="$await__on_8hpp.html" title=" " alt="" coords="222,183,350,223"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="289,150,289,182,284,182,284,150"/>
+<area shape="poly" id="edge9_Node000009_Node000008" title=" " alt="" coords="804,150,784,184,779,181,799,147"/>
+</map>
