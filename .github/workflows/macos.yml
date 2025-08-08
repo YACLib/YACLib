@@ -13,6 +13,7 @@ on:
 
 jobs:
   # TODO(mkornaukhov03) Maybe add CORO flag? But we test only oldest compiler them doesn't support it
+  # TODO(ocelaiwo) GCC compiler won't work and was removed, fix it in the future
   main:
     runs-on: 'macos-${{ matrix.os }}'
     strategy:
@@ -47,14 +48,11 @@ jobs:
         run: |
           if [[ "${{ matrix.os }}" == "13" ]]; then
             llvm=/usr/local/opt/llvm@14
-            cxx_compilers=("$llvm/bin/clang++" g++-14 clang++)
-            gnu_link_options="-Wl,-ld_classic"
           elif [[ "${{ matrix.os }}" == "15" ]]; then
             llvm=/opt/homebrew/opt/llvm@20
-            cxx_compilers=("$llvm/bin/clang++" g++-15 clang++)
-            gnu_link_options="-Wl,-ld_classic"
           fi
-          compiler_names=(clang gnu apple_clang)
+          cxx_compilers=("$llvm/bin/clang++" clang++)
+          compiler_names=(clang apple_clang)
           stdlib_names=(libcxx libstdcxx default)
           link_options=(
             "-L$llvm/lib;-Wl,-rpath,$llvm/lib"
@@ -84,9 +82,6 @@ jobs:
                 if [[ "${stdlib_names[$j]}" == "default" ]]; then
                   link_option=""; compile_option="-stdlib=libc++"
                 fi
-              fi
-              if [[ "${compiler_names[$i]}" == "gnu" ]]; then
-                link_option="${link_option};${gnu_link_options}"
               fi
 
               dir="build_${compiler_names[$i]}_${stdlib_names[$j]}"
