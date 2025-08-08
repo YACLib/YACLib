@@ -133,14 +133,14 @@ class Task final {
    *
    * \return internal Core state ptr
    */
-  [[nodiscard]] detail::ResultCorePtr<V, E>& GetCore() noexcept {
+  [[nodiscard]] detail::UniqueCorePtr<V, E>& GetCore() noexcept {
     return _core;
   }
-  Task(detail::ResultCorePtr<V, E> core) noexcept : _core{std::move(core)} {
+  Task(detail::UniqueCorePtr<V, E> core) noexcept : _core{std::move(core)} {
   }
 
  private:
-  detail::ResultCorePtr<V, E> _core;
+  detail::UniqueCorePtr<V, E> _core;
 };
 
 extern template class Task<>;

@@ -2,8 +2,7 @@
 
 namespace yaclib::detail {
 
-template bool WaitCore<DefaultEvent, NoTimeoutTag, BaseCore>(const NoTimeoutTag&, BaseCore&) noexcept;
-template bool WaitCore<DefaultEvent, NoTimeoutTag, BaseCore, BaseCore>(const NoTimeoutTag&, BaseCore&,
-                                                                       BaseCore&) noexcept;
+template bool WaitCore<DefaultEvent, NoTimeoutTag, UniqueHandle>(const NoTimeoutTag&, UniqueHandle) noexcept;
+template bool WaitCore<DefaultEvent, NoTimeoutTag, SharedHandle>(const NoTimeoutTag&, SharedHandle) noexcept;
 
 }  // namespace yaclib::detail

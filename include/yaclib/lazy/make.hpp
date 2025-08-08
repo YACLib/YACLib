@@ -7,7 +7,7 @@ namespace yaclib {
 namespace detail {
 
 template <typename V, typename E>
-class ReadyCore : public ResultCore<V, E> {
+class ReadyCore : public UniqueCore<V, E> {
  public:
   template <typename... Args>
   ReadyCore(Args&&... args) noexcept(std::is_nothrow_constructible_v<Result<V, E>, Args&&...>) {
@@ -43,14 +43,14 @@ template <typename V = Unit, typename E = StopError, typename... Args>
 /*Task*/ auto MakeTask(Args&&... args) {
   if constexpr (sizeof...(Args) == 0) {
     using T = std::conditional_t<std::is_same_v<V, Unit>, void, V>;
-    return Task{detail::ResultCorePtr<T, E>{MakeUnique<detail::ReadyCore<T, E>>(std::in_place)}};
+    return Task{detail::UniqueCorePtr<T, E>{MakeUnique<detail::ReadyCore<T, E>>(std::in_place)}};
   } else if constexpr (std::is_same_v<V, Unit>) {
     using T0 = std::decay_t<head_t<Args&&...>>;
     using T = std::conditional_t<std::is_same_v<T0, Unit>, void, T0>;
     return Task{
-      detail::ResultCorePtr<T, E>{MakeUnique<detail::ReadyCore<T, E>>(std::in_place, std::forward<Args>(args)...)}};
+      detail::UniqueCorePtr<T, E>{MakeUnique<detail::ReadyCore<T, E>>(std::in_place, std::forward<Args>(args)...)}};
   } else {
-    return Task{detail::ResultCorePtr<V, E>{MakeUnique<detail::ReadyCore<V, E>>(std::forward<Args>(args)...)}};
+    return Task{detail::UniqueCorePtr<V, E>{MakeUnique<detail::ReadyCore<V, E>>(std::forward<Args>(args)...)}};
   }
 }
 

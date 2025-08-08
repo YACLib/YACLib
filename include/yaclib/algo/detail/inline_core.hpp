@@ -51,4 +51,11 @@ YACLIB_INLINE void Loop(InlineCore* prev, InlineCore* curr) noexcept {
   }
 }
 
+template <bool SymmetricTransfer>
+#if YACLIB_SYMMETRIC_TRANSFER != 0
+using Transfer = std::conditional_t<SymmetricTransfer, yaclib_std::coroutine_handle<>, InlineCore*>;
+#else
+using Transfer = InlineCore*;
+#endif
+
 }  // namespace yaclib::detail

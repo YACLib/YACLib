@@ -1,6 +1,6 @@
 #pragma once
 
-#include <yaclib/algo/detail/base_core.hpp>
+#include <yaclib/algo/detail/inline_core.hpp>
 #include <yaclib/util/cast.hpp>
 #include <yaclib/util/detail/set_deleter.hpp>
 

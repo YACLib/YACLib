@@ -1,7 +1,6 @@
 #pragma once
 
 #include <yaclib/algo/detail/base_core.hpp>
-#include <yaclib/algo/detail/shared_core.hpp>
 #include <yaclib/algo/detail/wait_event.hpp>
 #include <yaclib/util/detail/atomic_counter.hpp>
 #include <yaclib/util/detail/default_event.hpp>
@@ -21,8 +20,8 @@ template <typename Event, typename Timeout, typename Range>
 bool WaitRange(const Timeout& timeout, Range&& range, std::size_t count) noexcept {
   Event event{count + 1};
   // event ref counter = n + 1, it is optimization: we don't want to notify when return true immediately
-  const auto wait_count = range([&](auto& core) noexcept {
-    return core.SetCallback(event.GetCall());
+  const auto wait_count = range([&](auto handle) noexcept {
+    return handle.SetCallback(event.GetCall());
   });
   if (wait_count == 0 || event.SubEqual(count - wait_count + 1)) {
     return true;
@@ -37,8 +36,8 @@ bool WaitRange(const Timeout& timeout, Range&& range, std::size_t count) noexcep
     if (event.Wait(token, timeout)) {
       return true;
     }
-    reset_count = range([](BaseCore& core) noexcept {
-      return core.Reset();
+    reset_count = range([](UniqueHandle handle) noexcept {
+      return handle.Reset();
     });
     if (reset_count != 0 && (reset_count == wait_count || event.SubEqual(reset_count))) {
       return false;
@@ -49,17 +48,15 @@ bool WaitRange(const Timeout& timeout, Range&& range, std::size_t count) noexcep
   return reset_count == 0;  // LCOV_EXCL_LINE shitty gcov cannot parse it
 }
 
-template <typename Event, typename Timeout, typename... Cores>
-bool WaitCore(const Timeout& timeout, Cores&... cores) noexcept {
-  static_assert(sizeof...(cores) >= 1, "Number of futures must be at least one");
-  static_assert((... && (std::is_same_v<BaseCore, Cores> || std::is_same_v<SharedBaseCore, Cores>)),
-                "Cores must be waitable in Wait function");
+template <typename Event, typename Timeout, typename... Handles>
+bool WaitCore(const Timeout& timeout, Handles... handles) noexcept {
+  static_assert(sizeof...(handles) >= 1, "Number of futures must be at least one");
   auto range = [&](auto&& func) noexcept {
-    return (... + static_cast<std::size_t>(func(cores)));
+    return (... + static_cast<std::size_t>(func(handles)));
   };
-  using FinalEvent = std::conditional_t<sizeof...(cores) == 1, MultiEvent<Event, OneCounter, CallCallback>,
+  using FinalEvent = std::conditional_t<sizeof...(handles) == 1, MultiEvent<Event, OneCounter, CallCallback>,
                                         MultiEvent<Event, AtomicCounter, CallCallback>>;
-  return WaitRange<FinalEvent>(timeout, range, sizeof...(cores));
+  return WaitRange<FinalEvent>(timeout, range, sizeof...(handles));
 }
 
 template <typename Event, typename Timeout, typename Iterator>
@@ -72,7 +69,7 @@ bool WaitIterator(const Timeout& timeout, Iterator it, std::size_t count) noexce
   if (count == 1) {
     auto range = [&](auto&& func) noexcept {
       YACLIB_ASSERT(it->Valid());
-      return static_cast<std::size_t>(func(*it->GetCore()));
+      return static_cast<std::size_t>(func(it->GetBaseHandle()));
     };
     return WaitRange<MultiEvent<Event, OneCounter, CallCallback>>(timeout, range, 1);
   }
@@ -81,7 +78,7 @@ bool WaitIterator(const Timeout& timeout, Iterator it, std::size_t count) noexce
     std::conditional_t<std::is_same_v<Timeout, NoTimeoutTag>, Iterator&, Iterator> range_it = it;
     for (std::size_t i = 0; i != count; ++i) {
       YACLIB_ASSERT(range_it->Valid());
-      wait_count += static_cast<std::size_t>(func(*range_it->GetCore()));
+      wait_count += static_cast<std::size_t>(func(range_it->GetBaseHandle()));
       ++range_it;
     }
     return wait_count;
@@ -89,8 +86,7 @@ bool WaitIterator(const Timeout& timeout, Iterator it, std::size_t count) noexce
   return WaitRange<MultiEvent<Event, AtomicCounter, CallCallback>>(timeout, range, count);
 }
 
-extern template bool WaitCore<DefaultEvent, NoTimeoutTag, BaseCore>(const NoTimeoutTag&, BaseCore&) noexcept;
-extern template bool WaitCore<DefaultEvent, NoTimeoutTag, BaseCore, BaseCore>(const NoTimeoutTag&, BaseCore&,
-                                                                              BaseCore&) noexcept;
+extern template bool WaitCore<DefaultEvent, NoTimeoutTag, UniqueHandle>(const NoTimeoutTag&, UniqueHandle) noexcept;
+extern template bool WaitCore<DefaultEvent, NoTimeoutTag, SharedHandle>(const NoTimeoutTag&, SharedHandle) noexcept;
 
 }  // namespace yaclib::detail

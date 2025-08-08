@@ -19,7 +19,8 @@ class SharedFuture final {
   }
 
   [[nodiscard]] bool Ready() const noexcept {
-    return _core->IsSet();
+    YACLIB_ASSERT(Valid());
+    return !_core->Empty();
   }
 
   [[nodiscard]] const Result<V, E>& Get() const noexcept {
@@ -38,8 +39,8 @@ class SharedFuture final {
     return _core;
   }
 
-  [[nodiscard]] detail::SharedBaseCore* GetBaseCore() const noexcept {
-    return _core.Get();
+  [[nodiscard]] detail::SharedHandle GetBaseHandle() const noexcept {
+    return detail::SharedHandle{*_core};
   }
 
   /**

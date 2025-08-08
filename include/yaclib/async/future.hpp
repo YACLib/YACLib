@@ -1,7 +1,7 @@
 #pragma once
 
 #include <yaclib/algo/detail/core.hpp>
-#include <yaclib/algo/detail/result_core.hpp>
+#include <yaclib/algo/detail/unique_core.hpp>
 #include <yaclib/async/wait.hpp>
 #include <yaclib/exe/executor.hpp>
 #include <yaclib/fwd.hpp>
@@ -176,19 +176,19 @@ class FutureBase {
    *
    * \return internal Core state ptr
    */
-  [[nodiscard]] detail::ResultCorePtr<V, E>& GetCore() noexcept {
+  [[nodiscard]] detail::UniqueCorePtr<V, E>& GetCore() noexcept {
     return _core;
   }
 
-  [[nodiscard]] detail::BaseCore* GetBaseCore() noexcept {
-    return _core.Get();
+  [[nodiscard]] detail::UniqueHandle GetBaseHandle() noexcept {
+    return detail::UniqueHandle{*_core};
   }
 
  protected:
-  explicit FutureBase(detail::ResultCorePtr<V, E> core) noexcept : _core{std::move(core)} {
+  explicit FutureBase(detail::UniqueCorePtr<V, E> core) noexcept : _core{std::move(core)} {
   }
 
-  detail::ResultCorePtr<V, E> _core;
+  detail::UniqueCorePtr<V, E> _core;
 };
 
 extern template class FutureBase<void, StopError>;
@@ -206,7 +206,7 @@ class Future final : public FutureBase<V, E> {
  public:
   using Base::Base;
 
-  Future(detail::ResultCorePtr<V, E> core) noexcept : Base{std::move(core)} {
+  Future(detail::UniqueCorePtr<V, E> core) noexcept : Base{std::move(core)} {
   }
 
   /**
@@ -241,7 +241,7 @@ class FutureOn final : public FutureBase<V, E> {
   using Base::Detach;
   using Base::Then;
 
-  FutureOn(detail::ResultCorePtr<V, E> core) noexcept : Base{std::move(core)} {
+  FutureOn(detail::UniqueCorePtr<V, E> core) noexcept : Base{std::move(core)} {
   }
 
   /**

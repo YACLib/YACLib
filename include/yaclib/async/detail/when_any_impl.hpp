@@ -1,7 +1,7 @@
 #pragma once
 
 #include <yaclib/algo/detail/inline_core.hpp>
-#include <yaclib/algo/detail/result_core.hpp>
+#include <yaclib/algo/detail/unique_core.hpp>
 #include <yaclib/async/detail/when_impl.hpp>
 #include <yaclib/fwd.hpp>
 #include <yaclib/log.hpp>
@@ -24,13 +24,13 @@ class AnyCombinatorBase {
   yaclib_std::atomic_bool _done;
 
  protected:
-  ResultCorePtr<V, E> _core;
+  UniqueCorePtr<V, E> _core;
 
-  explicit AnyCombinatorBase(std::size_t /*count*/, ResultCorePtr<V, E>&& core) noexcept
+  explicit AnyCombinatorBase(std::size_t /*count*/, UniqueCorePtr<V, E>&& core) noexcept
     : _done{false}, _core{std::move(core)} {
   }
 
-  bool Combine(ResultCore<V, E>& caller) noexcept {
+  bool Combine(UniqueCore<V, E>& caller) noexcept {
     if (!_done.load(std::memory_order_acquire) && !_done.exchange(true, std::memory_order_acq_rel)) {
       _core->Store(std::move(caller.Get()));
       caller.DecRef();
@@ -50,13 +50,13 @@ class AnyCombinatorBase<V, E, FailPolicy::LastFail> {
   yaclib_std::atomic_size_t _state;
 
  protected:
-  ResultCorePtr<V, E> _core;
+  UniqueCorePtr<V, E> _core;
 
-  explicit AnyCombinatorBase(std::size_t count, ResultCorePtr<V, E>&& core) noexcept
+  explicit AnyCombinatorBase(std::size_t count, UniqueCorePtr<V, E>&& core) noexcept
     : _state{2 * count}, _core{std::move(core)} {
   }
 
-  bool Combine(ResultCore<V, E>& caller) noexcept {
+  bool Combine(UniqueCore<V, E>& caller) noexcept {
     if (!DoneImpl(_state.load(std::memory_order_acquire))) {
       auto& result = caller.Get();
       if (result) {
@@ -83,9 +83,9 @@ class AnyCombinatorBase<V, E, FailPolicy::FirstFail> {
   yaclib_std::atomic_uintptr_t _state;
 
  protected:
-  ResultCorePtr<V, E> _core;
+  UniqueCorePtr<V, E> _core;
 
-  explicit AnyCombinatorBase(std::size_t /*count*/, ResultCorePtr<V, E>&& core) : _state{0}, _core{std::move(core)} {
+  explicit AnyCombinatorBase(std::size_t /*count*/, UniqueCorePtr<V, E>&& core) : _state{0}, _core{std::move(core)} {
   }
 
   ~AnyCombinatorBase() noexcept {
@@ -95,14 +95,14 @@ class AnyCombinatorBase<V, E, FailPolicy::FirstFail> {
       return;
     }
     YACLIB_ASSERT(state != 0);
-    auto& fail = *reinterpret_cast<ResultCore<V, E>*>(state);
+    auto& fail = *reinterpret_cast<UniqueCore<V, E>*>(state);
     _core->Store(std::move(fail.Get()));
     fail.DecRef();
     auto* core = _core.Release();
     Loop(core, core->template SetResult<false>());
   }
 
-  bool Combine(ResultCore<V, E>& caller) noexcept {
+  bool Combine(UniqueCore<V, E>& caller) noexcept {
     auto state = _state.load(std::memory_order_acquire);
     if (state != kDoneImpl) {
       auto& result = caller.Get();
@@ -116,7 +116,7 @@ class AnyCombinatorBase<V, E, FailPolicy::FirstFail> {
       state = _state.exchange(kDoneImpl, std::memory_order_acq_rel);
       if (state != kDoneImpl) {
         if (state != 0) {
-          auto& fail = *reinterpret_cast<ResultCore<V, E>*>(state);
+          auto& fail = *reinterpret_cast<UniqueCore<V, E>*>(state);
           fail.DecRef();
         }
         _core->Store(std::move(caller.Get()));
@@ -137,21 +137,21 @@ class AnyCombinator : public InlineCore, public AnyCombinatorBase<V, E, P> {
  public:
   static auto Make(std::size_t count) {
     // TODO(MBkkt) Maybe single allocation instead of two?
-    auto combine_core = MakeUnique<ResultCore<V, E>>();
+    auto combine_core = MakeUnique<UniqueCore<V, E>>();
     auto* raw_core = combine_core.Get();
     auto combinator = MakeShared<AnyCombinator<V, E, P>>(count, count, std::move(combine_core));
-    ResultCorePtr<V, E> future_core{NoRefTag{}, raw_core};
+    UniqueCorePtr<V, E> future_core{NoRefTag{}, raw_core};
     return std::pair{std::move(future_core), combinator.Release()};
   }
 
-  void AddInput(ResultCore<V, E>& input) noexcept {
+  void AddInput(UniqueCore<V, E>& input) noexcept {
     input.CallInline(*this);
   }
 
  private:
   template <bool SymmetricTransfer>
   [[nodiscard]] YACLIB_INLINE auto Impl(InlineCore& caller) noexcept {
-    if (this->Combine(DownCast<ResultCore<V, E>>(caller))) {
+    if (this->Combine(DownCast<UniqueCore<V, E>>(caller))) {
       auto* callback = this->_core.Release();
       DecRef();
       return WhenSetResult<SymmetricTransfer>(callback);

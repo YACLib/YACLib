@@ -1,6 +1,6 @@
 #pragma once
 
-#include <yaclib/algo/detail/result_core.hpp>
+#include <yaclib/algo/detail/unique_core.hpp>
 #include <yaclib/async/future.hpp>
 #include <yaclib/fwd.hpp>
 #include <yaclib/util/helper.hpp>
@@ -25,14 +25,14 @@ template <typename V = Unit, typename E = StopError, typename... Args>
 /*Future*/ auto MakeFuture(Args&&... args) {
   if constexpr (sizeof...(Args) == 0) {
     using T = std::conditional_t<std::is_same_v<V, Unit>, void, V>;
-    return Future{detail::ResultCorePtr<T, E>{MakeUnique<detail::ResultCore<T, E>>(std::in_place)}};
+    return Future{detail::UniqueCorePtr<T, E>{MakeUnique<detail::UniqueCore<T, E>>(std::in_place)}};
   } else if constexpr (std::is_same_v<V, Unit>) {
     using T0 = std::decay_t<head_t<Args&&...>>;
     using T = std::conditional_t<std::is_same_v<T0, Unit>, void, T0>;
     return Future{
-      detail::ResultCorePtr<T, E>{MakeUnique<detail::ResultCore<T, E>>(std::in_place, std::forward<Args>(args)...)}};
+      detail::UniqueCorePtr<T, E>{MakeUnique<detail::UniqueCore<T, E>>(std::in_place, std::forward<Args>(args)...)}};
   } else {
-    return Future{detail::ResultCorePtr<V, E>{MakeUnique<detail::ResultCore<V, E>>(std::forward<Args>(args)...)}};
+    return Future{detail::UniqueCorePtr<V, E>{MakeUnique<detail::UniqueCore<V, E>>(std::forward<Args>(args)...)}};
   }
 }
 

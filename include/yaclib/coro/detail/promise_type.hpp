@@ -1,6 +1,6 @@
 #pragma once
 
-#include <yaclib/algo/detail/result_core.hpp>
+#include <yaclib/algo/detail/unique_core.hpp>
 #include <yaclib/coro/coro.hpp>
 #include <yaclib/util/cast.hpp>
 #include <yaclib/util/detail/unique_counter.hpp>
@@ -37,12 +37,12 @@ struct Destroy final {
 template <bool Lazy>
 struct PromiseTypeDeleter final {
   template <typename V, typename E>
-  static void Delete(ResultCore<V, E>& core) noexcept;
+  static void Delete(UniqueCore<V, E>& core) noexcept;
 };
 
 template <typename V, typename E, bool Lazy>
-class PromiseType final : public OneCounter<ResultCore<V, E>, PromiseTypeDeleter<Lazy>> {
-  using Base = OneCounter<ResultCore<V, E>, PromiseTypeDeleter<Lazy>>;
+class PromiseType final : public OneCounter<UniqueCore<V, E>, PromiseTypeDeleter<Lazy>> {
+  using Base = OneCounter<UniqueCore<V, E>, PromiseTypeDeleter<Lazy>>;
 
  public:
   PromiseType() noexcept : Base{0} {
@@ -50,9 +50,9 @@ class PromiseType final : public OneCounter<ResultCore<V, E>, PromiseTypeDeleter
 
   auto get_return_object() noexcept {
     if constexpr (Lazy) {
-      return Task<V, E>{ResultCorePtr<V, E>{NoRefTag{}, this}};
+      return Task<V, E>{UniqueCorePtr<V, E>{NoRefTag{}, this}};
     } else {
-      return Future<V, E>{ResultCorePtr<V, E>{NoRefTag{}, this}};
+      return Future<V, E>{UniqueCorePtr<V, E>{NoRefTag{}, this}};
     }
   }
 
@@ -131,7 +131,7 @@ class PromiseType final : public OneCounter<ResultCore<V, E>, PromiseTypeDeleter
 
 template <bool Lazy>
 template <typename V, typename E>
-void PromiseTypeDeleter<Lazy>::Delete(ResultCore<V, E>& core) noexcept {
+void PromiseTypeDeleter<Lazy>::Delete(UniqueCore<V, E>& core) noexcept {
   auto& promise = DownCast<PromiseType<V, E, Lazy>>(core);
   auto handle = promise.Handle();
   handle.destroy();
