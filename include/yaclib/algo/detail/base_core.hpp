@@ -35,6 +35,13 @@ class BaseCore : public InlineCore {
     }
   }
 
+  void CopyExecutorTo(BaseCore& callback) noexcept {
+    if (!callback._executor) {
+      YACLIB_ASSERT(_executor != nullptr);
+      callback._executor = _executor;
+    }
+  }
+
 #if YACLIB_CORO != 0                                                      // Compiler inline this call in tests
   [[nodiscard]] virtual yaclib_std::coroutine_handle<> Curr() noexcept {  // LCOV_EXCL_LINE
     YACLIB_PURE_VIRTUAL();                                                // LCOV_EXCL_LINE
@@ -56,6 +63,9 @@ class BaseCore : public InlineCore {
   [[nodiscard]] bool SetCallbackImpl(InlineCore& callback) noexcept;
 
   [[nodiscard]] bool ResetImpl() noexcept;
+
+  template <bool SymmetricTransfer, bool Shared>
+  [[nodiscard]] Transfer<SymmetricTransfer> SetInlineImpl(InlineCore& callback) noexcept;
 
   template <bool SymmetricTransfer, bool Shared>
   [[nodiscard]] Transfer<SymmetricTransfer> SetResultImpl() noexcept;

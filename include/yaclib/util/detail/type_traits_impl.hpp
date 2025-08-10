@@ -80,4 +80,16 @@ struct FutureBaseTypes<FutureOn<V, E>> final {
   using Error = E;
 };
 
+template <typename T>
+struct SharedFutureTypes final {
+  using Value = T;
+  using Error = T;
+};
+
+template <typename V, typename E>
+struct FutureBaseTypes<SharedFuture<V, E>> final {
+  using Value = V;
+  using Error = E;
+};
+
 }  // namespace yaclib::detail

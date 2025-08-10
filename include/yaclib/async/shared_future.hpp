@@ -1,5 +1,6 @@
 #pragma once
 
+#include <yaclib/algo/detail/core.hpp>
 #include <yaclib/algo/detail/shared_core.hpp>
 
 namespace yaclib {
@@ -12,7 +13,7 @@ class SharedFuture final {
   static_assert(std::is_copy_constructible_v<Result<V, E>>, "Result should be copyable");
 
  public:
-  SharedFuture() = default;
+  SharedFuture() noexcept = default;
 
   [[nodiscard]] bool Valid() const noexcept {
     return _core != nullptr;
@@ -33,6 +34,23 @@ class SharedFuture final {
     YACLIB_ASSERT(Valid());
     YACLIB_ASSERT(Ready());
     return _core->Get();
+  }
+
+  template <typename Func>
+  [[nodiscard]] /*FutureOn*/ auto Then(IExecutor& e, Func&& f) const {
+    YACLIB_WARN(e.Tag() == IExecutor::Type::Inline,
+                "better way is use ThenInline(...) instead of Then(MakeInline(), ...)");
+    return detail::SetCallback<detail::CoreType::Then, detail::CallbackType::On>(_core, &e, std::forward<Func>(f));
+  }
+
+  template <typename Func>
+  [[nodiscard]] /*Future*/ auto ThenInline(Func&& f) const {
+    return detail::SetCallback<detail::CoreType::Then, detail::CallbackType::Inline>(this->_core, nullptr,
+                                                                                     std::forward<Func>(f));
+  }
+
+  [[nodiscard]] detail::SharedCorePtr<V, E>& GetCore() noexcept {
+    return _core;
   }
 
   [[nodiscard]] const detail::SharedCorePtr<V, E>& GetCore() const noexcept {

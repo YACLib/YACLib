@@ -23,6 +23,15 @@ class SharedCore : public ResultCore<V, E> {
     return BaseCore::SetCallbackImpl<true>(callback);
   }
 
+  // Users should be cautious calling SetInline on a SharedCore
+  // because the core's lifetime is managed by the SharedPromise and
+  // SharedFutures and they might all be gone by the time
+  // the callback is called
+  template <bool SymmetricTransfer>
+  [[nodiscard]] Transfer<SymmetricTransfer> SetInline(InlineCore& callback) noexcept {
+    return BaseCore::SetInlineImpl<SymmetricTransfer, true>(callback);
+  }
+
   template <bool SymmetricTransfer>
   [[nodiscard]] Transfer<SymmetricTransfer> SetResult() noexcept {
     return BaseCore::SetResultImpl<SymmetricTransfer, true>();
