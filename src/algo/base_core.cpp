@@ -39,10 +39,16 @@ template <bool SymmetricTransfer, bool Shared>
   YACLIB_ASSERT(expected != kResult);
   if constexpr (Shared) {
     auto* head = reinterpret_cast<InlineCore*>(expected);
-    while (head) {
+    while (head && head->next) {
       auto next = head->next;
       Loop(this, head);
       head = static_cast<InlineCore*>(next);
+    }
+    DecRef();
+    if (head) {
+      // If the refcount here is 2, the callback is the last one for this core
+      // (no shared futures left), so the value may be moved
+      Loop(this, head);
     }
     DecRef();
     DecRef();
