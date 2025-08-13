@@ -44,18 +44,30 @@ class ResultCore : public BaseCore {
  protected:
   template <bool SymmetricTransfer, bool Shared>
   [[nodiscard]] YACLIB_INLINE auto Impl(InlineCore& caller) noexcept {
-    if constexpr (std::is_move_constructible_v<Result<V, E>>) {
-      if constexpr (std::is_copy_constructible_v<Result<V, E>>) {
-        if (caller.GetRef() != 1) {
-          ResultCore<V, E>::Store(DownCast<ResultCore<V, E>>(caller).Get());
-          return BaseCore::SetResultImpl<SymmetricTransfer, Shared>();
-        }
+    if constexpr (std::is_copy_constructible_v<Result<V, E>>) {
+      // Copy values can come from both Unique and Shared cores
+      const auto ref = caller.GetRef();
+      if (ref >= 3) {
+        // This is a Shared core and Shared futures exist and/or not
+        // the last callback in the list, the value may not be moved
+        ResultCore<V, E>::Store(DownCast<ResultCore<V, E>>(caller).Get());
+        return BaseCore::SetResultImpl<SymmetricTransfer, Shared>();
       }
-      YACLIB_ASSERT(caller.GetRef() == 1);
+      // ref == 1: This is a Unique core, move the value and destroy the core
+      // ref == 2: This is a Shared core, no more SharedFutures exist and the
+      // last callback in the list, move the value but do not destroy the core
+      ResultCore<V, E>::Store(std::move(DownCast<ResultCore<V, E>>(caller).Get()));
+      if (ref == 1) {
+        caller.DecRef();
+      }
+      return BaseCore::SetResultImpl<SymmetricTransfer, Shared>();
+    } else if constexpr (std::is_move_constructible_v<Result<V, E>>) {
+      // Move-only values are from Unique cores only
       ResultCore<V, E>::Store(std::move(DownCast<ResultCore<V, E>>(caller).Get()));
       caller.DecRef();
       return BaseCore::SetResultImpl<SymmetricTransfer, Shared>();
     } else {
+      // Unreachable, cannot set callbacks on immovable cores
       YACLIB_PURE_VIRTUAL();
       return Noop<SymmetricTransfer>();
     }

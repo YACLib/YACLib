@@ -291,5 +291,42 @@ TEST(SharedFuture, FutureToSharedConcurrent) {
   tp.Wait();
 }
 
+static int copy_ctor{0};
+static int move_ctor{0};
+
+struct Counter {
+  static void Init() {
+    copy_ctor = 0;
+    move_ctor = 0;
+  }
+
+  Counter() noexcept = default;
+  Counter(const Counter&) noexcept {
+    ++copy_ctor;
+  }
+  Counter(Counter&&) noexcept {
+    ++move_ctor;
+  }
+  [[maybe_unused]] Counter& operator=(Counter&&) noexcept = default;
+  Counter& operator=(const Counter&) noexcept = default;
+  ~Counter() = default;
+};
+
+TEST(SharedFuture, MoveValueFromShared) {
+  auto [sf, sp] = yaclib::MakeSharedContract<Counter>();
+
+  auto f1 = Share(sf);
+  auto f2 = Share(sf);
+  auto f3 = Share(sf);
+
+  sf = {};
+
+  Counter::Init();
+  std::move(sp).Set();
+
+  ASSERT_EQ(copy_ctor, 2);
+  ASSERT_EQ(move_ctor, 1);
+}
+
 }  // namespace
 }  // namespace test
