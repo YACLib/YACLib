@@ -114,5 +114,23 @@ TEST(Connect, ConnectLoops) {
   ASSERT_EQ(std::move(f3).Get().Value(), kSetInt + 2);
 }
 
+struct MoveOnly {
+  MoveOnly() = default;
+
+  MoveOnly(const MoveOnly&) = delete;
+  MoveOnly(MoveOnly&&) = default;
+
+  MoveOnly& operator=(const MoveOnly&) = delete;
+  MoveOnly& operator=(MoveOnly&&) = default;
+};
+
+TEST(Connect, MoveOnly) {
+  auto [f1, p1] = yaclib::MakeContract<MoveOnly>();
+  auto [f2, p2] = yaclib::MakeContract<MoveOnly>();
+  doConnect(f1, p2);
+  std::move(p1).Set();
+  std::ignore = std::move(f2).Get().Value();
+}
+
 }  // namespace
 }  // namespace test
