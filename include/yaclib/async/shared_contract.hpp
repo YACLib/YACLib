@@ -13,7 +13,8 @@ using SharedContract = std::pair<SharedFuture<V, E>, SharedPromise<V, E>>;
 
 template <typename V = void, typename E = StopError>
 [[nodiscard]] SharedContract<V, E> MakeSharedContract() {
-  // 3 refs for SharedPromise, 1 ref for SharedFuture
+  // 3 refs for the promise (1 for the promise itself and 2 for the last callback)
+  // 1 ref for the future
   auto core = MakeShared<detail::SharedCore<V, E>>(4);
   SharedFuture<V, E> future{detail::SharedCorePtr<V, E>{NoRefTag{}, core.Get()}};
   SharedPromise<V, E> promise{detail::SharedCorePtr<V, E>{NoRefTag{}, core.Release()}};
