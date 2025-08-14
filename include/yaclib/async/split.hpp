@@ -14,4 +14,10 @@ SharedFuture<V, E> Split(FutureBase<V, E>&& future) {
   return std::move(f);
 }
 
+template <typename V, typename E>
+SharedFuture<V, E> Split(SharedPromise<V, E>& promise) {
+  YACLIB_ASSERT(promise.Valid());
+  return SharedFuture<V, E>{promise.GetCore()};
+}
+
 }  // namespace yaclib

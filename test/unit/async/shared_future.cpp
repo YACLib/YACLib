@@ -6,6 +6,7 @@
 #include <yaclib/async/shared_future.hpp>
 #include <yaclib/async/shared_promise.hpp>
 #include <yaclib/async/split.hpp>
+#include <yaclib/exe/manual.hpp>
 #include <yaclib/exe/submit.hpp>
 #include <yaclib/runtime/fair_thread_pool.hpp>
 
@@ -326,6 +327,45 @@ TEST(SharedFuture, MoveValueFromShared) {
 
   ASSERT_EQ(copy_ctor, 2);
   ASSERT_EQ(move_ctor, 1);
+}
+
+TEST(SharedFuture, MakeSharedPromise) {
+  auto sp = yaclib::MakeSharedPromise<Counter>();
+
+  auto f1 = Share(sp);
+  auto f2 = Share(sp);
+  auto f3 = Share(sp);
+
+  Counter::Init();
+  std::move(sp).Set();
+
+  ASSERT_EQ(copy_ctor, 2);
+  ASSERT_EQ(move_ctor, 1);
+}
+
+TEST(SharedFuture, SharedPromiseShareOn) {
+  yaclib::ManualExecutor e;
+  auto sp = yaclib::MakeSharedPromise<int>();
+
+  auto f1 = Share(sp);
+  auto f2 = Share(sp, e);
+
+  std::move(sp).Set(kSetInt);
+  std::ignore = e.Drain();
+
+  ASSERT_EQ(std::move(f1).Get().Value(), kSetInt);
+  ASSERT_EQ(std::move(f2).Get().Value(), kSetInt);
+}
+
+TEST(SharedFuture, SharedPromiseSplit) {
+  auto sp = yaclib::MakeSharedPromise<int>();
+
+  auto sf = Split(sp);
+  auto f = Share(sf);
+
+  std::move(sp).Set(kSetInt);
+
+  ASSERT_EQ(std::move(f).Get().Value(), kSetInt);
 }
 
 }  // namespace

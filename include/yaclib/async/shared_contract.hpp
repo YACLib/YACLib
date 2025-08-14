@@ -21,4 +21,11 @@ template <typename V = void, typename E = StopError>
   return {std::move(future), std::move(promise)};
 }
 
+template <typename V = void, typename E = StopError>
+[[nodiscard]] SharedPromise<V, E> MakeSharedPromise() {
+  auto core = MakeShared<detail::SharedCore<V, E>>(3);
+  SharedPromise<V, E> promise{detail::SharedCorePtr<V, E>{NoRefTag{}, core.Release()}};
+  return promise;
+}
+
 }  // namespace yaclib

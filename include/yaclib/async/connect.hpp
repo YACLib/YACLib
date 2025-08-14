@@ -56,4 +56,20 @@ void Connect(const SharedFuture<V, E>& f, SharedPromise<V, E>&& p) {
   }
 }
 
+template <typename V, typename E>
+void Connect(SharedPromise<V, E>& primary, Promise<V, E>&& subsumed) {
+  YACLIB_ASSERT(primary.Valid());
+  YACLIB_ASSERT(subsumed.Valid());
+  auto subsumed_core = subsumed.GetCore().Release();
+  std::ignore = primary.GetCore()->SetCallback(*subsumed_core);
+}
+
+template <typename V, typename E>
+void Connect(SharedPromise<V, E>& primary, SharedPromise<V, E>&& subsumed) {
+  YACLIB_ASSERT(primary.Valid());
+  YACLIB_ASSERT(subsumed.Valid());
+  auto subsumed_core = subsumed.GetCore().Release();
+  std::ignore = primary.GetCore()->SetCallback(*subsumed_core);
+}
+
 }  // namespace yaclib

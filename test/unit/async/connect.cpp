@@ -132,5 +132,20 @@ TEST(Connect, MoveOnly) {
   std::ignore = std::move(f2).Get().Value();
 }
 
+TEST(Connect, ConnectToSharedPromise) {
+  auto [pf, pp] = yaclib::MakeSharedContract<int>();
+  auto [f, p] = yaclib::MakeContract<int>();
+  auto [sf, sp] = yaclib::MakeSharedContract<int>();
+
+  Connect(pp, std::move(p));
+  Connect(pp, std::move(sp));
+
+  std::move(pp).Set(kSetInt);
+
+  ASSERT_EQ(pf.Get().Value(), kSetInt);
+  ASSERT_EQ(std::move(f).Get().Value(), kSetInt);
+  ASSERT_EQ(sf.Get().Value(), kSetInt);
+}
+
 }  // namespace
 }  // namespace test
