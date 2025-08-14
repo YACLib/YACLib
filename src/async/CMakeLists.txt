@@ -10,7 +10,6 @@ list(APPEND YACLIB_INCLUDES
   ${YACLIB_INCLUDE_DIR}/async/shared_future.hpp
   ${YACLIB_INCLUDE_DIR}/async/shared_promise.hpp
   ${YACLIB_INCLUDE_DIR}/async/split.hpp
-  ${YACLIB_INCLUDE_DIR}/async/subsume.hpp
   ${YACLIB_INCLUDE_DIR}/async/wait.hpp
   ${YACLIB_INCLUDE_DIR}/async/wait_for.hpp
   ${YACLIB_INCLUDE_DIR}/async/wait_until.hpp

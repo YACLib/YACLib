@@ -3,7 +3,6 @@
 #include <yaclib/async/connect.hpp>
 #include <yaclib/async/contract.hpp>
 #include <yaclib/async/shared_future.hpp>
-#include <yaclib/async/subsume.hpp>
 #include <yaclib/exe/executor.hpp>
 
 namespace yaclib {
@@ -24,15 +23,17 @@ FutureOn<V, E> Share(const SharedFuture<V, E>& future, IExecutor& executor) {
 
 template <typename V, typename E>
 Future<V, E> Share(SharedPromise<V, E>& promise) {
+  YACLIB_ASSERT(promise.Valid());
   auto [f, p] = MakeContract<V, E>();
-  Subsume(promise, std::move(p));
+  Connect(promise, std::move(p));
   return std::move(f);
 }
 
 template <typename V, typename E>
 FutureOn<V, E> Share(SharedPromise<V, E>& promise, IExecutor& executor) {
+  YACLIB_ASSERT(promise.Valid());
   auto [f, p] = MakeContractOn<V, E>(executor);
-  Subsume(promise, std::move(p));
+  Connect(promise, std::move(p));
   return std::move(f);
 }
 
