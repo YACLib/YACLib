@@ -328,5 +328,19 @@ TEST(SharedFuture, MoveValueFromShared) {
   ASSERT_EQ(move_ctor, 1);
 }
 
+TEST(SharedFuture, MakeSharedPromise) {
+  auto sp = yaclib::MakeSharedPromise<Counter>();
+
+  auto f1 = Share(sp);
+  auto f2 = Share(sp);
+  auto f3 = Share(sp);
+
+  Counter::Init();
+  std::move(sp).Set();
+
+  ASSERT_EQ(copy_ctor, 2);
+  ASSERT_EQ(move_ctor, 1);
+}
+
 }  // namespace
 }  // namespace test
