@@ -4,6 +4,8 @@
 #include <yaclib/util/cast.hpp>
 #include <yaclib/util/result.hpp>
 
+#include <utility>
+
 namespace yaclib::detail {
 
 struct Callback {
@@ -34,6 +36,15 @@ class ResultCore : public BaseCore {
 
   [[nodiscard]] Result<V, E>& Get() noexcept {
     return _result;
+  }
+
+  template <bool Condition>
+  decltype(auto) MoveOrConst() {
+    if constexpr (Condition) {
+      return std::move(Get());
+    } else {
+      return std::as_const(Get());
+    }
   }
 
   union {

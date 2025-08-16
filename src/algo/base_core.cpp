@@ -34,6 +34,22 @@ template bool BaseCore::SetCallbackImpl<true>(InlineCore&) noexcept;
 }
 
 template <bool SymmetricTransfer, bool Shared>
+[[nodiscard]] Transfer<SymmetricTransfer> BaseCore::SetInlineImpl(InlineCore& callback) noexcept {
+  if (!SetCallbackImpl<Shared>(callback)) {
+    return Step<SymmetricTransfer>(*this, callback);
+  }
+  return Noop<SymmetricTransfer>();
+}
+
+template Transfer<false> BaseCore::SetInlineImpl<false, false>(InlineCore&) noexcept;
+template Transfer<false> BaseCore::SetInlineImpl<false, true>(InlineCore&) noexcept;
+
+#if YACLIB_SYMMETRIC_TRANSFER != 0
+template Transfer<true> BaseCore::SetInlineImpl<true, false>(InlineCore&) noexcept;
+template Transfer<true> BaseCore::SetInlineImpl<true, true>(InlineCore&) noexcept;
+#endif
+
+template <bool SymmetricTransfer, bool Shared>
 [[nodiscard]] Transfer<SymmetricTransfer> BaseCore::SetResultImpl() noexcept {
   const auto expected = _callback.exchange(kResult, std::memory_order_acq_rel);
   YACLIB_ASSERT(expected != kResult);

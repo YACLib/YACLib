@@ -9,7 +9,7 @@ template <typename V, typename E, typename Func>
 YACLIB_INLINE auto Schedule(IExecutor& e, Func&& f) {
   auto* core = [&] {
     if constexpr (std::is_same_v<V, Unit>) {
-      return MakeCore<CoreType::Run, true, void, E>(std::forward<Func>(f));
+      return MakeCore<CoreType::Run, true, false, void, E>(std::forward<Func>(f));
     } else {
       return MakeUnique<PromiseCore<V, E, Func&&>>(std::forward<Func>(f)).Release();
     }

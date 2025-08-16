@@ -1,6 +1,7 @@
 #include <yaclib/async/contract.hpp>
 #include <yaclib/async/future.hpp>
 #include <yaclib/async/promise.hpp>
+#include <yaclib/async/run.hpp>
 #include <yaclib/async/share.hpp>
 #include <yaclib/async/shared_contract.hpp>
 #include <yaclib/async/shared_future.hpp>
@@ -366,6 +367,122 @@ TEST(SharedFuture, SharedPromiseSplit) {
   std::move(sp).Set(kSetInt);
 
   ASSERT_EQ(std::move(f).Get().Value(), kSetInt);
+}
+
+TEST(SharedFuture, ThenSet) {
+  yaclib::FairThreadPool tp;
+  auto [sf, sp] = yaclib::MakeSharedContract<int>();
+
+  sf.Then(tp,
+          [](int x) {
+            return x + 1;
+          })
+    .Detach([](int x) {
+      ASSERT_EQ(x, kSetInt + 1);
+    });
+  std::move(sp).Set(kSetInt);
+
+  tp.SoftStop();
+  tp.Wait();
+}
+
+TEST(SharedFuture, SetThen) {
+  yaclib::FairThreadPool tp;
+  auto [sf, sp] = yaclib::MakeSharedContract<int>();
+
+  std::move(sp).Set(kSetInt);
+  sf.Then(tp,
+          [](int x) {
+            return x + 1;
+          })
+    .Detach([](int x) {
+      ASSERT_EQ(x, kSetInt + 1);
+    });
+
+  tp.SoftStop();
+  tp.Wait();
+}
+
+TEST(SharedFuture, ThenSetThen) {
+  yaclib::FairThreadPool tp;
+  auto [sf, sp] = yaclib::MakeSharedContract<int>();
+
+  sf.Then(tp,
+          [](int x) {
+            return x + 1;
+          })
+    .Detach([](int x) {
+      ASSERT_EQ(x, kSetInt + 1);
+    });
+  std::move(sp).Set(kSetInt);
+  sf.Then(tp,
+          [](int x) {
+            return x + 1;
+          })
+    .Detach([](int x) {
+      ASSERT_EQ(x, kSetInt + 1);
+    });
+
+  tp.SoftStop();
+  tp.Wait();
+}
+
+TEST(SharedFuture, ThenOutlivesContract) {
+  yaclib::ManualExecutor e;
+  {
+    auto [sf, sp] = yaclib::MakeSharedContract<int>();
+    sf.Then(e,
+            [](int x) {
+              return x + 1;
+            })
+      .Detach([](int x) {
+        ASSERT_EQ(x, kSetInt + 1);
+      });
+
+    std::move(sp).Set(kSetInt);
+  }
+  std::ignore = e.Drain();
+}
+
+TEST(SharedFuture, ThenInline) {
+  auto [sf, sp] = yaclib::MakeSharedContract<int>();
+
+  sf.ThenInline([](int x) {
+      return x + 1;
+    })
+    .DetachInline([](int x) {
+      ASSERT_EQ(x, kSetInt + 1);
+    });
+  std::move(sp).Set(kSetInt);
+  sf.ThenInline([](int x) {
+      return x + 1;
+    })
+    .DetachInline([](int x) {
+      ASSERT_EQ(x, kSetInt + 1);
+    });
+}
+
+TEST(SharedFuture, Unwrapping) {
+  yaclib::ManualExecutor e1;
+  yaclib::ManualExecutor e2;
+  auto [f, p] = yaclib::MakeContract<int>();
+
+  auto res = std::move(f).Then(e1, [&](int x) {
+    auto [sf, sp] = yaclib::MakeSharedContract<int>();
+
+    yaclib::Run(e2, [x, sp = std::move(sp)]() mutable {
+      std::move(sp).Set(x + 1);
+    }).Detach();
+
+    return sf;
+  });
+
+  std::move(p).Set(kSetInt);
+
+  std::ignore = e1.Drain();
+  std::ignore = e2.Drain();
+
+  ASSERT_EQ(std::move(res).Get().Value(), kSetInt + 1);
 }
 
 }  // namespace

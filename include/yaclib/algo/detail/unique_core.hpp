@@ -37,10 +37,7 @@ class UniqueCore : public ResultCore<V, E> {
 
   template <bool SymmetricTransfer>
   [[nodiscard]] Transfer<SymmetricTransfer> SetInline(InlineCore& callback) noexcept {
-    if (!SetCallback(callback)) {
-      return Step<SymmetricTransfer>(*this, callback);
-    }
-    return Noop<SymmetricTransfer>();
+    return BaseCore::SetInlineImpl<SymmetricTransfer, false>(callback);
   }
 
   template <bool SymmetricTransfer>

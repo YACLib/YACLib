@@ -59,7 +59,7 @@ void kek() {
 }
 
 TEST(Core, EmptySizeof) {
-  auto* core = yaclib::detail::MakeCore<yaclib::detail::CoreType::Run, true, void, yaclib::StopError>([] {
+  auto* core = yaclib::detail::MakeCore<yaclib::detail::CoreType::Run, true, false, void, yaclib::StopError>([] {
     kek();
   });
 
@@ -74,7 +74,7 @@ TEST(Core, EmptySizeof) {
 }
 
 TEST(Core, Sizeof) {
-  auto* core = yaclib::detail::MakeCore<yaclib::detail::CoreType::Run, true, void, yaclib::StopError>(kek);
+  auto* core = yaclib::detail::MakeCore<yaclib::detail::CoreType::Run, true, false, void, yaclib::StopError>(kek);
   static_assert(sizeof(void*) == sizeof(int) || sizeof(*core) == (sizeof(yaclib::detail::BaseCore) +  //
                                                                   sizeof(yaclib::Result<>) +          //
                                                                   sizeof(&kek) +                      //

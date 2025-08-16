@@ -64,6 +64,12 @@ using future_base_value_t = typename detail::FutureBaseTypes<T>::Value;  // NOLI
 template <typename T>
 using future_base_error_t = typename detail::FutureBaseTypes<T>::Error;  // NOLINT
 
+template <typename T>
+using shared_future_value_t = typename detail::SharedFutureTypes<T>::Value;  // NOLINT
+
+template <typename T>
+using shared_future_error_t = typename detail::SharedFutureTypes<T>::Error;  // NOLINT
+
 template <bool Condition, typename T>
 decltype(auto) move_if(T&& arg) noexcept {  // NOLINT
   if constexpr (Condition) {
