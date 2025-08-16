@@ -1,0 +1,13 @@
+<map id="include/yaclib/async/shared_future.hpp" name="include/yaclib/async/shared_future.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="59,5,196,46"/>
+<area shape="rect" id="Node000002" href="$connect_8hpp.html" title=" " alt="" coords="59,94,196,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="130,62,130,94,125,94,125,62"/>
+<area shape="rect" id="Node000003" href="$share_8hpp.html" title=" " alt="" coords="5,183,143,223"/>
+<area shape="poly" id="edge4_Node000001_Node000003" title=" " alt="" coords="81,57,62,75,48,95,43,117,46,140,64,181,59,183,41,141,38,117,44,93,58,71,77,53"/>
+<area shape="rect" id="Node000005" href="$shared__contract_8hpp.html" title=" " alt="" coords="220,94,363,135"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="179,51,256,91,253,96,177,56"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="110,149,88,184,84,181,105,147"/>
+<area shape="rect" id="Node000004" href="$split_8hpp.html" title=" " alt="" coords="195,183,332,223"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="172,141,234,180,231,184,169,145"/>
+<area shape="poly" id="edge6_Node000005_Node000004" title=" " alt="" coords="283,150,272,183,267,181,278,149"/>
+</map>

@@ -1,0 +1,14 @@
+<map id="yaclib::Strand" name="yaclib::Strand">
+<area shape="rect" id="Node000001" title=" " alt="" coords="178,226,276,252"/>
+<area shape="rect" id="Node000002" href="$classyaclib_1_1Job.html" title="Callable that can be executed in an IExecutor." alt="" coords="126,153,207,178"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="188,188,219,224,215,228,184,192"/>
+<area shape="rect" id="Node000003" href="$classyaclib_1_1IFunc.html" title="Callable interface." alt="" coords="5,79,99,105"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="86,111,149,150,146,154,83,116"/>
+<area shape="rect" id="Node000004" href="$classyaclib_1_1IRef.html" title="Reference counting interface." alt="" coords="127,5,212,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="138,42,73,81,71,76,135,37"/>
+<area shape="rect" id="Node000006" href="$classyaclib_1_1IExecutor.html" title=" " alt="" coords="231,153,345,178"/>
+<area shape="poly" id="edge6_Node000006_Node000004" title=" " alt="" coords="214,36,241,54,265,77,276,96,283,117,290,152,284,153,278,118,271,99,261,81,238,58,211,41"/>
+<area shape="rect" id="Node000005" href="$structyaclib_1_1detail_1_1Node.html" title="Node class, used in intrusive data structure." alt="" coords="123,79,251,105"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="182,120,173,153,167,151,177,119"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="270,192,239,228,235,224,266,188"/>
+</map>

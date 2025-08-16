@@ -1,0 +1,11 @@
+<map id="yaclib::detail::fiber::RecursiveTimedMutex" name="yaclib::detail::fiber::RecursiveTimedMutex">
+<area shape="rect" id="Node000001" title=" " alt="" coords="107,199,263,240"/>
+<area shape="rect" id="Node000002" href="$classyaclib_1_1detail_1_1fiber_1_1RecursiveMutex.html" title=" " alt="" coords="124,109,245,150"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="187,165,187,199,182,199,182,165"/>
+<area shape="rect" id="Node000003" href="$classyaclib_1_1detail_1_1fiber_1_1FiberQueue.html" title=" " alt="" coords="5,5,127,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="102,54,164,107,160,111,99,58"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="151,13,218,39"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="187,54,187,108,182,108,182,54"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="244,13,312,39"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="271,54,251,87,222,111,219,107,247,83,266,51"/>
+</map>

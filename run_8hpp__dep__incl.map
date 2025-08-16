@@ -1,0 +1,9 @@
+<map id="include/yaclib/async/run.hpp" name="include/yaclib/async/run.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="161,5,298,46"/>
+<area shape="rect" id="Node000002" href="$simple_8cpp.html" title=" " alt="" coords="5,94,139,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="182,56,109,96,106,91,179,51"/>
+<area shape="rect" id="Node000003" href="$when__all_8cpp.html" title=" " alt="" coords="163,94,296,135"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="232,62,232,94,227,94,227,62"/>
+<area shape="rect" id="Node000004" href="$when__any_8cpp.html" title=" " alt="" coords="320,94,453,135"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="280,51,352,91,350,96,277,56"/>
+</map>

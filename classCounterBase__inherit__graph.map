@@ -1,0 +1,15 @@
+<map id="CounterBase" name="CounterBase">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,52,102,77"/>
+<area shape="rect" id="Node000002" href="$structyaclib_1_1detail_1_1AtomicCounter.html" title=" " alt="" coords="151,8,334,49"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="116,50,150,43,151,48,117,55"/>
+<area shape="rect" id="Node000005" href="$structyaclib_1_1detail_1_1OneCounter.html" title=" " alt="" coords="160,76,326,117"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="117,72,160,80,159,85,116,78"/>
+<area shape="rect" id="Node000003" href="$structyaclib_1_1detail_1_1AtomicCounter.html" title=" " alt="" coords="570,5,754,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="350,25,570,24,570,29,350,30"/>
+<area shape="rect" id="Node000004" href="$classyaclib_1_1detail_1_1AwaitEvent.html" title=" " alt="" coords="831,13,994,39"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="769,23,831,23,831,28,769,28"/>
+<area shape="rect" id="Node000006" href="$structyaclib_1_1detail_1_1OneCounter.html" title=" " alt="" coords="547,74,777,130"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="342,95,547,98,547,103,342,100"/>
+<area shape="rect" id="Node000007" href="$classyaclib_1_1detail_1_1PromiseType.html" title=" " alt="" coords="826,81,999,122"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="792,99,826,99,826,104,792,104"/>
+</map>
