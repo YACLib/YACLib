@@ -11,19 +11,30 @@ namespace yaclib {
 template <typename V, typename E>
 using SharedContract = std::pair<SharedFuture<V, E>, SharedPromise<V, E>>;
 
+template <typename V, typename E>
+using SharedContractOn = std::pair<SharedFutureOn<V, E>, SharedPromise<V, E>>;
+
 template <typename V = void, typename E = StopError>
 [[nodiscard]] SharedContract<V, E> MakeSharedContract() {
-  // 3 refs for the promise (1 for the promise itself and 2 for the last callback)
-  // 1 ref for the future
-  auto core = MakeShared<detail::SharedCore<V, E>>(4);
+  auto core = MakeShared<detail::SharedCore<V, E>>(detail::kSharedRefWithFuture);
   SharedFuture<V, E> future{detail::SharedCorePtr<V, E>{NoRefTag{}, core.Get()}};
   SharedPromise<V, E> promise{detail::SharedCorePtr<V, E>{NoRefTag{}, core.Release()}};
   return {std::move(future), std::move(promise)};
 }
 
 template <typename V = void, typename E = StopError>
+[[nodiscard]] SharedContract<V, E> MakeSharedContractOn(IExecutor& e) {
+  auto core = MakeShared<detail::SharedCore<V, E>>(detail::kSharedRefWithFuture);
+  e.IncRef();
+  core->_executor.Reset(NoRefTag{}, &e);
+  SharedFutureOn<V, E> future{detail::SharedCorePtr<V, E>{NoRefTag{}, core.Get()}};
+  SharedPromise<V, E> promise{detail::SharedCorePtr<V, E>{NoRefTag{}, core.Release()}};
+  return {std::move(future), std::move(promise)};
+}
+
+template <typename V = void, typename E = StopError>
 [[nodiscard]] SharedPromise<V, E> MakeSharedPromise() {
-  auto core = MakeShared<detail::SharedCore<V, E>>(3);
+  auto core = MakeShared<detail::SharedCore<V, E>>(detail::kSharedRefNoFuture);
   SharedPromise<V, E> promise{detail::SharedCorePtr<V, E>{NoRefTag{}, core.Release()}};
   return promise;
 }

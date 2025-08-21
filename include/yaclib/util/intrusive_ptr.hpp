@@ -18,6 +18,8 @@ class IntrusivePtr final {
   static_assert(std::is_base_of_v<IRef, T>, "T must be derived class of IRef");
 
  public:
+  using Pointee = T;
+
   IntrusivePtr() noexcept;
 
   IntrusivePtr(T* other) noexcept;

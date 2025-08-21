@@ -12,6 +12,7 @@
 #include <yaclib/coro/await_on.hpp>
 #include <yaclib/coro/future.hpp>
 #include <yaclib/coro/on.hpp>
+#include <yaclib/coro/shared_future.hpp>
 #include <yaclib/coro/task.hpp>
 #include <yaclib/exe/manual.hpp>
 #include <yaclib/lazy/make.hpp>
@@ -30,7 +31,7 @@ using namespace std::chrono_literals;
 
 TYPED_TEST(AsyncSuite, JustWorksPack) {
   yaclib::FairThreadPool tp;
-  auto coro = [&]() -> std::conditional_t<TestFixture::kIsFuture, yaclib::Future<int>, yaclib::Task<int>> {
+  auto coro = [&]() -> typename TestFixture::template AsyncT<int> {
     auto f1 = yaclib::Run(tp, [] {
       yaclib_std::this_thread::sleep_for(1ms * YACLIB_CI_SLOWDOWN);
       return 1;
@@ -50,7 +51,7 @@ TYPED_TEST(AsyncSuite, JustWorksPack) {
 
 TYPED_TEST(AsyncSuite, JustWorksRange) {
   yaclib::FairThreadPool tp;
-  auto coro = [&]() -> std::conditional_t<TestFixture::kIsFuture, yaclib::Future<int>, yaclib::Task<int>> {
+  auto coro = [&]() -> typename TestFixture::template AsyncT<int> {
     std::array<yaclib::FutureOn<int>, 2> arr;
     arr[0] = yaclib::Run(tp, [] {
       yaclib_std::this_thread::sleep_for(50ms * YACLIB_CI_SLOWDOWN);
@@ -72,7 +73,7 @@ TYPED_TEST(AsyncSuite, JustWorksRange) {
 
 TYPED_TEST(AsyncSuite, JustWorksCoAwait) {
   yaclib::FairThreadPool tp;
-  auto coro = [&]() -> std::conditional_t<TestFixture::kIsFuture, yaclib::Future<int>, yaclib::Task<int>> {
+  auto coro = [&]() -> typename TestFixture::template AsyncT<int> {
     auto f1 = yaclib::Run(tp, [] {
       yaclib_std::this_thread::sleep_for(50ms * YACLIB_CI_SLOWDOWN);
       return 1;
@@ -88,7 +89,7 @@ TYPED_TEST(AsyncSuite, JustWorksCoAwait) {
 
 TYPED_TEST(AsyncSuite, JustWorksCoAwaitException) {
   yaclib::FairThreadPool tp;
-  auto coro = [&]() -> std::conditional_t<TestFixture::kIsFuture, yaclib::Future<int>, yaclib::Task<int>> {
+  auto coro = [&]() -> typename TestFixture::template AsyncT<int> {
     auto f1 = yaclib::Run(tp, [] {
       throw std::runtime_error{""};
       return 2;
@@ -129,7 +130,7 @@ TYPED_TEST(AsyncSuite, CheckSuspend) {
   };
 
   auto outer_future = coro();
-  if constexpr (TestFixture::kIsFuture) {
+  if constexpr (!TestFixture::kIsTask) {
     EXPECT_EQ(1, counter);
   } else {
     EXPECT_EQ(0, counter);
@@ -158,7 +159,7 @@ TYPED_TEST(AsyncSuite, AwaitNoSuspend) {
   };
 
   auto outer_future = coro();
-  if constexpr (TestFixture::kIsFuture) {
+  if constexpr (!TestFixture::kIsTask) {
     EXPECT_EQ(2, counter);
   } else {
     EXPECT_EQ(0, counter);
@@ -180,7 +181,7 @@ TYPED_TEST(AsyncSuite, AwaitSingleNoSuspend) {
   };
 
   auto outer_future = coro();
-  if constexpr (TestFixture::kIsFuture) {
+  if constexpr (!TestFixture::kIsTask) {
     EXPECT_EQ(2, counter);
   } else {
     EXPECT_EQ(0, counter);
@@ -209,7 +210,7 @@ TYPED_TEST(AsyncSuite, AwaitOnSingle) {
   yaclib::FairThreadPool tp{1};
   yaclib::FairThreadPool tp1{1};
   auto main_thread = yaclib_std::this_thread::get_id();
-  auto coro = [&]() -> std::conditional_t<TestFixture::kIsFuture, yaclib::Future<int>, yaclib::Task<int>> {
+  auto coro = [&]() -> typename TestFixture::template AsyncT<int> {
     auto f1 = yaclib::Run(tp, [] {
       yaclib_std::this_thread::sleep_for(50ms * YACLIB_CI_SLOWDOWN);
       return 1;
@@ -231,7 +232,7 @@ TYPED_TEST(AsyncSuite, AwaitOnMulti) {
   yaclib::FairThreadPool tp{2};
   yaclib::FairThreadPool tp1{1};
   auto main_thread = yaclib_std::this_thread::get_id();
-  auto coro = [&]() -> std::conditional_t<TestFixture::kIsFuture, yaclib::Future<int>, yaclib::Task<int>> {
+  auto coro = [&]() -> typename TestFixture::template AsyncT<int> {
     auto f1 = yaclib::Run(tp, [] {
       yaclib_std::this_thread::sleep_for(50ms * YACLIB_CI_SLOWDOWN);
       return 1;
@@ -256,7 +257,7 @@ TYPED_TEST(AsyncSuite, AwaitOnSingleReady) {
   yaclib::FairThreadPool tp{1};
   yaclib::FairThreadPool tp1{1};
   auto main_thread = yaclib_std::this_thread::get_id();
-  auto coro = [&]() -> std::conditional_t<TestFixture::kIsFuture, yaclib::Future<int>, yaclib::Task<int>> {
+  auto coro = [&]() -> typename TestFixture::template AsyncT<int> {
     auto f1 = yaclib::Run(tp, [] {
       return 1;
     });
@@ -278,7 +279,7 @@ TYPED_TEST(AsyncSuite, AwaitOnMultiReady) {
   yaclib::FairThreadPool tp{2};
   yaclib::FairThreadPool tp1{1};
   auto main_thread = yaclib_std::this_thread::get_id();
-  auto coro = [&]() -> std::conditional_t<TestFixture::kIsFuture, yaclib::Future<int>, yaclib::Task<int>> {
+  auto coro = [&]() -> typename TestFixture::template AsyncT<int> {
     auto f1 = yaclib::Run(tp, [] {
       return 1;
     });

@@ -18,6 +18,8 @@ namespace yaclib {
  */
 template <typename V, typename E>
 class FutureBase {
+  using CoreType = detail::CoreType;
+
  public:
   static_assert(Check<V>(), "V should be valid");
   static_assert(Check<E>(), "E should be valid");
@@ -34,7 +36,7 @@ class FutureBase {
    *
    * Needed only for usability, e.g. instead of std::optional<Future<T>> in containers.
    */
-  FutureBase() noexcept = default;
+  FutureBase() = default;
 
   /**
    * If Future is \ref Valid then call \ref Stop
@@ -132,7 +134,8 @@ class FutureBase {
   [[nodiscard]] /*FutureOn*/ auto Then(IExecutor& e, Func&& f) && {
     YACLIB_WARN(e.Tag() == IExecutor::Type::Inline,
                 "better way is use ThenInline(...) instead of Then(MakeInline(), ...)");
-    return detail::SetCallback<detail::CoreType::Then, detail::CallbackType::On>(_core, &e, std::forward<Func>(f));
+    constexpr auto CoreT = CoreType::ToUnique | CoreType::Call;
+    return detail::SetCallback<CoreT, true>(_core, &e, std::forward<Func>(f));
   }
 
   /**
@@ -153,7 +156,8 @@ class FutureBase {
    */
   template <typename Func>
   void DetachInline(Func&& f) && {
-    detail::SetCallback<detail::CoreType::Detach, detail::CallbackType::Inline>(_core, nullptr, std::forward<Func>(f));
+    constexpr auto CoreT = CoreType::Detach;
+    detail::SetCallback<CoreT, false>(_core, nullptr, std::forward<Func>(f));
   }
 
   /**
@@ -168,7 +172,8 @@ class FutureBase {
   void Detach(IExecutor& e, Func&& f) && {
     YACLIB_WARN(e.Tag() == IExecutor::Type::Inline,
                 "better way is use DetachInline(...) instead of Detach(MakeInline(), ...)");
-    detail::SetCallback<detail::CoreType::Detach, detail::CallbackType::On>(_core, &e, std::forward<Func>(f));
+    constexpr auto CoreT = CoreType::Detach | CoreType::Call;
+    detail::SetCallback<CoreT, false>(_core, &e, std::forward<Func>(f));
   }
 
   /**
@@ -201,6 +206,7 @@ extern template class FutureBase<void, StopError>;
  */
 template <typename V, typename E>
 class Future final : public FutureBase<V, E> {
+  using CoreType = detail::CoreType;
   using Base = FutureBase<V, E>;
 
  public:
@@ -219,8 +225,8 @@ class Future final : public FutureBase<V, E> {
    */
   template <typename Func>
   [[nodiscard]] /*Future*/ auto ThenInline(Func&& f) && {
-    return detail::SetCallback<detail::CoreType::Then, detail::CallbackType::Inline>(this->_core, nullptr,
-                                                                                     std::forward<Func>(f));
+    constexpr auto CoreT = CoreType::ToUnique;
+    return detail::SetCallback<CoreT, false>(this->_core, nullptr, std::forward<Func>(f));
   }
 };
 
@@ -234,6 +240,7 @@ extern template class Future<>;
  */
 template <typename V, typename E>
 class FutureOn final : public FutureBase<V, E> {
+  using CoreType = detail::CoreType;
   using Base = FutureBase<V, E>;
 
  public:
@@ -262,8 +269,8 @@ class FutureOn final : public FutureBase<V, E> {
    */
   template <typename Func>
   [[nodiscard]] /*FutureOn*/ auto ThenInline(Func&& f) && {
-    return detail::SetCallback<detail::CoreType::Then, detail::CallbackType::InlineOn>(this->_core, nullptr,
-                                                                                       std::forward<Func>(f));
+    constexpr auto CoreT = CoreType::ToUnique;
+    return detail::SetCallback<CoreT, true>(this->_core, nullptr, std::forward<Func>(f));
   }
 
   /**
@@ -275,8 +282,8 @@ class FutureOn final : public FutureBase<V, E> {
    */
   template <typename Func>
   [[nodiscard]] /*FutureOn*/ auto Then(Func&& f) && {
-    return detail::SetCallback<detail::CoreType::Then, detail::CallbackType::On>(this->_core, nullptr,
-                                                                                 std::forward<Func>(f));
+    constexpr auto CoreT = CoreType::ToUnique | CoreType::Call;
+    return detail::SetCallback<CoreT, true>(this->_core, nullptr, std::forward<Func>(f));
   }
 
   /**
@@ -287,8 +294,8 @@ class FutureOn final : public FutureBase<V, E> {
    */
   template <typename Func>
   void Detach(Func&& f) && {
-    detail::SetCallback<detail::CoreType::Detach, detail::CallbackType::On>(this->_core, nullptr,
-                                                                            std::forward<Func>(f));
+    constexpr auto CoreT = CoreType::Detach | CoreType::Call;
+    detail::SetCallback<CoreT, false>(this->_core, nullptr, std::forward<Func>(f));
   }
 };
 

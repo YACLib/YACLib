@@ -36,13 +36,60 @@ class NoResultCore : public BaseCore {
 };
 
 enum class CoreType : unsigned char {
-  Run = 0,
-  Then = 1,
-  Detach = 2,
+  None = 0,
+  Run = 1 << 0,
+  Detach = 1 << 1,
+  FromUnique = 1 << 2,
+  FromShared = 1 << 3,
+  ToUnique = 1 << 4,
+  ToShared = 1 << 5,
+  Call = 1 << 6,
+  Lazy = 1 << 7,
 };
 
+inline constexpr CoreType operator|(CoreType a, CoreType b) {
+  return static_cast<CoreType>(static_cast<unsigned char>(a) | static_cast<unsigned char>(b));
+}
+
+inline constexpr CoreType operator&(CoreType a, CoreType b) {
+  return static_cast<CoreType>(static_cast<unsigned char>(a) & static_cast<unsigned char>(b));
+}
+
+constexpr bool IsRun(CoreType type) {
+  return static_cast<bool>(type & CoreType::Run);
+}
+
+constexpr bool IsDetach(CoreType type) {
+  return static_cast<bool>(type & CoreType::Detach);
+}
+
+constexpr bool IsFromUnique(CoreType type) {
+  return static_cast<bool>(type & CoreType::FromUnique);
+}
+
+constexpr bool IsFromShared(CoreType type) {
+  return static_cast<bool>(type & CoreType::FromShared);
+}
+
+constexpr bool IsToShared(CoreType type) {
+  return static_cast<bool>(type & CoreType::ToShared);
+}
+
+constexpr bool IsToUnique(CoreType type) {
+  return static_cast<bool>(type & CoreType::ToUnique);
+}
+
+constexpr bool IsCall(CoreType type) {
+  return static_cast<bool>(type & CoreType::Call);
+}
+
+constexpr bool IsLazy(CoreType type) {
+  return static_cast<bool>(type & CoreType::Lazy);
+}
+
 template <CoreType Type, typename V, typename E>
-using ResultCoreT = std::conditional_t<Type == CoreType::Detach, NoResultCore, UniqueCore<V, E>>;
+using ResultCoreT = std::conditional_t<IsDetach(Type), NoResultCore,
+                                       std::conditional_t<IsToShared(Type), SharedCore<V, E>, UniqueCore<V, E>>>;
 
 YACLIB_INLINE BaseCore* MoveToCaller(BaseCore* head) noexcept {
   YACLIB_ASSERT(head);
@@ -60,14 +107,13 @@ enum class AsyncType {
   Shared,
 };
 
-template <typename Ret, typename Arg, typename E, typename Func, CoreType Type, AsyncType kAsync, bool kIsCall,
-          bool kFromShared>
+template <typename Ret, typename Arg, typename E, typename Func, CoreType Type, AsyncType kAsync>
 class Core : public ResultCoreT<Type, Ret, E>, public FuncCore<Func> {
   using F = FuncCore<Func>;
   using Storage = typename F::Storage;
   using Invoke = typename F::Invoke;
 
-  static_assert(!(Type == CoreType::Detach && kAsync != AsyncType::None), "Detach cannot be Async, should be void");
+  static_assert(!(IsDetach(Type) && kAsync != AsyncType::None), "Detach cannot be Async, should be void");
 
  public:
   using Base = ResultCoreT<Type, Ret, E>;
@@ -79,7 +125,7 @@ class Core : public ResultCoreT<Type, Ret, E>, public FuncCore<Func> {
  private:
   void Call() noexcept final {
     YACLIB_ASSERT(this->_self.unwrapping == 0);
-    if constexpr (Type == CoreType::Run) {
+    if constexpr (IsRun(Type)) {
       YACLIB_ASSERT(this->_self.caller == nullptr);
       if constexpr (is_invocable_v<Invoke>) {
         Loop(this, CallImpl<false>(Unit{}));  // optimization
@@ -89,7 +135,7 @@ class Core : public ResultCoreT<Type, Ret, E>, public FuncCore<Func> {
     } else {
       YACLIB_ASSERT(this->_self.caller != this);
       auto& core = DownCast<ResultCore<Arg, E>>(*this->_self.caller);
-      Loop(this, CallImpl<false>(core.template MoveOrConst<!kFromShared>()));
+      Loop(this, CallImpl<false>(core.template MoveOrConst<IsFromUnique(Type)>()));
     }
   }
 
@@ -106,7 +152,7 @@ class Core : public ResultCoreT<Type, Ret, E>, public FuncCore<Func> {
       auto& core = DownCast<ResultCore<Ret, E>>(*this->_self.caller);
       return Done<SymmetricTransfer, true>(core.template MoveOrConst<!AsyncShared>());
     };
-    if constexpr (Type == CoreType::Run) {
+    if constexpr (IsRun(Type)) {
       return async_done();
     } else {
       if constexpr (kAsync != AsyncType::None) {
@@ -116,22 +162,18 @@ class Core : public ResultCoreT<Type, Ret, E>, public FuncCore<Func> {
       }
       YACLIB_ASSERT(this->_self.caller == nullptr);
       this->_self.caller = &caller;
-      if constexpr (kFromShared) {
-        DownCast<BaseCore>(caller).CopyExecutorTo(*this);
-      } else {
-        DownCast<BaseCore>(caller).MoveExecutorTo(*this);
+      DownCast<BaseCore>(caller).TransferExecutorTo<IsFromShared(Type)>(*this);
+      if constexpr (IsFromShared(Type) && (IsCall(Type) || kAsync != AsyncType::None)) {
+        // The callback can outlive all SharedFutures
+        // We assume ownership here and release it in Done()
+        caller.IncRef();
       }
-      if constexpr (kIsCall) {
-        if constexpr (kFromShared) {
-          // The callback can outlive all SharedFutures
-          // Need to assume ownership
-          caller.IncRef();
-        }
+      if constexpr (IsCall(Type)) {
         this->_executor->Submit(*this);
         return Noop<SymmetricTransfer>();
       } else {
         auto& core = DownCast<ResultCore<Arg, E>>(caller);
-        return CallImpl<SymmetricTransfer>(core.template MoveOrConst<!kFromShared>());
+        return CallImpl<SymmetricTransfer>(core.template MoveOrConst<IsFromUnique(Type)>());
       }
     }
   }
@@ -169,7 +211,17 @@ class Core : public ResultCoreT<Type, Ret, E>, public FuncCore<Func> {
     // [X x]   () -> X&& { touch x, then return it by rvalue reference }
     auto* caller = this->_self.caller;
     this->Store(std::forward<T>(value));
-    if constexpr ((Type != CoreType::Run && (!kFromShared || kIsCall)) || Async) {
+
+    // We decrease the reference count in the following cases:
+    // If !Async (We are now not called by the async result of our callback), then:
+    //   !Type & Run : We are not the first callback in the chain so there is a previous core AND:
+    //     Type & FromUnique : The previous core is a UniqueCore, we always have ownership
+    //     OR we have might have a SharedCore as the previous core and in that case:
+    //       Type & Call : Our callback can outlive the previous core OR
+    //       kAsync != AsyncType::None: Async operation of our callback can outlive the previous core
+    //       - So in the last two cases, we assume ownership of the SharedCore beforehand and release it here
+    // If Async, then we always have ownership of the async result of our callback
+    if constexpr ((!IsRun(Type) && (IsFromUnique(Type) || IsCall(Type) || kAsync != AsyncType::None)) || Async) {
       caller->DecRef();
     }
     if constexpr (!Async) {
@@ -213,7 +265,7 @@ class Core : public ResultCoreT<Type, Ret, E>, public FuncCore<Func> {
       constexpr auto kState = kIsException ? ResultState::Exception : ResultState::Error;
       if (state == kState) {
         using T = std::conditional_t<kIsException, std::exception_ptr, E>;
-        return CallResolveAsync<SymmetricTransfer>(std::get<T>(std::move(r.Internal())));
+        return CallResolveAsync<SymmetricTransfer>(std::get<T>(std::forward<Result>(r).Internal()));
       }
       return Done<SymmetricTransfer>(std::move(r));
     }
@@ -226,7 +278,7 @@ class Core : public ResultCoreT<Type, Ret, E>, public FuncCore<Func> {
       // In the case of SharedFuture we also release here because the
       // ownership needs to be 'transferred' into *this
       auto* core = async.GetCore().Release();
-      if constexpr (Type != CoreType::Run) {
+      if constexpr (!IsRun(Type)) {
         this->_self.caller->DecRef();
         this->_self.unwrapping = 1;
       }
@@ -307,84 +359,74 @@ struct Return<V, E, Func, 5> final {
   using Type = invoke_t<Func, Unit>;
 };
 
-template <CoreType CoreT, bool kIsCall, bool kFromShared, typename Arg, typename E, typename Func>
+template <CoreType CoreT, typename Arg, typename E, typename Func>
 auto* MakeCore(Func&& f) {
-  static_assert(CoreT != CoreType::Run || std::is_void_v<Arg>,
-                "It makes no sense to receive some value in first pipeline step");
+  static_assert(!IsRun(CoreT) || std::is_void_v<Arg>, "It makes no sense to receive some value in first pipeline step");
   using AsyncRet = result_value_t<typename detail::Return<Arg, E, Func&&>::Type>;
-  static_assert(CoreT != CoreType::Detach || std::is_void_v<AsyncRet>,
+  static_assert(!IsDetach(CoreT) || std::is_void_v<AsyncRet>,
                 "It makes no sense to return some value in Detach, since no one will be able to use it");
   using Ret0 = result_value_t<shared_future_value_t<future_base_value_t<task_value_t<AsyncRet>>>>;
   using Ret = std::conditional_t<std::is_same_v<Ret0, Unit>, void, Ret0>;
   constexpr AsyncType kAsync = [] {
     if constexpr (is_future_base_v<AsyncRet> || is_task_v<AsyncRet>) {
       return AsyncType::Unique;
-    } else if constexpr (is_shared_future_v<AsyncRet>) {
+    } else if constexpr (is_shared_future_base_v<AsyncRet>) {
       return AsyncType::Shared;
     } else {
       return AsyncType::None;
     }
   }();
   // TODO(MBkkt) Think about inline/detach optimization
-  using Core = detail::Core<Ret, Arg, E, Func&&, CoreT, kAsync, kIsCall, kFromShared>;
-  return MakeUnique<Core>(std::forward<Func>(f)).Release();
+  using Core = detail::Core<Ret, Arg, E, Func&&, CoreT, kAsync>;
+  if constexpr (IsToShared(CoreT)) {
+    return MakeShared<Core>(detail::kSharedRefWithFuture, std::forward<Func>(f)).Release();
+  } else {
+    return MakeUnique<Core>(std::forward<Func>(f)).Release();
+  }
 }
 
-enum class CallbackType : unsigned char {
-  Inline = 0,
-  On = 1,
-  InlineOn = 2,
-  LazyInline = 3,
-  LazyOn = 4,
-};
+template <CoreType CoreT, bool On, typename FromCorePtr, typename Func>
+auto SetCallback(FromCorePtr&& core, IExecutor* executor, Func&& f) {
+  using Arg = typename remove_cvref_t<FromCorePtr>::Pointee::Value;
+  using E = typename remove_cvref_t<FromCorePtr>::Pointee::Error;
 
-template <CoreType CoreT, CallbackType CallbackT, typename Arg, typename E, typename Func>
-auto SetCallback(UniqueCorePtr<Arg, E>& core, IExecutor* executor, Func&& f) {
+  static constexpr bool Unique = std::is_same_v<UniqueCorePtr<Arg, E>&, FromCorePtr>;
+  static constexpr bool Shared = std::is_same_v<const SharedCorePtr<Arg, E>&, FromCorePtr>;
+  static_assert(Unique || Shared);
+
   YACLIB_ASSERT(core);
-  constexpr bool kIsDetach = CoreT == CoreType::Detach;
-  constexpr bool kIsLazy = CallbackT == CallbackType::LazyInline || CallbackT == CallbackType::LazyOn;
-  constexpr bool kIsCall = CallbackT == CallbackType::On || CallbackT == CallbackType::LazyOn;
-  constexpr bool kFromShared = false;
-  auto* callback = MakeCore<CoreT, kIsCall, kFromShared, Arg, E>(std::forward<Func>(f));
+  static constexpr auto From = Unique ? CoreType::FromUnique : CoreType::FromShared;
+  auto* callback = MakeCore<CoreT | From, Arg, E>(std::forward<Func>(f));
   // TODO(MBkkt) callback, executor, caller should be in ctor
-  if constexpr (kIsDetach) {
+  if constexpr (IsDetach(CoreT)) {
     callback->StoreCallback(MakeDrop());
   }
   callback->_executor = executor;
-  auto* caller = core.Release();
-  if constexpr (!kIsLazy) {
+
+  auto* caller = [&] {
+    if constexpr (Unique) {
+      return core.Release();
+    } else {
+      return core.Get();
+    }
+  }();
+
+  if constexpr (!IsLazy(CoreT)) {
     Loop(caller, caller->template SetInline<false>(*callback));
   }
+
   using ResultCoreT = typename std::remove_reference_t<decltype(*callback)>::Base;
-  if constexpr (kIsLazy) {
+  if constexpr (IsLazy(CoreT)) {
+    static_assert(!Shared, "Shared + Lazy (SharedTask) is not supported");
     callback->next = caller;
     caller->StoreCallback(*callback);
     return Task{IntrusivePtr<ResultCoreT>{NoRefTag{}, callback}};
-  } else if constexpr (!kIsDetach) {
-    if constexpr (CallbackT == CallbackType::Inline) {
-      return Future{IntrusivePtr<ResultCoreT>{NoRefTag{}, callback}};
-    } else {
+  } else if constexpr (!IsDetach(CoreT)) {
+    // TODO(ocelaiwo): consider adding ThenShared etc. so add SharedFuture/On here
+    if constexpr (On) {
       return FutureOn{IntrusivePtr<ResultCoreT>{NoRefTag{}, callback}};
-    }
-  }
-}
-
-template <CoreType CoreT, CallbackType CallbackT, typename Arg, typename E, typename Func>
-auto SetCallback(const SharedCorePtr<Arg, E>& core, IExecutor* executor, Func&& f) {
-  YACLIB_ASSERT(core);
-  constexpr bool kIsDetach = CoreT == CoreType::Detach;
-  constexpr bool kIsCall = CallbackT == CallbackType::On || CallbackT == CallbackType::LazyOn;
-  constexpr bool kFromShared = true;
-  auto* callback = MakeCore<CoreT, kIsCall, kFromShared, Arg, E>(std::forward<Func>(f));
-  // TODO(MBkkt) callback, executor, caller should be in ctor
-  callback->_executor = executor;
-  Loop(core.Get(), core->template SetInline<false>(*callback));
-  using ResultCoreT = typename std::remove_reference_t<decltype(*callback)>::Base;
-  if constexpr (!kIsDetach) {
-    if constexpr (CallbackT == CallbackType::Inline) {
-      return Future{IntrusivePtr<ResultCoreT>{NoRefTag{}, callback}};
     } else {
-      return FutureOn{IntrusivePtr<ResultCoreT>{NoRefTag{}, callback}};
+      return Future{IntrusivePtr<ResultCoreT>{NoRefTag{}, callback}};
     }
   }
 }

@@ -27,7 +27,7 @@ auto GetContract() {
 
 template <typename L, typename R>
 void doConnect(L& l, R& r) {
-  if constexpr (yaclib::is_shared_future_v<L>) {
+  if constexpr (yaclib::is_shared_future_base_v<L>) {
     Connect(l, std::move(r));
   } else {
     Connect(std::move(l), std::move(r));
@@ -36,7 +36,7 @@ void doConnect(L& l, R& r) {
 
 template <typename Future>
 auto doGet(Future& f) {
-  if constexpr (yaclib::is_shared_future_v<Future>) {
+  if constexpr (yaclib::is_shared_future_base_v<Future>) {
     return f.Get().Value();
   } else {
     return std::move(f).Get().Value();

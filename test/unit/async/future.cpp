@@ -602,17 +602,17 @@ TEST(Simple, MakePromiseContract) {
 
 TYPED_TEST(AsyncSuite, ExceptionCallbackReturningValue) {
   yaclib::FairThreadPool tp{1};
-  auto f = INVOKE(tp, [] {
-    return 1;
-  });
-  f = std::move(f)
-        .Then([](yaclib::Result<int>) {
-          throw std::runtime_error{""};
-        })
-        .Then([](yaclib::Result<> result) {
-          EXPECT_EQ(result.State(), yaclib::ResultState::Exception);
-          return 0;
-        });
+  auto f = INVOKE(tp,
+                  [] {
+                    return 1;
+                  })
+             .Then([](yaclib::Result<int>) {
+               throw std::runtime_error{""};
+             })
+             .Then([](yaclib::Result<> result) {
+               EXPECT_EQ(result.State(), yaclib::ResultState::Exception);
+               return 0;
+             });
   EXPECT_EQ(std::move(f).Get().Ok(), 0);
   tp.Stop();
   tp.Wait();
@@ -620,17 +620,17 @@ TYPED_TEST(AsyncSuite, ExceptionCallbackReturningValue) {
 
 TYPED_TEST(AsyncSuite, ExceptionCallbackReturningFuture) {
   yaclib::FairThreadPool tp{1};
-  auto f = INVOKE(tp, [] {
-    return 1;
-  });
-  f = std::move(f)
-        .Then([](int) -> yaclib::Future<> {
-          throw std::runtime_error{""};
-        })
-        .Then([](yaclib::Result<> result) {
-          EXPECT_EQ(result.State(), yaclib::ResultState::Exception);
-          return 0;
-        });
+  auto f = INVOKE(tp,
+                  [] {
+                    return 1;
+                  })
+             .Then([](int) -> yaclib::Future<> {
+               throw std::runtime_error{""};
+             })
+             .Then([](yaclib::Result<> result) {
+               EXPECT_EQ(result.State(), yaclib::ResultState::Exception);
+               return 0;
+             });
   EXPECT_EQ(std::move(f).Get().Ok(), 0);
   tp.Stop();
   tp.Wait();
@@ -655,8 +655,10 @@ TEST(Simple, SetAndGetRequiresOnlyMove) {
 
 TYPED_TEST(AsyncSuite, Special) {
   using Type = typename TestFixture::Type;
-  static_assert(!std::is_copy_constructible_v<Type>);
-  static_assert(!std::is_copy_assignable_v<Type>);
+  if constexpr (!TestFixture::kIsSharedFuture) {
+    static_assert(!std::is_copy_constructible_v<Type>);
+    static_assert(!std::is_copy_assignable_v<Type>);
+  }
   static_assert(std::is_move_constructible_v<Type>);
   static_assert(std::is_move_assignable_v<Type>);
 }
@@ -754,14 +756,14 @@ TYPED_TEST(AsyncSuite, InvokeAsync) {
 }
 
 TYPED_TEST(AsyncSuite, InvokePromiseJust) {
-  auto f = INVOKE_V(int, yaclib::MakeInline(), [](yaclib::Promise<int>&& p) {
+  auto f = INVOKE_V(int, yaclib::MakeInline(), [](PROMISE_T(int) && p) {
     std::move(p).Set(1);
   });
   EXPECT_EQ(std::move(f).Get().Ok(), 1);
 }
 
 TYPED_TEST(AsyncSuite, InvokePromiseDrop) {
-  auto f = INVOKE_V(int, yaclib::MakeInline(yaclib::StopTag{}), [](yaclib::Promise<int>&& p) {
+  auto f = INVOKE_V(int, yaclib::MakeInline(yaclib::StopTag{}), [](PROMISE_T(int) && p) {
     std::move(p).Set(1);
   });
   try {
@@ -775,7 +777,7 @@ TYPED_TEST(AsyncSuite, InvokePromiseDrop) {
 
 TYPED_TEST(AsyncSuite, InvokePromiseSetAfterCall) {
   yaclib::FairThreadPool tp{1};
-  auto f = INVOKE_V(int, tp, [&](yaclib::Promise<int>&& p) {
+  auto f = INVOKE_V(int, tp, [&](PROMISE_T(int) && p) {
     yaclib::Run(tp, [p = std::move(p)]() mutable {
       yaclib_std::this_thread::sleep_for(10ms);
       std::move(p).Set(1);
@@ -788,7 +790,7 @@ TYPED_TEST(AsyncSuite, InvokePromiseSetAfterCall) {
 
 TYPED_TEST(AsyncSuite, InvokePromiseSetInCall) {
   yaclib::FairThreadPool tp{1};
-  auto f = INVOKE_V(int, tp, [kek = std::make_unique<int>(2)](yaclib::Promise<int>&& p) {
+  auto f = INVOKE_V(int, tp, [kek = std::make_unique<int>(2)](PROMISE_T(int) && p) {
     std::move(p).Set(1);
     yaclib_std::this_thread::sleep_for(10ms);
     EXPECT_EQ(*kek, 2);
@@ -802,7 +804,7 @@ TYPED_TEST(AsyncSuite, InvokePromiseException) {
   // exception
   {
     static constexpr std::string_view kTest = "rdpsliora";
-    auto f = INVOKE_V(int, yaclib::MakeInline(), [](yaclib::Promise<int>&&) {
+    auto f = INVOKE_V(int, yaclib::MakeInline(), [](PROMISE_T(int) &&) {
       throw std::runtime_error{kTest.data()};
     });
     try {
@@ -815,7 +817,7 @@ TYPED_TEST(AsyncSuite, InvokePromiseException) {
   }
   // exception after move just ignored
   {
-    auto f = INVOKE_V(int, yaclib::MakeInline(), [](yaclib::Promise<int>) {
+    auto f = INVOKE_V(int, yaclib::MakeInline(), [](PROMISE_T(int)) {
       throw 1;
     });
     try {

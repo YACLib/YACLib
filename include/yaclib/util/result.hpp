@@ -182,6 +182,10 @@ class Result final {
     return _result;
   }
 
+  [[nodiscard]] const Variant& Internal() const {
+    return _result;
+  }
+
  private:
   template <typename R>
   static decltype(auto) Get(R&& r) {

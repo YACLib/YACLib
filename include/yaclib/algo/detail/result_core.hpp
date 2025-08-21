@@ -16,6 +16,9 @@ struct Callback {
 template <typename V, typename E>
 class ResultCore : public BaseCore {
  public:
+  using Value = V;
+  using Error = E;
+
   ResultCore() noexcept : BaseCore{kEmpty} {
   }
 

@@ -9,5 +9,5 @@
  */
 template <typename V, typename E, typename... Args>
 struct yaclib_std::coroutine_traits<yaclib::Future<V, E>, Args...> final {
-  using promise_type = yaclib::detail::PromiseType<V, E, false>;
+  using promise_type = yaclib::detail::PromiseType<V, E, false, false>;
 };

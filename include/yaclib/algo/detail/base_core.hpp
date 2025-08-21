@@ -3,6 +3,7 @@
 #include <yaclib/algo/detail/inline_core.hpp>
 #include <yaclib/exe/executor.hpp>
 #include <yaclib/exe/inline.hpp>
+#include <yaclib/util/type_traits.hpp>
 
 #if YACLIB_CORO != 0
 #  include <yaclib/coro/coro.hpp>
@@ -28,17 +29,11 @@ class BaseCore : public InlineCore {
     return callback == kEmpty;
   }
 
-  void MoveExecutorTo(BaseCore& callback) noexcept {
+  template <bool Shared>
+  void TransferExecutorTo(BaseCore& callback) noexcept {
     if (!callback._executor) {
       YACLIB_ASSERT(_executor != nullptr);
-      callback._executor = std::move(_executor);
-    }
-  }
-
-  void CopyExecutorTo(BaseCore& callback) noexcept {
-    if (!callback._executor) {
-      YACLIB_ASSERT(_executor != nullptr);
-      callback._executor = _executor;
+      callback._executor = move_if<!Shared>(_executor);
     }
   }
 

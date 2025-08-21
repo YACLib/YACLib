@@ -485,5 +485,60 @@ TEST(SharedFuture, Unwrapping) {
   ASSERT_EQ(std::move(res).Get().Value(), kSetInt + 1);
 }
 
+TEST(SharedFuture, MultipleWait) {
+  yaclib::FairThreadPool tp{4};
+  auto lambda = [] {
+    return kSetInt;
+  };
+
+  auto sf = yaclib::RunShared(tp, lambda);
+
+  Wait(sf);
+  ASSERT_EQ(sf.Get().Value(), kSetInt);
+
+  auto sf1 = yaclib::RunShared(tp, lambda);
+  auto sf2 = yaclib::RunShared(tp, lambda);
+  auto f1 = yaclib::Run(tp, lambda);
+
+  Wait(sf1, sf1, f1, sf2);
+
+  ASSERT_EQ(sf1.Get().Value(), kSetInt);
+  ASSERT_EQ(sf2.Get().Value(), kSetInt);
+  ASSERT_EQ(std::move(f1).Get().Value(), kSetInt);
+
+  tp.SoftStop();
+  tp.Wait();
+}
+
+TEST(SharedFuture, MultipleWaitDynamic) {
+  yaclib::FairThreadPool tp{4};
+  auto lambda = [] {
+    return kSetInt;
+  };
+
+  std::vector<yaclib::SharedFutureOn<int>> futures;
+
+  futures.push_back(yaclib::RunShared(tp, lambda));
+
+  Wait(futures.begin(), futures.end());
+
+  ASSERT_EQ(futures[0].Get().Value(), kSetInt);
+
+  futures.clear();
+
+  for (size_t i = 0; i < 10; ++i) {
+    futures.push_back(yaclib::RunShared(tp, lambda));
+  }
+
+  Wait(futures.begin(), futures.end());
+
+  for (size_t i = 0; i < 10; ++i) {
+    ASSERT_EQ(futures[i].Get().Value(), kSetInt);
+  }
+
+  tp.SoftStop();
+  tp.Wait();
+}
+
 }  // namespace
 }  // namespace test
