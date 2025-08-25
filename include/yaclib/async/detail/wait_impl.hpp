@@ -17,11 +17,15 @@ namespace yaclib::detail {
 struct NoTimeoutTag final {};
 
 template <typename Event, typename Timeout, typename Range>
-bool WaitRange(const Timeout& timeout, Range&& range, std::size_t count) noexcept {
-  Event event{count + 1};
+bool WaitRange(const Timeout& timeout, Range&& range, std::size_t count, Node* to_wait, size_t to_wait_count) noexcept {
+  Event event{count + 1, to_wait, to_wait_count};
   // event ref counter = n + 1, it is optimization: we don't want to notify when return true immediately
   const auto wait_count = range([&](auto handle) noexcept {
-    return handle.SetCallback(event.GetCall());
+    if constexpr (std::is_same_v<decltype(handle), UniqueHandle>) {
+      return handle.SetCallback(event.GetCall(0));
+    } else {
+      return handle.SetCallback(event.GetCall(--to_wait_count));
+    }
   });
   if (wait_count == 0 || event.SubEqual(count - wait_count + 1)) {
     return true;
@@ -56,7 +60,8 @@ bool WaitCore(const Timeout& timeout, Handles... handles) noexcept {
   };
   using FinalEvent = std::conditional_t<sizeof...(handles) == 1, MultiEvent<Event, OneCounter, CallCallback>,
                                         MultiEvent<Event, AtomicCounter, CallCallback>>;
-  return WaitRange<FinalEvent>(timeout, range, sizeof...(handles));
+  std::array<EventHandle, max(count of shared, 1)> event_handles;
+  return WaitRange<FinalEvent>(timeout, range, sizeof...(handles), event_handles.data(), event_handles.size());
 }
 
 template <typename Event, typename Timeout, typename Iterator>
@@ -71,6 +76,7 @@ bool WaitIterator(const Timeout& timeout, Iterator it, std::size_t count) noexce
       YACLIB_ASSERT(it->Valid());
       return static_cast<std::size_t>(func(it->GetBaseHandle()));
     };
+    EventHandle event_handles;
     return WaitRange<MultiEvent<Event, OneCounter, CallCallback>>(timeout, range, 1);
   }
   auto range = [&](auto&& func) noexcept {
