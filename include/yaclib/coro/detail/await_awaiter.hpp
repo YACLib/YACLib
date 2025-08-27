@@ -88,9 +88,12 @@ class AwaitEvent final : public InlineCore, public AtomicCounter<NopeBase, NopeD
     }
     return Noop<SymmetricTransfer>();
   }
+
+ public:
   [[nodiscard]] InlineCore* Here(InlineCore& caller) noexcept final {
     return Impl<false>(caller);
   }
+
 #if YACLIB_SYMMETRIC_TRANSFER != 0
   [[nodiscard]] yaclib_std::coroutine_handle<> Next(InlineCore& caller) noexcept final {
     return Impl<true>(caller);
@@ -151,11 +154,11 @@ class [[nodiscard]] MultiAwaitAwaiter<AwaitEvent> final : public MultiAwaitAwait
 
   template <typename It>
   explicit MultiAwaitAwaiter(It it, std::size_t count) noexcept : _event{count + 1} {
-    static_assert(std::is_same_v<decltype(it->GetBaseHandle()), UniqueHandle>);
+    static_assert(std::is_same_v<decltype(it->GetHandle()), UniqueHandle>);
     std::size_t wait_count = 0;
     for (std::size_t i = 0; i != count; ++i) {
       YACLIB_ASSERT(it->Valid());
-      wait_count += static_cast<std::size_t>(it->GetBaseHandle().SetCallback(_event));
+      wait_count += static_cast<std::size_t>(it->GetHandle().SetCallback(_event));
       ++it;
     }
     _event.count.fetch_sub(count - wait_count, std::memory_order_relaxed);
@@ -209,11 +212,11 @@ class [[nodiscard]] MultiAwaitAwaiter<DynamicSharedEvent<AwaitEvent>> final
  public:
   template <typename It>
   explicit MultiAwaitAwaiter(It it, std::size_t shared_count) noexcept : _event{shared_count, shared_count + 1} {
-    static_assert(std::is_same_v<decltype(it->GetBaseHandle()), SharedHandle>);
+    static_assert(std::is_same_v<decltype(it->GetHandle()), SharedHandle>);
     std::size_t wait_count = 0;
     for (std::size_t i = 0; i != shared_count; ++i) {
       YACLIB_ASSERT(it->Valid());
-      wait_count += static_cast<std::size_t>(it->GetBaseHandle().SetCallback(_event.callbacks[i]));
+      wait_count += static_cast<std::size_t>(it->GetHandle().SetCallback(_event.callbacks[i]));
       ++it;
     }
     _event.event.count.fetch_sub(shared_count - wait_count, std::memory_order_relaxed);
@@ -270,7 +273,7 @@ class [[nodiscard]] AwaitSingleAwaiter<true, V, E> final {
   }
 
   template <typename Promise>
-  YACLIB_INLINE bool await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
+  YACLIB_INLINE bool await_suspend(yaclib_std::coroutine_handle<Promise> handle) const noexcept {
     return _result->SetCallback(handle.promise());
   }
 

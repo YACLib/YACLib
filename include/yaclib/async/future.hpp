@@ -25,6 +25,8 @@ class FutureBase {
   static_assert(Check<E>(), "E should be valid");
   static_assert(!std::is_same_v<V, E>, "Future cannot be instantiated with same V and E, because it's ambiguous");
 
+  using Handle = detail::UniqueHandle;
+
   FutureBase(const FutureBase&) = delete;
   FutureBase& operator=(const FutureBase&) = delete;
 
@@ -185,7 +187,7 @@ class FutureBase {
     return _core;
   }
 
-  [[nodiscard]] detail::UniqueHandle GetBaseHandle() noexcept {
+  [[nodiscard]] detail::UniqueHandle GetHandle() noexcept {
     return detail::UniqueHandle{*_core};
   }
 

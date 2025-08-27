@@ -10,10 +10,7 @@
 #include <yaclib/async/when_any.hpp>
 #include <yaclib/coro/await.hpp>
 #include <yaclib/coro/await_on.hpp>
-#include <yaclib/coro/future.hpp>
 #include <yaclib/coro/on.hpp>
-#include <yaclib/coro/shared_future.hpp>
-#include <yaclib/coro/task.hpp>
 #include <yaclib/exe/manual.hpp>
 #include <yaclib/lazy/make.hpp>
 #include <yaclib/runtime/fair_thread_pool.hpp>

@@ -17,17 +17,18 @@ namespace yaclib::detail {
 // This callback just dispatches to the Event's CallCallback
 template <typename Event>
 struct EventHelperCallback final : InlineCore {
+  // Default ctor needed for use inside std::array
   EventHelperCallback() = default;
   EventHelperCallback(Event* event) : event(event) {
   }
 
   [[nodiscard]] InlineCore* Here(InlineCore& caller) noexcept {
-    return static_cast<InlineCore&>(event->GetCall()).Here(caller);
+    return event->GetCall().Here(caller);
   }
 
 #if YACLIB_SYMMETRIC_TRANSFER != 0
   [[nodiscard]] yaclib_std::coroutine_handle<> Next(InlineCore& caller) noexcept final {
-    return static_cast<InlineCore&>(event->GetCall()).Next(caller);
+    return event->GetCall().Next(caller);
   }
 #endif
 
@@ -36,6 +37,11 @@ struct EventHelperCallback final : InlineCore {
 
 template <typename Event, size_t SharedCount>
 struct StaticSharedEvent {
+  static_assert(SharedCount > 1);
+
+  static inline constexpr bool Shared = true;
+  using CoreEvent = Event;
+
   StaticSharedEvent(size_t total_count) : event{total_count} {
     callbacks.fill(&event);
   }
@@ -46,6 +52,9 @@ struct StaticSharedEvent {
 
 template <typename Event>
 struct DynamicSharedEvent {
+  static inline constexpr bool Shared = true;
+  using CoreEvent = Event;
+
   DynamicSharedEvent(size_t total_count, size_t shared_count) : event{total_count}, callbacks{shared_count, &event} {
   }
 

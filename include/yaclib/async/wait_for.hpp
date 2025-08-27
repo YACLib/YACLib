@@ -23,7 +23,7 @@ template <typename Event = detail::MutexEvent, typename Rep, typename Period, ty
 YACLIB_INLINE std::enable_if_t<(... && is_waitable_with_timeout_v<Waited>), bool> WaitFor(
   const std::chrono::duration<Rep, Period>& timeout_duration, Waited&... fs) noexcept {
   YACLIB_ASSERT(... && fs.Valid());
-  return detail::WaitCore<Event>(timeout_duration, fs.GetBaseHandle()...);
+  return detail::WaitCore<Event>(timeout_duration, fs.GetHandle()...);
 }
 
 /**

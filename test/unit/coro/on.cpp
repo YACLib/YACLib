@@ -4,9 +4,7 @@
 #include <yaclib/async/run.hpp>
 #include <yaclib/coro/await.hpp>
 #include <yaclib/coro/current_executor.hpp>
-#include <yaclib/coro/future.hpp>
 #include <yaclib/coro/on.hpp>
-#include <yaclib/coro/shared_future.hpp>
 #include <yaclib/coro/yield.hpp>
 #include <yaclib/exe/strand.hpp>
 #include <yaclib/runtime/fair_thread_pool.hpp>

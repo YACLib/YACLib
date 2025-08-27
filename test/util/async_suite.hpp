@@ -6,6 +6,7 @@
 
 #if YACLIB_CORO != 0
 #  include <yaclib/coro/future.hpp>
+#  include <yaclib/coro/shared_future.hpp>
 #  include <yaclib/coro/task.hpp>
 #endif
 

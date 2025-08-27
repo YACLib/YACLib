@@ -20,6 +20,8 @@ class SharedFutureBase {
   static_assert(!std::is_same_v<V, E>, "SharedFuture cannot be instantiated with same V and E, because it's ambiguous");
   static_assert(std::is_copy_constructible_v<Result<V, E>>, "Result should be copyable");
 
+  using Handle = detail::SharedHandle;
+
   SharedFutureBase() = default;
 
   [[nodiscard]] bool Valid() const noexcept {
@@ -77,7 +79,7 @@ class SharedFutureBase {
     return _core;
   }
 
-  [[nodiscard]] detail::SharedHandle GetBaseHandle() const noexcept {
+  [[nodiscard]] detail::SharedHandle GetHandle() const noexcept {
     return detail::SharedHandle{*_core};
   }
 

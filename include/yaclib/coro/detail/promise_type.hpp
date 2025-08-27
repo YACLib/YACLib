@@ -37,18 +37,9 @@ struct Destroy final {
 };
 
 template <bool Lazy, bool Shared>
-struct PromiseTypeDeleter;
-
-template <bool Lazy>
-struct PromiseTypeDeleter<Lazy, false> final {
+struct PromiseTypeDeleter final {
   template <typename V, typename E>
-  static void Delete(UniqueCore<V, E>& core) noexcept;
-};
-
-template <bool Lazy>
-struct PromiseTypeDeleter<Lazy, true> final {
-  template <typename V, typename E>
-  static void Delete(SharedCore<V, E>& core) noexcept;
+  static void Delete(ResultCore<V, E>& core) noexcept;
 };
 
 template <typename V, typename E, bool Lazy, bool Shared>
@@ -155,18 +146,10 @@ class PromiseType final : public PromiseTypeBase<V, E, Lazy, Shared> {
   }
 };
 
-template <bool Lazy>
+template <bool Lazy, bool Shared>
 template <typename V, typename E>
-void PromiseTypeDeleter<Lazy, false>::Delete(UniqueCore<V, E>& core) noexcept {
-  auto& promise = DownCast<PromiseType<V, E, Lazy, false>>(core);
-  auto handle = promise.Handle();
-  handle.destroy();
-}
-
-template <bool Lazy>
-template <typename V, typename E>
-void PromiseTypeDeleter<Lazy, true>::Delete(SharedCore<V, E>& core) noexcept {
-  auto& promise = DownCast<PromiseType<V, E, Lazy, true>>(core);
+void PromiseTypeDeleter<Lazy, Shared>::Delete(ResultCore<V, E>& core) noexcept {
+  auto& promise = DownCast<PromiseType<V, E, Lazy, Shared>>(core);
   auto handle = promise.Handle();
   handle.destroy();
 }

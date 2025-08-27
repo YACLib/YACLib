@@ -16,141 +16,95 @@ namespace yaclib::detail {
 
 struct NoTimeoutTag final {};
 
-template <typename Event, size_t SharedCount, typename Timeout, typename Range>
-bool WaitRange(const Timeout& timeout, Range&& range, std::size_t total_count) noexcept {
-  static_assert(SharedCount == 0 || std::is_same_v<Timeout, NoTimeoutTag>);
-
-  // Event ref counter = n + 1, it is optimization: we don't want to notify when return true immediately
-  auto shared_event = [&] {
-    if constexpr (SharedCount <= 1) {
-      // If we have only one shared handle, we can use .next of the original event
-      return Event{total_count + 1};
+template <typename Event, typename Timeout, typename Range>
+bool WaitRange(Event& event, const Timeout& timeout, Range&& range, std::size_t count) noexcept {
+  auto& core_event = [&]() -> typename Event::CoreEvent& {
+    if constexpr (Event::Shared) {
+      return event.event;
     } else {
-      // One of the shared handles will use .next of the original event
-      return StaticSharedEvent<Event, SharedCount - 1>{total_count + 1};
+      return event;
     }
   }();
-
-  Event& event = [&]() -> Event& {
-    if constexpr (SharedCount <= 1) {
-      return shared_event;
-    } else {
-      return shared_event.event;
-    }
-  }();
-
-  size_t callback_count = 0;
 
   const auto wait_count = [&] {
-    if constexpr (SharedCount <= 1) {
-      return range([&](auto handle) noexcept {
-        return handle.SetCallback(event.GetCall());
+    if constexpr (Event::Shared) {
+      return range([&, callback_count = std::size_t{}](auto handle) mutable noexcept {
+        if constexpr (std::is_same_v<UniqueHandle, decltype(handle)>) {
+          return handle.SetCallback(core_event.GetCall());
+        } else {
+          return handle.SetCallback(event.callbacks[callback_count++]);
+        }
       });
     } else {
       return range([&](auto handle) noexcept {
-        if constexpr (std::is_same_v<UniqueHandle, decltype(handle)>) {
-          return handle.SetCallback(event.GetCall());
-        } else {
-          if (callback_count == SharedCount - 1) {
-            return handle.SetCallback(event.GetCall());
-          } else {
-            return handle.SetCallback(shared_event.callbacks[callback_count++]);
-          }
-        }
+        return handle.SetCallback(core_event.GetCall());
       });
     }
   }();
 
-  // This does not compile
-  // const auto wait_count = range([&](auto handle) noexcept {
-  //   if constexpr (std::is_same_v<UniqueHandle, decltype(handle)> || SharedCount <= 1) {
-  //     return handle.SetCallback(event.GetCall());
-  //   } else {
-  //     if (callback_count == SharedCount - 1) {
-  //       return handle.SetCallback(event.GetCall());
-  //     } else {
-  //       return handle.SetCallback(shared_event.callbacks[callback_count++]);
-  //     }
-  //   }
-  // });
-
-  if (wait_count == 0 || event.SubEqual(total_count - wait_count + 1)) {
+  if (wait_count == 0 || core_event.SubEqual(count - wait_count + 1)) {
     return true;
   }
 
-  auto token = event.Make();
-  std::size_t reset_count = 0;
+  auto token = core_event.Make();
 
   // Not available for shared future
+  // but this is not always if-constexpred away in case of shared futures
   if constexpr (!std::is_same_v<Timeout, NoTimeoutTag>) {
+    std::size_t reset_count = 0;
+
     // If you have problem with TSAN here, check this link: https://github.com/google/sanitizers/issues/1259
     // TLDR: new pthread function is not supported by thread sanitizer yet.
-    if (event.Wait(token, timeout)) {
+    if (core_event.Wait(token, timeout)) {
       return true;
     }
     reset_count = range([](UniqueHandle handle) noexcept {
       return handle.Reset();
     });
-    if (reset_count != 0 && (reset_count == wait_count || event.SubEqual(reset_count))) {
+    if (reset_count != 0 && (reset_count == wait_count || core_event.SubEqual(reset_count))) {
       return false;
     }
     // We know we have `wait_count - reset_count` Results, but we must wait until event was not used by cores
-  }
-
-  event.Wait(token);
-  return reset_count == 0;  // LCOV_EXCL_LINE shitty gcov cannot parse it
-}
-
-// Used only when waiting on an iterator over shared futures
-// Shared futures do not support timeout so no timeout parameter
-template <typename Event, typename Range>
-bool WaitRangeSharedDynamic(Range&& range, std::size_t shared_count) noexcept {
-  YACLIB_ASSERT(shared_count >= 2);
-  // Event ref counter = n + 1, it is optimization: we don't want to notify when return true immediately
-  // One of the shared handles will use .next of the original event
-  DynamicSharedEvent<Event> shared_event{shared_count + 1, shared_count - 1};
-
-  size_t callback_count = 0;
-  const auto wait_count = range([&](SharedHandle handle) noexcept {
-    if (callback_count == shared_count - 1) {
-      return handle.SetCallback(shared_event.event.GetCall());
-    } else {
-      return handle.SetCallback(shared_event.callbacks[callback_count++]);
-    }
-  });
-
-  if (wait_count == 0 || shared_event.event.SubEqual(shared_count - wait_count + 1)) {
+    core_event.Wait(token);
+    return reset_count == 0;
+  } else {
+    core_event.Wait(token);
     return true;
   }
-
-  auto token = shared_event.event.Make();
-  std::size_t reset_count = 0;
-
-  shared_event.event.Wait(token);
-  return reset_count == 0;  // LCOV_EXCL_LINE shitty gcov cannot parse it
 }
 
 template <typename Event, typename Timeout, typename... Handles>
 bool WaitCore(const Timeout& timeout, Handles... handles) noexcept {
   static_assert(sizeof...(handles) >= 1, "Number of futures must be at least one");
 
-  static constexpr size_t SharedCount = TypeCount<SharedHandle, Handles...>();
+  static constexpr size_t SharedCount = Count<SharedHandle, Handles...>;
   static_assert(SharedCount == 0 || std::is_same_v<Timeout, NoTimeoutTag>);
 
   auto range = [&](auto&& func) noexcept {
     return (... + static_cast<std::size_t>(func(handles)));
   };
-  using FinalEvent = std::conditional_t<sizeof...(handles) == 1, MultiEvent<Event, OneCounter, CallCallback>,
-                                        MultiEvent<Event, AtomicCounter, CallCallback>>;
 
-  return WaitRange<FinalEvent, SharedCount>(timeout, range, sizeof...(handles));
+  using CoreEvent = std::conditional_t<sizeof...(handles) == 1, MultiEvent<Event, OneCounter, CallCallback>,
+                                       MultiEvent<Event, AtomicCounter, CallCallback>>;
+
+  auto event = [&] {
+    if constexpr (SharedCount <= 1) {
+      // If we have only one shared handle, we can use .next of the original event
+      return CoreEvent{sizeof...(handles) + 1};
+    } else {
+      // One of the shared handles will use .next of the original event
+      return StaticSharedEvent<CoreEvent, SharedCount>{sizeof...(handles) + 1};
+    }
+  }();
+
+  return WaitRange(event, timeout, range, sizeof...(handles));
 }
 
 template <typename Event, typename Timeout, typename Iterator>
 bool WaitIterator(const Timeout& timeout, Iterator it, std::size_t count) noexcept {
   static_assert(is_waitable_v<typename std::iterator_traits<Iterator>::value_type>,
                 "Wait function Iterator must be point to some Waitable (Future or SharedFuture)");
-  static constexpr bool Shared = std::is_same_v<decltype(it->GetBaseHandle()), SharedHandle>;
+  static constexpr bool Shared = std::is_same_v<decltype(it->GetHandle()), SharedHandle>;
 
   if (count == 0) {
     return true;
@@ -158,28 +112,33 @@ bool WaitIterator(const Timeout& timeout, Iterator it, std::size_t count) noexce
   if (count == 1) {
     auto range = [&](auto&& func) noexcept {
       YACLIB_ASSERT(it->Valid());
-      return static_cast<std::size_t>(func(it->GetBaseHandle()));
+      return static_cast<std::size_t>(func(it->GetHandle()));
     };
-    // SharedCount template parameter here is actually irrelevant
-    return WaitRange<MultiEvent<Event, OneCounter, CallCallback>, Shared ? 1 : 0>(timeout, range, 1);
+    auto event = MultiEvent<Event, OneCounter, CallCallback>{count + 1};
+    return WaitRange(event, timeout, range, 1);
   }
   auto range = [&](auto&& func) noexcept {
     std::size_t wait_count = 0;
     std::conditional_t<std::is_same_v<Timeout, NoTimeoutTag>, Iterator&, Iterator> range_it = it;
     for (std::size_t i = 0; i != count; ++i) {
       YACLIB_ASSERT(range_it->Valid());
-      wait_count += static_cast<std::size_t>(func(range_it->GetBaseHandle()));
+      wait_count += static_cast<std::size_t>(func(range_it->GetHandle()));
       ++range_it;
     }
     return wait_count;
   };
-  // TODO(ocelaiwo): We can try to unroll count up to some value to avoid
-  // dynamic allocation in most common cases
-  if constexpr (Shared) {
-    return WaitRangeSharedDynamic<MultiEvent<Event, AtomicCounter, CallCallback>>(range, count);
-  } else {
-    return WaitRange<MultiEvent<Event, AtomicCounter, CallCallback>, 0>(timeout, range, count);
-  }
+
+  auto event = [&] {
+    if constexpr (Shared) {
+      // TODO(ocelaiwo): We can try to unroll count up to some value to avoid
+      // dynamic allocation in most common cases
+      return DynamicSharedEvent<MultiEvent<Event, AtomicCounter, CallCallback>>{count + 1, count};
+    } else {
+      return MultiEvent<Event, AtomicCounter, CallCallback>{count + 1};
+    }
+  }();
+
+  return WaitRange(event, timeout, range, count);
 }
 
 extern template bool WaitCore<DefaultEvent, NoTimeoutTag, UniqueHandle>(const NoTimeoutTag&, UniqueHandle) noexcept;

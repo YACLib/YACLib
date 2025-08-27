@@ -82,15 +82,8 @@ decltype(auto) move_if(T&& arg) noexcept {  // NOLINT
   }
 }
 
-template <typename Type>
-constexpr size_t TypeCount() {
-  return 0;
-}
-
-template <typename Type, typename Head, typename... Tail>
-constexpr size_t TypeCount() {
-  return (std::is_same_v<Type, Head> ? 1 : 0) + TypeCount<Type, Tail...>();
-}
+template <typename T, typename... List>
+inline constexpr auto Count = (std::size_t{std::is_same_v<T, List> ? 1 : 0} + ...);
 
 template <typename T>
 constexpr bool Check() noexcept {

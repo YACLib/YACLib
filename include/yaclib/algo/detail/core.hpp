@@ -387,8 +387,8 @@ auto* MakeCore(Func&& f) {
 
 template <CoreType CoreT, bool On, typename FromCorePtr, typename Func>
 auto SetCallback(FromCorePtr&& core, IExecutor* executor, Func&& f) {
-  using Arg = typename remove_cvref_t<FromCorePtr>::Pointee::Value;
-  using E = typename remove_cvref_t<FromCorePtr>::Pointee::Error;
+  using Arg = typename remove_cvref_t<FromCorePtr>::Value::Value;
+  using E = typename remove_cvref_t<FromCorePtr>::Value::Error;
 
   static constexpr bool Unique = std::is_same_v<UniqueCorePtr<Arg, E>&, FromCorePtr>;
   static constexpr bool Shared = std::is_same_v<const SharedCorePtr<Arg, E>&, FromCorePtr>;
