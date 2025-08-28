@@ -26,6 +26,9 @@ struct AsyncSuite : testing::Test {
   using FutureT = std::conditional_t<kIsSharedFuture, yaclib::SharedFuture<V, E>, yaclib::Future<V, E>>;
 
   template <typename V = void, typename E = yaclib::StopError>
+  using FutureOnT = std::conditional_t<kIsSharedFuture, yaclib::SharedFutureOn<V, E>, yaclib::FutureOn<V, E>>;
+
+  template <typename V = void, typename E = yaclib::StopError>
   using AsyncT = std::conditional_t<kIsTask, yaclib::Task<V, E>, FutureT<V, E>>;
 
   using Type = T;
@@ -59,6 +62,15 @@ TYPED_TEST_SUITE(AsyncSuite, Types, TypeNames);
       return yaclib::Schedule(executor, func);                                                                         \
     } else {                                                                                                           \
       return yaclib::RunShared(executor, func);                                                                        \
+    }                                                                                                                  \
+  }()
+
+#define RUN(executor, func)                                                                                            \
+  [&] {                                                                                                                \
+    if constexpr (TestFixture::kIsSharedFuture) {                                                                      \
+      return yaclib::RunShared(executor, func);                                                                        \
+    } else {                                                                                                           \
+      return yaclib::Run(executor, func);                                                                              \
     }                                                                                                                  \
   }()
 

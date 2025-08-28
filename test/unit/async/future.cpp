@@ -1,3 +1,5 @@
+#include "yaclib/async/shared_contract.hpp"
+
 #include <util/async_suite.hpp>
 #include <util/error_code.hpp>
 #include <util/error_suite.hpp>
@@ -39,11 +41,17 @@ namespace {
 
 using namespace std::chrono_literals;
 
-template <typename FutureType, typename E = yaclib::StopError, typename ErrorType>
+template <typename FutureType, bool Shared, typename E = yaclib::StopError, typename ErrorType>
 void ErrorsCheck(ErrorType expected) {
   static_assert(std::is_same_v<ErrorType, std::exception_ptr> || std::is_same_v<ErrorType, yaclib::StopError> ||
                 std::is_same_v<ErrorType, LikeErrorCode>);
-  auto [f, p] = yaclib::MakeContract<FutureType, E>();
+  auto [f, p] = [] {
+    if constexpr (Shared) {
+      return yaclib::MakeSharedContract<FutureType, E>();
+    } else {
+      return yaclib::MakeContract<FutureType, E>();
+    }
+  }();
   EXPECT_FALSE(f.Ready());
   std::move(p).Set(expected);
   EXPECT_TRUE(f.Ready());
@@ -58,9 +66,15 @@ void ErrorsCheck(ErrorType expected) {
 }
 
 // FutureType must be default constructible
-template <typename FutureType>
+template <typename FutureType, bool Shared>
 void ValueCheck() {
-  auto [f, p] = yaclib::MakeContract<FutureType>();
+  auto [f, p] = [] {
+    if constexpr (Shared) {
+      return yaclib::MakeSharedContract<FutureType>();
+    } else {
+      return yaclib::MakeContract<FutureType>();
+    }
+  }();
   using Value = std::conditional_t<std::is_void_v<FutureType>, yaclib::Unit, FutureType>;
   EXPECT_FALSE(f.Ready());
   std::move(p).Set(Value{});
@@ -70,11 +84,18 @@ void ValueCheck() {
   EXPECT_EQ(std::move(result).Ok(), Value{});
 }
 
+template <bool Shared>
 void AsyncGetResult(std::size_t num_threads) {
   static constexpr std::string_view kMessage = "Hello, world!";
   yaclib::FairThreadPool tp{num_threads};
 
-  auto [f, p] = yaclib::MakeContract<std::string>();
+  auto [f, p] = [] {
+    if constexpr (Shared) {
+      return yaclib::MakeSharedContract<std::string>();
+    } else {
+      return yaclib::MakeContract<std::string>();
+    }
+  }();
   Submit(tp, [p = std::move(p)]() mutable {
     std::move(p).Set(std::string{kMessage});
   });
@@ -84,16 +105,20 @@ void AsyncGetResult(std::size_t num_threads) {
 }
 
 TEST(JustWorks, Value) {
-  ValueCheck<double>();
+  ValueCheck<double, false>();
+  ValueCheck<double, true>();
 }
 
 TEST(JustWorks, ErrorCode) {
-  ErrorsCheck<double>(yaclib::StopError{yaclib::StopTag{}});
-  ErrorsCheck<double, LikeErrorCode>(LikeErrorCode{});
+  ErrorsCheck<double, false>(yaclib::StopError{yaclib::StopTag{}});
+  ErrorsCheck<double, false, LikeErrorCode>(LikeErrorCode{});
+  ErrorsCheck<double, true>(yaclib::StopError{yaclib::StopTag{}});
+  ErrorsCheck<double, true, LikeErrorCode>(LikeErrorCode{});
 }
 
 TEST(JustWorks, Exception) {
-  ErrorsCheck<double>(std::make_exception_ptr(std::runtime_error{""}));
+  ErrorsCheck<double, false>(std::make_exception_ptr(std::runtime_error{""}));
+  ErrorsCheck<double, true>(std::make_exception_ptr(std::runtime_error{""}));
 }
 
 TYPED_TEST(AsyncSuite, Run) {
@@ -150,23 +175,30 @@ TYPED_TEST(AsyncSuite, JustWorksVoidThen) {
 }
 
 TEST(VoidJustWorks, Simple) {
-  ValueCheck<void>();
+  ValueCheck<void, false>();
+  ValueCheck<void, true>();
 }
 
 TEST(VoidJustWorks, ErrorCode) {
-  ErrorsCheck<void>(yaclib::StopError{yaclib::StopTag{}});
-  ErrorsCheck<double, LikeErrorCode>(LikeErrorCode{});
+  ErrorsCheck<void, false>(yaclib::StopError{yaclib::StopTag{}});
+  ErrorsCheck<double, false, LikeErrorCode>(LikeErrorCode{});
+  ErrorsCheck<void, true>(yaclib::StopError{yaclib::StopTag{}});
+  ErrorsCheck<double, true, LikeErrorCode>(LikeErrorCode{});
 }
 
 TEST(VoidJustWorks, Exception) {
-  ErrorsCheck<void>(std::make_exception_ptr(std::runtime_error{""}));
+  ErrorsCheck<void, false>(std::make_exception_ptr(std::runtime_error{""}));
+  ErrorsCheck<void, true>(std::make_exception_ptr(std::runtime_error{""}));
 }
 
 TEST(JustWorks, AsyncGetResult) {
-  AsyncGetResult(1);
-  AsyncGetResult(4);
+  AsyncGetResult<false>(1);
+  AsyncGetResult<false>(4);
+  AsyncGetResult<true>(1);
+  AsyncGetResult<true>(4);
 }
 
+// TODO shared
 TEST(JustWorks, AsyncRun) {
   yaclib::FairThreadPool tp{3};
   EXPECT_EQ(tp.Tag(), yaclib::IExecutor::Type::FairThreadPool);
@@ -192,6 +224,7 @@ TEST(JustWorks, AsyncRun) {
   tp.Wait();
 }
 
+// TODO shared
 TEST(JustWorks, Promise) {
   yaclib::FairThreadPool tp{2};
   auto [f, p] = yaclib::MakeContract<>();
@@ -207,6 +240,7 @@ TEST(JustWorks, Promise) {
   tp.Wait();
 }
 
+// TODO shared
 TEST(Future, VoidParameter) {
   int called = 0;
   auto func = [&] {
@@ -219,6 +253,7 @@ TEST(Future, VoidParameter) {
   EXPECT_EQ(called, 4);
 }
 
+// TODO Shared
 TEST(Future, UnitParameter) {
   int called = 0;
   auto func = [&](yaclib::Unit) {
@@ -228,6 +263,7 @@ TEST(Future, UnitParameter) {
   EXPECT_EQ(called, 4);
 }
 
+// TODO Shared
 TEST(Future, AutoParameter) {
   int called = 0;
   auto func = [&](auto&& v) {
@@ -238,6 +274,7 @@ TEST(Future, AutoParameter) {
   EXPECT_EQ(called, 4);
 }
 
+// TODO Shared
 TEST(Detach, AsyncSimple) {
   yaclib::FairThreadPool tp{1};
 
@@ -263,6 +300,7 @@ TEST(Detach, AsyncSimple) {
   EXPECT_TRUE(called);
 }
 
+// TODO Shared
 TEST(Detach, DetachOn) {
   yaclib::FairThreadPool tp{1};
 
@@ -286,6 +324,7 @@ TEST(Detach, DetachOn) {
   EXPECT_TRUE(called);
 }
 
+// TODO Shared
 TEST(Detach, DetachOn2) {
   yaclib::FairThreadPool tp1{1};
   yaclib::FairThreadPool tp2{1};
@@ -328,6 +367,7 @@ TYPED_TEST(AsyncSuite, ThenThreadPool) {
   tp.Wait();
 }
 
+// TODO Shared
 TEST(Simple, ThenOn) {
   yaclib::FairThreadPool tp{2};
   auto [f, p] = yaclib::MakeContract<>();
@@ -343,6 +383,7 @@ TEST(Simple, ThenOn) {
   tp.Wait();
 }
 
+// TODO Shared
 TEST(Simple, Stop) {
   yaclib::FairThreadPool tp{1};
   {
@@ -486,6 +527,7 @@ TYPED_TEST(AsyncSuite, AsyncThen) {
   tp.Wait();
 }
 
+// TODO Shared
 TYPED_TEST(Error, Simple1) {
   using TestType = typename TestFixture::Type;
   static constexpr bool kIsError = !std::is_same_v<TestType, std::exception_ptr>;
@@ -519,6 +561,7 @@ TYPED_TEST(Error, Simple1) {
   tp.Wait();
 }
 
+// TODO Shared
 TYPED_TEST(Error, Simple2) {
   using TestType = typename TestFixture::Type;
   static constexpr bool kIsError = !std::is_same_v<TestType, std::exception_ptr>;
@@ -556,6 +599,47 @@ TYPED_TEST(Error, Simple2) {
   tp.Wait();
 }
 
+TYPED_TEST(Error, Shared) {
+  using TestType = typename TestFixture::Type;
+  static constexpr bool kIsError = !std::is_same_v<TestType, std::exception_ptr>;
+  using ErrorType = std::conditional_t<kIsError, TestType, yaclib::StopError>;
+
+  yaclib::FairThreadPool tp{1};
+  // Pipeline stages:
+  auto first = []() -> yaclib::Result<int, ErrorType> {
+    if constexpr (kIsError) {
+      return yaclib::StopTag{};
+    } else {
+      throw std::runtime_error{"first"};
+    }
+    return 0;
+  };
+  auto second = [](int v) {
+    std::cout << v << " x 2" << std::endl;
+    return v * 2;
+  };
+  auto third = [](int v) {
+    std::cout << v << " + 1" << std::endl;
+    return v + 1;
+  };
+  auto error_handler = [](TestType) -> int {
+    return 42;
+  };
+  auto last = [&](int v) {
+    // EXPECT_EQ(&yaclib::CurrentThreadPool(), tp);
+    return v + 11;
+  };
+  auto pipeline = yaclib::RunShared<ErrorType>(tp, first).Then(second).Then(third).Then(error_handler).Then(last);
+  EXPECT_EQ(std::move(pipeline).Get().Value(), 53);
+
+  auto pipeline_error_from_shared = yaclib::RunShared<ErrorType>(tp, first).Then(error_handler).Then(last);
+  EXPECT_EQ(std::move(pipeline_error_from_shared).Get().Value(), 53);
+
+  tp.Stop();
+  tp.Wait();
+}
+
+// TODO Shared
 TEST(Pipeline, Simple2) {
   yaclib::FairThreadPool tp1{2};
   yaclib::FairThreadPool tp2{3};
@@ -585,6 +669,7 @@ TEST(Pipeline, Simple2) {
   tp2.Wait();
 }
 
+// TODO Shared
 TEST(Simple, MakePromiseContract) {
   yaclib::ManualExecutor manual;
   EXPECT_EQ(manual.Tag(), yaclib::IExecutor::Type::Manual);
@@ -663,12 +748,14 @@ TYPED_TEST(AsyncSuite, Special) {
   static_assert(std::is_move_assignable_v<Type>);
 }
 
+// TODO Shared
 TEST(Future, CheckReferenceWrapper) {
   int x = 5;
   auto [f, p] = yaclib::MakeContract<std::reference_wrapper<int>>();
   std::move(p).Set(std::ref(x));
 }
 
+// TODO Shared
 TEST(Future, CheckConstGet) {
   auto [f, p] = yaclib::MakeContract<int>();
   auto ptr = std::as_const(f).Get();

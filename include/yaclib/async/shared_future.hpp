@@ -33,10 +33,30 @@ class SharedFutureBase {
     return !_core->Empty();
   }
 
+  [[nodiscard]] Result<V, E> Get() && noexcept {
+    YACLIB_ASSERT(Valid());
+    Wait(*this);
+    if (_core->GetRef() == 1) {
+      return std::move(_core->Get());
+    } else {
+      return _core->Get();
+    }
+  }
+
   [[nodiscard]] const Result<V, E>& Get() const& noexcept {
     YACLIB_ASSERT(Valid());
     Wait(*this);
     return _core->Get();
+  }
+
+  [[nodiscard]] Result<V, E> Touch() && noexcept {
+    YACLIB_ASSERT(Valid());
+    YACLIB_ASSERT(Ready());
+    if (_core->GetRef() == 1) {
+      return std::move(_core->Get());
+    } else {
+      return _core->Get();
+    }
   }
 
   [[nodiscard]] const Result<V, E>& Touch() const& noexcept {
@@ -125,9 +145,10 @@ class SharedFutureOn final : public SharedFutureBase<V, E> {
   SharedFutureOn(detail::SharedCorePtr<V, E> core) noexcept : Base{std::move(core)} {
   }
 
-  [[nodiscard]] SharedFuture<V, E> On(std::nullptr_t) && noexcept {
-    return {std::move(this->_core)};
-  }
+  // TODO test
+  // [[nodiscard]] SharedFuture<V, E> On(std::nullptr_t) && noexcept {
+  //   return {std::move(this->_core)};
+  // }
 
   template <typename Func>
   [[nodiscard]] /*FutureOn*/ auto ThenInline(Func&& f) const {

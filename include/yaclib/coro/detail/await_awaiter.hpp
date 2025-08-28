@@ -185,11 +185,11 @@ class [[nodiscard]] MultiAwaitAwaiter<StaticSharedEvent<AwaitEvent, SharedCount>
     size_t shared_count = 0;
     const auto wait_count = (... + static_cast<std::size_t>([&](auto handle) {
                                if constexpr (std::is_same_v<decltype(handle), UniqueHandle>) {
-                                 handle.SetCallback(_event.event);
+                                 return handle.SetCallback(_event.event);
                                } else {
-                                 handle.SetCallback(_event.callbacks[shared_count++]);
+                                 return handle.SetCallback(_event.callbacks[shared_count++]);
                                }
-                             })(handles));
+                             }(handles)));
     _event.event.count.fetch_sub(sizeof...(handles) - wait_count, std::memory_order_relaxed);
     YACLIB_ASSERT(shared_count == SharedCount);
   }
@@ -211,7 +211,7 @@ class [[nodiscard]] MultiAwaitAwaiter<DynamicSharedEvent<AwaitEvent>> final
   : public MultiAwaitAwaiterBase<MultiAwaitAwaiter<DynamicSharedEvent<AwaitEvent>>> {
  public:
   template <typename It>
-  explicit MultiAwaitAwaiter(It it, std::size_t shared_count) noexcept : _event{shared_count, shared_count + 1} {
+  explicit MultiAwaitAwaiter(It it, std::size_t shared_count) noexcept : _event{shared_count + 1, shared_count} {
     static_assert(std::is_same_v<decltype(it->GetHandle()), SharedHandle>);
     std::size_t wait_count = 0;
     for (std::size_t i = 0; i != shared_count; ++i) {
@@ -278,7 +278,7 @@ class [[nodiscard]] AwaitSingleAwaiter<true, V, E> final {
   }
 
   auto await_resume() {
-    return _result->Get().Ok();
+    return std::move(_result->Get()).Ok();
   }
 
  private:

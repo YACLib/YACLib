@@ -29,11 +29,11 @@ using namespace std::chrono_literals;
 TYPED_TEST(AsyncSuite, JustWorksPack) {
   yaclib::FairThreadPool tp;
   auto coro = [&]() -> typename TestFixture::template AsyncT<int> {
-    auto f1 = yaclib::Run(tp, [] {
+    auto f1 = RUN(tp, [] {
       yaclib_std::this_thread::sleep_for(1ms * YACLIB_CI_SLOWDOWN);
       return 1;
     });
-    auto f2 = yaclib::Run(tp, [] {
+    auto f2 = RUN(tp, [] {
       return 2;
     });
 
@@ -49,12 +49,12 @@ TYPED_TEST(AsyncSuite, JustWorksPack) {
 TYPED_TEST(AsyncSuite, JustWorksRange) {
   yaclib::FairThreadPool tp;
   auto coro = [&]() -> typename TestFixture::template AsyncT<int> {
-    std::array<yaclib::FutureOn<int>, 2> arr;
-    arr[0] = yaclib::Run(tp, [] {
+    std::array<typename TestFixture::template FutureOnT<int>, 2> arr;
+    arr[0] = RUN(tp, [] {
       yaclib_std::this_thread::sleep_for(50ms * YACLIB_CI_SLOWDOWN);
       return 1;
     });
-    arr[1] = yaclib::Run(tp, [] {
+    arr[1] = RUN(tp, [] {
       return 2;
     });
 
@@ -71,7 +71,7 @@ TYPED_TEST(AsyncSuite, JustWorksRange) {
 TYPED_TEST(AsyncSuite, JustWorksCoAwait) {
   yaclib::FairThreadPool tp;
   auto coro = [&]() -> typename TestFixture::template AsyncT<int> {
-    auto f1 = yaclib::Run(tp, [] {
+    auto f1 = RUN(tp, [] {
       yaclib_std::this_thread::sleep_for(50ms * YACLIB_CI_SLOWDOWN);
       return 1;
     });
@@ -87,7 +87,7 @@ TYPED_TEST(AsyncSuite, JustWorksCoAwait) {
 TYPED_TEST(AsyncSuite, JustWorksCoAwaitException) {
   yaclib::FairThreadPool tp;
   auto coro = [&]() -> typename TestFixture::template AsyncT<int> {
-    auto f1 = yaclib::Run(tp, [] {
+    auto f1 = RUN(tp, [] {
       throw std::runtime_error{""};
       return 2;
     });
@@ -109,10 +109,10 @@ TYPED_TEST(AsyncSuite, CheckSuspend) {
 
   auto coro = [&]() -> typename TestFixture::Type {
     counter = 1;
-    auto future1 = yaclib::Run(tp, [&] {
+    auto future1 = RUN(tp, [&] {
       yaclib_std::this_thread::sleep_for(coro_sleep_time);
     });
-    auto future2 = yaclib::Run(tp, [&] {
+    auto future2 = RUN(tp, [&] {
       yaclib_std::this_thread::sleep_for(coro_sleep_time);
     });
 

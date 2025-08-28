@@ -26,10 +26,12 @@ struct EventHelperCallback final : InlineCore {
     return event->GetCall().Here(caller);
   }
 
+  // TODO(ocelaiwo): For now shared futures never do symmetric transfer
+  // It is possile to do so if the last callback is to destroy the shared core
 #if YACLIB_SYMMETRIC_TRANSFER != 0
-  [[nodiscard]] yaclib_std::coroutine_handle<> Next(InlineCore& caller) noexcept final {
-    return event->GetCall().Next(caller);
-  }
+  [[nodiscard]] yaclib_std::coroutine_handle<> Next(InlineCore& caller) noexcept final {  // LCOV_EXCL_LINE
+    return event->GetCall().Next(caller);                                                 // LCOV_EXCL_LINE
+  }  // LCOV_EXCL_LINE
 #endif
 
   Event* event;
