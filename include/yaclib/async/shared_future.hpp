@@ -108,7 +108,7 @@ class SharedFutureBase {
   }
 
  protected:
-  explicit SharedFutureBase(detail::SharedCorePtr<V, E> core) noexcept : _core(std::move(core)) {
+  explicit SharedFutureBase(detail::SharedCorePtr<V, E> core) noexcept : _core{std::move(core)} {
   }
 
   detail::SharedCorePtr<V, E> _core;

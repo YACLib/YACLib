@@ -91,7 +91,7 @@ class AwaitEvent : public InlineCore, public AtomicCounter<NopeBase, NopeDeleter
  public:
   using AtomicCounter<NopeBase, NopeDeleter>::AtomicCounter;
 
-  static constexpr bool Shared = false;
+  static constexpr auto kShared = false;
 
   AwaitEvent& GetCall() noexcept {
     return *this;
@@ -127,7 +127,7 @@ class AwaitEvent : public InlineCore, public AtomicCounter<NopeBase, NopeDeleter
 template <typename Event>
 class MultiAwaitAwaiter final : public Event {
  public:
-  static constexpr bool Shared = Event::Shared;
+  static constexpr auto kShared = Event::kShared;
 
   YACLIB_INLINE bool await_ready() const noexcept {
     return this->Get(std::memory_order_acquire) == 1;
@@ -145,7 +145,7 @@ class MultiAwaitAwaiter final : public Event {
   template <typename... Handles>
   explicit MultiAwaitAwaiter(Handles... handles) noexcept : Event{sizeof...(handles) + 1} {
     const auto wait_count = [&] {
-      if constexpr (!Shared) {
+      if constexpr (!kShared) {
         return (... + static_cast<std::size_t>([&](auto handle) {
                   return handle.SetCallback(*this);
                 }(handles)));
@@ -205,10 +205,11 @@ class [[nodiscard]] AwaitSingleAwaiter<false, V, E> final {
   UniqueCorePtr<V, E> _result;
 };
 
+// TODO(ocelaiwo): different overloads for lvalue and rvalue
 template <typename V, typename E>
 class [[nodiscard]] AwaitSingleAwaiter<true, V, E> final {
  public:
-  explicit AwaitSingleAwaiter(const SharedCorePtr<V, E>& result) noexcept : _result{result} {
+  explicit AwaitSingleAwaiter(SharedCorePtr<V, E> result) noexcept : _result{std::move(result)} {
     YACLIB_ASSERT(_result != nullptr);
   }
 
@@ -221,12 +222,12 @@ class [[nodiscard]] AwaitSingleAwaiter<true, V, E> final {
     return _result->SetCallback(handle.promise());
   }
 
-  const auto& await_resume() const {
-    return _result->GetConst().Ok();
+  auto await_resume() const {
+    return std::as_const(_result->Get()).Ok();
   }
 
  private:
-  const SharedCorePtr<V, E>& _result;
+  SharedCorePtr<V, E> _result;
 };
 
 }  // namespace yaclib::detail

@@ -19,7 +19,7 @@ template <typename Event>
 struct EventHelperCallback final : InlineCore {
   // Default ctor needed for use inside std::array
   EventHelperCallback() = default;
-  EventHelperCallback(Event* event) : event(event) {
+  EventHelperCallback(Event* event) : event{event} {
   }
 
   [[nodiscard]] InlineCore* Here(InlineCore& caller) noexcept {
@@ -39,9 +39,9 @@ struct EventHelperCallback final : InlineCore {
 
 template <typename Event, size_t SharedCount>
 struct StaticSharedEvent : public Event {
-  static constexpr bool Shared = true;
+  static constexpr bool kShared = true;
 
-  StaticSharedEvent(size_t total_count) : Event{total_count} {
+  explicit StaticSharedEvent(size_t total_count) : Event{total_count} {
     callbacks.fill(this);
   }
 
@@ -50,9 +50,9 @@ struct StaticSharedEvent : public Event {
 
 template <typename Event>
 struct DynamicSharedEvent : public Event {
-  static constexpr bool Shared = true;
+  static constexpr bool kShared = true;
 
-  DynamicSharedEvent(size_t total_count) : Event{total_count}, callbacks{total_count - 1, this} {
+  explicit DynamicSharedEvent(size_t total_count) : Event{total_count}, callbacks{total_count - 1, this} {
   }
 
   std::vector<EventHelperCallback<Event>> callbacks;

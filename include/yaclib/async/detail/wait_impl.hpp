@@ -19,7 +19,7 @@ struct NoTimeoutTag final {};
 template <typename Event, typename Timeout, typename Range>
 bool WaitRange(Event& event, const Timeout& timeout, Range&& range, std::size_t count) noexcept {
   const auto wait_count = [&] {
-    if constexpr (Event::Shared) {
+    if constexpr (Event::kShared) {
       return range([&, callback_count = std::size_t{}](auto handle) mutable noexcept {
         if constexpr (std::is_same_v<UniqueHandle, decltype(handle)>) {
           return handle.SetCallback(event.GetCall());
@@ -58,15 +58,15 @@ bool WaitRange(Event& event, const Timeout& timeout, Range&& range, std::size_t 
     // We know we have `wait_count - reset_count` Results, but we must wait until event was not used by cores
   }
   event.Wait(token);
-  return reset_count == 0;
+  return reset_count == 0;  // LCOV_EXCL_LINE lcov won't parse it
 }
 
 template <typename Event, typename Timeout, typename... Handles>
 bool WaitCore(const Timeout& timeout, Handles... handles) noexcept {
   static_assert(sizeof...(handles) >= 1, "Number of futures must be at least one");
 
-  static constexpr size_t SharedCount = Count<SharedHandle, Handles...>;
-  static_assert(SharedCount == 0 || std::is_same_v<Timeout, NoTimeoutTag>);
+  static constexpr size_t kSharedCount = Count<SharedHandle, Handles...>;
+  static_assert(kSharedCount == 0 || std::is_same_v<Timeout, NoTimeoutTag>);
 
   auto range = [&](auto&& func) noexcept {
     return (... + static_cast<std::size_t>(func(handles)));
@@ -75,15 +75,9 @@ bool WaitCore(const Timeout& timeout, Handles... handles) noexcept {
   using CoreEvent = std::conditional_t<sizeof...(handles) == 1, MultiEvent<Event, OneCounter, CallCallback>,
                                        MultiEvent<Event, AtomicCounter, CallCallback>>;
 
-  auto event = [&] {
-    if constexpr (SharedCount <= 1) {
-      // If we have only one shared handle, we can use .next of the original event
-      return CoreEvent{sizeof...(handles) + 1};
-    } else {
-      // One of the shared handles will use .next of the original event
-      return StaticSharedEvent<CoreEvent, SharedCount>{sizeof...(handles) + 1};
-    }
-  }();
+  // If we have only one shared handle, we can use .next of the original event
+  using FinalEvent = std::conditional_t<kSharedCount <= 1, CoreEvent, StaticSharedEvent<CoreEvent, kSharedCount>>;
+  FinalEvent event{sizeof...(handles) + 1};
 
   return WaitRange(event, timeout, range, sizeof...(handles));
 }
@@ -92,15 +86,19 @@ template <typename Event, typename Timeout, typename Iterator>
 bool WaitIterator(const Timeout& timeout, Iterator it, std::size_t count) noexcept {
   static_assert(is_waitable_v<typename std::iterator_traits<Iterator>::value_type>,
                 "Wait function Iterator must be point to some Waitable (Future or SharedFuture)");
-  static constexpr bool Shared = std::is_same_v<decltype(it->GetHandle()), SharedHandle>;
+  static constexpr bool kShared = std::is_same_v<decltype(it->GetHandle()), SharedHandle>;
 
   if (count == 0) {
     return true;
   }
+
+  // TODO(ocelaiwo): We can try to unroll count more to avoid
+  // dynamic allocation in most common cases
   if (count == 1) {
     YACLIB_ASSERT(it->Valid());
     return WaitCore<Event>(timeout, it->GetHandle());
   }
+
   auto range = [&](auto&& func) noexcept {
     std::size_t wait_count = 0;
     std::conditional_t<std::is_same_v<Timeout, NoTimeoutTag>, Iterator&, Iterator> range_it = it;
@@ -112,15 +110,9 @@ bool WaitIterator(const Timeout& timeout, Iterator it, std::size_t count) noexce
     return wait_count;
   };
 
-  auto event = [&] {
-    if constexpr (Shared) {
-      // TODO(ocelaiwo): We can try to unroll count up to some value to avoid
-      // dynamic allocation in most common cases
-      return DynamicSharedEvent<MultiEvent<Event, AtomicCounter, CallCallback>>{count + 1};
-    } else {
-      return MultiEvent<Event, AtomicCounter, CallCallback>{count + 1};
-    }
-  }();
+  using CoreEvent = MultiEvent<Event, AtomicCounter, CallCallback>;
+  using FinalEvent = std::conditional_t<kShared, DynamicSharedEvent<CoreEvent>, CoreEvent>;
+  FinalEvent event{count + 1};
 
   return WaitRange(event, timeout, range, count);
 }

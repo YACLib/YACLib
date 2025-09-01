@@ -41,10 +41,6 @@ class ResultCore : public BaseCore {
     return _result;
   }
 
-  [[nodiscard]] const Result<V, E>& GetConst() const noexcept {
-    return _result;
-  }
-
   template <bool Condition>
   decltype(auto) MoveOrConst() {
     if constexpr (Condition) {

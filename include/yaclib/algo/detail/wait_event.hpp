@@ -60,7 +60,7 @@ struct DropCallback : InlineCore {
 
 template <typename Event, template <typename...> typename Counter, template <typename...> typename... Callbacks>
 struct MultiEvent : Counter<Event, SetDeleter>, Callbacks<MultiEvent<Event, Counter, Callbacks...>>... {
-  static constexpr bool Shared = false;
+  static constexpr bool kShared = false;
   using Counter<Event, SetDeleter>::Counter;
 };
 

@@ -84,6 +84,29 @@ TYPED_TEST(AsyncSuite, JustWorksCoAwait) {
   tp.Wait();
 }
 
+constexpr std::string_view kSetString = "aaa-aaa-aaa-aaa-aaa-aaa-aaa-aaa-aaa-aaa-aaa";
+
+TEST(SharedFuture, JustWorksCoAwaitShared) {
+  yaclib::FairThreadPool tp;
+  yaclib::SharedFutureOn<std::string> sf;
+  auto coro = [&]() -> yaclib::Future<std::string> {
+    auto sf1 = RunShared(tp, [] {
+      yaclib_std::this_thread::sleep_for(50ms * YACLIB_CI_SLOWDOWN);
+      return std::string{kSetString};
+    });
+
+    sf = sf1;
+    auto str = co_await sf1;
+    EXPECT_EQ(str, kSetString);
+    co_return co_await std::move(sf1);
+  };
+  auto future = coro();
+  EXPECT_EQ(std::move(future).Get().Ok(), kSetString);
+  EXPECT_EQ(sf.Get().Ok(), kSetString);
+  tp.HardStop();
+  tp.Wait();
+}
+
 TYPED_TEST(AsyncSuite, JustWorksCoAwaitException) {
   yaclib::FairThreadPool tp;
   auto coro = [&]() -> typename TestFixture::template AsyncT<int> {
