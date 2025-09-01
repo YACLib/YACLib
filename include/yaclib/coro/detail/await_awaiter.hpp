@@ -146,18 +146,19 @@ class MultiAwaitAwaiter final : public Event {
   explicit MultiAwaitAwaiter(Handles... handles) noexcept : Event{sizeof...(handles) + 1} {
     const auto wait_count = [&] {
       if constexpr (!kShared) {
-        return (... + static_cast<std::size_t>([&](auto handle) {
-                  return handle.SetCallback(*this);
-                }(handles)));
+        auto setter = [&](auto handle) {
+          return handle.SetCallback(*this);
+        };
+        return (... + static_cast<std::size_t>(setter(handles)));
       } else {
-        size_t shared_count = 0;
-        return (... + static_cast<std::size_t>([&](auto handle) mutable {
-                  if constexpr (std::is_same_v<decltype(handle), UniqueHandle>) {
-                    return handle.SetCallback(*this);
-                  } else {
-                    return handle.SetCallback(this->callbacks[shared_count++]);
-                  }
-                }(handles)));
+        auto setter = [&, callback_count = std::size_t{}](auto handle) mutable {
+          if constexpr (std::is_same_v<decltype(handle), UniqueHandle>) {
+            return handle.SetCallback(*this);
+          } else {
+            return handle.SetCallback(this->callbacks[callback_count++]);
+          }
+        };
+        return (... + static_cast<std::size_t>(setter(handles)));
       }
     }();
     this->count.fetch_sub(sizeof...(handles) - wait_count, std::memory_order_relaxed);
