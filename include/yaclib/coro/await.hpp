@@ -29,12 +29,11 @@ YACLIB_INLINE auto Await(Waited&... waited) noexcept {
   return Awaiter{waited.GetHandle()...};
 }
 
-template <typename Iterator,
-          typename = std::enable_if_t<is_waitable_v<typename std::iterator_traits<Iterator>::value_type>>>
+template <typename Iterator, typename Value = typename std::iterator_traits<Iterator>::value_type,
+          typename = std::enable_if_t<is_waitable_v<Value>>>
 YACLIB_INLINE auto Await(Iterator begin, std::size_t count) noexcept {
   using namespace detail;
-  using Handle = typename std::iterator_traits<Iterator>::value_type::Handle;
-  static constexpr bool Shared = std::is_same_v<Handle, SharedHandle>;
+  static constexpr bool Shared = std::is_same_v<typename Value::Handle, SharedHandle>;
   using Awaiter =
     std::conditional_t<Shared, MultiAwaitAwaiter<DynamicSharedEvent<AwaitEvent>>, MultiAwaitAwaiter<AwaitEvent>>;
   return Awaiter{begin, count};

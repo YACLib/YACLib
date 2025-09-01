@@ -15,7 +15,7 @@ template <typename V = Unit, typename E = StopError, typename Func>
 YACLIB_INLINE auto Run(IExecutor& e, Func&& f) {
   auto* core = [&] {
     if constexpr (std::is_same_v<V, Unit>) {
-      constexpr auto CoreT = CoreType::Run | CoreType::Call | CoreType::ToUnique;
+      static constexpr auto CoreT = CoreType::Run | CoreType::Call | CoreType::ToUnique;
       return MakeCore<CoreT, void, E>(std::forward<Func>(f));
     } else {
       return MakeUnique<PromiseCore<V, E, Func&&, false>>(std::forward<Func>(f)).Release();
@@ -32,7 +32,7 @@ template <typename V = Unit, typename E = StopError, typename Func>
 YACLIB_INLINE auto RunShared(IExecutor& e, Func&& f) {
   auto* core = [&] {
     if constexpr (std::is_same_v<V, Unit>) {
-      constexpr auto CoreT = CoreType::Run | CoreType::Call | CoreType::ToShared;
+      static constexpr auto CoreT = CoreType::Run | CoreType::Call | CoreType::ToShared;
       return MakeCore<CoreT, void, E>(std::forward<Func>(f));
     } else {
       return MakeShared<PromiseCore<V, E, Func&&, true>>(detail::kSharedRefWithFuture, std::forward<Func>(f)).Release();

@@ -38,29 +38,23 @@ struct EventHelperCallback final : InlineCore {
 };
 
 template <typename Event, size_t SharedCount>
-struct StaticSharedEvent {
-  static_assert(SharedCount > 1);
+struct StaticSharedEvent : public Event {
+  static constexpr bool Shared = true;
 
-  static inline constexpr bool Shared = true;
-  using CoreEvent = Event;
-
-  StaticSharedEvent(size_t total_count) : event{total_count} {
-    callbacks.fill(&event);
+  StaticSharedEvent(size_t total_count) : Event{total_count} {
+    callbacks.fill(this);
   }
 
-  Event event;
   std::array<EventHelperCallback<Event>, SharedCount> callbacks;
 };
 
 template <typename Event>
-struct DynamicSharedEvent {
-  static inline constexpr bool Shared = true;
-  using CoreEvent = Event;
+struct DynamicSharedEvent : public Event {
+  static constexpr bool Shared = true;
 
-  DynamicSharedEvent(size_t total_count, size_t shared_count) : event{total_count}, callbacks{shared_count, &event} {
+  DynamicSharedEvent(size_t total_count) : Event{total_count}, callbacks{total_count - 1, this} {
   }
 
-  Event event;
   std::vector<EventHelperCallback<Event>> callbacks;
 };
 

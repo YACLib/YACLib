@@ -25,8 +25,6 @@ class FutureBase {
   static_assert(Check<E>(), "E should be valid");
   static_assert(!std::is_same_v<V, E>, "Future cannot be instantiated with same V and E, because it's ambiguous");
 
-  using Handle = detail::UniqueHandle;
-
   FutureBase(const FutureBase&) = delete;
   FutureBase& operator=(const FutureBase&) = delete;
 
@@ -136,7 +134,7 @@ class FutureBase {
   [[nodiscard]] /*FutureOn*/ auto Then(IExecutor& e, Func&& f) && {
     YACLIB_WARN(e.Tag() == IExecutor::Type::Inline,
                 "better way is use ThenInline(...) instead of Then(MakeInline(), ...)");
-    constexpr auto CoreT = CoreType::ToUnique | CoreType::Call;
+    static constexpr auto CoreT = CoreType::ToUnique | CoreType::Call;
     return detail::SetCallback<CoreT, true>(_core, &e, std::forward<Func>(f));
   }
 
@@ -158,7 +156,7 @@ class FutureBase {
    */
   template <typename Func>
   void DetachInline(Func&& f) && {
-    constexpr auto CoreT = CoreType::Detach;
+    static constexpr auto CoreT = CoreType::Detach;
     detail::SetCallback<CoreT, false>(_core, nullptr, std::forward<Func>(f));
   }
 
@@ -174,7 +172,7 @@ class FutureBase {
   void Detach(IExecutor& e, Func&& f) && {
     YACLIB_WARN(e.Tag() == IExecutor::Type::Inline,
                 "better way is use DetachInline(...) instead of Detach(MakeInline(), ...)");
-    constexpr auto CoreT = CoreType::Detach | CoreType::Call;
+    static constexpr auto CoreT = CoreType::Detach | CoreType::Call;
     detail::SetCallback<CoreT, false>(_core, &e, std::forward<Func>(f));
   }
 
@@ -186,6 +184,8 @@ class FutureBase {
   [[nodiscard]] detail::UniqueCorePtr<V, E>& GetCore() noexcept {
     return _core;
   }
+
+  using Handle = detail::UniqueHandle;
 
   [[nodiscard]] detail::UniqueHandle GetHandle() noexcept {
     return detail::UniqueHandle{*_core};
@@ -227,7 +227,7 @@ class Future final : public FutureBase<V, E> {
    */
   template <typename Func>
   [[nodiscard]] /*Future*/ auto ThenInline(Func&& f) && {
-    constexpr auto CoreT = CoreType::ToUnique;
+    static constexpr auto CoreT = CoreType::ToUnique;
     return detail::SetCallback<CoreT, false>(this->_core, nullptr, std::forward<Func>(f));
   }
 };
@@ -271,7 +271,7 @@ class FutureOn final : public FutureBase<V, E> {
    */
   template <typename Func>
   [[nodiscard]] /*FutureOn*/ auto ThenInline(Func&& f) && {
-    constexpr auto CoreT = CoreType::ToUnique;
+    static constexpr auto CoreT = CoreType::ToUnique;
     return detail::SetCallback<CoreT, true>(this->_core, nullptr, std::forward<Func>(f));
   }
 
@@ -284,7 +284,7 @@ class FutureOn final : public FutureBase<V, E> {
    */
   template <typename Func>
   [[nodiscard]] /*FutureOn*/ auto Then(Func&& f) && {
-    constexpr auto CoreT = CoreType::ToUnique | CoreType::Call;
+    static constexpr auto CoreT = CoreType::ToUnique | CoreType::Call;
     return detail::SetCallback<CoreT, true>(this->_core, nullptr, std::forward<Func>(f));
   }
 
@@ -296,7 +296,7 @@ class FutureOn final : public FutureBase<V, E> {
    */
   template <typename Func>
   void Detach(Func&& f) && {
-    constexpr auto CoreT = CoreType::Detach | CoreType::Call;
+    static constexpr auto CoreT = CoreType::Detach | CoreType::Call;
     detail::SetCallback<CoreT, false>(this->_core, nullptr, std::forward<Func>(f));
   }
 };

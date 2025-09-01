@@ -59,9 +59,8 @@ struct DropCallback : InlineCore {
 };
 
 template <typename Event, template <typename...> typename Counter, template <typename...> typename... Callbacks>
-struct MultiEvent final : Counter<Event, SetDeleter>, Callbacks<MultiEvent<Event, Counter, Callbacks...>>... {
-  static inline constexpr bool Shared = false;
-  using CoreEvent = MultiEvent;
+struct MultiEvent : Counter<Event, SetDeleter>, Callbacks<MultiEvent<Event, Counter, Callbacks...>>... {
+  static constexpr bool Shared = false;
   using Counter<Event, SetDeleter>::Counter;
 };
 

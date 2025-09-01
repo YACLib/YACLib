@@ -66,9 +66,32 @@ struct [[nodiscard]] TransferSingleAwaiter final {
   UniqueCorePtr<V, E> _result;
 };
 
-class AwaitEvent final : public InlineCore, public AtomicCounter<NopeBase, NopeDeleter> {
+template <typename Handle>
+struct [[nodiscard]] AwaitAwaiter final {
+  explicit AwaitAwaiter(Handle caller) noexcept : _caller{caller} {
+  }
+
+  YACLIB_INLINE bool await_ready() const noexcept {
+    return !_caller.core.Empty();
+  }
+
+  template <typename Promise>
+  YACLIB_INLINE bool await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
+    return _caller.SetCallback(handle.promise());
+  }
+
+  constexpr void await_resume() const noexcept {
+  }
+
+ private:
+  Handle _caller;
+};
+
+class AwaitEvent : public InlineCore, public AtomicCounter<NopeBase, NopeDeleter> {
  public:
   using AtomicCounter<NopeBase, NopeDeleter>::AtomicCounter;
+
+  static constexpr bool Shared = false;
 
   AwaitEvent& GetCall() noexcept {
     return *this;
@@ -101,137 +124,58 @@ class AwaitEvent final : public InlineCore, public AtomicCounter<NopeBase, NopeD
 #endif
 };
 
-template <typename Handle>
-struct [[nodiscard]] AwaitAwaiter final {
-  explicit AwaitAwaiter(Handle caller) noexcept : _caller{caller} {
-  }
-
-  YACLIB_INLINE bool await_ready() const noexcept {
-    return !_caller.core.Empty();
-  }
-
-  template <typename Promise>
-  YACLIB_INLINE bool await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
-    return _caller.SetCallback(handle.promise());
-  }
-
-  constexpr void await_resume() const noexcept {
-  }
-
- private:
-  Handle _caller;
-};
-
-template <typename Awaiter>
-class [[nodiscard]] MultiAwaitAwaiterBase {
- public:
-  YACLIB_INLINE bool await_ready() const noexcept {
-    return static_cast<const Awaiter*>(this)->Event().Get(std::memory_order_acquire) == 1;
-  }
-
-  template <typename Promise>
-  YACLIB_INLINE bool await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
-    static_cast<Awaiter*>(this)->Event().next = &handle.promise();
-    return !static_cast<Awaiter*>(this)->Event().SubEqual(1);
-  }
-
-  constexpr void await_resume() const noexcept {
-  }
-};
-
 template <typename Event>
-class MultiAwaitAwaiter;
-
-template <>
-class [[nodiscard]] MultiAwaitAwaiter<AwaitEvent> final : public MultiAwaitAwaiterBase<MultiAwaitAwaiter<AwaitEvent>> {
+class MultiAwaitAwaiter final : public Event {
  public:
+  static constexpr bool Shared = Event::Shared;
+
+  YACLIB_INLINE bool await_ready() const noexcept {
+    return this->Get(std::memory_order_acquire) == 1;
+  }
+
+  template <typename Promise>
+  YACLIB_INLINE bool await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
+    this->next = &handle.promise();
+    return !this->SubEqual(1);
+  }
+
+  constexpr void await_resume() const noexcept {
+  }
+
   template <typename... Handles>
-  explicit MultiAwaitAwaiter(Handles... handles) noexcept : _event{sizeof...(handles) + 1} {
-    static_assert((... && std::is_same_v<Handles, UniqueHandle>));
-    const auto wait_count = (... + static_cast<std::size_t>(handles.SetCallback(_event)));
-    _event.count.fetch_sub(sizeof...(handles) - wait_count, std::memory_order_relaxed);
+  explicit MultiAwaitAwaiter(Handles... handles) noexcept : Event{sizeof...(handles) + 1} {
+    const auto wait_count = [&] {
+      if constexpr (!Shared) {
+        return (... + static_cast<std::size_t>([&](auto handle) {
+                  return handle.SetCallback(*this);
+                }(handles)));
+      } else {
+        return (... + static_cast<std::size_t>([&, shared_count = std::size_t{}](auto handle) mutable {
+                  if constexpr (std::is_same_v<decltype(handle), UniqueHandle>) {
+                    return handle.SetCallback(*this);
+                  } else {
+                    return handle.SetCallback(this->callbacks[shared_count++]);
+                  }
+                }(handles)));
+      }
+    }();
+    this->count.fetch_sub(sizeof...(handles) - wait_count, std::memory_order_relaxed);
   }
 
   template <typename It>
-  explicit MultiAwaitAwaiter(It it, std::size_t count) noexcept : _event{count + 1} {
-    static_assert(std::is_same_v<decltype(it->GetHandle()), UniqueHandle>);
+  explicit MultiAwaitAwaiter(It it, std::size_t count) noexcept : Event{count + 1} {
     std::size_t wait_count = 0;
     for (std::size_t i = 0; i != count; ++i) {
       YACLIB_ASSERT(it->Valid());
-      wait_count += static_cast<std::size_t>(it->GetHandle().SetCallback(_event));
+      if constexpr (std::is_same_v<decltype(it->GetHandle()), UniqueHandle>) {
+        wait_count += static_cast<std::size_t>(it->GetHandle().SetCallback(*this));
+      } else {
+        wait_count += static_cast<std::size_t>(it->GetHandle().SetCallback(this->callbacks[i]));
+      }
       ++it;
     }
-    _event.count.fetch_sub(count - wait_count, std::memory_order_relaxed);
+    this->count.fetch_sub(count - wait_count, std::memory_order_relaxed);
   }
-
-  AwaitEvent& Event() {
-    return _event;
-  }
-
-  const AwaitEvent& Event() const {
-    return _event;
-  }
-
- private:
-  AwaitEvent _event;
-};
-
-template <size_t SharedCount>
-class [[nodiscard]] MultiAwaitAwaiter<StaticSharedEvent<AwaitEvent, SharedCount>> final
-  : public MultiAwaitAwaiterBase<MultiAwaitAwaiter<StaticSharedEvent<AwaitEvent, SharedCount>>> {
- public:
-  template <typename... Handles>
-  explicit MultiAwaitAwaiter(Handles... handles) noexcept : _event{sizeof...(handles) + 1} {
-    size_t shared_count = 0;
-    const auto wait_count = (... + static_cast<std::size_t>([&](auto handle) {
-                               if constexpr (std::is_same_v<decltype(handle), UniqueHandle>) {
-                                 return handle.SetCallback(_event.event);
-                               } else {
-                                 return handle.SetCallback(_event.callbacks[shared_count++]);
-                               }
-                             }(handles)));
-    _event.event.count.fetch_sub(sizeof...(handles) - wait_count, std::memory_order_relaxed);
-    YACLIB_ASSERT(shared_count == SharedCount);
-  }
-
-  AwaitEvent& Event() {
-    return _event.event;
-  }
-
-  const AwaitEvent& Event() const {
-    return _event.event;
-  }
-
- private:
-  StaticSharedEvent<AwaitEvent, SharedCount> _event;
-};
-
-template <>
-class [[nodiscard]] MultiAwaitAwaiter<DynamicSharedEvent<AwaitEvent>> final
-  : public MultiAwaitAwaiterBase<MultiAwaitAwaiter<DynamicSharedEvent<AwaitEvent>>> {
- public:
-  template <typename It>
-  explicit MultiAwaitAwaiter(It it, std::size_t shared_count) noexcept : _event{shared_count + 1, shared_count} {
-    static_assert(std::is_same_v<decltype(it->GetHandle()), SharedHandle>);
-    std::size_t wait_count = 0;
-    for (std::size_t i = 0; i != shared_count; ++i) {
-      YACLIB_ASSERT(it->Valid());
-      wait_count += static_cast<std::size_t>(it->GetHandle().SetCallback(_event.callbacks[i]));
-      ++it;
-    }
-    _event.event.count.fetch_sub(shared_count - wait_count, std::memory_order_relaxed);
-  }
-
-  AwaitEvent& Event() {
-    return _event.event;
-  }
-
-  const AwaitEvent& Event() const {
-    return _event.event;
-  }
-
- private:
-  DynamicSharedEvent<AwaitEvent> _event;
 };
 
 template <bool Shared, typename V, typename E>
@@ -277,8 +221,8 @@ class [[nodiscard]] AwaitSingleAwaiter<true, V, E> final {
     return _result->SetCallback(handle.promise());
   }
 
-  auto await_resume() {
-    return std::move(_result->Get()).Ok();
+  const auto& await_resume() const {
+    return _result->GetConst().Ok();
   }
 
  private:

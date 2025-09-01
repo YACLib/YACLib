@@ -50,11 +50,9 @@ template <typename V, typename E, bool Lazy, bool Shared>
 class PromiseType final : public PromiseTypeBase<V, E, Lazy, Shared> {
   using Base = PromiseTypeBase<V, E, Lazy, Shared>;
   static_assert(!Lazy || !Shared, "Not supported");
-  static constexpr size_t ref = Shared ? detail::kSharedRefWithFuture : 0;
 
  public:
-  // TODO SHARED REFCOUNT
-  PromiseType() noexcept : Base{ref} {
+  PromiseType() noexcept : Base{Shared ? detail::kSharedRefWithFuture : 0} {
   }  // get_return_object is gonna be invoked right after ctor
 
   auto get_return_object() noexcept {

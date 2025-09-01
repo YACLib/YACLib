@@ -87,8 +87,11 @@ TYPED_TEST_SUITE(AsyncSuite, Types, TypeNames);
 
 #define DETACH(future, func)                                                                                           \
   do {                                                                                                                 \
-    if constexpr (TestFixture::kIsFuture || TestFixture::kIsSharedFuture) {                                            \
+    if constexpr (TestFixture::kIsFuture) {                                                                            \
       std::move(future).Detach(func);                                                                                  \
+    } else if constexpr (TestFixture::kIsSharedFuture) {                                                               \
+      future.Subscribe(func);                                                                                          \
+      std::move(future).Detach();                                                                                      \
     } else {                                                                                                           \
       std::move(future).Then(func).Detach();                                                                           \
     }                                                                                                                  \

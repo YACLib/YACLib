@@ -20,8 +20,6 @@ class SharedFutureBase {
   static_assert(!std::is_same_v<V, E>, "SharedFuture cannot be instantiated with same V and E, because it's ambiguous");
   static_assert(std::is_copy_constructible_v<Result<V, E>>, "Result should be copyable");
 
-  using Handle = detail::SharedHandle;
-
   SharedFutureBase() = default;
 
   [[nodiscard]] bool Valid() const noexcept {
@@ -43,6 +41,8 @@ class SharedFutureBase {
     }
   }
 
+  void Get() const&& = delete;
+
   [[nodiscard]] const Result<V, E>& Get() const& noexcept {
     YACLIB_ASSERT(Valid());
     Wait(*this);
@@ -59,6 +59,8 @@ class SharedFutureBase {
     }
   }
 
+  void Touch() const&& = delete;
+
   [[nodiscard]] const Result<V, E>& Touch() const& noexcept {
     YACLIB_ASSERT(Valid());
     YACLIB_ASSERT(Ready());
@@ -69,7 +71,7 @@ class SharedFutureBase {
   [[nodiscard]] /*FutureOn*/ auto Then(IExecutor& e, Func&& f) const {
     YACLIB_WARN(e.Tag() == IExecutor::Type::Inline,
                 "better way is use ThenInline(...) instead of Then(MakeInline(), ...)");
-    constexpr auto CoreT = CoreType::ToUnique | CoreType::Call;
+    static constexpr auto CoreT = CoreType::ToUnique | CoreType::Call;
     return detail::SetCallback<CoreT, true>(_core, &e, std::forward<Func>(f));
   }
 
@@ -79,7 +81,7 @@ class SharedFutureBase {
 
   template <typename Func>
   void SubscribeInline(Func&& f) const {
-    constexpr auto CoreT = CoreType::Detach;
+    static constexpr auto CoreT = CoreType::Detach;
     detail::SetCallback<CoreT, false>(_core, nullptr, std::forward<Func>(f));
   }
 
@@ -87,7 +89,7 @@ class SharedFutureBase {
   void Subscribe(IExecutor& e, Func&& f) const {
     YACLIB_WARN(e.Tag() == IExecutor::Type::Inline,
                 "better way is use SubscribeInline(...) instead of Subscribe(MakeInline(), ...)");
-    constexpr auto CoreT = CoreType::Detach | CoreType::Call;
+    static constexpr auto CoreT = CoreType::Detach | CoreType::Call;
     detail::SetCallback<CoreT, true>(_core, &e, std::forward<Func>(f));
   }
 
@@ -98,6 +100,8 @@ class SharedFutureBase {
   [[nodiscard]] const detail::SharedCorePtr<V, E>& GetCore() const noexcept {
     return _core;
   }
+
+  using Handle = detail::SharedHandle;
 
   [[nodiscard]] detail::SharedHandle GetHandle() const noexcept {
     return detail::SharedHandle{*_core};
@@ -125,7 +129,7 @@ class SharedFuture final : public SharedFutureBase<V, E> {
 
   template <typename Func>
   [[nodiscard]] /*Future*/ auto ThenInline(Func&& f) const {
-    constexpr auto CoreT = CoreType::ToUnique;
+    static constexpr auto CoreT = CoreType::ToUnique;
     return detail::SetCallback<CoreT, false>(this->_core, nullptr, std::forward<Func>(f));
   }
 };
@@ -145,33 +149,26 @@ class SharedFutureOn final : public SharedFutureBase<V, E> {
   SharedFutureOn(detail::SharedCorePtr<V, E> core) noexcept : Base{std::move(core)} {
   }
 
-  // TODO test
-  // [[nodiscard]] SharedFuture<V, E> On(std::nullptr_t) && noexcept {
-  //   return {std::move(this->_core)};
-  // }
+  [[nodiscard]] SharedFuture<V, E> On(std::nullptr_t) && noexcept {
+    return {std::move(this->_core)};
+  }
 
   template <typename Func>
   [[nodiscard]] /*FutureOn*/ auto ThenInline(Func&& f) const {
-    constexpr auto CoreT = CoreType::ToUnique;
+    static constexpr auto CoreT = CoreType::ToUnique;
     return detail::SetCallback<CoreT, true>(this->_core, nullptr, std::forward<Func>(f));
   }
 
   template <typename Func>
   [[nodiscard]] /*FutureOn*/ auto Then(Func&& f) const {
-    constexpr auto CoreT = CoreType::ToUnique | CoreType::Call;
+    static constexpr auto CoreT = CoreType::ToUnique | CoreType::Call;
     return detail::SetCallback<CoreT, true>(this->_core, nullptr, std::forward<Func>(f));
   }
 
   template <typename Func>
   void Subscribe(Func&& f) const {
-    constexpr auto CoreT = CoreType::Detach | CoreType::Call;
+    static constexpr auto CoreT = CoreType::Detach | CoreType::Call;
     detail::SetCallback<CoreT, false>(this->_core, nullptr, std::forward<Func>(f));
-  }
-
-  template <typename Func>
-  void Detach(Func&& f) && {
-    Subscribe(std::forward<Func>(f));
-    std::move(*this).Detach();
   }
 };
 

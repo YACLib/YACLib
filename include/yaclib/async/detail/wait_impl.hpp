@@ -18,59 +18,47 @@ struct NoTimeoutTag final {};
 
 template <typename Event, typename Timeout, typename Range>
 bool WaitRange(Event& event, const Timeout& timeout, Range&& range, std::size_t count) noexcept {
-  auto& core_event = [&]() -> typename Event::CoreEvent& {
-    if constexpr (Event::Shared) {
-      return event.event;
-    } else {
-      return event;
-    }
-  }();
-
   const auto wait_count = [&] {
     if constexpr (Event::Shared) {
       return range([&, callback_count = std::size_t{}](auto handle) mutable noexcept {
         if constexpr (std::is_same_v<UniqueHandle, decltype(handle)>) {
-          return handle.SetCallback(core_event.GetCall());
+          return handle.SetCallback(event.GetCall());
         } else {
           return handle.SetCallback(event.callbacks[callback_count++]);
         }
       });
     } else {
       return range([&](auto handle) noexcept {
-        return handle.SetCallback(core_event.GetCall());
+        return handle.SetCallback(event.GetCall());
       });
     }
   }();
 
-  if (wait_count == 0 || core_event.SubEqual(count - wait_count + 1)) {
+  if (wait_count == 0 || event.SubEqual(count - wait_count + 1)) {
     return true;
   }
 
-  auto token = core_event.Make();
+  auto token = event.Make();
+  std::size_t reset_count = 0;
 
   // Not available for shared future
   // but this is not always if-constexpred away in case of shared futures
   if constexpr (!std::is_same_v<Timeout, NoTimeoutTag>) {
-    std::size_t reset_count = 0;
-
     // If you have problem with TSAN here, check this link: https://github.com/google/sanitizers/issues/1259
     // TLDR: new pthread function is not supported by thread sanitizer yet.
-    if (core_event.Wait(token, timeout)) {
+    if (event.Wait(token, timeout)) {
       return true;
     }
     reset_count = range([](UniqueHandle handle) noexcept {
       return handle.Reset();
     });
-    if (reset_count != 0 && (reset_count == wait_count || core_event.SubEqual(reset_count))) {
+    if (reset_count != 0 && (reset_count == wait_count || event.SubEqual(reset_count))) {
       return false;
     }
     // We know we have `wait_count - reset_count` Results, but we must wait until event was not used by cores
-    core_event.Wait(token);
-    return reset_count == 0;
-  } else {
-    core_event.Wait(token);
-    return true;
   }
+  event.Wait(token);
+  return reset_count == 0;
 }
 
 template <typename Event, typename Timeout, typename... Handles>
@@ -110,12 +98,8 @@ bool WaitIterator(const Timeout& timeout, Iterator it, std::size_t count) noexce
     return true;
   }
   if (count == 1) {
-    auto range = [&](auto&& func) noexcept {
-      YACLIB_ASSERT(it->Valid());
-      return static_cast<std::size_t>(func(it->GetHandle()));
-    };
-    auto event = MultiEvent<Event, OneCounter, CallCallback>{count + 1};
-    return WaitRange(event, timeout, range, 1);
+    YACLIB_ASSERT(it->Valid());
+    return WaitCore<Event>(timeout, it->GetHandle());
   }
   auto range = [&](auto&& func) noexcept {
     std::size_t wait_count = 0;
@@ -132,7 +116,7 @@ bool WaitIterator(const Timeout& timeout, Iterator it, std::size_t count) noexce
     if constexpr (Shared) {
       // TODO(ocelaiwo): We can try to unroll count up to some value to avoid
       // dynamic allocation in most common cases
-      return DynamicSharedEvent<MultiEvent<Event, AtomicCounter, CallCallback>>{count + 1, count};
+      return DynamicSharedEvent<MultiEvent<Event, AtomicCounter, CallCallback>>{count + 1};
     } else {
       return MultiEvent<Event, AtomicCounter, CallCallback>{count + 1};
     }

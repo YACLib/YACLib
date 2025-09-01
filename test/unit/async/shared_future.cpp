@@ -462,6 +462,24 @@ TEST(SharedFuture, ThenInline) {
     });
 }
 
+TEST(SharedFuture, On) {
+  yaclib::FairThreadPool tp{4};
+
+  auto f = yaclib::RunShared(tp,
+                             [] {
+                               return kSetInt;
+                             })
+             .On(nullptr)
+             .ThenInline([](int a) {
+               return a + kSetInt;
+             });
+
+  ASSERT_EQ(std::move(f).Get().Value(), kSetInt + kSetInt);
+
+  tp.SoftStop();
+  tp.Wait();
+}
+
 TEST(SharedFuture, Unwrapping) {
   yaclib::ManualExecutor e1;
   yaclib::ManualExecutor e2;

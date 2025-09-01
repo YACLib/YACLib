@@ -61,7 +61,7 @@ void kek() {
 TEST(Core, EmptySizeof) {
   using CoreType = yaclib::detail::CoreType;
 
-  constexpr auto UniqueCoreT = CoreType::Run | CoreType::ToUnique | CoreType::Call;
+  static constexpr auto UniqueCoreT = CoreType::Run | CoreType::ToUnique | CoreType::Call;
   auto* unique = yaclib::detail::MakeCore<UniqueCoreT, void, yaclib::StopError>([] {
     kek();
   });
@@ -71,7 +71,7 @@ TEST(Core, EmptySizeof) {
                                                                     0));
   std::cout << "sizeof(yaclib::MakeCore, ToUnique, zero capture lambda): " << sizeof(*unique) << std::endl;
 
-  constexpr auto SharedCoreT = CoreType::Run | CoreType::ToShared | CoreType::Call;
+  static constexpr auto SharedCoreT = CoreType::Run | CoreType::ToShared | CoreType::Call;
   auto* shared = yaclib::detail::MakeCore<SharedCoreT, void, yaclib::StopError>([] {
     kek();
   });
@@ -91,7 +91,7 @@ TEST(Core, EmptySizeof) {
 TEST(Core, Sizeof) {
   using CoreType = yaclib::detail::CoreType;
 
-  constexpr auto UniqueCoreT = CoreType::Run | CoreType::ToUnique | CoreType::Call;
+  static constexpr auto UniqueCoreT = CoreType::Run | CoreType::ToUnique | CoreType::Call;
   auto* unique = yaclib::detail::MakeCore<UniqueCoreT, void, yaclib::StopError>(kek);
   static_assert(sizeof(void*) == sizeof(int) || sizeof(*unique) == (sizeof(yaclib::detail::BaseCore) +  //
                                                                     sizeof(yaclib::Result<>) +          //
@@ -99,7 +99,7 @@ TEST(Core, Sizeof) {
                                                                     0));
   std::cout << "sizeof(yaclib::MakeCore, ToUnique, function): " << sizeof(*unique) << std::endl;
 
-  constexpr auto SharedCoreT = CoreType::Run | CoreType::ToShared | CoreType::Call;
+  static constexpr auto SharedCoreT = CoreType::Run | CoreType::ToShared | CoreType::Call;
   auto* shared = yaclib::detail::MakeCore<SharedCoreT, void, yaclib::StopError>(kek);
   static_assert(sizeof(void*) == sizeof(int) || sizeof(*shared) == (sizeof(yaclib::detail::BaseCore) +  //
                                                                     sizeof(yaclib::Result<>) +          //

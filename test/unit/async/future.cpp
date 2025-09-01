@@ -1,5 +1,3 @@
-#include "yaclib/async/shared_contract.hpp"
-
 #include <util/async_suite.hpp>
 #include <util/error_code.hpp>
 #include <util/error_suite.hpp>
@@ -11,6 +9,7 @@
 #include <yaclib/async/make.hpp>
 #include <yaclib/async/promise.hpp>
 #include <yaclib/async/run.hpp>
+#include <yaclib/async/shared_contract.hpp>
 #include <yaclib/async/wait.hpp>
 #include <yaclib/exe/executor.hpp>
 #include <yaclib/exe/job.hpp>

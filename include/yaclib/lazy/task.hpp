@@ -69,19 +69,19 @@ class Task final {
   template <typename Func>
   /*Task*/ auto Then(IExecutor& e, Func&& f) && {
     YACLIB_ASSERT(!Ready());
-    constexpr auto CoreT = CoreType::ToUnique | CoreType::Call | CoreType::Lazy;
+    static constexpr auto CoreT = CoreType::ToUnique | CoreType::Call | CoreType::Lazy;
     return detail::SetCallback<CoreT, false>(_core, &e, std::forward<Func>(f));
   }
   template <typename Func>
   /*Task*/ auto ThenInline(Func&& f) && {
     YACLIB_ASSERT(!Ready());
-    constexpr auto CoreT = CoreType::ToUnique | CoreType::Lazy;
+    static constexpr auto CoreT = CoreType::ToUnique | CoreType::Lazy;
     return detail::SetCallback<CoreT, false>(_core, nullptr, std::forward<Func>(f));
   }
   template <typename Func>
   /*Task*/ auto Then(Func&& f) && {
     YACLIB_ASSERT(!Ready());
-    constexpr auto CoreT = CoreType::ToUnique | CoreType::Call | CoreType::Lazy;
+    static constexpr auto CoreT = CoreType::ToUnique | CoreType::Call | CoreType::Lazy;
     return detail::SetCallback<CoreT, false>(_core, nullptr, std::forward<Func>(f));
   }
 

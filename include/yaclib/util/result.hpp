@@ -160,6 +160,7 @@ class Result final {
   [[nodiscard]] V&& Value() && noexcept {
     return std::get<V>(std::move(_result));
   }
+
   [[nodiscard]] const V& Value() const& noexcept {
     return std::get<V>(_result);
   }
