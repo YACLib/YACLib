@@ -150,7 +150,8 @@ class MultiAwaitAwaiter final : public Event {
                   return handle.SetCallback(*this);
                 }(handles)));
       } else {
-        return (... + static_cast<std::size_t>([&, shared_count = std::size_t{}](auto handle) mutable {
+        size_t shared_count = 0;
+        return (... + static_cast<std::size_t>([&](auto handle) mutable {
                   if constexpr (std::is_same_v<decltype(handle), UniqueHandle>) {
                     return handle.SetCallback(*this);
                   } else {
