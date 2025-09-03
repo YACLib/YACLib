@@ -6,6 +6,7 @@
 
 #if YACLIB_CORO != 0
 #  include <yaclib/coro/future.hpp>
+#  include <yaclib/coro/shared_future.hpp>
 #  include <yaclib/coro/task.hpp>
 #endif
 
@@ -18,6 +19,18 @@ namespace test {
 template <typename T>
 struct AsyncSuite : testing::Test {
   static constexpr bool kIsFuture = yaclib::is_future_base_v<T>;
+  static constexpr bool kIsTask = yaclib::is_task_v<T>;
+  static constexpr bool kIsSharedFuture = yaclib::is_shared_future_base_v<T>;
+
+  template <typename V = void, typename E = yaclib::StopError>
+  using FutureT = std::conditional_t<kIsSharedFuture, yaclib::SharedFuture<V, E>, yaclib::Future<V, E>>;
+
+  template <typename V = void, typename E = yaclib::StopError>
+  using FutureOnT = std::conditional_t<kIsSharedFuture, yaclib::SharedFutureOn<V, E>, yaclib::FutureOn<V, E>>;
+
+  template <typename V = void, typename E = yaclib::StopError>
+  using AsyncT = std::conditional_t<kIsTask, yaclib::Task<V, E>, FutureT<V, E>>;
+
   using Type = T;
 };
 
@@ -29,13 +42,15 @@ struct TypeNames {
         return "Future";
       case 1:
         return "Task";
+      case 2:
+        return "SharedFuture";
       default:
         return "unknown";
     }
   }
 };
 
-using Types = testing::Types<yaclib::Future<>, yaclib::Task<>>;
+using Types = testing::Types<yaclib::Future<>, yaclib::Task<>, yaclib::SharedFuture<>>;
 
 TYPED_TEST_SUITE(AsyncSuite, Types, TypeNames);
 
@@ -43,8 +58,19 @@ TYPED_TEST_SUITE(AsyncSuite, Types, TypeNames);
   [&] {                                                                                                                \
     if constexpr (TestFixture::kIsFuture) {                                                                            \
       return yaclib::Run(executor, func);                                                                              \
-    } else {                                                                                                           \
+    } else if constexpr (TestFixture::kIsTask) {                                                                       \
       return yaclib::Schedule(executor, func);                                                                         \
+    } else {                                                                                                           \
+      return yaclib::RunShared(executor, func);                                                                        \
+    }                                                                                                                  \
+  }()
+
+#define RUN(executor, func)                                                                                            \
+  [&] {                                                                                                                \
+    if constexpr (TestFixture::kIsSharedFuture) {                                                                      \
+      return yaclib::RunShared(executor, func);                                                                        \
+    } else {                                                                                                           \
+      return yaclib::Run(executor, func);                                                                              \
     }                                                                                                                  \
   }()
 
@@ -52,8 +78,10 @@ TYPED_TEST_SUITE(AsyncSuite, Types, TypeNames);
   [&] {                                                                                                                \
     if constexpr (TestFixture::kIsFuture) {                                                                            \
       return yaclib::AsyncContract<V>(executor, func);                                                                 \
-    } else {                                                                                                           \
+    } else if constexpr (TestFixture::kIsTask) {                                                                       \
       return yaclib::LazyContract<V>(executor, func);                                                                  \
+    } else {                                                                                                           \
+      return yaclib::AsyncSharedContract<V>(executor, func);                                                           \
     }                                                                                                                  \
   }()
 
@@ -61,9 +89,15 @@ TYPED_TEST_SUITE(AsyncSuite, Types, TypeNames);
   do {                                                                                                                 \
     if constexpr (TestFixture::kIsFuture) {                                                                            \
       std::move(future).Detach(func);                                                                                  \
+    } else if constexpr (TestFixture::kIsSharedFuture) {                                                               \
+      future.Subscribe(func);                                                                                          \
+      std::move(future).Detach();                                                                                      \
     } else {                                                                                                           \
       std::move(future).Then(func).Detach();                                                                           \
     }                                                                                                                  \
   } while (false)
+
+#define PROMISE_T(type)                                                                                                \
+  std::conditional_t<TestFixture::kIsSharedFuture, yaclib::SharedPromise<type>, yaclib::Promise<type>>
 
 }  // namespace test

@@ -1,8 +1,10 @@
 #pragma once
 
+#include <yaclib/algo/detail/shared_core.hpp>
 #include <yaclib/algo/detail/unique_core.hpp>
 #include <yaclib/coro/coro.hpp>
 #include <yaclib/util/cast.hpp>
+#include <yaclib/util/detail/atomic_counter.hpp>
 #include <yaclib/util/detail/unique_counter.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 
@@ -10,7 +12,7 @@
 
 namespace yaclib::detail {
 
-template <typename V, typename E, bool Lazy>
+template <typename V, typename E, bool Lazy, bool Shared>
 class PromiseType;
 
 struct Destroy final {
@@ -34,22 +36,29 @@ struct Destroy final {
   }
 };
 
-template <bool Lazy>
+template <bool Lazy, bool Shared>
 struct PromiseTypeDeleter final {
   template <typename V, typename E>
-  static void Delete(UniqueCore<V, E>& core) noexcept;
+  static void Delete(ResultCore<V, E>& core) noexcept;
 };
 
-template <typename V, typename E, bool Lazy>
-class PromiseType final : public OneCounter<UniqueCore<V, E>, PromiseTypeDeleter<Lazy>> {
-  using Base = OneCounter<UniqueCore<V, E>, PromiseTypeDeleter<Lazy>>;
+template <typename V, typename E, bool Lazy, bool Shared>
+using PromiseTypeBase = std::conditional_t<Shared, AtomicCounter<SharedCore<V, E>, PromiseTypeDeleter<Lazy, Shared>>,
+                                           OneCounter<UniqueCore<V, E>, PromiseTypeDeleter<Lazy, Shared>>>;
+
+template <typename V, typename E, bool Lazy, bool Shared>
+class PromiseType final : public PromiseTypeBase<V, E, Lazy, Shared> {
+  using Base = PromiseTypeBase<V, E, Lazy, Shared>;
+  static_assert(!Lazy || !Shared, "Not supported");
 
  public:
-  PromiseType() noexcept : Base{0} {
+  PromiseType() noexcept : Base{Shared ? detail::kSharedRefWithFuture : 0} {
   }  // get_return_object is gonna be invoked right after ctor
 
   auto get_return_object() noexcept {
-    if constexpr (Lazy) {
+    if constexpr (Shared) {
+      return SharedFuture<V, E>{SharedCorePtr<V, E>{NoRefTag{}, this}};
+    } else if constexpr (Lazy) {
       return Task<V, E>{UniqueCorePtr<V, E>{NoRefTag{}, this}};
     } else {
       return Future<V, E>{UniqueCorePtr<V, E>{NoRefTag{}, this}};
@@ -88,6 +97,12 @@ class PromiseType final : public OneCounter<UniqueCore<V, E>, PromiseTypeDeleter
   }
 
  private:
+  void IncRef() noexcept final {
+    return this->Add(1);
+  }
+  size_t GetRef() noexcept final {
+    return this->Get();
+  }
   void DecRef() noexcept final {
     this->Sub(1);
   }
@@ -129,10 +144,10 @@ class PromiseType final : public OneCounter<UniqueCore<V, E>, PromiseTypeDeleter
   }
 };
 
-template <bool Lazy>
+template <bool Lazy, bool Shared>
 template <typename V, typename E>
-void PromiseTypeDeleter<Lazy>::Delete(UniqueCore<V, E>& core) noexcept {
-  auto& promise = DownCast<PromiseType<V, E, Lazy>>(core);
+void PromiseTypeDeleter<Lazy, Shared>::Delete(ResultCore<V, E>& core) noexcept {
+  auto& promise = DownCast<PromiseType<V, E, Lazy, Shared>>(core);
   auto handle = promise.Handle();
   handle.destroy();
 }

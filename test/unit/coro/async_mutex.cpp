@@ -11,6 +11,7 @@
 #include <yaclib/coro/guard_sticky.hpp>
 #include <yaclib/coro/mutex.hpp>
 #include <yaclib/coro/on.hpp>
+#include <yaclib/coro/shared_future.hpp>
 #include <yaclib/coro/shared_mutex.hpp>
 #include <yaclib/coro/task.hpp>
 #include <yaclib/exe/manual.hpp>
@@ -34,11 +35,11 @@ TYPED_TEST(AsyncSuite, JustWorks) {
 
   static constexpr std::size_t kCoros = 10'000;
 
-  std::array<yaclib::Future<>, kCoros> futures;
+  std::array<typename TestFixture::template FutureT<>, kCoros> futures;
   std::size_t cs = 0;
 
   auto coro1 = [&]() -> typename TestFixture::Type {
-    if constexpr (TestFixture::kIsFuture) {
+    if constexpr (!TestFixture::kIsTask) {
       co_await On(tp);
     }
     co_await m.Lock();
@@ -48,7 +49,7 @@ TYPED_TEST(AsyncSuite, JustWorks) {
   };
 
   for (std::size_t i = 0; i < kCoros; ++i) {
-    if constexpr (TestFixture::kIsFuture) {
+    if constexpr (!TestFixture::kIsTask) {
       futures[i] = coro1();
     } else {
       futures[i] = coro1().ToFuture(tp).On(nullptr);
@@ -72,11 +73,11 @@ TYPED_TEST(AsyncSuite, Counter) {
 
   static constexpr std::size_t kCoros = 20;
   static constexpr std::size_t kCSperCoro = 2000;
-  std::array<yaclib::Future<>, kCoros> futures;
+  std::array<typename TestFixture::template FutureT<>, kCoros> futures;
   std::size_t cs = 0;
 
   auto coro1 = [&]() -> typename TestFixture::Type {
-    if constexpr (TestFixture::kIsFuture) {
+    if constexpr (!TestFixture::kIsTask) {
       co_await On(tp);
     }
     for (std::size_t j = 0; j < kCSperCoro; ++j) {
@@ -88,7 +89,7 @@ TYPED_TEST(AsyncSuite, Counter) {
   };
 
   for (std::size_t i = 0; i < kCoros; ++i) {
-    if constexpr (TestFixture::kIsFuture) {
+    if constexpr (!TestFixture::kIsTask) {
       futures[i] = coro1();
     } else {
       futures[i] = coro1().ToFuture(tp).On(nullptr);
@@ -137,7 +138,7 @@ TYPED_TEST(AsyncSuite, LockAsync) {
   std::size_t value = 0;
 
   auto coro = [&](yaclib::Future<bool>& future) -> typename TestFixture::Type {
-    if constexpr (TestFixture::kIsFuture) {
+    if constexpr (!TestFixture::kIsTask) {
       co_await On(*manual);
     }
     co_await m.Lock();
@@ -148,7 +149,7 @@ TYPED_TEST(AsyncSuite, LockAsync) {
     co_return{};
   };
   auto run_coro = [&](auto&& func, auto&& arg) {
-    if constexpr (TestFixture::kIsFuture) {
+    if constexpr (!TestFixture::kIsTask) {
       return func(arg);
     } else {
       return func(arg).ToFuture(*manual).On(nullptr);
@@ -185,7 +186,7 @@ TYPED_TEST(AsyncSuite, ScopedLockAsync) {
   std::size_t value = 0;
 
   auto coro = [&](yaclib::Future<bool>& future) -> typename TestFixture::Type {
-    if constexpr (TestFixture::kIsFuture) {
+    if constexpr (!TestFixture::kIsTask) {
       co_await On(*manual);
     }
     auto guard = co_await m.Guard();
@@ -196,7 +197,7 @@ TYPED_TEST(AsyncSuite, ScopedLockAsync) {
   };
 
   auto run_coro = [&](auto&& func, auto&& arg) {
-    if constexpr (TestFixture::kIsFuture) {
+    if constexpr (!TestFixture::kIsTask) {
       return func(arg);
     } else {
       return func(arg).ToFuture(*manual).On(nullptr);
@@ -236,12 +237,13 @@ TYPED_TEST(AsyncSuite, GuardRelease) {
   static constexpr std::size_t kCoros = 20;
   static constexpr std::size_t kCSperCoro = 200;
 
-  std::array<yaclib::Future<int>, kCoros> futures;
+  std::array<typename TestFixture::template FutureT<int>, kCoros> futures;
   std::size_t cs = 0;
-  using Coro = std::conditional_t<TestFixture::kIsFuture, yaclib::Future<int>, yaclib::Task<int>>;
+  using Coro =
+    std::conditional_t<!TestFixture::kIsTask, typename TestFixture::template FutureT<int>, yaclib::Task<int>>;
   auto coro1 = [&]() -> Coro {
     for (std::size_t j = 0; j < kCSperCoro; ++j) {
-      if constexpr (TestFixture::kIsFuture) {
+      if constexpr (!TestFixture::kIsTask) {
         co_await On(tp);
       }
       auto g = co_await m.Guard();
@@ -252,7 +254,7 @@ TYPED_TEST(AsyncSuite, GuardRelease) {
     co_return 42;
   };
   for (std::size_t i = 0; i < kCoros; ++i) {
-    if constexpr (TestFixture::kIsFuture) {
+    if constexpr (!TestFixture::kIsTask) {
       futures[i] = coro1();
     } else {
       futures[i] = coro1().ToFuture(tp).On(nullptr);
@@ -273,11 +275,11 @@ TYPED_TEST(AsyncSuite, UnlockHereBehaviour) {
 
   yaclib::FairThreadPool tp{kThreads};
   yaclib::Mutex<> m;
-  std::array<yaclib::Future<>, kCoros> futures;
+  std::array<typename TestFixture::template FutureT<>, kCoros> futures;
   yaclib_std::atomic_bool start{false};
 
   auto coro1 = [&]() -> typename TestFixture::Type {
-    if constexpr (TestFixture::kIsFuture) {
+    if constexpr (!TestFixture::kIsTask) {
       co_await On(tp);
     }
     co_await m.Lock();
@@ -289,7 +291,7 @@ TYPED_TEST(AsyncSuite, UnlockHereBehaviour) {
     co_return{};
   };
   auto coro2 = [&]() -> typename TestFixture::Type {
-    if constexpr (TestFixture::kIsFuture) {
+    if constexpr (!TestFixture::kIsTask) {
       co_await On(tp);
     }
     co_await m.Lock();
@@ -301,7 +303,7 @@ TYPED_TEST(AsyncSuite, UnlockHereBehaviour) {
   };
 
   util::StopWatch sw;
-  if constexpr (TestFixture::kIsFuture) {
+  if constexpr (!TestFixture::kIsTask) {
     futures[0] = coro1();
   } else {
     futures[0] = coro1().ToFuture(tp).On(nullptr);
@@ -310,7 +312,7 @@ TYPED_TEST(AsyncSuite, UnlockHereBehaviour) {
     yaclib_std::this_thread::sleep_for(10ms);
   }
   for (std::size_t i = 1; i < kCoros; ++i) {
-    if constexpr (TestFixture::kIsFuture) {
+    if constexpr (!TestFixture::kIsTask) {
       futures[i] = coro2();
     } else {
       futures[i] = coro2().ToFuture(tp).On(nullptr);
@@ -336,11 +338,11 @@ TYPED_TEST(AsyncSuite, UnlockOnBehaviour) {
 
   yaclib::FairThreadPool tp{kThreads};
   yaclib::Mutex<> m;
-  std::array<yaclib::Future<>, kCoros> futures;
+  std::array<typename TestFixture::template FutureT<>, kCoros> futures;
 
   yaclib_std::atomic_bool start{false};
   auto coro1 = [&]() -> typename TestFixture::Type {
-    if constexpr (TestFixture::kIsFuture) {
+    if constexpr (!TestFixture::kIsTask) {
       co_await On(tp);
     }
     co_await m.Lock();
@@ -352,7 +354,7 @@ TYPED_TEST(AsyncSuite, UnlockOnBehaviour) {
 
   yaclib_std::thread::id locked_id{};
   auto coro2 = [&]() -> typename TestFixture::Type {
-    if constexpr (TestFixture::kIsFuture) {
+    if constexpr (!TestFixture::kIsTask) {
       co_await On(tp);
     }
     co_await m.Lock();
@@ -368,7 +370,7 @@ TYPED_TEST(AsyncSuite, UnlockOnBehaviour) {
   };
 
   util::StopWatch sw;
-  if constexpr (TestFixture::kIsFuture) {
+  if constexpr (!TestFixture::kIsTask) {
     futures[0] = coro1();
   } else {
     futures[0] = coro1().ToFuture(tp).On(nullptr);
@@ -377,7 +379,7 @@ TYPED_TEST(AsyncSuite, UnlockOnBehaviour) {
     yaclib_std::this_thread::sleep_for(10ms);
   }
   for (std::size_t i = 1; i < kCoros; ++i) {
-    if constexpr (TestFixture::kIsFuture) {
+    if constexpr (!TestFixture::kIsTask) {
       futures[i] = coro2();
     } else {
       futures[i] = coro2().ToFuture(tp).On(nullptr);

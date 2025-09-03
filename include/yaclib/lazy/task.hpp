@@ -23,6 +23,8 @@ void Start(BaseCore* head) noexcept;
  */
 template <typename V, typename E>
 class Task final {
+  using CoreType = detail::CoreType;
+
  public:
   static_assert(Check<V>(), "V should be valid");
   static_assert(Check<E>(), "E should be valid");
@@ -67,19 +69,20 @@ class Task final {
   template <typename Func>
   /*Task*/ auto Then(IExecutor& e, Func&& f) && {
     YACLIB_ASSERT(!Ready());
-    return detail::SetCallback<detail::CoreType::Then, detail::CallbackType::LazyOn>(_core, &e, std::forward<Func>(f));
+    static constexpr auto CoreT = CoreType::ToUnique | CoreType::Call | CoreType::Lazy;
+    return detail::SetCallback<CoreT, false>(_core, &e, std::forward<Func>(f));
   }
   template <typename Func>
   /*Task*/ auto ThenInline(Func&& f) && {
     YACLIB_ASSERT(!Ready());
-    return detail::SetCallback<detail::CoreType::Then, detail::CallbackType::LazyInline>(_core, nullptr,
-                                                                                         std::forward<Func>(f));
+    static constexpr auto CoreT = CoreType::ToUnique | CoreType::Lazy;
+    return detail::SetCallback<CoreT, false>(_core, nullptr, std::forward<Func>(f));
   }
   template <typename Func>
   /*Task*/ auto Then(Func&& f) && {
     YACLIB_ASSERT(!Ready());
-    return detail::SetCallback<detail::CoreType::Then, detail::CallbackType::LazyOn>(_core, nullptr,
-                                                                                     std::forward<Func>(f));
+    static constexpr auto CoreT = CoreType::ToUnique | CoreType::Call | CoreType::Lazy;
+    return detail::SetCallback<CoreT, false>(_core, nullptr, std::forward<Func>(f));
   }
 
   void Cancel() && noexcept {

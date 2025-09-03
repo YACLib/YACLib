@@ -1,7 +1,10 @@
 #pragma once
 
 #include <yaclib/algo/detail/func_core.hpp>
+#include <yaclib/algo/detail/shared_core.hpp>
 #include <yaclib/algo/detail/unique_core.hpp>
+#include <yaclib/async/promise.hpp>
+#include <yaclib/async/shared_promise.hpp>
 #include <yaclib/log.hpp>
 
 #include <type_traits>
@@ -9,21 +12,24 @@
 
 namespace yaclib::detail {
 
-template <typename V, typename E, typename Func>
-class PromiseCore : public UniqueCore<V, E>, public FuncCore<Func> {
+template <typename V, typename E, typename Func, bool Shared>
+class PromiseCore : public std::conditional_t<Shared, SharedCore<V, E>, UniqueCore<V, E>>, public FuncCore<Func> {
   using F = FuncCore<Func>;
   using Invoke = typename F::Invoke;
   using Storage = typename F::Storage;
 
+  using CorePtrT = std::conditional_t<Shared, SharedCorePtr<V, E>, UniqueCorePtr<V, E>>;
+  using PromiseT = std::conditional_t<Shared, SharedPromise<V, E>, Promise<V, E>>;
+
  public:
-  using Base = UniqueCore<V, E>;
+  using Base = std::conditional_t<Shared, SharedCore<V, E>, UniqueCore<V, E>>;
 
   explicit PromiseCore(Func&& f) : F{std::forward<Func>(f)} {
   }
 
  private:
   void Call() noexcept final {
-    Promise<V, E> promise{UniqueCorePtr<V, E>{NoRefTag{}, this}};
+    PromiseT promise{CorePtrT{NoRefTag{}, this}};
     try {
       // We need to move func with capture on stack, because promise can be Set before func return
       static_assert(std::is_nothrow_move_constructible_v<Storage>);

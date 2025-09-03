@@ -8,6 +8,7 @@ list(APPEND YACLIB_INCLUDES
   ${YACLIB_INCLUDE_DIR}/coro/guard.hpp
   ${YACLIB_INCLUDE_DIR}/coro/mutex.hpp
   ${YACLIB_INCLUDE_DIR}/coro/on.hpp
+  ${YACLIB_INCLUDE_DIR}/coro/shared_future.hpp
   ${YACLIB_INCLUDE_DIR}/coro/task.hpp
   ${YACLIB_INCLUDE_DIR}/coro/yield.hpp
   )

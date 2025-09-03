@@ -59,30 +59,59 @@ void kek() {
 }
 
 TEST(Core, EmptySizeof) {
-  auto* core = yaclib::detail::MakeCore<yaclib::detail::CoreType::Run, true, false, void, yaclib::StopError>([] {
+  using CoreType = yaclib::detail::CoreType;
+
+  static constexpr auto UniqueCoreT = CoreType::Run | CoreType::ToUnique | CoreType::Call;
+  auto* unique = yaclib::detail::MakeCore<UniqueCoreT, void, yaclib::StopError>([] {
     kek();
   });
+  static_assert(sizeof(void*) == sizeof(int) || sizeof(*unique) == (sizeof(yaclib::detail::BaseCore) +  //
+                                                                    sizeof(yaclib::Result<>) +          //
+                                                                    kZeroCaptureLambdaSizeof +          //
+                                                                    0));
+  std::cout << "sizeof(yaclib::MakeCore, ToUnique, zero capture lambda): " << sizeof(*unique) << std::endl;
 
-  static_assert(sizeof(void*) == sizeof(int) || sizeof(*core) == (sizeof(yaclib::detail::BaseCore) +  //
-                                                                  sizeof(yaclib::Result<>) +          //
-                                                                  kZeroCaptureLambdaSizeof +          //
-                                                                  0));
-  std::cout << "sizeof(yaclib::MakeCore, zero capture lambda): " << sizeof(*core) << std::endl;
+  static constexpr auto SharedCoreT = CoreType::Run | CoreType::ToShared | CoreType::Call;
+  auto* shared = yaclib::detail::MakeCore<SharedCoreT, void, yaclib::StopError>([] {
+    kek();
+  });
+  static_assert(sizeof(void*) == sizeof(int) || sizeof(*shared) == (sizeof(yaclib::detail::BaseCore) +  //
+                                                                    sizeof(yaclib::Result<>) +          //
+                                                                    kZeroCaptureLambdaSizeof +          //
+                                                                    sizeof(size_t)));
+  std::cout << "sizeof(yaclib::MakeCore, ToShared, zero capture lambda): " << sizeof(*shared) << std::endl;
 
-  core->StoreCallback(yaclib::detail::MakeDrop());
-  static_cast<yaclib::Job*>(core)->Drop();
+  unique->StoreCallback(yaclib::detail::MakeDrop());
+  static_cast<yaclib::Job*>(unique)->Drop();
+
+  std::ignore = shared->SetCallback(yaclib::detail::MakeDrop());
+  static_cast<yaclib::Job*>(shared)->Drop();
 }
 
 TEST(Core, Sizeof) {
-  auto* core = yaclib::detail::MakeCore<yaclib::detail::CoreType::Run, true, false, void, yaclib::StopError>(kek);
-  static_assert(sizeof(void*) == sizeof(int) || sizeof(*core) == (sizeof(yaclib::detail::BaseCore) +  //
-                                                                  sizeof(yaclib::Result<>) +          //
-                                                                  sizeof(&kek) +                      //
-                                                                  0));
-  std::cout << "sizeof(yaclib::MakeCore, function): " << sizeof(*core) << std::endl;
+  using CoreType = yaclib::detail::CoreType;
 
-  core->StoreCallback(yaclib::detail::MakeDrop());
-  static_cast<yaclib::Job*>(core)->Drop();
+  static constexpr auto UniqueCoreT = CoreType::Run | CoreType::ToUnique | CoreType::Call;
+  auto* unique = yaclib::detail::MakeCore<UniqueCoreT, void, yaclib::StopError>(kek);
+  static_assert(sizeof(void*) == sizeof(int) || sizeof(*unique) == (sizeof(yaclib::detail::BaseCore) +  //
+                                                                    sizeof(yaclib::Result<>) +          //
+                                                                    sizeof(&kek) +                      //
+                                                                    0));
+  std::cout << "sizeof(yaclib::MakeCore, ToUnique, function): " << sizeof(*unique) << std::endl;
+
+  static constexpr auto SharedCoreT = CoreType::Run | CoreType::ToShared | CoreType::Call;
+  auto* shared = yaclib::detail::MakeCore<SharedCoreT, void, yaclib::StopError>(kek);
+  static_assert(sizeof(void*) == sizeof(int) || sizeof(*shared) == (sizeof(yaclib::detail::BaseCore) +  //
+                                                                    sizeof(yaclib::Result<>) +          //
+                                                                    sizeof(&kek) +                      //
+                                                                    sizeof(size_t)));
+  std::cout << "sizeof(yaclib::MakeCore, ToShared, zero capture lambda): " << sizeof(*shared) << std::endl;
+
+  unique->StoreCallback(yaclib::detail::MakeDrop());
+  static_cast<yaclib::Job*>(unique)->Drop();
+
+  std::ignore = shared->SetCallback(yaclib::detail::MakeDrop());
+  static_cast<yaclib::Job*>(shared)->Drop();
 }
 
 }  // namespace

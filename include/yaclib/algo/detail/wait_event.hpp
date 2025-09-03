@@ -1,6 +1,7 @@
 #pragma once
 
 #include <yaclib/algo/detail/inline_core.hpp>
+#include <yaclib/algo/detail/shared_event.hpp>
 #include <yaclib/util/cast.hpp>
 #include <yaclib/util/detail/set_deleter.hpp>
 
@@ -18,9 +19,12 @@ struct CallCallback : InlineCore {
     DownCast<Derived>(*this).Sub(1);
     return Noop<SymmetricTransfer>();
   }
+
+ public:
   [[nodiscard]] InlineCore* Here(InlineCore& /*caller*/) noexcept final {
     return Impl<false>();
   }
+
 #if YACLIB_SYMMETRIC_TRANSFER != 0
   [[nodiscard]] yaclib_std::coroutine_handle<> Next(InlineCore& /*caller*/) noexcept final {
     return Impl<true>();
@@ -41,9 +45,12 @@ struct DropCallback : InlineCore {
     DownCast<Derived>(*this).Sub(1);
     return Noop<SymmetricTransfer>();
   }
+
+ public:
   [[nodiscard]] InlineCore* Here(InlineCore& caller) noexcept final {
     return Impl<false>(caller);
   }
+
 #if YACLIB_SYMMETRIC_TRANSFER != 0
   [[nodiscard]] yaclib_std::coroutine_handle<> Next(InlineCore& caller) noexcept final {
     return Impl<true>(caller);
@@ -52,7 +59,8 @@ struct DropCallback : InlineCore {
 };
 
 template <typename Event, template <typename...> typename Counter, template <typename...> typename... Callbacks>
-struct MultiEvent final : Counter<Event, SetDeleter>, Callbacks<MultiEvent<Event, Counter, Callbacks...>>... {
+struct MultiEvent : Counter<Event, SetDeleter>, Callbacks<MultiEvent<Event, Counter, Callbacks...>>... {
+  static constexpr bool kShared = false;
   using Counter<Event, SetDeleter>::Counter;
 };
 

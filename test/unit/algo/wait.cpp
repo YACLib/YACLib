@@ -223,6 +223,31 @@ TEST(Wait, ResetWait) {
   tp.HardStop();
   tp.Wait();
 }
+
+TEST(Wait, Stress) {
+  yaclib::FairThreadPool tp{4};
+
+  std::vector<yaclib::Future<int>> futures;
+  std::vector<yaclib::Promise<int>> promises;
+
+  for (size_t i = 0; i < 100000; ++i) {
+    auto [f, p] = yaclib::MakeContract<int>();
+    futures.push_back(std::move(f));
+    promises.push_back(std::move(p));
+  }
+
+  yaclib::Run(tp, [&] {
+    for (size_t i = 0; i < 100000; ++i) {
+      std::move(promises[i]).Set(5);
+    }
+  }).Detach();
+
+  auto done = WaitFor(10ms, futures.begin(), futures.end());
+
+  tp.SoftStop();
+  tp.Wait();
+}
+
 // silly test to pass codecov
 TEST(SillyTest, ForTouch) {
   yaclib::FairThreadPool tp;

@@ -41,16 +41,19 @@ template <typename T>
 inline constexpr bool is_future_base_v = detail::IsInstantiationOf<FutureBase, T>::Value ||  // NOLINT
                                          detail::IsInstantiationOf<Future, T>::Value ||      // dummy comments
                                          detail::IsInstantiationOf<FutureOn, T>::Value;      // for format
-template <typename T>
-inline constexpr bool is_task_v = detail::IsInstantiationOf<Task, T>::Value;  // NOLINT
 
 template <typename T>
-inline constexpr bool is_shared_future_v = detail::IsInstantiationOf<SharedFuture, T>::Value;
+inline constexpr bool is_shared_future_base_v = detail::IsInstantiationOf<SharedFutureBase, T>::Value ||  // NOLINT
+                                                detail::IsInstantiationOf<SharedFuture, T>::Value ||  // dummy comments
+                                                detail::IsInstantiationOf<SharedFutureOn, T>::Value;  // for format
+
+template <typename T>
+inline constexpr bool is_task_v = detail::IsInstantiationOf<Task, T>::Value;  // NOLINT
 
 // Waitable: a reference to a shared future or a non-const reference to a regular future
 template <typename T>
 inline constexpr bool is_waitable_v =
-  is_shared_future_v<remove_cvref_t<T>> ||
+  is_shared_future_base_v<remove_cvref_t<T>> ||
   (!std::is_const_v<std::remove_reference_t<T>> && is_future_base_v<remove_cvref_t<T>>);
 
 // Waitable with timeout: a non-const reference to a regular future (shared futures cannot be waited with timeout)
@@ -78,6 +81,9 @@ decltype(auto) move_if(T&& arg) noexcept {  // NOLINT
     return std::forward<T>(arg);
   }
 }
+
+template <typename T, typename... List>
+inline constexpr auto Count = (std::size_t{std::is_same_v<T, List> ? 1 : 0} + ...);
 
 template <typename T>
 constexpr bool Check() noexcept {

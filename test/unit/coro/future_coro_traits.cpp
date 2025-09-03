@@ -3,6 +3,7 @@
 #include <yaclib/async/run.hpp>
 #include <yaclib/coro/await.hpp>
 #include <yaclib/coro/future.hpp>
+#include <yaclib/coro/shared_future.hpp>
 
 #include <exception>
 #include <stack>
@@ -121,6 +122,17 @@ TEST(CoroTraits, Lambda) {
   };
 
   EXPECT_EQ(coro().Touch().Ok(), 42);
+}
+
+TEST(CoroTraits, Shared) {
+  auto coro = [&]() -> yaclib::SharedFuture<int> {
+    co_return 42;
+  };
+
+  auto f1 = coro();
+  auto f2 = f1;
+
+  EXPECT_EQ(f2.Touch().Ok(), 42);
 }
 
 }  // namespace

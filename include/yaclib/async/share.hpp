@@ -8,14 +8,14 @@
 namespace yaclib {
 
 template <typename V, typename E>
-Future<V, E> Share(const SharedFuture<V, E>& future) {
+Future<V, E> Share(const SharedFutureBase<V, E>& future) {
   auto [f, p] = MakeContract<V, E>();
   Connect(future, std::move(p));
   return std::move(f);
 }
 
 template <typename V, typename E>
-FutureOn<V, E> Share(const SharedFuture<V, E>& future, IExecutor& executor) {
+FutureOn<V, E> Share(const SharedFutureBase<V, E>& future, IExecutor& executor) {
   auto [f, p] = MakeContractOn<V, E>(executor);
   Connect(future, std::move(p));
   return std::move(f);

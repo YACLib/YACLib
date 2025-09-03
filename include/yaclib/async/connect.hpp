@@ -22,7 +22,7 @@ void Connect(FutureBase<V, E>&& f, Promise<V, E>&& p) {
 }
 
 template <typename V, typename E>
-void Connect(const SharedFuture<V, E>& f, Promise<V, E>&& p) {
+void Connect(const SharedFutureBase<V, E>& f, Promise<V, E>&& p) {
   YACLIB_ASSERT(f.Valid());
   YACLIB_ASSERT(p.Valid());
   if (f.GetCore()->SetCallback(*p.GetCore().Get())) {
@@ -45,7 +45,7 @@ void Connect(FutureBase<V, E>&& f, SharedPromise<V, E>&& p) {
 }
 
 template <typename V, typename E>
-void Connect(const SharedFuture<V, E>& f, SharedPromise<V, E>&& p) {
+void Connect(const SharedFutureBase<V, E>& f, SharedPromise<V, E>&& p) {
   YACLIB_ASSERT(f.Valid());
   YACLIB_ASSERT(p.Valid());
   YACLIB_ASSERT(f.GetCore() != p.GetCore());

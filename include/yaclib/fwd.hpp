@@ -49,8 +49,14 @@ class [[nodiscard]] FutureOn;
 template <typename V = void, typename E = StopError>
 class [[nodiscard]] Promise;
 
+template <typename V, typename E>
+class SharedFutureBase;
+
 template <typename V = void, typename E = StopError>
 class [[nodiscard]] SharedFuture;
+
+template <typename V = void, typename E = StopError>
+class [[nodiscard]] SharedFutureOn;
 
 template <typename V = void, typename E = StopError>
 class [[nodiscard]] SharedPromise;

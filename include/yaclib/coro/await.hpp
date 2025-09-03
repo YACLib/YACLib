@@ -7,39 +7,41 @@
 
 namespace yaclib {
 
-/**
- * TODO(mkornaukhov03) Add doxygen docs
- */
 template <typename V, typename E>
 YACLIB_INLINE auto Await(Task<V, E>& task) noexcept {
   YACLIB_ASSERT(task.Valid());
   return detail::TransferAwaiter{UpCast<detail::BaseCore>(*task.GetCore())};
 }
 
-/**
- * TODO(mkornaukhov03) Add doxygen docs
- */
-template <typename... V, typename... E>
-YACLIB_INLINE auto Await(FutureBase<V, E>&... fs) noexcept {
-  YACLIB_ASSERT(... && fs.Valid());
-  return detail::AwaitAwaiter<sizeof...(fs) == 1>{UpCast<detail::BaseCore>(*fs.GetCore())...};
+template <typename Waited, typename = std::enable_if_t<is_waitable_v<Waited>>>
+YACLIB_INLINE auto Await(Waited& waited) noexcept {
+  YACLIB_ASSERT(waited.Valid());
+  return detail::AwaitAwaiter{waited.GetHandle()};
 }
 
-/**
- * TODO(mkornaukhov03) Add doxygen docs
- */
-template <typename Iterator>
-YACLIB_INLINE auto Await(Iterator begin, std::size_t count) noexcept
-  -> std::enable_if_t<!is_future_base_v<Iterator>, detail::AwaitAwaiter<false>> {
-  return detail::AwaitAwaiter<false>{begin, count};
+template <typename... Waited, typename = std::enable_if_t<(... && is_waitable_v<Waited>)>>
+YACLIB_INLINE auto Await(Waited&... waited) noexcept {
+  using namespace detail;
+  static constexpr auto kSharedCount = Count<SharedHandle, typename Waited::Handle...>;
+  using Awaiter = std::conditional_t<kSharedCount == 0, MultiAwaitAwaiter<AwaitEvent>,
+                                     MultiAwaitAwaiter<StaticSharedEvent<AwaitEvent, kSharedCount>>>;
+  YACLIB_ASSERT(... && waited.Valid());
+  return Awaiter{waited.GetHandle()...};
 }
 
-/**
- * TODO(mkornaukhov03) Add doxygen docs
- */
-template <typename Iterator>
-YACLIB_INLINE auto Await(Iterator begin, Iterator end) noexcept
-  -> std::enable_if_t<!is_future_base_v<Iterator>, detail::AwaitAwaiter<false>> {
+template <typename Iterator, typename Value = typename std::iterator_traits<Iterator>::value_type,
+          typename = std::enable_if_t<is_waitable_v<Value>>>
+YACLIB_INLINE auto Await(Iterator begin, std::size_t count) noexcept {
+  using namespace detail;
+  static constexpr auto kShared = std::is_same_v<typename Value::Handle, SharedHandle>;
+  using Awaiter =
+    std::conditional_t<kShared, MultiAwaitAwaiter<DynamicSharedEvent<AwaitEvent>>, MultiAwaitAwaiter<AwaitEvent>>;
+  return Awaiter{begin, count};
+}
+
+template <typename Iterator,
+          typename = std::enable_if_t<is_waitable_v<typename std::iterator_traits<Iterator>::value_type>>>
+YACLIB_INLINE auto Await(Iterator begin, Iterator end) noexcept {
   // We don't use std::distance because we want to alert the user to the fact that it can be expensive.
   // Maybe the user has the size of the range, otherwise it is suggested to call Await(begin, distance(begin, end))
   return Await(begin, static_cast<std::size_t>(end - begin));
@@ -48,7 +50,13 @@ YACLIB_INLINE auto Await(Iterator begin, Iterator end) noexcept
 template <typename V, typename E>
 YACLIB_INLINE auto operator co_await(FutureBase<V, E>&& future) noexcept {
   YACLIB_ASSERT(future.Valid());
-  return detail::AwaitSingleAwaiter{std::move(future.GetCore())};
+  return detail::AwaitSingleAwaiter<false, V, E>{std::move(future.GetCore())};
+}
+
+template <typename V, typename E>
+YACLIB_INLINE auto operator co_await(const SharedFutureBase<V, E>& future) noexcept {
+  YACLIB_ASSERT(future.Valid());
+  return detail::AwaitSingleAwaiter<true, V, E>{future.GetCore()};
 }
 
 template <typename V, typename E>
