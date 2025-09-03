@@ -54,6 +54,36 @@ using Types = testing::Types<yaclib::Future<>, yaclib::Task<>, yaclib::SharedFut
 
 TYPED_TEST_SUITE(AsyncSuite, Types, TypeNames);
 
+template <typename T>
+struct FutureSuite : testing::Test {
+  static constexpr bool kIsFuture = yaclib::is_future_base_v<T>;
+  static constexpr bool kIsSharedFuture = yaclib::is_shared_future_base_v<T>;
+
+  template <typename V = void, typename E = yaclib::StopError>
+  using FutureT = std::conditional_t<kIsFuture, yaclib::Future<V, E>, yaclib::SharedFuture<V, E>>;
+
+  template <typename V = void, typename E = yaclib::StopError>
+  using FutureOnT = std::conditional_t<kIsFuture, yaclib::FutureOn<V, E>, yaclib::SharedFutureOn<V, E>>;
+};
+
+struct FutureTypeNames {
+  template <typename T>
+  static std::string GetName(int i) {
+    switch (i) {
+      case 0:
+        return "Future";
+      case 1:
+        return "SharedFuture";
+      default:
+        return "unknown";
+    }
+  }
+};
+
+using FutureTypes = testing::Types<yaclib::Future<>, yaclib::SharedFuture<>>;
+
+TYPED_TEST_SUITE(FutureSuite, FutureTypes, FutureTypeNames);
+
 #define INVOKE(executor, func)                                                                                         \
   [&] {                                                                                                                \
     if constexpr (TestFixture::kIsFuture) {                                                                            \
