@@ -61,6 +61,7 @@ struct DynamicSharedEvent : public Event {
 
 template <typename Event, typename... Handles>
 void SetCallbacksStatic(Event& event, Handles... handles) {
+  static_assert(sizeof...(handles) >= 2, "Number of futures must be at least two");
   const auto wait_count = [&] {
     if constexpr (!Event::kShared) {
       auto setter = [&](auto handle) {

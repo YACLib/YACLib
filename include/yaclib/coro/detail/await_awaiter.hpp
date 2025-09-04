@@ -131,7 +131,6 @@ class MultiAwaitAwaiter final : public Event {
 
   template <typename... Handles>
   explicit MultiAwaitAwaiter(Handles... handles) noexcept : Event{sizeof...(handles) + 1} {
-    static_assert(sizeof...(handles) >= 2, "Number of futures must be at least two");
     SetCallbacksStatic(*this, handles...);
   }
 

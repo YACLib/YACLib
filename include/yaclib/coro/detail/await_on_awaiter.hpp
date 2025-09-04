@@ -92,7 +92,6 @@ class [[nodiscard]] MultiAwaitOnAwaiter final : public Event {
   template <typename... Handles>
   explicit MultiAwaitOnAwaiter(IExecutor& e, Handles... handles) noexcept
     : Event{sizeof...(handles) + 1}, _executor{e} {
-    static_assert(sizeof...(handles) >= 2, "Number of futures must be at least two");
     SetCallbacksStatic(*this, handles...);
   }
 
