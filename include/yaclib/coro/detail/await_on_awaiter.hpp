@@ -1,5 +1,8 @@
 #pragma once
 
+#include "yaclib/algo/detail/shared_event.hpp"
+#include "yaclib/exe/executor.hpp"
+
 #include <yaclib/async/future.hpp>
 #include <yaclib/coro/coro.hpp>
 #include <yaclib/lazy/task.hpp>
@@ -25,6 +28,17 @@ class AwaitOnEvent : public InlineCore, public AwaitOnCounterT<Single> {
   explicit AwaitOnEvent(std::size_t n) noexcept : AwaitOnCounterT<Single>{n} {
   }
 
+  [[nodiscard]] InlineCore* Here(InlineCore& caller) noexcept final {
+    return Impl<false>(caller);
+  }
+
+#if YACLIB_SYMMETRIC_TRANSFER != 0
+  [[nodiscard]] yaclib_std::coroutine_handle<> Next(InlineCore& caller) noexcept final {
+    return Impl<true>(caller);
+  }
+#endif
+
+ protected:
   BaseCore* job{nullptr};
 
  private:
@@ -40,23 +54,12 @@ class AwaitOnEvent : public InlineCore, public AwaitOnCounterT<Single> {
     }
     return Noop<SymmetricTransfer>();
   }
-
- public:
-  [[nodiscard]] InlineCore* Here(InlineCore& caller) noexcept final {
-    return Impl<false>(caller);
-  }
-
-#if YACLIB_SYMMETRIC_TRANSFER != 0
-  [[nodiscard]] yaclib_std::coroutine_handle<> Next(InlineCore& caller) noexcept final {
-    return Impl<true>(caller);
-  }
-#endif
 };
 
 template <typename Handle>
-struct [[nodiscard]] AwaitOnAwaiter final {
-  explicit AwaitOnAwaiter(IExecutor& e, Handle caller) noexcept : _executor{e}, _event{1} {
-    _event.job = &caller.core;
+struct [[nodiscard]] AwaitOnAwaiter final : AwaitOnEvent<false> {
+  explicit AwaitOnAwaiter(IExecutor& e, Handle caller) noexcept : AwaitOnEvent<false>{1}, _executor{e} {
+    job = &caller.core;
   }
 
   constexpr bool await_ready() const noexcept {
@@ -67,10 +70,10 @@ struct [[nodiscard]] AwaitOnAwaiter final {
   YACLIB_INLINE void await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
     auto& core = handle.promise();
     core._executor = &_executor;
-    Handle caller_handle{*_event.job};
-    _event.job = &core;
+    Handle caller_handle{*job};
+    job = &core;
 
-    if (!caller_handle.SetCallback(_event)) {
+    if (!caller_handle.SetCallback(*this)) {
       _executor.Submit(core);
     }
   }
@@ -80,53 +83,23 @@ struct [[nodiscard]] AwaitOnAwaiter final {
 
  private:
   IExecutor& _executor;
-  AwaitOnEvent<true> _event;
 };
 
 template <typename Event>
-class [[nodiscard]] MultiAwaitOnAwaiter final {
+class [[nodiscard]] MultiAwaitOnAwaiter final : public Event {
  public:
   static constexpr auto kShared = Event::kShared;
 
   template <typename... Handles>
   explicit MultiAwaitOnAwaiter(IExecutor& e, Handles... handles) noexcept
-    : _executor{e}, _event{sizeof...(handles) + 1} {
+    : Event{sizeof...(handles) + 1}, _executor{e} {
     static_assert(sizeof...(handles) >= 2, "Number of futures must be at least two");
-
-    const auto wait_count = [&] {
-      if constexpr (!kShared) {
-        auto setter = [&](auto handle) {
-          return handle.SetCallback(_event);
-        };
-        return (... + static_cast<std::size_t>(setter(handles)));
-      } else {
-        auto setter = [&, callback_count = std::size_t{}](auto handle) mutable {
-          if constexpr (std::is_same_v<decltype(handle), UniqueHandle>) {
-            return handle.SetCallback(_event);
-          } else {
-            return handle.SetCallback(_event.callbacks[callback_count++]);
-          }
-        };
-        return (... + static_cast<std::size_t>(setter(handles)));
-      }
-    }();
-
-    _event.count.fetch_sub(sizeof...(handles) - wait_count, std::memory_order_relaxed);
+    SetCallbacksStatic(*this, handles...);
   }
 
   template <typename It>
-  explicit MultiAwaitOnAwaiter(IExecutor& e, It it, std::size_t count) noexcept : _executor{e}, _event{count + 1} {
-    std::size_t wait_count = 0;
-    for (std::size_t i = 0; i != count; ++i) {
-      YACLIB_ASSERT(it->Valid());
-      if constexpr (std::is_same_v<decltype(it->GetHandle()), UniqueHandle>) {
-        wait_count += static_cast<std::size_t>(it->GetHandle().SetCallback(_event));
-      } else {
-        wait_count += static_cast<std::size_t>(it->GetHandle().SetCallback(_event.callbacks[i]));
-      }
-      ++it;
-    }
-    _event.count.fetch_sub(count - wait_count, std::memory_order_relaxed);
+  explicit MultiAwaitOnAwaiter(IExecutor& e, It it, std::size_t count) noexcept : Event{count + 1}, _executor{e} {
+    SetCallbacksDynamic(*this, it, count);
   }
 
   constexpr bool await_ready() const noexcept {
@@ -137,9 +110,9 @@ class [[nodiscard]] MultiAwaitOnAwaiter final {
   YACLIB_INLINE void await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
     auto& core = handle.promise();
     core._executor = &_executor;
-    _event.job = &core;
+    this->job = &core;
 
-    if (_event.SubEqual(1)) {
+    if (this->SubEqual(1)) {
       _executor.Submit(core);
     }
   }
@@ -149,7 +122,6 @@ class [[nodiscard]] MultiAwaitOnAwaiter final {
 
  private:
   IExecutor& _executor;
-  Event _event;
 };
 
 }  // namespace yaclib::detail

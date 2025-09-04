@@ -129,6 +129,17 @@ class MultiAwaitAwaiter final : public Event {
  public:
   static constexpr auto kShared = Event::kShared;
 
+  template <typename... Handles>
+  explicit MultiAwaitAwaiter(Handles... handles) noexcept : Event{sizeof...(handles) + 1} {
+    static_assert(sizeof...(handles) >= 2, "Number of futures must be at least two");
+    SetCallbacksStatic(*this, handles...);
+  }
+
+  template <typename It>
+  explicit MultiAwaitAwaiter(It it, std::size_t count) noexcept : Event{count + 1} {
+    SetCallbacksDynamic(*this, it, count);
+  }
+
   YACLIB_INLINE bool await_ready() const noexcept {
     return this->Get(std::memory_order_acquire) == 1;
   }
@@ -140,43 +151,6 @@ class MultiAwaitAwaiter final : public Event {
   }
 
   constexpr void await_resume() const noexcept {
-  }
-
-  template <typename... Handles>
-  explicit MultiAwaitAwaiter(Handles... handles) noexcept : Event{sizeof...(handles) + 1} {
-    const auto wait_count = [&] {
-      if constexpr (!kShared) {
-        auto setter = [&](auto handle) {
-          return handle.SetCallback(*this);
-        };
-        return (... + static_cast<std::size_t>(setter(handles)));
-      } else {
-        auto setter = [&, callback_count = std::size_t{}](auto handle) mutable {
-          if constexpr (std::is_same_v<decltype(handle), UniqueHandle>) {
-            return handle.SetCallback(*this);
-          } else {
-            return handle.SetCallback(this->callbacks[callback_count++]);
-          }
-        };
-        return (... + static_cast<std::size_t>(setter(handles)));
-      }
-    }();
-    this->count.fetch_sub(sizeof...(handles) - wait_count, std::memory_order_relaxed);
-  }
-
-  template <typename It>
-  explicit MultiAwaitAwaiter(It it, std::size_t count) noexcept : Event{count + 1} {
-    std::size_t wait_count = 0;
-    for (std::size_t i = 0; i != count; ++i) {
-      YACLIB_ASSERT(it->Valid());
-      if constexpr (std::is_same_v<decltype(it->GetHandle()), UniqueHandle>) {
-        wait_count += static_cast<std::size_t>(it->GetHandle().SetCallback(*this));
-      } else {
-        wait_count += static_cast<std::size_t>(it->GetHandle().SetCallback(this->callbacks[i]));
-      }
-      ++it;
-    }
-    this->count.fetch_sub(count - wait_count, std::memory_order_relaxed);
   }
 };
 
