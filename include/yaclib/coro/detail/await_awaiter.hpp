@@ -1,5 +1,6 @@
 #pragma once
 
+#include <yaclib/algo/detail/inline_core.hpp>
 #include <yaclib/algo/detail/shared_event.hpp>
 #include <yaclib/async/future.hpp>
 #include <yaclib/coro/coro.hpp>
@@ -67,26 +68,64 @@ struct [[nodiscard]] TransferSingleAwaiter final {
 };
 
 template <typename Handle>
-struct [[nodiscard]] AwaitAwaiter final {
-  explicit AwaitAwaiter(Handle caller) noexcept : _caller{caller} {
+struct AwaitAwaiterBase {
+  explicit AwaitAwaiterBase(Handle caller) noexcept : _core{&caller.core} {
   }
 
   YACLIB_INLINE bool await_ready() const noexcept {
-    return !_caller.core.Empty();
-  }
-
-  template <typename Promise>
-  YACLIB_INLINE bool await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
-    return _caller.SetCallback(handle.promise());
+    return !_core->Empty();
   }
 
   constexpr void await_resume() const noexcept {
   }
 
- private:
-  Handle _caller;
+ protected:
+  // caller core before await_suspend, callee core after
+  BaseCore* _core;
 };
 
+template <typename Handle, bool Sticky>
+struct [[nodiscard]] AwaitAwaiter;
+
+template <typename Handle>
+struct [[nodiscard]] AwaitAwaiter<Handle, false> final : public AwaitAwaiterBase<Handle> {
+  using AwaitAwaiterBase<Handle>::AwaitAwaiterBase;
+
+  template <typename Promise>
+  YACLIB_INLINE bool await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
+    return Handle{*this->_core}.SetCallback(handle.promise());
+  }
+};
+
+template <typename Handle>
+struct [[nodiscard]] AwaitAwaiter<Handle, true> final : public AwaitAwaiterBase<Handle>, public InlineCore {
+  using AwaitAwaiterBase<Handle>::AwaitAwaiterBase;
+
+  template <typename Promise>
+  YACLIB_INLINE bool await_suspend(yaclib_std::coroutine_handle<Promise> handle) noexcept {
+    auto caller_handle = Handle{*this->_core};
+    this->_core = &handle.promise();
+    return caller_handle.SetCallback(*this);
+  }
+
+  void Call() noexcept final {
+    this->_core->_executor->Submit(*this->_core);
+  }
+
+  [[nodiscard]] InlineCore* Here(InlineCore& caller) noexcept final {
+    Call();
+    return nullptr;
+  }
+
+#if YACLIB_SYMMETRIC_TRANSFER != 0
+  [[nodiscard]] yaclib_std::coroutine_handle<> Next(InlineCore& caller) noexcept final {
+    Call();
+    return Noop<true>();
+  }
+#endif
+};
+
+template <bool Sticky>
 class AwaitEvent : public InlineCore, public AtomicCounter<NopeBase, NopeDeleter> {
  public:
   using AtomicCounter<NopeBase, NopeDeleter>::AtomicCounter;
@@ -101,12 +140,17 @@ class AwaitEvent : public InlineCore, public AtomicCounter<NopeBase, NopeDeleter
   template <bool SymmetricTransfer>
   [[nodiscard]] YACLIB_INLINE auto Impl(InlineCore& caller) noexcept {
     if (this->SubEqual(1)) {
-      auto* curr = static_cast<InlineCore*>(next);
-      if constexpr (SymmetricTransfer) {
-        return Step<true>(caller, *curr);
+      if constexpr (Sticky) {
+        auto* curr = static_cast<BaseCore*>(next);
+        curr->_executor->Submit(*curr);
       } else {
-        curr = curr->Here(caller);
-        YACLIB_ASSERT(curr == nullptr);
+        auto* curr = static_cast<InlineCore*>(next);
+        if constexpr (SymmetricTransfer) {
+          return Step<true>(caller, *curr);
+        } else {
+          curr = curr->Here(caller);
+          YACLIB_ASSERT(curr == nullptr);
+        }
       }
     }
     return Noop<SymmetricTransfer>();
