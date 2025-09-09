@@ -1,0 +1,21 @@
+<map id="yaclib::detail::AwaitEvent" name="yaclib::detail::AwaitEvent">
+<area shape="rect" id="Node000001" title=" " alt="" coords="946,63,1109,88"/>
+<area shape="rect" id="Node000002" href="$classyaclib_1_1detail_1_1InlineCore.html" title=" " alt="" coords="727,33,882,59"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="898,56,946,62,945,67,898,61"/>
+<area shape="rect" id="Node000003" href="$classyaclib_1_1Job.html" title="Callable that can be executed in an IExecutor." alt="" coords="368,33,449,59"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="465,44,727,44,727,49,465,49"/>
+<area shape="rect" id="Node000004" href="$classyaclib_1_1IFunc.html" title="Callable interface." alt="" coords="157,5,250,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="266,24,367,38,367,43,265,29"/>
+<area shape="rect" id="Node000005" href="$classyaclib_1_1IRef.html" title="Reference counting interface." alt="" coords="5,5,90,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="105,16,156,16,156,21,105,21"/>
+<area shape="rect" id="Node000006" href="$structyaclib_1_1detail_1_1Node.html" title="Node class, used in intrusive data structure." alt="" coords="139,55,267,80"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="282,57,367,48,367,53,283,62"/>
+<area shape="rect" id="Node000007" href="$structyaclib_1_1detail_1_1AtomicCounter.html" title=" " alt="" coords="713,83,896,124"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="912,87,945,83,946,88,912,93"/>
+<area shape="rect" id="Node000008" href="$structyaclib_1_1detail_1_1NopeBase.html" title=" " alt="" coords="329,87,488,112"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="503,98,713,100,712,105,503,103"/>
+<area shape="rect" id="Node000009" href="$structyaclib_1_1detail_1_1AtomicCounter.html" title=" " alt="" coords="317,137,500,177"/>
+<area shape="poly" id="edge8_Node000007_Node000009" title=" " alt="" coords="515,143,689,121,713,117,713,123,689,126,516,148"/>
+<area shape="rect" id="Node000010" href="$classCounterBase.html" title=" " alt="" coords="155,144,251,170"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="267,154,316,154,316,160,267,160"/>
+</map>

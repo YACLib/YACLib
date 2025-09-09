@@ -1,0 +1,9 @@
+<map id="yaclib::detail::fiber::BiNodeScheduler" name="yaclib::detail::fiber::BiNodeScheduler">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,94,134,135"/>
+<area shape="rect" id="Node000003" href="$classyaclib_1_1detail_1_1fiber_1_1FiberBase.html" title=" " alt="" coords="9,183,130,223"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="72,150,72,182,67,182,67,150"/>
+<area shape="rect" id="Node000002" href="$structyaclib_1_1detail_1_1fiber_1_1Node.html" title=" " alt="" coords="9,5,130,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="72,62,72,94,67,94,67,62"/>
+<area shape="rect" id="Node000004" href="$classyaclib_1_1detail_1_1fiber_1_1Fiber.html" title=" " alt="" coords="9,271,130,312"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="72,239,72,271,67,271,67,239"/>
+</map>

@@ -1,0 +1,17 @@
+<map id="include/yaclib/async/detail/when_impl.hpp" name="include/yaclib/async/detail/when_impl.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="197,5,343,46"/>
+<area shape="rect" id="Node000002" href="$when__all__impl_8hpp.html" title=" " alt="" coords="5,94,172,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="216,55,131,96,128,91,214,51"/>
+<area shape="rect" id="Node000003" href="$when__all_8hpp.html" title=" " alt="" coords="100,183,237,223"/>
+<area shape="poly" id="edge7_Node000001_Node000003" title=" " alt="" coords="253,61,182,184,177,181,249,58"/>
+<area shape="rect" id="Node000005" href="$when__any__impl_8hpp.html" title=" " alt="" coords="246,94,419,135"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="295,57,320,92,316,95,291,60"/>
+<area shape="rect" id="Node000006" href="$when__any_8hpp.html" title=" " alt="" coords="303,183,440,223"/>
+<area shape="poly" id="edge8_Node000001_Node000006" title=" " alt="" coords="359,41,400,61,418,75,433,93,439,105,440,117,432,142,416,165,397,184,394,180,412,161,427,140,435,117,434,106,429,95,415,79,397,65,357,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="119,144,152,180,148,184,115,148"/>
+<area shape="rect" id="Node000004" href="$when__all_8cpp.html" title=" " alt="" coords="102,271,235,312"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="171,239,171,271,166,271,166,239"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="350,148,365,181,360,183,345,150"/>
+<area shape="rect" id="Node000007" href="$when__any_8cpp.html" title=" " alt="" coords="305,271,438,312"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="374,239,374,271,369,271,369,239"/>
+</map>

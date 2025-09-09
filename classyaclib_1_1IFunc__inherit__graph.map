@@ -1,0 +1,52 @@
+<map id="yaclib::IFunc" name="yaclib::IFunc">
+<area shape="rect" id="Node000001" title="Callable interface." alt="" coords="139,256,232,281"/>
+<area shape="rect" id="Node000003" href="$classyaclib_1_1Job.html" title="Callable that can be executed in an IExecutor." alt="" coords="325,214,406,240"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="247,252,324,234,325,239,248,257"/>
+<area shape="rect" id="Node000025" href="$classyaclib_1_1detail_1_1SharedFunc.html" title=" " alt="" coords="282,264,449,305"/>
+<area shape="poly" id="edge25_Node000001_Node000025" title=" " alt="" coords="248,271,281,274,281,280,248,277"/>
+<area shape="rect" id="Node000002" href="$classyaclib_1_1IRef.html" title="Reference counting interface." alt="" coords="5,256,90,281"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="105,266,138,266,138,271,105,271"/>
+<area shape="rect" id="Node000004" href="$structyaclib_1_1OneShotEvent_1_1TimedWaiter.html" title="Public only because Waiter is public." alt="" coords="506,84,650,125"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="394,203,442,169,497,135,523,123,525,128,500,140,444,174,397,207"/>
+<area shape="rect" id="Node000005" href="$structyaclib_1_1OneShotEvent_1_1Waiter.html" title="Waiter is public for advanced users." alt="" coords="506,149,650,190"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="420,210,505,187,506,192,422,215"/>
+<area shape="rect" id="Node000006" href="$classyaclib_1_1Strand.html" title=" " alt="" coords="529,214,627,240"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="422,224,528,224,528,230,422,230"/>
+<area shape="rect" id="Node000007" href="$classyaclib_1_1detail_1_1InlineCore.html" title=" " alt="" coords="500,264,656,289"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="422,237,520,260,519,266,421,243"/>
+<area shape="rect" id="Node000024" href="$classyaclib_1_1detail_1_1UniqueJob.html" title=" " alt="" coords="498,313,658,354"/>
+<area shape="poly" id="edge24_Node000003_Node000024" title=" " alt="" coords="422,237,450,250,466,263,476,275,485,287,500,300,519,311,517,315,497,304,482,291,472,278,462,266,448,255,420,242"/>
+<area shape="rect" id="Node000008" href="$classyaclib_1_1detail_1_1AwaitOnEvent.html" title=" " alt="" coords="993,285,1174,326"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="654,252,656,251,665,233,671,208,678,144,685,80,693,54,705,37,729,21,752,10,774,4,797,3,842,13,894,37,931,61,964,91,993,125,1018,161,1055,231,1077,284,1073,286,1050,233,1013,164,989,128,960,95,928,65,891,41,841,19,796,8,775,9,754,15,732,25,709,41,698,57,691,81,683,144,677,209,670,235,660,254,658,256"/>
+<area shape="rect" id="Node000010" href="$classyaclib_1_1detail_1_1AllCombinator.html" title=" " alt="" coords="711,51,889,91"/>
+<area shape="poly" id="edge9_Node000007_Node000010" title=" " alt="" coords="653,253,656,251,664,239,670,222,680,178,690,134,697,116,705,103,721,90,725,94,709,106,701,118,695,135,685,179,675,223,668,241,660,254,657,257"/>
+<area shape="rect" id="Node000011" href="$classyaclib_1_1detail_1_1AllCombinator_3_01OrderPolicy_1_1Same_00_01R_00_01E_01_4.html" title=" " alt="" coords="709,116,890,157"/>
+<area shape="poly" id="edge10_Node000007_Node000011" title=" " alt="" coords="651,254,656,251,673,231,680,211,688,189,705,168,724,155,727,160,709,172,692,192,685,212,677,234,659,254,655,258"/>
+<area shape="rect" id="Node000012" href="$classyaclib_1_1detail_1_1AnyCombinator.html" title=" " alt="" coords="707,181,892,222"/>
+<area shape="poly" id="edge11_Node000007_Node000012" title=" " alt="" coords="639,256,657,250,706,231,737,220,739,225,708,236,659,255,640,261"/>
+<area shape="rect" id="Node000013" href="$classyaclib_1_1detail_1_1AwaitEvent.html" title=" " alt="" coords="718,246,881,272"/>
+<area shape="poly" id="edge12_Node000007_Node000013" title=" " alt="" coords="671,267,717,263,718,268,671,272"/>
+<area shape="rect" id="Node000014" href="$classyaclib_1_1detail_1_1AwaitOnEvent.html" title=" " alt="" coords="710,296,890,337"/>
+<area shape="poly" id="edge13_Node000007_Node000014" title=" " alt="" coords="668,290,710,298,709,303,667,295"/>
+<area shape="rect" id="Node000015" href="$classyaclib_1_1detail_1_1BaseCore.html" title=" " alt="" coords="723,361,877,387"/>
+<area shape="poly" id="edge15_Node000007_Node000015" title=" " alt="" coords="647,293,659,300,675,312,684,324,694,335,708,346,735,358,733,363,706,351,690,339,680,327,671,315,656,304,645,298"/>
+<area shape="rect" id="Node000021" href="$structyaclib_1_1detail_1_1CallCallback.html" title=" " alt="" coords="715,411,884,451"/>
+<area shape="poly" id="edge21_Node000007_Node000021" title=" " alt="" coords="653,295,660,300,678,325,685,350,691,374,709,397,724,408,721,412,705,401,687,376,680,351,673,327,656,304,650,299"/>
+<area shape="rect" id="Node000022" href="$structyaclib_1_1detail_1_1DropCallback.html" title=" " alt="" coords="713,476,887,517"/>
+<area shape="poly" id="edge22_Node000007_Node000022" title=" " alt="" coords="655,296,660,300,669,314,675,334,685,382,695,430,701,448,709,461,724,473,721,478,705,465,696,451,690,431,680,383,670,335,664,316,656,304,652,300"/>
+<area shape="rect" id="Node000023" href="$structyaclib_1_1detail_1_1EventHelperCallback.html" title=" " alt="" coords="716,541,884,582"/>
+<area shape="poly" id="edge23_Node000007_Node000023" title=" " alt="" coords="656,296,660,300,671,320,678,347,685,415,692,482,699,508,709,527,723,539,720,543,705,530,694,510,687,483,680,415,673,348,666,322,656,303,652,300"/>
+<area shape="rect" id="Node000009" href="$structyaclib_1_1detail_1_1AwaitOnAwaiter.html" title=" " alt="" coords="1223,285,1414,326"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="1189,303,1223,303,1223,308,1189,308"/>
+<area shape="poly" id="edge14_Node000014_Node000008" title=" " alt="" coords="906,310,993,307,993,312,906,315"/>
+<area shape="rect" id="Node000016" href="$classyaclib_1_1detail_1_1NoResultCore.html" title=" " alt="" coords="994,354,1173,380"/>
+<area shape="poly" id="edge16_Node000015_Node000016" title=" " alt="" coords="893,369,994,367,994,372,893,374"/>
+<area shape="rect" id="Node000017" href="$classyaclib_1_1detail_1_1ResultCore.html" title=" " alt="" coords="1003,404,1164,445"/>
+<area shape="poly" id="edge17_Node000015_Node000017" title=" " alt="" coords="891,387,1003,407,1002,413,890,393"/>
+<area shape="rect" id="Node000018" href="$classyaclib_1_1detail_1_1SharedCore.html" title=" " alt="" coords="1236,364,1401,405"/>
+<area shape="poly" id="edge18_Node000017_Node000018" title=" " alt="" coords="1179,406,1235,396,1236,401,1179,411"/>
+<area shape="rect" id="Node000019" href="$classyaclib_1_1detail_1_1UniqueCore.html" title=" " alt="" coords="1236,429,1401,470"/>
+<area shape="poly" id="edge19_Node000017_Node000019" title=" " alt="" coords="1179,432,1236,438,1235,444,1179,437"/>
+<area shape="rect" id="Node000020" href="$classyaclib_1_1detail_1_1ReadyCore.html" title=" " alt="" coords="1464,429,1624,470"/>
+<area shape="poly" id="edge20_Node000019_Node000020" title=" " alt="" coords="1417,447,1463,447,1463,452,1417,452"/>
+</map>
