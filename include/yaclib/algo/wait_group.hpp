@@ -172,12 +172,12 @@ class WaitGroup final {
   }
 
   /**
-   * just shortcut for co_await wait_group.Await();
+   * just shortcut for co_await wait_group.AwaitInline();
    *
    * TODO(MBkkt) move all shortcut to AwaitSticky
    */
   YACLIB_INLINE auto operator co_await() noexcept {
-    return AwaitSticky();
+    return AwaitInline();
   }
 #endif
 

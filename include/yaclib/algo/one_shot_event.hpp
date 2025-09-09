@@ -168,12 +168,12 @@ class OneShotEvent {
   }
 
   /**
-   * just shortcut for co_await event.Await();
+   * just shortcut for co_await event.AwaitInline();
    *
    * TODO(MBkkt) move all shortcut to AwaitSticky
    */
-  YACLIB_INLINE StickyAwaiter operator co_await() noexcept {
-    return AwaitSticky();
+  YACLIB_INLINE InlineAwaiter operator co_await() noexcept {
+    return AwaitInline();
   }
 #endif
 
