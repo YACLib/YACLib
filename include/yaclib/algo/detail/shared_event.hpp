@@ -1,5 +1,6 @@
 #pragma once
 
+#include <yaclib/algo/detail/base_core.hpp>
 #include <yaclib/algo/detail/inline_core.hpp>
 
 #if YACLIB_CORO != 0
@@ -57,5 +58,44 @@ struct DynamicSharedEvent : public Event {
 
   std::vector<EventHelperCallback<Event>> callbacks;
 };
+
+template <typename Event, typename... Handles>
+void SetCallbacksStatic(Event& event, Handles... handles) {
+  static_assert(sizeof...(handles) >= 2, "Number of futures must be at least two");
+  const auto wait_count = [&] {
+    if constexpr (!Event::kShared) {
+      auto setter = [&](auto handle) {
+        return handle.SetCallback(event);
+      };
+      return (... + static_cast<std::size_t>(setter(handles)));
+    } else {
+      auto setter = [&, callback_count = std::size_t{}](auto handle) mutable {
+        if constexpr (std::is_same_v<decltype(handle), UniqueHandle>) {
+          return handle.SetCallback(event);
+        } else {
+          return handle.SetCallback(event.callbacks[callback_count++]);
+        }
+      };
+      return (... + static_cast<std::size_t>(setter(handles)));
+    }
+  }();
+
+  event.count.fetch_sub(sizeof...(handles) - wait_count, std::memory_order_relaxed);
+}
+
+template <typename Event, typename It>
+void SetCallbacksDynamic(Event& event, It it, std::size_t count) {
+  std::size_t wait_count = 0;
+  for (std::size_t i = 0; i != count; ++i) {
+    YACLIB_ASSERT(it->Valid());
+    if constexpr (std::is_same_v<decltype(it->GetHandle()), UniqueHandle>) {
+      wait_count += static_cast<std::size_t>(it->GetHandle().SetCallback(event));
+    } else {
+      wait_count += static_cast<std::size_t>(it->GetHandle().SetCallback(event.callbacks[i]));
+    }
+    ++it;
+  }
+  event.count.fetch_sub(count - wait_count, std::memory_order_relaxed);
+}
 
 }  // namespace yaclib::detail
