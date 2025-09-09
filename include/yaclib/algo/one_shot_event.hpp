@@ -13,10 +13,6 @@
 
 namespace yaclib {
 
-class OneShotEventAwait;
-class OneShotEventAwaitSticky;
-class OneShotEventAwaitOn;
-
 /**
  * This class useful to wait or co_await some event.
  *
@@ -91,7 +87,7 @@ class OneShotEvent {
     };
   };
 
-  class [[nodiscard]] Awaiter final : public BaseAwaiter {
+  class [[nodiscard]] InlineAwaiter final : public BaseAwaiter {
    public:
     using BaseAwaiter::BaseAwaiter;
 
@@ -148,8 +144,8 @@ class OneShotEvent {
    *
    * immediately return if Event is Ready
    */
-  YACLIB_INLINE Awaiter Await() noexcept {
-    return Awaiter{*this};
+  YACLIB_INLINE InlineAwaiter AwaitInline() noexcept {
+    return InlineAwaiter{*this};
   }
 
   /**
@@ -176,8 +172,8 @@ class OneShotEvent {
    *
    * TODO(MBkkt) move all shortcut to AwaitSticky
    */
-  YACLIB_INLINE Awaiter operator co_await() noexcept {
-    return Await();
+  YACLIB_INLINE StickyAwaiter operator co_await() noexcept {
+    return AwaitSticky();
   }
 #endif
 

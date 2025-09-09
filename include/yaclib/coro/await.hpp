@@ -16,15 +16,15 @@ YACLIB_INLINE auto Await(Task<V, E>& task) noexcept {
 template <typename Waited, typename = std::enable_if_t<is_waitable_v<Waited>>>
 YACLIB_INLINE auto Await(Waited& waited) noexcept {
   YACLIB_ASSERT(waited.Valid());
-  return detail::AwaitAwaiter{waited.GetHandle()};
+  return detail::AwaitAwaiter<typename Waited::Handle, true>{waited.GetHandle()};
 }
 
 template <typename... Waited, typename = std::enable_if_t<(... && is_waitable_v<Waited>)>>
 YACLIB_INLINE auto Await(Waited&... waited) noexcept {
   using namespace detail;
   static constexpr auto kSharedCount = Count<SharedHandle, typename Waited::Handle...>;
-  using Awaiter = std::conditional_t<kSharedCount == 0, MultiAwaitAwaiter<AwaitEvent>,
-                                     MultiAwaitAwaiter<StaticSharedEvent<AwaitEvent, kSharedCount>>>;
+  using Awaiter = std::conditional_t<kSharedCount == 0, MultiAwaitAwaiter<AwaitEvent<true>>,
+                                     MultiAwaitAwaiter<StaticSharedEvent<AwaitEvent<true>, kSharedCount>>>;
   YACLIB_ASSERT(... && waited.Valid());
   return Awaiter{waited.GetHandle()...};
 }
@@ -34,8 +34,8 @@ template <typename Iterator, typename Value = typename std::iterator_traits<Iter
 YACLIB_INLINE auto Await(Iterator begin, std::size_t count) noexcept {
   using namespace detail;
   static constexpr auto kShared = std::is_same_v<typename Value::Handle, SharedHandle>;
-  using Awaiter =
-    std::conditional_t<kShared, MultiAwaitAwaiter<DynamicSharedEvent<AwaitEvent>>, MultiAwaitAwaiter<AwaitEvent>>;
+  using Awaiter = std::conditional_t<kShared, MultiAwaitAwaiter<DynamicSharedEvent<AwaitEvent<true>>>,
+                                     MultiAwaitAwaiter<AwaitEvent<true>>>;
   return Awaiter{begin, count};
 }
 
