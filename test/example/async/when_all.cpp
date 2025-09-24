@@ -41,7 +41,7 @@ TEST(Example, WhenAll) {
   // Parallel composition
   // All combinator: std::vector<Future<T>> -> Future<std::vector<T>>
   // Non-blocking!
-  yaclib::Future<std::vector<int>> all = WhenAll(futs.begin(), futs.size());
+  yaclib::Future<std::vector<int>> all = WhenAllVector(futs.begin(), futs.size());
 
   // Blocks
   std::vector<int> ints = std::move(all).Get().Ok();

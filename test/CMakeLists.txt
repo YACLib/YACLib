@@ -28,6 +28,7 @@ set(TEST_UTIL_INCLUDES
   util/helpers.hpp
   util/inline_helper.hpp
   util/time.hpp
+  util/when_suite.hpp
   )
 set(TEST_UTIL_SOURCES
   test.cpp
@@ -53,6 +54,7 @@ set(YACLIB_UNIT_SOURCES
   unit/async/future
   unit/async/future_inline
   unit/async/future_functor
+  unit/algo/when
   unit/algo/when_all
   unit/algo/wait
   unit/algo/when_any
