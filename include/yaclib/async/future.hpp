@@ -186,6 +186,7 @@ class FutureBase {
   }
 
   using Handle = detail::UniqueHandle;
+  using Core = detail::UniqueCore<V, E>;
 
   [[nodiscard]] detail::UniqueHandle GetHandle() noexcept {
     return detail::UniqueHandle{*_core};

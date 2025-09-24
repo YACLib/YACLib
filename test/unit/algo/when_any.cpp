@@ -3,7 +3,7 @@
 #include <yaclib/async/make.hpp>
 #include <yaclib/async/promise.hpp>
 #include <yaclib/async/run.hpp>
-#include <yaclib/async/when_any.hpp>
+#include <yaclib/async/when.hpp>
 #include <yaclib/runtime/fair_thread_pool.hpp>
 #include <yaclib/util/intrusive_ptr.hpp>
 #include <yaclib/util/result.hpp>

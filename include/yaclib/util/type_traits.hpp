@@ -6,6 +6,7 @@
 #include <exception>
 #include <type_traits>
 #include <utility>
+#include <variant>
 
 namespace yaclib {
 
@@ -61,6 +62,10 @@ template <typename T>
 inline constexpr bool is_waitable_with_timeout_v =
   (!std::is_const_v<std::remove_reference_t<T>> && is_future_base_v<remove_cvref_t<T>>);
 
+// Combinator input: futures by value
+template <typename T>
+inline constexpr bool is_combinator_input_v = (is_shared_future_base_v<T> || is_future_base_v<T>);
+
 template <typename T>
 using future_base_value_t = typename detail::FutureBaseTypes<T>::Value;  // NOLINT
 
@@ -84,6 +89,81 @@ decltype(auto) move_if(T&& arg) noexcept {  // NOLINT
 
 template <typename T, typename... List>
 inline constexpr auto Count = (std::size_t{std::is_same_v<T, List> ? 1 : 0} + ...);
+
+template <typename T, typename... Ts>
+inline constexpr auto Contains = (std::is_same_v<T, Ts> || ...);
+
+template <typename T, typename Tuple>
+struct append {};
+
+template <typename T, typename... Ts>
+struct append<T, std::tuple<Ts...>> {
+  using Type = std::tuple<T, Ts...>;
+};
+
+template <typename... Ts>
+struct Unique;
+
+template <typename T>
+struct Unique<T> {
+  using Type = std::tuple<T>;
+};
+
+template <typename T, typename... Ts>
+struct Unique<T, Ts...> {
+ private:
+  using PrevType = Unique<Ts...>::Type;
+
+ public:
+  using Type = std::conditional_t<Contains<T, Ts...>, PrevType, typename append<T, PrevType>::Type>;
+};
+
+template <typename Tuple>
+struct Variant;
+
+template <typename... Ts>
+struct Variant<std::tuple<Ts...>> {
+  using Type = std::variant<Ts...>;
+};
+
+template <typename Tuple>
+struct MaybeVariant;
+
+template <typename T>
+struct MaybeVariant<std::tuple<T>> {
+  using Type = T;
+};
+
+template <typename... Ts>
+struct MaybeVariant<std::tuple<Ts...>> {
+  using Type = std::variant<Ts...>;
+};
+
+template <typename T>
+struct WrapVoid {
+  using Type = T;
+};
+
+template <>
+struct WrapVoid<void> {
+  using Type = Unit;
+};
+
+template <typename T>
+using wrap_void_t = typename WrapVoid<T>::Type;
+
+template <typename T>
+struct WrapBool {
+  using Type = T;
+};
+
+template <>
+struct WrapBool<bool> {
+  using Type = unsigned char;
+};
+
+template <typename T>
+using wrap_bool_t = typename WrapBool<T>::Type;
 
 template <typename T>
 constexpr bool Check() noexcept {

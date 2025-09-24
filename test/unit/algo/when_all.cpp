@@ -5,6 +5,7 @@
 #include <yaclib/async/make.hpp>
 #include <yaclib/async/promise.hpp>
 #include <yaclib/async/run.hpp>
+#include <yaclib/async/when.hpp>
 #include <yaclib/async/when_all.hpp>
 #include <yaclib/runtime/fair_thread_pool.hpp>
 #include <yaclib/util/result.hpp>
@@ -82,9 +83,9 @@ void JustWorks() {
 
   auto all = [&futures] {
     if constexpr (suite == TestSuite::Array) {
-      return yaclib::WhenAll<F, O>(std::move(futures[0]), std::move(futures[1]), std::move(futures[2]));
+      return yaclib::WhenAllVector<F, O>(std::move(futures[0]), std::move(futures[1]), std::move(futures[2]));
     } else {
-      return yaclib::WhenAll<F, O>(futures.begin(), futures.end());
+      return yaclib::WhenAllVector<F, O>(futures.begin(), futures.end());
     }
   }();
 
@@ -157,16 +158,16 @@ void AllFails() {
   auto all = [&futures] {
     if constexpr (O == yaclib::OrderPolicy::Fifo) {
       if constexpr (suite == TestSuite::Array) {
-        return yaclib::WhenAll(std::move(futures[0]), std::move(futures[1]), std::move(futures[2]));
+        return yaclib::WhenAllVector(std::move(futures[0]), std::move(futures[1]), std::move(futures[2]));
       } else {
-        return yaclib::WhenAll(futures.begin(), futures.end());
+        return yaclib::WhenAllVector(futures.begin(), futures.end());
       }
     } else {
       if constexpr (suite == TestSuite::Array) {
-        return yaclib::WhenAll<yaclib::FailPolicy::FirstFail, O>(std::move(futures[0]), std::move(futures[1]),
-                                                                 std::move(futures[2]));
+        return yaclib::WhenAllVector<yaclib::FailPolicy::FirstFail, O>(std::move(futures[0]), std::move(futures[1]),
+                                                                       std::move(futures[2]));
       } else {
-        return yaclib::WhenAll<yaclib::FailPolicy::FirstFail, O>(futures.begin(), futures.end());
+        return yaclib::WhenAllVector<yaclib::FailPolicy::FirstFail, O>(futures.begin(), futures.end());
       }
     }
   }();
@@ -209,10 +210,10 @@ void ErrorFails() {
 
   auto all = [&futures] {
     if constexpr (suite == TestSuite::Array) {
-      return yaclib::WhenAll<yaclib::FailPolicy::FirstFail, O>(std::move(futures[0]), std::move(futures[1]),
-                                                               std::move(futures[2]));
+      return yaclib::WhenAllVector<yaclib::FailPolicy::FirstFail, O>(std::move(futures[0]), std::move(futures[1]),
+                                                                     std::move(futures[2]));
     } else {
-      return yaclib::WhenAll<yaclib::FailPolicy::FirstFail, O>(futures.begin(), futures.end());
+      return yaclib::WhenAllVector<yaclib::FailPolicy::FirstFail, O>(futures.begin(), futures.end());
     }
   }();
 
@@ -240,7 +241,7 @@ TYPED_TEST(WhenAllT, ArrayErrorFails) {
 template <typename T = int, yaclib::OrderPolicy O = yaclib::OrderPolicy::Fifo>
 void EmptyInput() {
   auto empty = std::vector<yaclib::Future<T>>{};
-  auto all = yaclib::WhenAll<yaclib::FailPolicy::FirstFail, O>(empty.begin(), empty.end());
+  auto all = yaclib::WhenAllVector<yaclib::FailPolicy::FirstFail, O>(empty.begin(), empty.end());
 
   EXPECT_FALSE(all.Valid());
 }
@@ -278,10 +279,10 @@ void MultiThreaded() {
   auto ints =
     [&fs] {
       if constexpr (suite == TestSuite::Vector) {
-        return yaclib::WhenAll<yaclib::FailPolicy::FirstFail, O>(fs.begin(), fs.end());
+        return yaclib::WhenAllVector<yaclib::FailPolicy::FirstFail, O>(fs.begin(), fs.end());
       } else {
-        return yaclib::WhenAll<yaclib::FailPolicy::FirstFail, O>(std::move(fs[0]), std::move(fs[1]), std::move(fs[2]),
-                                                                 std::move(fs[3]), std::move(fs[4]), std::move(fs[5]));
+        return yaclib::WhenAllVector<yaclib::FailPolicy::FirstFail, O>(
+          std::move(fs[0]), std::move(fs[1]), std::move(fs[2]), std::move(fs[3]), std::move(fs[4]), std::move(fs[5]));
       }
     }()
       .Get();
@@ -329,7 +330,7 @@ void FirstFail() {
         return yaclib::Result<void, Error>{yaclib::StopTag{}};
       }));
     }
-    EXPECT_THROW(std::ignore = WhenAll(ints.begin(), ints.end()).Get().Ok(), yaclib::ResultError<Error>);
+    EXPECT_THROW(std::ignore = WhenAllVector(ints.begin(), ints.end()).Get().Ok(), yaclib::ResultError<Error>);
     ints.clear();
   }
   tp.Stop();
@@ -364,7 +365,7 @@ template <typename T>
 void TestBadTypes() {
   auto f1 = yaclib::MakeFuture<T>();
   auto f2 = yaclib::MakeFuture<T>();
-  auto f_all = yaclib::WhenAll<yaclib::FailPolicy::None>(std::move(f1), std::move(f2)).Get();
+  auto f_all = yaclib::WhenAllVector<yaclib::FailPolicy::None>(std::move(f1), std::move(f2)).Get();
   EXPECT_EQ(f_all.State(), yaclib::ResultState::Value);
 }
 
@@ -382,7 +383,7 @@ TEST(WhenAll, Bool) {
   };
   auto f1 = yaclib::Run(tp, func);
   auto f2 = yaclib::Run(tp, func);
-  auto v = yaclib::WhenAll(std::move(f1), std::move(f2)).Get().Ok();
+  auto v = yaclib::WhenAllVector(std::move(f1), std::move(f2)).Get().Ok();
   std::vector<unsigned char> expected{0, 0};
   EXPECT_EQ(v, expected);
 
