@@ -17,9 +17,12 @@ list(APPEND YACLIB_INCLUDES
   ${YACLIB_INCLUDE_DIR}/async/when_any.hpp
   )
 list(APPEND YACLIB_HEADERS
+  ${YACLIB_INCLUDE_DIR}/async/detail/all.hpp
+  ${YACLIB_INCLUDE_DIR}/async/detail/all_tuple.hpp
+  ${YACLIB_INCLUDE_DIR}/async/detail/any.hpp
+  ${YACLIB_INCLUDE_DIR}/async/detail/join.hpp
   ${YACLIB_INCLUDE_DIR}/async/detail/wait_impl.hpp
-  ${YACLIB_INCLUDE_DIR}/async/detail/when_all_impl.hpp
-  ${YACLIB_INCLUDE_DIR}/async/detail/when_any_impl.hpp
+  ${YACLIB_INCLUDE_DIR}/async/detail/when.hpp
   ${YACLIB_INCLUDE_DIR}/async/detail/when_impl.hpp
   )
 list(APPEND YACLIB_SOURCES

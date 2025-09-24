@@ -16,7 +16,7 @@ YACLIB_INLINE auto AwaitOn(IExecutor& e, Waited& waited) noexcept {
 template <typename... Waited, typename = std::enable_if_t<(... && is_waitable_v<Waited>)>>
 YACLIB_INLINE auto AwaitOn(IExecutor& e, Waited&... waited) noexcept {
   using namespace detail;
-  static constexpr auto kSharedCount = Count<SharedHandle, typename Waited::Handle...>;
+  static constexpr auto kSharedCount = kCount<SharedHandle, typename Waited::Handle...>;
   using CoreEvent = AwaitOnEvent<false>;
   using Event = std::conditional_t<kSharedCount == 0, CoreEvent, StaticSharedEvent<CoreEvent, kSharedCount>>;
   YACLIB_ASSERT(... && waited.Valid());

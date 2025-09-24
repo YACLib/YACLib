@@ -18,6 +18,7 @@ class ResultCore : public BaseCore {
  public:
   using Value = V;
   using Error = E;
+  using ResultType = Result<V, E>;
 
   ResultCore() noexcept : BaseCore{kEmpty} {
   }
@@ -49,6 +50,8 @@ class ResultCore : public BaseCore {
       return std::as_const(Get());
     }
   }
+
+  virtual Result<V, E> Retire() = 0;
 
   union {
     Result<V, E> _result;
