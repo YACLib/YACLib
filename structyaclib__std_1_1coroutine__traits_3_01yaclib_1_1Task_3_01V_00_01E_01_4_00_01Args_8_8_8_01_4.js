@@ -1,0 +1,4 @@
+var structyaclib__std_1_1coroutine__traits_3_01yaclib_1_1Task_3_01V_00_01E_01_4_00_01Args_8_8_8_01_4 =
+[
+    [ "promise_type", "structyaclib__std_1_1coroutine__traits_3_01yaclib_1_1Task_3_01V_00_01E_01_4_00_01Args_8_8_8_01_4.html#a0b877bc7b069e90b74f9204213f5d9c1", null ]
+];
