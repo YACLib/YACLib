@@ -1,5 +1,7 @@
 list(APPEND YACLIB_INCLUDES
   ${YACLIB_INCLUDE_DIR}/coro/await.hpp
+  ${YACLIB_INCLUDE_DIR}/coro/await_inline.hpp
+  ${YACLIB_INCLUDE_DIR}/coro/await_sticky.hpp
   ${YACLIB_INCLUDE_DIR}/coro/await_on.hpp
   ${YACLIB_INCLUDE_DIR}/coro/coro.hpp
   ${YACLIB_INCLUDE_DIR}/coro/current_executor.hpp

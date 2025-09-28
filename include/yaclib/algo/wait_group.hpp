@@ -153,8 +153,8 @@ class WaitGroup final {
   /**
    * See OneShotEvent::Await
    */
-  YACLIB_INLINE auto Await() noexcept {
-    return _event.Await();
+  YACLIB_INLINE auto AwaitInline() noexcept {
+    return _event.AwaitInline();
   }
 
   /**
@@ -172,12 +172,12 @@ class WaitGroup final {
   }
 
   /**
-   * just shortcut for co_await wait_group.Await();
+   * just shortcut for co_await wait_group.AwaitInline();
    *
    * TODO(MBkkt) move all shortcut to AwaitSticky
    */
   YACLIB_INLINE auto operator co_await() noexcept {
-    return Await();
+    return AwaitInline();
   }
 #endif
 
