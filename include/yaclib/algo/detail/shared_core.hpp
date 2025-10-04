@@ -24,7 +24,7 @@ class SharedCore : public ResultCore<V, E> {
   }
 #endif
 
-  Result<V, E> Retire() override final {
+  Result<V, E> Retire() final {
     auto result = (this->GetRef() == 1) ? std::move(this->Get()) : std::as_const(this->Get());
     this->DecRef();
     return result;

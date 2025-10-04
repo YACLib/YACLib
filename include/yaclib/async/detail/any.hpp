@@ -5,15 +5,18 @@
 #include <yaclib/util/fail_policy.hpp>
 #include <yaclib/util/type_traits.hpp>
 
+#include <atomic>
+
 namespace yaclib::detail {
 
 template <typename... Cores>
 struct AnyBase {
-  static constexpr StrategyOrder Order = StrategyOrder::None;
-  static constexpr StrategyPolicy Policy = StrategyPolicy::Managed;
+  static constexpr ConsumePolicy ConsumeP = ConsumePolicy::Unordered;
+  static constexpr CorePolicy CoreP = CorePolicy::Managed;
 
   using ValueType = typename MaybeVariant<typename Unique<std::tuple<typename Cores::Value...>>::Type>::Type;
-  using ErrorType = typename MaybeVariant<typename Unique<std::tuple<typename Cores::Error...>>::Type>::Type;
+  using ErrorType = head_t<typename Cores::Error...>;
+  static_assert((... && std::is_same_v<ErrorType, typename Cores::Error>));
 
   explicit AnyBase(Promise<ValueType, ErrorType> p) : _p{std::move(p)} {
   }
@@ -29,9 +32,6 @@ template <typename... Cores>
 struct Any<FailPolicy::None, Cores...> : public AnyBase<Cores...> {
   using Base = AnyBase<Cores...>;
 
-  using Base::Order;
-  using Base::Policy;
-
   using typename Base::ErrorType;
   using typename Base::ValueType;
 
@@ -40,12 +40,10 @@ struct Any<FailPolicy::None, Cores...> : public AnyBase<Cores...> {
 
   template <typename Result>
   void Consume(Result&& result) {
-    if (!_done.exchange(true)) {
+    if (!_done.load(std::memory_order_relaxed) && !_done.exchange(true, std::memory_order_relaxed)) {
       std::move(this->_p).Set(std::forward<Result>(result));
     }
   }
-
-  ~Any() = default;
 
   yaclib_std::atomic_bool _done = false;
 };
@@ -53,9 +51,6 @@ struct Any<FailPolicy::None, Cores...> : public AnyBase<Cores...> {
 template <typename... Cores>
 struct Any<FailPolicy::FirstFail, Cores...> : public AnyBase<Cores...> {
   using Base = AnyBase<Cores...>;
-
-  using Base::Order;
-  using Base::Policy;
 
   using typename Base::ErrorType;
   using typename Base::ValueType;
@@ -66,13 +61,13 @@ struct Any<FailPolicy::FirstFail, Cores...> : public AnyBase<Cores...> {
   template <typename Result>
   void Consume(Result&& result) {
     if (result) {
-      auto old = _state.exchange(State::kValue);
+      auto old = _state.exchange(State::kValue, std::memory_order_relaxed);
       if (old != State::kValue) {
         std::move(this->_p).Set(std::forward<Result>(result).Value());
       }
     } else {
       State expected = State::kEmpty;
-      if (_state.compare_exchange_strong(expected, State::kError)) {
+      if (_state.compare_exchange_strong(expected, State::kError, std::memory_order_relaxed)) {
         if (result.State() == ResultState::Error) {
           error = std::forward<Result>(result).Error();
         } else {
@@ -83,7 +78,7 @@ struct Any<FailPolicy::FirstFail, Cores...> : public AnyBase<Cores...> {
   }
 
   ~Any() {
-    if (_state.load() != State::kValue) {
+    if (_state.load(std::memory_order_relaxed) != State::kValue) {
       std::move(this->_p).Set(std::move(error));
     }
   }
@@ -103,9 +98,6 @@ template <typename... Cores>
 struct Any<FailPolicy::LastFail, Cores...> : public AnyBase<Cores...> {
   using Base = AnyBase<Cores...>;
 
-  using Base::Order;
-  using Base::Policy;
-
   using typename Base::ErrorType;
   using typename Base::ValueType;
 
@@ -114,18 +106,16 @@ struct Any<FailPolicy::LastFail, Cores...> : public AnyBase<Cores...> {
 
   template <typename Result>
   void Consume(Result&& result) {
-    if (!DoneImpl(_state.load())) {
+    if (!DoneImpl(_state.load(std::memory_order_relaxed))) {
       if (result) {
-        if (!DoneImpl(_state.exchange(1))) {
+        if (!DoneImpl(_state.exchange(1, std::memory_order_relaxed))) {
           std::move(this->_p).Set(std::forward<Result>(result));
         }
-      } else if (_state.fetch_sub(2) == 2) {
+      } else if (_state.fetch_sub(2, std::memory_order_relaxed) == 2) {
         std::move(this->_p).Set(std::forward<Result>(result));
       }
     }
   }
-
-  ~Any() = default;
 
  private:
   static bool DoneImpl(std::size_t value) noexcept {

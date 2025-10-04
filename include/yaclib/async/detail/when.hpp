@@ -22,9 +22,13 @@ using IsUniqueCore = detail::IsInstantiationOf<detail::UniqueCore, T>;
 template <typename T>
 using IsSharedCore = detail::IsInstantiationOf<detail::SharedCore, T>;
 
+static constexpr bool IsOrdered(ConsumePolicy p) {
+  return p == ConsumePolicy::Static || p == ConsumePolicy::Dynamic;
+}
+
 template <typename Strategy, typename Core>
 YACLIB_INLINE void ConsumeImpl(Strategy& st, Core& core) {
-  if constexpr (Strategy::Policy == StrategyPolicy::Owned) {
+  if constexpr (Strategy::CoreP == CorePolicy::Owned) {
     st.Consume(core);
   } else {
     st.Consume(core.Retire());
@@ -33,7 +37,7 @@ YACLIB_INLINE void ConsumeImpl(Strategy& st, Core& core) {
 
 template <size_t Index, typename Strategy, typename Core>
 YACLIB_INLINE void ConsumeImpl(Strategy& st, Core& core) {
-  if constexpr (Strategy::Policy == StrategyPolicy::Owned) {
+  if constexpr (Strategy::CoreP == CorePolicy::Owned) {
     st.template Consume<Index>(core);
   } else {
     st.template Consume<Index>(core.Retire());
@@ -42,7 +46,7 @@ YACLIB_INLINE void ConsumeImpl(Strategy& st, Core& core) {
 
 template <typename Strategy, typename Core>
 YACLIB_INLINE void ConsumeImpl(Strategy& st, Core& core, size_t index) {
-  if constexpr (Strategy::Policy == StrategyPolicy::Owned) {
+  if constexpr (Strategy::CoreP == CorePolicy::Owned) {
     st.Consume(index, core);
   } else {
     st.Consume(index, core.Retire());
@@ -51,9 +55,11 @@ YACLIB_INLINE void ConsumeImpl(Strategy& st, Core& core, size_t index) {
 
 template <size_t Index, typename Strategy, typename Core>
 YACLIB_INLINE void Consume(Strategy& st, Core& core) {
-  if constexpr (Strategy::Order == StrategyOrder::None) {
+  if constexpr (Strategy::ConsumeP == ConsumePolicy::None) {
+    // no-op
+  } else if constexpr (Strategy::ConsumeP == ConsumePolicy::Unordered) {
     ConsumeImpl(st, core);
-  } else if constexpr (Strategy::Order == StrategyOrder::Static) {
+  } else if constexpr (Strategy::ConsumeP == ConsumePolicy::Static) {
     ConsumeImpl<Index>(st, core);
   } else {
     ConsumeImpl(st, core, Index);
@@ -62,9 +68,11 @@ YACLIB_INLINE void Consume(Strategy& st, Core& core) {
 
 template <typename Strategy, typename Core>
 YACLIB_INLINE void Consume(Strategy& st, Core& core, size_t index) {
-  static_assert(Strategy::Order != StrategyOrder::Static);
+  static_assert(Strategy::ConsumeP != ConsumePolicy::Static);
 
-  if constexpr (Strategy::Order == StrategyOrder::None) {
+  if constexpr (Strategy::ConsumeP == ConsumePolicy::None) {
+    // no-op
+  } else if constexpr (Strategy::ConsumeP == ConsumePolicy::Unordered) {
     ConsumeImpl(st, core);
   } else {
     ConsumeImpl(st, core, index);
@@ -144,7 +152,7 @@ struct SingleStaticCombinator
   using Base = StaticCombinatorCallback<SingleStaticCombinator<Strategy, Cores...>, head_t<Cores...>, 0>;
   using Core = head_t<Cores...>;
 
-  static_assert(Strategy::Order == StrategyOrder::None);
+  static_assert(!IsOrdered(Strategy::ConsumeP));
   static_assert(IsUniqueCore<Core>::Value);
   static_assert((... && std::is_same_v<Core, Cores>));
 
@@ -155,7 +163,7 @@ struct SingleStaticCombinator
   }
 
   void SetCore(Core& core, size_t i) {
-    if constexpr (Strategy::Policy == StrategyPolicy::Owned) {
+    if constexpr (Strategy::CoreP == CorePolicy::Owned) {
       st.Register(i, core);
     }
 
@@ -196,7 +204,7 @@ class StaticCombinator : public IRef {
   };
 
   using Callbacks =
-    std::conditional_t<Strategy::Order != StrategyOrder::None,
+    std::conditional_t<IsOrdered(Strategy::ConsumeP),
                        typename OrderedCallbacks<decltype(std::make_index_sequence<sizeof...(Cores)>{})>::Type,
                        UnorderedCallbacks<UniqueUniqueCores, SharedCores>>;
 
@@ -205,7 +213,7 @@ class StaticCombinator : public IRef {
 
   StaticCombinator(yaclib::Promise<typename Strategy::ValueType, typename Strategy::ErrorType> p)
     : st{sizeof...(Cores), std::move(p)} {
-    if constexpr (Strategy::Order != StrategyOrder::None) {
+    if constexpr (IsOrdered(Strategy::ConsumeP)) {
       Init(callbacks);
     } else {
       Init(callbacks.unique_tuple);
@@ -226,18 +234,16 @@ class StaticCombinator : public IRef {
   template <size_t Index, typename Core>
   void SetCore(Core& core) {
     auto& callback = [&]() -> auto& {
-      if constexpr (Strategy::Order != StrategyOrder::None) {
+      if constexpr (IsOrdered(Strategy::ConsumeP)) {
         return std::get<Index>(callbacks);
+      } else if constexpr (IsSharedCore<Core>::Value) {
+        return std::get<translate_index_v<Index, std::tuple<Cores...>, SharedCores>>(callbacks.shared_tuple);
       } else {
-        if constexpr (IsSharedCore<Core>::Value) {
-          return std::get<translate_index_v<Index, std::tuple<Cores...>, SharedCores>>(callbacks.shared_tuple);
-        } else {
-          return std::get<index_of_v<Core, UniqueUniqueCores>>(callbacks.unique_tuple);
-        }
+        return std::get<index_of_v<Core, UniqueUniqueCores>>(callbacks.unique_tuple);
       }
     }();
 
-    if constexpr (Strategy::Policy == StrategyPolicy::Owned) {
+    if constexpr (Strategy::CoreP == CorePolicy::Owned) {
       st.Register(Index, core);
     }
 
@@ -268,9 +274,10 @@ class SingleDynamicCombinator
   using Core = typename Value::Core;
   using StrategyType = Strategy;
 
-  static_assert(Strategy::Order == StrategyOrder::None && IsUniqueCore<Core>::Value);
+  static_assert(!IsOrdered(Strategy::ConsumeP));
+  static_assert(IsUniqueCore<Core>::Value);
 
-  SingleDynamicCombinator(size_t count, yaclib::Promise<typename Strategy::ValueType, typename Strategy::ErrorType> p)
+  SingleDynamicCombinator(size_t count, Promise<typename Strategy::ValueType, typename Strategy::ErrorType> p)
     : Base{this}, st{count, std::move(p)} {
   }
 
@@ -279,7 +286,7 @@ class SingleDynamicCombinator
       auto& core = *begin->GetCore().Release();
       begin++;
 
-      if constexpr (Strategy::Policy == StrategyPolicy::Owned) {
+      if constexpr (Strategy::CoreP == CorePolicy::Owned) {
         st.Register(i, core);
       }
 
@@ -300,8 +307,7 @@ class DynamicCombinator : public IRef {
   using StrategyType = Strategy;
 
   DynamicCombinator(size_t count, yaclib::Promise<typename Strategy::ValueType, typename Strategy::ErrorType> p)
-    : st{count, std::move(p)} {
-    callbacks = {count, {this}};
+    : st{count, std::move(p)}, callbacks{count, {this}} {
   }
 
   void Set(Iterator begin, std::size_t count) {
@@ -309,7 +315,7 @@ class DynamicCombinator : public IRef {
       auto& core = *begin->GetCore().Release();
       begin++;
 
-      if constexpr (Strategy::Policy == StrategyPolicy::Owned) {
+      if constexpr (Strategy::CoreP == CorePolicy::Owned) {
         st.Register(i, core);
       }
 
@@ -328,21 +334,23 @@ template <typename Strategy, typename... Futures>
 auto When(Futures... futures) {
   if constexpr (sizeof...(Futures) == 0) {
     return Future<typename Strategy::ValueType, typename Strategy::ErrorType>{nullptr};
+  } else {
+    auto [f, p] = MakeContract<typename Strategy::ValueType, typename Strategy::ErrorType>();
+
+    using FinalCombinator =
+      std::conditional_t<CoreSignature<typename Futures::Core...>::total_count == 1 && !IsOrdered(Strategy::ConsumeP),
+                         SingleStaticCombinator<Strategy, typename Futures::Core...>,
+                         StaticCombinator<Strategy, typename Futures::Core...>>;
+
+    auto combinator = MakeShared<FinalCombinator>(sizeof...(Futures), std::move(p)).Release();
+    combinator->Set(*(futures.GetCore().Release())...);
+    return std::move(f);
   }
-  auto [f, p] = MakeContract<typename Strategy::ValueType, typename Strategy::ErrorType>();
-
-  using FinalCombinator = std::conditional_t<
-    CoreSignature<typename Futures::Core...>::total_count == 1 && Strategy::Order == StrategyOrder::None,
-    SingleStaticCombinator<Strategy, typename Futures::Core...>, StaticCombinator<Strategy, typename Futures::Core...>>;
-
-  auto combinator = MakeShared<FinalCombinator>(sizeof...(Futures), std::move(p)).Release();
-  combinator->Set(*(futures.GetCore().Release())...);
-  return std::move(f);
 }
 
 template <typename Strategy, typename Iterator, typename Value = typename std::iterator_traits<Iterator>::value_type>
 auto When(Iterator begin, std::size_t count) {
-  static_assert(Strategy::Order != StrategyOrder::Static);
+  static_assert(Strategy::ConsumeP != ConsumePolicy::Static);
 
   if (count == 0) {
     return Future<typename Strategy::ValueType, typename Strategy::ErrorType>{nullptr};
@@ -350,7 +358,7 @@ auto When(Iterator begin, std::size_t count) {
   auto [f, p] = MakeContract<typename Strategy::ValueType, typename Strategy::ErrorType>();
 
   using FinalCombinator =
-    std::conditional_t<Strategy::Order == StrategyOrder::None && IsUniqueCore<typename Value::Core>::Value,
+    std::conditional_t<!IsOrdered(Strategy::ConsumeP) && IsUniqueCore<typename Value::Core>::Value,
                        SingleDynamicCombinator<Strategy, Iterator>, DynamicCombinator<Strategy, Iterator>>;
 
   auto combinator = MakeShared<FinalCombinator>(count, count, std::move(p)).Release();

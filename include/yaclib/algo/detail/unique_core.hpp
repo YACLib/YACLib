@@ -21,14 +21,14 @@ class UniqueCore : public ResultCore<V, E> {
   }
 #endif
 
-  Result<V, E> Retire() override final {
+  Result<V, E> Retire() final {
     if constexpr (std::is_move_constructible_v<Result<V, E>>) {
       auto result = std::move(this->Get());
       this->DecRef();
       return result;
     } else {
       YACLIB_PURE_VIRTUAL();
-      return {};  // LCOV_EXCL_LINE
+      return {};
     }
   }
 

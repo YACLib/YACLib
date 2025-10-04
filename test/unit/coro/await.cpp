@@ -357,7 +357,7 @@ TEST(CoroFuture, WhenAll) {
     yaclib_std::this_thread::sleep_for(10ms);
     co_return counter.fetch_add(1);
   };
-  auto f = yaclib::WhenAllVector(coro(), coro());
+  auto f = yaclib::WhenAll(coro(), coro());
   auto results = std::move(f).Get().Ok();
   std::vector<int> expected{0, 1};
   EXPECT_EQ(results, expected);
@@ -564,8 +564,7 @@ TEST(Future, WhenAllCoro) {
   };
   auto f1 = coro();
   auto f2 = coro();
-  auto f3 =
-    yaclib::WhenAllVector<yaclib::FailPolicy::FirstFail, yaclib::OrderPolicy::Same>(std::move(f1), std::move(f2));
+  auto f3 = yaclib::WhenAll(std::move(f1), std::move(f2));
   std::ignore = e.Drain();
   // TODO put back to void
   EXPECT_EQ(std::move(f3).Get().Ok(), (std::vector<yaclib::Unit>{{}, {}}));
@@ -871,7 +870,7 @@ TYPED_TEST(WhenSuite, CoroStatic) {
 }
 
 TYPED_TEST(WhenSuite, CoroDynamic) {
-  if constexpr (TestFixture::Strategy::Order == yaclib::StrategyOrder::Static) {
+  if constexpr (TestFixture::Strategy::ConsumeP == yaclib::ConsumePolicy::Static) {
     GTEST_SKIP();
   } else {
     yaclib::ManualExecutor e;

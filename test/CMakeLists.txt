@@ -54,6 +54,7 @@ set(YACLIB_UNIT_SOURCES
   unit/async/future
   unit/async/future_inline
   unit/async/future_functor
+  unit/algo/join
   unit/algo/when
   unit/algo/when_all
   unit/algo/wait

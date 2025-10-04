@@ -67,10 +67,10 @@ template <typename T>
 inline constexpr bool is_combinator_input_v = (is_shared_future_base_v<T> || is_future_base_v<T>);
 
 template <typename T>
-using future_base_value_t = typename detail::FutureBaseTypes<T>::Value;  // NOLINT
+using async_value_t = typename detail::AsyncTypes<T>::Value;  // NOLINT
 
 template <typename T>
-using future_base_error_t = typename detail::FutureBaseTypes<T>::Error;  // NOLINT
+using async_error_t = typename detail::AsyncTypes<T>::Error;  // NOLINT
 
 template <bool Condition, typename T>
 decltype(auto) move_if(T&& arg) noexcept {  // NOLINT
@@ -82,16 +82,16 @@ decltype(auto) move_if(T&& arg) noexcept {  // NOLINT
 }
 
 template <typename T, typename... List>
-inline constexpr auto Count = (std::size_t{std::is_same_v<T, List> ? 1 : 0} + ...);
+inline constexpr auto kCount = (std::size_t{std::is_same_v<T, List> ? 1 : 0} + ...);
 
 template <typename T, typename... Ts>
-inline constexpr auto Contains = (std::is_same_v<T, Ts> || ...);
+inline constexpr auto kContains = (std::is_same_v<T, Ts> || ...);
 
 template <typename T, typename Tuple>
-struct Append {};
+struct Prepend;
 
 template <typename T, typename... Ts>
-struct Append<T, std::tuple<Ts...>> {
+struct Prepend<T, std::tuple<Ts...>> {
   using Type = std::tuple<T, Ts...>;
 };
 
@@ -125,7 +125,7 @@ struct Filter<F, std::tuple<T, Ts...>> {
   using PrevType = typename Filter<F, std::tuple<Ts...>>::Type;
 
  public:
-  using Type = std::conditional_t<F<T>::Value, typename Append<T, PrevType>::Type, PrevType>;
+  using Type = std::conditional_t<F<T>::Value, typename Prepend<T, PrevType>::Type, PrevType>;
 };
 
 template <typename Tuple>
@@ -147,7 +147,7 @@ struct Unique<std::tuple<T, Ts...>> {
   using PrevType = typename Unique<std::tuple<Ts...>>::Type;
 
  public:
-  using Type = std::conditional_t<Contains<T, Ts...>, PrevType, typename Append<T, PrevType>::Type>;
+  using Type = std::conditional_t<kContains<T, Ts...>, PrevType, typename Prepend<T, PrevType>::Type>;
 };
 
 template <typename Tuple>
@@ -184,29 +184,23 @@ struct WrapVoid<void> {
 template <typename T>
 using wrap_void_t = typename WrapVoid<T>::Type;
 
-template <typename T>
-struct WrapBool {
-  using Type = T;
-};
-
-template <>
-struct WrapBool<bool> {
-  using Type = unsigned char;
-};
-
-template <typename T>
-using wrap_bool_t = typename WrapBool<T>::Type;
-
 template <size_t FromIndex, size_t ToIndex, typename FromTuple, typename ToTuple>
 struct TranslateIndexImpl;
+
+template <size_t ToIndex, typename... From, typename... To>
+struct TranslateIndexImpl<0, ToIndex, std::tuple<From...>, std::tuple<To...>> {
+  static_assert(sizeof...(From) >= sizeof...(To));
+  static constexpr size_t Index() {
+    return ToIndex;
+  }
+};
 
 template <size_t FromIndex, size_t ToIndex, typename... From, typename... To>
 struct TranslateIndexImpl<FromIndex, ToIndex, std::tuple<From...>, std::tuple<To...>> {
   static_assert(sizeof...(From) >= sizeof...(To));
+  static_assert(FromIndex != 0);
   static constexpr size_t Index() {
-    if constexpr (FromIndex == 0 || sizeof...(To) == 0) {
-      return ToIndex;
-    } else if constexpr (std::is_same_v<head_t<From...>, head_t<To...>>) {
+    if constexpr (std::is_same_v<head_t<From...>, head_t<To...>>) {
       return TranslateIndexImpl<FromIndex - 1, ToIndex + 1, tail_t<std::tuple<From...>>,
                                 tail_t<std::tuple<To...>>>::Index();
     } else {

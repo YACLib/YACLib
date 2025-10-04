@@ -4,18 +4,34 @@
 #include <yaclib/util/combinator_strategy.hpp>
 #include <yaclib/util/result.hpp>
 
-#include <string_view>
-
 #include <gtest/gtest.h>
 
 namespace test {
+
+struct NoneManaged {
+  using ValueType = void;
+  using ErrorType = yaclib::StopError;
+
+  static constexpr yaclib::ConsumePolicy ConsumeP = yaclib::ConsumePolicy::None;
+  static constexpr yaclib::CorePolicy CoreP = yaclib::CorePolicy::Managed;
+
+  NoneManaged(size_t count, yaclib::Promise<ValueType, ErrorType> p) : _p{std::move(p)} {
+  }
+
+  ~NoneManaged() {
+    std::move(_p).Set();
+  }
+
+ private:
+  yaclib::Promise<ValueType, ErrorType> _p;
+};
 
 struct UnorderedManaged {
   using ValueType = void;
   using ErrorType = yaclib::StopError;
 
-  static constexpr yaclib::StrategyOrder Order = yaclib::StrategyOrder::None;
-  static constexpr yaclib::StrategyPolicy Policy = yaclib::StrategyPolicy::Managed;
+  static constexpr yaclib::ConsumePolicy ConsumeP = yaclib::ConsumePolicy::Unordered;
+  static constexpr yaclib::CorePolicy CoreP = yaclib::CorePolicy::Managed;
 
   UnorderedManaged(size_t count, yaclib::Promise<ValueType, ErrorType> p) : _p{std::move(p)} {
   }
@@ -36,8 +52,8 @@ struct StaticManaged {
   using ValueType = void;
   using ErrorType = yaclib::StopError;
 
-  static constexpr yaclib::StrategyOrder Order = yaclib::StrategyOrder::Static;
-  static constexpr yaclib::StrategyPolicy Policy = yaclib::StrategyPolicy::Managed;
+  static constexpr yaclib::ConsumePolicy ConsumeP = yaclib::ConsumePolicy::Static;
+  static constexpr yaclib::CorePolicy CoreP = yaclib::CorePolicy::Managed;
 
   StaticManaged(size_t count, yaclib::Promise<ValueType, ErrorType> p) : _p{std::move(p)} {
   }
@@ -58,8 +74,8 @@ struct DynamicManaged {
   using ValueType = void;
   using ErrorType = yaclib::StopError;
 
-  static constexpr yaclib::StrategyOrder Order = yaclib::StrategyOrder::Dynamic;
-  static constexpr yaclib::StrategyPolicy Policy = yaclib::StrategyPolicy::Managed;
+  static constexpr yaclib::ConsumePolicy ConsumeP = yaclib::ConsumePolicy::Dynamic;
+  static constexpr yaclib::CorePolicy CoreP = yaclib::CorePolicy::Managed;
 
   DynamicManaged(size_t count, yaclib::Promise<ValueType, ErrorType> p) : _p{std::move(p)} {
   }
@@ -76,12 +92,34 @@ struct DynamicManaged {
   yaclib::Promise<ValueType, ErrorType> _p;
 };
 
+struct NoneOwned {
+  using ValueType = void;
+  using ErrorType = yaclib::StopError;
+
+  static constexpr yaclib::ConsumePolicy ConsumeP = yaclib::ConsumePolicy::None;
+  static constexpr yaclib::CorePolicy CoreP = yaclib::CorePolicy::Owned;
+
+  NoneOwned(size_t count, yaclib::Promise<ValueType, ErrorType> p) : _p{std::move(p)} {
+  }
+
+  template <typename Core>
+  void Register(size_t i, Core& core) {
+  }
+
+  ~NoneOwned() {
+    std::move(_p).Set();
+  }
+
+ private:
+  yaclib::Promise<ValueType, ErrorType> _p;
+};
+
 struct UnorderedOwned {
   using ValueType = void;
   using ErrorType = yaclib::StopError;
 
-  static constexpr yaclib::StrategyOrder Order = yaclib::StrategyOrder::None;
-  static constexpr yaclib::StrategyPolicy Policy = yaclib::StrategyPolicy::Owned;
+  static constexpr yaclib::ConsumePolicy ConsumeP = yaclib::ConsumePolicy::Unordered;
+  static constexpr yaclib::CorePolicy CoreP = yaclib::CorePolicy::Owned;
 
   UnorderedOwned(size_t count, yaclib::Promise<ValueType, ErrorType> p) : _p{std::move(p)} {
   }
@@ -107,8 +145,8 @@ struct StaticOwned {
   using ValueType = void;
   using ErrorType = yaclib::StopError;
 
-  static constexpr yaclib::StrategyOrder Order = yaclib::StrategyOrder::Static;
-  static constexpr yaclib::StrategyPolicy Policy = yaclib::StrategyPolicy::Owned;
+  static constexpr yaclib::ConsumePolicy ConsumeP = yaclib::ConsumePolicy::Static;
+  static constexpr yaclib::CorePolicy CoreP = yaclib::CorePolicy::Owned;
 
   StaticOwned(size_t count, yaclib::Promise<ValueType, ErrorType> p) : _p{std::move(p)} {
   }
@@ -134,8 +172,8 @@ struct DynamicOwned {
   using ValueType = void;
   using ErrorType = yaclib::StopError;
 
-  static constexpr yaclib::StrategyOrder Order = yaclib::StrategyOrder::Dynamic;
-  static constexpr yaclib::StrategyPolicy Policy = yaclib::StrategyPolicy::Owned;
+  static constexpr yaclib::ConsumePolicy ConsumeP = yaclib::ConsumePolicy::Dynamic;
+  static constexpr yaclib::CorePolicy CoreP = yaclib::CorePolicy::Owned;
 
   DynamicOwned(size_t count, yaclib::Promise<ValueType, ErrorType> p) : _p{std::move(p)} {
   }
@@ -162,24 +200,28 @@ struct WhenSuite : public testing::Test {
   using Strategy = T;
 };
 
-using WhenTypes =
-  ::testing::Types<UnorderedManaged, StaticManaged, DynamicManaged, UnorderedOwned, StaticOwned, DynamicOwned>;
+using WhenTypes = ::testing::Types<NoneManaged, UnorderedManaged, StaticManaged, DynamicManaged, NoneOwned,
+                                   UnorderedOwned, StaticOwned, DynamicOwned>;
 
 struct WhenNames {
   template <typename T>
   static std::string GetName(int i) {
     switch (i) {
       case 0:
-        return "UnordredManaged";
+        return "NoneManaged";
       case 1:
-        return "StaticManaged";
+        return "UnorderedManaged";
       case 2:
-        return "DynamicManaged";
+        return "StaticManaged";
       case 3:
-        return "UnorderedOwned";
+        return "DynamicManaged";
       case 4:
-        return "StaticOwned";
+        return "NoneOwned";
       case 5:
+        return "UnorderedOwned";
+      case 6:
+        return "StaticOwned";
+      case 7:
         return "DynamicOwned";
       default:
         return "unknown";

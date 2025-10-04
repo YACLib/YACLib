@@ -57,43 +57,43 @@ struct InstantiationTypes<Instance, Instance<V, E>> final {
 };
 
 template <typename T>
-struct FutureBaseTypes final {
+struct AsyncTypes final {
   using Value = T;
   using Error = T;
 };
 
 template <typename V, typename E>
-struct FutureBaseTypes<FutureBase<V, E>> final {
+struct AsyncTypes<FutureBase<V, E>> final {
   using Value = V;
   using Error = E;
 };
 
 template <typename V, typename E>
-struct FutureBaseTypes<Future<V, E>> final {
+struct AsyncTypes<Future<V, E>> final {
   using Value = V;
   using Error = E;
 };
 
 template <typename V, typename E>
-struct FutureBaseTypes<FutureOn<V, E>> final {
+struct AsyncTypes<FutureOn<V, E>> final {
   using Value = V;
   using Error = E;
 };
 
 template <typename V, typename E>
-struct FutureBaseTypes<SharedFutureBase<V, E>> final {
+struct AsyncTypes<SharedFutureBase<V, E>> final {
   using Value = V;
   using Error = E;
 };
 
 template <typename V, typename E>
-struct FutureBaseTypes<SharedFuture<V, E>> final {
+struct AsyncTypes<SharedFuture<V, E>> final {
   using Value = V;
   using Error = E;
 };
 
 template <typename V, typename E>
-struct FutureBaseTypes<SharedFutureOn<V, E>> final {
+struct AsyncTypes<SharedFutureOn<V, E>> final {
   using Value = V;
   using Error = E;
 };

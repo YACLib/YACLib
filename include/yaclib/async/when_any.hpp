@@ -9,8 +9,11 @@
 namespace yaclib {
 
 template <FailPolicy F = FailPolicy::LastFail, typename... Futures,
-          typename = std::enable_if_t<(... && is_combinator_input_v<Futures>), void>>
+          typename = std::enable_if_t<(... && is_combinator_input_v<Futures>)>>
 YACLIB_INLINE auto WhenAny(Futures... futures) {
+  using FutureError = typename head_t<Futures...>::Core::Error;
+  static_assert((... && std::is_same_v<FutureError, typename Futures::Core::Error>),
+                "All futures need to have the same error type");
   using Strategy = detail::Any<F, std::remove_reference_t<decltype(*futures.GetCore())>...>;
   return detail::When<Strategy>(std::move(futures)...);
 }
@@ -21,8 +24,8 @@ YACLIB_INLINE auto WhenAny(It begin, std::size_t count) {
 
   if constexpr (is_future_base_v<T>) {
     if (count == 1) {
-      using V = future_base_value_t<T>;
-      using E = future_base_error_t<T>;
+      using V = async_value_t<T>;
+      using E = async_error_t<T>;
       return Future<V, E>{std::exchange(begin->GetCore(), nullptr)};
     }
   }

@@ -44,7 +44,7 @@ TYPED_TEST(WhenSuite, SharedStatic) {
 }
 
 TYPED_TEST(WhenSuite, UniqueDynamic) {
-  if constexpr (TestFixture::Strategy::Order == yaclib::StrategyOrder::Static) {
+  if constexpr (TestFixture::Strategy::ConsumeP == yaclib::ConsumePolicy::Static) {
     GTEST_SKIP();
   } else {
     std::vector<yaclib::Future<std::string>> vec;
@@ -58,7 +58,7 @@ TYPED_TEST(WhenSuite, UniqueDynamic) {
 }
 
 TYPED_TEST(WhenSuite, SharedDynamic) {
-  if constexpr (TestFixture::Strategy::Order == yaclib::StrategyOrder::Static) {
+  if constexpr (TestFixture::Strategy::ConsumeP == yaclib::ConsumePolicy::Static) {
     GTEST_SKIP();
   } else {
     std::vector<yaclib::SharedFuture<std::string>> vec;
@@ -99,7 +99,7 @@ TYPED_TEST(WhenSuite, AsyncStatic) {
 }
 
 TYPED_TEST(WhenSuite, AsyncUniqueDynamic) {
-  if constexpr (TestFixture::Strategy::Order == yaclib::StrategyOrder::Static) {
+  if constexpr (TestFixture::Strategy::ConsumeP == yaclib::ConsumePolicy::Static) {
     GTEST_SKIP();
   } else {
     yaclib::FairThreadPool tp{4};
@@ -126,7 +126,7 @@ TYPED_TEST(WhenSuite, AsyncUniqueDynamic) {
 }
 
 TYPED_TEST(WhenSuite, AsyncSharedDynamic) {
-  if constexpr (TestFixture::Strategy::Order == yaclib::StrategyOrder::Static) {
+  if constexpr (TestFixture::Strategy::ConsumeP == yaclib::ConsumePolicy::Static) {
     GTEST_SKIP();
   } else {
     yaclib::FairThreadPool tp{4};
