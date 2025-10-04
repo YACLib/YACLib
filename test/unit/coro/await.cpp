@@ -1,5 +1,6 @@
 #include <util/async_suite.hpp>
 #include <util/time.hpp>
+#include <util/when_suite.hpp>
 
 #include <yaclib/async/connect.hpp>
 #include <yaclib/async/contract.hpp>
@@ -563,9 +564,10 @@ TEST(Future, WhenAllCoro) {
   };
   auto f1 = coro();
   auto f2 = coro();
-  auto f3 = yaclib::WhenAll<yaclib::FailPolicy::FirstFail, yaclib::OrderPolicy::Same>(std::move(f1), std::move(f2));
+  auto f3 = yaclib::WhenAll(std::move(f1), std::move(f2));
   std::ignore = e.Drain();
-  EXPECT_EQ(std::move(f3).Get().Ok(), yaclib::Unit{});
+  // TODO put back to void
+  EXPECT_EQ(std::move(f3).Get().Ok(), (std::vector<yaclib::Unit>{{}, {}}));
 }
 
 TEST(Future, ConnectCoro) {
@@ -851,6 +853,38 @@ TEST(Recursion, LazyCoro) {
 TEST(Recursion, EagerCoro) {
   // honest recursion, in clang debug/release produce recursion frames
   EXPECT_EQ(recursiveEagerCoro(kEagerRecursion).Get().Ok(), 42);
+}
+
+TYPED_TEST(WhenSuite, CoroStatic) {
+  yaclib::ManualExecutor e;
+  auto coro = [&]() -> yaclib::Future<> {
+    co_await On(e);
+    co_return{};
+  };
+  auto f1 = coro();
+  auto f2 = coro();
+  auto f3 = yaclib::detail::When<typename TestFixture::Strategy>(std::move(f1), std::move(f2));
+  std::ignore = e.Drain();
+  // TODO put back to void
+  EXPECT_EQ(std::move(f3).Get().Ok(), (yaclib::Unit{}));
+}
+
+TYPED_TEST(WhenSuite, CoroDynamic) {
+  if constexpr (TestFixture::Strategy::ConsumeP == yaclib::ConsumePolicy::Static) {
+    GTEST_SKIP();
+  } else {
+    yaclib::ManualExecutor e;
+    auto coro = [&]() -> yaclib::Future<> {
+      co_await On(e);
+      co_return{};
+    };
+    std::vector<yaclib::Future<>> vec;
+    vec.push_back(coro());
+    vec.push_back(coro());
+    auto f3 = yaclib::detail::When<typename TestFixture::Strategy>(vec.begin(), vec.size());
+    std::ignore = e.Drain();
+    EXPECT_EQ(std::move(f3).Get().Ok(), ((yaclib::Unit{})));
+  }
 }
 
 }  // namespace
