@@ -464,19 +464,16 @@ TEST(SharedFuture, ThenInline) {
 }
 
 TEST(SharedFuture, RunShared) {
-  yaclib::FairThreadPool tp{4};
-  auto lambda = [] {
-    return std::this_thread::get_id();
-  };
+  yaclib::ManualExecutor e;
 
-  auto sf1 = yaclib::RunShared(lambda);
-  EXPECT_EQ(sf1.Get().Value(), std::this_thread::get_id());
+  auto sf1 = yaclib::RunShared([] {});
+  EXPECT_EQ(sf1.Get().Value(), yaclib::Unit{});
 
-  auto sf2 = yaclib::RunShared(tp, lambda);
-  EXPECT_NE(sf2.Get().Value(), std::this_thread::get_id());
-
-  tp.SoftStop();
-  tp.Wait();
+  auto sf2 = yaclib::RunShared(e, [] {});
+  EXPECT_EQ(sf2.Ready(), false);
+  std::ignore = e.Drain();
+  EXPECT_EQ(sf2.Ready(), true);
+  EXPECT_EQ(sf2.Touch().Value(), yaclib::Unit{});
 }
 
 TEST(SharedFuture, On) {
