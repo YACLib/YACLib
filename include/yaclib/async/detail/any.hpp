@@ -32,9 +32,15 @@ struct Any<FailPolicy::None, OutputValue, OutputError, InputCore> {
   void Consume(Result&& result) {
     if (!_done.load(std::memory_order_relaxed) && !_done.exchange(true, std::memory_order_acq_rel)) {
       if constexpr (IsVariant<OutputValue>::value) {
-        std::move(this->_p).Set(OutputValue{std::forward<Result>(result).Value()});
+        if (result) {
+          std::move(this->_p).Set(OutputValue{std::forward<Result>(result).Value()});
+        } else if (result.State() == ResultState::Error) {
+          std::move(this->_p).Set(std::forward<Result>(result).Error());
+        } else {
+          std::move(this->_p).Set(std::forward<Result>(result).Exception());
+        }
       } else {
-        std::move(this->_p).Set(std::forward<Result>(result).Value());
+        std::move(this->_p).Set(std::forward<Result>(result));
       }
     }
   }
