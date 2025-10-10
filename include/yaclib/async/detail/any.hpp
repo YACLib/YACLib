@@ -13,10 +13,7 @@ template <FailPolicy P, typename OutputValue, typename OutputError, typename Inp
 struct Any;
 
 template <typename T>
-struct IsVariant : std::false_type {};
-
-template <typename... Ts>
-struct IsVariant<std::variant<Ts...>> : std::true_type {};
+using IsVariant = IsInstantiationOf<std::variant, T>;
 
 template <typename OutputValue, typename OutputError, typename InputCore>
 struct Any<FailPolicy::None, OutputValue, OutputError, InputCore> {
@@ -31,7 +28,7 @@ struct Any<FailPolicy::None, OutputValue, OutputError, InputCore> {
   template <typename Result>
   void Consume(Result&& result) {
     if (!_done.load(std::memory_order_relaxed) && !_done.exchange(true, std::memory_order_acq_rel)) {
-      if constexpr (IsVariant<OutputValue>::value) {
+      if constexpr (IsVariant<OutputValue>::Value) {
         if (result) {
           std::move(this->_p).Set(OutputValue{std::forward<Result>(result).Value()});
         } else if (result.State() == ResultState::Error) {
@@ -64,7 +61,7 @@ struct Any<FailPolicy::FirstFail, OutputValue, OutputError, InputCore> {
     if (result) {
       if (_state.load(std::memory_order_relaxed) != State::kValue &&
           _state.exchange(State::kValue, std::memory_order_acq_rel) != State::kValue) {
-        if constexpr (IsVariant<OutputValue>::value) {
+        if constexpr (IsVariant<OutputValue>::Value) {
           std::move(this->_p).Set(OutputValue{std::forward<Result>(result).Value()});
         } else {
           std::move(this->_p).Set(std::forward<Result>(result).Value());
@@ -120,7 +117,7 @@ struct Any<FailPolicy::LastFail, OutputValue, OutputError, InputCore> {
     if (!DoneImpl(_state.load(std::memory_order_acquire))) {
       if (result) {
         if (!DoneImpl(_state.exchange(1, std::memory_order_acq_rel))) {
-          if constexpr (IsVariant<OutputValue>::value) {
+          if constexpr (IsVariant<OutputValue>::Value) {
             std::move(this->_p).Set(OutputValue{std::forward<Result>(result).Value()});
           } else {
             std::move(this->_p).Set(std::forward<Result>(result));
