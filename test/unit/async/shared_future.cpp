@@ -466,10 +466,12 @@ TEST(SharedFuture, ThenInline) {
 TEST(SharedFuture, RunShared) {
   yaclib::ManualExecutor e;
 
-  auto sf1 = yaclib::RunShared([] {});
+  auto sf1 = yaclib::RunShared([] {
+  });
   EXPECT_EQ(sf1.Get().Value(), yaclib::Unit{});
 
-  auto sf2 = yaclib::RunShared(e, [] {});
+  auto sf2 = yaclib::RunShared(e, [] {
+  });
   EXPECT_EQ(sf2.Ready(), false);
   std::ignore = e.Drain();
   EXPECT_EQ(sf2.Ready(), true);
