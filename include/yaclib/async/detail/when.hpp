@@ -226,40 +226,6 @@ struct SingleCombinator : InlineCore {
 };
 
 template <typename Strategy, typename... Cores>
-struct SingleStaticCombinator
-  : StaticCombinatorCallback<SingleStaticCombinator<Strategy, Cores...>, head_t<Cores...>, 0> {
- private:
-  using Base = StaticCombinatorCallback<SingleStaticCombinator<Strategy, Cores...>, head_t<Cores...>, 0>;
-  using Core = head_t<Cores...>;
-
-  static_assert(!kIsOrdered<Strategy::kConsumePolicy>);
-  static_assert(IsUniqueCore<Core>::Value);
-  static_assert((... && std::is_same_v<Core, Cores>));
-
-  void SetCore(Core& core, std::size_t i) {
-    if constexpr (Strategy::kCorePolicy == CorePolicy::Owned) {
-      st.Register(i, core);
-    }
-
-    if (!core.SetCallback(*this)) {
-      Consume<0>(st, core);
-      this->DecRef();
-    }
-  }
-
- public:
-  SingleStaticCombinator(typename Strategy::PromiseType p) : Base{this}, st{sizeof...(Cores), std::move(p)} {
-  }
-
-  void Set(Cores&... cores) {
-    std::size_t index = 0;
-    (..., SetCore(cores, index++));
-  }
-
-  Strategy st;
-};
-
-template <typename Strategy, typename... Cores>
 struct StaticCombinator : IRef {
  private:
   template <typename Sequence>
@@ -343,38 +309,6 @@ struct StaticCombinator : IRef {
 
   Strategy st;
   Callbacks callbacks;
-};
-
-template <typename Strategy, typename Core>
-struct SingleDynamicCombinator : StaticCombinatorCallback<SingleDynamicCombinator<Strategy, Core>, Core, 0> {
- private:
-  using Base = StaticCombinatorCallback<SingleDynamicCombinator<Strategy, Core>, Core, 0>;
-
-  static_assert(!kIsOrdered<Strategy::kConsumePolicy>);
-  static_assert(IsUniqueCore<Core>::Value);
-
- public:
-  SingleDynamicCombinator(std::size_t count, typename Strategy::PromiseType p) : Base{this}, st{count, std::move(p)} {
-  }
-
-  template <typename Iterator>
-  void Set(Iterator begin, std::size_t count) {
-    for (std::size_t i = 0; i < count; ++i) {
-      auto& core = *begin->GetCore().Release();
-      begin++;
-
-      if constexpr (Strategy::kCorePolicy == CorePolicy::Owned) {
-        st.Register(i, core);
-      }
-
-      if (!core.SetCallback(*this)) {
-        Consume(st, core, i);
-        this->DecRef();
-      }
-    }
-  }
-
-  Strategy st;
 };
 
 template <typename Strategy, typename Core>
