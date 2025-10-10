@@ -20,10 +20,10 @@ struct AllTuple<FailPolicy::None, OutputValue, OutputError, InputCore> {
   static constexpr ConsumePolicy kConsumePolicy = ConsumePolicy::Static;
   static constexpr CorePolicy kCorePolicy = CorePolicy::Managed;
 
-  AllTuple(size_t count, PromiseType p) : _p{std::move(p)} {
+  AllTuple(std::size_t count, PromiseType p) : _p{std::move(p)} {
   }
 
-  template <size_t Index, typename Result>
+  template <std::size_t Index, typename Result>
   void Consume(Result&& result) {
     std::get<Index>(_tuple) = std::forward<Result>(result);
   }
@@ -44,10 +44,10 @@ struct AllTuple<FailPolicy::FirstFail, OutputValue, OutputError, InputCore> {
   static constexpr ConsumePolicy kConsumePolicy = ConsumePolicy::Static;
   static constexpr CorePolicy kCorePolicy = CorePolicy::Managed;
 
-  AllTuple(size_t count, PromiseType p) : _p{std::move(p)} {
+  AllTuple(std::size_t count, PromiseType p) : _p{std::move(p)} {
   }
 
-  template <size_t Index, typename Result>
+  template <std::size_t Index, typename Result>
   void Consume(Result&& result) {
     if (!result && !_done.load(std::memory_order_relaxed) && !_done.exchange(true, std::memory_order_acq_rel)) {
       if (result.State() == ResultState::Error) {

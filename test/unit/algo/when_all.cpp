@@ -138,7 +138,7 @@ void JustWorks() {
 
     if constexpr (F == yaclib::FailPolicy::None) {
       auto values = std::move(all).Touch().Value();
-      size_t i = 0;
+      std::size_t i = 0;
       for (const auto& v : values) {
         if constexpr (is_void) {
           EXPECT_EQ(v, yaclib::Unit{});
@@ -194,7 +194,7 @@ void JustWorks() {
 
     if constexpr (F == yaclib::FailPolicy::None) {
       auto values = std::move(all).Touch().Value();
-      size_t i = 0;
+      std::size_t i = 0;
       for (const auto& v : values) {
         if constexpr (is_void) {
           EXPECT_EQ(v, yaclib::Unit{});

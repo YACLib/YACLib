@@ -10,11 +10,8 @@ namespace yaclib {
 template <FailPolicy F = FailPolicy::None, typename... Futures,
           typename = std::enable_if_t<(... && is_combinator_input_v<Futures>)>>
 YACLIB_INLINE auto Join(Futures... futures) {
-  using OutputError = typename head_t<Futures...>::Core::Error;
-  static_assert((... && std::is_same_v<OutputError, typename Futures::Core::Error>),
-                "All futures need to have the same error type");
-
-  return detail::When<detail::Join, F, void, OutputError>(std::move(futures)...);
+  detail::CheckSameError<Futures...>();
+  return detail::When<detail::Join, F, void, typename head_t<Futures...>::Core::Error>(std::move(futures)...);
 }
 
 template <FailPolicy F = FailPolicy::None, typename It, typename T = typename std::iterator_traits<It>::value_type>

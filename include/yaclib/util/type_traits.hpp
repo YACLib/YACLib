@@ -184,22 +184,23 @@ struct WrapVoid<void> {
 template <typename T>
 using wrap_void_t = typename WrapVoid<T>::Type;
 
-template <size_t FromIndex, size_t ToIndex, typename FromTuple, typename ToTuple>
+template <std::size_t FromIndex, std::size_t ToIndex, typename FromTuple, typename ToTuple>
 struct TranslateIndexImpl;
 
-template <size_t ToIndex, typename... From, typename... To>
+template <std::size_t ToIndex, typename... From, typename... To>
 struct TranslateIndexImpl<0, ToIndex, std::tuple<From...>, std::tuple<To...>> {
   static_assert(sizeof...(From) >= sizeof...(To));
-  static constexpr size_t Index() {
+  static constexpr std::size_t Index() {
     return ToIndex;
   }
 };
 
-template <size_t FromIndex, size_t ToIndex, typename... From, typename... To>
+template <std::size_t FromIndex, std::size_t ToIndex, typename... From, typename... To>
 struct TranslateIndexImpl<FromIndex, ToIndex, std::tuple<From...>, std::tuple<To...>> {
   static_assert(sizeof...(From) >= sizeof...(To));
   static_assert(FromIndex != 0);
-  static constexpr size_t Index() {
+
+  static constexpr std::size_t Index() {
     if constexpr (std::is_same_v<head_t<From...>, head_t<To...>>) {
       return TranslateIndexImpl<FromIndex - 1, ToIndex + 1, tail_t<std::tuple<From...>>,
                                 tail_t<std::tuple<To...>>>::Index();
@@ -209,8 +210,8 @@ struct TranslateIndexImpl<FromIndex, ToIndex, std::tuple<From...>, std::tuple<To
   }
 };
 
-template <size_t FromIndex, typename FromTuple, typename ToTuple>
-inline constexpr size_t translate_index_v = TranslateIndexImpl<FromIndex, 0, FromTuple, ToTuple>::Index();
+template <std::size_t FromIndex, typename FromTuple, typename ToTuple>
+inline constexpr std::size_t translate_index_v = TranslateIndexImpl<FromIndex, 0, FromTuple, ToTuple>::Index();
 
 template <typename T, typename Tuple>
 struct IndexOf;
@@ -218,7 +219,8 @@ struct IndexOf;
 template <typename T, typename... Ts>
 struct IndexOf<T, std::tuple<Ts...>> {
   static_assert(sizeof...(Ts) > 0);
-  static constexpr size_t Index() {
+
+  static constexpr std::size_t Index() {
     if constexpr (std::is_same_v<T, head_t<Ts...>>) {
       return 0;
     } else {
@@ -228,7 +230,7 @@ struct IndexOf<T, std::tuple<Ts...>> {
 };
 
 template <typename T, typename Tuple>
-inline constexpr size_t index_of_v = IndexOf<T, Tuple>::Index();
+inline constexpr std::size_t index_of_v = IndexOf<T, Tuple>::Index();
 
 template <typename T>
 constexpr bool Check() noexcept {

@@ -16,15 +16,21 @@
 
 namespace yaclib::detail {
 
+template <typename... Futures>
+YACLIB_INLINE void CheckSameError() {
+  using Error = typename head_t<Futures...>::Core::Error;
+  static_assert((... && std::is_same_v<Error, typename Futures::Core::Error>),
+                "All futures need to have the same error type");
+}
+
 template <typename T>
 using IsUniqueCore = detail::IsInstantiationOf<detail::UniqueCore, T>;
 
 template <typename T>
 using IsSharedCore = detail::IsInstantiationOf<detail::SharedCore, T>;
 
-static constexpr bool IsOrdered(ConsumePolicy p) {
-  return p == ConsumePolicy::Static || p == ConsumePolicy::Dynamic;
-}
+template <ConsumePolicy P>
+inline constexpr bool kIsOrdered = P == ConsumePolicy::Static || P == ConsumePolicy::Dynamic;
 
 template <typename Strategy, typename Core>
 YACLIB_INLINE void ConsumeImpl(Strategy& st, Core& core) {
@@ -35,7 +41,7 @@ YACLIB_INLINE void ConsumeImpl(Strategy& st, Core& core) {
   }
 }
 
-template <size_t Index, typename Strategy, typename Core>
+template <std::size_t Index, typename Strategy, typename Core>
 YACLIB_INLINE void ConsumeImpl(Strategy& st, Core& core) {
   if constexpr (Strategy::kCorePolicy == CorePolicy::Owned) {
     st.template Consume<Index>(core);
@@ -45,7 +51,7 @@ YACLIB_INLINE void ConsumeImpl(Strategy& st, Core& core) {
 }
 
 template <typename Strategy, typename Core>
-YACLIB_INLINE void ConsumeImpl(Strategy& st, Core& core, size_t index) {
+YACLIB_INLINE void ConsumeImpl(Strategy& st, Core& core, std::size_t index) {
   if constexpr (Strategy::kCorePolicy == CorePolicy::Owned) {
     st.Consume(index, core);
   } else {
@@ -53,7 +59,7 @@ YACLIB_INLINE void ConsumeImpl(Strategy& st, Core& core, size_t index) {
   }
 }
 
-template <size_t Index, typename Strategy, typename Core>
+template <std::size_t Index, typename Strategy, typename Core>
 YACLIB_INLINE void Consume(Strategy& st, Core& core) {
   if constexpr (Strategy::kConsumePolicy == ConsumePolicy::None) {
     if constexpr (Strategy::kCorePolicy == CorePolicy::Managed) {
@@ -69,7 +75,7 @@ YACLIB_INLINE void Consume(Strategy& st, Core& core) {
 }
 
 template <typename Strategy, typename Core>
-YACLIB_INLINE void Consume(Strategy& st, Core& core, size_t index) {
+YACLIB_INLINE void Consume(Strategy& st, Core& core, std::size_t index) {
   static_assert(Strategy::kConsumePolicy != ConsumePolicy::Static);
 
   if constexpr (Strategy::kConsumePolicy == ConsumePolicy::None) {
@@ -83,8 +89,8 @@ YACLIB_INLINE void Consume(Strategy& st, Core& core, size_t index) {
   }
 }
 
-template <typename Combinator, typename Core, size_t Index>
-struct StaticCombinatorCallback : public InlineCore {
+template <typename Combinator, typename Core, std::size_t Index>
+struct StaticCombinatorCallback : InlineCore {
   StaticCombinatorCallback() = default;
   StaticCombinatorCallback(Combinator* self) : _self(self) {
   }
@@ -112,7 +118,7 @@ struct StaticCombinatorCallback : public InlineCore {
 };
 
 template <typename Combinator, typename Core>
-struct DynamicCombinatorCallback : public InlineCore {
+struct DynamicCombinatorCallback : InlineCore {
   DynamicCombinatorCallback() = default;
   DynamicCombinatorCallback(Combinator* self) : _self(self) {
   }
@@ -145,9 +151,78 @@ struct CoreSignature {
   using UniqueUniqueCores = typename Unique<typename Filter<IsUniqueCore, std::tuple<Cores...>>::Type>::Type;
   using SharedCores = typename Filter<IsSharedCore, std::tuple<Cores...>>::Type;
 
-  static constexpr size_t kUniqueCount = std::tuple_size_v<UniqueUniqueCores>;
-  static constexpr size_t kSharedCount = std::tuple_size_v<SharedCores>;
-  static constexpr size_t kTotalCount = kUniqueCount + kSharedCount;
+  static constexpr std::size_t kUniqueCount = std::tuple_size_v<UniqueUniqueCores>;
+  static constexpr std::size_t kSharedCount = std::tuple_size_v<SharedCores>;
+  static constexpr std::size_t kTotalCount = kUniqueCount + kSharedCount;
+};
+
+template <typename Strategy, typename Core, std::size_t CoreCount>
+struct SingleCombinator : InlineCore {
+  // Static case constructor
+  SingleCombinator(typename Strategy::PromiseType p) : st{CoreCount, std::move(p)} {
+  }
+
+  // Dynamic case constructor
+  SingleCombinator(std::size_t count, typename Strategy::PromiseType p) : st{count, std::move(p)} {
+  }
+
+  // Static case Set
+  template <typename... Cores>
+  void Set(Cores&... cores) {
+    static_assert((... && std::is_same_v<Core, Cores>));
+    std::size_t index = 0;
+    (..., SetCore(cores, index++));
+  }
+
+  // Dynamic case Set
+  template <typename Iterator, typename = typename std::iterator_traits<Iterator>::value_type>
+  void Set(Iterator begin, std::size_t count) {
+    for (std::size_t i = 0; i < count; ++i) {
+      auto& core = *begin->GetCore().Release();
+      begin++;
+
+      if constexpr (Strategy::kCorePolicy == CorePolicy::Owned) {
+        st.Register(i, core);
+      }
+
+      if (!core.SetCallback(*this)) {
+        Consume(st, core, i);
+        this->DecRef();
+      }
+    }
+  }
+
+  [[nodiscard]] InlineCore* Here(InlineCore& caller) noexcept override {
+    Impl(caller);
+    return nullptr;
+  }
+
+#if YACLIB_SYMMETRIC_TRANSFER != 0
+  [[nodiscard]] yaclib_std::coroutine_handle<> Next(InlineCore& caller) noexcept override {
+    Impl(caller);
+    return yaclib_std::noop_coroutine();
+  }
+#endif
+
+ private:
+  void SetCore(Core& core, std::size_t i) {
+    if constexpr (Strategy::kCorePolicy == CorePolicy::Owned) {
+      st.Register(i, core);
+    }
+
+    if (!core.SetCallback(*this)) {
+      Consume<0>(st, core);
+      DecRef();
+    }
+  }
+
+  YACLIB_INLINE void Impl(InlineCore& caller) {
+    auto& core = DownCast<Core>(caller);
+    Consume<0>(st, core);
+    DecRef();
+  }
+
+  Strategy st;
 };
 
 template <typename Strategy, typename... Cores>
@@ -157,11 +232,11 @@ struct SingleStaticCombinator
   using Base = StaticCombinatorCallback<SingleStaticCombinator<Strategy, Cores...>, head_t<Cores...>, 0>;
   using Core = head_t<Cores...>;
 
-  static_assert(!IsOrdered(Strategy::kConsumePolicy));
+  static_assert(!kIsOrdered<Strategy::kConsumePolicy>);
   static_assert(IsUniqueCore<Core>::Value);
   static_assert((... && std::is_same_v<Core, Cores>));
 
-  void SetCore(Core& core, size_t i) {
+  void SetCore(Core& core, std::size_t i) {
     if constexpr (Strategy::kCorePolicy == CorePolicy::Owned) {
       st.Register(i, core);
     }
@@ -177,7 +252,7 @@ struct SingleStaticCombinator
   }
 
   void Set(Cores&... cores) {
-    size_t index = 0;
+    std::size_t index = 0;
     (..., SetCore(cores, index++));
   }
 
@@ -185,7 +260,7 @@ struct SingleStaticCombinator
 };
 
 template <typename Strategy, typename... Cores>
-struct StaticCombinator : public IRef {
+struct StaticCombinator : IRef {
  private:
   template <typename Sequence>
   struct OrderedCallbacks;
@@ -208,7 +283,7 @@ struct StaticCombinator : public IRef {
   };
 
   using Callbacks =
-    std::conditional_t<IsOrdered(Strategy::kConsumePolicy),
+    std::conditional_t<kIsOrdered<Strategy::kConsumePolicy>,
                        typename OrderedCallbacks<decltype(std::make_index_sequence<sizeof...(Cores)>{})>::Type,
                        UnorderedCallbacks<UniqueUniqueCores, SharedCores>>;
 
@@ -222,9 +297,9 @@ struct StaticCombinator : public IRef {
     InitImpl(tuple, std::make_index_sequence<std::tuple_size_v<Tuple>>{});
   }
 
-  template <size_t Index, typename Core>
+  template <std::size_t Index, typename Core>
   auto& GetCallbackHelper() {
-    if constexpr (IsOrdered(Strategy::kConsumePolicy)) {
+    if constexpr (kIsOrdered<Strategy::kConsumePolicy>) {
       return std::get<Index>(callbacks);
     } else if constexpr (IsSharedCore<Core>::Value) {
       return std::get<translate_index_v<Index, std::tuple<Cores...>, SharedCores>>(callbacks.shared_tuple);
@@ -233,7 +308,7 @@ struct StaticCombinator : public IRef {
     }
   }
 
-  template <size_t Index, typename Core>
+  template <std::size_t Index, typename Core>
   void SetCore(Core& core) {
     auto& callback = GetCallbackHelper<Index, Core>();
 
@@ -254,7 +329,7 @@ struct StaticCombinator : public IRef {
 
  public:
   StaticCombinator(typename Strategy::PromiseType p) : st{sizeof...(Cores), std::move(p)} {
-    if constexpr (IsOrdered(Strategy::kConsumePolicy)) {
+    if constexpr (kIsOrdered<Strategy::kConsumePolicy>) {
       Init(callbacks);
     } else {
       Init(callbacks.unique_tuple);
@@ -270,22 +345,21 @@ struct StaticCombinator : public IRef {
   Callbacks callbacks;
 };
 
-template <typename Strategy, typename Iterator, typename Value = typename std::iterator_traits<Iterator>::value_type>
-struct SingleDynamicCombinator
-  : StaticCombinatorCallback<SingleDynamicCombinator<Strategy, Iterator>, typename Value::Core, 0> {
+template <typename Strategy, typename Core>
+struct SingleDynamicCombinator : StaticCombinatorCallback<SingleDynamicCombinator<Strategy, Core>, Core, 0> {
  private:
-  using Base = StaticCombinatorCallback<SingleDynamicCombinator<Strategy, Iterator>, typename Value::Core, 0>;
-  using Core = typename Value::Core;
+  using Base = StaticCombinatorCallback<SingleDynamicCombinator<Strategy, Core>, Core, 0>;
 
-  static_assert(!IsOrdered(Strategy::kConsumePolicy));
+  static_assert(!kIsOrdered<Strategy::kConsumePolicy>);
   static_assert(IsUniqueCore<Core>::Value);
 
  public:
-  SingleDynamicCombinator(size_t count, typename Strategy::PromiseType p) : Base{this}, st{count, std::move(p)} {
+  SingleDynamicCombinator(std::size_t count, typename Strategy::PromiseType p) : Base{this}, st{count, std::move(p)} {
   }
 
+  template <typename Iterator>
   void Set(Iterator begin, std::size_t count) {
-    for (size_t i = 0; i < count; ++i) {
+    for (std::size_t i = 0; i < count; ++i) {
       auto& core = *begin->GetCore().Release();
       begin++;
 
@@ -303,16 +377,15 @@ struct SingleDynamicCombinator
   Strategy st;
 };
 
-template <typename Strategy, typename Iterator, typename Value = typename std::iterator_traits<Iterator>::value_type>
-struct DynamicCombinator : public IRef {
-  using Core = typename Value::Core;
-
-  DynamicCombinator(size_t count, typename Strategy::PromiseType p)
+template <typename Strategy, typename Core>
+struct DynamicCombinator : IRef {
+  DynamicCombinator(std::size_t count, typename Strategy::PromiseType p)
     : st{count, std::move(p)}, callbacks{count, {this}} {
   }
 
+  template <typename Iterator>
   void Set(Iterator begin, std::size_t count) {
-    for (size_t i = 0; i < count; ++i) {
+    for (std::size_t i = 0; i < count; ++i) {
       auto& core = *begin->GetCore().Release();
       begin++;
 
@@ -352,12 +425,12 @@ auto When(Futures... futures) {
     using S = Strategy<F, OutputValue, OutputError, InputCore>;
 
     using FinalCombinator =
-      std::conditional_t<CoreSignature<typename Futures::Core...>::kTotalCount == 1 && !IsOrdered(S::kConsumePolicy),
-                         SingleStaticCombinator<S, typename Futures::Core...>,
+      std::conditional_t<CoreSignature<typename Futures::Core...>::kTotalCount == 1 && !kIsOrdered<S::kConsumePolicy>,
+                         SingleCombinator<S, head_t<typename Futures::Core...>, sizeof...(Futures)>,
                          StaticCombinator<S, typename Futures::Core...>>;
 
-    auto combinator = MakeShared<FinalCombinator>(sizeof...(Futures), std::move(p)).Release();
-    combinator->Set(*(futures.GetCore().Release())...);
+    auto* combinator = MakeShared<FinalCombinator>(sizeof...(Futures), std::move(p)).Release();
+    combinator->Set(*futures.GetCore().Release()...);
     return std::move(f);
   }
 }
@@ -371,14 +444,15 @@ auto When(Iterator begin, std::size_t count) {
 
   auto [f, p] = MakeContract<OutputValue, OutputError>();
 
-  using S = Strategy<F, OutputValue, OutputError, typename Value::Core>;
+  using Core = typename Value::Core;
+  using S = Strategy<F, OutputValue, OutputError, Core>;
 
   static_assert(S::kConsumePolicy != ConsumePolicy::Static);
 
-  using FinalCombinator = std::conditional_t<!IsOrdered(S::kConsumePolicy) && IsUniqueCore<typename Value::Core>::Value,
-                                             SingleDynamicCombinator<S, Iterator>, DynamicCombinator<S, Iterator>>;
+  using FinalCombinator = std::conditional_t<!kIsOrdered<S::kConsumePolicy> && IsUniqueCore<Core>::Value,
+                                             SingleCombinator<S, Core, 0>, DynamicCombinator<S, Core>>;
 
-  auto combinator = MakeShared<FinalCombinator>(count, count, std::move(p)).Release();
+  auto* combinator = MakeShared<FinalCombinator>(count, count, std::move(p)).Release();
   combinator->Set(begin, count);
   return std::move(f);
 }

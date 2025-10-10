@@ -99,7 +99,8 @@ TEST(SharedMutex, TestParallelReaders) {
   TestParallelReaders(4, 2);
 }
 
-yaclib::Task<> Reader(yaclib::SharedMutex<>& rmw, std::size_t num_iterations, std::int32_t& activity, size_t index) {
+yaclib::Task<> Reader(yaclib::SharedMutex<>& rmw, std::size_t num_iterations, std::int32_t& activity,
+                      std::size_t index) {
   for (std::size_t i = 0; i != num_iterations; ++i) {
     auto guard = co_await rmw.GuardShared();
     yaclib::InjectFault();
@@ -112,7 +113,8 @@ yaclib::Task<> Reader(yaclib::SharedMutex<>& rmw, std::size_t num_iterations, st
   co_return{};
 }
 
-yaclib::Task<> Writer(yaclib::SharedMutex<>& rmw, std::size_t num_iterations, std::int32_t& activity, size_t index) {
+yaclib::Task<> Writer(yaclib::SharedMutex<>& rmw, std::size_t num_iterations, std::int32_t& activity,
+                      std::size_t index) {
   for (std::size_t i = 0; i != num_iterations; ++i) {
     auto guard = co_await rmw.Guard();
     EXPECT_EQ(activity, 0);

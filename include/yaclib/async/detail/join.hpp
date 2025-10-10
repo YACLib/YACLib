@@ -10,11 +10,14 @@
 namespace yaclib::detail {
 
 template <FailPolicy F, typename OutputValue, typename OutputError, typename InputCore>
-struct Join;
+struct Join {
+  static_assert(F != FailPolicy::LastFail, "LastFail policy is not supported by Join");
+  static_assert(std::is_void_v<OutputValue>);
+};
 
-template <typename InputCore>
-struct Join<FailPolicy::None, void, StopError, InputCore> {
-  using PromiseType = Promise<void, StopError>;
+template <typename OutputError, typename InputCore>
+struct Join<FailPolicy::None, void, OutputError, InputCore> {
+  using PromiseType = Promise<void, OutputError>;
 
   static constexpr ConsumePolicy kConsumePolicy = ConsumePolicy::None;
   static constexpr CorePolicy kCorePolicy = CorePolicy::Managed;

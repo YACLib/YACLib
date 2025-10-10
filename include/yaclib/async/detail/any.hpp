@@ -12,6 +12,12 @@ namespace yaclib::detail {
 template <FailPolicy P, typename OutputValue, typename OutputError, typename InputCore>
 struct Any;
 
+template <typename T>
+struct IsVariant : std::false_type {};
+
+template <typename... Ts>
+struct IsVariant<std::variant<Ts...>> : std::true_type {};
+
 template <typename OutputValue, typename OutputError, typename InputCore>
 struct Any<FailPolicy::None, OutputValue, OutputError, InputCore> {
   using PromiseType = Promise<OutputValue, OutputError>;
@@ -19,13 +25,17 @@ struct Any<FailPolicy::None, OutputValue, OutputError, InputCore> {
   static constexpr ConsumePolicy kConsumePolicy = ConsumePolicy::Unordered;
   static constexpr CorePolicy kCorePolicy = CorePolicy::Managed;
 
-  Any(size_t count, PromiseType p) : _p{std::move(p)} {
+  Any(std::size_t count, PromiseType p) : _p{std::move(p)} {
   }
 
   template <typename Result>
   void Consume(Result&& result) {
     if (!_done.load(std::memory_order_relaxed) && !_done.exchange(true, std::memory_order_acq_rel)) {
-      std::move(this->_p).Set(std::forward<Result>(result));
+      if constexpr (IsVariant<OutputValue>::value) {
+        std::move(this->_p).Set(OutputValue{std::forward<Result>(result).Value()});
+      } else {
+        std::move(this->_p).Set(std::forward<Result>(result).Value());
+      }
     }
   }
 
@@ -40,19 +50,24 @@ struct Any<FailPolicy::FirstFail, OutputValue, OutputError, InputCore> {
   static constexpr ConsumePolicy kConsumePolicy = ConsumePolicy::Unordered;
   static constexpr CorePolicy kCorePolicy = CorePolicy::Managed;
 
-  Any(size_t count, PromiseType p) : _p{std::move(p)} {
+  Any(std::size_t count, PromiseType p) : _p{std::move(p)} {
   }
 
   template <typename Result>
   void Consume(Result&& result) {
     if (result) {
-      auto old = _state.exchange(State::kValue, std::memory_order_acq_rel);
-      if (old != State::kValue) {
-        std::move(this->_p).Set(std::forward<Result>(result).Value());
+      if (_state.load(std::memory_order_relaxed) != State::kValue &&
+          _state.exchange(State::kValue, std::memory_order_acq_rel) != State::kValue) {
+        if constexpr (IsVariant<OutputValue>::value) {
+          std::move(this->_p).Set(OutputValue{std::forward<Result>(result).Value()});
+        } else {
+          std::move(this->_p).Set(std::forward<Result>(result).Value());
+        }
       }
     } else {
       State expected = State::kEmpty;
-      if (_state.compare_exchange_strong(expected, State::kError, std::memory_order_acq_rel)) {
+      if (_state.load(std::memory_order_relaxed) == expected &&
+          _state.compare_exchange_strong(expected, State::kError, std::memory_order_acq_rel)) {
         if (result.State() == ResultState::Error) {
           error = std::forward<Result>(result).Error();
         } else {
@@ -91,7 +106,7 @@ struct Any<FailPolicy::LastFail, OutputValue, OutputError, InputCore> {
   static constexpr ConsumePolicy kConsumePolicy = ConsumePolicy::Unordered;
   static constexpr CorePolicy kCorePolicy = CorePolicy::Managed;
 
-  Any(size_t count, PromiseType p) : _state{2 * count}, _p{std::move(p)} {
+  Any(std::size_t count, PromiseType p) : _state{2 * count}, _p{std::move(p)} {
   }
 
   template <typename Result>
@@ -99,10 +114,18 @@ struct Any<FailPolicy::LastFail, OutputValue, OutputError, InputCore> {
     if (!DoneImpl(_state.load(std::memory_order_acquire))) {
       if (result) {
         if (!DoneImpl(_state.exchange(1, std::memory_order_acq_rel))) {
-          std::move(this->_p).Set(std::forward<Result>(result));
+          if constexpr (IsVariant<OutputValue>::value) {
+            std::move(this->_p).Set(OutputValue{std::forward<Result>(result).Value()});
+          } else {
+            std::move(this->_p).Set(std::forward<Result>(result));
+          }
         }
       } else if (_state.fetch_sub(2, std::memory_order_acq_rel) == 2) {
-        std::move(this->_p).Set(std::forward<Result>(result));
+        if (result.State() == ResultState::Error) {
+          std::move(this->_p).Set(std::forward<Result>(result).Error());
+        } else {
+          std::move(this->_p).Set(std::forward<Result>(result).Exception());
+        }
       }
     }
   }

@@ -19,7 +19,7 @@ struct NoneManaged {
   static constexpr yaclib::ConsumePolicy kConsumePolicy = yaclib::ConsumePolicy::None;
   static constexpr yaclib::CorePolicy kCorePolicy = yaclib::CorePolicy::Managed;
 
-  NoneManaged(size_t count, PromiseType p) : _p{std::move(p)} {
+  NoneManaged(std::size_t count, PromiseType p) : _p{std::move(p)} {
   }
 
   ~NoneManaged() {
@@ -37,7 +37,7 @@ struct UnorderedManaged {
   static constexpr yaclib::ConsumePolicy kConsumePolicy = yaclib::ConsumePolicy::Unordered;
   static constexpr yaclib::CorePolicy kCorePolicy = yaclib::CorePolicy::Managed;
 
-  UnorderedManaged(size_t count, PromiseType p) : _p{std::move(p)} {
+  UnorderedManaged(std::size_t count, PromiseType p) : _p{std::move(p)} {
   }
 
   template <typename Result>
@@ -59,10 +59,10 @@ struct StaticManaged {
   static constexpr yaclib::ConsumePolicy kConsumePolicy = yaclib::ConsumePolicy::Static;
   static constexpr yaclib::CorePolicy kCorePolicy = yaclib::CorePolicy::Managed;
 
-  StaticManaged(size_t count, PromiseType p) : _p{std::move(p)} {
+  StaticManaged(std::size_t count, PromiseType p) : _p{std::move(p)} {
   }
 
-  template <size_t Index, typename Result>
+  template <std::size_t Index, typename Result>
   void Consume(Result&& result) {
   }
 
@@ -81,11 +81,11 @@ struct DynamicManaged {
   static constexpr yaclib::ConsumePolicy kConsumePolicy = yaclib::ConsumePolicy::Dynamic;
   static constexpr yaclib::CorePolicy kCorePolicy = yaclib::CorePolicy::Managed;
 
-  DynamicManaged(size_t count, PromiseType p) : _p{std::move(p)} {
+  DynamicManaged(std::size_t count, PromiseType p) : _p{std::move(p)} {
   }
 
   template <typename Result>
-  void Consume(size_t index, Result&& result) {
+  void Consume(std::size_t index, Result&& result) {
   }
 
   ~DynamicManaged() {
@@ -103,16 +103,16 @@ struct NoneOwned {
   static constexpr yaclib::ConsumePolicy kConsumePolicy = yaclib::ConsumePolicy::None;
   static constexpr yaclib::CorePolicy kCorePolicy = yaclib::CorePolicy::Owned;
 
-  NoneOwned(size_t count, PromiseType p) : _p{std::move(p)} {
+  NoneOwned(std::size_t count, PromiseType p) : _p{std::move(p)} {
   }
 
-  void Register(size_t i, InputCore& core) {
+  void Register(std::size_t i, InputCore& core) {
     _cores.push_back(&core);
   }
 
   ~NoneOwned() {
     std::move(this->_p).Set();
-    for (size_t i = 0; i < _cores.size(); ++i) {
+    for (std::size_t i = 0; i < _cores.size(); ++i) {
       _cores[i]->DecRef();
     }
   }
@@ -129,10 +129,10 @@ struct UnorderedOwned {
   static constexpr yaclib::ConsumePolicy kConsumePolicy = yaclib::ConsumePolicy::Unordered;
   static constexpr yaclib::CorePolicy kCorePolicy = yaclib::CorePolicy::Owned;
 
-  UnorderedOwned(size_t count, PromiseType p) : _p{std::move(p)} {
+  UnorderedOwned(std::size_t count, PromiseType p) : _p{std::move(p)} {
   }
 
-  void Register(size_t i, InputCore& core) {
+  void Register(std::size_t i, InputCore& core) {
   }
 
   void Consume(InputCore& core) {
@@ -154,13 +154,13 @@ struct StaticOwned {
   static constexpr yaclib::ConsumePolicy kConsumePolicy = yaclib::ConsumePolicy::Static;
   static constexpr yaclib::CorePolicy kCorePolicy = yaclib::CorePolicy::Owned;
 
-  StaticOwned(size_t count, PromiseType p) : _p{std::move(p)} {
+  StaticOwned(std::size_t count, PromiseType p) : _p{std::move(p)} {
   }
 
-  void Register(size_t i, InputCore& core) {
+  void Register(std::size_t i, InputCore& core) {
   }
 
-  template <size_t Index>
+  template <std::size_t Index>
   void Consume(InputCore& core) {
     core.DecRef();
   }
@@ -180,13 +180,13 @@ struct DynamicOwned {
   static constexpr yaclib::ConsumePolicy kConsumePolicy = yaclib::ConsumePolicy::Dynamic;
   static constexpr yaclib::CorePolicy kCorePolicy = yaclib::CorePolicy::Owned;
 
-  DynamicOwned(size_t count, PromiseType p) : _p{std::move(p)} {
+  DynamicOwned(std::size_t count, PromiseType p) : _p{std::move(p)} {
   }
 
-  void Register(size_t i, InputCore& core) {
+  void Register(std::size_t i, InputCore& core) {
   }
 
-  void Consume(size_t index, InputCore& core) {
+  void Consume(std::size_t index, InputCore& core) {
     core.DecRef();
   }
 
@@ -298,7 +298,7 @@ auto CallWhen(Iterator begin, Iterator end) {
 }
 
 template <typename StrategyT, typename Iterator, typename Value = typename std::iterator_traits<Iterator>::value_type>
-auto CallWhen(Iterator begin, size_t count) {
+auto CallWhen(Iterator begin, std::size_t count) {
   static constexpr auto F = yaclib::FailPolicy::None;
   using V = void;
   using E = yaclib::StopError;

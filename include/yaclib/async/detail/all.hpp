@@ -22,11 +22,11 @@ struct All<FailPolicy::None, OutputValue, OutputError, InputCore> {
   static constexpr ConsumePolicy kConsumePolicy = ConsumePolicy::None;
   static constexpr CorePolicy kCorePolicy = CorePolicy::Owned;
 
-  All(size_t count, PromiseType p) : _p{std::move(p)} {
+  All(std::size_t count, PromiseType p) : _p{std::move(p)} {
     _cores.resize(count);
   }
 
-  void Register(size_t i, InputCore& core) {
+  void Register(std::size_t i, InputCore& core) {
     _cores[i] = &core;
   }
 
@@ -54,11 +54,11 @@ struct All<FailPolicy::FirstFail, OutputValue, OutputError, InputCore> {
   static constexpr ConsumePolicy kConsumePolicy = ConsumePolicy::Unordered;
   static constexpr CorePolicy kCorePolicy = CorePolicy::Owned;
 
-  All(size_t count, PromiseType p) : _p{std::move(p)} {
+  All(std::size_t count, PromiseType p) : _p{std::move(p)} {
     _cores.resize(count);
   }
 
-  void Register(size_t i, InputCore& core) {
+  void Register(std::size_t i, InputCore& core) {
     _cores[i] = &core;
   }
 

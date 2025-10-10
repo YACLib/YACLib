@@ -18,7 +18,6 @@ class ResultCore : public BaseCore {
  public:
   using Value = V;
   using Error = E;
-  using ResultType = Result<V, E>;
 
   ResultCore() noexcept : BaseCore{kEmpty} {
   }

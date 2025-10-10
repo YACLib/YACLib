@@ -11,11 +11,10 @@ namespace yaclib {
 template <FailPolicy F = FailPolicy::LastFail, typename... Futures,
           typename = std::enable_if_t<(... && is_combinator_input_v<Futures>)>>
 YACLIB_INLINE auto WhenAny(Futures... futures) {
-  using OutputValue = typename MaybeVariant<typename Unique<std::tuple<typename Futures::Core::Value...>>::Type>::Type;
+  detail::CheckSameError<Futures...>();
 
+  using OutputValue = typename MaybeVariant<typename Unique<std::tuple<typename Futures::Core::Value...>>::Type>::Type;
   using OutputError = typename head_t<Futures...>::Core::Error;
-  static_assert((... && std::is_same_v<OutputError, typename Futures::Core::Error>),
-                "All futures need to have the same error type");
 
   return detail::When<detail::Any, F, OutputValue, OutputError>(std::move(futures)...);
 }

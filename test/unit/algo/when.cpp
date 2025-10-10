@@ -52,7 +52,7 @@ TYPED_TEST(WhenSuite, UniqueDynamic) {
     GTEST_SKIP();
   } else {
     std::vector<yaclib::Future<std::string>> vec;
-    for (size_t i = 0; i < 5; ++i) {
+    for (std::size_t i = 0; i < 5; ++i) {
       vec.push_back(yaclib::MakeFuture<std::string>(kSetString));
     }
 
@@ -66,7 +66,7 @@ TYPED_TEST(WhenSuite, SharedDynamic) {
     GTEST_SKIP();
   } else {
     std::vector<yaclib::SharedFuture<std::string>> vec;
-    for (size_t i = 0; i < 5; ++i) {
+    for (std::size_t i = 0; i < 5; ++i) {
       vec.push_back(yaclib::RunShared([] {
         return std::string{kSetString};
       }));
@@ -108,12 +108,12 @@ TYPED_TEST(WhenSuite, AsyncUniqueDynamic) {
     yaclib::FairThreadPool tp{4};
 
     std::vector<yaclib::Future<std::string>> vec;
-    for (size_t i = 0; i < 5; ++i) {
+    for (std::size_t i = 0; i < 5; ++i) {
       vec.push_back(yaclib::Run([] {
         return std::string{kSetString};
       }));
     }
-    for (size_t i = 0; i < 5; ++i) {
+    for (std::size_t i = 0; i < 5; ++i) {
       vec.push_back(yaclib::Run([] {
         yaclib_std::this_thread::sleep_for(100ms);
         return std::string{kSetString};
@@ -135,12 +135,12 @@ TYPED_TEST(WhenSuite, AsyncSharedDynamic) {
     yaclib::FairThreadPool tp{4};
 
     std::vector<yaclib::SharedFuture<std::string>> vec;
-    for (size_t i = 0; i < 5; ++i) {
+    for (std::size_t i = 0; i < 5; ++i) {
       vec.push_back(yaclib::RunShared([] {
         return std::string{kSetString};
       }));
     }
-    for (size_t i = 0; i < 5; ++i) {
+    for (std::size_t i = 0; i < 5; ++i) {
       vec.push_back(yaclib::RunShared([] {
         yaclib_std::this_thread::sleep_for(100ms);
         return std::string{kSetString};
