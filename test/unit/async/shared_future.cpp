@@ -12,6 +12,7 @@
 #include <yaclib/runtime/fair_thread_pool.hpp>
 
 #include <string_view>
+#include <thread>
 
 #include <gtest/gtest.h>
 
@@ -134,7 +135,7 @@ void Concurrent(Expected expected) {
 
   auto [sf, sp] = yaclib::MakeSharedContract<V, E>();
 
-  for (size_t i = 0; i < 10; ++i) {
+  for (std::size_t i = 0; i < 10; ++i) {
     yaclib::Submit(tp, [&sf = sf, &tp, expected]() {
       Share(sf).Detach(tp, [expected](Expected value) {
         EXPECT_EQ(value, expected);
@@ -247,7 +248,7 @@ TEST(SharedFuture, SharedFutureConcurrentGet) {
   });
 
   yaclib::FairThreadPool tp2;
-  for (size_t i = 0; i < 10; ++i) {
+  for (std::size_t i = 0; i < 10; ++i) {
     yaclib::Submit(tp2, [&sf = sf]() mutable {
       ASSERT_EQ(sf.Get().Value(), kSetInt);
     });
@@ -462,6 +463,21 @@ TEST(SharedFuture, ThenInline) {
     });
 }
 
+TEST(SharedFuture, RunShared) {
+  yaclib::ManualExecutor e;
+
+  yaclib::SharedFuture<> sf1 = yaclib::RunShared([] {
+  });
+  EXPECT_EQ(sf1.Get().Value(), yaclib::Unit{});
+
+  yaclib::SharedFutureOn<> sf2 = yaclib::RunShared(e, [] {
+  });
+  EXPECT_EQ(sf2.Ready(), false);
+  std::ignore = e.Drain();
+  EXPECT_EQ(sf2.Ready(), true);
+  EXPECT_EQ(sf2.Touch().Value(), yaclib::Unit{});
+}
+
 TEST(SharedFuture, On) {
   yaclib::FairThreadPool tp{4};
 
@@ -544,13 +560,13 @@ TEST(SharedFuture, MultipleWaitDynamic) {
 
   futures.clear();
 
-  for (size_t i = 0; i < 10; ++i) {
+  for (std::size_t i = 0; i < 10; ++i) {
     futures.push_back(yaclib::RunShared(tp, lambda));
   }
 
   Wait(futures.begin(), futures.end());
 
-  for (size_t i = 0; i < 10; ++i) {
+  for (std::size_t i = 0; i < 10; ++i) {
     ASSERT_EQ(futures[i].Get().Value(), kSetInt);
   }
 

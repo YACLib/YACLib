@@ -49,5 +49,30 @@ TEST(Example, WhenAny) {
   tp.Wait();
 }
 
+TEST(Example, WhenAnyShared) {
+  yaclib::FairThreadPool tp{4};
+
+  std::vector<yaclib::SharedFutureOn<int>> futs;
+
+  // Run sync computations in parallel
+
+  for (int i = 0; i < 5; ++i) {
+    futs.push_back(yaclib::RunShared(tp, [i]() -> int {
+      return i;
+    }));
+  }
+
+  // Parallel composition
+  // Any combinator: std::vector<Future<T>> -> Future<T>
+  // Non-blocking!
+  yaclib::Future<int> any = WhenAny(futs.begin(), futs.size());
+
+  // First value
+  std::cout << "Any value: " << std::move(any).Get().Ok() << std::endl;
+
+  tp.Stop();
+  tp.Wait();
+}
+
 }  // namespace
 }  // namespace test

@@ -18,9 +18,14 @@ list(APPEND YACLIB_INCLUDES
   )
 list(APPEND YACLIB_HEADERS
   ${YACLIB_INCLUDE_DIR}/async/detail/wait_impl.hpp
-  ${YACLIB_INCLUDE_DIR}/async/detail/when_all_impl.hpp
-  ${YACLIB_INCLUDE_DIR}/async/detail/when_any_impl.hpp
   ${YACLIB_INCLUDE_DIR}/async/detail/when_impl.hpp
+  )
+list(APPEND YACLIB_HEADERS
+  ${YACLIB_INCLUDE_DIR}/async/when/all.hpp
+  ${YACLIB_INCLUDE_DIR}/async/when/all_tuple.hpp
+  ${YACLIB_INCLUDE_DIR}/async/when/any.hpp
+  ${YACLIB_INCLUDE_DIR}/async/when/join.hpp
+  ${YACLIB_INCLUDE_DIR}/async/when/when.hpp
   )
 list(APPEND YACLIB_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/future_impl.cpp

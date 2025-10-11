@@ -230,14 +230,14 @@ TEST(Wait, Stress) {
   std::vector<yaclib::Future<int>> futures;
   std::vector<yaclib::Promise<int>> promises;
 
-  for (size_t i = 0; i < 100000; ++i) {
+  for (std::size_t i = 0; i < 100000; ++i) {
     auto [f, p] = yaclib::MakeContract<int>();
     futures.push_back(std::move(f));
     promises.push_back(std::move(p));
   }
 
   yaclib::Run(tp, [&] {
-    for (size_t i = 0; i < 100000; ++i) {
+    for (std::size_t i = 0; i < 100000; ++i) {
       std::move(promises[i]).Set(5);
     }
   }).Detach();
@@ -294,7 +294,7 @@ TEST(Wait, WaitOnSharedConcurrent) {
     std::move(sp).Set(42);
   });
 
-  for (size_t i = 0; i < 4; ++i) {
+  for (std::size_t i = 0; i < 4; ++i) {
     yaclib::Submit(tp, [&sf = sf]() mutable {
       yaclib_std::this_thread::sleep_for(1ms);
       yaclib::Wait(sf);

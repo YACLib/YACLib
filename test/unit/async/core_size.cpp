@@ -78,7 +78,7 @@ TEST(Core, EmptySizeof) {
   static_assert(sizeof(void*) == sizeof(int) || sizeof(*shared) == (sizeof(yaclib::detail::BaseCore) +  //
                                                                     sizeof(yaclib::Result<>) +          //
                                                                     kZeroCaptureLambdaSizeof +          //
-                                                                    sizeof(size_t)));
+                                                                    sizeof(std::size_t)));
   std::cout << "sizeof(yaclib::MakeCore, ToShared, zero capture lambda): " << sizeof(*shared) << std::endl;
 
   unique->StoreCallback(yaclib::detail::MakeDrop());
@@ -104,7 +104,7 @@ TEST(Core, Sizeof) {
   static_assert(sizeof(void*) == sizeof(int) || sizeof(*shared) == (sizeof(yaclib::detail::BaseCore) +  //
                                                                     sizeof(yaclib::Result<>) +          //
                                                                     sizeof(&kek) +                      //
-                                                                    sizeof(size_t)));
+                                                                    sizeof(std::size_t)));
   std::cout << "sizeof(yaclib::MakeCore, ToShared, zero capture lambda): " << sizeof(*shared) << std::endl;
 
   unique->StoreCallback(yaclib::detail::MakeDrop());

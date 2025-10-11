@@ -1,5 +1,6 @@
 #include <util/async_suite.hpp>
 #include <util/time.hpp>
+#include <util/when_suite.hpp>
 
 #include <yaclib/async/connect.hpp>
 #include <yaclib/async/contract.hpp>
@@ -356,7 +357,9 @@ TEST(CoroFuture, WhenAll) {
     yaclib_std::this_thread::sleep_for(10ms);
     co_return counter.fetch_add(1);
   };
-  auto f = yaclib::WhenAll(coro(), coro());
+  auto f1 = coro();
+  auto f2 = coro();
+  auto f = yaclib::WhenAll(std::move(f1), std::move(f2));
   auto results = std::move(f).Get().Ok();
   std::vector<int> expected{0, 1};
   EXPECT_EQ(results, expected);
@@ -563,7 +566,7 @@ TEST(Future, WhenAllCoro) {
   };
   auto f1 = coro();
   auto f2 = coro();
-  auto f3 = yaclib::WhenAll<yaclib::FailPolicy::FirstFail, yaclib::OrderPolicy::Same>(std::move(f1), std::move(f2));
+  auto f3 = yaclib::WhenAll(std::move(f1), std::move(f2));
   std::ignore = e.Drain();
   EXPECT_EQ(std::move(f3).Get().Ok(), yaclib::Unit{});
 }
@@ -851,6 +854,38 @@ TEST(Recursion, LazyCoro) {
 TEST(Recursion, EagerCoro) {
   // honest recursion, in clang debug/release produce recursion frames
   EXPECT_EQ(recursiveEagerCoro(kEagerRecursion).Get().Ok(), 42);
+}
+
+TYPED_TEST(WhenSuite, CoroStatic) {
+  yaclib::ManualExecutor e;
+  auto coro = [&]() -> yaclib::Future<> {
+    co_await On(e);
+    co_return{};
+  };
+  auto f1 = coro();
+  auto f2 = coro();
+  auto f3 = CallWhen<typename TestFixture::Strategy>(std::move(f1), std::move(f2));
+  std::ignore = e.Drain();
+  // TODO put back to void
+  EXPECT_EQ(std::move(f3).Get().Ok(), (yaclib::Unit{}));
+}
+
+TYPED_TEST(WhenSuite, CoroDynamic) {
+  if constexpr (IsStaticStrategy<typename TestFixture::Strategy>) {
+    GTEST_SKIP();
+  } else {
+    yaclib::ManualExecutor e;
+    auto coro = [&]() -> yaclib::Future<> {
+      co_await On(e);
+      co_return{};
+    };
+    std::vector<yaclib::Future<>> vec;
+    vec.push_back(coro());
+    vec.push_back(coro());
+    auto f3 = CallWhen<typename TestFixture::Strategy>(vec.begin(), vec.size());
+    std::ignore = e.Drain();
+    EXPECT_EQ(std::move(f3).Get().Ok(), ((yaclib::Unit{})));
+  }
 }
 
 }  // namespace

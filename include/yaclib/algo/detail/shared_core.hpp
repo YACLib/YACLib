@@ -6,8 +6,8 @@ namespace yaclib::detail {
 
 // 3 refs for the promise (1 for the promise itself and 2 for the last callback)
 // 1 ref for the future
-inline constexpr size_t kSharedRefWithFuture = 4;
-inline constexpr size_t kSharedRefNoFuture = 3;
+inline constexpr std::size_t kSharedRefWithFuture = 4;
+inline constexpr std::size_t kSharedRefNoFuture = 3;
 
 template <typename V, typename E>
 class SharedCore : public ResultCore<V, E> {
@@ -23,6 +23,12 @@ class SharedCore : public ResultCore<V, E> {
     return ResultCore<V, E>::template Impl<true, true>(caller);
   }
 #endif
+
+  Result<V, E> Retire() final {
+    auto result = (this->GetRef() == 1) ? std::move(this->Get()) : std::as_const(this->Get());
+    this->DecRef();
+    return result;
+  }
 
   [[nodiscard]] bool SetCallback(InlineCore& callback) noexcept {
     return BaseCore::SetCallbackImpl<true>(callback);
