@@ -359,7 +359,7 @@ TEST(WhenAll, FailWithError) {
 
   auto f3 = yaclib::MakeFuture<int>(yaclib::StopTag{});
   auto f4 = yaclib::MakeFuture<int>(3);
-  auto all2 = yaclib::WhenAll(std::move(f1), std::move(f2)).Get();
+  auto all2 = yaclib::WhenAll(std::move(f3), std::move(f4)).Get();
   EXPECT_EQ(std::move(all2).Error(), yaclib::StopTag{});
 }
 
