@@ -351,5 +351,17 @@ TEST(WhenAll, FirstFail) {
   FirstFail<LikeErrorCode>();
 }
 
+TEST(WhenAll, FailWithError) {
+  auto f1 = yaclib::MakeFuture<void>(yaclib::StopTag{});
+  auto f2 = yaclib::MakeFuture<void>(yaclib::Unit{});
+  auto all1 = yaclib::WhenAll(std::move(f1), std::move(f2)).Get();
+  EXPECT_EQ(std::move(all1).Error(), yaclib::StopTag{});
+
+  auto f3 = yaclib::MakeFuture<int>(yaclib::StopTag{});
+  auto f4 = yaclib::MakeFuture<int>(3);
+  auto all2 = yaclib::WhenAll(std::move(f1), std::move(f2)).Get();
+  EXPECT_EQ(std::move(all2).Error(), yaclib::StopTag{});
+}
+
 }  // namespace
 }  // namespace test
