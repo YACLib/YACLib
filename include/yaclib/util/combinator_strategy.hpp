@@ -40,6 +40,6 @@ enum class CorePolicy {
   Managed,
 };
 
-// The related code is located in async/detail/when.hpp
+// The related code is located in async/when/when.hpp
 
 }  // namespace yaclib

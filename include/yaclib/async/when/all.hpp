@@ -10,7 +10,7 @@
 
 #include <vector>
 
-namespace yaclib::detail {
+namespace yaclib::when {
 
 template <FailPolicy F, typename OutputValue, typename OutputError, typename InputCore>
 struct All {
@@ -93,4 +93,4 @@ struct All<FailPolicy::FirstFail, OutputValue, OutputError, InputCore> {
   PromiseType _p;
 };
 
-}  // namespace yaclib::detail
+}  // namespace yaclib::when

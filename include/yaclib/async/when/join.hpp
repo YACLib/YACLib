@@ -7,7 +7,7 @@
 
 #include <atomic>
 
-namespace yaclib::detail {
+namespace yaclib::when {
 
 template <FailPolicy F, typename OutputValue, typename OutputError, typename InputCore>
 struct Join {
@@ -65,4 +65,4 @@ struct Join<FailPolicy::FirstFail, void, OutputError, InputCore> {
   PromiseType _p;
 };
 
-}  // namespace yaclib::detail
+}  // namespace yaclib::when

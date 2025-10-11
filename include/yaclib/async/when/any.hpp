@@ -7,7 +7,7 @@
 
 #include <atomic>
 
-namespace yaclib::detail {
+namespace yaclib::when {
 
 template <FailPolicy F, typename OutputValue, typename OutputError, typename InputCore>
 struct Any;
@@ -127,4 +127,4 @@ struct Any<FailPolicy::LastFail, OutputValue, OutputError, InputCore> {
   PromiseType _p;
 };
 
-}  // namespace yaclib::detail
+}  // namespace yaclib::when

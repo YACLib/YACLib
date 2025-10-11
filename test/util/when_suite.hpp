@@ -1,7 +1,7 @@
 #pragma once
 
-#include <yaclib/async/detail/when.hpp>
 #include <yaclib/async/promise.hpp>
+#include <yaclib/async/when/when.hpp>
 #include <yaclib/util/combinator_strategy.hpp>
 #include <yaclib/util/fail_policy.hpp>
 #include <yaclib/util/result.hpp>
@@ -250,21 +250,21 @@ auto CallWhen(Futures... futures) {
   using E = yaclib::StopError;
 
   if constexpr (std::is_same_v<StrategyT, NoneManagedTag>) {
-    return yaclib::detail::When<NoneManaged, F, V, E>(std::move(futures)...);
+    return yaclib::when::When<NoneManaged, F, V, E>(std::move(futures)...);
   } else if constexpr (std::is_same_v<StrategyT, UnorderedManagedTag>) {
-    return yaclib::detail::When<UnorderedManaged, F, V, E>(std::move(futures)...);
+    return yaclib::when::When<UnorderedManaged, F, V, E>(std::move(futures)...);
   } else if constexpr (std::is_same_v<StrategyT, StaticManagedTag>) {
-    return yaclib::detail::When<StaticManaged, F, V, E>(std::move(futures)...);
+    return yaclib::when::When<StaticManaged, F, V, E>(std::move(futures)...);
   } else if constexpr (std::is_same_v<StrategyT, DynamicManagedTag>) {
-    return yaclib::detail::When<DynamicManaged, F, V, E>(std::move(futures)...);
+    return yaclib::when::When<DynamicManaged, F, V, E>(std::move(futures)...);
   } else if constexpr (std::is_same_v<StrategyT, NoneOwnedTag>) {
-    return yaclib::detail::When<NoneOwned, F, V, E>(std::move(futures)...);
+    return yaclib::when::When<NoneOwned, F, V, E>(std::move(futures)...);
   } else if constexpr (std::is_same_v<StrategyT, UnorderedOwnedTag>) {
-    return yaclib::detail::When<UnorderedOwned, F, V, E>(std::move(futures)...);
+    return yaclib::when::When<UnorderedOwned, F, V, E>(std::move(futures)...);
   } else if constexpr (std::is_same_v<StrategyT, StaticOwnedTag>) {
-    return yaclib::detail::When<StaticOwned, F, V, E>(std::move(futures)...);
+    return yaclib::when::When<StaticOwned, F, V, E>(std::move(futures)...);
   } else if constexpr (std::is_same_v<StrategyT, DynamicOwnedTag>) {
-    return yaclib::detail::When<DynamicOwned, F, V, E>(std::move(futures)...);
+    return yaclib::when::When<DynamicOwned, F, V, E>(std::move(futures)...);
   } else {
     return nullptr;
   }
@@ -277,21 +277,21 @@ auto CallWhen(Iterator begin, Iterator end) {
   using E = yaclib::StopError;
 
   if constexpr (std::is_same_v<StrategyT, NoneManagedTag>) {
-    return yaclib::detail::When<NoneManaged, F, V, E>(begin, end);
+    return yaclib::when::When<NoneManaged, F, V, E>(begin, end);
   } else if constexpr (std::is_same_v<StrategyT, UnorderedManagedTag>) {
-    return yaclib::detail::When<UnorderedManaged, F, V, E>(begin, end);
+    return yaclib::when::When<UnorderedManaged, F, V, E>(begin, end);
   } else if constexpr (std::is_same_v<StrategyT, StaticManagedTag>) {
-    return yaclib::detail::When<StaticManaged, F, V, E>(begin, end);
+    return yaclib::when::When<StaticManaged, F, V, E>(begin, end);
   } else if constexpr (std::is_same_v<StrategyT, DynamicManagedTag>) {
-    return yaclib::detail::When<DynamicManaged, F, V, E>(begin, end);
+    return yaclib::when::When<DynamicManaged, F, V, E>(begin, end);
   } else if constexpr (std::is_same_v<StrategyT, NoneOwnedTag>) {
-    return yaclib::detail::When<NoneOwned, F, V, E>(begin, end);
+    return yaclib::when::When<NoneOwned, F, V, E>(begin, end);
   } else if constexpr (std::is_same_v<StrategyT, UnorderedOwnedTag>) {
-    return yaclib::detail::When<UnorderedOwned, F, V, E>(begin, end);
+    return yaclib::when::When<UnorderedOwned, F, V, E>(begin, end);
   } else if constexpr (std::is_same_v<StrategyT, StaticOwnedTag>) {
-    return yaclib::detail::When<StaticOwned, F, V, E>(begin, end);
+    return yaclib::when::When<StaticOwned, F, V, E>(begin, end);
   } else if constexpr (std::is_same_v<StrategyT, DynamicOwnedTag>) {
-    return yaclib::detail::When<DynamicOwned, F, V, E>(begin, end);
+    return yaclib::when::When<DynamicOwned, F, V, E>(begin, end);
   } else {
     return nullptr;
   }
@@ -304,21 +304,21 @@ auto CallWhen(Iterator begin, std::size_t count) {
   using E = yaclib::StopError;
 
   if constexpr (std::is_same_v<StrategyT, NoneManagedTag>) {
-    return yaclib::detail::When<NoneManaged, F, V, E>(begin, count);
+    return yaclib::when::When<NoneManaged, F, V, E>(begin, count);
   } else if constexpr (std::is_same_v<StrategyT, UnorderedManagedTag>) {
-    return yaclib::detail::When<UnorderedManaged, F, V, E>(begin, count);
+    return yaclib::when::When<UnorderedManaged, F, V, E>(begin, count);
   } else if constexpr (std::is_same_v<StrategyT, StaticManagedTag>) {
-    return yaclib::detail::When<StaticManaged, F, V, E>(begin, count);
+    return yaclib::when::When<StaticManaged, F, V, E>(begin, count);
   } else if constexpr (std::is_same_v<StrategyT, DynamicManagedTag>) {
-    return yaclib::detail::When<DynamicManaged, F, V, E>(begin, count);
+    return yaclib::when::When<DynamicManaged, F, V, E>(begin, count);
   } else if constexpr (std::is_same_v<StrategyT, NoneOwnedTag>) {
-    return yaclib::detail::When<NoneOwned, F, V, E>(begin, count);
+    return yaclib::when::When<NoneOwned, F, V, E>(begin, count);
   } else if constexpr (std::is_same_v<StrategyT, UnorderedOwnedTag>) {
-    return yaclib::detail::When<UnorderedOwned, F, V, E>(begin, count);
+    return yaclib::when::When<UnorderedOwned, F, V, E>(begin, count);
   } else if constexpr (std::is_same_v<StrategyT, StaticOwnedTag>) {
-    return yaclib::detail::When<StaticOwned, F, V, E>(begin, count);
+    return yaclib::when::When<StaticOwned, F, V, E>(begin, count);
   } else if constexpr (std::is_same_v<StrategyT, DynamicOwnedTag>) {
-    return yaclib::detail::When<DynamicOwned, F, V, E>(begin, count);
+    return yaclib::when::When<DynamicOwned, F, V, E>(begin, count);
   } else {
     return nullptr;
   }

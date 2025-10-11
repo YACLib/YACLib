@@ -1,11 +1,10 @@
 #pragma once
 
-#include "yaclib/async/detail/join.hpp"
-
 #include <yaclib/algo/detail/result_core.hpp>
-#include <yaclib/async/detail/all.hpp>
-#include <yaclib/async/detail/all_tuple.hpp>
-#include <yaclib/async/detail/when.hpp>
+#include <yaclib/async/when/all.hpp>
+#include <yaclib/async/when/all_tuple.hpp>
+#include <yaclib/async/when/join.hpp>
+#include <yaclib/async/when/when.hpp>
 #include <yaclib/config.hpp>
 #include <yaclib/util/fail_policy.hpp>
 #include <yaclib/util/type_traits.hpp>
@@ -19,7 +18,7 @@ using ContainerElem = std::conditional_t<F == FailPolicy::FirstFail, wrap_void_t
 template <FailPolicy F = FailPolicy::FirstFail, typename... Futures,
           typename = std::enable_if_t<(... && is_combinator_input_v<Futures>)>>
 YACLIB_INLINE auto WhenAll(Futures... futures) {
-  detail::CheckSameError<Futures...>();
+  when::CheckSameError<Futures...>();
 
   using Head = typename head_t<Futures...>::Core;
   using Value = typename Head::Value;
@@ -27,14 +26,14 @@ YACLIB_INLINE auto WhenAll(Futures... futures) {
 
   if constexpr ((... && std::is_same_v<Value, typename Futures::Core::Value>)) {
     if constexpr (std::is_same_v<Value, void> && F != FailPolicy::None) {
-      return detail::When<detail::Join, F, void, OutputError>(std::move(futures)...);
+      return when::When<when::Join, F, void, OutputError>(std::move(futures)...);
     } else {
       using OutputValue = std::vector<ContainerElem<Head, F>>;
-      return detail::When<detail::All, F, OutputValue, OutputError>(std::move(futures)...);
+      return when::When<when::All, F, OutputValue, OutputError>(std::move(futures)...);
     }
   } else {
     using OutputValue = std::tuple<ContainerElem<typename Futures::Core, F>...>;
-    return detail::When<detail::AllTuple, F, OutputValue, OutputError>(std::move(futures)...);
+    return when::When<when::AllTuple, F, OutputValue, OutputError>(std::move(futures)...);
   }
 }
 
@@ -43,10 +42,10 @@ YACLIB_INLINE auto WhenAll(It begin, std::size_t count) {
   using OutputError = typename T::Core::Error;
 
   if constexpr (std::is_same_v<typename T::Core::Value, void> && F != FailPolicy::None) {
-    return detail::When<detail::Join, F, void, OutputError>(begin, count);
+    return when::When<when::Join, F, void, OutputError>(begin, count);
   } else {
     using OutputValue = std::vector<ContainerElem<typename T::Core, F>>;
-    return detail::When<detail::All, F, OutputValue, OutputError>(begin, count);
+    return when::When<when::All, F, OutputValue, OutputError>(begin, count);
   }
 }
 

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <yaclib/async/detail/any.hpp>
-#include <yaclib/async/detail/when.hpp>
+#include <yaclib/async/when/any.hpp>
+#include <yaclib/async/when/when.hpp>
 #include <yaclib/config.hpp>
 #include <yaclib/util/fail_policy.hpp>
 #include <yaclib/util/type_traits.hpp>
@@ -11,12 +11,12 @@ namespace yaclib {
 template <FailPolicy F = FailPolicy::LastFail, typename... Futures,
           typename = std::enable_if_t<(... && is_combinator_input_v<Futures>)>>
 YACLIB_INLINE auto WhenAny(Futures... futures) {
-  detail::CheckSameError<Futures...>();
+  when::CheckSameError<Futures...>();
 
   using OutputValue = typename MaybeVariant<typename Unique<std::tuple<typename Futures::Core::Value...>>::Type>::Type;
   using OutputError = typename head_t<Futures...>::Core::Error;
 
-  return detail::When<detail::Any, F, OutputValue, OutputError>(std::move(futures)...);
+  return when::When<when::Any, F, OutputValue, OutputError>(std::move(futures)...);
 }
 
 template <FailPolicy F = FailPolicy::LastFail, typename It, typename T = typename std::iterator_traits<It>::value_type>
@@ -29,7 +29,7 @@ YACLIB_INLINE auto WhenAny(It begin, std::size_t count) {
     }
   }
 
-  return detail::When<detail::Any, F, typename T::Core::Value, typename T::Core::Error>(begin, count);
+  return when::When<when::Any, F, typename T::Core::Value, typename T::Core::Error>(begin, count);
 }
 
 template <FailPolicy F = FailPolicy::LastFail, typename It, typename T = typename std::iterator_traits<It>::value_type>

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <yaclib/async/detail/join.hpp>
-#include <yaclib/async/detail/when.hpp>
+#include <yaclib/async/when/join.hpp>
+#include <yaclib/async/when/when.hpp>
 #include <yaclib/util/fail_policy.hpp>
 #include <yaclib/util/type_traits.hpp>
 
@@ -10,13 +10,13 @@ namespace yaclib {
 template <FailPolicy F = FailPolicy::None, typename... Futures,
           typename = std::enable_if_t<(... && is_combinator_input_v<Futures>)>>
 YACLIB_INLINE auto Join(Futures... futures) {
-  detail::CheckSameError<Futures...>();
-  return detail::When<detail::Join, F, void, typename head_t<Futures...>::Core::Error>(std::move(futures)...);
+  when::CheckSameError<Futures...>();
+  return when::When<when::Join, F, void, typename head_t<Futures...>::Core::Error>(std::move(futures)...);
 }
 
 template <FailPolicy F = FailPolicy::None, typename It, typename T = typename std::iterator_traits<It>::value_type>
 YACLIB_INLINE auto Join(It begin, std::size_t count) {
-  return detail::When<detail::Join, F, void, typename T::Core::Error>(begin, count);
+  return when::When<when::Join, F, void, typename T::Core::Error>(begin, count);
 }
 
 template <FailPolicy F = FailPolicy::None, typename It, typename T = typename std::iterator_traits<It>::value_type>

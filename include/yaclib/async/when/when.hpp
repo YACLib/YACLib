@@ -14,7 +14,7 @@
 #include <tuple>
 #include <vector>
 
-namespace yaclib::detail {
+namespace yaclib::when {
 
 template <typename... Futures>
 YACLIB_INLINE void CheckSameError() {
@@ -93,7 +93,7 @@ YACLIB_INLINE void Consume(Strategy& st, Core& core, std::size_t index) {
 }
 
 template <typename Combinator, typename Core, std::size_t Index>
-struct CombinatorCallback final : InlineCore {
+struct CombinatorCallback final : detail::InlineCore {
   CombinatorCallback(Combinator* self = nullptr) : _self{self} {
   }
 
@@ -135,7 +135,7 @@ struct CoreSignature {
 };
 
 template <typename Strategy, typename Core>
-struct SingleCombinator : InlineCore {
+struct SingleCombinator : detail::InlineCore {
   SingleCombinator(std::size_t count, typename Strategy::PromiseType p) : st{count, std::move(p)} {
   }
 
@@ -329,7 +329,7 @@ auto When(Futures... futures) {
       std::conditional_t<(... && std::is_same_v<Head, typename Futures::Core>), Head,
                          std::conditional_t<(... && (std::is_same_v<Value, typename Futures::Core::Value> &&
                                                      std::is_same_v<Error, typename Futures::Core::Error>)),
-                                            ResultCore<Value, Error>, InlineCore>>;
+                                            detail::ResultCore<Value, Error>, detail::InlineCore>>;
 
     using S = Strategy<F, OutputValue, OutputError, InputCore>;
 
@@ -366,4 +366,4 @@ auto When(Iterator begin, std::size_t count) {
   return std::move(f);
 }
 
-}  // namespace yaclib::detail
+}  // namespace yaclib::when

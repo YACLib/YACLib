@@ -1,10 +1,10 @@
 #include <util/when_suite.hpp>
 #include <yaclib_std/detail/this_thread.hpp>
 
-#include <yaclib/async/detail/when.hpp>
 #include <yaclib/async/make.hpp>
 #include <yaclib/async/promise.hpp>
 #include <yaclib/async/run.hpp>
+#include <yaclib/async/when/when.hpp>
 #include <yaclib/runtime/fair_thread_pool.hpp>
 #include <yaclib/util/combinator_strategy.hpp>
 #include <yaclib/util/result.hpp>

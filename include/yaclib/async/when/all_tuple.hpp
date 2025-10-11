@@ -8,7 +8,7 @@
 #include <yaclib/util/result.hpp>
 #include <yaclib/util/type_traits.hpp>
 
-namespace yaclib::detail {
+namespace yaclib::when {
 
 template <FailPolicy F, typename OutputValue, typename OutputError, typename InputCore>
 struct AllTuple {
@@ -74,4 +74,4 @@ struct AllTuple<FailPolicy::FirstFail, OutputValue, OutputError, InputCore> {
   PromiseType _p;
 };
 
-}  // namespace yaclib::detail
+}  // namespace yaclib::when
