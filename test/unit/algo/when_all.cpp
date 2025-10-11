@@ -143,7 +143,7 @@ struct WhenAllNames {
 TYPED_TEST_SUITE(WhenAllSuite, WhenAllTypes, WhenAllNames);
 
 TYPED_TEST(WhenAllSuite, JustWorks) {
-  using T = TestFixture::Tag;
+  using T = typename TestFixture::Tag;
   static constexpr bool is_void = std::is_void_v<typename T::T>;
 
   auto [f1, p1] = GetContract<0, T::FT, typename T::T>();
@@ -194,7 +194,7 @@ TYPED_TEST(WhenAllSuite, JustWorks) {
 }
 
 TYPED_TEST(WhenAllSuite, AllFails) {
-  using T = TestFixture::Tag;
+  using T = typename TestFixture::Tag;
   static constexpr bool is_void = std::is_void_v<typename T::T>;
 
   auto [f1, p1] = GetContract<0, T::FT, typename T::T>();
@@ -227,7 +227,7 @@ TYPED_TEST(WhenAllSuite, AllFails) {
 }
 
 TYPED_TEST(WhenAllSuite, MultiThreaded) {
-  using T = TestFixture::Tag;
+  using T = typename TestFixture::Tag;
   static constexpr bool is_void = std::is_void_v<typename T::T>;
   static constexpr int kValues = 6;
 
