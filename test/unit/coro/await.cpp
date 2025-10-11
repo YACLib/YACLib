@@ -568,8 +568,7 @@ TEST(Future, WhenAllCoro) {
   auto f2 = coro();
   auto f3 = yaclib::WhenAll(std::move(f1), std::move(f2));
   std::ignore = e.Drain();
-  // TODO put back to void
-  EXPECT_EQ(std::move(f3).Get().Ok(), (std::vector<yaclib::Unit>{{}, {}}));
+  EXPECT_EQ(std::move(f3).Get().Ok(), yaclib::Unit{});
 }
 
 TEST(Future, ConnectCoro) {

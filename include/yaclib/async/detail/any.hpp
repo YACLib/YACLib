@@ -9,11 +9,8 @@
 
 namespace yaclib::detail {
 
-template <FailPolicy P, typename OutputValue, typename OutputError, typename InputCore>
+template <FailPolicy F, typename OutputValue, typename OutputError, typename InputCore>
 struct Any;
-
-template <typename T>
-using IsVariant = IsInstantiationOf<std::variant, T>;
 
 template <typename OutputValue, typename OutputError, typename InputCore>
 struct Any<FailPolicy::None, OutputValue, OutputError, InputCore> {
@@ -28,16 +25,12 @@ struct Any<FailPolicy::None, OutputValue, OutputError, InputCore> {
   template <typename Result>
   void Consume(Result&& result) {
     if (!_done.load(std::memory_order_relaxed) && !_done.exchange(true, std::memory_order_acq_rel)) {
-      if constexpr (IsVariant<OutputValue>::Value) {
-        if (result) {
-          std::move(this->_p).Set(OutputValue{std::forward<Result>(result).Value()});
-        } else if (result.State() == ResultState::Error) {
-          std::move(this->_p).Set(std::forward<Result>(result).Error());
-        } else {
-          std::move(this->_p).Set(std::forward<Result>(result).Exception());
-        }
+      if (result) {
+        std::move(_p).Set(std::forward<Result>(result).Value());
+      } else if (result.State() == ResultState::Error) {
+        std::move(_p).Set(std::forward<Result>(result).Error());
       } else {
-        std::move(this->_p).Set(std::forward<Result>(result));
+        std::move(_p).Set(std::forward<Result>(result).Exception());
       }
     }
   }
@@ -61,11 +54,7 @@ struct Any<FailPolicy::FirstFail, OutputValue, OutputError, InputCore> {
     if (result) {
       if (_state.load(std::memory_order_relaxed) != State::kValue &&
           _state.exchange(State::kValue, std::memory_order_acq_rel) != State::kValue) {
-        if constexpr (IsVariant<OutputValue>::Value) {
-          std::move(this->_p).Set(OutputValue{std::forward<Result>(result).Value()});
-        } else {
-          std::move(this->_p).Set(std::forward<Result>(result).Value());
-        }
+        std::move(_p).Set(std::forward<Result>(result).Value());
       }
     } else {
       State expected = State::kEmpty;
@@ -81,11 +70,11 @@ struct Any<FailPolicy::FirstFail, OutputValue, OutputError, InputCore> {
   }
 
   ~Any() {
-    if (_state.load(std::memory_order_acquire) != State::kValue) {
+    if (_p.Valid()) {
       if (error.State() == ResultState::Error) {
-        std::move(this->_p).Set(std::move(error).Error());
+        std::move(_p).Set(std::move(error).Error());
       } else {
-        std::move(this->_p).Set(std::move(error).Exception());
+        std::move(_p).Set(std::move(error).Exception());
       }
     }
   }
@@ -117,17 +106,13 @@ struct Any<FailPolicy::LastFail, OutputValue, OutputError, InputCore> {
     if (!DoneImpl(_state.load(std::memory_order_acquire))) {
       if (result) {
         if (!DoneImpl(_state.exchange(1, std::memory_order_acq_rel))) {
-          if constexpr (IsVariant<OutputValue>::Value) {
-            std::move(this->_p).Set(OutputValue{std::forward<Result>(result).Value()});
-          } else {
-            std::move(this->_p).Set(std::forward<Result>(result));
-          }
+          std::move(_p).Set(std::forward<Result>(result).Value());
         }
       } else if (_state.fetch_sub(2, std::memory_order_acq_rel) == 2) {
         if (result.State() == ResultState::Error) {
-          std::move(this->_p).Set(std::forward<Result>(result).Error());
+          std::move(_p).Set(std::forward<Result>(result).Error());
         } else {
-          std::move(this->_p).Set(std::forward<Result>(result).Exception());
+          std::move(_p).Set(std::forward<Result>(result).Exception());
         }
       }
     }

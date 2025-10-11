@@ -12,9 +12,9 @@
 
 namespace yaclib {
 
-template <typename Future, FailPolicy F>
-using TupleElem = std::conditional_t<F == FailPolicy::FirstFail, wrap_void_t<typename Future::Core::Value>,
-                                     Result<typename Future::Core::Value, typename Future::Core::Error>>;
+template <typename Core, FailPolicy F>
+using ContainerElem = std::conditional_t<F == FailPolicy::FirstFail, wrap_void_t<typename Core::Value>,
+                                         Result<typename Core::Value, typename Core::Error>>;
 
 template <FailPolicy F = FailPolicy::FirstFail, typename... Futures,
           typename = std::enable_if_t<(... && is_combinator_input_v<Futures>)>>
@@ -26,10 +26,14 @@ YACLIB_INLINE auto WhenAll(Futures... futures) {
   using OutputError = typename Head::Error;
 
   if constexpr ((... && std::is_same_v<Value, typename Futures::Core::Value>)) {
-    using OutputValue = std::vector<wrap_void_t<Value>>;
-    return detail::When<detail::All, F, OutputValue, OutputError>(std::move(futures)...);
+    if constexpr (std::is_same_v<Value, void> && F != FailPolicy::None) {
+      return detail::When<detail::Join, F, void, OutputError>(std::move(futures)...);
+    } else {
+      using OutputValue = std::vector<ContainerElem<Head, F>>;
+      return detail::When<detail::All, F, OutputValue, OutputError>(std::move(futures)...);
+    }
   } else {
-    using OutputValue = std::tuple<TupleElem<Futures, F>...>;
+    using OutputValue = std::tuple<ContainerElem<typename Futures::Core, F>...>;
     return detail::When<detail::AllTuple, F, OutputValue, OutputError>(std::move(futures)...);
   }
 }
@@ -38,12 +42,12 @@ template <FailPolicy F = FailPolicy::FirstFail, typename It, typename T = typena
 YACLIB_INLINE auto WhenAll(It begin, std::size_t count) {
   using OutputError = typename T::Core::Error;
 
-  // if constexpr (std::is_same_v<typename T::Core::Value, void>) {
-  //   return detail::When<detail::Join, F, void, OutputError>(begin, count);
-  // } else {
-  using OutputValue = std::vector<wrap_void_t<typename T::Core::Value>>;
-  return detail::When<detail::All, F, OutputValue, OutputError>(begin, count);
-  // }
+  if constexpr (std::is_same_v<typename T::Core::Value, void> && F != FailPolicy::None) {
+    return detail::When<detail::Join, F, void, OutputError>(begin, count);
+  } else {
+    using OutputValue = std::vector<ContainerElem<typename T::Core, F>>;
+    return detail::When<detail::All, F, OutputValue, OutputError>(begin, count);
+  }
 }
 
 template <FailPolicy F = FailPolicy::FirstFail, typename It, typename T = typename std::iterator_traits<It>::value_type>

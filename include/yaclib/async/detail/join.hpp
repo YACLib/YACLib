@@ -12,7 +12,7 @@ namespace yaclib::detail {
 template <FailPolicy F, typename OutputValue, typename OutputError, typename InputCore>
 struct Join {
   static_assert(F != FailPolicy::LastFail, "LastFail policy is not supported by Join");
-  static_assert(std::is_void_v<OutputValue>);
+  static_assert(std::is_void_v<OutputValue>, "OutputValue should be void for Join");
 };
 
 template <typename OutputError, typename InputCore>
@@ -47,16 +47,16 @@ struct Join<FailPolicy::FirstFail, void, OutputError, InputCore> {
   void Consume(Result&& result) {
     if (!result && !_done.load(std::memory_order_relaxed) && !_done.exchange(true, std::memory_order_acq_rel)) {
       if (result.State() == ResultState::Error) {
-        std::move(this->_p).Set(std::forward<Result>(result).Error());
+        std::move(_p).Set(std::forward<Result>(result).Error());
       } else {
-        std::move(this->_p).Set(std::forward<Result>(result).Exception());
+        std::move(_p).Set(std::forward<Result>(result).Exception());
       }
     }
   }
 
   ~Join() {
-    if (!_done.load(std::memory_order_acquire)) {
-      std::move(this->_p).Set();
+    if (_p.Valid()) {
+      std::move(_p).Set();
     }
   }
 

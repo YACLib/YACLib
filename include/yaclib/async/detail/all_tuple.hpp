@@ -11,7 +11,9 @@
 namespace yaclib::detail {
 
 template <FailPolicy F, typename OutputValue, typename OutputError, typename InputCore>
-struct AllTuple;
+struct AllTuple {
+  static_assert(F != FailPolicy::LastFail, "LastFail policy is not supported by AllTuple");
+};
 
 template <typename OutputValue, typename OutputError, typename InputCore>
 struct AllTuple<FailPolicy::None, OutputValue, OutputError, InputCore> {
@@ -29,7 +31,7 @@ struct AllTuple<FailPolicy::None, OutputValue, OutputError, InputCore> {
   }
 
   ~AllTuple() {
-    std::move(this->_p).Set(std::move(_tuple));
+    std::move(_p).Set(std::move(_tuple));
   }
 
  private:
@@ -51,9 +53,9 @@ struct AllTuple<FailPolicy::FirstFail, OutputValue, OutputError, InputCore> {
   void Consume(Result&& result) {
     if (!result && !_done.load(std::memory_order_relaxed) && !_done.exchange(true, std::memory_order_acq_rel)) {
       if (result.State() == ResultState::Error) {
-        std::move(this->_p).Set(std::forward<Result>(result).Error());
+        std::move(_p).Set(std::forward<Result>(result).Error());
       } else {
-        std::move(this->_p).Set(std::forward<Result>(result).Exception());
+        std::move(_p).Set(std::forward<Result>(result).Exception());
       }
     } else {
       std::get<Index>(_tuple) = std::forward<Result>(result).Value();
@@ -61,8 +63,8 @@ struct AllTuple<FailPolicy::FirstFail, OutputValue, OutputError, InputCore> {
   }
 
   ~AllTuple() {
-    if (!_done.load(std::memory_order_acquire)) {
-      std::move(this->_p).Set(std::move(_tuple));
+    if (_p.Valid()) {
+      std::move(_p).Set(std::move(_tuple));
     }
   }
 

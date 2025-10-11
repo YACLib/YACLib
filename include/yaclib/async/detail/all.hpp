@@ -13,7 +13,9 @@
 namespace yaclib::detail {
 
 template <FailPolicy F, typename OutputValue, typename OutputError, typename InputCore>
-struct All;
+struct All {
+  static_assert(F != FailPolicy::LastFail, "LastFail policy is not supported by All");
+};
 
 template <typename OutputValue, typename OutputError, typename InputCore>
 struct All<FailPolicy::None, OutputValue, OutputError, InputCore> {
@@ -34,12 +36,9 @@ struct All<FailPolicy::None, OutputValue, OutputError, InputCore> {
     OutputValue output;
     output.reserve(_cores.size());
     for (auto* core : _cores) {
-      auto core_result = core->Retire();
-      if (core_result) {
-        output.push_back(std::move(core_result).Value());
-      }
+      output.push_back(core->Retire());
     }
-    std::move(this->_p).Set(std::move(output));
+    std::move(_p).Set(std::move(output));
   }
 
  private:
@@ -66,25 +65,25 @@ struct All<FailPolicy::FirstFail, OutputValue, OutputError, InputCore> {
     auto& result = core.Get();
     if (!result && !_done.load(std::memory_order_relaxed) && !_done.exchange(true, std::memory_order_acq_rel)) {
       if (result.State() == ResultState::Exception) {
-        std::move(this->_p).Set(std::as_const(result).Exception());
+        std::move(_p).Set(std::as_const(result).Exception());
       } else {
-        std::move(this->_p).Set(std::as_const(result).Error());
+        std::move(_p).Set(std::as_const(result).Error());
       }
     }
   }
 
   ~All() {
-    if (_done.load(std::memory_order_acquire)) {
-      for (auto* core : _cores) {
-        core->DecRef();
-      }
-    } else {
+    if (_p.Valid()) {
       OutputValue result;
       result.reserve(_cores.size());
       for (auto* core : _cores) {
         result.push_back(core->Retire().Value());
       }
-      std::move(this->_p).Set(std::move(result));
+      std::move(_p).Set(std::move(result));
+    } else {
+      for (auto* core : _cores) {
+        core->DecRef();
+      }
     }
   }
 

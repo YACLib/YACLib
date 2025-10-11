@@ -18,6 +18,7 @@ namespace yaclib::detail {
 
 template <typename... Futures>
 YACLIB_INLINE void CheckSameError() {
+  static_assert(sizeof...(Futures) > 0);
   using Error = typename head_t<Futures...>::Core::Error;
   static_assert((... && std::is_same_v<Error, typename Futures::Core::Error>),
                 "All futures need to have the same error type");
@@ -31,6 +32,8 @@ using IsSharedCore = detail::IsInstantiationOf<detail::SharedCore, T>;
 
 template <ConsumePolicy P>
 inline constexpr bool kIsOrdered = P == ConsumePolicy::Static || P == ConsumePolicy::Dynamic;
+
+inline constexpr std::size_t kDynamicTag = std::numeric_limits<std::size_t>::max();
 
 template <typename Strategy, typename Core>
 YACLIB_INLINE void ConsumeImpl(Strategy& st, Core& core) {
@@ -90,18 +93,17 @@ YACLIB_INLINE void Consume(Strategy& st, Core& core, std::size_t index) {
 }
 
 template <typename Combinator, typename Core, std::size_t Index>
-struct StaticCombinatorCallback : InlineCore {
-  StaticCombinatorCallback() = default;
-  StaticCombinatorCallback(Combinator* self) : _self(self) {
+struct CombinatorCallback final : InlineCore {
+  CombinatorCallback(Combinator* self = nullptr) : _self{self} {
   }
 
-  [[nodiscard]] InlineCore* Here(InlineCore& caller) noexcept override {
+  [[nodiscard]] InlineCore* Here(InlineCore& caller) noexcept final {
     Impl(caller);
     return nullptr;
   }
 
 #if YACLIB_SYMMETRIC_TRANSFER != 0
-  [[nodiscard]] yaclib_std::coroutine_handle<> Next(InlineCore& caller) noexcept override {
+  [[nodiscard]] yaclib_std::coroutine_handle<> Next(InlineCore& caller) noexcept final {
     Impl(caller);
     return yaclib_std::noop_coroutine();
   }
@@ -110,36 +112,12 @@ struct StaticCombinatorCallback : InlineCore {
  private:
   YACLIB_INLINE void Impl(InlineCore& caller) {
     auto& core = DownCast<Core>(caller);
-    Consume<Index>(_self->st, core);
-    _self->DecRef();
-  }
-
-  Combinator* _self;
-};
-
-template <typename Combinator, typename Core>
-struct DynamicCombinatorCallback : InlineCore {
-  DynamicCombinatorCallback() = default;
-  DynamicCombinatorCallback(Combinator* self) : _self(self) {
-  }
-
-  [[nodiscard]] InlineCore* Here(InlineCore& caller) noexcept override {
-    Impl(caller);
-    return nullptr;
-  }
-
-#if YACLIB_SYMMETRIC_TRANSFER != 0
-  [[nodiscard]] yaclib_std::coroutine_handle<> Next(InlineCore& caller) noexcept override {
-    Impl(caller);
-    return yaclib_std::noop_coroutine();
-  }
-#endif
-
- private:
-  YACLIB_INLINE void Impl(InlineCore& caller) {
-    auto& core = DownCast<Core>(caller);
-    auto index = this - _self->callbacks.data();
-    Consume(_self->st, core, index);
+    if constexpr (Index == kDynamicTag) {
+      auto index = this - _self->callbacks.data();
+      Consume(_self->st, core, index);
+    } else {
+      Consume<Index>(_self->st, core);
+    }
     _self->DecRef();
   }
 
@@ -156,13 +134,8 @@ struct CoreSignature {
   static constexpr std::size_t kTotalCount = kUniqueCount + kSharedCount;
 };
 
-template <typename Strategy, typename Core, std::size_t CoreCount>
+template <typename Strategy, typename Core>
 struct SingleCombinator : InlineCore {
-  // Static case constructor
-  SingleCombinator(typename Strategy::PromiseType p) : st{CoreCount, std::move(p)} {
-  }
-
-  // Dynamic case constructor
   SingleCombinator(std::size_t count, typename Strategy::PromiseType p) : st{count, std::move(p)} {
   }
 
@@ -179,7 +152,6 @@ struct SingleCombinator : InlineCore {
   void Set(Iterator begin, std::size_t count) {
     for (std::size_t i = 0; i < count; ++i) {
       auto& core = *begin->GetCore().Release();
-      begin++;
 
       if constexpr (Strategy::kCorePolicy == CorePolicy::Owned) {
         st.Register(i, core);
@@ -187,18 +159,20 @@ struct SingleCombinator : InlineCore {
 
       if (!core.SetCallback(*this)) {
         Consume(st, core, i);
-        this->DecRef();
+        DecRef();
       }
+
+      ++begin;
     }
   }
 
-  [[nodiscard]] InlineCore* Here(InlineCore& caller) noexcept override {
+  [[nodiscard]] InlineCore* Here(InlineCore& caller) noexcept final {
     Impl(caller);
     return nullptr;
   }
 
 #if YACLIB_SYMMETRIC_TRANSFER != 0
-  [[nodiscard]] yaclib_std::coroutine_handle<> Next(InlineCore& caller) noexcept override {
+  [[nodiscard]] yaclib_std::coroutine_handle<> Next(InlineCore& caller) noexcept final {
     Impl(caller);
     return yaclib_std::noop_coroutine();
   }
@@ -233,7 +207,7 @@ struct StaticCombinator : IRef {
 
   template <std::size_t... Is>
   struct OrderedCallbacks<std::index_sequence<Is...>> {
-    using Type = std::tuple<StaticCombinatorCallback<StaticCombinator, Cores, Is>...>;
+    using Type = std::tuple<CombinatorCallback<StaticCombinator, Cores, Is>...>;
   };
 
   using UniqueUniqueCores = typename CoreSignature<Cores...>::UniqueUniqueCores;
@@ -244,8 +218,8 @@ struct StaticCombinator : IRef {
 
   template <typename... UniqueCores, typename... SharedCores>
   struct UnorderedCallbacks<std::tuple<UniqueCores...>, std::tuple<SharedCores...>> {
-    std::tuple<StaticCombinatorCallback<StaticCombinator, UniqueCores, 0>...> unique_tuple;
-    std::tuple<StaticCombinatorCallback<StaticCombinator, SharedCores, 0>...> shared_tuple;
+    std::tuple<CombinatorCallback<StaticCombinator, UniqueCores, 0>...> unique_tuple;
+    std::tuple<CombinatorCallback<StaticCombinator, SharedCores, 0>...> shared_tuple;
   };
 
   using Callbacks =
@@ -294,7 +268,7 @@ struct StaticCombinator : IRef {
   }
 
  public:
-  StaticCombinator(typename Strategy::PromiseType p) : st{sizeof...(Cores), std::move(p)} {
+  StaticCombinator(std::size_t count, typename Strategy::PromiseType p) : st{count, std::move(p)} {
     if constexpr (kIsOrdered<Strategy::kConsumePolicy>) {
       Init(callbacks);
     } else {
@@ -321,7 +295,6 @@ struct DynamicCombinator : IRef {
   void Set(Iterator begin, std::size_t count) {
     for (std::size_t i = 0; i < count; ++i) {
       auto& core = *begin->GetCore().Release();
-      begin++;
 
       if constexpr (Strategy::kCorePolicy == CorePolicy::Owned) {
         st.Register(i, core);
@@ -331,11 +304,13 @@ struct DynamicCombinator : IRef {
         Consume(st, core, i);
         DecRef();
       }
+
+      ++begin;
     }
   }
 
   Strategy st;
-  std::vector<DynamicCombinatorCallback<DynamicCombinator, Core>> callbacks;
+  std::vector<CombinatorCallback<DynamicCombinator, Core, kDynamicTag>> callbacks;
 };
 
 template <template <FailPolicy, typename...> typename Strategy, FailPolicy F, typename OutputValue,
@@ -360,10 +335,10 @@ auto When(Futures... futures) {
 
     using FinalCombinator =
       std::conditional_t<CoreSignature<typename Futures::Core...>::kTotalCount == 1 && !kIsOrdered<S::kConsumePolicy>,
-                         SingleCombinator<S, head_t<typename Futures::Core...>, sizeof...(Futures)>,
+                         SingleCombinator<S, head_t<typename Futures::Core...>>,
                          StaticCombinator<S, typename Futures::Core...>>;
 
-    auto* combinator = MakeShared<FinalCombinator>(sizeof...(Futures), std::move(p)).Release();
+    auto* combinator = MakeShared<FinalCombinator>(sizeof...(Futures), sizeof...(Futures), std::move(p)).Release();
     combinator->Set(*futures.GetCore().Release()...);
     return std::move(f);
   }
@@ -384,7 +359,7 @@ auto When(Iterator begin, std::size_t count) {
   static_assert(S::kConsumePolicy != ConsumePolicy::Static);
 
   using FinalCombinator = std::conditional_t<!kIsOrdered<S::kConsumePolicy> && IsUniqueCore<Core>::Value,
-                                             SingleCombinator<S, Core, 0>, DynamicCombinator<S, Core>>;
+                                             SingleCombinator<S, Core>, DynamicCombinator<S, Core>>;
 
   auto* combinator = MakeShared<FinalCombinator>(count, count, std::move(p)).Release();
   combinator->Set(begin, count);
