@@ -1,0 +1,7 @@
+<map id="yaclib::FairThreadPool" name="yaclib::FairThreadPool">
+<area shape="rect" id="Node000001" title="TODO(kononovk) Doxygen docs." alt="" coords="5,153,154,178"/>
+<area shape="rect" id="Node000002" href="$classyaclib_1_1IExecutor.html" title=" " alt="" coords="22,79,137,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="82,120,82,152,77,152,77,120"/>
+<area shape="rect" id="Node000003" href="$classyaclib_1_1IRef.html" title="Reference counting interface." alt="" coords="37,5,122,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="82,46,82,79,77,79,77,46"/>
+</map>

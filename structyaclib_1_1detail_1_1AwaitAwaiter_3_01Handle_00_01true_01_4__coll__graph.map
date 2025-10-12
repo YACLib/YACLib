@@ -1,0 +1,27 @@
+<map id="yaclib::detail::AwaitAwaiter&lt; Handle, true &gt;" name="yaclib::detail::AwaitAwaiter&lt; Handle, true &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="68,526,242,567"/>
+<area shape="rect" id="Node000002" href="$structyaclib_1_1detail_1_1AwaitAwaiterBase.html" title=" " alt="" coords="186,436,361,477"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="236,488,183,528,180,524,233,484"/>
+<area shape="rect" id="Node000003" href="$classyaclib_1_1detail_1_1BaseCore.html" title=" " alt="" coords="204,348,359,373"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="282,389,278,436,272,436,276,389"/>
+<area shape="rect" id="Node000004" href="$classyaclib_1_1detail_1_1InlineCore.html" title=" " alt="" coords="41,252,196,277"/>
+<area shape="poly" id="edge13_Node000001_Node000004" title=" " alt="" coords="125,292,155,526,150,526,119,293"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="154,283,262,345,259,349,151,287"/>
+<area shape="rect" id="Node000005" href="$classyaclib_1_1Job.html" title="Callable that can be executed in an IExecutor." alt="" coords="78,155,159,181"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="121,197,121,251,116,251,116,197"/>
+<area shape="rect" id="Node000006" href="$classyaclib_1_1IFunc.html" title="Callable interface." alt="" coords="5,80,99,106"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="75,116,110,153,106,157,71,119"/>
+<area shape="rect" id="Node000007" href="$classyaclib_1_1IRef.html" title="Reference counting interface." alt="" coords="10,5,94,31"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="55,46,55,80,49,80,49,46"/>
+<area shape="rect" id="Node000008" href="$structyaclib_1_1detail_1_1Node.html" title="Node class, used in intrusive data structure." alt="" coords="123,80,251,106"/>
+<area shape="poly" id="edge7_Node000005_Node000008" title=" " alt="" coords="167,119,132,157,128,153,163,116"/>
+<area shape="poly" id="edge8_Node000008_Node000008" title=" " alt="" coords="267,86,277,93,269,100,252,103,251,97,267,95,272,93,265,90"/>
+<area shape="rect" id="Node000009" href="$classyaclib_1_1IntrusivePtr.html" title=" " alt="" coords="220,244,348,285"/>
+<area shape="poly" id="edge9_Node000003_Node000009" title=" " alt="" coords="286,300,284,348,279,347,280,300"/>
+<area shape="rect" id="Node000010" href="$classyaclib_1_1IntrusivePtr.html" title="A intrusive pointer to objects with an embedded reference count." alt="" coords="205,155,363,181"/>
+<area shape="poly" id="edge10_Node000009_Node000010" title=" " alt="" coords="287,196,287,243,281,243,281,196"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="371,252,525,277"/>
+<area shape="poly" id="edge11_Node000003_Node000011" title=" " alt="" coords="416,288,349,326,306,350,303,345,347,321,413,283"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="418,155,478,181"/>
+<area shape="poly" id="edge12_Node000011_Node000012" title=" " alt="" coords="451,197,451,251,445,251,445,197"/>
+</map>

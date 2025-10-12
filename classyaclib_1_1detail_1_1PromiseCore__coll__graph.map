@@ -1,0 +1,13 @@
+<map id="yaclib::detail::PromiseCore&lt; V, E, Func, Shared &gt;" name="yaclib::detail::PromiseCore&lt; V, E, Func, Shared &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="790,60,962,101"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="590,5,738,76"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="754,55,790,62,789,67,753,60"/>
+<area shape="rect" id="Node000003" href="$classyaclib_1_1detail_1_1FuncCore.html" title=" " alt="" coords="587,100,740,141"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="755,101,789,94,790,100,756,106"/>
+<area shape="rect" id="Node000004" href="$unionyaclib_1_1detail_1_1FuncCore_1_1State.html" title=" " alt="" coords="351,100,504,141"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="520,118,586,118,586,123,520,123"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="5,79,257,104"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="273,103,350,110,350,116,272,108"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="19,128,243,169"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="258,139,326,133,350,130,350,135,327,138,259,144"/>
+</map>

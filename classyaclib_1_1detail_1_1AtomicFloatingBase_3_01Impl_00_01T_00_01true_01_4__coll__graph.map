@@ -1,0 +1,9 @@
+<map id="yaclib::detail::AtomicFloatingBase&lt; Impl, T, true &gt;" name="yaclib::detail::AtomicFloatingBase&lt; Impl, T, true &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,256,190,297"/>
+<area shape="rect" id="Node000002" href="$classyaclib_1_1detail_1_1AtomicBase.html" title=" " alt="" coords="13,168,182,208"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="100,224,100,256,95,256,95,224"/>
+<area shape="rect" id="Node000003" href="$classyaclib_1_1detail_1_1AtomicWait.html" title=" " alt="" coords="15,79,180,120"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="100,135,100,167,95,167,95,135"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="74,5,121,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="100,46,100,79,95,79,95,46"/>
+</map>

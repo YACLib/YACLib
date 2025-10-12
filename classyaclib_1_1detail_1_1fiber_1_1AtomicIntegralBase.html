@@ -1,0 +1,226 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.9.8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<!-- BEGIN opengraph metadata -->
+<meta property="og:title" content="Doxygen Awesome" />
+<meta property="og:image" content="https://repository-images.githubusercontent.com/348492097/4f16df80-88fb-11eb-9d31-4015ff22c452" />
+<meta property="og:description" content="Custom CSS theme for doxygen html-documentation with lots of customization parameters." />
+<meta property="og:url" content="https://jothepro.github.io/doxygen-awesome-css/" />
+<!-- END opengraph metadata -->
+<!-- BEGIN twitter metadata -->
+<meta name="twitter:image:src" content="https://repository-images.githubusercontent.com/348492097/4f16df80-88fb-11eb-9d31-4015ff22c452" />
+<meta name="twitter:title" content="Doxygen Awesome" />
+<meta name="twitter:description" content="Custom CSS theme for doxygen html-documentation with lots of customization parameters." />
+<!-- END twitter metadata -->
+<title>YACLib: yaclib::detail::fiber::AtomicIntegralBase&lt; T, IsIntegral &gt; Class Template Reference</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link rel="icon" type="image/svg+xml" href="logo.drawio.svg"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+<script type="text/javascript" src="doxygen-awesome-fragment-copy-button.js"></script>
+<script type="text/javascript" src="doxygen-awesome-paragraph-link.js"></script>
+<script type="text/javascript" src="toggle-alternative-theme.js"></script>
+<script type="text/javascript">
+    DoxygenAwesomeFragmentCopyButton.init()
+    DoxygenAwesomeDarkModeToggle.init()
+    DoxygenAwesomeParagraphLink.init()
+</script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="custom.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only-darkmode-toggle.css" rel="stylesheet" type="text/css"/>
+<link href="custom-alternative.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<!-- https://tholman.com/github-corners/ -->
+<a href="https://github.com/YACLib/YACLib" class="github-corner" title="View source on GitHub" target="_blank">
+    <svg viewBox="0 0 250 250" width="40" height="40" style="position: absolute; top: 0; border: 0; right: 0; z-index: 99;" aria-hidden="true">
+    <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
+   <div id="projectname">YACLib
+   </div>
+   <div id="projectbrief">C++ library for concurrent tasks execution</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Search');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase-members.html">List of all members</a>  </div>
+  <div class="headertitle"><div class="title">yaclib::detail::fiber::AtomicIntegralBase&lt; T, IsIntegral &gt; Class Template Reference</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p><code>#include &lt;<a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html">atomic.hpp</a>&gt;</code></p>
+<div class="dynheader">
+Inheritance diagram for yaclib::detail::fiber::AtomicIntegralBase&lt; T, IsIntegral &gt;:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase__inherit__graph.svg" width="155" height="436"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
+<div class="dynheader">
+Collaboration diagram for yaclib::detail::fiber::AtomicIntegralBase&lt; T, IsIntegral &gt;:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase__coll__graph.svg" width="206" height="440"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="inherited" name="inherited"></a>
+Additional Inherited Members</h2></td></tr>
+<tr class="inherit_header pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html">yaclib::detail::fiber::AtomicBase&lt; T &gt;</a></td></tr>
+<tr class="memitem:aa2c50fe44948129596596711a3a57d62 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase" id="r_aa2c50fe44948129596596711a3a57d62"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html#aa2c50fe44948129596596711a3a57d62">store</a> (T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">desired</a>, std::memory_order) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:aa2c50fe44948129596596711a3a57d62 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a518a544b17fd4e4b05206217642a1ffe inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase" id="r_a518a544b17fd4e4b05206217642a1ffe"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html#a518a544b17fd4e4b05206217642a1ffe">store</a> (T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">desired</a>, std::memory_order) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">volatile</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a518a544b17fd4e4b05206217642a1ffe inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4fa3c1716033cfe89664e0a63819b55b inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase" id="r_a4fa3c1716033cfe89664e0a63819b55b"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html#a4fa3c1716033cfe89664e0a63819b55b">load</a> (std::memory_order) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a4fa3c1716033cfe89664e0a63819b55b inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a848abca645828855ce211030c0efdaad inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase" id="r_a848abca645828855ce211030c0efdaad"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html#a848abca645828855ce211030c0efdaad">load</a> (std::memory_order) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">volatile</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a848abca645828855ce211030c0efdaad inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa1cd6d30413291a2006c9cc198d56793 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase" id="r_aa1cd6d30413291a2006c9cc198d56793"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html#aa1cd6d30413291a2006c9cc198d56793">operator T</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:aa1cd6d30413291a2006c9cc198d56793 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a15eea11672a151f880de55f12e4ef304 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase" id="r_a15eea11672a151f880de55f12e4ef304"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html#a15eea11672a151f880de55f12e4ef304">operator T</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">volatile</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a15eea11672a151f880de55f12e4ef304 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae8fd8e0a08d7152f0bc893771abab567 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase" id="r_ae8fd8e0a08d7152f0bc893771abab567"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html#ae8fd8e0a08d7152f0bc893771abab567">exchange</a> (T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">desired</a>, std::memory_order) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:ae8fd8e0a08d7152f0bc893771abab567 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac0e97ca4e3e00db2debefca8c68c9c2d inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase" id="r_ac0e97ca4e3e00db2debefca8c68c9c2d"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html#ac0e97ca4e3e00db2debefca8c68c9c2d">exchange</a> (T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">desired</a>, std::memory_order) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">volatile</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:ac0e97ca4e3e00db2debefca8c68c9c2d inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8f740ff39fe48d3640e913a7d3d144d8 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase" id="r_a8f740ff39fe48d3640e913a7d3d144d8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html#a8f740ff39fe48d3640e913a7d3d144d8">compare_exchange_weak</a> (T &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">expected</a>, T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">desired</a>, std::memory_order, std::memory_order) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a8f740ff39fe48d3640e913a7d3d144d8 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac1e1a04c52c488bef7c211e397242504 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase" id="r_ac1e1a04c52c488bef7c211e397242504"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html#ac1e1a04c52c488bef7c211e397242504">compare_exchange_weak</a> (T &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">expected</a>, T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">desired</a>, std::memory_order, std::memory_order) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">volatile</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:ac1e1a04c52c488bef7c211e397242504 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac97c31bed8bf6fcec9e35c6d772523d7 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase" id="r_ac97c31bed8bf6fcec9e35c6d772523d7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html#ac97c31bed8bf6fcec9e35c6d772523d7">compare_exchange_weak</a> (T &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">expected</a>, T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">desired</a>, std::memory_order) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:ac97c31bed8bf6fcec9e35c6d772523d7 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7c9d7060f0c32a5f6e44e05dcc769107 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase" id="r_a7c9d7060f0c32a5f6e44e05dcc769107"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html#a7c9d7060f0c32a5f6e44e05dcc769107">compare_exchange_weak</a> (T &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">expected</a>, T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">desired</a>, std::memory_order) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">volatile</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a7c9d7060f0c32a5f6e44e05dcc769107 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a166f23dc221a0f931e4ee96c77b6c9bb inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase" id="r_a166f23dc221a0f931e4ee96c77b6c9bb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html#a166f23dc221a0f931e4ee96c77b6c9bb">compare_exchange_strong</a> (T &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">expected</a>, T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">desired</a>, std::memory_order, std::memory_order) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a166f23dc221a0f931e4ee96c77b6c9bb inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a37bc87c803b0002c004da89d8f8b2e23 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase" id="r_a37bc87c803b0002c004da89d8f8b2e23"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html#a37bc87c803b0002c004da89d8f8b2e23">compare_exchange_strong</a> (T &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">expected</a>, T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">desired</a>, std::memory_order, std::memory_order) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">volatile</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a37bc87c803b0002c004da89d8f8b2e23 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6d71243d61bdeaa174b5b3080e2863c7 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase" id="r_a6d71243d61bdeaa174b5b3080e2863c7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html#a6d71243d61bdeaa174b5b3080e2863c7">compare_exchange_strong</a> (T &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">expected</a>, T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">desired</a>, std::memory_order) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a6d71243d61bdeaa174b5b3080e2863c7 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a42afc95946ec2f06f57bbc2bc34883fe inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase" id="r_a42afc95946ec2f06f57bbc2bc34883fe"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html#a42afc95946ec2f06f57bbc2bc34883fe">compare_exchange_strong</a> (T &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">expected</a>, T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">desired</a>, std::memory_order) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">volatile</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a42afc95946ec2f06f57bbc2bc34883fe inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4da09f6d93046f453037c3c197639bff inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase" id="r_a4da09f6d93046f453037c3c197639bff"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html#a4da09f6d93046f453037c3c197639bff">is_lock_free</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">volatile</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a4da09f6d93046f453037c3c197639bff inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a006b8c315dc7ee7cfe968ee25cc41a71 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase" id="r_a006b8c315dc7ee7cfe968ee25cc41a71"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html#a006b8c315dc7ee7cfe968ee25cc41a71">is_lock_free</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a006b8c315dc7ee7cfe968ee25cc41a71 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicWait"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicWait')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicWait.html">yaclib::detail::fiber::AtomicWait&lt; T &gt;</a></td></tr>
+<tr class="memitem:aac97cc7b5031763d6be9df0d9c9c6e9f inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicWait" id="r_aac97cc7b5031763d6be9df0d9c9c6e9f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicWait.html#aac97cc7b5031763d6be9df0d9c9c6e9f">AtomicWait</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a>=<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">default</a></td></tr>
+<tr class="separator:aac97cc7b5031763d6be9df0d9c9c6e9f inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicWait"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abf2bb597ebbbd41f2e521a459b897898 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicWait" id="r_abf2bb597ebbbd41f2e521a459b897898"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">constexpr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicWait.html#abf2bb597ebbbd41f2e521a459b897898">AtomicWait</a> (T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">desired</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:abf2bb597ebbbd41f2e521a459b897898 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicWait"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a55f61bdfc8dc5e6720b6a4c57cfca7ad inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicWait" id="r_a55f61bdfc8dc5e6720b6a4c57cfca7ad"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicWait.html#a55f61bdfc8dc5e6720b6a4c57cfca7ad">operator=</a> (T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">desired</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">volatile</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a55f61bdfc8dc5e6720b6a4c57cfca7ad inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicWait"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a399cc852ebc82642f2366df3d5f4a5d7 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicWait" id="r_a399cc852ebc82642f2366df3d5f4a5d7"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicWait.html#a399cc852ebc82642f2366df3d5f4a5d7">operator=</a> (T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">desired</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a399cc852ebc82642f2366df3d5f4a5d7 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicWait"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4da09f6d93046f453037c3c197639bff inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicWait" id="r_a4da09f6d93046f453037c3c197639bff"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicWait.html#a4da09f6d93046f453037c3c197639bff">is_lock_free</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">volatile</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a4da09f6d93046f453037c3c197639bff inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicWait"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a006b8c315dc7ee7cfe968ee25cc41a71 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicWait" id="r_a006b8c315dc7ee7cfe968ee25cc41a71"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicWait.html#a006b8c315dc7ee7cfe968ee25cc41a71">is_lock_free</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a006b8c315dc7ee7cfe968ee25cc41a71 inherit pub_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicWait"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_static_attribs_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td colspan="2" onclick="javascript:toggleInherit('pub_static_attribs_classyaclib_1_1detail_1_1fiber_1_1AtomicBase')"><img src="closed.png" alt="-"/>&#160;Static Public Attributes inherited from <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html">yaclib::detail::fiber::AtomicBase&lt; T &gt;</a></td></tr>
+<tr class="memitem:a78806ff58e35a1a51765506c8446556d inherit pub_static_attribs_classyaclib_1_1detail_1_1fiber_1_1AtomicBase" id="r_a78806ff58e35a1a51765506c8446556d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">static</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">constexpr</a> <a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html#a78806ff58e35a1a51765506c8446556d">is_always_lock_free</a></td></tr>
+<tr class="separator:a78806ff58e35a1a51765506c8446556d inherit pub_static_attribs_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_static_attribs_classyaclib_1_1detail_1_1fiber_1_1AtomicWait"><td colspan="2" onclick="javascript:toggleInherit('pub_static_attribs_classyaclib_1_1detail_1_1fiber_1_1AtomicWait')"><img src="closed.png" alt="-"/>&#160;Static Public Attributes inherited from <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicWait.html">yaclib::detail::fiber::AtomicWait&lt; T &gt;</a></td></tr>
+<tr class="memitem:a78806ff58e35a1a51765506c8446556d inherit pub_static_attribs_classyaclib_1_1detail_1_1fiber_1_1AtomicWait" id="r_a78806ff58e35a1a51765506c8446556d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">static</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">constexpr</a> <a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicWait.html#a78806ff58e35a1a51765506c8446556d">is_always_lock_free</a> = <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">true</a></td></tr>
+<tr class="separator:a78806ff58e35a1a51765506c8446556d inherit pub_static_attribs_classyaclib_1_1detail_1_1fiber_1_1AtomicWait"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pro_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html">yaclib::detail::fiber::AtomicBase&lt; T &gt;</a></td></tr>
+<tr class="memitem:a8de884c64ab41d31dd60d6be28398d3c inherit pro_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase" id="r_a8de884c64ab41d31dd60d6be28398d3c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html#a8de884c64ab41d31dd60d6be28398d3c">CompareExchangeHelper</a> (T &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">expected</a>, T <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">desired</a>)</td></tr>
+<tr class="separator:a8de884c64ab41d31dd60d6be28398d3c inherit pro_methods_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pro_attribs_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classyaclib_1_1detail_1_1fiber_1_1AtomicBase')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html">yaclib::detail::fiber::AtomicBase&lt; T &gt;</a></td></tr>
+<tr class="memitem:a49e4e2329382d82639bfae619a1b34d6 inherit pro_attribs_classyaclib_1_1detail_1_1fiber_1_1AtomicBase" id="r_a49e4e2329382d82639bfae619a1b34d6"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html#a49e4e2329382d82639bfae619a1b34d6">_value</a></td></tr>
+<tr class="separator:a49e4e2329382d82639bfae619a1b34d6 inherit pro_attribs_classyaclib_1_1detail_1_1fiber_1_1AtomicBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pro_attribs_classyaclib_1_1detail_1_1fiber_1_1AtomicWait"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classyaclib_1_1detail_1_1fiber_1_1AtomicWait')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicWait.html">yaclib::detail::fiber::AtomicWait&lt; T &gt;</a></td></tr>
+<tr class="memitem:a49e4e2329382d82639bfae619a1b34d6 inherit pro_attribs_classyaclib_1_1detail_1_1fiber_1_1AtomicWait" id="r_a49e4e2329382d82639bfae619a1b34d6"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicWait.html#a49e4e2329382d82639bfae619a1b34d6">_value</a></td></tr>
+<tr class="separator:a49e4e2329382d82639bfae619a1b34d6 inherit pro_attribs_classyaclib_1_1detail_1_1fiber_1_1AtomicWait"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><div class="compoundTemplParams">template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T, <a class="el" href="classbool.html">bool</a> IsIntegral = std::is_integral_v&lt;T&gt; &amp;&amp; !std::is_same_v&lt;T, bool&gt;&gt;<br />
+class yaclib::detail::fiber::AtomicIntegralBase&lt; T, IsIntegral &gt;</div>
+<p class="definition">Definition at line <a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html#l00140">140</a> of file <a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html">atomic.hpp</a>.</p>
+</div><hr/>The documentation for this class was generated from the following file:<ul>
+<li>include/yaclib/fault/detail/fiber/<a class="el" href="fault_2detail_2fiber_2atomic_8hpp_source.html">atomic.hpp</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="namespaceyaclib.html">yaclib</a></li><li class="navelem"><a class="el" href="namespaceyaclib_1_1detail.html">detail</a></li><li class="navelem"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html">fiber</a></li><li class="navelem"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase.html">AtomicIntegralBase</a></li>
+    <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+  </ul>
+</div>
+</body>
+</html>
