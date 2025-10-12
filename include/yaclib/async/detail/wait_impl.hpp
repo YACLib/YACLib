@@ -65,7 +65,7 @@ template <typename Event, typename Timeout, typename... Handles>
 bool WaitCore(const Timeout& timeout, Handles... handles) noexcept {
   static_assert(sizeof...(handles) >= 1, "Number of futures must be at least one");
 
-  static constexpr size_t kSharedCount = Count<SharedHandle, Handles...>;
+  static constexpr std::size_t kSharedCount = kCount<SharedHandle, Handles...>;
   static_assert(kSharedCount == 0 || std::is_same_v<Timeout, NoTimeoutTag>);
 
   auto range = [&](auto&& func) noexcept {

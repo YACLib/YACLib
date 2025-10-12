@@ -100,7 +100,7 @@ class PromiseType final : public PromiseTypeBase<V, E, Lazy, Shared> {
   void IncRef() noexcept final {
     return this->Add(1);
   }
-  size_t GetRef() noexcept final {
+  std::size_t GetRef() noexcept final {
     return this->Get();
   }
   void DecRef() noexcept final {

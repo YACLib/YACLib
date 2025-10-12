@@ -365,7 +365,7 @@ auto* MakeCore(Func&& f) {
   using AsyncRet = result_value_t<typename detail::Return<Arg, E, Func&&>::Type>;
   static_assert(!IsDetach(CoreT) || std::is_void_v<AsyncRet>,
                 "It makes no sense to return some value in Detach, since no one will be able to use it");
-  using Ret0 = result_value_t<shared_future_value_t<future_base_value_t<task_value_t<AsyncRet>>>>;
+  using Ret0 = result_value_t<async_value_t<task_value_t<AsyncRet>>>;
   using Ret = std::conditional_t<std::is_same_v<Ret0, Unit>, void, Ret0>;
   constexpr AsyncType kAsync = [] {
     if constexpr (is_future_base_v<AsyncRet> || is_task_v<AsyncRet>) {

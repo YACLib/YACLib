@@ -85,6 +85,23 @@ TEST(ResultCore, ImplNonMovable) {
 #endif
 }
 
+void CheckUniqueCoreRetireNonMovable() {
+  auto [f1, p1] = yaclib::MakeContract<NonMovable>();
+  std::move(p1).Set();
+  auto core = f1.GetCore().Release();
+  auto non_movable = core->Retire();  // Should fail
+  // The previous line basically does nothing, so DecRef() to avoid memory leak
+  core->DecRef();
+}
+
+TEST(UniqueCore, RetireNonMovable) {
+#ifndef YACLIB_LOG_DEBUG
+  CheckUniqueCoreRetireNonMovable();
+#else
+  EXPECT_FATAL_FAILURE(CheckUniqueCoreRetireNonMovable(), "");
+#endif
+}
+
 TEST(UniqueJob, Ref) {
   auto task = yaclib::detail::MakeUniqueJob([] {
   });

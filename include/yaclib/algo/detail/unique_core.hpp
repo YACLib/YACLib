@@ -2,6 +2,8 @@
 
 #include <yaclib/algo/detail/result_core.hpp>
 
+#include <type_traits>
+
 namespace yaclib::detail {
 
 template <typename V, typename E>
@@ -18,6 +20,17 @@ class UniqueCore : public ResultCore<V, E> {
     return ResultCore<V, E>::template Impl<true, false>(caller);
   }
 #endif
+
+  Result<V, E> Retire() final {
+    if constexpr (std::is_move_constructible_v<Result<V, E>>) {
+      auto result = std::move(this->Get());
+      this->DecRef();
+      return result;
+    } else {
+      YACLIB_PURE_VIRTUAL();
+      return {};
+    }
+  }
 
   void StoreCallback(InlineCore& callback) noexcept {
     BaseCore::StoreCallbackImpl(callback);

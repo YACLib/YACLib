@@ -102,6 +102,7 @@ class SharedFutureBase {
   }
 
   using Handle = detail::SharedHandle;
+  using Core = detail::SharedCore<V, E>;
 
   [[nodiscard]] detail::SharedHandle GetHandle() const noexcept {
     return detail::SharedHandle{*_core};

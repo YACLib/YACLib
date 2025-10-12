@@ -50,6 +50,8 @@ class ResultCore : public BaseCore {
     }
   }
 
+  virtual Result<V, E> Retire() = 0;
+
   union {
     Result<V, E> _result;
     Callback _self;

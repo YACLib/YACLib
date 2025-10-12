@@ -22,7 +22,7 @@ class Helper final : public Counter<ObjectT, DefaultDeleter> {
     this->Sub(1);
   }
 
-  size_t GetRef() noexcept final {
+  std::size_t GetRef() noexcept final {
     return this->Get();
   }
 };

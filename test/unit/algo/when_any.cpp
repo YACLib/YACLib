@@ -438,5 +438,19 @@ TEST(WhenAny, LengthOne) {
   EXPECT_EQ(old_addr, new_addr);
 }
 
+TEST(WhenAny, DifferentTypes) {
+  auto f1 = yaclib::MakeFuture<int>(3);
+  auto f2 = yaclib::MakeFuture<double>(3.1);
+  auto f = yaclib::WhenAny(std::move(f1), std::move(f2));
+  EXPECT_EQ(std::get<0>(std::move(f).Get().Value()), 3);
+}
+
+TEST(WhenAny, DifferentTypesFail) {
+  auto f1 = yaclib::MakeFuture<int>(yaclib::StopTag{});
+  auto f2 = yaclib::MakeFuture<double>(yaclib::StopTag{});
+  auto f = yaclib::WhenAny(std::move(f1), std::move(f2));
+  EXPECT_EQ(std::move(f).Get().Error(), yaclib::StopTag{});
+}
+
 }  // namespace
 }  // namespace test

@@ -60,7 +60,7 @@ template <typename E = StopError, typename Func>
 
 template <typename E = StopError, typename Func>
 /*SharedFuture*/ auto RunShared(Func&& f) {
-  return detail::RunShared<Unit, E>(MakeInline(), std::forward<Func>(f));
+  return detail::RunShared<Unit, E>(MakeInline(), std::forward<Func>(f)).On(nullptr);
 }
 
 /**
@@ -79,7 +79,7 @@ template <typename E = StopError, typename Func>
 }
 
 template <typename E = StopError, typename Func>
-/*SharedFuture*/ auto RunShared(IExecutor& e, Func&& f) {
+/*SharedFutureOn*/ auto RunShared(IExecutor& e, Func&& f) {
   return detail::RunShared<Unit, E>(e, std::forward<Func>(f));
 }
 
