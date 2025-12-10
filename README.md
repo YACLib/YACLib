@@ -64,6 +64,7 @@ https://discord.gg/xy2fDKj8VZ)
 * [Releases](#releases)
 * [Contributing](#contributing)
 * [Thanks](#thanks)
+* [Used by](#used-by)
 * [Contacts](#contacts)
 * [License](#license)
 
@@ -520,6 +521,10 @@ For more details you can check the following links:
 * Paul E. McKenney for an incredible
   [book about parallel programming](https://cdn.kernel.org/pub/linux/kernel/people/paulmck/perfbook/perfbook.html),
   which gave me a lot of insight into memory models and how they relate to what's going on in hardware.
+
+## Used by
+
+* [SereneDB](https://github.com/serenedb/serenedb)
 
 ## Contacts
 
