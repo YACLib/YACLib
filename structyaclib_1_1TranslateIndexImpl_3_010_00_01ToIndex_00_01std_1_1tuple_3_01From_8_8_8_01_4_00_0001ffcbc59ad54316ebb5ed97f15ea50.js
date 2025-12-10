@@ -1,0 +1,4 @@
+var structyaclib_1_1TranslateIndexImpl_3_010_00_01ToIndex_00_01std_1_1tuple_3_01From_8_8_8_01_4_00_0001ffcbc59ad54316ebb5ed97f15ea50 =
+[
+    [ "Index", "structyaclib_1_1TranslateIndexImpl_3_010_00_01ToIndex_00_01std_1_1tuple_3_01From_8_8_8_01_4_00_0001ffcbc59ad54316ebb5ed97f15ea50.html#a77f18f2366fa2a4797d43d148dcfbed0", null ]
+];

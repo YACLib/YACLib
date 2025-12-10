@@ -1,0 +1,13 @@
+<map id="yaclib::detail::fiber::AtomicIntegralBase&lt; T, true &gt;" name="yaclib::detail::fiber::AtomicIntegralBase&lt; T, true &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="32,379,173,435"/>
+<area shape="rect" id="Node000002" href="$classyaclib_1_1detail_1_1fiber_1_1AtomicFloatingBase_3_01T_00_01true_01_4.html" title=" " alt="" coords="31,274,175,330"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="105,345,105,378,100,378,100,345"/>
+<area shape="rect" id="Node000003" href="$classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html" title=" " alt="" coords="39,184,167,225"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="105,240,105,274,100,274,100,240"/>
+<area shape="rect" id="Node000004" href="$classyaclib_1_1detail_1_1fiber_1_1AtomicWait.html" title=" " alt="" coords="41,94,165,135"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="105,150,105,184,100,184,100,150"/>
+<area shape="rect" id="Node000005" href="$classbool.html" title=" " alt="" coords="5,5,51,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="26,46,32,69,42,81,55,91,52,96,38,85,27,71,21,47"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="159,5,198,31"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="168,46,151,72,128,96,124,92,147,68,164,43"/>
+</map>

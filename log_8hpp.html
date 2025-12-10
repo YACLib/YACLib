@@ -1,0 +1,500 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.9.8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<!-- BEGIN opengraph metadata -->
+<meta property="og:title" content="Doxygen Awesome" />
+<meta property="og:image" content="https://repository-images.githubusercontent.com/348492097/4f16df80-88fb-11eb-9d31-4015ff22c452" />
+<meta property="og:description" content="Custom CSS theme for doxygen html-documentation with lots of customization parameters." />
+<meta property="og:url" content="https://jothepro.github.io/doxygen-awesome-css/" />
+<!-- END opengraph metadata -->
+<!-- BEGIN twitter metadata -->
+<meta name="twitter:image:src" content="https://repository-images.githubusercontent.com/348492097/4f16df80-88fb-11eb-9d31-4015ff22c452" />
+<meta name="twitter:title" content="Doxygen Awesome" />
+<meta name="twitter:description" content="Custom CSS theme for doxygen html-documentation with lots of customization parameters." />
+<!-- END twitter metadata -->
+<title>YACLib: include/yaclib/log.hpp File Reference</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link rel="icon" type="image/svg+xml" href="logo.drawio.svg"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+<script type="text/javascript" src="doxygen-awesome-fragment-copy-button.js"></script>
+<script type="text/javascript" src="doxygen-awesome-paragraph-link.js"></script>
+<script type="text/javascript" src="toggle-alternative-theme.js"></script>
+<script type="text/javascript">
+    DoxygenAwesomeFragmentCopyButton.init()
+    DoxygenAwesomeDarkModeToggle.init()
+    DoxygenAwesomeParagraphLink.init()
+</script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="custom.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only-darkmode-toggle.css" rel="stylesheet" type="text/css"/>
+<link href="custom-alternative.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<!-- https://tholman.com/github-corners/ -->
+<a href="https://github.com/YACLib/YACLib" class="github-corner" title="View source on GitHub" target="_blank">
+    <svg viewBox="0 0 250 250" width="40" height="40" style="position: absolute; top: 0; border: 0; right: 0; z-index: 99;" aria-hidden="true">
+    <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
+   <div id="projectname">YACLib
+   </div>
+   <div id="projectbrief">C++ library for concurrent tasks execution</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Search');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('log_8hpp.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#namespaces">Namespaces</a> &#124;
+<a href="#define-members">Macros</a> &#124;
+<a href="#typedef-members">Typedefs</a> &#124;
+<a href="#enum-members">Enumerations</a> &#124;
+<a href="#func-members">Functions</a>  </div>
+  <div class="headertitle"><div class="title">log.hpp File Reference</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="textblock"><code>#include &lt;string_view&gt;</code><br />
+</div><div class="textblock"><div class="dynheader">
+Include dependency graph for log.hpp:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="log_8hpp__incl.svg" width="155" height="111"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+</div>
+</div><div class="textblock"><div class="dynheader">
+This graph shows which files directly or indirectly include this file:</div>
+<div class="dyncontent">
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="log_8hpp__dep__incl.svg" width="100%" height="600"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
+</div>
+</div>
+<p><a href="log_8hpp_source.html">Go to the source code of this file.</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="namespaces" name="namespaces"></a>
+Namespaces</h2></td></tr>
+<tr class="memitem:namespaceyaclib" id="r_namespaceyaclib"><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceyaclib.html">yaclib</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:namespaceyaclib_1_1detail" id="r_namespaceyaclib_1_1detail"><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail.html">yaclib::detail</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
+Macros</h2></td></tr>
+<tr class="memitem:ac9ad6184aa3569a53fec42b063a48de3" id="r_ac9ad6184aa3569a53fec42b063a48de3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8hpp.html#ac9ad6184aa3569a53fec42b063a48de3">YACLIB_FUNC_NAME</a>&#160;&#160;&#160;__func__</td></tr>
+<tr class="separator:ac9ad6184aa3569a53fec42b063a48de3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a76edd340029316759932fd3cf3c3347e" id="r_a76edd340029316759932fd3cf3c3347e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8hpp.html#a76edd340029316759932fd3cf3c3347e">YACLIB_LOG_MESSAGE</a>(level,  cond,  message)</td></tr>
+<tr class="separator:a76edd340029316759932fd3cf3c3347e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abaf43bf62501f78c61ab03146858a55b" id="r_abaf43bf62501f78c61ab03146858a55b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8hpp.html#abaf43bf62501f78c61ab03146858a55b">YACLIB_SET_CALLBACK</a>(level,  callback)</td></tr>
+<tr class="separator:abaf43bf62501f78c61ab03146858a55b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab9730c52c69ffff0177800955a20bd6b" id="r_ab9730c52c69ffff0177800955a20bd6b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8hpp.html#ab9730c52c69ffff0177800955a20bd6b">YACLIB_STUB1</a>(first)</td></tr>
+<tr class="separator:ab9730c52c69ffff0177800955a20bd6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5e9fc92734aa6438c4e3b0c68a25fc0a" id="r_a5e9fc92734aa6438c4e3b0c68a25fc0a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8hpp.html#a5e9fc92734aa6438c4e3b0c68a25fc0a">YACLIB_STUB2</a>(first,  second)</td></tr>
+<tr class="separator:a5e9fc92734aa6438c4e3b0c68a25fc0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab05bcb1d2e49c7bb3a2261aab41288e1" id="r_ab05bcb1d2e49c7bb3a2261aab41288e1"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8hpp.html#ab05bcb1d2e49c7bb3a2261aab41288e1">YACLIB_INIT_WARN</a>(callback)&#160;&#160;&#160;<a class="el" href="log_8hpp.html#ab9730c52c69ffff0177800955a20bd6b">YACLIB_STUB1</a>(callback)</td></tr>
+<tr class="separator:ab05bcb1d2e49c7bb3a2261aab41288e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a36920bb2d0d3cb09288f43f21cf49b06" id="r_a36920bb2d0d3cb09288f43f21cf49b06"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8hpp.html#a36920bb2d0d3cb09288f43f21cf49b06">YACLIB_WARN</a>(cond,  message)&#160;&#160;&#160;<a class="el" href="log_8hpp.html#a5e9fc92734aa6438c4e3b0c68a25fc0a">YACLIB_STUB2</a>(cond, message)</td></tr>
+<tr class="separator:a36920bb2d0d3cb09288f43f21cf49b06"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:add80853ef75a164b028da060656fb15f" id="r_add80853ef75a164b028da060656fb15f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8hpp.html#add80853ef75a164b028da060656fb15f">YACLIB_INIT_DEBUG</a>(callback)&#160;&#160;&#160;<a class="el" href="log_8hpp.html#ab9730c52c69ffff0177800955a20bd6b">YACLIB_STUB1</a>(callback)</td></tr>
+<tr class="separator:add80853ef75a164b028da060656fb15f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a639dcbb24c47e6f97e3e96246d2a667f" id="r_a639dcbb24c47e6f97e3e96246d2a667f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8hpp.html#a639dcbb24c47e6f97e3e96246d2a667f">YACLIB_DEBUG</a>(cond,  message)&#160;&#160;&#160;<a class="el" href="log_8hpp.html#a5e9fc92734aa6438c4e3b0c68a25fc0a">YACLIB_STUB2</a>(cond, message)</td></tr>
+<tr class="separator:a639dcbb24c47e6f97e3e96246d2a667f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab933fe23356887a2f98cc201fb1a241d" id="r_ab933fe23356887a2f98cc201fb1a241d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8hpp.html#ab933fe23356887a2f98cc201fb1a241d">YACLIB_ASSERT</a>(cond)&#160;&#160;&#160;<a class="el" href="log_8hpp.html#ab9730c52c69ffff0177800955a20bd6b">YACLIB_STUB1</a>(!(cond))</td></tr>
+<tr class="separator:ab933fe23356887a2f98cc201fb1a241d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af0901bb53ae728866ef8b10dcbbc9028" id="r_af0901bb53ae728866ef8b10dcbbc9028"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8hpp.html#af0901bb53ae728866ef8b10dcbbc9028">YACLIB_PURE_VIRTUAL</a>()&#160;&#160;&#160;<a class="el" href="log_8hpp.html#ab9730c52c69ffff0177800955a20bd6b">YACLIB_STUB1</a>(true)</td></tr>
+<tr class="separator:af0901bb53ae728866ef8b10dcbbc9028"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
+Typedefs</h2></td></tr>
+<tr class="memitem:afdfb626823d9a5075a28a145f9196686" id="r_afdfb626823d9a5075a28a145f9196686"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">using</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceyaclib.html#afdfb626823d9a5075a28a145f9196686">yaclib::LogCallback</a> = <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a>(*)(std::string_view <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">file</a>, std::size_t <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">line</a>, std::string_view <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">function</a>, std::string_view <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">condition</a>, std::string_view <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">message</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:afdfb626823d9a5075a28a145f9196686"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="enum-members" name="enum-members"></a>
+Enumerations</h2></td></tr>
+<tr class="memitem:a44b382e51014af270e36b0b8b7a66879" id="r_a44b382e51014af270e36b0b8b7a66879"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail.html#a44b382e51014af270e36b0b8b7a66879">yaclib::detail::LogLevel</a> : unsigned char { <a class="el" href="namespaceyaclib_1_1detail.html#a44b382e51014af270e36b0b8b7a66879aa603905470e2a5b8c13e96b579ef0dba">yaclib::detail::Debug</a> = 0
+, <a class="el" href="namespaceyaclib_1_1detail.html#a44b382e51014af270e36b0b8b7a66879a56525ae64d370c0b448ac0d60710ef17">yaclib::detail::Warn</a> = 1
+, <a class="el" href="namespaceyaclib_1_1detail.html#a44b382e51014af270e36b0b8b7a66879ae93f994f01c537c4e2f7d8528c3eb5e9">yaclib::detail::Count</a> = 3
+ }</td></tr>
+<tr class="separator:a44b382e51014af270e36b0b8b7a66879"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a0bb14b1701a50d1218fcb292d2883ebb" id="r_a0bb14b1701a50d1218fcb292d2883ebb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail.html#a0bb14b1701a50d1218fcb292d2883ebb">yaclib::detail::SetCallback</a> (<a class="el" href="namespaceyaclib_1_1detail.html#a44b382e51014af270e36b0b8b7a66879">LogLevel</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">level</a>, <a class="el" href="namespaceyaclib.html#afdfb626823d9a5075a28a145f9196686">LogCallback</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">callback</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a0bb14b1701a50d1218fcb292d2883ebb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1aa0b4e49b23302a0c419a9d2b2d8e55" id="r_a1aa0b4e49b23302a0c419a9d2b2d8e55"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail.html#a1aa0b4e49b23302a0c419a9d2b2d8e55">yaclib::detail::LogMessage</a> (<a class="el" href="namespaceyaclib_1_1detail.html#a44b382e51014af270e36b0b8b7a66879">LogLevel</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">level</a>, std::string_view <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">file</a>, std::size_t <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">line</a>, std::string_view <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">func</a>, std::string_view <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">condition</a>, std::string_view <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">message</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a1aa0b4e49b23302a0c419a9d2b2d8e55"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<h2 class="groupheader">Macro Definition Documentation</h2>
+<a id="ab933fe23356887a2f98cc201fb1a241d" name="ab933fe23356887a2f98cc201fb1a241d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab933fe23356887a2f98cc201fb1a241d">&#9670;&#160;</a></span>YACLIB_ASSERT</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define YACLIB_ASSERT</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">cond</td><td>)</td>
+          <td>&#160;&#160;&#160;<a class="el" href="log_8hpp.html#ab9730c52c69ffff0177800955a20bd6b">YACLIB_STUB1</a>(!(cond))</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="log_8hpp_source.html#l00085">85</a> of file <a class="el" href="log_8hpp_source.html">log.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a639dcbb24c47e6f97e3e96246d2a667f" name="a639dcbb24c47e6f97e3e96246d2a667f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a639dcbb24c47e6f97e3e96246d2a667f">&#9670;&#160;</a></span>YACLIB_DEBUG</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define YACLIB_DEBUG</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">cond, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">message&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;<a class="el" href="log_8hpp.html#a5e9fc92734aa6438c4e3b0c68a25fc0a">YACLIB_STUB2</a>(cond, message)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="log_8hpp_source.html#l00084">84</a> of file <a class="el" href="log_8hpp_source.html">log.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ac9ad6184aa3569a53fec42b063a48de3" name="ac9ad6184aa3569a53fec42b063a48de3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac9ad6184aa3569a53fec42b063a48de3">&#9670;&#160;</a></span>YACLIB_FUNC_NAME</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define YACLIB_FUNC_NAME&#160;&#160;&#160;__func__</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="log_8hpp_source.html#l00034">34</a> of file <a class="el" href="log_8hpp_source.html">log.hpp</a>.</p>
+
+</div>
+</div>
+<a id="add80853ef75a164b028da060656fb15f" name="add80853ef75a164b028da060656fb15f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#add80853ef75a164b028da060656fb15f">&#9670;&#160;</a></span>YACLIB_INIT_DEBUG</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define YACLIB_INIT_DEBUG</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">callback</td><td>)</td>
+          <td>&#160;&#160;&#160;<a class="el" href="log_8hpp.html#ab9730c52c69ffff0177800955a20bd6b">YACLIB_STUB1</a>(callback)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="log_8hpp_source.html#l00083">83</a> of file <a class="el" href="log_8hpp_source.html">log.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ab05bcb1d2e49c7bb3a2261aab41288e1" name="ab05bcb1d2e49c7bb3a2261aab41288e1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab05bcb1d2e49c7bb3a2261aab41288e1">&#9670;&#160;</a></span>YACLIB_INIT_WARN</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define YACLIB_INIT_WARN</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">callback</td><td>)</td>
+          <td>&#160;&#160;&#160;<a class="el" href="log_8hpp.html#ab9730c52c69ffff0177800955a20bd6b">YACLIB_STUB1</a>(callback)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="log_8hpp_source.html#l00073">73</a> of file <a class="el" href="log_8hpp_source.html">log.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a76edd340029316759932fd3cf3c3347e" name="a76edd340029316759932fd3cf3c3347e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a76edd340029316759932fd3cf3c3347e">&#9670;&#160;</a></span>YACLIB_LOG_MESSAGE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define YACLIB_LOG_MESSAGE</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">level, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">cond, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">message&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">  <span class="keywordflow">do</span> {                                                                                                                 \</div>
+<div class="line">    if (!!(cond)) {                                                                                                    \</div>
+<div class="line">      ::yaclib::detail::LogMessage(level, __FILE__, __LINE__, <a class="code hl_define" href="log_8hpp.html#ac9ad6184aa3569a53fec42b063a48de3">YACLIB_FUNC_NAME</a>, #cond, (message));                     \</div>
+<div class="line">    }                                                                                                                  \</div>
+<div class="line">  } <span class="keywordflow">while</span> (<span class="keyword">false</span>)</div>
+<div class="ttc" id="alog_8hpp_html_ac9ad6184aa3569a53fec42b063a48de3"><div class="ttname"><a href="log_8hpp.html#ac9ad6184aa3569a53fec42b063a48de3">YACLIB_FUNC_NAME</a></div><div class="ttdeci">#define YACLIB_FUNC_NAME</div><div class="ttdef"><b>Definition</b> <a href="log_8hpp_source.html#l00034">log.hpp:34</a></div></div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="log_8hpp_source.html#l00038">38</a> of file <a class="el" href="log_8hpp_source.html">log.hpp</a>.</p>
+
+</div>
+</div>
+<a id="af0901bb53ae728866ef8b10dcbbc9028" name="af0901bb53ae728866ef8b10dcbbc9028"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af0901bb53ae728866ef8b10dcbbc9028">&#9670;&#160;</a></span>YACLIB_PURE_VIRTUAL</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define YACLIB_PURE_VIRTUAL</td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td>&#160;&#160;&#160;<a class="el" href="log_8hpp.html#ab9730c52c69ffff0177800955a20bd6b">YACLIB_STUB1</a>(true)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="log_8hpp_source.html#l00086">86</a> of file <a class="el" href="log_8hpp_source.html">log.hpp</a>.</p>
+
+</div>
+</div>
+<a id="abaf43bf62501f78c61ab03146858a55b" name="abaf43bf62501f78c61ab03146858a55b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abaf43bf62501f78c61ab03146858a55b">&#9670;&#160;</a></span>YACLIB_SET_CALLBACK</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define YACLIB_SET_CALLBACK</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">level, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">callback&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">  <span class="keywordflow">do</span> {                                                                                                                 \</div>
+<div class="line">    ::yaclib::detail::SetCallback(level, (callback));                                                                  \</div>
+<div class="line">  } <span class="keywordflow">while</span> (<span class="keyword">false</span>)</div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="log_8hpp_source.html#l00045">45</a> of file <a class="el" href="log_8hpp_source.html">log.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ab9730c52c69ffff0177800955a20bd6b" name="ab9730c52c69ffff0177800955a20bd6b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab9730c52c69ffff0177800955a20bd6b">&#9670;&#160;</a></span>YACLIB_STUB1</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define YACLIB_STUB1</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">first</td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    <span class="keywordflow">do</span> {                                                                                                               \</div>
+<div class="line">      if (<span class="keyword">false</span>) {                                                                                                     \</div>
+<div class="line">        (void)(first);                                                                                                 \</div>
+<div class="line">      }                                                                                                                \</div>
+<div class="line">    } <span class="keywordflow">while</span> (<span class="keyword">false</span>)</div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="log_8hpp_source.html#l00054">54</a> of file <a class="el" href="log_8hpp_source.html">log.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a5e9fc92734aa6438c4e3b0c68a25fc0a" name="a5e9fc92734aa6438c4e3b0c68a25fc0a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5e9fc92734aa6438c4e3b0c68a25fc0a">&#9670;&#160;</a></span>YACLIB_STUB2</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define YACLIB_STUB2</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">first, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">second&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    <span class="keywordflow">do</span> {                                                                                                               \</div>
+<div class="line">      if (<span class="keyword">false</span>) {                                                                                                     \</div>
+<div class="line">        (void)(first);                                                                                                 \</div>
+<div class="line">        (void)(second);                                                                                                \</div>
+<div class="line">      }                                                                                                                \</div>
+<div class="line">    } <span class="keywordflow">while</span> (<span class="keyword">false</span>)</div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="log_8hpp_source.html#l00060">60</a> of file <a class="el" href="log_8hpp_source.html">log.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a36920bb2d0d3cb09288f43f21cf49b06" name="a36920bb2d0d3cb09288f43f21cf49b06"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a36920bb2d0d3cb09288f43f21cf49b06">&#9670;&#160;</a></span>YACLIB_WARN</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define YACLIB_WARN</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">cond, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">message&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;<a class="el" href="log_8hpp.html#a5e9fc92734aa6438c4e3b0c68a25fc0a">YACLIB_STUB2</a>(cond, message)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="log_8hpp_source.html#l00074">74</a> of file <a class="el" href="log_8hpp_source.html">log.hpp</a>.</p>
+
+</div>
+</div>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_5202e9473254619c80971b7f5a23629e.html">yaclib</a></li><li class="navelem"><a class="el" href="log_8hpp.html">log.hpp</a></li>
+    <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+  </ul>
+</div>
+</body>
+</html>

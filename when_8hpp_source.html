@@ -1,0 +1,620 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.9.8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<!-- BEGIN opengraph metadata -->
+<meta property="og:title" content="Doxygen Awesome" />
+<meta property="og:image" content="https://repository-images.githubusercontent.com/348492097/4f16df80-88fb-11eb-9d31-4015ff22c452" />
+<meta property="og:description" content="Custom CSS theme for doxygen html-documentation with lots of customization parameters." />
+<meta property="og:url" content="https://jothepro.github.io/doxygen-awesome-css/" />
+<!-- END opengraph metadata -->
+<!-- BEGIN twitter metadata -->
+<meta name="twitter:image:src" content="https://repository-images.githubusercontent.com/348492097/4f16df80-88fb-11eb-9d31-4015ff22c452" />
+<meta name="twitter:title" content="Doxygen Awesome" />
+<meta name="twitter:description" content="Custom CSS theme for doxygen html-documentation with lots of customization parameters." />
+<!-- END twitter metadata -->
+<title>YACLib: include/yaclib/async/when/when.hpp Source File</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link rel="icon" type="image/svg+xml" href="logo.drawio.svg"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+<script type="text/javascript" src="doxygen-awesome-fragment-copy-button.js"></script>
+<script type="text/javascript" src="doxygen-awesome-paragraph-link.js"></script>
+<script type="text/javascript" src="toggle-alternative-theme.js"></script>
+<script type="text/javascript">
+    DoxygenAwesomeFragmentCopyButton.init()
+    DoxygenAwesomeDarkModeToggle.init()
+    DoxygenAwesomeParagraphLink.init()
+</script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="custom.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only-darkmode-toggle.css" rel="stylesheet" type="text/css"/>
+<link href="custom-alternative.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<!-- https://tholman.com/github-corners/ -->
+<a href="https://github.com/YACLib/YACLib" class="github-corner" title="View source on GitHub" target="_blank">
+    <svg viewBox="0 0 250 250" width="40" height="40" style="position: absolute; top: 0; border: 0; right: 0; z-index: 99;" aria-hidden="true">
+    <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
+   <div id="projectname">YACLib
+   </div>
+   <div id="projectbrief">C++ library for concurrent tasks execution</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Search');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function() { init_codefold(0); });
+/* @license-end */
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('when_8hpp_source.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">when.hpp</div></div>
+</div><!--header-->
+<div class="contents">
+<a href="when_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span> </div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &lt;<a class="code" href="inline__core_8hpp.html">yaclib/algo/detail/inline_core.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &lt;<a class="code" href="result__core_8hpp.html">yaclib/algo/detail/result_core.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &lt;<a class="code" href="unique__core_8hpp.html">yaclib/algo/detail/unique_core.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &lt;<a class="code" href="contract_8hpp.html">yaclib/async/contract.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#include &lt;<a class="code" href="cast_8hpp.html">yaclib/util/cast.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#include &lt;<a class="code" href="combinator__strategy_8hpp.html">yaclib/util/combinator_strategy.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &lt;<a class="code" href="helper_8hpp.html">yaclib/util/helper.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &lt;<a class="code" href="intrusive__ptr_8hpp.html">yaclib/util/intrusive_ptr.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#include &lt;<a class="code" href="ref_8hpp.html">yaclib/util/ref.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &lt;<a class="code" href="type__traits_8hpp.html">yaclib/util/type_traits.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#include &lt;tuple&gt;</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">#include &lt;vector&gt;</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span> </div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespaceyaclib_1_1when.html">yaclib::when</a> {</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span> </div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span>... <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Futures</a>&gt;</div>
+<div class="foldopen" id="foldopen00020" data-start="{" data-end="}">
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno"><a class="line" href="namespaceyaclib_1_1when.html#ab99dc51c64aa6af1d9135eec9cf02db0">   20</a></span><a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">YACLIB_INLINE</a> <span class="keywordtype">void</span> <a class="code hl_function" href="namespaceyaclib_1_1when.html#ab99dc51c64aa6af1d9135eec9cf02db0">CheckSameError</a>() {</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>  <span class="keyword">static_assert</span>(<span class="keyword">sizeof</span>...(Futures) &gt; 0);</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>  <span class="keyword">using </span><a class="code hl_enumvalue" href="namespaceyaclib.html#ae1f6897e2da3979d79e68711b14524d0a902b0d55fddef6f8d651fe1035b7d4bd">Error</a> = <span class="keyword">typename</span> <a class="code hl_typedef" href="namespaceyaclib.html#a23af97c15e210af60f48dba5fa3736b7">head_t</a>&lt;<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Futures</a>...&gt;::Core::Error;</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>  <span class="keyword">static_assert</span>((... &amp;&amp; std::is_same_v&lt;Error, typename Futures::Core::Error&gt;),</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>                <span class="stringliteral">&quot;All futures need to have the same error type&quot;</span>);</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>}</div>
+</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span> </div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno"><a class="line" href="namespaceyaclib_1_1when.html#a08a296269aa83f65fc91adbd44b426dd">   28</a></span><span class="keyword">using </span><a class="code hl_struct" href="structyaclib_1_1detail_1_1IsInstantiationOf.html">IsUniqueCore</a> = <a class="code hl_struct" href="structyaclib_1_1detail_1_1IsInstantiationOf.html">detail::IsInstantiationOf&lt;detail::UniqueCore, T&gt;</a>;</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span> </div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno"><a class="line" href="namespaceyaclib_1_1when.html#a2756747d7d250737cc8cfa0cf636c595">   31</a></span><span class="keyword">using </span><a class="code hl_struct" href="structyaclib_1_1detail_1_1IsInstantiationOf.html">IsSharedCore</a> = <a class="code hl_struct" href="structyaclib_1_1detail_1_1IsInstantiationOf.html">detail::IsInstantiationOf&lt;detail::SharedCore, T&gt;</a>;</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span> </div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span><span class="keyword">template</span> &lt;ConsumePolicy P&gt;</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno"><a class="line" href="namespaceyaclib_1_1when.html#a24ab06ef0b9da04ecd4ea7de9f6d90de">   34</a></span><span class="keyword">inline</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> <a class="code hl_variable" href="namespaceyaclib_1_1when.html#a24ab06ef0b9da04ecd4ea7de9f6d90de">kIsOrdered</a> = <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">P</a> == <a class="code hl_enumvalue" href="namespaceyaclib.html#abf0ca1b3669b19068ca678745439ba20a84a8921b25f505d0d2077aeb5db4bc16">ConsumePolicy::Static</a> || <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">P</a> == <a class="code hl_enumvalue" href="namespaceyaclib.html#abf0ca1b3669b19068ca678745439ba20a971fd8cc345d8bd9f92e9f7d88fdf20c">ConsumePolicy::Dynamic</a>;</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span> </div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno"><a class="line" href="namespaceyaclib_1_1when.html#ac55efdf7489a9623b637c3d7ec3bd5f2">   36</a></span><span class="keyword">inline</span> <span class="keyword">constexpr</span> std::size_t <a class="code hl_variable" href="namespaceyaclib_1_1when.html#ac55efdf7489a9623b637c3d7ec3bd5f2">kDynamicTag</a> = std::numeric_limits&lt;std::size_t&gt;::max();</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span> </div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Strategy, <span class="keyword">typename</span> Core&gt;</div>
+<div class="foldopen" id="foldopen00039" data-start="{" data-end="}">
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno"><a class="line" href="namespaceyaclib_1_1when.html#a49a16f4fc52f74c11493b60c03baf4ff">   39</a></span><a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">YACLIB_INLINE</a> <span class="keywordtype">void</span> <a class="code hl_function" href="namespaceyaclib_1_1when.html#a49a16f4fc52f74c11493b60c03baf4ff">ConsumeImpl</a>(Strategy&amp; st, Core&amp; core) {</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>  <span class="keywordflow">if</span> <span class="keyword">constexpr</span> (Strategy::kCorePolicy == <a class="code hl_enumvalue" href="namespaceyaclib.html#acd309e632ae921f3d06e4675f471fab3a60848c692f8ddb0363e500da44563bae">CorePolicy::Owned</a>) {</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    st.Consume(core);</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>  } <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>    st.Consume(core.Retire());</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>  }</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>}</div>
+</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span> </div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span><span class="keyword">template</span> &lt;std::<span class="keywordtype">size_t</span> Index, <span class="keyword">typename</span> Strategy, <span class="keyword">typename</span> Core&gt;</div>
+<div class="foldopen" id="foldopen00048" data-start="{" data-end="}">
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno"><a class="line" href="namespaceyaclib_1_1when.html#af4696ee9638ce1de747bf8df90678fbf">   48</a></span><a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">YACLIB_INLINE</a> <span class="keywordtype">void</span> <a class="code hl_function" href="namespaceyaclib_1_1when.html#a49a16f4fc52f74c11493b60c03baf4ff">ConsumeImpl</a>(Strategy&amp; st, Core&amp; core) {</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>  <span class="keywordflow">if</span> <span class="keyword">constexpr</span> (Strategy::kCorePolicy == <a class="code hl_enumvalue" href="namespaceyaclib.html#acd309e632ae921f3d06e4675f471fab3a60848c692f8ddb0363e500da44563bae">CorePolicy::Owned</a>) {</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>    st.template <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Consume&lt;Index&gt;</a>(core);</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>  } <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>    st.template <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Consume&lt;Index&gt;</a>(core.Retire());</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>  }</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>}</div>
+</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span> </div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Strategy, <span class="keyword">typename</span> Core&gt;</div>
+<div class="foldopen" id="foldopen00057" data-start="{" data-end="}">
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno"><a class="line" href="namespaceyaclib_1_1when.html#ac2288174e890f07d1c2016b48a8d949b">   57</a></span><a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">YACLIB_INLINE</a> <span class="keywordtype">void</span> <a class="code hl_function" href="namespaceyaclib_1_1when.html#a49a16f4fc52f74c11493b60c03baf4ff">ConsumeImpl</a>(Strategy&amp; st, Core&amp; core, std::size_t index) {</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>  <span class="keywordflow">if</span> <span class="keyword">constexpr</span> (Strategy::kCorePolicy == <a class="code hl_enumvalue" href="namespaceyaclib.html#acd309e632ae921f3d06e4675f471fab3a60848c692f8ddb0363e500da44563bae">CorePolicy::Owned</a>) {</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>    st.Consume(index, core);</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>  } <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>    st.Consume(index, core.Retire());</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>  }</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>}</div>
+</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span> </div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span><span class="keyword">template</span> &lt;std::<span class="keywordtype">size_t</span> Index, <span class="keyword">typename</span> Strategy, <span class="keyword">typename</span> Core&gt;</div>
+<div class="foldopen" id="foldopen00066" data-start="{" data-end="}">
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno"><a class="line" href="namespaceyaclib_1_1when.html#af5d5d125de2f6b7093d0fabe03b833ac">   66</a></span><a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">YACLIB_INLINE</a> <span class="keywordtype">void</span> <a class="code hl_function" href="namespaceyaclib_1_1when.html#af5d5d125de2f6b7093d0fabe03b833ac">Consume</a>(Strategy&amp; st, Core&amp; core) {</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>  <span class="keywordflow">if</span> <span class="keyword">constexpr</span> (Strategy::kConsumePolicy == <a class="code hl_enumvalue" href="namespaceyaclib.html#abf0ca1b3669b19068ca678745439ba20a6adf97f83acf6453d4a6a4b1070f3754">ConsumePolicy::None</a>) {</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>    <span class="keywordflow">if</span> <span class="keyword">constexpr</span> (Strategy::kCorePolicy == <a class="code hl_enumvalue" href="namespaceyaclib.html#acd309e632ae921f3d06e4675f471fab3a80c202b1c3fd395a7bfe4d846c914bc3">CorePolicy::Managed</a>) {</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>      core.DecRef();</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>    }</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>  } <span class="keywordflow">else</span> <span class="keywordflow">if</span> <span class="keyword">constexpr</span> (Strategy::kConsumePolicy == <a class="code hl_enumvalue" href="namespaceyaclib.html#abf0ca1b3669b19068ca678745439ba20a288d468c5e0969f26a310773eda65603">ConsumePolicy::Unordered</a>) {</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>    <a class="code hl_function" href="namespaceyaclib_1_1when.html#a49a16f4fc52f74c11493b60c03baf4ff">ConsumeImpl</a>(st, core);</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>  } <span class="keywordflow">else</span> <span class="keywordflow">if</span> <span class="keyword">constexpr</span> (Strategy::kConsumePolicy == <a class="code hl_enumvalue" href="namespaceyaclib.html#abf0ca1b3669b19068ca678745439ba20a84a8921b25f505d0d2077aeb5db4bc16">ConsumePolicy::Static</a>) {</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>    <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">ConsumeImpl&lt;Index&gt;</a>(st, core);</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>  } <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>    <a class="code hl_function" href="namespaceyaclib_1_1when.html#a49a16f4fc52f74c11493b60c03baf4ff">ConsumeImpl</a>(st, core, Index);</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>  }</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>}</div>
+</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span> </div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Strategy, <span class="keyword">typename</span> Core&gt;</div>
+<div class="foldopen" id="foldopen00081" data-start="{" data-end="}">
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno"><a class="line" href="namespaceyaclib_1_1when.html#a559721e3607335a17511d27e0699ef97">   81</a></span><a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">YACLIB_INLINE</a> <span class="keywordtype">void</span> <a class="code hl_function" href="namespaceyaclib_1_1when.html#af5d5d125de2f6b7093d0fabe03b833ac">Consume</a>(Strategy&amp; st, Core&amp; core, std::size_t index) {</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>  <span class="keyword">static_assert</span>(Strategy::kConsumePolicy != <a class="code hl_enumvalue" href="namespaceyaclib.html#abf0ca1b3669b19068ca678745439ba20a84a8921b25f505d0d2077aeb5db4bc16">ConsumePolicy::Static</a>);</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span> </div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>  <span class="keywordflow">if</span> <span class="keyword">constexpr</span> (Strategy::kConsumePolicy == <a class="code hl_enumvalue" href="namespaceyaclib.html#abf0ca1b3669b19068ca678745439ba20a6adf97f83acf6453d4a6a4b1070f3754">ConsumePolicy::None</a>) {</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>    <span class="keywordflow">if</span> <span class="keyword">constexpr</span> (Strategy::kCorePolicy == <a class="code hl_enumvalue" href="namespaceyaclib.html#acd309e632ae921f3d06e4675f471fab3a80c202b1c3fd395a7bfe4d846c914bc3">CorePolicy::Managed</a>) {</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>      core.DecRef();</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>    }</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>  } <span class="keywordflow">else</span> <span class="keywordflow">if</span> <span class="keyword">constexpr</span> (Strategy::kConsumePolicy == <a class="code hl_enumvalue" href="namespaceyaclib.html#abf0ca1b3669b19068ca678745439ba20a288d468c5e0969f26a310773eda65603">ConsumePolicy::Unordered</a>) {</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>    <a class="code hl_function" href="namespaceyaclib_1_1when.html#a49a16f4fc52f74c11493b60c03baf4ff">ConsumeImpl</a>(st, core);</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>  } <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>    <a class="code hl_function" href="namespaceyaclib_1_1when.html#a49a16f4fc52f74c11493b60c03baf4ff">ConsumeImpl</a>(st, core, index);</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>  }</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>}</div>
+</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span> </div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Combinator, <span class="keyword">typename</span> Core, std::<span class="keywordtype">size_t</span> Index&gt;</div>
+<div class="foldopen" id="foldopen00096" data-start="{" data-end="};">
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno"><a class="line" href="structyaclib_1_1when_1_1CombinatorCallback.html">   96</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structyaclib_1_1when_1_1CombinatorCallback.html">CombinatorCallback</a> <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">final</a> : <a class="code hl_class" href="classyaclib_1_1detail_1_1InlineCore.html">detail::InlineCore</a> {</div>
+<div class="foldopen" id="foldopen00097" data-start="{" data-end="}">
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno"><a class="line" href="structyaclib_1_1when_1_1CombinatorCallback.html#a4afbc0e6845af5f61c1c76bb4d829809">   97</a></span>  <a class="code hl_function" href="structyaclib_1_1when_1_1CombinatorCallback.html#a4afbc0e6845af5f61c1c76bb4d829809">CombinatorCallback</a>(<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Combinator</a>* <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">self</a> = <span class="keyword">nullptr</span>) : _self{<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">self</a>} {</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>  }</div>
+</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span> </div>
+<div class="foldopen" id="foldopen00100" data-start="{" data-end="}">
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno"><a class="line" href="structyaclib_1_1when_1_1CombinatorCallback.html#a04cfefe1e6bf58929a9ff6f0cc450f8f">  100</a></span>  [[<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">nodiscard</a>]] InlineCore* <a class="code hl_function" href="structyaclib_1_1when_1_1CombinatorCallback.html#a04cfefe1e6bf58929a9ff6f0cc450f8f">Here</a>(InlineCore&amp; caller) <span class="keyword">noexcept</span> <span class="keyword">final</span> {</div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>    Impl(caller);</div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>    <span class="keywordflow">return</span> <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>  }</div>
+</div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span> </div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span><span class="preprocessor">#if YACLIB_SYMMETRIC_TRANSFER != 0</span></div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>  [[<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">nodiscard</a>]] yaclib_std::coroutine_handle&lt;&gt; <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Next</a>(InlineCore&amp; caller) <span class="keyword">noexcept</span> <span class="keyword">final</span> {</div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>    Impl(caller);</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="namespaceyaclib__std.html#a8e16b0ce286fac0ba98b57b69b077f8b">yaclib_std::noop_coroutine</a>();</div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>  }</div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span> </div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span> <span class="keyword">private</span>:</div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>  <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">YACLIB_INLINE</a> <span class="keywordtype">void</span> Impl(InlineCore&amp; caller) {</div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>    <span class="keyword">auto</span>&amp; core = <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">DownCast&lt;Core&gt;</a>(caller);</div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>    <span class="keywordflow">if</span> <span class="keyword">constexpr</span> (Index == <a class="code hl_variable" href="namespaceyaclib_1_1when.html#ac55efdf7489a9623b637c3d7ec3bd5f2">kDynamicTag</a>) {</div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>      <span class="keyword">auto</span> index = <span class="keyword">this</span> - _self-&gt;callbacks.data();</div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>      <a class="code hl_function" href="namespaceyaclib_1_1when.html#af5d5d125de2f6b7093d0fabe03b833ac">Consume</a>(_self-&gt;st, core, index);</div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>    } <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>      <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Consume&lt;Index&gt;</a>(_self-&gt;st, core);</div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>    }</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>    _self-&gt;DecRef();</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>  }</div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span> </div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>  <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Combinator</a>* _self;</div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>};</div>
+</div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span> </div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span>... <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Cores</a>&gt;</div>
+<div class="foldopen" id="foldopen00128" data-start="{" data-end="};">
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno"><a class="line" href="structyaclib_1_1when_1_1CoreSignature.html">  128</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structyaclib_1_1when_1_1CoreSignature.html">CoreSignature</a> {</div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno"><a class="line" href="structyaclib_1_1when_1_1CoreSignature.html#ae63a3929e6dc05232aca40c807ffd9d4">  129</a></span>  <span class="keyword">using </span><a class="code hl_typedef" href="structyaclib_1_1when_1_1CoreSignature.html#ae63a3929e6dc05232aca40c807ffd9d4">UniqueUniqueCores</a> = <span class="keyword">typename</span> <a class="code hl_struct" href="structyaclib_1_1Unique.html">Unique</a>&lt;<span class="keyword">typename</span> <a class="code hl_struct" href="structyaclib_1_1Filter.html">Filter</a>&lt;<a class="code hl_typedef" href="namespaceyaclib_1_1when.html#a08a296269aa83f65fc91adbd44b426dd">IsUniqueCore</a>, std::tuple&lt;<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Cores</a>...&gt;&gt;::Type&gt;::Type;</div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno"><a class="line" href="structyaclib_1_1when_1_1CoreSignature.html#a51b57492e216b62c1862ed23b40eb6f6">  130</a></span>  <span class="keyword">using </span><a class="code hl_typedef" href="structyaclib_1_1when_1_1CoreSignature.html#a51b57492e216b62c1862ed23b40eb6f6">SharedCores</a> = <span class="keyword">typename</span> <a class="code hl_struct" href="structyaclib_1_1Filter.html">Filter</a>&lt;<a class="code hl_typedef" href="namespaceyaclib_1_1when.html#a2756747d7d250737cc8cfa0cf636c595">IsSharedCore</a>, std::tuple&lt;<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Cores</a>...&gt;&gt;::Type;</div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span> </div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno"><a class="line" href="structyaclib_1_1when_1_1CoreSignature.html#a7dc1aba58c886bd1decdc5f43670c34a">  132</a></span>  <span class="keyword">static</span> <span class="keyword">constexpr</span> std::size_t <a class="code hl_variable" href="structyaclib_1_1when_1_1CoreSignature.html#a7dc1aba58c886bd1decdc5f43670c34a">kUniqueCount</a> = std::tuple_size_v&lt;UniqueUniqueCores&gt;;</div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno"><a class="line" href="structyaclib_1_1when_1_1CoreSignature.html#a0a5fa8e64feb7f7cfb5f533efe666463">  133</a></span>  <span class="keyword">static</span> <span class="keyword">constexpr</span> std::size_t <a class="code hl_variable" href="structyaclib_1_1when_1_1CoreSignature.html#a0a5fa8e64feb7f7cfb5f533efe666463">kSharedCount</a> = std::tuple_size_v&lt;SharedCores&gt;;</div>
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno"><a class="line" href="structyaclib_1_1when_1_1CoreSignature.html#a517b94b9675a4a61597232694dbeea81">  134</a></span>  <span class="keyword">static</span> <span class="keyword">constexpr</span> std::size_t <a class="code hl_variable" href="structyaclib_1_1when_1_1CoreSignature.html#a517b94b9675a4a61597232694dbeea81">kTotalCount</a> = <a class="code hl_variable" href="structyaclib_1_1when_1_1CoreSignature.html#a7dc1aba58c886bd1decdc5f43670c34a">kUniqueCount</a> + <a class="code hl_variable" href="structyaclib_1_1when_1_1CoreSignature.html#a0a5fa8e64feb7f7cfb5f533efe666463">kSharedCount</a>;</div>
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>};</div>
+</div>
+<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span> </div>
+<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Strategy, <span class="keyword">typename</span> Core&gt;</div>
+<div class="foldopen" id="foldopen00138" data-start="{" data-end="};">
+<div class="line"><a id="l00138" name="l00138"></a><span class="lineno"><a class="line" href="structyaclib_1_1when_1_1SingleCombinator.html">  138</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structyaclib_1_1when_1_1SingleCombinator.html">SingleCombinator</a> : <a class="code hl_class" href="classyaclib_1_1detail_1_1InlineCore.html">detail::InlineCore</a> {</div>
+<div class="foldopen" id="foldopen00139" data-start="{" data-end="}">
+<div class="line"><a id="l00139" name="l00139"></a><span class="lineno"><a class="line" href="structyaclib_1_1when_1_1SingleCombinator.html#abdb4af69a8a9df9ef69ce83e74f5bc63">  139</a></span>  <a class="code hl_function" href="structyaclib_1_1when_1_1SingleCombinator.html#abdb4af69a8a9df9ef69ce83e74f5bc63">SingleCombinator</a>(std::size_t count, <span class="keyword">typename</span> Strategy::PromiseType <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">p</a>) : st{count, std::<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">move</a>(<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">p</a>)} {</div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span>  }</div>
+</div>
+<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span> </div>
+<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span>  <span class="comment">// Static case Set</span></div>
+<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span>  <span class="keyword">template</span> &lt;<span class="keyword">typename</span>... <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Cores</a>&gt;</div>
+<div class="foldopen" id="foldopen00144" data-start="{" data-end="}">
+<div class="line"><a id="l00144" name="l00144"></a><span class="lineno"><a class="line" href="structyaclib_1_1when_1_1SingleCombinator.html#a808ea2d77bc64e9476738fcc1dec3566">  144</a></span>  <span class="keywordtype">void</span> <a class="code hl_function" href="structyaclib_1_1when_1_1SingleCombinator.html#a808ea2d77bc64e9476738fcc1dec3566">Set</a>(<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Cores</a>&amp;... <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">cores</a>) {</div>
+<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span>    <span class="keyword">static_assert</span>((... &amp;&amp; std::is_same_v&lt;Core, Cores&gt;));</div>
+<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span>    std::size_t index = 0;</div>
+<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span>    (..., SetCore(<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">cores</a>, index++));</div>
+<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span>  }</div>
+</div>
+<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span> </div>
+<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>  <span class="comment">// Dynamic case Set</span></div>
+<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span>  <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">template &lt;typename Iterator, typename = typename std::iterator_traits&lt;Iterator&gt;::value_type</a>&gt;</div>
+<div class="foldopen" id="foldopen00152" data-start="{" data-end="}">
+<div class="line"><a id="l00152" name="l00152"></a><span class="lineno"><a class="line" href="structyaclib_1_1when_1_1SingleCombinator.html#ace1d328e99213ab03eadf9059a987ebe">  152</a></span>  <span class="keywordtype">void</span> <a class="code hl_function" href="structyaclib_1_1when_1_1SingleCombinator.html#ace1d328e99213ab03eadf9059a987ebe">Set</a>(<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Iterator</a> <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">begin</a>, std::size_t count) {</div>
+<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span>    <span class="keywordflow">for</span> (std::size_t <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">i</a> = 0; <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">i</a> &lt; count; ++<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">i</a>) {</div>
+<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span>      <span class="keyword">auto</span>&amp; core = *<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">begin</a>-&gt;GetCore().Release();</div>
+<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span> </div>
+<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span>      <span class="keywordflow">if</span> <span class="keyword">constexpr</span> (Strategy::kCorePolicy == <a class="code hl_enumvalue" href="namespaceyaclib.html#acd309e632ae921f3d06e4675f471fab3a60848c692f8ddb0363e500da44563bae">CorePolicy::Owned</a>) {</div>
+<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>        st.Register(<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">i</a>, core);</div>
+<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>      }</div>
+<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span> </div>
+<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>      <span class="keywordflow">if</span> (!core.SetCallback(*<span class="keyword">this</span>)) {</div>
+<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>        <a class="code hl_function" href="namespaceyaclib_1_1when.html#af5d5d125de2f6b7093d0fabe03b833ac">Consume</a>(st, core, <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">i</a>);</div>
+<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>        <a class="code hl_function" href="classyaclib_1_1IRef.html#ac32e2fdabdd266b2f27bd8a3fc1480a6">DecRef</a>();</div>
+<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>      }</div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span> </div>
+<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>      ++<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">begin</a>;</div>
+<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>    }</div>
+<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>  }</div>
+</div>
+<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span> </div>
+<div class="foldopen" id="foldopen00169" data-start="{" data-end="}">
+<div class="line"><a id="l00169" name="l00169"></a><span class="lineno"><a class="line" href="structyaclib_1_1when_1_1SingleCombinator.html#a4595c17a16282e9d6babcc965dd00f3a">  169</a></span>  [[<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">nodiscard</a>]] InlineCore* <a class="code hl_function" href="structyaclib_1_1when_1_1SingleCombinator.html#a4595c17a16282e9d6babcc965dd00f3a">Here</a>(InlineCore&amp; caller) <span class="keyword">noexcept</span> <span class="keyword">final</span> {</div>
+<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span>    Impl(caller);</div>
+<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span>    <span class="keywordflow">return</span> <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>  }</div>
+</div>
+<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span> </div>
+<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span><span class="preprocessor">#if YACLIB_SYMMETRIC_TRANSFER != 0</span></div>
+<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span>  [[<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">nodiscard</a>]] yaclib_std::coroutine_handle&lt;&gt; <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Next</a>(InlineCore&amp; caller) <span class="keyword">noexcept</span> <span class="keyword">final</span> {</div>
+<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span>    Impl(caller);</div>
+<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="namespaceyaclib__std.html#a8e16b0ce286fac0ba98b57b69b077f8b">yaclib_std::noop_coroutine</a>();</div>
+<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span>  }</div>
+<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span> </div>
+<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span> <span class="keyword">private</span>:</div>
+<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span>  <span class="keywordtype">void</span> SetCore(Core&amp; core, std::size_t <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">i</a>) {</div>
+<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span>    <span class="keywordflow">if</span> <span class="keyword">constexpr</span> (Strategy::kCorePolicy == <a class="code hl_enumvalue" href="namespaceyaclib.html#acd309e632ae921f3d06e4675f471fab3a60848c692f8ddb0363e500da44563bae">CorePolicy::Owned</a>) {</div>
+<div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span>      st.Register(<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">i</a>, core);</div>
+<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span>    }</div>
+<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span> </div>
+<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span>    <span class="keywordflow">if</span> (!core.SetCallback(*<span class="keyword">this</span>)) {</div>
+<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span>      <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Consume&lt;0&gt;</a>(st, core);</div>
+<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span>      <a class="code hl_function" href="classyaclib_1_1IRef.html#ac32e2fdabdd266b2f27bd8a3fc1480a6">DecRef</a>();</div>
+<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span>    }</div>
+<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span>  }</div>
+<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span> </div>
+<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span>  <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">YACLIB_INLINE</a> <span class="keywordtype">void</span> Impl(InlineCore&amp; caller) {</div>
+<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>    <span class="keyword">auto</span>&amp; core = <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">DownCast&lt;Core&gt;</a>(caller);</div>
+<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>    <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Consume&lt;0&gt;</a>(st, core);</div>
+<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span>    <a class="code hl_function" href="classyaclib_1_1IRef.html#ac32e2fdabdd266b2f27bd8a3fc1480a6">DecRef</a>();</div>
+<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span>  }</div>
+<div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span> </div>
+<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span>  Strategy st;</div>
+<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span>};</div>
+</div>
+<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span> </div>
+<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Strategy, <span class="keyword">typename</span>... <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Cores</a>&gt;</div>
+<div class="foldopen" id="foldopen00203" data-start="{" data-end="};">
+<div class="line"><a id="l00203" name="l00203"></a><span class="lineno"><a class="line" href="structyaclib_1_1when_1_1StaticCombinator.html">  203</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structyaclib_1_1when_1_1StaticCombinator.html">StaticCombinator</a> : <a class="code hl_class" href="classyaclib_1_1IRef.html">IRef</a> {</div>
+<div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span> <span class="keyword">private</span>:</div>
+<div class="line"><a id="l00205" name="l00205"></a><span class="lineno">  205</span>  <span class="keyword">template</span> &lt;<span class="keyword">typename</span> Sequence&gt;</div>
+<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span>  <span class="keyword">struct </span>OrderedCallbacks;</div>
+<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span> </div>
+<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span>  <span class="keyword">template</span> &lt;std::size_t... <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Is</a>&gt;</div>
+<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span>  <span class="keyword">struct </span>OrderedCallbacks&lt;std::<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">index_sequence</a>&lt;Is...&gt;&gt; {</div>
+<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span>    <span class="keyword">using </span>Type = std::tuple&lt;CombinatorCallback&lt;StaticCombinator, Cores, Is&gt;...&gt;;</div>
+<div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span>  };</div>
+<div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span> </div>
+<div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span>  <span class="keyword">using </span>UniqueUniqueCores = <span class="keyword">typename</span> <a class="code hl_struct" href="structyaclib_1_1when_1_1CoreSignature.html">CoreSignature</a>&lt;<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Cores</a>...&gt;::UniqueUniqueCores;</div>
+<div class="line"><a id="l00214" name="l00214"></a><span class="lineno">  214</span>  <span class="keyword">using </span>SharedCores = <span class="keyword">typename</span> <a class="code hl_struct" href="structyaclib_1_1when_1_1CoreSignature.html">CoreSignature</a>&lt;<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Cores</a>...&gt;::SharedCores;</div>
+<div class="line"><a id="l00215" name="l00215"></a><span class="lineno">  215</span> </div>
+<div class="line"><a id="l00216" name="l00216"></a><span class="lineno">  216</span>  <span class="keyword">template</span> &lt;<span class="keyword">typename</span> UniqueTuple, <span class="keyword">typename</span> SharedTuple&gt;</div>
+<div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span>  <span class="keyword">struct </span>UnorderedCallbacks;</div>
+<div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span> </div>
+<div class="line"><a id="l00219" name="l00219"></a><span class="lineno">  219</span>  <span class="keyword">template</span> &lt;<span class="keyword">typename</span>... <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">UniqueCores</a>, <span class="keyword">typename</span>... SharedCores&gt;</div>
+<div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span>  <span class="keyword">struct </span>UnorderedCallbacks&lt;std::<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">tuple</a>&lt;UniqueCores...&gt;, std::tuple&lt;SharedCores...&gt;&gt; {</div>
+<div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span>    std::tuple&lt;CombinatorCallback&lt;StaticCombinator, UniqueCores, 0&gt;...&gt; unique_tuple;</div>
+<div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span>    std::tuple&lt;CombinatorCallback&lt;StaticCombinator, SharedCores, 0&gt;...&gt; shared_tuple;</div>
+<div class="line"><a id="l00223" name="l00223"></a><span class="lineno">  223</span>  };</div>
+<div class="line"><a id="l00224" name="l00224"></a><span class="lineno">  224</span> </div>
+<div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span>  <span class="keyword">using </span>Callbacks =</div>
+<div class="line"><a id="l00226" name="l00226"></a><span class="lineno">  226</span>    std::conditional_t&lt;kIsOrdered&lt;Strategy::kConsumePolicy&gt;,</div>
+<div class="line"><a id="l00227" name="l00227"></a><span class="lineno">  227</span>                       <span class="keyword">typename</span> OrderedCallbacks&lt;<span class="keyword">decltype</span>(std::make_index_sequence&lt;<span class="keyword">sizeof</span>...(Cores)&gt;{})&gt;::Type,</div>
+<div class="line"><a id="l00228" name="l00228"></a><span class="lineno">  228</span>                       <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">UnorderedCallbacks&lt;UniqueUniqueCores, SharedCores&gt;</a>&gt;;</div>
+<div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span> </div>
+<div class="line"><a id="l00230" name="l00230"></a><span class="lineno">  230</span>  <span class="keyword">template</span> &lt;<span class="keyword">typename</span> <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Tuple</a>, std::size_t... <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Is</a>&gt;</div>
+<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span>  <span class="keywordtype">void</span> InitImpl(<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Tuple</a>&amp; <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">tuple</a>, std::index_sequence&lt;Is...&gt;) {</div>
+<div class="line"><a id="l00232" name="l00232"></a><span class="lineno">  232</span>    ((std::get&lt;Is&gt;(<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">tuple</a>) = {<span class="keyword">this</span>}), ...);</div>
+<div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span>  }</div>
+<div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span> </div>
+<div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span>  <span class="keyword">template</span> &lt;<span class="keyword">typename</span> Tuple&gt;</div>
+<div class="line"><a id="l00236" name="l00236"></a><span class="lineno">  236</span>  <span class="keywordtype">void</span> Init(<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Tuple</a>&amp; <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">tuple</a>) {</div>
+<div class="line"><a id="l00237" name="l00237"></a><span class="lineno">  237</span>    InitImpl(<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">tuple</a>, std::make_index_sequence&lt;std::tuple_size_v&lt;Tuple&gt;&gt;{});</div>
+<div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span>  }</div>
+<div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span> </div>
+<div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span>  <span class="keyword">template</span> &lt;std::<span class="keywordtype">size_t</span> Index, <span class="keyword">typename</span> Core&gt;</div>
+<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span>  <span class="keyword">auto</span>&amp; GetCallbackHelper() {</div>
+<div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span>    <span class="keywordflow">if</span> <span class="keyword">constexpr</span> (<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">kIsOrdered&lt;Strategy::kConsumePolicy&gt;</a>) {</div>
+<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span>      <span class="keywordflow">return</span> std::get&lt;Index&gt;(<a class="code hl_variable" href="structyaclib_1_1when_1_1StaticCombinator.html#a50506b3ce09181cdcbf94f1e7dc1823c">callbacks</a>);</div>
+<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span>    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> <span class="keyword">constexpr</span> (<a class="code hl_struct" href="structyaclib_1_1detail_1_1IsInstantiationOf.html">IsSharedCore&lt;Core&gt;::Value</a>) {</div>
+<div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span>      <span class="keywordflow">return</span> std::get&lt;<a class="code hl_variable" href="namespaceyaclib.html#a9fc4654a4367af802754a7ea30531756">translate_index_v</a>&lt;Index, std::tuple&lt;<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Cores</a>...&gt;, SharedCores&gt;&gt;(<a class="code hl_variable" href="structyaclib_1_1when_1_1StaticCombinator.html#a50506b3ce09181cdcbf94f1e7dc1823c">callbacks</a>.shared_tuple);</div>
+<div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span>    } <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span>      <span class="keywordflow">return</span> std::get&lt;index_of_v&lt;Core, UniqueUniqueCores&gt;&gt;(<a class="code hl_variable" href="structyaclib_1_1when_1_1StaticCombinator.html#a50506b3ce09181cdcbf94f1e7dc1823c">callbacks</a>.unique_tuple);</div>
+<div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span>    }</div>
+<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span>  }</div>
+<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span> </div>
+<div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span>  <span class="keyword">template</span> &lt;std::<span class="keywordtype">size_t</span> Index, <span class="keyword">typename</span> Core&gt;</div>
+<div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span>  <span class="keywordtype">void</span> SetCore(Core&amp; core) {</div>
+<div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span>    <span class="keyword">auto</span>&amp; <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">callback</a> = <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">GetCallbackHelper&lt;Index, Core&gt;</a>();</div>
+<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span> </div>
+<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span>    <span class="keywordflow">if</span> <span class="keyword">constexpr</span> (Strategy::kCorePolicy == <a class="code hl_enumvalue" href="namespaceyaclib.html#acd309e632ae921f3d06e4675f471fab3a60848c692f8ddb0363e500da44563bae">CorePolicy::Owned</a>) {</div>
+<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span>      <a class="code hl_variable" href="structyaclib_1_1when_1_1StaticCombinator.html#aa1744cc995d869480768b4dfa4105128">st</a>.Register(Index, core);</div>
+<div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span>    }</div>
+<div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span> </div>
+<div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span>    <span class="keywordflow">if</span> (!core.SetCallback(<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">callback</a>)) {</div>
+<div class="line"><a id="l00260" name="l00260"></a><span class="lineno">  260</span>      <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Consume&lt;Index&gt;</a>(<a class="code hl_variable" href="structyaclib_1_1when_1_1StaticCombinator.html#aa1744cc995d869480768b4dfa4105128">st</a>, core);</div>
+<div class="line"><a id="l00261" name="l00261"></a><span class="lineno">  261</span>      <a class="code hl_function" href="classyaclib_1_1IRef.html#ac32e2fdabdd266b2f27bd8a3fc1480a6">DecRef</a>();</div>
+<div class="line"><a id="l00262" name="l00262"></a><span class="lineno">  262</span>    }</div>
+<div class="line"><a id="l00263" name="l00263"></a><span class="lineno">  263</span>  }</div>
+<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span> </div>
+<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span>  <span class="keyword">template</span> &lt;std::size_t... <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Is</a>&gt;</div>
+<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span>  <span class="keywordtype">void</span> SetImpl(std::index_sequence&lt;Is...&gt;, <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Cores</a>&amp;... <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">cores</a>) {</div>
+<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span>    (<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">SetCore&lt;Is&gt;</a>(<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">cores</a>), ...);</div>
+<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span>  }</div>
+<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span> </div>
+<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span> <span class="keyword">public</span>:</div>
+<div class="foldopen" id="foldopen00271" data-start="{" data-end="}">
+<div class="line"><a id="l00271" name="l00271"></a><span class="lineno"><a class="line" href="structyaclib_1_1when_1_1StaticCombinator.html#a0f6a2fc0c11fa7b62bb5edc1404a9682">  271</a></span>  <a class="code hl_function" href="structyaclib_1_1when_1_1StaticCombinator.html#a0f6a2fc0c11fa7b62bb5edc1404a9682">StaticCombinator</a>(std::size_t count, <span class="keyword">typename</span> Strategy::PromiseType <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">p</a>) : <a class="code hl_variable" href="structyaclib_1_1when_1_1StaticCombinator.html#aa1744cc995d869480768b4dfa4105128">st</a>{count, std::<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">move</a>(<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">p</a>)} {</div>
+<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span>    <span class="keywordflow">if</span> <span class="keyword">constexpr</span> (<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">kIsOrdered&lt;Strategy::kConsumePolicy&gt;</a>) {</div>
+<div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span>      Init(<a class="code hl_variable" href="structyaclib_1_1when_1_1StaticCombinator.html#a50506b3ce09181cdcbf94f1e7dc1823c">callbacks</a>);</div>
+<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span>    } <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span>      Init(<a class="code hl_variable" href="structyaclib_1_1when_1_1StaticCombinator.html#a50506b3ce09181cdcbf94f1e7dc1823c">callbacks</a>.unique_tuple);</div>
+<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span>      Init(<a class="code hl_variable" href="structyaclib_1_1when_1_1StaticCombinator.html#a50506b3ce09181cdcbf94f1e7dc1823c">callbacks</a>.shared_tuple);</div>
+<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span>    }</div>
+<div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span>  }</div>
+</div>
+<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span> </div>
+<div class="foldopen" id="foldopen00280" data-start="{" data-end="}">
+<div class="line"><a id="l00280" name="l00280"></a><span class="lineno"><a class="line" href="structyaclib_1_1when_1_1StaticCombinator.html#a99a71b821e045edc2ff0875b7ca2cc52">  280</a></span>  <span class="keywordtype">void</span> <a class="code hl_function" href="structyaclib_1_1when_1_1StaticCombinator.html#a99a71b821e045edc2ff0875b7ca2cc52">Set</a>(<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Cores</a>&amp;... <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">cores</a>) {</div>
+<div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span>    SetImpl(std::make_index_sequence&lt;<span class="keyword">sizeof</span>...(<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Cores</a>)&gt;{}, <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">cores</a>...);</div>
+<div class="line"><a id="l00282" name="l00282"></a><span class="lineno">  282</span>  }</div>
+</div>
+<div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span> </div>
+<div class="line"><a id="l00284" name="l00284"></a><span class="lineno"><a class="line" href="structyaclib_1_1when_1_1StaticCombinator.html#aa1744cc995d869480768b4dfa4105128">  284</a></span>  Strategy <a class="code hl_variable" href="structyaclib_1_1when_1_1StaticCombinator.html#aa1744cc995d869480768b4dfa4105128">st</a>;</div>
+<div class="line"><a id="l00285" name="l00285"></a><span class="lineno"><a class="line" href="structyaclib_1_1when_1_1StaticCombinator.html#a50506b3ce09181cdcbf94f1e7dc1823c">  285</a></span>  Callbacks <a class="code hl_variable" href="structyaclib_1_1when_1_1StaticCombinator.html#a50506b3ce09181cdcbf94f1e7dc1823c">callbacks</a>;</div>
+<div class="line"><a id="l00286" name="l00286"></a><span class="lineno">  286</span>};</div>
+</div>
+<div class="line"><a id="l00287" name="l00287"></a><span class="lineno">  287</span> </div>
+<div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Strategy, <span class="keyword">typename</span> Core&gt;</div>
+<div class="foldopen" id="foldopen00289" data-start="{" data-end="};">
+<div class="line"><a id="l00289" name="l00289"></a><span class="lineno"><a class="line" href="structyaclib_1_1when_1_1DynamicCombinator.html">  289</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structyaclib_1_1when_1_1DynamicCombinator.html">DynamicCombinator</a> : <a class="code hl_class" href="classyaclib_1_1IRef.html">IRef</a> {</div>
+<div class="foldopen" id="foldopen00290" data-start="{" data-end="}">
+<div class="line"><a id="l00290" name="l00290"></a><span class="lineno"><a class="line" href="structyaclib_1_1when_1_1DynamicCombinator.html#a178747e64dff85f5bab8ce70810bb1df">  290</a></span>  <a class="code hl_function" href="structyaclib_1_1when_1_1DynamicCombinator.html#a178747e64dff85f5bab8ce70810bb1df">DynamicCombinator</a>(std::size_t count, <span class="keyword">typename</span> Strategy::PromiseType <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">p</a>)</div>
+<div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span>    : <a class="code hl_variable" href="structyaclib_1_1when_1_1DynamicCombinator.html#af2109dc9a11ebbec8dee023909c35600">st</a>{count, std::<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">move</a>(<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">p</a>)}, <a class="code hl_variable" href="structyaclib_1_1when_1_1DynamicCombinator.html#aef7c53ede5f3f7b3dc6fca5f74ea8cc2">callbacks</a>{count, {<span class="keyword">this</span>}} {</div>
+<div class="line"><a id="l00292" name="l00292"></a><span class="lineno">  292</span>  }</div>
+</div>
+<div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span> </div>
+<div class="line"><a id="l00294" name="l00294"></a><span class="lineno">  294</span>  <span class="keyword">template</span> &lt;<span class="keyword">typename</span> Iterator&gt;</div>
+<div class="foldopen" id="foldopen00295" data-start="{" data-end="}">
+<div class="line"><a id="l00295" name="l00295"></a><span class="lineno"><a class="line" href="structyaclib_1_1when_1_1DynamicCombinator.html#abfde5095133a77220ff4d039ae0ead3c">  295</a></span>  <span class="keywordtype">void</span> <a class="code hl_function" href="structyaclib_1_1when_1_1DynamicCombinator.html#abfde5095133a77220ff4d039ae0ead3c">Set</a>(<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Iterator</a> <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">begin</a>, std::size_t count) {</div>
+<div class="line"><a id="l00296" name="l00296"></a><span class="lineno">  296</span>    <span class="keywordflow">for</span> (std::size_t <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">i</a> = 0; <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">i</a> &lt; count; ++<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">i</a>) {</div>
+<div class="line"><a id="l00297" name="l00297"></a><span class="lineno">  297</span>      <span class="keyword">auto</span>&amp; core = *<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">begin</a>-&gt;GetCore().Release();</div>
+<div class="line"><a id="l00298" name="l00298"></a><span class="lineno">  298</span> </div>
+<div class="line"><a id="l00299" name="l00299"></a><span class="lineno">  299</span>      <span class="keywordflow">if</span> <span class="keyword">constexpr</span> (Strategy::kCorePolicy == <a class="code hl_enumvalue" href="namespaceyaclib.html#acd309e632ae921f3d06e4675f471fab3a60848c692f8ddb0363e500da44563bae">CorePolicy::Owned</a>) {</div>
+<div class="line"><a id="l00300" name="l00300"></a><span class="lineno">  300</span>        st.Register(<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">i</a>, core);</div>
+<div class="line"><a id="l00301" name="l00301"></a><span class="lineno">  301</span>      }</div>
+<div class="line"><a id="l00302" name="l00302"></a><span class="lineno">  302</span> </div>
+<div class="line"><a id="l00303" name="l00303"></a><span class="lineno">  303</span>      <span class="keywordflow">if</span> (!core.SetCallback(callbacks[<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">i</a>])) {</div>
+<div class="line"><a id="l00304" name="l00304"></a><span class="lineno">  304</span>        <a class="code hl_function" href="namespaceyaclib_1_1when.html#af5d5d125de2f6b7093d0fabe03b833ac">Consume</a>(st, core, <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">i</a>);</div>
+<div class="line"><a id="l00305" name="l00305"></a><span class="lineno">  305</span>        DecRef();</div>
+<div class="line"><a id="l00306" name="l00306"></a><span class="lineno">  306</span>      }</div>
+<div class="line"><a id="l00307" name="l00307"></a><span class="lineno">  307</span> </div>
+<div class="line"><a id="l00308" name="l00308"></a><span class="lineno">  308</span>      ++<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">begin</a>;</div>
+<div class="line"><a id="l00309" name="l00309"></a><span class="lineno">  309</span>    }</div>
+<div class="line"><a id="l00310" name="l00310"></a><span class="lineno">  310</span>  }</div>
+</div>
+<div class="line"><a id="l00311" name="l00311"></a><span class="lineno">  311</span> </div>
+<div class="line"><a id="l00312" name="l00312"></a><span class="lineno"><a class="line" href="structyaclib_1_1when_1_1DynamicCombinator.html#af2109dc9a11ebbec8dee023909c35600">  312</a></span>  Strategy <a class="code hl_variable" href="structyaclib_1_1when_1_1DynamicCombinator.html#af2109dc9a11ebbec8dee023909c35600">st</a>;</div>
+<div class="line"><a id="l00313" name="l00313"></a><span class="lineno"><a class="line" href="structyaclib_1_1when_1_1DynamicCombinator.html#aef7c53ede5f3f7b3dc6fca5f74ea8cc2">  313</a></span>  std::vector&lt;CombinatorCallback&lt;DynamicCombinator, Core, kDynamicTag&gt;&gt; <a class="code hl_variable" href="structyaclib_1_1when_1_1DynamicCombinator.html#aef7c53ede5f3f7b3dc6fca5f74ea8cc2">callbacks</a>;</div>
+<div class="line"><a id="l00314" name="l00314"></a><span class="lineno">  314</span>};</div>
+</div>
+<div class="line"><a id="l00315" name="l00315"></a><span class="lineno">  315</span> </div>
+<div class="line"><a id="l00316" name="l00316"></a><span class="lineno">  316</span><span class="keyword">template</span> &lt;<span class="keyword">template</span> &lt;<a class="code hl_enumeration" href="namespaceyaclib.html#a437be4673ff497cc842489b8d1b64841">FailPolicy</a>, <span class="keyword">typename</span>...&gt; <span class="keyword">typename</span> Strategy, <a class="code hl_enumeration" href="namespaceyaclib.html#a437be4673ff497cc842489b8d1b64841">FailPolicy</a> F, <span class="keyword">typename</span> OutputValue,</div>
+<div class="line"><a id="l00317" name="l00317"></a><span class="lineno">  317</span>          <span class="keyword">typename</span> OutputError, <span class="keyword">typename</span>... Futures&gt;</div>
+<div class="foldopen" id="foldopen00318" data-start="{" data-end="}">
+<div class="line"><a id="l00318" name="l00318"></a><span class="lineno"><a class="line" href="namespaceyaclib_1_1when.html#a84a5784ca9f87a62518041808e4ac491">  318</a></span><span class="keyword">auto</span> <a class="code hl_function" href="namespaceyaclib_1_1when.html#a84a5784ca9f87a62518041808e4ac491">When</a>(Futures... futures) {</div>
+<div class="line"><a id="l00319" name="l00319"></a><span class="lineno">  319</span>  <span class="keywordflow">if</span> <span class="keyword">constexpr</span> (<span class="keyword">sizeof</span>...(Futures) == 0) {</div>
+<div class="line"><a id="l00320" name="l00320"></a><span class="lineno">  320</span>    <span class="keywordflow">return</span> <a class="code hl_class" href="classyaclib_1_1Future.html">Future&lt;OutputValue, OutputError&gt;</a>{<span class="keyword">nullptr</span>};</div>
+<div class="line"><a id="l00321" name="l00321"></a><span class="lineno">  321</span>  } <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00322" name="l00322"></a><span class="lineno">  322</span>    <span class="keyword">auto</span> [f, p] = MakeContract&lt;OutputValue, OutputError&gt;();</div>
+<div class="line"><a id="l00323" name="l00323"></a><span class="lineno">  323</span> </div>
+<div class="line"><a id="l00324" name="l00324"></a><span class="lineno">  324</span>    <span class="keyword">using </span>Head = <span class="keyword">typename</span> <a class="code hl_typedef" href="namespaceyaclib.html#a23af97c15e210af60f48dba5fa3736b7">head_t</a>&lt;Futures...&gt;::Core;</div>
+<div class="line"><a id="l00325" name="l00325"></a><span class="lineno">  325</span>    <span class="keyword">using </span><a class="code hl_enumvalue" href="namespaceyaclib.html#ae1f6897e2da3979d79e68711b14524d0a689202409e48743b914713f96d93947c">Value</a> = <span class="keyword">typename</span> Head::Value;</div>
+<div class="line"><a id="l00326" name="l00326"></a><span class="lineno">  326</span>    <span class="keyword">using </span><a class="code hl_enumvalue" href="namespaceyaclib.html#ae1f6897e2da3979d79e68711b14524d0a902b0d55fddef6f8d651fe1035b7d4bd">Error</a> = <span class="keyword">typename</span> Head::Error;</div>
+<div class="line"><a id="l00327" name="l00327"></a><span class="lineno">  327</span> </div>
+<div class="line"><a id="l00328" name="l00328"></a><span class="lineno">  328</span>    <span class="keyword">using </span>InputCore =</div>
+<div class="line"><a id="l00329" name="l00329"></a><span class="lineno">  329</span>      std::conditional_t&lt;(... &amp;&amp; std::is_same_v&lt;Head, typename Futures::Core&gt;), Head,</div>
+<div class="line"><a id="l00330" name="l00330"></a><span class="lineno">  330</span>                         std::conditional_t&lt;(... &amp;&amp; (std::is_same_v&lt;Value, typename Futures::Core::Value&gt; &amp;&amp;</div>
+<div class="line"><a id="l00331" name="l00331"></a><span class="lineno">  331</span>                                                     std::is_same_v&lt;Error, typename Futures::Core::Error&gt;)),</div>
+<div class="line"><a id="l00332" name="l00332"></a><span class="lineno">  332</span>                                            <a class="code hl_class" href="classyaclib_1_1detail_1_1ResultCore.html">detail::ResultCore&lt;Value, Error&gt;</a>, <a class="code hl_class" href="classyaclib_1_1detail_1_1InlineCore.html">detail::InlineCore</a>&gt;&gt;;</div>
+<div class="line"><a id="l00333" name="l00333"></a><span class="lineno">  333</span> </div>
+<div class="line"><a id="l00334" name="l00334"></a><span class="lineno">  334</span>    <span class="keyword">using </span>S = Strategy&lt;F, OutputValue, OutputError, InputCore&gt;;</div>
+<div class="line"><a id="l00335" name="l00335"></a><span class="lineno">  335</span> </div>
+<div class="line"><a id="l00336" name="l00336"></a><span class="lineno">  336</span>    <span class="keyword">using </span>FinalCombinator =</div>
+<div class="line"><a id="l00337" name="l00337"></a><span class="lineno">  337</span>      std::conditional_t&lt;<a class="code hl_struct" href="structyaclib_1_1when_1_1CoreSignature.html">CoreSignature</a>&lt;<span class="keyword">typename</span> Futures::Core...&gt;::kTotalCount == 1 &amp;&amp; !kIsOrdered&lt;S::kConsumePolicy&gt;,</div>
+<div class="line"><a id="l00338" name="l00338"></a><span class="lineno">  338</span>                         <a class="code hl_struct" href="structyaclib_1_1when_1_1SingleCombinator.html">SingleCombinator</a>&lt;S, <a class="code hl_typedef" href="namespaceyaclib.html#a23af97c15e210af60f48dba5fa3736b7">head_t</a>&lt;<span class="keyword">typename</span> Futures::Core...&gt;&gt;,</div>
+<div class="line"><a id="l00339" name="l00339"></a><span class="lineno">  339</span>                         <a class="code hl_struct" href="structyaclib_1_1when_1_1StaticCombinator.html">StaticCombinator</a>&lt;S, <span class="keyword">typename</span> Futures::Core...&gt;&gt;;</div>
+<div class="line"><a id="l00340" name="l00340"></a><span class="lineno">  340</span> </div>
+<div class="line"><a id="l00341" name="l00341"></a><span class="lineno">  341</span>    <span class="keyword">auto</span>* combinator = MakeShared&lt;FinalCombinator&gt;(<span class="keyword">sizeof</span>...(Futures), <span class="keyword">sizeof</span>...(Futures), std::move(p)).Release();</div>
+<div class="line"><a id="l00342" name="l00342"></a><span class="lineno">  342</span>    combinator-&gt;<a class="code hl_function" href="structyaclib_1_1when_1_1StaticCombinator.html#a99a71b821e045edc2ff0875b7ca2cc52">Set</a>(*futures.GetCore().Release()...);</div>
+<div class="line"><a id="l00343" name="l00343"></a><span class="lineno">  343</span>    <span class="keywordflow">return</span> std::move(f);</div>
+<div class="line"><a id="l00344" name="l00344"></a><span class="lineno">  344</span>  }</div>
+<div class="line"><a id="l00345" name="l00345"></a><span class="lineno">  345</span>}</div>
+</div>
+<div class="line"><a id="l00346" name="l00346"></a><span class="lineno">  346</span> </div>
+<div class="line"><a id="l00347" name="l00347"></a><span class="lineno">  347</span><span class="keyword">template</span> &lt;<span class="keyword">template</span> &lt;<a class="code hl_enumeration" href="namespaceyaclib.html#a437be4673ff497cc842489b8d1b64841">FailPolicy</a>, <span class="keyword">typename</span>...&gt; <span class="keyword">typename</span> Strategy, <a class="code hl_enumeration" href="namespaceyaclib.html#a437be4673ff497cc842489b8d1b64841">FailPolicy</a> F, <span class="keyword">typename</span> OutputValue,</div>
+<div class="line"><a id="l00348" name="l00348"></a><span class="lineno">  348</span>          <span class="keyword">typename</span> OutputError, <span class="keyword">typename</span> Iterator, <span class="keyword">typename</span> <a class="code hl_enumvalue" href="namespaceyaclib.html#ae1f6897e2da3979d79e68711b14524d0a689202409e48743b914713f96d93947c">Value</a> = <span class="keyword">typename</span> std::iterator_traits&lt;Iterator&gt;::value_type&gt;</div>
+<div class="foldopen" id="foldopen00349" data-start="{" data-end="}">
+<div class="line"><a id="l00349" name="l00349"></a><span class="lineno"><a class="line" href="namespaceyaclib_1_1when.html#a9c8e4c65b64ad8601fca0321cd180b13">  349</a></span><span class="keyword">auto</span> <a class="code hl_function" href="namespaceyaclib_1_1when.html#a84a5784ca9f87a62518041808e4ac491">When</a>(Iterator begin, std::size_t count) {</div>
+<div class="line"><a id="l00350" name="l00350"></a><span class="lineno">  350</span>  <span class="keywordflow">if</span> (count == 0) {</div>
+<div class="line"><a id="l00351" name="l00351"></a><span class="lineno">  351</span>    <span class="keywordflow">return</span> <a class="code hl_class" href="classyaclib_1_1Future.html">Future&lt;OutputValue, OutputError&gt;</a>{<span class="keyword">nullptr</span>};</div>
+<div class="line"><a id="l00352" name="l00352"></a><span class="lineno">  352</span>  }</div>
+<div class="line"><a id="l00353" name="l00353"></a><span class="lineno">  353</span> </div>
+<div class="line"><a id="l00354" name="l00354"></a><span class="lineno">  354</span>  <span class="keyword">auto</span> [f, p] = MakeContract&lt;OutputValue, OutputError&gt;();</div>
+<div class="line"><a id="l00355" name="l00355"></a><span class="lineno">  355</span> </div>
+<div class="line"><a id="l00356" name="l00356"></a><span class="lineno">  356</span>  <span class="keyword">using </span>Core = <span class="keyword">typename</span> Value::Core;</div>
+<div class="line"><a id="l00357" name="l00357"></a><span class="lineno">  357</span>  <span class="keyword">using </span>S = Strategy&lt;F, OutputValue, OutputError, Core&gt;;</div>
+<div class="line"><a id="l00358" name="l00358"></a><span class="lineno">  358</span> </div>
+<div class="line"><a id="l00359" name="l00359"></a><span class="lineno">  359</span>  <span class="keyword">static_assert</span>(S::kConsumePolicy != ConsumePolicy::Static);</div>
+<div class="line"><a id="l00360" name="l00360"></a><span class="lineno">  360</span> </div>
+<div class="line"><a id="l00361" name="l00361"></a><span class="lineno">  361</span>  <span class="keyword">using </span>FinalCombinator = std::conditional_t&lt;!kIsOrdered&lt;S::kConsumePolicy&gt; &amp;&amp; <a class="code hl_struct" href="structyaclib_1_1detail_1_1IsInstantiationOf.html">IsUniqueCore&lt;Core&gt;::Value</a>,</div>
+<div class="line"><a id="l00362" name="l00362"></a><span class="lineno">  362</span>                                             <a class="code hl_struct" href="structyaclib_1_1when_1_1SingleCombinator.html">SingleCombinator&lt;S, Core&gt;</a>, <a class="code hl_struct" href="structyaclib_1_1when_1_1DynamicCombinator.html">DynamicCombinator&lt;S, Core&gt;</a>&gt;;</div>
+<div class="line"><a id="l00363" name="l00363"></a><span class="lineno">  363</span> </div>
+<div class="line"><a id="l00364" name="l00364"></a><span class="lineno">  364</span>  <span class="keyword">auto</span>* combinator = MakeShared&lt;FinalCombinator&gt;(count, count, std::move(p)).Release();</div>
+<div class="line"><a id="l00365" name="l00365"></a><span class="lineno">  365</span>  combinator-&gt;<a class="code hl_function" href="structyaclib_1_1when_1_1DynamicCombinator.html#abfde5095133a77220ff4d039ae0ead3c">Set</a>(begin, count);</div>
+<div class="line"><a id="l00366" name="l00366"></a><span class="lineno">  366</span>  <span class="keywordflow">return</span> std::move(f);</div>
+<div class="line"><a id="l00367" name="l00367"></a><span class="lineno">  367</span>}</div>
+</div>
+<div class="line"><a id="l00368" name="l00368"></a><span class="lineno">  368</span> </div>
+<div class="line"><a id="l00369" name="l00369"></a><span class="lineno">  369</span>}  <span class="comment">// namespace yaclib::when</span></div>
+<div class="ttc" id="acast_8hpp_html"><div class="ttname"><a href="cast_8hpp.html">cast.hpp</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1Future_html"><div class="ttname"><a href="classyaclib_1_1Future.html">yaclib::Future</a></div><div class="ttdoc">Provides a mechanism to access the result of async operations.</div><div class="ttdef"><b>Definition</b> <a href="async_2future_8hpp_source.html#l00211">future.hpp:211</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1IRef_html"><div class="ttname"><a href="classyaclib_1_1IRef.html">yaclib::IRef</a></div><div class="ttdoc">Reference counting interface.</div><div class="ttdef"><b>Definition</b> <a href="ref_8hpp_source.html#l00012">ref.hpp:12</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1IRef_html_ac32e2fdabdd266b2f27bd8a3fc1480a6"><div class="ttname"><a href="classyaclib_1_1IRef.html#ac32e2fdabdd266b2f27bd8a3fc1480a6">yaclib::IRef::DecRef</a></div><div class="ttdeci">virtual void DecRef() noexcept</div><div class="ttdoc">Decrements reference counter.</div><div class="ttdef"><b>Definition</b> <a href="ref_8hpp_source.html#l00023">ref.hpp:23</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1InlineCore_html"><div class="ttname"><a href="classyaclib_1_1detail_1_1InlineCore.html">yaclib::detail::InlineCore</a></div><div class="ttdef"><b>Definition</b> <a href="inline__core_8hpp_source.html#l00013">inline_core.hpp:13</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1ResultCore_html"><div class="ttname"><a href="classyaclib_1_1detail_1_1ResultCore.html">yaclib::detail::ResultCore</a></div><div class="ttdef"><b>Definition</b> <a href="result__core_8hpp_source.html#l00017">result_core.hpp:17</a></div></div>
+<div class="ttc" id="acombinator__strategy_8hpp_html"><div class="ttname"><a href="combinator__strategy_8hpp.html">combinator_strategy.hpp</a></div></div>
+<div class="ttc" id="acontract_8hpp_html"><div class="ttname"><a href="contract_8hpp.html">contract.hpp</a></div></div>
+<div class="ttc" id="ahelper_8hpp_html"><div class="ttname"><a href="helper_8hpp.html">helper.hpp</a></div></div>
+<div class="ttc" id="ainline__core_8hpp_html"><div class="ttname"><a href="inline__core_8hpp.html">inline_core.hpp</a></div></div>
+<div class="ttc" id="aintrusive__ptr_8hpp_html"><div class="ttname"><a href="intrusive__ptr_8hpp.html">intrusive_ptr.hpp</a></div></div>
+<div class="ttc" id="anamespaceyaclib_1_1when_html"><div class="ttname"><a href="namespaceyaclib_1_1when.html">yaclib::when</a></div><div class="ttdef"><b>Definition</b> <a href="all_8hpp_source.html#l00013">all.hpp:13</a></div></div>
+<div class="ttc" id="anamespaceyaclib_1_1when_html_a08a296269aa83f65fc91adbd44b426dd"><div class="ttname"><a href="namespaceyaclib_1_1when.html#a08a296269aa83f65fc91adbd44b426dd">yaclib::when::IsUniqueCore</a></div><div class="ttdeci">detail::IsInstantiationOf&lt; detail::UniqueCore, T &gt; IsUniqueCore</div><div class="ttdef"><b>Definition</b> <a href="when_8hpp_source.html#l00028">when.hpp:28</a></div></div>
+<div class="ttc" id="anamespaceyaclib_1_1when_html_a24ab06ef0b9da04ecd4ea7de9f6d90de"><div class="ttname"><a href="namespaceyaclib_1_1when.html#a24ab06ef0b9da04ecd4ea7de9f6d90de">yaclib::when::kIsOrdered</a></div><div class="ttdeci">constexpr bool kIsOrdered</div><div class="ttdef"><b>Definition</b> <a href="when_8hpp_source.html#l00034">when.hpp:34</a></div></div>
+<div class="ttc" id="anamespaceyaclib_1_1when_html_a2756747d7d250737cc8cfa0cf636c595"><div class="ttname"><a href="namespaceyaclib_1_1when.html#a2756747d7d250737cc8cfa0cf636c595">yaclib::when::IsSharedCore</a></div><div class="ttdeci">detail::IsInstantiationOf&lt; detail::SharedCore, T &gt; IsSharedCore</div><div class="ttdef"><b>Definition</b> <a href="when_8hpp_source.html#l00031">when.hpp:31</a></div></div>
+<div class="ttc" id="anamespaceyaclib_1_1when_html_a49a16f4fc52f74c11493b60c03baf4ff"><div class="ttname"><a href="namespaceyaclib_1_1when.html#a49a16f4fc52f74c11493b60c03baf4ff">yaclib::when::ConsumeImpl</a></div><div class="ttdeci">YACLIB_INLINE void ConsumeImpl(Strategy &amp;st, Core &amp;core)</div><div class="ttdef"><b>Definition</b> <a href="when_8hpp_source.html#l00039">when.hpp:39</a></div></div>
+<div class="ttc" id="anamespaceyaclib_1_1when_html_a84a5784ca9f87a62518041808e4ac491"><div class="ttname"><a href="namespaceyaclib_1_1when.html#a84a5784ca9f87a62518041808e4ac491">yaclib::when::When</a></div><div class="ttdeci">auto When(Futures... futures)</div><div class="ttdef"><b>Definition</b> <a href="when_8hpp_source.html#l00318">when.hpp:318</a></div></div>
+<div class="ttc" id="anamespaceyaclib_1_1when_html_ab99dc51c64aa6af1d9135eec9cf02db0"><div class="ttname"><a href="namespaceyaclib_1_1when.html#ab99dc51c64aa6af1d9135eec9cf02db0">yaclib::when::CheckSameError</a></div><div class="ttdeci">YACLIB_INLINE void CheckSameError()</div><div class="ttdef"><b>Definition</b> <a href="when_8hpp_source.html#l00020">when.hpp:20</a></div></div>
+<div class="ttc" id="anamespaceyaclib_1_1when_html_ac55efdf7489a9623b637c3d7ec3bd5f2"><div class="ttname"><a href="namespaceyaclib_1_1when.html#ac55efdf7489a9623b637c3d7ec3bd5f2">yaclib::when::kDynamicTag</a></div><div class="ttdeci">constexpr std::size_t kDynamicTag</div><div class="ttdef"><b>Definition</b> <a href="when_8hpp_source.html#l00036">when.hpp:36</a></div></div>
+<div class="ttc" id="anamespaceyaclib_1_1when_html_af5d5d125de2f6b7093d0fabe03b833ac"><div class="ttname"><a href="namespaceyaclib_1_1when.html#af5d5d125de2f6b7093d0fabe03b833ac">yaclib::when::Consume</a></div><div class="ttdeci">YACLIB_INLINE void Consume(Strategy &amp;st, Core &amp;core)</div><div class="ttdef"><b>Definition</b> <a href="when_8hpp_source.html#l00066">when.hpp:66</a></div></div>
+<div class="ttc" id="anamespaceyaclib__std_html_a8e16b0ce286fac0ba98b57b69b077f8b"><div class="ttname"><a href="namespaceyaclib__std.html#a8e16b0ce286fac0ba98b57b69b077f8b">yaclib_std::noop_coroutine</a></div><div class="ttdeci">constexpr yaclib_std::coroutine_handle noop_coroutine() noexcept</div><div class="ttdef"><b>Definition</b> <a href="coro_8hpp_source.html#l00049">coro.hpp:49</a></div></div>
+<div class="ttc" id="anamespaceyaclib_html_a23af97c15e210af60f48dba5fa3736b7"><div class="ttname"><a href="namespaceyaclib.html#a23af97c15e210af60f48dba5fa3736b7">yaclib::head_t</a></div><div class="ttdeci">typename detail::Head&lt; Args... &gt;::Type head_t</div><div class="ttdef"><b>Definition</b> <a href="type__traits_8hpp_source.html#l00018">type_traits.hpp:18</a></div></div>
+<div class="ttc" id="anamespaceyaclib_html_a437be4673ff497cc842489b8d1b64841"><div class="ttname"><a href="namespaceyaclib.html#a437be4673ff497cc842489b8d1b64841">yaclib::FailPolicy</a></div><div class="ttdeci">FailPolicy</div><div class="ttdoc">This Policy describe how algorithm interpret if Future will be fulfilled by fail (exception or error)</div><div class="ttdef"><b>Definition</b> <a href="fail__policy_8hpp_source.html#l00012">fail_policy.hpp:12</a></div></div>
+<div class="ttc" id="anamespaceyaclib_html_a9fc4654a4367af802754a7ea30531756"><div class="ttname"><a href="namespaceyaclib.html#a9fc4654a4367af802754a7ea30531756">yaclib::translate_index_v</a></div><div class="ttdeci">constexpr std::size_t translate_index_v</div><div class="ttdef"><b>Definition</b> <a href="type__traits_8hpp_source.html#l00214">type_traits.hpp:214</a></div></div>
+<div class="ttc" id="anamespaceyaclib_html_abf0ca1b3669b19068ca678745439ba20a288d468c5e0969f26a310773eda65603"><div class="ttname"><a href="namespaceyaclib.html#abf0ca1b3669b19068ca678745439ba20a288d468c5e0969f26a310773eda65603">yaclib::ConsumePolicy::Unordered</a></div><div class="ttdeci">@ Unordered</div></div>
+<div class="ttc" id="anamespaceyaclib_html_abf0ca1b3669b19068ca678745439ba20a6adf97f83acf6453d4a6a4b1070f3754"><div class="ttname"><a href="namespaceyaclib.html#abf0ca1b3669b19068ca678745439ba20a6adf97f83acf6453d4a6a4b1070f3754">yaclib::ConsumePolicy::None</a></div><div class="ttdeci">@ None</div></div>
+<div class="ttc" id="anamespaceyaclib_html_abf0ca1b3669b19068ca678745439ba20a84a8921b25f505d0d2077aeb5db4bc16"><div class="ttname"><a href="namespaceyaclib.html#abf0ca1b3669b19068ca678745439ba20a84a8921b25f505d0d2077aeb5db4bc16">yaclib::ConsumePolicy::Static</a></div><div class="ttdeci">@ Static</div></div>
+<div class="ttc" id="anamespaceyaclib_html_abf0ca1b3669b19068ca678745439ba20a971fd8cc345d8bd9f92e9f7d88fdf20c"><div class="ttname"><a href="namespaceyaclib.html#abf0ca1b3669b19068ca678745439ba20a971fd8cc345d8bd9f92e9f7d88fdf20c">yaclib::ConsumePolicy::Dynamic</a></div><div class="ttdeci">@ Dynamic</div></div>
+<div class="ttc" id="anamespaceyaclib_html_ac918e7a0c384bcf611e0b5b4b2cd5504"><div class="ttname"><a href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">yaclib::MakeContract</a></div><div class="ttdeci">Contract&lt; V, E &gt; MakeContract()</div><div class="ttdoc">Creates related future and promise.</div><div class="ttdef"><b>Definition</b> <a href="contract_8hpp_source.html#l00025">contract.hpp:25</a></div></div>
+<div class="ttc" id="anamespaceyaclib_html_acd309e632ae921f3d06e4675f471fab3a60848c692f8ddb0363e500da44563bae"><div class="ttname"><a href="namespaceyaclib.html#acd309e632ae921f3d06e4675f471fab3a60848c692f8ddb0363e500da44563bae">yaclib::CorePolicy::Owned</a></div><div class="ttdeci">@ Owned</div></div>
+<div class="ttc" id="anamespaceyaclib_html_acd309e632ae921f3d06e4675f471fab3a80c202b1c3fd395a7bfe4d846c914bc3"><div class="ttname"><a href="namespaceyaclib.html#acd309e632ae921f3d06e4675f471fab3a80c202b1c3fd395a7bfe4d846c914bc3">yaclib::CorePolicy::Managed</a></div><div class="ttdeci">@ Managed</div></div>
+<div class="ttc" id="anamespaceyaclib_html_ae1f6897e2da3979d79e68711b14524d0a689202409e48743b914713f96d93947c"><div class="ttname"><a href="namespaceyaclib.html#ae1f6897e2da3979d79e68711b14524d0a689202409e48743b914713f96d93947c">yaclib::ResultState::Value</a></div><div class="ttdeci">@ Value</div></div>
+<div class="ttc" id="anamespaceyaclib_html_ae1f6897e2da3979d79e68711b14524d0a902b0d55fddef6f8d651fe1035b7d4bd"><div class="ttname"><a href="namespaceyaclib.html#ae1f6897e2da3979d79e68711b14524d0a902b0d55fddef6f8d651fe1035b7d4bd">yaclib::ResultState::Error</a></div><div class="ttdeci">@ Error</div></div>
+<div class="ttc" id="aref_8hpp_html"><div class="ttname"><a href="ref_8hpp.html">ref.hpp</a></div></div>
+<div class="ttc" id="aresult__core_8hpp_html"><div class="ttname"><a href="result__core_8hpp.html">result_core.hpp</a></div></div>
+<div class="ttc" id="astructyaclib_1_1Filter_html"><div class="ttname"><a href="structyaclib_1_1Filter.html">yaclib::Filter</a></div><div class="ttdef"><b>Definition</b> <a href="type__traits_8hpp_source.html#l00110">type_traits.hpp:110</a></div></div>
+<div class="ttc" id="astructyaclib_1_1Unique_html"><div class="ttname"><a href="structyaclib_1_1Unique.html">yaclib::Unique</a></div><div class="ttdef"><b>Definition</b> <a href="type__traits_8hpp_source.html#l00132">type_traits.hpp:132</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1IsInstantiationOf_html"><div class="ttname"><a href="structyaclib_1_1detail_1_1IsInstantiationOf.html">yaclib::detail::IsInstantiationOf</a></div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00038">type_traits_impl.hpp:38</a></div></div>
+<div class="ttc" id="astructyaclib_1_1when_1_1CombinatorCallback_html"><div class="ttname"><a href="structyaclib_1_1when_1_1CombinatorCallback.html">yaclib::when::CombinatorCallback</a></div><div class="ttdef"><b>Definition</b> <a href="when_8hpp_source.html#l00096">when.hpp:96</a></div></div>
+<div class="ttc" id="astructyaclib_1_1when_1_1CombinatorCallback_html_a04cfefe1e6bf58929a9ff6f0cc450f8f"><div class="ttname"><a href="structyaclib_1_1when_1_1CombinatorCallback.html#a04cfefe1e6bf58929a9ff6f0cc450f8f">yaclib::when::CombinatorCallback::Here</a></div><div class="ttdeci">InlineCore * Here(InlineCore &amp;caller) noexcept final</div><div class="ttdef"><b>Definition</b> <a href="when_8hpp_source.html#l00100">when.hpp:100</a></div></div>
+<div class="ttc" id="astructyaclib_1_1when_1_1CombinatorCallback_html_a4afbc0e6845af5f61c1c76bb4d829809"><div class="ttname"><a href="structyaclib_1_1when_1_1CombinatorCallback.html#a4afbc0e6845af5f61c1c76bb4d829809">yaclib::when::CombinatorCallback::CombinatorCallback</a></div><div class="ttdeci">CombinatorCallback(Combinator *self=nullptr)</div><div class="ttdef"><b>Definition</b> <a href="when_8hpp_source.html#l00097">when.hpp:97</a></div></div>
+<div class="ttc" id="astructyaclib_1_1when_1_1CoreSignature_html"><div class="ttname"><a href="structyaclib_1_1when_1_1CoreSignature.html">yaclib::when::CoreSignature</a></div><div class="ttdef"><b>Definition</b> <a href="when_8hpp_source.html#l00128">when.hpp:128</a></div></div>
+<div class="ttc" id="astructyaclib_1_1when_1_1CoreSignature_html_a0a5fa8e64feb7f7cfb5f533efe666463"><div class="ttname"><a href="structyaclib_1_1when_1_1CoreSignature.html#a0a5fa8e64feb7f7cfb5f533efe666463">yaclib::when::CoreSignature::kSharedCount</a></div><div class="ttdeci">static constexpr std::size_t kSharedCount</div><div class="ttdef"><b>Definition</b> <a href="when_8hpp_source.html#l00133">when.hpp:133</a></div></div>
+<div class="ttc" id="astructyaclib_1_1when_1_1CoreSignature_html_a517b94b9675a4a61597232694dbeea81"><div class="ttname"><a href="structyaclib_1_1when_1_1CoreSignature.html#a517b94b9675a4a61597232694dbeea81">yaclib::when::CoreSignature::kTotalCount</a></div><div class="ttdeci">static constexpr std::size_t kTotalCount</div><div class="ttdef"><b>Definition</b> <a href="when_8hpp_source.html#l00134">when.hpp:134</a></div></div>
+<div class="ttc" id="astructyaclib_1_1when_1_1CoreSignature_html_a51b57492e216b62c1862ed23b40eb6f6"><div class="ttname"><a href="structyaclib_1_1when_1_1CoreSignature.html#a51b57492e216b62c1862ed23b40eb6f6">yaclib::when::CoreSignature::SharedCores</a></div><div class="ttdeci">typename Filter&lt; IsSharedCore, std::tuple&lt; Cores... &gt; &gt;::Type SharedCores</div><div class="ttdef"><b>Definition</b> <a href="when_8hpp_source.html#l00130">when.hpp:130</a></div></div>
+<div class="ttc" id="astructyaclib_1_1when_1_1CoreSignature_html_a7dc1aba58c886bd1decdc5f43670c34a"><div class="ttname"><a href="structyaclib_1_1when_1_1CoreSignature.html#a7dc1aba58c886bd1decdc5f43670c34a">yaclib::when::CoreSignature::kUniqueCount</a></div><div class="ttdeci">static constexpr std::size_t kUniqueCount</div><div class="ttdef"><b>Definition</b> <a href="when_8hpp_source.html#l00132">when.hpp:132</a></div></div>
+<div class="ttc" id="astructyaclib_1_1when_1_1CoreSignature_html_ae63a3929e6dc05232aca40c807ffd9d4"><div class="ttname"><a href="structyaclib_1_1when_1_1CoreSignature.html#ae63a3929e6dc05232aca40c807ffd9d4">yaclib::when::CoreSignature::UniqueUniqueCores</a></div><div class="ttdeci">typename Unique&lt; typename Filter&lt; IsUniqueCore, std::tuple&lt; Cores... &gt; &gt;::Type &gt;::Type UniqueUniqueCores</div><div class="ttdef"><b>Definition</b> <a href="when_8hpp_source.html#l00129">when.hpp:129</a></div></div>
+<div class="ttc" id="astructyaclib_1_1when_1_1DynamicCombinator_html"><div class="ttname"><a href="structyaclib_1_1when_1_1DynamicCombinator.html">yaclib::when::DynamicCombinator</a></div><div class="ttdef"><b>Definition</b> <a href="when_8hpp_source.html#l00289">when.hpp:289</a></div></div>
+<div class="ttc" id="astructyaclib_1_1when_1_1DynamicCombinator_html_a178747e64dff85f5bab8ce70810bb1df"><div class="ttname"><a href="structyaclib_1_1when_1_1DynamicCombinator.html#a178747e64dff85f5bab8ce70810bb1df">yaclib::when::DynamicCombinator::DynamicCombinator</a></div><div class="ttdeci">DynamicCombinator(std::size_t count, typename Strategy::PromiseType p)</div><div class="ttdef"><b>Definition</b> <a href="when_8hpp_source.html#l00290">when.hpp:290</a></div></div>
+<div class="ttc" id="astructyaclib_1_1when_1_1DynamicCombinator_html_abfde5095133a77220ff4d039ae0ead3c"><div class="ttname"><a href="structyaclib_1_1when_1_1DynamicCombinator.html#abfde5095133a77220ff4d039ae0ead3c">yaclib::when::DynamicCombinator::Set</a></div><div class="ttdeci">void Set(Iterator begin, std::size_t count)</div><div class="ttdef"><b>Definition</b> <a href="when_8hpp_source.html#l00295">when.hpp:295</a></div></div>
+<div class="ttc" id="astructyaclib_1_1when_1_1DynamicCombinator_html_aef7c53ede5f3f7b3dc6fca5f74ea8cc2"><div class="ttname"><a href="structyaclib_1_1when_1_1DynamicCombinator.html#aef7c53ede5f3f7b3dc6fca5f74ea8cc2">yaclib::when::DynamicCombinator::callbacks</a></div><div class="ttdeci">std::vector&lt; CombinatorCallback&lt; DynamicCombinator, Core, kDynamicTag &gt; &gt; callbacks</div><div class="ttdef"><b>Definition</b> <a href="when_8hpp_source.html#l00313">when.hpp:313</a></div></div>
+<div class="ttc" id="astructyaclib_1_1when_1_1DynamicCombinator_html_af2109dc9a11ebbec8dee023909c35600"><div class="ttname"><a href="structyaclib_1_1when_1_1DynamicCombinator.html#af2109dc9a11ebbec8dee023909c35600">yaclib::when::DynamicCombinator::st</a></div><div class="ttdeci">Strategy st</div><div class="ttdef"><b>Definition</b> <a href="when_8hpp_source.html#l00312">when.hpp:312</a></div></div>
+<div class="ttc" id="astructyaclib_1_1when_1_1SingleCombinator_html"><div class="ttname"><a href="structyaclib_1_1when_1_1SingleCombinator.html">yaclib::when::SingleCombinator</a></div><div class="ttdef"><b>Definition</b> <a href="when_8hpp_source.html#l00138">when.hpp:138</a></div></div>
+<div class="ttc" id="astructyaclib_1_1when_1_1SingleCombinator_html_a4595c17a16282e9d6babcc965dd00f3a"><div class="ttname"><a href="structyaclib_1_1when_1_1SingleCombinator.html#a4595c17a16282e9d6babcc965dd00f3a">yaclib::when::SingleCombinator::Here</a></div><div class="ttdeci">InlineCore * Here(InlineCore &amp;caller) noexcept final</div><div class="ttdef"><b>Definition</b> <a href="when_8hpp_source.html#l00169">when.hpp:169</a></div></div>
+<div class="ttc" id="astructyaclib_1_1when_1_1SingleCombinator_html_a808ea2d77bc64e9476738fcc1dec3566"><div class="ttname"><a href="structyaclib_1_1when_1_1SingleCombinator.html#a808ea2d77bc64e9476738fcc1dec3566">yaclib::when::SingleCombinator::Set</a></div><div class="ttdeci">void Set(Cores &amp;... cores)</div><div class="ttdef"><b>Definition</b> <a href="when_8hpp_source.html#l00144">when.hpp:144</a></div></div>
+<div class="ttc" id="astructyaclib_1_1when_1_1SingleCombinator_html_abdb4af69a8a9df9ef69ce83e74f5bc63"><div class="ttname"><a href="structyaclib_1_1when_1_1SingleCombinator.html#abdb4af69a8a9df9ef69ce83e74f5bc63">yaclib::when::SingleCombinator::SingleCombinator</a></div><div class="ttdeci">SingleCombinator(std::size_t count, typename Strategy::PromiseType p)</div><div class="ttdef"><b>Definition</b> <a href="when_8hpp_source.html#l00139">when.hpp:139</a></div></div>
+<div class="ttc" id="astructyaclib_1_1when_1_1SingleCombinator_html_ace1d328e99213ab03eadf9059a987ebe"><div class="ttname"><a href="structyaclib_1_1when_1_1SingleCombinator.html#ace1d328e99213ab03eadf9059a987ebe">yaclib::when::SingleCombinator::Set</a></div><div class="ttdeci">void Set(Iterator begin, std::size_t count)</div><div class="ttdef"><b>Definition</b> <a href="when_8hpp_source.html#l00152">when.hpp:152</a></div></div>
+<div class="ttc" id="astructyaclib_1_1when_1_1StaticCombinator_html"><div class="ttname"><a href="structyaclib_1_1when_1_1StaticCombinator.html">yaclib::when::StaticCombinator</a></div><div class="ttdef"><b>Definition</b> <a href="when_8hpp_source.html#l00203">when.hpp:203</a></div></div>
+<div class="ttc" id="astructyaclib_1_1when_1_1StaticCombinator_html_a0f6a2fc0c11fa7b62bb5edc1404a9682"><div class="ttname"><a href="structyaclib_1_1when_1_1StaticCombinator.html#a0f6a2fc0c11fa7b62bb5edc1404a9682">yaclib::when::StaticCombinator::StaticCombinator</a></div><div class="ttdeci">StaticCombinator(std::size_t count, typename Strategy::PromiseType p)</div><div class="ttdef"><b>Definition</b> <a href="when_8hpp_source.html#l00271">when.hpp:271</a></div></div>
+<div class="ttc" id="astructyaclib_1_1when_1_1StaticCombinator_html_a50506b3ce09181cdcbf94f1e7dc1823c"><div class="ttname"><a href="structyaclib_1_1when_1_1StaticCombinator.html#a50506b3ce09181cdcbf94f1e7dc1823c">yaclib::when::StaticCombinator::callbacks</a></div><div class="ttdeci">Callbacks callbacks</div><div class="ttdef"><b>Definition</b> <a href="when_8hpp_source.html#l00285">when.hpp:285</a></div></div>
+<div class="ttc" id="astructyaclib_1_1when_1_1StaticCombinator_html_a99a71b821e045edc2ff0875b7ca2cc52"><div class="ttname"><a href="structyaclib_1_1when_1_1StaticCombinator.html#a99a71b821e045edc2ff0875b7ca2cc52">yaclib::when::StaticCombinator::Set</a></div><div class="ttdeci">void Set(Cores &amp;... cores)</div><div class="ttdef"><b>Definition</b> <a href="when_8hpp_source.html#l00280">when.hpp:280</a></div></div>
+<div class="ttc" id="astructyaclib_1_1when_1_1StaticCombinator_html_aa1744cc995d869480768b4dfa4105128"><div class="ttname"><a href="structyaclib_1_1when_1_1StaticCombinator.html#aa1744cc995d869480768b4dfa4105128">yaclib::when::StaticCombinator::st</a></div><div class="ttdeci">Strategy st</div><div class="ttdef"><b>Definition</b> <a href="when_8hpp_source.html#l00284">when.hpp:284</a></div></div>
+<div class="ttc" id="atype__traits_8hpp_html"><div class="ttname"><a href="type__traits_8hpp.html">type_traits.hpp</a></div></div>
+<div class="ttc" id="aunique__core_8hpp_html"><div class="ttname"><a href="unique__core_8hpp.html">unique_core.hpp</a></div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_5202e9473254619c80971b7f5a23629e.html">yaclib</a></li><li class="navelem"><a class="el" href="dir_4063a9e34a1302ac947dfe60cb383789.html">async</a></li><li class="navelem"><a class="el" href="dir_2295b224cd20d14ade2298ad6bbe3d9f.html">when</a></li><li class="navelem"><a class="el" href="when_8hpp.html">when.hpp</a></li>
+    <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+  </ul>
+</div>
+</body>
+</html>
