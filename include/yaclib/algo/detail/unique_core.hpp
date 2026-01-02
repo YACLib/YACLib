@@ -43,7 +43,7 @@ class UniqueCore : public ResultCore<V, E> {
   // Sometimes we know it will be last callback in cycle, so we want call it right now, instead of SetInline
   void CallInline(InlineCore& callback) noexcept {
     if (!SetCallback(callback)) {
-      auto* next = callback.Here(*this);
+      [[maybe_unused]] auto* next = callback.Here(*this);
       YACLIB_ASSERT(next == nullptr);
     }
   }
