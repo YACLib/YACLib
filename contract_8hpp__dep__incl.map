@@ -1,0 +1,19 @@
+<map id="include/yaclib/async/contract.hpp" name="include/yaclib/async/contract.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="167,5,304,46"/>
+<area shape="rect" id="Node000002" href="$share_8hpp.html" title=" " alt="" coords="5,94,143,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="187,56,112,96,109,91,184,51"/>
+<area shape="rect" id="Node000003" href="$when_8hpp.html" title=" " alt="" coords="167,94,304,135"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="238,62,238,94,233,94,233,62"/>
+<area shape="rect" id="Node000009" href="$simple_8cpp.html" title=" " alt="" coords="329,94,462,135"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="286,51,360,91,358,96,284,56"/>
+<area shape="rect" id="Node000004" href="$join_8hpp.html" title=" " alt="" coords="5,183,143,223"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="187,145,112,185,109,180,184,140"/>
+<area shape="rect" id="Node000005" href="$when__all_8hpp.html" title=" " alt="" coords="167,183,304,223"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="238,150,238,182,233,182,233,150"/>
+<area shape="rect" id="Node000007" href="$when__any_8hpp.html" title=" " alt="" coords="328,183,465,223"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="287,140,361,180,359,185,284,145"/>
+<area shape="rect" id="Node000006" href="$when__all_8cpp.html" title=" " alt="" coords="169,271,302,312"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="238,239,238,271,233,271,233,239"/>
+<area shape="rect" id="Node000008" href="$when__any_8cpp.html" title=" " alt="" coords="330,271,463,312"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="399,239,399,271,394,271,394,239"/>
+</map>

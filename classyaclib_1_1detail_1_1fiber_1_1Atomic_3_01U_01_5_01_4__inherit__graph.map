@@ -1,0 +1,11 @@
+<map id="yaclib::detail::fiber::Atomic&lt; U * &gt;" name="yaclib::detail::fiber::Atomic&lt; U * &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="28,289,150,330"/>
+<area shape="rect" id="Node000002" href="$classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html" title=" " alt="" coords="20,199,158,240"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="92,255,92,289,86,289,86,255"/>
+<area shape="rect" id="Node000003" href="$classyaclib_1_1detail_1_1fiber_1_1AtomicWait.html" title=" " alt="" coords="5,95,130,136"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="77,151,87,198,82,199,72,152"/>
+<area shape="rect" id="Node000004" href="$classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html" title=" " alt="" coords="154,95,282,136"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="183,148,115,201,112,196,180,144"/>
+<area shape="rect" id="Node000005" href="$classyaclib_1_1detail_1_1fiber_1_1AtomicWait.html" title=" " alt="" coords="156,5,280,46"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="221,62,221,95,216,95,216,62"/>
+</map>

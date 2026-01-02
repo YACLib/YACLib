@@ -1,0 +1,10 @@
+<map id="include/yaclib/fault/detail/shared_mutex.hpp" name="include/yaclib/fault/detail/shared_mutex.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="30,5,195,46"/>
+<area shape="rect" id="Node000002" href="$fault_2detail_2mutex_8hpp.html" title=" " alt="" coords="5,94,124,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="104,48,85,82,80,79,99,45"/>
+<area shape="rect" id="Node000003" href="$inject_8hpp.html" title=" " alt="" coords="41,183,184,208"/>
+<area shape="poly" id="edge4_Node000001_Node000003" title=" " alt="" coords="124,46,138,93,140,114,138,135,127,169,122,168,133,134,135,114,133,95,118,47"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="79,134,100,168,95,171,74,136"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="82,256,143,282"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="115,209,115,241,110,241,110,209"/>
+</map>

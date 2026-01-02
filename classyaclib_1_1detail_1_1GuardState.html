@@ -1,0 +1,528 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.9.8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<!-- BEGIN opengraph metadata -->
+<meta property="og:title" content="Doxygen Awesome" />
+<meta property="og:image" content="https://repository-images.githubusercontent.com/348492097/4f16df80-88fb-11eb-9d31-4015ff22c452" />
+<meta property="og:description" content="Custom CSS theme for doxygen html-documentation with lots of customization parameters." />
+<meta property="og:url" content="https://jothepro.github.io/doxygen-awesome-css/" />
+<!-- END opengraph metadata -->
+<!-- BEGIN twitter metadata -->
+<meta name="twitter:image:src" content="https://repository-images.githubusercontent.com/348492097/4f16df80-88fb-11eb-9d31-4015ff22c452" />
+<meta name="twitter:title" content="Doxygen Awesome" />
+<meta name="twitter:description" content="Custom CSS theme for doxygen html-documentation with lots of customization parameters." />
+<!-- END twitter metadata -->
+<title>YACLib: yaclib::detail::GuardState Class Reference</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link rel="icon" type="image/svg+xml" href="logo.drawio.svg"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+<script type="text/javascript" src="doxygen-awesome-fragment-copy-button.js"></script>
+<script type="text/javascript" src="doxygen-awesome-paragraph-link.js"></script>
+<script type="text/javascript" src="toggle-alternative-theme.js"></script>
+<script type="text/javascript">
+    DoxygenAwesomeFragmentCopyButton.init()
+    DoxygenAwesomeDarkModeToggle.init()
+    DoxygenAwesomeParagraphLink.init()
+</script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="custom.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only-darkmode-toggle.css" rel="stylesheet" type="text/css"/>
+<link href="custom-alternative.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<!-- https://tholman.com/github-corners/ -->
+<a href="https://github.com/YACLib/YACLib" class="github-corner" title="View source on GitHub" target="_blank">
+    <svg viewBox="0 0 250 250" width="40" height="40" style="position: absolute; top: 0; border: 0; right: 0; z-index: 99;" aria-hidden="true">
+    <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
+   <div id="projectname">YACLib
+   </div>
+   <div id="projectbrief">C++ library for concurrent tasks execution</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Search');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('classyaclib_1_1detail_1_1GuardState.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pro-attribs">Protected Attributes</a> &#124;
+<a href="classyaclib_1_1detail_1_1GuardState-members.html">List of all members</a>  </div>
+  <div class="headertitle"><div class="title">yaclib::detail::GuardState Class Reference</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p><code>#include &lt;<a class="el" href="guard__state_8hpp_source.html">guard_state.hpp</a>&gt;</code></p>
+<div class="dynheader">
+Inheritance diagram for yaclib::detail::GuardState:</div>
+<div class="dyncontent">
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="classyaclib_1_1detail_1_1GuardState__inherit__graph.svg" width="100%" height="417"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
+<div class="dynheader">
+Collaboration diagram for yaclib::detail::GuardState:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="classyaclib_1_1detail_1_1GuardState__coll__graph.svg" width="175" height="126"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:ab19cdcc5242bcd432280bd46e47429df" id="r_ab19cdcc5242bcd432280bd46e47429df"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1GuardState.html#ab19cdcc5242bcd432280bd46e47429df">GuardState</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a>=<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">default</a></td></tr>
+<tr class="separator:ab19cdcc5242bcd432280bd46e47429df"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac20363ae31607a9ff56ca7f42e3203e3" id="r_ac20363ae31607a9ff56ca7f42e3203e3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1GuardState.html#ac20363ae31607a9ff56ca7f42e3203e3">GuardState</a> (<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a> *<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">ptr</a>, <a class="el" href="classbool.html">bool</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">owns</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:ac20363ae31607a9ff56ca7f42e3203e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a77fce0c5b546884dcf1196c4a787b8d4" id="r_a77fce0c5b546884dcf1196c4a787b8d4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1GuardState.html#a77fce0c5b546884dcf1196c4a787b8d4">GuardState</a> (<a class="el" href="classyaclib_1_1detail_1_1GuardState.html">GuardState</a> &amp;&amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">other</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a77fce0c5b546884dcf1196c4a787b8d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a395b03e20538664142951940f0af34af" id="r_a395b03e20538664142951940f0af34af"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classyaclib_1_1detail_1_1GuardState.html">GuardState</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1GuardState.html#a395b03e20538664142951940f0af34af">operator=</a> (<a class="el" href="classyaclib_1_1detail_1_1GuardState.html">GuardState</a> &amp;&amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">other</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a395b03e20538664142951940f0af34af"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a037cd79816e3d032c8bcbf7228a8326c" id="r_a037cd79816e3d032c8bcbf7228a8326c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1GuardState.html#a037cd79816e3d032c8bcbf7228a8326c">Swap</a> (<a class="el" href="classyaclib_1_1detail_1_1GuardState.html">GuardState</a> &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">other</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a037cd79816e3d032c8bcbf7228a8326c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa4ee0239358614ac3170d1dbeb2c9367" id="r_aa4ee0239358614ac3170d1dbeb2c9367"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1GuardState.html#aa4ee0239358614ac3170d1dbeb2c9367">Ptr</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a></td></tr>
+<tr class="separator:aa4ee0239358614ac3170d1dbeb2c9367"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7620fd3f04ae89bd45f8386035593f21" id="r_a7620fd3f04ae89bd45f8386035593f21"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1GuardState.html#a7620fd3f04ae89bd45f8386035593f21">Owns</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a7620fd3f04ae89bd45f8386035593f21"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af7d1281f3d81529b33781501818427dd" id="r_af7d1281f3d81529b33781501818427dd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1GuardState.html#af7d1281f3d81529b33781501818427dd">LockState</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:af7d1281f3d81529b33781501818427dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab139aa24febbf300f831c1655244f055" id="r_ab139aa24febbf300f831c1655244f055"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1GuardState.html#ab139aa24febbf300f831c1655244f055">UnlockState</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:ab139aa24febbf300f831c1655244f055"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a187fb48f1fd3d00b16128f865f68e9e9" id="r_a187fb48f1fd3d00b16128f865f68e9e9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1GuardState.html#a187fb48f1fd3d00b16128f865f68e9e9">ReleaseState</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a187fb48f1fd3d00b16128f865f68e9e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
+Protected Attributes</h2></td></tr>
+<tr class="memitem:a928a0f81134c2e533167677aa0a125e2" id="r_a928a0f81134c2e533167677aa0a125e2"><td class="memItemLeft" align="right" valign="top">std::uintptr_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1GuardState.html#a928a0f81134c2e533167677aa0a125e2">_state</a> = 0</td></tr>
+<tr class="separator:a928a0f81134c2e533167677aa0a125e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock">
+<p class="definition">Definition at line <a class="el" href="guard__state_8hpp_source.html#l00009">9</a> of file <a class="el" href="guard__state_8hpp_source.html">guard_state.hpp</a>.</p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="ab19cdcc5242bcd432280bd46e47429df" name="ab19cdcc5242bcd432280bd46e47429df"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab19cdcc5242bcd432280bd46e47429df">&#9670;&#160;</a></span>GuardState() <span class="overload">[1/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">yaclib::detail::GuardState::GuardState </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">default</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac20363ae31607a9ff56ca7f42e3203e3" name="ac20363ae31607a9ff56ca7f42e3203e3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac20363ae31607a9ff56ca7f42e3203e3">&#9670;&#160;</a></span>GuardState() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">yaclib::detail::GuardState::GuardState </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a> *&#160;</td>
+          <td class="paramname"><em>ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classbool.html">bool</a>&#160;</td>
+          <td class="paramname"><em>owns</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">explicit</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="guard__state_8hpp_source.html#l00015">15</a> of file <a class="el" href="guard__state_8hpp_source.html">guard_state.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="a77fce0c5b546884dcf1196c4a787b8d4" name="a77fce0c5b546884dcf1196c4a787b8d4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a77fce0c5b546884dcf1196c4a787b8d4">&#9670;&#160;</a></span>GuardState() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">yaclib::detail::GuardState::GuardState </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classyaclib_1_1detail_1_1GuardState.html">GuardState</a> &amp;&amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="guard__state_8hpp_source.html#l00019">19</a> of file <a class="el" href="guard__state_8hpp_source.html">guard_state.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="af7d1281f3d81529b33781501818427dd" name="af7d1281f3d81529b33781501818427dd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af7d1281f3d81529b33781501818427dd">&#9670;&#160;</a></span>LockState()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a> * yaclib::detail::GuardState::LockState </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="guard__state_8hpp_source.html#l00040">40</a> of file <a class="el" href="guard__state_8hpp_source.html">guard_state.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="guard__state_8hpp_source.html#l00059">_state</a>, <a class="el" href="guard__state_8hpp_source.html#l00036">Owns()</a>, <a class="el" href="guard__state_8hpp_source.html#l00032">Ptr()</a>, and <a class="el" href="log_8hpp_source.html#l00084">YACLIB_DEBUG</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="guard_8hpp_source.html#l00035">yaclib::detail::Guard&lt; M, Shared &gt;::Lock()</a>, and <a class="el" href="guard_8hpp_source.html#l00044">yaclib::detail::Guard&lt; M, Shared &gt;::TryLock()</a>.</p>
+
+</div>
+</div>
+<a id="a395b03e20538664142951940f0af34af" name="a395b03e20538664142951940f0af34af"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a395b03e20538664142951940f0af34af">&#9670;&#160;</a></span>operator=()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classyaclib_1_1detail_1_1GuardState.html">GuardState</a> &amp; yaclib::detail::GuardState::operator= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classyaclib_1_1detail_1_1GuardState.html">GuardState</a> &amp;&amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="guard__state_8hpp_source.html#l00023">23</a> of file <a class="el" href="guard__state_8hpp_source.html">guard_state.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>, and <a class="el" href="guard__state_8hpp_source.html#l00028">Swap()</a>.</p>
+
+</div>
+</div>
+<a id="a7620fd3f04ae89bd45f8386035593f21" name="a7620fd3f04ae89bd45f8386035593f21"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7620fd3f04ae89bd45f8386035593f21">&#9670;&#160;</a></span>Owns()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classbool.html">bool</a> yaclib::detail::GuardState::Owns </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="guard__state_8hpp_source.html#l00036">36</a> of file <a class="el" href="guard__state_8hpp_source.html">guard_state.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="guard__state_8hpp_source.html#l00059">_state</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="guard__state_8hpp_source.html#l00040">LockState()</a>, <a class="el" href="guard_8hpp_source.html#l00092">yaclib::detail::Guard&lt; M, Shared &gt;::OwnsLock()</a>, and <a class="el" href="guard__state_8hpp_source.html#l00046">UnlockState()</a>.</p>
+
+</div>
+</div>
+<a id="aa4ee0239358614ac3170d1dbeb2c9367" name="aa4ee0239358614ac3170d1dbeb2c9367"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa4ee0239358614ac3170d1dbeb2c9367">&#9670;&#160;</a></span>Ptr()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a> * yaclib::detail::GuardState::Ptr </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="guard__state_8hpp_source.html#l00032">32</a> of file <a class="el" href="guard__state_8hpp_source.html">guard_state.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="guard__state_8hpp_source.html#l00059">_state</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="guard__state_8hpp_source.html#l00040">LockState()</a>, <a class="el" href="guard_8hpp_source.html#l00088">yaclib::detail::Guard&lt; M, Shared &gt;::Mutex()</a>, <a class="el" href="guard__state_8hpp_source.html#l00052">ReleaseState()</a>, and <a class="el" href="guard__state_8hpp_source.html#l00046">UnlockState()</a>.</p>
+
+</div>
+</div>
+<a id="a187fb48f1fd3d00b16128f865f68e9e9" name="a187fb48f1fd3d00b16128f865f68e9e9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a187fb48f1fd3d00b16128f865f68e9e9">&#9670;&#160;</a></span>ReleaseState()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a> * yaclib::detail::GuardState::ReleaseState </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="guard__state_8hpp_source.html#l00052">52</a> of file <a class="el" href="guard__state_8hpp_source.html">guard_state.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="guard__state_8hpp_source.html#l00059">_state</a>, <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>, and <a class="el" href="guard__state_8hpp_source.html#l00032">Ptr()</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="guard_8hpp_source.html#l00084">yaclib::detail::Guard&lt; M, Shared &gt;::Release()</a>.</p>
+
+</div>
+</div>
+<a id="a037cd79816e3d032c8bcbf7228a8326c" name="a037cd79816e3d032c8bcbf7228a8326c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a037cd79816e3d032c8bcbf7228a8326c">&#9670;&#160;</a></span>Swap()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a> yaclib::detail::GuardState::Swap </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classyaclib_1_1detail_1_1GuardState.html">GuardState</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="guard__state_8hpp_source.html#l00028">28</a> of file <a class="el" href="guard__state_8hpp_source.html">guard_state.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="guard__state_8hpp_source.html#l00059">_state</a>, and <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="guard__state_8hpp_source.html#l00023">operator=()</a>.</p>
+
+</div>
+</div>
+<a id="ab139aa24febbf300f831c1655244f055" name="ab139aa24febbf300f831c1655244f055"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab139aa24febbf300f831c1655244f055">&#9670;&#160;</a></span>UnlockState()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a> * yaclib::detail::GuardState::UnlockState </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="guard__state_8hpp_source.html#l00046">46</a> of file <a class="el" href="guard__state_8hpp_source.html">guard_state.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="guard__state_8hpp_source.html#l00059">_state</a>, <a class="el" href="guard__state_8hpp_source.html#l00036">Owns()</a>, <a class="el" href="guard__state_8hpp_source.html#l00032">Ptr()</a>, and <a class="el" href="log_8hpp_source.html#l00084">YACLIB_DEBUG</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="guard_8hpp_source.html#l00044">yaclib::detail::Guard&lt; M, Shared &gt;::TryLock()</a>, <a class="el" href="guard_8hpp_source.html#l00053">yaclib::detail::Guard&lt; M, Shared &gt;::Unlock()</a>, <a class="el" href="guard_8hpp_source.html#l00071">yaclib::detail::Guard&lt; M, Shared &gt;::UnlockHere()</a>, and <a class="el" href="guard_8hpp_source.html#l00062">yaclib::detail::Guard&lt; M, Shared &gt;::UnlockOn()</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Data Documentation</h2>
+<a id="a928a0f81134c2e533167677aa0a125e2" name="a928a0f81134c2e533167677aa0a125e2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a928a0f81134c2e533167677aa0a125e2">&#9670;&#160;</a></span>_state</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::uintptr_t yaclib::detail::GuardState::_state = 0</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="guard__state_8hpp_source.html#l00059">59</a> of file <a class="el" href="guard__state_8hpp_source.html">guard_state.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="guard__state_8hpp_source.html#l00040">LockState()</a>, <a class="el" href="guard__state_8hpp_source.html#l00036">Owns()</a>, <a class="el" href="guard__state_8hpp_source.html#l00032">Ptr()</a>, <a class="el" href="guard__state_8hpp_source.html#l00052">ReleaseState()</a>, <a class="el" href="guard_8hpp_source.html#l00080">yaclib::detail::Guard&lt; M, Shared &gt;::Swap()</a>, <a class="el" href="guard__state_8hpp_source.html#l00028">Swap()</a>, and <a class="el" href="guard__state_8hpp_source.html#l00046">UnlockState()</a>.</p>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following file:<ul>
+<li>include/yaclib/coro/detail/<a class="el" href="guard__state_8hpp_source.html">guard_state.hpp</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="namespaceyaclib.html">yaclib</a></li><li class="navelem"><a class="el" href="namespaceyaclib_1_1detail.html">detail</a></li><li class="navelem"><a class="el" href="classyaclib_1_1detail_1_1GuardState.html">GuardState</a></li>
+    <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+  </ul>
+</div>
+</body>
+</html>

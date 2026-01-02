@@ -1,0 +1,7 @@
+<map id="yaclib::detail::GuardAwaiter&lt; Guard, M, Shared &gt;" name="yaclib::detail::GuardAwaiter&lt; Guard, M, Shared &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,184,182,225"/>
+<area shape="rect" id="Node000002" href="$classyaclib_1_1detail_1_1LockAwaiter.html" title=" " alt="" coords="8,94,179,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="96,150,96,184,91,184,91,150"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="71,5,116,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="96,46,96,93,91,93,91,46"/>
+</map>

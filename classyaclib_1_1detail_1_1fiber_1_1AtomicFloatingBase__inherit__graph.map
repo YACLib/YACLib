@@ -1,0 +1,11 @@
+<map id="yaclib::detail::fiber::AtomicFloatingBase&lt; T, IsFloating &gt;" name="yaclib::detail::fiber::AtomicFloatingBase&lt; T, IsFloating &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,183,150,238"/>
+<area shape="rect" id="Node000004" href="$classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase.html" title=" " alt="" coords="7,286,148,342"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="80,254,80,286,75,286,75,254"/>
+<area shape="rect" id="Node000002" href="$classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html" title=" " alt="" coords="13,94,142,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="80,150,80,182,75,182,75,150"/>
+<area shape="rect" id="Node000003" href="$classyaclib_1_1detail_1_1fiber_1_1AtomicWait.html" title=" " alt="" coords="15,5,140,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="80,62,80,94,75,94,75,62"/>
+<area shape="rect" id="Node000005" href="$classyaclib_1_1detail_1_1fiber_1_1Atomic.html" title=" " alt="" coords="17,390,138,431"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="80,358,80,390,75,390,75,358"/>
+</map>

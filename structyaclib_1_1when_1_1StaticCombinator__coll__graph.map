@@ -1,0 +1,9 @@
+<map id="yaclib::when::StaticCombinator&lt; Strategy, Cores &gt;" name="yaclib::when::StaticCombinator&lt; Strategy, Cores &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="415,47,612,88"/>
+<area shape="rect" id="Node000002" href="$classyaclib_1_1IRef.html" title="Reference counting interface." alt="" coords="115,5,199,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="215,22,391,45,414,48,414,54,390,50,214,27"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="122,55,192,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="207,65,414,65,414,70,207,70"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="5,104,309,205"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="323,111,426,86,427,91,324,116"/>
+</map>

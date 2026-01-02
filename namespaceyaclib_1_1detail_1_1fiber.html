@@ -1,0 +1,1973 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.9.8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<!-- BEGIN opengraph metadata -->
+<meta property="og:title" content="Doxygen Awesome" />
+<meta property="og:image" content="https://repository-images.githubusercontent.com/348492097/4f16df80-88fb-11eb-9d31-4015ff22c452" />
+<meta property="og:description" content="Custom CSS theme for doxygen html-documentation with lots of customization parameters." />
+<meta property="og:url" content="https://jothepro.github.io/doxygen-awesome-css/" />
+<!-- END opengraph metadata -->
+<!-- BEGIN twitter metadata -->
+<meta name="twitter:image:src" content="https://repository-images.githubusercontent.com/348492097/4f16df80-88fb-11eb-9d31-4015ff22c452" />
+<meta name="twitter:title" content="Doxygen Awesome" />
+<meta name="twitter:description" content="Custom CSS theme for doxygen html-documentation with lots of customization parameters." />
+<!-- END twitter metadata -->
+<title>YACLib: yaclib::detail::fiber Namespace Reference</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link rel="icon" type="image/svg+xml" href="logo.drawio.svg"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+<script type="text/javascript" src="doxygen-awesome-fragment-copy-button.js"></script>
+<script type="text/javascript" src="doxygen-awesome-paragraph-link.js"></script>
+<script type="text/javascript" src="toggle-alternative-theme.js"></script>
+<script type="text/javascript">
+    DoxygenAwesomeFragmentCopyButton.init()
+    DoxygenAwesomeDarkModeToggle.init()
+    DoxygenAwesomeParagraphLink.init()
+</script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="custom.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only-darkmode-toggle.css" rel="stylesheet" type="text/css"/>
+<link href="custom-alternative.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<!-- https://tholman.com/github-corners/ -->
+<a href="https://github.com/YACLib/YACLib" class="github-corner" title="View source on GitHub" target="_blank">
+    <svg viewBox="0 0 250 250" width="40" height="40" style="position: absolute; top: 0; border: 0; right: 0; z-index: 99;" aria-hidden="true">
+    <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
+   <div id="projectname">YACLib
+   </div>
+   <div id="projectbrief">C++ library for concurrent tasks execution</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Search');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('namespaceyaclib_1_1detail_1_1fiber.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#nested-classes">Classes</a> &#124;
+<a href="#typedef-members">Typedefs</a> &#124;
+<a href="#enum-members">Enumerations</a> &#124;
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
+  <div class="headertitle"><div class="title">yaclib::detail::fiber Namespace Reference</div></div>
+</div><!--header-->
+<div class="contents">
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structyaclib_1_1detail_1_1fiber_1_1Allocation.html">Allocation</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1Atomic.html">Atomic</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1Atomic_3_01U_01_5_01_4.html">Atomic&lt; U * &gt;</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html">AtomicBase</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicFlag.html">AtomicFlag</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicFloatingBase.html">AtomicFloatingBase</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicFloatingBase_3_01T_00_01true_01_4.html">AtomicFloatingBase&lt; T, true &gt;</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase.html">AtomicIntegralBase</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicIntegralBase_3_01T_00_01true_01_4.html">AtomicIntegralBase&lt; T, true &gt;</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1AtomicWait.html">AtomicWait</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1BiList.html">BiList</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1BiNodeScheduler.html">BiNodeScheduler</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1BiNodeWaitQueue.html">BiNodeWaitQueue</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ConditionVariable.html">ConditionVariable</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1DefaultAllocator.html">DefaultAllocator</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocator used by default.  <a href="classyaclib_1_1detail_1_1fiber_1_1DefaultAllocator.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ExecutionContext.html">ExecutionContext</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1Fiber.html">Fiber</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html">FiberBase</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1FiberQueue.html">FiberQueue</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1IStackAllocator.html">IStackAllocator</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Passed to coroutine/fiber constructor, specifies the way in which memory for <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1Stack.html" title="Manages stack memory.">Stack</a> is Allocated and Released.  <a href="classyaclib_1_1detail_1_1fiber_1_1IStackAllocator.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1Mutex.html">Mutex</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structyaclib_1_1detail_1_1fiber_1_1Node.html">Node</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structyaclib_1_1detail_1_1fiber_1_1NoTimeoutTag.html">NoTimeoutTag</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1RecursiveMutex.html">RecursiveMutex</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1RecursiveTimedMutex.html">RecursiveTimedMutex</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1SharedMutex.html">SharedMutex</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1SharedTimedMutex.html">SharedTimedMutex</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1Stack.html">Stack</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Manages stack memory.  <a href="classyaclib_1_1detail_1_1fiber_1_1Stack.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structyaclib_1_1detail_1_1fiber_1_1SystemClock.html">SystemClock</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1Thread.html">Thread</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1TimedMutex.html">TimedMutex</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
+Typedefs</h2></td></tr>
+<tr class="memitem:a799c29ee5e4ef68bfb549ee53eeb9af0" id="r_a799c29ee5e4ef68bfb549ee53eeb9af0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">using</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#a799c29ee5e4ef68bfb549ee53eeb9af0">Trampoline</a> = <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a>(*)(<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a> *<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">arg</a>)</td></tr>
+<tr class="separator:a799c29ee5e4ef68bfb549ee53eeb9af0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9529ed5a346dcf7542aa6a3e4fecb8fc" id="r_a9529ed5a346dcf7542aa6a3e4fecb8fc"><td class="memTemplParams" colspan="2">template&lt;typename... Args&gt; </td></tr>
+<tr class="memitem:a9529ed5a346dcf7542aa6a3e4fecb8fc"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">using</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#a9529ed5a346dcf7542aa6a3e4fecb8fc">FuncState</a> = std::tuple&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> std::decay_t&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Args</a> &gt;... &gt;</td></tr>
+<tr class="separator:a9529ed5a346dcf7542aa6a3e4fecb8fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="enum-members" name="enum-members"></a>
+Enumerations</h2></td></tr>
+<tr class="memitem:ae6e287bc27ddbada3d6cc7c200dd5c40" id="r_ae6e287bc27ddbada3d6cc7c200dd5c40"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#ae6e287bc27ddbada3d6cc7c200dd5c40">FiberState</a> { <a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#ae6e287bc27ddbada3d6cc7c200dd5c40ae3b248a55f97fea195a0b9dc4ed67c2a">Running</a>
+, <a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#ae6e287bc27ddbada3d6cc7c200dd5c40ad7e3c81a824855a901f8b374e385daf0">Suspended</a>
+, <a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#ae6e287bc27ddbada3d6cc7c200dd5c40aa4ce7f35837e6a332530308853bd5f75">Waiting</a>
+, <a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#ae6e287bc27ddbada3d6cc7c200dd5c40a355e71f6e8c3ed2a17a59a90f8ae7d96">Completed</a>
+ }</td></tr>
+<tr class="separator:ae6e287bc27ddbada3d6cc7c200dd5c40"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:adcf6a8d09c021b982928103bf583b1e0" id="r_adcf6a8d09c021b982928103bf583b1e0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#adcf6a8d09c021b982928103bf583b1e0">SetRandomListPick</a> (std::uint32_t <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">k</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:adcf6a8d09c021b982928103bf583b1e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a29642407868c3e4806d969387dfae8a1" id="r_a29642407868c3e4806d969387dfae8a1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structyaclib_1_1detail_1_1fiber_1_1Node.html">Node</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#a29642407868c3e4806d969387dfae8a1">PollRandomElementFromList</a> (<a class="el" href="classyaclib_1_1detail_1_1fiber_1_1BiList.html">BiList</a> &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">list</a>)</td></tr>
+<tr class="separator:a29642407868c3e4806d969387dfae8a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a91ead14481f2dd15256c9f3e5ea8cf10" id="r_a91ead14481f2dd15256c9f3e5ea8cf10"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#a91ead14481f2dd15256c9f3e5ea8cf10">GetImpl</a> (std::uint64_t <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">i</a>)</td></tr>
+<tr class="separator:a91ead14481f2dd15256c9f3e5ea8cf10"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad9b577e7d5c2ca315841b5fe9d7f53c8" id="r_ad9b577e7d5c2ca315841b5fe9d7f53c8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#ad9b577e7d5c2ca315841b5fe9d7f53c8">Set</a> (<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a> *<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">new_value</a>, std::uint64_t <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">i</a>)</td></tr>
+<tr class="separator:ad9b577e7d5c2ca315841b5fe9d7f53c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3fa803b5e6e2618d82e1f0204a984e54" id="r_a3fa803b5e6e2618d82e1f0204a984e54"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#a3fa803b5e6e2618d82e1f0204a984e54">SetDefault</a> (<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a> *<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">new_value</a>, std::uint64_t <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">i</a>)</td></tr>
+<tr class="separator:a3fa803b5e6e2618d82e1f0204a984e54"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aac27f137e24a76c68aca09b35c42b00d" id="r_aac27f137e24a76c68aca09b35c42b00d"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </td></tr>
+<tr class="memitem:aac27f137e24a76c68aca09b35c42b00d"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#aac27f137e24a76c68aca09b35c42b00d">operator==</a> (<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">lhs</a>, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">rhs</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:aac27f137e24a76c68aca09b35c42b00d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afbc5103a9eed8143d70a0229fc0d12e1" id="r_afbc5103a9eed8143d70a0229fc0d12e1"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </td></tr>
+<tr class="memitem:afbc5103a9eed8143d70a0229fc0d12e1"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#afbc5103a9eed8143d70a0229fc0d12e1">operator!=</a> (<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">lhs</a>, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">rhs</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:afbc5103a9eed8143d70a0229fc0d12e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae56d78d6aefe5ef268badf1f2578455d" id="r_ae56d78d6aefe5ef268badf1f2578455d"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </td></tr>
+<tr class="memitem:ae56d78d6aefe5ef268badf1f2578455d"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#ae56d78d6aefe5ef268badf1f2578455d">operator==</a> (<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">lhs</a>, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> *<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">rhs</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:ae56d78d6aefe5ef268badf1f2578455d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a360544e93f7f5e810b17bf98c0fa6f99" id="r_a360544e93f7f5e810b17bf98c0fa6f99"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </td></tr>
+<tr class="memitem:a360544e93f7f5e810b17bf98c0fa6f99"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#a360544e93f7f5e810b17bf98c0fa6f99">operator!=</a> (<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">lhs</a>, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> *<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">rhs</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a360544e93f7f5e810b17bf98c0fa6f99"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae84e9aceb3737a922f453dacb61b7254" id="r_ae84e9aceb3737a922f453dacb61b7254"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </td></tr>
+<tr class="memitem:ae84e9aceb3737a922f453dacb61b7254"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#ae84e9aceb3737a922f453dacb61b7254">operator==</a> (T *<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">lhs</a>, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">rhs</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:ae84e9aceb3737a922f453dacb61b7254"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a42602807b9489c90de288c4e6f255d8e" id="r_a42602807b9489c90de288c4e6f255d8e"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </td></tr>
+<tr class="memitem:a42602807b9489c90de288c4e6f255d8e"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#a42602807b9489c90de288c4e6f255d8e">operator!=</a> (T *<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">lhs</a>, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">rhs</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a42602807b9489c90de288c4e6f255d8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0d7c505d3d9c7a4c0c809a6bcbce4110" id="r_a0d7c505d3d9c7a4c0c809a6bcbce4110"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </td></tr>
+<tr class="memitem:a0d7c505d3d9c7a4c0c809a6bcbce4110"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#a0d7c505d3d9c7a4c0c809a6bcbce4110">operator==</a> (<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">lhs</a>, std::nullptr_t) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a0d7c505d3d9c7a4c0c809a6bcbce4110"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6c04b8111ace4b58bb7659fb5e67fd6c" id="r_a6c04b8111ace4b58bb7659fb5e67fd6c"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </td></tr>
+<tr class="memitem:a6c04b8111ace4b58bb7659fb5e67fd6c"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#a6c04b8111ace4b58bb7659fb5e67fd6c">operator==</a> (std::nullptr_t, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">rhs</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a6c04b8111ace4b58bb7659fb5e67fd6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a65ea573221eaea6ed9320b8f3b00edad" id="r_a65ea573221eaea6ed9320b8f3b00edad"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </td></tr>
+<tr class="memitem:a65ea573221eaea6ed9320b8f3b00edad"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#a65ea573221eaea6ed9320b8f3b00edad">operator!=</a> (<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">lhs</a>, std::nullptr_t) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a65ea573221eaea6ed9320b8f3b00edad"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a39afe6097bb98ea8acbe8bf88f1e1beb" id="r_a39afe6097bb98ea8acbe8bf88f1e1beb"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </td></tr>
+<tr class="memitem:a39afe6097bb98ea8acbe8bf88f1e1beb"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#a39afe6097bb98ea8acbe8bf88f1e1beb">operator!=</a> (std::nullptr_t, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">rhs</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a39afe6097bb98ea8acbe8bf88f1e1beb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a196050039fe3a575250a6f3fc0be76c1" id="r_a196050039fe3a575250a6f3fc0be76c1"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </td></tr>
+<tr class="memitem:a196050039fe3a575250a6f3fc0be76c1"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#a196050039fe3a575250a6f3fc0be76c1">operator&lt;</a> (<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">lhs</a>, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">rhs</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a196050039fe3a575250a6f3fc0be76c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9cf2ac388b4266e1127d1c340b0623a1" id="r_a9cf2ac388b4266e1127d1c340b0623a1"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </td></tr>
+<tr class="memitem:a9cf2ac388b4266e1127d1c340b0623a1"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#a9cf2ac388b4266e1127d1c340b0623a1">operator&gt;</a> (<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">lhs</a>, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">rhs</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a9cf2ac388b4266e1127d1c340b0623a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aede6ccb367eb607867bacbcc7863d638" id="r_aede6ccb367eb607867bacbcc7863d638"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </td></tr>
+<tr class="memitem:aede6ccb367eb607867bacbcc7863d638"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#aede6ccb367eb607867bacbcc7863d638">operator&lt;</a> (<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">lhs</a>, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> *<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">rhs</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:aede6ccb367eb607867bacbcc7863d638"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a866883e4f53edbb21f4bbd89e5515e04" id="r_a866883e4f53edbb21f4bbd89e5515e04"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </td></tr>
+<tr class="memitem:a866883e4f53edbb21f4bbd89e5515e04"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#a866883e4f53edbb21f4bbd89e5515e04">operator&lt;</a> (T *<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">lhs</a>, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">rhs</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a866883e4f53edbb21f4bbd89e5515e04"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1f197fafaa3b7b7a40bc9453f72f9763" id="r_a1f197fafaa3b7b7a40bc9453f72f9763"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </td></tr>
+<tr class="memitem:a1f197fafaa3b7b7a40bc9453f72f9763"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#a1f197fafaa3b7b7a40bc9453f72f9763">operator&gt;</a> (<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">lhs</a>, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> *<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">rhs</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a1f197fafaa3b7b7a40bc9453f72f9763"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a610cb5e471cd583297b86c8ff8b254dc" id="r_a610cb5e471cd583297b86c8ff8b254dc"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </td></tr>
+<tr class="memitem:a610cb5e471cd583297b86c8ff8b254dc"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#a610cb5e471cd583297b86c8ff8b254dc">operator&gt;</a> (T *<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">lhs</a>, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">rhs</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a610cb5e471cd583297b86c8ff8b254dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0d444944da0059e0d8ec46f087945bfc" id="r_a0d444944da0059e0d8ec46f087945bfc"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </td></tr>
+<tr class="memitem:a0d444944da0059e0d8ec46f087945bfc"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#a0d444944da0059e0d8ec46f087945bfc">operator&lt;</a> (<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">lhs</a>, std::nullptr_t) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a0d444944da0059e0d8ec46f087945bfc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab0684c211436da30ff4f479df684fb93" id="r_ab0684c211436da30ff4f479df684fb93"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </td></tr>
+<tr class="memitem:ab0684c211436da30ff4f479df684fb93"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#ab0684c211436da30ff4f479df684fb93">operator&lt;</a> (std::nullptr_t, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">rhs</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:ab0684c211436da30ff4f479df684fb93"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2ed01dba6b201ab3e0d30a54709c0149" id="r_a2ed01dba6b201ab3e0d30a54709c0149"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </td></tr>
+<tr class="memitem:a2ed01dba6b201ab3e0d30a54709c0149"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#a2ed01dba6b201ab3e0d30a54709c0149">operator&gt;</a> (<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">lhs</a>, std::nullptr_t) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a2ed01dba6b201ab3e0d30a54709c0149"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aac6dacf817a0ebbe24c9d427bc7dd619" id="r_aac6dacf817a0ebbe24c9d427bc7dd619"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </td></tr>
+<tr class="memitem:aac6dacf817a0ebbe24c9d427bc7dd619"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#aac6dacf817a0ebbe24c9d427bc7dd619">operator&gt;</a> (std::nullptr_t, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">rhs</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:aac6dacf817a0ebbe24c9d427bc7dd619"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4731263bf5e096b92ea5a8b45db06345" id="r_a4731263bf5e096b92ea5a8b45db06345"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </td></tr>
+<tr class="memitem:a4731263bf5e096b92ea5a8b45db06345"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#a4731263bf5e096b92ea5a8b45db06345">operator&gt;=</a> (<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">lhs</a>, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">rhs</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a4731263bf5e096b92ea5a8b45db06345"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aadbee59b089636754579a871dbb0a679" id="r_aadbee59b089636754579a871dbb0a679"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </td></tr>
+<tr class="memitem:aadbee59b089636754579a871dbb0a679"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#aadbee59b089636754579a871dbb0a679">operator&lt;=</a> (<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">lhs</a>, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">rhs</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:aadbee59b089636754579a871dbb0a679"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a63d6695e39ade39e0d97182631551321" id="r_a63d6695e39ade39e0d97182631551321"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </td></tr>
+<tr class="memitem:a63d6695e39ade39e0d97182631551321"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#a63d6695e39ade39e0d97182631551321">operator&lt;=</a> (<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">lhs</a>, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> *<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">rhs</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a63d6695e39ade39e0d97182631551321"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afdafd15a43818cfb95ca5727d93e7113" id="r_afdafd15a43818cfb95ca5727d93e7113"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </td></tr>
+<tr class="memitem:afdafd15a43818cfb95ca5727d93e7113"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#afdafd15a43818cfb95ca5727d93e7113">operator&lt;=</a> (T *<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">lhs</a>, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">rhs</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:afdafd15a43818cfb95ca5727d93e7113"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a80e4a56484ef1d704054f9b9f0fd952d" id="r_a80e4a56484ef1d704054f9b9f0fd952d"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </td></tr>
+<tr class="memitem:a80e4a56484ef1d704054f9b9f0fd952d"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#a80e4a56484ef1d704054f9b9f0fd952d">operator&gt;=</a> (<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">lhs</a>, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> *<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">rhs</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a80e4a56484ef1d704054f9b9f0fd952d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8dca4b672fea55455bbb41d2623db2a8" id="r_a8dca4b672fea55455bbb41d2623db2a8"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </td></tr>
+<tr class="memitem:a8dca4b672fea55455bbb41d2623db2a8"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#a8dca4b672fea55455bbb41d2623db2a8">operator&gt;=</a> (T *<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">lhs</a>, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">rhs</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a8dca4b672fea55455bbb41d2623db2a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3a820f6d3e3f78a2c0934925e35dcccb" id="r_a3a820f6d3e3f78a2c0934925e35dcccb"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </td></tr>
+<tr class="memitem:a3a820f6d3e3f78a2c0934925e35dcccb"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#a3a820f6d3e3f78a2c0934925e35dcccb">operator&lt;=</a> (<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">lhs</a>, std::nullptr_t) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a3a820f6d3e3f78a2c0934925e35dcccb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2dd76da3b4a2776b3e916272642a1422" id="r_a2dd76da3b4a2776b3e916272642a1422"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </td></tr>
+<tr class="memitem:a2dd76da3b4a2776b3e916272642a1422"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#a2dd76da3b4a2776b3e916272642a1422">operator&lt;=</a> (std::nullptr_t, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">rhs</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a2dd76da3b4a2776b3e916272642a1422"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4a1f19cbae11ebec4e70b3bb5a8d2684" id="r_a4a1f19cbae11ebec4e70b3bb5a8d2684"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </td></tr>
+<tr class="memitem:a4a1f19cbae11ebec4e70b3bb5a8d2684"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#a4a1f19cbae11ebec4e70b3bb5a8d2684">operator&gt;=</a> (<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">lhs</a>, std::nullptr_t) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a4a1f19cbae11ebec4e70b3bb5a8d2684"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af49c0d991179ee3122207f4a98e1f909" id="r_af49c0d991179ee3122207f4a98e1f909"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </td></tr>
+<tr class="memitem:af49c0d991179ee3122207f4a98e1f909"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#af49c0d991179ee3122207f4a98e1f909">operator&gt;=</a> (std::nullptr_t, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">rhs</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:af49c0d991179ee3122207f4a98e1f909"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7d7fb7579965bae7b1c57ce160d3d7b8" id="r_a7d7fb7579965bae7b1c57ce160d3d7b8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#a7d7fb7579965bae7b1c57ce160d3d7b8">ScheduleFiber</a> (<a class="el" href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html">FiberBase</a> *fiber)</td></tr>
+<tr class="separator:a7d7fb7579965bae7b1c57ce160d3d7b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a28d31f2d9e3222b8d61fa108cad482e3" id="r_a28d31f2d9e3222b8d61fa108cad482e3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">static</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">auto</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#a28d31f2d9e3222b8d61fa108cad482e3">GetMap</a> ()</td></tr>
+<tr class="separator:a28d31f2d9e3222b8d61fa108cad482e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:af95f0dfdb9e1fcc2cabbce3bca2367c4" id="r_af95f0dfdb9e1fcc2cabbce3bca2367c4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">static</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#a67e01d76c3f59bfdf3054d6bea063561">FiberBase::Id</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#af95f0dfdb9e1fcc2cabbce3bca2367c4">sNextId</a> = 1</td></tr>
+<tr class="separator:af95f0dfdb9e1fcc2cabbce3bca2367c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5e804cee1e9b044807900fe32e8c3069" id="r_a5e804cee1e9b044807900fe32e8c3069"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">static</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1DefaultAllocator.html">DefaultAllocator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#a5e804cee1e9b044807900fe32e8c3069">sAllocator</a></td></tr>
+<tr class="separator:a5e804cee1e9b044807900fe32e8c3069"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac8d93d7401c15c58411ae352f81504ec" id="r_ac8d93d7401c15c58411ae352f81504ec"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">static</a> std::uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#ac8d93d7401c15c58411ae352f81504ec">sRandomListPick</a> = 10</td></tr>
+<tr class="separator:ac8d93d7401c15c58411ae352f81504ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4fa3c32cae14118547314e830e0a98e0" id="r_a4fa3c32cae14118547314e830e0a98e0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">static</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">unsigned</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#a4fa3c32cae14118547314e830e0a98e0">gHardwareConcurrency</a> {0}</td></tr>
+<tr class="separator:a4fa3c32cae14118547314e830e0a98e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<h2 class="groupheader">Typedef Documentation</h2>
+<a id="a9529ed5a346dcf7542aa6a3e4fecb8fc" name="a9529ed5a346dcf7542aa6a3e4fecb8fc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9529ed5a346dcf7542aa6a3e4fecb8fc">&#9670;&#160;</a></span>FuncState</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename... Args&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">using</a> <a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#a9529ed5a346dcf7542aa6a3e4fecb8fc">yaclib::detail::fiber::FuncState</a> = <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typedef</a> std::tuple&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> std::decay_t&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Args</a>&gt;...&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="fiber_8hpp_source.html#l00010">10</a> of file <a class="el" href="fiber_8hpp_source.html">fiber.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a799c29ee5e4ef68bfb549ee53eeb9af0" name="a799c29ee5e4ef68bfb549ee53eeb9af0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a799c29ee5e4ef68bfb549ee53eeb9af0">&#9670;&#160;</a></span>Trampoline</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">using</a> <a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#a799c29ee5e4ef68bfb549ee53eeb9af0">yaclib::detail::fiber::Trampoline</a> = <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typedef</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a> (*)(<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a>* <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">arg</a>)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="execution__context_8hpp_source.html#l00014">14</a> of file <a class="el" href="execution__context_8hpp_source.html">execution_context.hpp</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Enumeration Type Documentation</h2>
+<a id="ae6e287bc27ddbada3d6cc7c200dd5c40" name="ae6e287bc27ddbada3d6cc7c200dd5c40"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae6e287bc27ddbada3d6cc7c200dd5c40">&#9670;&#160;</a></span>FiberState</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">enum</a> <a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html#ae6e287bc27ddbada3d6cc7c200dd5c40">yaclib::detail::fiber::FiberState</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ae6e287bc27ddbada3d6cc7c200dd5c40ae3b248a55f97fea195a0b9dc4ed67c2a" name="ae6e287bc27ddbada3d6cc7c200dd5c40ae3b248a55f97fea195a0b9dc4ed67c2a"></a>Running&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ae6e287bc27ddbada3d6cc7c200dd5c40ad7e3c81a824855a901f8b374e385daf0" name="ae6e287bc27ddbada3d6cc7c200dd5c40ad7e3c81a824855a901f8b374e385daf0"></a>Suspended&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ae6e287bc27ddbada3d6cc7c200dd5c40aa4ce7f35837e6a332530308853bd5f75" name="ae6e287bc27ddbada3d6cc7c200dd5c40aa4ce7f35837e6a332530308853bd5f75"></a>Waiting&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ae6e287bc27ddbada3d6cc7c200dd5c40a355e71f6e8c3ed2a17a59a90f8ae7d96" name="ae6e287bc27ddbada3d6cc7c200dd5c40a355e71f6e8c3ed2a17a59a90f8ae7d96"></a>Completed&#160;</td><td class="fielddoc"></td></tr>
+</table>
+
+<p class="definition">Definition at line <a class="el" href="fiber__base_8hpp_source.html#l00020">20</a> of file <a class="el" href="fiber__base_8hpp_source.html">fiber_base.hpp</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="a91ead14481f2dd15256c9f3e5ea8cf10" name="a91ead14481f2dd15256c9f3e5ea8cf10"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a91ead14481f2dd15256c9f3e5ea8cf10">&#9670;&#160;</a></span>GetImpl()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a> * yaclib::detail::fiber::GetImpl </td>
+          <td>(</td>
+          <td class="paramtype">std::uint64_t&#160;</td>
+          <td class="paramname"><em>i</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="thread__local__proxy_8cpp_source.html#l00014">14</a> of file <a class="el" href="thread__local__proxy_8cpp_source.html">thread_local_proxy.cpp</a>.</p>
+
+<p class="reference">References <a class="el" href="scheduler_8cpp_source.html#l00048">yaclib::fault::Scheduler::Current()</a>, <a class="el" href="thread__local__proxy_8cpp_source.html#l00009">GetMap()</a>, <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>, and <a class="el" href="log_8hpp_source.html#l00085">YACLIB_ASSERT</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="thread__local__proxy_8hpp_source.html#l00074">yaclib::detail::fiber::ThreadLocalPtrProxy&lt; Type &gt;::Get()</a>, <a class="el" href="thread__local__proxy_8hpp_source.html#l00038">yaclib::detail::fiber::ThreadLocalPtrProxy&lt; Type &gt;::operator=()</a>, <a class="el" href="thread__local__proxy_8hpp_source.html#l00060">yaclib::detail::fiber::ThreadLocalPtrProxy&lt; Type &gt;::operator=()</a>, <a class="el" href="thread__local__proxy_8hpp_source.html#l00026">yaclib::detail::fiber::ThreadLocalPtrProxy&lt; Type &gt;::ThreadLocalPtrProxy()</a>, and <a class="el" href="thread__local__proxy_8hpp_source.html#l00050">yaclib::detail::fiber::ThreadLocalPtrProxy&lt; Type &gt;::ThreadLocalPtrProxy()</a>.</p>
+
+</div>
+</div>
+<a id="a28d31f2d9e3222b8d61fa108cad482e3" name="a28d31f2d9e3222b8d61fa108cad482e3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a28d31f2d9e3222b8d61fa108cad482e3">&#9670;&#160;</a></span>GetMap()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">static</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">auto</a> &amp; yaclib::detail::fiber::GetMap </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="thread__local__proxy_8cpp_source.html#l00009">9</a> of file <a class="el" href="thread__local__proxy_8cpp_source.html">thread_local_proxy.cpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="thread__local__proxy_8cpp_source.html#l00014">GetImpl()</a>, and <a class="el" href="thread__local__proxy_8cpp_source.html#l00026">SetDefault()</a>.</p>
+
+</div>
+</div>
+<a id="afbc5103a9eed8143d70a0229fc0d12e1" name="afbc5103a9eed8143d70a0229fc0d12e1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afbc5103a9eed8143d70a0229fc0d12e1">&#9670;&#160;</a></span>operator!=() <span class="overload">[1/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classbool.html">bool</a> yaclib::detail::fiber::operator!= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>lhs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>rhs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="thread__local__proxy_8hpp_source.html#l00098">98</a> of file <a class="el" href="thread__local__proxy_8hpp_source.html">thread_local_proxy.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="a65ea573221eaea6ed9320b8f3b00edad" name="a65ea573221eaea6ed9320b8f3b00edad"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a65ea573221eaea6ed9320b8f3b00edad">&#9670;&#160;</a></span>operator!=() <span class="overload">[2/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classbool.html">bool</a> yaclib::detail::fiber::operator!= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>lhs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::nullptr_t&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="thread__local__proxy_8hpp_source.html#l00133">133</a> of file <a class="el" href="thread__local__proxy_8hpp_source.html">thread_local_proxy.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="a360544e93f7f5e810b17bf98c0fa6f99" name="a360544e93f7f5e810b17bf98c0fa6f99"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a360544e93f7f5e810b17bf98c0fa6f99">&#9670;&#160;</a></span>operator!=() <span class="overload">[3/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classbool.html">bool</a> yaclib::detail::fiber::operator!= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>lhs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> *&#160;</td>
+          <td class="paramname"><em>rhs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="thread__local__proxy_8hpp_source.html#l00108">108</a> of file <a class="el" href="thread__local__proxy_8hpp_source.html">thread_local_proxy.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="a39afe6097bb98ea8acbe8bf88f1e1beb" name="a39afe6097bb98ea8acbe8bf88f1e1beb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a39afe6097bb98ea8acbe8bf88f1e1beb">&#9670;&#160;</a></span>operator!=() <span class="overload">[4/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classbool.html">bool</a> yaclib::detail::fiber::operator!= </td>
+          <td>(</td>
+          <td class="paramtype">std::nullptr_t&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>rhs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="thread__local__proxy_8hpp_source.html#l00138">138</a> of file <a class="el" href="thread__local__proxy_8hpp_source.html">thread_local_proxy.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="a42602807b9489c90de288c4e6f255d8e" name="a42602807b9489c90de288c4e6f255d8e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a42602807b9489c90de288c4e6f255d8e">&#9670;&#160;</a></span>operator!=() <span class="overload">[5/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classbool.html">bool</a> yaclib::detail::fiber::operator!= </td>
+          <td>(</td>
+          <td class="paramtype">T *&#160;</td>
+          <td class="paramname"><em>lhs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>rhs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="thread__local__proxy_8hpp_source.html#l00118">118</a> of file <a class="el" href="thread__local__proxy_8hpp_source.html">thread_local_proxy.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="a196050039fe3a575250a6f3fc0be76c1" name="a196050039fe3a575250a6f3fc0be76c1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a196050039fe3a575250a6f3fc0be76c1">&#9670;&#160;</a></span>operator&lt;() <span class="overload">[1/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classbool.html">bool</a> yaclib::detail::fiber::operator&lt; </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>lhs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>rhs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="thread__local__proxy_8hpp_source.html#l00143">143</a> of file <a class="el" href="thread__local__proxy_8hpp_source.html">thread_local_proxy.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="aede6ccb367eb607867bacbcc7863d638" name="aede6ccb367eb607867bacbcc7863d638"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aede6ccb367eb607867bacbcc7863d638">&#9670;&#160;</a></span>operator&lt;() <span class="overload">[2/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classbool.html">bool</a> yaclib::detail::fiber::operator&lt; </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>lhs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> *&#160;</td>
+          <td class="paramname"><em>rhs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="thread__local__proxy_8hpp_source.html#l00153">153</a> of file <a class="el" href="thread__local__proxy_8hpp_source.html">thread_local_proxy.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="a0d444944da0059e0d8ec46f087945bfc" name="a0d444944da0059e0d8ec46f087945bfc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0d444944da0059e0d8ec46f087945bfc">&#9670;&#160;</a></span>operator&lt;() <span class="overload">[3/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classbool.html">bool</a> yaclib::detail::fiber::operator&lt; </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>lhs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::nullptr_t&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="thread__local__proxy_8hpp_source.html#l00173">173</a> of file <a class="el" href="thread__local__proxy_8hpp_source.html">thread_local_proxy.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="ab0684c211436da30ff4f479df684fb93" name="ab0684c211436da30ff4f479df684fb93"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab0684c211436da30ff4f479df684fb93">&#9670;&#160;</a></span>operator&lt;() <span class="overload">[4/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classbool.html">bool</a> yaclib::detail::fiber::operator&lt; </td>
+          <td>(</td>
+          <td class="paramtype">std::nullptr_t&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>rhs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="thread__local__proxy_8hpp_source.html#l00178">178</a> of file <a class="el" href="thread__local__proxy_8hpp_source.html">thread_local_proxy.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="a866883e4f53edbb21f4bbd89e5515e04" name="a866883e4f53edbb21f4bbd89e5515e04"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a866883e4f53edbb21f4bbd89e5515e04">&#9670;&#160;</a></span>operator&lt;() <span class="overload">[5/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classbool.html">bool</a> yaclib::detail::fiber::operator&lt; </td>
+          <td>(</td>
+          <td class="paramtype">T *&#160;</td>
+          <td class="paramname"><em>lhs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>rhs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="thread__local__proxy_8hpp_source.html#l00158">158</a> of file <a class="el" href="thread__local__proxy_8hpp_source.html">thread_local_proxy.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="aadbee59b089636754579a871dbb0a679" name="aadbee59b089636754579a871dbb0a679"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aadbee59b089636754579a871dbb0a679">&#9670;&#160;</a></span>operator&lt;=() <span class="overload">[1/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classbool.html">bool</a> yaclib::detail::fiber::operator&lt;= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>lhs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>rhs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="thread__local__proxy_8hpp_source.html#l00198">198</a> of file <a class="el" href="thread__local__proxy_8hpp_source.html">thread_local_proxy.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="a63d6695e39ade39e0d97182631551321" name="a63d6695e39ade39e0d97182631551321"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a63d6695e39ade39e0d97182631551321">&#9670;&#160;</a></span>operator&lt;=() <span class="overload">[2/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classbool.html">bool</a> yaclib::detail::fiber::operator&lt;= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>lhs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> *&#160;</td>
+          <td class="paramname"><em>rhs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="thread__local__proxy_8hpp_source.html#l00203">203</a> of file <a class="el" href="thread__local__proxy_8hpp_source.html">thread_local_proxy.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="a3a820f6d3e3f78a2c0934925e35dcccb" name="a3a820f6d3e3f78a2c0934925e35dcccb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3a820f6d3e3f78a2c0934925e35dcccb">&#9670;&#160;</a></span>operator&lt;=() <span class="overload">[3/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classbool.html">bool</a> yaclib::detail::fiber::operator&lt;= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>lhs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::nullptr_t&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="thread__local__proxy_8hpp_source.html#l00223">223</a> of file <a class="el" href="thread__local__proxy_8hpp_source.html">thread_local_proxy.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="a2dd76da3b4a2776b3e916272642a1422" name="a2dd76da3b4a2776b3e916272642a1422"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2dd76da3b4a2776b3e916272642a1422">&#9670;&#160;</a></span>operator&lt;=() <span class="overload">[4/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classbool.html">bool</a> yaclib::detail::fiber::operator&lt;= </td>
+          <td>(</td>
+          <td class="paramtype">std::nullptr_t&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>rhs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="thread__local__proxy_8hpp_source.html#l00228">228</a> of file <a class="el" href="thread__local__proxy_8hpp_source.html">thread_local_proxy.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="afdafd15a43818cfb95ca5727d93e7113" name="afdafd15a43818cfb95ca5727d93e7113"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afdafd15a43818cfb95ca5727d93e7113">&#9670;&#160;</a></span>operator&lt;=() <span class="overload">[5/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classbool.html">bool</a> yaclib::detail::fiber::operator&lt;= </td>
+          <td>(</td>
+          <td class="paramtype">T *&#160;</td>
+          <td class="paramname"><em>lhs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>rhs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="thread__local__proxy_8hpp_source.html#l00208">208</a> of file <a class="el" href="thread__local__proxy_8hpp_source.html">thread_local_proxy.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="aac27f137e24a76c68aca09b35c42b00d" name="aac27f137e24a76c68aca09b35c42b00d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aac27f137e24a76c68aca09b35c42b00d">&#9670;&#160;</a></span>operator==() <span class="overload">[1/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classbool.html">bool</a> yaclib::detail::fiber::operator== </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>lhs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>rhs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="thread__local__proxy_8hpp_source.html#l00093">93</a> of file <a class="el" href="thread__local__proxy_8hpp_source.html">thread_local_proxy.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="a0d7c505d3d9c7a4c0c809a6bcbce4110" name="a0d7c505d3d9c7a4c0c809a6bcbce4110"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0d7c505d3d9c7a4c0c809a6bcbce4110">&#9670;&#160;</a></span>operator==() <span class="overload">[2/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classbool.html">bool</a> yaclib::detail::fiber::operator== </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>lhs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::nullptr_t&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="thread__local__proxy_8hpp_source.html#l00123">123</a> of file <a class="el" href="thread__local__proxy_8hpp_source.html">thread_local_proxy.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="ae56d78d6aefe5ef268badf1f2578455d" name="ae56d78d6aefe5ef268badf1f2578455d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae56d78d6aefe5ef268badf1f2578455d">&#9670;&#160;</a></span>operator==() <span class="overload">[3/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classbool.html">bool</a> yaclib::detail::fiber::operator== </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>lhs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> *&#160;</td>
+          <td class="paramname"><em>rhs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="thread__local__proxy_8hpp_source.html#l00103">103</a> of file <a class="el" href="thread__local__proxy_8hpp_source.html">thread_local_proxy.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="a6c04b8111ace4b58bb7659fb5e67fd6c" name="a6c04b8111ace4b58bb7659fb5e67fd6c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6c04b8111ace4b58bb7659fb5e67fd6c">&#9670;&#160;</a></span>operator==() <span class="overload">[4/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classbool.html">bool</a> yaclib::detail::fiber::operator== </td>
+          <td>(</td>
+          <td class="paramtype">std::nullptr_t&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>rhs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="thread__local__proxy_8hpp_source.html#l00128">128</a> of file <a class="el" href="thread__local__proxy_8hpp_source.html">thread_local_proxy.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="ae84e9aceb3737a922f453dacb61b7254" name="ae84e9aceb3737a922f453dacb61b7254"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae84e9aceb3737a922f453dacb61b7254">&#9670;&#160;</a></span>operator==() <span class="overload">[5/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classbool.html">bool</a> yaclib::detail::fiber::operator== </td>
+          <td>(</td>
+          <td class="paramtype">T *&#160;</td>
+          <td class="paramname"><em>lhs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>rhs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="thread__local__proxy_8hpp_source.html#l00113">113</a> of file <a class="el" href="thread__local__proxy_8hpp_source.html">thread_local_proxy.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="a9cf2ac388b4266e1127d1c340b0623a1" name="a9cf2ac388b4266e1127d1c340b0623a1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9cf2ac388b4266e1127d1c340b0623a1">&#9670;&#160;</a></span>operator&gt;() <span class="overload">[1/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classbool.html">bool</a> yaclib::detail::fiber::operator&gt; </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>lhs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>rhs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="thread__local__proxy_8hpp_source.html#l00148">148</a> of file <a class="el" href="thread__local__proxy_8hpp_source.html">thread_local_proxy.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="a1f197fafaa3b7b7a40bc9453f72f9763" name="a1f197fafaa3b7b7a40bc9453f72f9763"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1f197fafaa3b7b7a40bc9453f72f9763">&#9670;&#160;</a></span>operator&gt;() <span class="overload">[2/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classbool.html">bool</a> yaclib::detail::fiber::operator&gt; </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>lhs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> *&#160;</td>
+          <td class="paramname"><em>rhs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="thread__local__proxy_8hpp_source.html#l00163">163</a> of file <a class="el" href="thread__local__proxy_8hpp_source.html">thread_local_proxy.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="a2ed01dba6b201ab3e0d30a54709c0149" name="a2ed01dba6b201ab3e0d30a54709c0149"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2ed01dba6b201ab3e0d30a54709c0149">&#9670;&#160;</a></span>operator&gt;() <span class="overload">[3/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classbool.html">bool</a> yaclib::detail::fiber::operator&gt; </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>lhs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::nullptr_t&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="thread__local__proxy_8hpp_source.html#l00183">183</a> of file <a class="el" href="thread__local__proxy_8hpp_source.html">thread_local_proxy.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="aac6dacf817a0ebbe24c9d427bc7dd619" name="aac6dacf817a0ebbe24c9d427bc7dd619"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aac6dacf817a0ebbe24c9d427bc7dd619">&#9670;&#160;</a></span>operator&gt;() <span class="overload">[4/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classbool.html">bool</a> yaclib::detail::fiber::operator&gt; </td>
+          <td>(</td>
+          <td class="paramtype">std::nullptr_t&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>rhs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="thread__local__proxy_8hpp_source.html#l00188">188</a> of file <a class="el" href="thread__local__proxy_8hpp_source.html">thread_local_proxy.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="a610cb5e471cd583297b86c8ff8b254dc" name="a610cb5e471cd583297b86c8ff8b254dc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a610cb5e471cd583297b86c8ff8b254dc">&#9670;&#160;</a></span>operator&gt;() <span class="overload">[5/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classbool.html">bool</a> yaclib::detail::fiber::operator&gt; </td>
+          <td>(</td>
+          <td class="paramtype">T *&#160;</td>
+          <td class="paramname"><em>lhs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>rhs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="thread__local__proxy_8hpp_source.html#l00168">168</a> of file <a class="el" href="thread__local__proxy_8hpp_source.html">thread_local_proxy.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="a4731263bf5e096b92ea5a8b45db06345" name="a4731263bf5e096b92ea5a8b45db06345"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4731263bf5e096b92ea5a8b45db06345">&#9670;&#160;</a></span>operator&gt;=() <span class="overload">[1/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classbool.html">bool</a> yaclib::detail::fiber::operator&gt;= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>lhs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>rhs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="thread__local__proxy_8hpp_source.html#l00193">193</a> of file <a class="el" href="thread__local__proxy_8hpp_source.html">thread_local_proxy.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="a80e4a56484ef1d704054f9b9f0fd952d" name="a80e4a56484ef1d704054f9b9f0fd952d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a80e4a56484ef1d704054f9b9f0fd952d">&#9670;&#160;</a></span>operator&gt;=() <span class="overload">[2/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classbool.html">bool</a> yaclib::detail::fiber::operator&gt;= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>lhs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> *&#160;</td>
+          <td class="paramname"><em>rhs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="thread__local__proxy_8hpp_source.html#l00213">213</a> of file <a class="el" href="thread__local__proxy_8hpp_source.html">thread_local_proxy.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="a4a1f19cbae11ebec4e70b3bb5a8d2684" name="a4a1f19cbae11ebec4e70b3bb5a8d2684"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4a1f19cbae11ebec4e70b3bb5a8d2684">&#9670;&#160;</a></span>operator&gt;=() <span class="overload">[3/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classbool.html">bool</a> yaclib::detail::fiber::operator&gt;= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>lhs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::nullptr_t&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="thread__local__proxy_8hpp_source.html#l00233">233</a> of file <a class="el" href="thread__local__proxy_8hpp_source.html">thread_local_proxy.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="af49c0d991179ee3122207f4a98e1f909" name="af49c0d991179ee3122207f4a98e1f909"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af49c0d991179ee3122207f4a98e1f909">&#9670;&#160;</a></span>operator&gt;=() <span class="overload">[4/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classbool.html">bool</a> yaclib::detail::fiber::operator&gt;= </td>
+          <td>(</td>
+          <td class="paramtype">std::nullptr_t&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>rhs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="thread__local__proxy_8hpp_source.html#l00238">238</a> of file <a class="el" href="thread__local__proxy_8hpp_source.html">thread_local_proxy.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="a8dca4b672fea55455bbb41d2623db2a8" name="a8dca4b672fea55455bbb41d2623db2a8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8dca4b672fea55455bbb41d2623db2a8">&#9670;&#160;</a></span>operator&gt;=() <span class="overload">[5/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> T , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classbool.html">bool</a> yaclib::detail::fiber::operator&gt;= </td>
+          <td>(</td>
+          <td class="paramtype">T *&#160;</td>
+          <td class="paramname"><em>lhs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="classyaclib_1_1detail_1_1fiber_1_1ThreadLocalPtrProxy.html">ThreadLocalPtrProxy</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">U</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>rhs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="thread__local__proxy_8hpp_source.html#l00218">218</a> of file <a class="el" href="thread__local__proxy_8hpp_source.html">thread_local_proxy.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="a29642407868c3e4806d969387dfae8a1" name="a29642407868c3e4806d969387dfae8a1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a29642407868c3e4806d969387dfae8a1">&#9670;&#160;</a></span>PollRandomElementFromList()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structyaclib_1_1detail_1_1fiber_1_1Node.html">Node</a> * yaclib::detail::fiber::PollRandomElementFromList </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1BiList.html">BiList</a> &amp;&#160;</td>
+          <td class="paramname"><em>list</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="scheduler_8cpp_source.html#l00147">147</a> of file <a class="el" href="scheduler_8cpp_source.html">scheduler.cpp</a>.</p>
+
+<p class="reference">References <a class="el" href="util_8cpp_source.html#l00022">yaclib::detail::GetRandNumber()</a>, <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>, and <a class="el" href="scheduler_8cpp_source.html#l00141">sRandomListPick</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="queue_8cpp_source.html#l00021">yaclib::detail::fiber::FiberQueue::NotifyOne()</a>.</p>
+
+</div>
+</div>
+<a id="a7d7fb7579965bae7b1c57ce160d3d7b8" name="a7d7fb7579965bae7b1c57ce160d3d7b8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7d7fb7579965bae7b1c57ce160d3d7b8">&#9670;&#160;</a></span>ScheduleFiber()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a> yaclib::detail::fiber::ScheduleFiber </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html">FiberBase</a> *&#160;</td>
+          <td class="paramname"><em>fiber</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="wakeup__helper_8cpp_source.html#l00007">7</a> of file <a class="el" href="wakeup__helper_8cpp_source.html">wakeup_helper.cpp</a>.</p>
+
+<p class="reference">References <a class="el" href="scheduler_8cpp_source.html#l00030">yaclib::fault::Scheduler::GetScheduler()</a>, and <a class="el" href="scheduler_8cpp_source.html#l00038">yaclib::fault::Scheduler::Schedule()</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="fiber__base_8cpp_source.html#l00042">yaclib::detail::fiber::FiberBase::Exit()</a>.</p>
+
+</div>
+</div>
+<a id="ad9b577e7d5c2ca315841b5fe9d7f53c8" name="ad9b577e7d5c2ca315841b5fe9d7f53c8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad9b577e7d5c2ca315841b5fe9d7f53c8">&#9670;&#160;</a></span>Set()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a> yaclib::detail::fiber::Set </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a> *&#160;</td>
+          <td class="paramname"><em>new_value</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::uint64_t&#160;</td>
+          <td class="paramname"><em>i</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="thread__local__proxy_8cpp_source.html#l00020">20</a> of file <a class="el" href="thread__local__proxy_8cpp_source.html">thread_local_proxy.cpp</a>.</p>
+
+<p class="reference">References <a class="el" href="scheduler_8cpp_source.html#l00048">yaclib::fault::Scheduler::Current()</a>, <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>, and <a class="el" href="log_8hpp_source.html#l00085">YACLIB_ASSERT</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="thread__local__proxy_8hpp_source.html#l00030">yaclib::detail::fiber::ThreadLocalPtrProxy&lt; Type &gt;::operator=()</a>.</p>
+
+</div>
+</div>
+<a id="a3fa803b5e6e2618d82e1f0204a984e54" name="a3fa803b5e6e2618d82e1f0204a984e54"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3fa803b5e6e2618d82e1f0204a984e54">&#9670;&#160;</a></span>SetDefault()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a> yaclib::detail::fiber::SetDefault </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a> *&#160;</td>
+          <td class="paramname"><em>new_value</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::uint64_t&#160;</td>
+          <td class="paramname"><em>i</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="thread__local__proxy_8cpp_source.html#l00026">26</a> of file <a class="el" href="thread__local__proxy_8cpp_source.html">thread_local_proxy.cpp</a>.</p>
+
+<p class="reference">References <a class="el" href="thread__local__proxy_8cpp_source.html#l00009">GetMap()</a>, and <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="thread__local__proxy_8hpp_source.html#l00038">yaclib::detail::fiber::ThreadLocalPtrProxy&lt; Type &gt;::operator=()</a>, <a class="el" href="thread__local__proxy_8hpp_source.html#l00060">yaclib::detail::fiber::ThreadLocalPtrProxy&lt; Type &gt;::operator=()</a>, <a class="el" href="thread__local__proxy_8hpp_source.html#l00026">yaclib::detail::fiber::ThreadLocalPtrProxy&lt; Type &gt;::ThreadLocalPtrProxy()</a>, <a class="el" href="thread__local__proxy_8hpp_source.html#l00050">yaclib::detail::fiber::ThreadLocalPtrProxy&lt; Type &gt;::ThreadLocalPtrProxy()</a>, and <a class="el" href="thread__local__proxy_8hpp_source.html#l00019">yaclib::detail::fiber::ThreadLocalPtrProxy&lt; Type &gt;::ThreadLocalPtrProxy()</a>.</p>
+
+</div>
+</div>
+<a id="adcf6a8d09c021b982928103bf583b1e0" name="adcf6a8d09c021b982928103bf583b1e0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adcf6a8d09c021b982928103bf583b1e0">&#9670;&#160;</a></span>SetRandomListPick()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a> yaclib::detail::fiber::SetRandomListPick </td>
+          <td>(</td>
+          <td class="paramtype">std::uint32_t&#160;</td>
+          <td class="paramname"><em>k</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="scheduler_8cpp_source.html#l00143">143</a> of file <a class="el" href="scheduler_8cpp_source.html">scheduler.cpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>, and <a class="el" href="scheduler_8cpp_source.html#l00141">sRandomListPick</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="config_8cpp_source.html#l00045">yaclib::fiber::SetFaultRandomListPick()</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="a4fa3c32cae14118547314e830e0a98e0" name="a4fa3c32cae14118547314e830e0a98e0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4fa3c32cae14118547314e830e0a98e0">&#9670;&#160;</a></span>gHardwareConcurrency</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">unsigned</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">int</a> yaclib::detail::fiber::gHardwareConcurrency {0}</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="thread_8cpp_source.html#l00010">10</a> of file <a class="el" href="thread_8cpp_source.html">thread.cpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="thread_8cpp_source.html#l00057">yaclib::detail::fiber::Thread::hardware_concurrency()</a>, and <a class="el" href="thread_8cpp_source.html#l00085">yaclib::detail::fiber::Thread::SetHardwareConcurrency()</a>.</p>
+
+</div>
+</div>
+<a id="a5e804cee1e9b044807900fe32e8c3069" name="a5e804cee1e9b044807900fe32e8c3069"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5e804cee1e9b044807900fe32e8c3069">&#9670;&#160;</a></span>sAllocator</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1DefaultAllocator.html">DefaultAllocator</a> yaclib::detail::fiber::sAllocator</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="fiber__base_8cpp_source.html#l00010">10</a> of file <a class="el" href="fiber__base_8cpp_source.html">fiber_base.cpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="fiber__base_8cpp_source.html#l00078">yaclib::detail::fiber::FiberBase::GetAllocator()</a>.</p>
+
+</div>
+</div>
+<a id="af95f0dfdb9e1fcc2cabbce3bca2367c4" name="af95f0dfdb9e1fcc2cabbce3bca2367c4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af95f0dfdb9e1fcc2cabbce3bca2367c4">&#9670;&#160;</a></span>sNextId</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#a67e01d76c3f59bfdf3054d6bea063561">FiberBase::Id</a> yaclib::detail::fiber::sNextId = 1</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="fiber__base_8cpp_source.html#l00008">8</a> of file <a class="el" href="fiber__base_8cpp_source.html">fiber_base.cpp</a>.</p>
+
+</div>
+</div>
+<a id="ac8d93d7401c15c58411ae352f81504ec" name="ac8d93d7401c15c58411ae352f81504ec"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac8d93d7401c15c58411ae352f81504ec">&#9670;&#160;</a></span>sRandomListPick</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::uint32_t yaclib::detail::fiber::sRandomListPick = 10</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="scheduler_8cpp_source.html#l00141">141</a> of file <a class="el" href="scheduler_8cpp_source.html">scheduler.cpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="scheduler_8cpp_source.html#l00147">PollRandomElementFromList()</a>, and <a class="el" href="scheduler_8cpp_source.html#l00143">SetRandomListPick()</a>.</p>
+
+</div>
+</div>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="namespaceyaclib.html">yaclib</a></li><li class="navelem"><a class="el" href="namespaceyaclib_1_1detail.html">detail</a></li><li class="navelem"><a class="el" href="namespaceyaclib_1_1detail_1_1fiber.html">fiber</a></li>
+    <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+  </ul>
+</div>
+</body>
+</html>

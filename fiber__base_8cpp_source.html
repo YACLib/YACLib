@@ -1,0 +1,288 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.9.8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<!-- BEGIN opengraph metadata -->
+<meta property="og:title" content="Doxygen Awesome" />
+<meta property="og:image" content="https://repository-images.githubusercontent.com/348492097/4f16df80-88fb-11eb-9d31-4015ff22c452" />
+<meta property="og:description" content="Custom CSS theme for doxygen html-documentation with lots of customization parameters." />
+<meta property="og:url" content="https://jothepro.github.io/doxygen-awesome-css/" />
+<!-- END opengraph metadata -->
+<!-- BEGIN twitter metadata -->
+<meta name="twitter:image:src" content="https://repository-images.githubusercontent.com/348492097/4f16df80-88fb-11eb-9d31-4015ff22c452" />
+<meta name="twitter:title" content="Doxygen Awesome" />
+<meta name="twitter:description" content="Custom CSS theme for doxygen html-documentation with lots of customization parameters." />
+<!-- END twitter metadata -->
+<title>YACLib: src/fault/fiber/fiber_base.cpp Source File</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link rel="icon" type="image/svg+xml" href="logo.drawio.svg"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+<script type="text/javascript" src="doxygen-awesome-fragment-copy-button.js"></script>
+<script type="text/javascript" src="doxygen-awesome-paragraph-link.js"></script>
+<script type="text/javascript" src="toggle-alternative-theme.js"></script>
+<script type="text/javascript">
+    DoxygenAwesomeFragmentCopyButton.init()
+    DoxygenAwesomeDarkModeToggle.init()
+    DoxygenAwesomeParagraphLink.init()
+</script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="custom.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only-darkmode-toggle.css" rel="stylesheet" type="text/css"/>
+<link href="custom-alternative.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<!-- https://tholman.com/github-corners/ -->
+<a href="https://github.com/YACLib/YACLib" class="github-corner" title="View source on GitHub" target="_blank">
+    <svg viewBox="0 0 250 250" width="40" height="40" style="position: absolute; top: 0; border: 0; right: 0; z-index: 99;" aria-hidden="true">
+    <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
+   <div id="projectname">YACLib
+   </div>
+   <div id="projectbrief">C++ library for concurrent tasks execution</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Search');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function() { init_codefold(0); });
+/* @license-end */
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('fiber__base_8cpp_source.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">fiber_base.cpp</div></div>
+</div><!--header-->
+<div class="contents">
+<a href="fiber__base_8cpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#include &lt;<a class="code" href="fiber__base_8hpp.html">yaclib/fault/detail/fiber/fiber_base.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span> </div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &lt;cstdio&gt;</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &lt;utility&gt;</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span> </div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespaceyaclib_1_1detail_1_1fiber.html">yaclib::detail::fiber</a> {</div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno"><a class="line" href="namespaceyaclib_1_1detail_1_1fiber.html#af95f0dfdb9e1fcc2cabbce3bca2367c4">    8</a></span><span class="keyword">static</span> <a class="code hl_typedef" href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#a67e01d76c3f59bfdf3054d6bea063561">FiberBase::Id</a> <a class="code hl_variable" href="namespaceyaclib_1_1detail_1_1fiber.html#af95f0dfdb9e1fcc2cabbce3bca2367c4">sNextId</a> = 1;</div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno"><a class="line" href="namespaceyaclib_1_1detail_1_1fiber.html#a5e804cee1e9b044807900fe32e8c3069">   10</a></span><span class="keyword">static</span> <a class="code hl_class" href="classyaclib_1_1detail_1_1fiber_1_1DefaultAllocator.html">DefaultAllocator</a> <a class="code hl_variable" href="namespaceyaclib_1_1detail_1_1fiber.html#a5e804cee1e9b044807900fe32e8c3069">sAllocator</a>;</div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
+<div class="foldopen" id="foldopen00012" data-start="{" data-end="}">
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno"><a class="line" href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#ac3869ed760bbde52de9ada5ed2d2bb53">   12</a></span><a class="code hl_function" href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#ac3869ed760bbde52de9ada5ed2d2bb53">FiberBase::FiberBase</a>() : _stack{<a class="code hl_variable" href="namespaceyaclib_1_1detail_1_1fiber.html#a5e804cee1e9b044807900fe32e8c3069">sAllocator</a>}, _id{++<a class="code hl_variable" href="namespaceyaclib_1_1detail_1_1fiber.html#af95f0dfdb9e1fcc2cabbce3bca2367c4">sNextId</a>} {</div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>}</div>
+</div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span> </div>
+<div class="foldopen" id="foldopen00015" data-start="{" data-end="}">
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno"><a class="line" href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#a928812b983a10d7c416c6f9d73528efc">   15</a></span><a class="code hl_typedef" href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#a67e01d76c3f59bfdf3054d6bea063561">FiberBase::Id</a> <a class="code hl_function" href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#a928812b983a10d7c416c6f9d73528efc">FiberBase::GetId</a>() <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a> {</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>  <span class="keywordflow">return</span> _id;</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>}</div>
+</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span> </div>
+<div class="foldopen" id="foldopen00019" data-start="{" data-end="}">
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno"><a class="line" href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#a390aa46f53fb4a90ab4f0f227be4c404">   19</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#a390aa46f53fb4a90ab4f0f227be4c404">FiberBase::Resume</a>() {</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>  <span class="keywordflow">if</span> (_state == <a class="code hl_enumvalue" href="namespaceyaclib_1_1detail_1_1fiber.html#ae6e287bc27ddbada3d6cc7c200dd5c40a355e71f6e8c3ed2a17a59a90f8ae7d96">Completed</a>) {</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>    <span class="keywordflow">return</span>;</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>  }</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span> </div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>  _state = <a class="code hl_enumvalue" href="namespaceyaclib_1_1detail_1_1fiber.html#ae6e287bc27ddbada3d6cc7c200dd5c40ae3b248a55f97fea195a0b9dc4ed67c2a">Running</a>;</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span> </div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>  _caller_context.<a class="code hl_function" href="classyaclib_1_1detail_1_1fiber_1_1ExecutionContext.html#a4aec3683a67724be23c39dc3e7d24d23">SwitchTo</a>(<a class="code hl_variable" href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#a6f48336c471b6b01fd00987ca2d5c299">_context</a>);</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span> </div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>  <span class="keywordflow">if</span> (<a class="code hl_variable" href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#ade48ac515ae9295f36886c081a648b99">_exception</a> != <span class="keyword">nullptr</span>) {</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>    <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">rethrow_exception</a>(<a class="code hl_variable" href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#ade48ac515ae9295f36886c081a648b99">_exception</a>);</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>  }</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>}</div>
+</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span> </div>
+<div class="foldopen" id="foldopen00033" data-start="{" data-end="}">
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno"><a class="line" href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#aaecee2aa7a4eb4c26a853c95d58c748c">   33</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#aaecee2aa7a4eb4c26a853c95d58c748c">FiberBase::Suspend</a>() {</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>  _state = <a class="code hl_enumvalue" href="namespaceyaclib_1_1detail_1_1fiber.html#ae6e287bc27ddbada3d6cc7c200dd5c40ad7e3c81a824855a901f8b374e385daf0">Suspended</a>;</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>  <a class="code hl_variable" href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#a6f48336c471b6b01fd00987ca2d5c299">_context</a>.<a class="code hl_function" href="classyaclib_1_1detail_1_1fiber_1_1ExecutionContext.html#a4aec3683a67724be23c39dc3e7d24d23">SwitchTo</a>(_caller_context);</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>}</div>
+</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span> </div>
+<div class="foldopen" id="foldopen00038" data-start="{" data-end="}">
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno"><a class="line" href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#a5259f98adfb6cc73cbe2bf4301388599">   38</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#a5259f98adfb6cc73cbe2bf4301388599">FiberBase::Start</a>() {</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>  <a class="code hl_variable" href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#a6f48336c471b6b01fd00987ca2d5c299">_context</a>.<a class="code hl_function" href="classyaclib_1_1detail_1_1fiber_1_1ExecutionContext.html#aeeb93569088037f1010442163fa3370f">Start</a>();</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>}</div>
+</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span> </div>
+<div class="foldopen" id="foldopen00042" data-start="{" data-end="}">
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno"><a class="line" href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#abd5dee6ad6778a966c8a24a48dbddb6d">   42</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#abd5dee6ad6778a966c8a24a48dbddb6d">FiberBase::Exit</a>() {</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>  _state = <a class="code hl_enumvalue" href="namespaceyaclib_1_1detail_1_1fiber.html#ae6e287bc27ddbada3d6cc7c200dd5c40a355e71f6e8c3ed2a17a59a90f8ae7d96">Completed</a>;</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>  <span class="keywordflow">if</span> (_joining_fiber != <span class="keyword">nullptr</span> &amp;&amp; _thread_alive) {</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>    <a class="code hl_function" href="namespaceyaclib_1_1detail_1_1fiber.html#a7d7fb7579965bae7b1c57ce160d3d7b8">ScheduleFiber</a>(_joining_fiber);</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>  }</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>  <a class="code hl_variable" href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#a6f48336c471b6b01fd00987ca2d5c299">_context</a>.<a class="code hl_function" href="classyaclib_1_1detail_1_1fiber_1_1ExecutionContext.html#ab0a796381861711f04c056270d503d2f">Exit</a>(_caller_context);</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>}</div>
+</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span> </div>
+<div class="foldopen" id="foldopen00050" data-start="{" data-end="}">
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno"><a class="line" href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#a14256f2b2c220fa6461c04889ee3d03b">   50</a></span><a class="code hl_enumeration" href="namespaceyaclib_1_1detail_1_1fiber.html#ae6e287bc27ddbada3d6cc7c200dd5c40">FiberState</a> <a class="code hl_function" href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#a14256f2b2c220fa6461c04889ee3d03b">FiberBase::GetState</a>() <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a> {</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>  <span class="keywordflow">return</span> _state;</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>}</div>
+</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span> </div>
+<div class="foldopen" id="foldopen00054" data-start="{" data-end="}">
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno"><a class="line" href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#a507d4eef6ffec2686946bf58c0d7d0a9">   54</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#a507d4eef6ffec2686946bf58c0d7d0a9">FiberBase::SetJoiningFiber</a>(<a class="code hl_class" href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html">FiberBase</a>* <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">joining_fiber</a>) <span class="keyword">noexcept</span> {</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>  _joining_fiber = <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">joining_fiber</a>;</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>}</div>
+</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span> </div>
+<div class="foldopen" id="foldopen00058" data-start="{" data-end="}">
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno"><a class="line" href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#a45ca7f3a1ce0f2d4021fdc76d6e918ef">   58</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#a45ca7f3a1ce0f2d4021fdc76d6e918ef">FiberBase::SetThreadDead</a>() <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a> {</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>  _thread_alive = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>}</div>
+</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span> </div>
+<div class="foldopen" id="foldopen00062" data-start="{" data-end="}">
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno"><a class="line" href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#a38259d8f7033b2f2139e9c8790a990fd">   62</a></span><span class="keywordtype">bool</span> <a class="code hl_function" href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#a38259d8f7033b2f2139e9c8790a990fd">FiberBase::IsThreadAlive</a>() <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a> {</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>  <span class="keywordflow">return</span> _thread_alive;</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>}</div>
+</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span> </div>
+<div class="foldopen" id="foldopen00066" data-start="{" data-end="}">
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno"><a class="line" href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#ae566675cd3c8b2ce337fb3bca59894c1">   66</a></span><span class="keywordtype">void</span>* <a class="code hl_function" href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#ae566675cd3c8b2ce337fb3bca59894c1">FiberBase::GetTLS</a>(std::uint64_t <span class="keywordtype">id</span>, std::unordered_map&lt;std::uint64_t, void*&gt;&amp; <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">defaults</a>) {</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>  <span class="keyword">auto</span> <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">it</a> = _tls.find(<span class="keywordtype">id</span>);</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>  <span class="keywordflow">if</span> (<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">it</a> == _tls.end()) {</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">defaults</a>[id];</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>  }</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>  <span class="keywordflow">return</span> <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">it</a>-&gt;second;</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>}</div>
+</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span> </div>
+<div class="foldopen" id="foldopen00074" data-start="{" data-end="}">
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno"><a class="line" href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#ab48650baffab0ff494ca97f4b55b754b">   74</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#ab48650baffab0ff494ca97f4b55b754b">FiberBase::SetTLS</a>(std::uint64_t <span class="keywordtype">id</span>, <span class="keywordtype">void</span>* <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">value</a>) {</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>  _tls[id] = <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">value</a>;</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>}</div>
+</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span> </div>
+<div class="foldopen" id="foldopen00078" data-start="{" data-end="}">
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno"><a class="line" href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#ac1085a9e44b573b42889893664fb6a5d">   78</a></span><a class="code hl_class" href="classyaclib_1_1detail_1_1fiber_1_1IStackAllocator.html">IStackAllocator</a>&amp; <a class="code hl_function" href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#ac1085a9e44b573b42889893664fb6a5d">FiberBase::GetAllocator</a>() <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a> {</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>  <span class="keywordflow">return</span> <a class="code hl_variable" href="namespaceyaclib_1_1detail_1_1fiber.html#a5e804cee1e9b044807900fe32e8c3069">sAllocator</a>;</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>}</div>
+</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span> </div>
+<div class="foldopen" id="foldopen00082" data-start="{" data-end="}">
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno"><a class="line" href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#a0caeb5a10c79084357db34f9feafa0b9">   82</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#a0caeb5a10c79084357db34f9feafa0b9">FiberBase::SetState</a>(<a class="code hl_enumeration" href="namespaceyaclib_1_1detail_1_1fiber.html#ae6e287bc27ddbada3d6cc7c200dd5c40">FiberState</a> <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">state</a>) <span class="keyword">noexcept</span> {</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>  _state = <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">state</a>;</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>}</div>
+</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span> </div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>}  <span class="comment">// namespace yaclib::detail::fiber</span></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1fiber_1_1DefaultAllocator_html"><div class="ttname"><a href="classyaclib_1_1detail_1_1fiber_1_1DefaultAllocator.html">yaclib::detail::fiber::DefaultAllocator</a></div><div class="ttdoc">Allocator used by default.</div><div class="ttdef"><b>Definition</b> <a href="default__allocator_8hpp_source.html#l00014">default_allocator.hpp:14</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1fiber_1_1ExecutionContext_html_a4aec3683a67724be23c39dc3e7d24d23"><div class="ttname"><a href="classyaclib_1_1detail_1_1fiber_1_1ExecutionContext.html#a4aec3683a67724be23c39dc3e7d24d23">yaclib::detail::fiber::ExecutionContext::SwitchTo</a></div><div class="ttdeci">void SwitchTo(ExecutionContext &amp;other)</div><div class="ttdef"><b>Definition</b> <a href="execution__context_8cpp_source.html#l00022">execution_context.cpp:22</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1fiber_1_1ExecutionContext_html_ab0a796381861711f04c056270d503d2f"><div class="ttname"><a href="classyaclib_1_1detail_1_1fiber_1_1ExecutionContext.html#ab0a796381861711f04c056270d503d2f">yaclib::detail::fiber::ExecutionContext::Exit</a></div><div class="ttdeci">void Exit(ExecutionContext &amp;other)</div><div class="ttdef"><b>Definition</b> <a href="execution__context_8cpp_source.html#l00033">execution_context.cpp:33</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1fiber_1_1ExecutionContext_html_aeeb93569088037f1010442163fa3370f"><div class="ttname"><a href="classyaclib_1_1detail_1_1fiber_1_1ExecutionContext.html#aeeb93569088037f1010442163fa3370f">yaclib::detail::fiber::ExecutionContext::Start</a></div><div class="ttdeci">void Start()</div><div class="ttdef"><b>Definition</b> <a href="execution__context_8cpp_source.html#l00016">execution_context.cpp:16</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1fiber_1_1FiberBase_html"><div class="ttname"><a href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html">yaclib::detail::fiber::FiberBase</a></div><div class="ttdef"><b>Definition</b> <a href="fiber__base_8hpp_source.html#l00027">fiber_base.hpp:27</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1fiber_1_1FiberBase_html_a0caeb5a10c79084357db34f9feafa0b9"><div class="ttname"><a href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#a0caeb5a10c79084357db34f9feafa0b9">yaclib::detail::fiber::FiberBase::SetState</a></div><div class="ttdeci">void SetState(FiberState state) noexcept</div><div class="ttdef"><b>Definition</b> <a href="fiber__base_8cpp_source.html#l00082">fiber_base.cpp:82</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1fiber_1_1FiberBase_html_a14256f2b2c220fa6461c04889ee3d03b"><div class="ttname"><a href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#a14256f2b2c220fa6461c04889ee3d03b">yaclib::detail::fiber::FiberBase::GetState</a></div><div class="ttdeci">FiberState GetState() noexcept</div><div class="ttdef"><b>Definition</b> <a href="fiber__base_8cpp_source.html#l00050">fiber_base.cpp:50</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1fiber_1_1FiberBase_html_a38259d8f7033b2f2139e9c8790a990fd"><div class="ttname"><a href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#a38259d8f7033b2f2139e9c8790a990fd">yaclib::detail::fiber::FiberBase::IsThreadAlive</a></div><div class="ttdeci">bool IsThreadAlive() const noexcept</div><div class="ttdef"><b>Definition</b> <a href="fiber__base_8cpp_source.html#l00062">fiber_base.cpp:62</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1fiber_1_1FiberBase_html_a390aa46f53fb4a90ab4f0f227be4c404"><div class="ttname"><a href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#a390aa46f53fb4a90ab4f0f227be4c404">yaclib::detail::fiber::FiberBase::Resume</a></div><div class="ttdeci">void Resume()</div><div class="ttdef"><b>Definition</b> <a href="fiber__base_8cpp_source.html#l00019">fiber_base.cpp:19</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1fiber_1_1FiberBase_html_a45ca7f3a1ce0f2d4021fdc76d6e918ef"><div class="ttname"><a href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#a45ca7f3a1ce0f2d4021fdc76d6e918ef">yaclib::detail::fiber::FiberBase::SetThreadDead</a></div><div class="ttdeci">void SetThreadDead() noexcept</div><div class="ttdef"><b>Definition</b> <a href="fiber__base_8cpp_source.html#l00058">fiber_base.cpp:58</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1fiber_1_1FiberBase_html_a507d4eef6ffec2686946bf58c0d7d0a9"><div class="ttname"><a href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#a507d4eef6ffec2686946bf58c0d7d0a9">yaclib::detail::fiber::FiberBase::SetJoiningFiber</a></div><div class="ttdeci">void SetJoiningFiber(FiberBase *joining_fiber) noexcept</div><div class="ttdef"><b>Definition</b> <a href="fiber__base_8cpp_source.html#l00054">fiber_base.cpp:54</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1fiber_1_1FiberBase_html_a5259f98adfb6cc73cbe2bf4301388599"><div class="ttname"><a href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#a5259f98adfb6cc73cbe2bf4301388599">yaclib::detail::fiber::FiberBase::Start</a></div><div class="ttdeci">void Start()</div><div class="ttdef"><b>Definition</b> <a href="fiber__base_8cpp_source.html#l00038">fiber_base.cpp:38</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1fiber_1_1FiberBase_html_a67e01d76c3f59bfdf3054d6bea063561"><div class="ttname"><a href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#a67e01d76c3f59bfdf3054d6bea063561">yaclib::detail::fiber::FiberBase::Id</a></div><div class="ttdeci">std::uint64_t Id</div><div class="ttdef"><b>Definition</b> <a href="fiber__base_8hpp_source.html#l00029">fiber_base.hpp:29</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1fiber_1_1FiberBase_html_a6f48336c471b6b01fd00987ca2d5c299"><div class="ttname"><a href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#a6f48336c471b6b01fd00987ca2d5c299">yaclib::detail::fiber::FiberBase::_context</a></div><div class="ttdeci">ExecutionContext _context</div><div class="ttdef"><b>Definition</b> <a href="fiber__base_8hpp_source.html#l00061">fiber_base.hpp:61</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1fiber_1_1FiberBase_html_a928812b983a10d7c416c6f9d73528efc"><div class="ttname"><a href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#a928812b983a10d7c416c6f9d73528efc">yaclib::detail::fiber::FiberBase::GetId</a></div><div class="ttdeci">Id GetId() const noexcept</div><div class="ttdef"><b>Definition</b> <a href="fiber__base_8cpp_source.html#l00015">fiber_base.cpp:15</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1fiber_1_1FiberBase_html_aaecee2aa7a4eb4c26a853c95d58c748c"><div class="ttname"><a href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#aaecee2aa7a4eb4c26a853c95d58c748c">yaclib::detail::fiber::FiberBase::Suspend</a></div><div class="ttdeci">void Suspend()</div><div class="ttdef"><b>Definition</b> <a href="fiber__base_8cpp_source.html#l00033">fiber_base.cpp:33</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1fiber_1_1FiberBase_html_ab48650baffab0ff494ca97f4b55b754b"><div class="ttname"><a href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#ab48650baffab0ff494ca97f4b55b754b">yaclib::detail::fiber::FiberBase::SetTLS</a></div><div class="ttdeci">void SetTLS(std::uint64_t id, void *value)</div><div class="ttdef"><b>Definition</b> <a href="fiber__base_8cpp_source.html#l00074">fiber_base.cpp:74</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1fiber_1_1FiberBase_html_abd5dee6ad6778a966c8a24a48dbddb6d"><div class="ttname"><a href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#abd5dee6ad6778a966c8a24a48dbddb6d">yaclib::detail::fiber::FiberBase::Exit</a></div><div class="ttdeci">void Exit()</div><div class="ttdef"><b>Definition</b> <a href="fiber__base_8cpp_source.html#l00042">fiber_base.cpp:42</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1fiber_1_1FiberBase_html_ac1085a9e44b573b42889893664fb6a5d"><div class="ttname"><a href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#ac1085a9e44b573b42889893664fb6a5d">yaclib::detail::fiber::FiberBase::GetAllocator</a></div><div class="ttdeci">static IStackAllocator &amp; GetAllocator() noexcept</div><div class="ttdef"><b>Definition</b> <a href="fiber__base_8cpp_source.html#l00078">fiber_base.cpp:78</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1fiber_1_1FiberBase_html_ac3869ed760bbde52de9ada5ed2d2bb53"><div class="ttname"><a href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#ac3869ed760bbde52de9ada5ed2d2bb53">yaclib::detail::fiber::FiberBase::FiberBase</a></div><div class="ttdeci">FiberBase()</div><div class="ttdef"><b>Definition</b> <a href="fiber__base_8cpp_source.html#l00012">fiber_base.cpp:12</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1fiber_1_1FiberBase_html_ade48ac515ae9295f36886c081a648b99"><div class="ttname"><a href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#ade48ac515ae9295f36886c081a648b99">yaclib::detail::fiber::FiberBase::_exception</a></div><div class="ttdeci">std::exception_ptr _exception</div><div class="ttdef"><b>Definition</b> <a href="fiber__base_8hpp_source.html#l00063">fiber_base.hpp:63</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1fiber_1_1FiberBase_html_ae566675cd3c8b2ce337fb3bca59894c1"><div class="ttname"><a href="classyaclib_1_1detail_1_1fiber_1_1FiberBase.html#ae566675cd3c8b2ce337fb3bca59894c1">yaclib::detail::fiber::FiberBase::GetTLS</a></div><div class="ttdeci">void * GetTLS(std::uint64_t id, std::unordered_map&lt; std::uint64_t, void * &gt; &amp;defaults)</div><div class="ttdef"><b>Definition</b> <a href="fiber__base_8cpp_source.html#l00066">fiber_base.cpp:66</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1detail_1_1fiber_1_1IStackAllocator_html"><div class="ttname"><a href="classyaclib_1_1detail_1_1fiber_1_1IStackAllocator.html">yaclib::detail::fiber::IStackAllocator</a></div><div class="ttdoc">Passed to coroutine/fiber constructor, specifies the way in which memory for Stack is Allocated and R...</div><div class="ttdef"><b>Definition</b> <a href="stack__allocator_8hpp_source.html#l00017">stack_allocator.hpp:17</a></div></div>
+<div class="ttc" id="afiber__base_8hpp_html"><div class="ttname"><a href="fiber__base_8hpp.html">fiber_base.hpp</a></div></div>
+<div class="ttc" id="anamespaceyaclib_1_1detail_1_1fiber_html"><div class="ttname"><a href="namespaceyaclib_1_1detail_1_1fiber.html">yaclib::detail::fiber</a></div><div class="ttdef"><b>Definition</b> <a href="fault_2detail_2fiber_2atomic_8hpp_source.html#l00007">atomic.hpp:7</a></div></div>
+<div class="ttc" id="anamespaceyaclib_1_1detail_1_1fiber_html_a5e804cee1e9b044807900fe32e8c3069"><div class="ttname"><a href="namespaceyaclib_1_1detail_1_1fiber.html#a5e804cee1e9b044807900fe32e8c3069">yaclib::detail::fiber::sAllocator</a></div><div class="ttdeci">static DefaultAllocator sAllocator</div><div class="ttdef"><b>Definition</b> <a href="fiber__base_8cpp_source.html#l00010">fiber_base.cpp:10</a></div></div>
+<div class="ttc" id="anamespaceyaclib_1_1detail_1_1fiber_html_a7d7fb7579965bae7b1c57ce160d3d7b8"><div class="ttname"><a href="namespaceyaclib_1_1detail_1_1fiber.html#a7d7fb7579965bae7b1c57ce160d3d7b8">yaclib::detail::fiber::ScheduleFiber</a></div><div class="ttdeci">void ScheduleFiber(FiberBase *fiber)</div><div class="ttdef"><b>Definition</b> <a href="wakeup__helper_8cpp_source.html#l00007">wakeup_helper.cpp:7</a></div></div>
+<div class="ttc" id="anamespaceyaclib_1_1detail_1_1fiber_html_ae6e287bc27ddbada3d6cc7c200dd5c40"><div class="ttname"><a href="namespaceyaclib_1_1detail_1_1fiber.html#ae6e287bc27ddbada3d6cc7c200dd5c40">yaclib::detail::fiber::FiberState</a></div><div class="ttdeci">FiberState</div><div class="ttdef"><b>Definition</b> <a href="fiber__base_8hpp_source.html#l00020">fiber_base.hpp:20</a></div></div>
+<div class="ttc" id="anamespaceyaclib_1_1detail_1_1fiber_html_ae6e287bc27ddbada3d6cc7c200dd5c40a355e71f6e8c3ed2a17a59a90f8ae7d96"><div class="ttname"><a href="namespaceyaclib_1_1detail_1_1fiber.html#ae6e287bc27ddbada3d6cc7c200dd5c40a355e71f6e8c3ed2a17a59a90f8ae7d96">yaclib::detail::fiber::Completed</a></div><div class="ttdeci">@ Completed</div><div class="ttdef"><b>Definition</b> <a href="fiber__base_8hpp_source.html#l00024">fiber_base.hpp:24</a></div></div>
+<div class="ttc" id="anamespaceyaclib_1_1detail_1_1fiber_html_ae6e287bc27ddbada3d6cc7c200dd5c40ad7e3c81a824855a901f8b374e385daf0"><div class="ttname"><a href="namespaceyaclib_1_1detail_1_1fiber.html#ae6e287bc27ddbada3d6cc7c200dd5c40ad7e3c81a824855a901f8b374e385daf0">yaclib::detail::fiber::Suspended</a></div><div class="ttdeci">@ Suspended</div><div class="ttdef"><b>Definition</b> <a href="fiber__base_8hpp_source.html#l00022">fiber_base.hpp:22</a></div></div>
+<div class="ttc" id="anamespaceyaclib_1_1detail_1_1fiber_html_ae6e287bc27ddbada3d6cc7c200dd5c40ae3b248a55f97fea195a0b9dc4ed67c2a"><div class="ttname"><a href="namespaceyaclib_1_1detail_1_1fiber.html#ae6e287bc27ddbada3d6cc7c200dd5c40ae3b248a55f97fea195a0b9dc4ed67c2a">yaclib::detail::fiber::Running</a></div><div class="ttdeci">@ Running</div><div class="ttdef"><b>Definition</b> <a href="fiber__base_8hpp_source.html#l00021">fiber_base.hpp:21</a></div></div>
+<div class="ttc" id="anamespaceyaclib_1_1detail_1_1fiber_html_af95f0dfdb9e1fcc2cabbce3bca2367c4"><div class="ttname"><a href="namespaceyaclib_1_1detail_1_1fiber.html#af95f0dfdb9e1fcc2cabbce3bca2367c4">yaclib::detail::fiber::sNextId</a></div><div class="ttdeci">static FiberBase::Id sNextId</div><div class="ttdef"><b>Definition</b> <a href="fiber__base_8cpp_source.html#l00008">fiber_base.cpp:8</a></div></div>
+<div class="ttc" id="anamespaceyaclib_html_ac918e7a0c384bcf611e0b5b4b2cd5504"><div class="ttname"><a href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">yaclib::MakeContract</a></div><div class="ttdeci">Contract&lt; V, E &gt; MakeContract()</div><div class="ttdoc">Creates related future and promise.</div><div class="ttdef"><b>Definition</b> <a href="contract_8hpp_source.html#l00025">contract.hpp:25</a></div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_f289338ed24f1cc6d174ad5a6e562081.html">fault</a></li><li class="navelem"><a class="el" href="dir_cda0f077cd9b594929f9fd94cd24e021.html">fiber</a></li><li class="navelem"><a class="el" href="fiber__base_8cpp.html">fiber_base.cpp</a></li>
+    <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+  </ul>
+</div>
+</body>
+</html>

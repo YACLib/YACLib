@@ -1,0 +1,12 @@
+<map id="yaclib::SharedGuard&lt; M &gt;" name="yaclib::SharedGuard&lt; M &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="8,363,177,388"/>
+<area shape="rect" id="Node000002" href="$classyaclib_1_1detail_1_1Guard.html" title=" " alt="" coords="26,273,159,313"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="95,329,95,362,90,362,90,329"/>
+<area shape="rect" id="Node000003" href="$classyaclib_1_1detail_1_1GuardState.html" title=" " alt="" coords="5,94,169,120"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="90,135,94,272,89,272,85,135"/>
+<area shape="rect" id="Node000005" href="$classyaclib_1_1detail_1_1Guard.html" title=" " alt="" coords="109,169,241,210"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="113,128,155,167,152,171,110,132"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="53,5,121,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="90,47,90,94,84,94,84,47"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="151,224,110,274,106,271,147,220"/>
+</map>

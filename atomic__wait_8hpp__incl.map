@@ -1,0 +1,9 @@
+<map id="include/yaclib/fault/detail/atomic_wait.hpp" name="include/yaclib/fault/detail/atomic_wait.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="62,5,217,46"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,94,122,120"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="123,48,88,84,84,81,119,45"/>
+<area shape="rect" id="Node000003" href="$inject_8hpp.html" title=" " alt="" coords="146,94,288,120"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="161,45,196,81,192,84,157,48"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="187,168,247,193"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="220,120,220,152,214,152,214,120"/>
+</map>

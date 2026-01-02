@@ -1,0 +1,15 @@
+<map id="include/yaclib/fault/detail/fiber/default_allocator.hpp" name="include/yaclib/fault/detail/fiber/default_allocator.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="232,5,360,61"/>
+<area shape="rect" id="Node000002" href="$stack__allocator_8hpp.html" title=" " alt="" coords="5,109,171,150"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="237,64,146,105,144,100,235,59"/>
+<area shape="rect" id="Node000004" href="$log_8hpp.html" title=" " alt="" coords="194,117,294,142"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="283,63,260,104,256,102,279,60"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="318,117,378,142"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="313,60,336,102,332,104,309,63"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="402,117,459,142"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="336,59,403,105,400,110,333,64"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="56,198,120,223"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="91,150,91,182,85,182,85,150"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="200,198,288,223"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="247,143,247,182,241,182,241,143"/>
+</map>

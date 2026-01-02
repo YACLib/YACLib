@@ -1,0 +1,555 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.9.8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<!-- BEGIN opengraph metadata -->
+<meta property="og:title" content="Doxygen Awesome" />
+<meta property="og:image" content="https://repository-images.githubusercontent.com/348492097/4f16df80-88fb-11eb-9d31-4015ff22c452" />
+<meta property="og:description" content="Custom CSS theme for doxygen html-documentation with lots of customization parameters." />
+<meta property="og:url" content="https://jothepro.github.io/doxygen-awesome-css/" />
+<!-- END opengraph metadata -->
+<!-- BEGIN twitter metadata -->
+<meta name="twitter:image:src" content="https://repository-images.githubusercontent.com/348492097/4f16df80-88fb-11eb-9d31-4015ff22c452" />
+<meta name="twitter:title" content="Doxygen Awesome" />
+<meta name="twitter:description" content="Custom CSS theme for doxygen html-documentation with lots of customization parameters." />
+<!-- END twitter metadata -->
+<title>YACLib: yaclib::Mutex&lt; Batching, FIFO &gt; Class Template Reference</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link rel="icon" type="image/svg+xml" href="logo.drawio.svg"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+<script type="text/javascript" src="doxygen-awesome-fragment-copy-button.js"></script>
+<script type="text/javascript" src="doxygen-awesome-paragraph-link.js"></script>
+<script type="text/javascript" src="toggle-alternative-theme.js"></script>
+<script type="text/javascript">
+    DoxygenAwesomeFragmentCopyButton.init()
+    DoxygenAwesomeDarkModeToggle.init()
+    DoxygenAwesomeParagraphLink.init()
+</script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="custom.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only-darkmode-toggle.css" rel="stylesheet" type="text/css"/>
+<link href="custom-alternative.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<!-- https://tholman.com/github-corners/ -->
+<a href="https://github.com/YACLib/YACLib" class="github-corner" title="View source on GitHub" target="_blank">
+    <svg viewBox="0 0 250 250" width="40" height="40" style="position: absolute; top: 0; border: 0; right: 0; z-index: 99;" aria-hidden="true">
+    <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
+   <div id="projectname">YACLib
+   </div>
+   <div id="projectbrief">C++ library for concurrent tasks execution</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Search');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('classyaclib_1_1Mutex.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
+<a href="classyaclib_1_1Mutex-members.html">List of all members</a>  </div>
+  <div class="headertitle"><div class="title">yaclib::Mutex&lt; Batching, FIFO &gt; Class Template Reference<span class="mlabels"><span class="mlabel">final</span></span></div></div>
+</div><!--header-->
+<div class="contents">
+
+<p><a class="el" href="classyaclib_1_1Mutex.html" title="Mutex for coroutines.">Mutex</a> for coroutines.  
+ <a href="classyaclib_1_1Mutex.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="coro_2mutex_8hpp_source.html">mutex.hpp</a>&gt;</code></p>
+<div class="dynheader">
+Inheritance diagram for yaclib::Mutex&lt; Batching, FIFO &gt;:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="classyaclib_1_1Mutex__inherit__graph.svg" width="172" height="140"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
+<div class="dynheader">
+Collaboration diagram for yaclib::Mutex&lt; Batching, FIFO &gt;:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="classyaclib_1_1Mutex__coll__graph.svg" width="172" height="140"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-types" name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:a52e38098d58459d60212613c7361ec1a" id="r_a52e38098d58459d60212613c7361ec1a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">using</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1Mutex.html#a52e38098d58459d60212613c7361ec1a">Base</a> = <a class="el" href="structyaclib_1_1detail_1_1MutexImpl.html">detail::MutexImpl</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">FIFO</a>, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Batching</a> &gt;</td></tr>
+<tr class="separator:a52e38098d58459d60212613c7361ec1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:a6a8a89adb339347d79407744b50be896" id="r_a6a8a89adb339347d79407744b50be896"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">auto</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1Mutex.html#a6a8a89adb339347d79407744b50be896">TryGuard</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="memdesc:a6a8a89adb339347d79407744b50be896"><td class="mdescLeft">&#160;</td><td class="mdescRight">Try to lock mutex and create <a class="el" href="classyaclib_1_1UniqueGuard.html">UniqueGuard</a> for it.  <br /></td></tr>
+<tr class="separator:a6a8a89adb339347d79407744b50be896"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a72df683423d10072689093723baa0dee" id="r_a72df683423d10072689093723baa0dee"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">auto</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1Mutex.html#a72df683423d10072689093723baa0dee">Guard</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="memdesc:a72df683423d10072689093723baa0dee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lock mutex and create <a class="el" href="classyaclib_1_1UniqueGuard.html">UniqueGuard</a> for it.  <br /></td></tr>
+<tr class="separator:a72df683423d10072689093723baa0dee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a68dceeca00e7bc6960ea27d68c07e971" id="r_a68dceeca00e7bc6960ea27d68c07e971"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">auto</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1Mutex.html#a68dceeca00e7bc6960ea27d68c07e971">GuardSticky</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="memdesc:a68dceeca00e7bc6960ea27d68c07e971"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lock mutex and create <a class="el" href="classyaclib_1_1StickyGuard.html">StickyGuard</a> for it.  <br /></td></tr>
+<tr class="separator:a68dceeca00e7bc6960ea27d68c07e971"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a66044ec2c4a1bd8e214b810010a5cfd0" id="r_a66044ec2c4a1bd8e214b810010a5cfd0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">auto</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1Mutex.html#a66044ec2c4a1bd8e214b810010a5cfd0">Lock</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="memdesc:a66044ec2c4a1bd8e214b810010a5cfd0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lock mutex.  <br /></td></tr>
+<tr class="separator:a66044ec2c4a1bd8e214b810010a5cfd0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4e4886eccf4f3c4da4742e7079a0d999" id="r_a4e4886eccf4f3c4da4742e7079a0d999"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">auto</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1Mutex.html#a4e4886eccf4f3c4da4742e7079a0d999">Unlock</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="memdesc:a4e4886eccf4f3c4da4742e7079a0d999"><td class="mdescLeft">&#160;</td><td class="mdescRight">The best way to unlock mutex, if you interested in batched critical section.  <br /></td></tr>
+<tr class="separator:a4e4886eccf4f3c4da4742e7079a0d999"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad5535430d58b191adeae2674b16c206b" id="r_ad5535430d58b191adeae2674b16c206b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">auto</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1Mutex.html#ad5535430d58b191adeae2674b16c206b">UnlockOn</a> (<a class="el" href="classyaclib_1_1IExecutor.html">IExecutor</a> &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">e</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="memdesc:ad5535430d58b191adeae2674b16c206b"><td class="mdescLeft">&#160;</td><td class="mdescRight">This method is an optimization for <a class="el" href="classyaclib_1_1Mutex.html#a4e4886eccf4f3c4da4742e7079a0d999" title="The best way to unlock mutex, if you interested in batched critical section.">Unlock()</a> and <a class="el" href="namespaceyaclib.html#a56dc2c5b95bbc3b8cd706654e0c49ba9" title="TODO(mkornaukhov03) Add doxygen docs.">On()</a>  <br /></td></tr>
+<tr class="separator:ad5535430d58b191adeae2674b16c206b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acf21216a9ddb9be58fc42eacedec3966" id="r_acf21216a9ddb9be58fc42eacedec3966"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1Mutex.html#acf21216a9ddb9be58fc42eacedec3966">TryLock</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="memdesc:acf21216a9ddb9be58fc42eacedec3966"><td class="mdescLeft">&#160;</td><td class="mdescRight">Try to lock mutex return true if mutex was locked, false otherwise.  <br /></td></tr>
+<tr class="separator:acf21216a9ddb9be58fc42eacedec3966"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2a71c810f5637af09bef0ed892acbbbb" id="r_a2a71c810f5637af09bef0ed892acbbbb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1Mutex.html#a2a71c810f5637af09bef0ed892acbbbb">UnlockHere</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="memdesc:a2a71c810f5637af09bef0ed892acbbbb"><td class="mdescLeft">&#160;</td><td class="mdescRight">The general way to unlock mutex, mainly for RAII.  <br /></td></tr>
+<tr class="separator:a2a71c810f5637af09bef0ed892acbbbb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr class="memitem:ab9621828978d361aa6a674dc838bb88d" id="r_ab9621828978d361aa6a674dc838bb88d"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">To</a> , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> From &gt; </td></tr>
+<tr class="memitem:ab9621828978d361aa6a674dc838bb88d"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">static</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">auto</a> &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classyaclib_1_1Mutex.html#ab9621828978d361aa6a674dc838bb88d">Cast</a> (From &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">from</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:ab9621828978d361aa6a674dc838bb88d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="inherited" name="inherited"></a>
+Additional Inherited Members</h2></td></tr>
+<tr class="inherit_header pro_methods_structyaclib_1_1detail_1_1MutexImpl"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_structyaclib_1_1detail_1_1MutexImpl')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="structyaclib_1_1detail_1_1MutexImpl.html">yaclib::detail::MutexImpl&lt; FIFO, Batching &gt;</a></td></tr>
+<tr class="memitem:ae22802ff3184ca7634adf7c46c6aea7b inherit pro_methods_structyaclib_1_1detail_1_1MutexImpl" id="r_ae22802ff3184ca7634adf7c46c6aea7b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structyaclib_1_1detail_1_1MutexImpl.html#ae22802ff3184ca7634adf7c46c6aea7b">TryLockAwait</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:ae22802ff3184ca7634adf7c46c6aea7b inherit pro_methods_structyaclib_1_1detail_1_1MutexImpl"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afb7322492d3dd9257ede5fd0544f4285 inherit pro_methods_structyaclib_1_1detail_1_1MutexImpl" id="r_afb7322492d3dd9257ede5fd0544f4285"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structyaclib_1_1detail_1_1MutexImpl.html#afb7322492d3dd9257ede5fd0544f4285">AwaitLock</a> (<a class="el" href="classyaclib_1_1detail_1_1BaseCore.html">BaseCore</a> &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">curr</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:afb7322492d3dd9257ede5fd0544f4285 inherit pro_methods_structyaclib_1_1detail_1_1MutexImpl"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a78b124e9c205d3a7b43fd0d9c980a123 inherit pro_methods_structyaclib_1_1detail_1_1MutexImpl" id="r_a78b124e9c205d3a7b43fd0d9c980a123"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structyaclib_1_1detail_1_1MutexImpl.html#a78b124e9c205d3a7b43fd0d9c980a123">TryUnlockAwait</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a78b124e9c205d3a7b43fd0d9c980a123 inherit pro_methods_structyaclib_1_1detail_1_1MutexImpl"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4975349c605d17818d5d49524e2c414e inherit pro_methods_structyaclib_1_1detail_1_1MutexImpl" id="r_a4975349c605d17818d5d49524e2c414e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">YACLIB_INLINE</a> <a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structyaclib_1_1detail_1_1MutexImpl.html#a4975349c605d17818d5d49524e2c414e">BatchingPossible</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">const</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a4975349c605d17818d5d49524e2c414e inherit pro_methods_structyaclib_1_1detail_1_1MutexImpl"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a19e8738691fa0a4b13ab72666a054e07 inherit pro_methods_structyaclib_1_1detail_1_1MutexImpl" id="r_a19e8738691fa0a4b13ab72666a054e07"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structyaclib_1_1detail_1_1MutexImpl.html#a19e8738691fa0a4b13ab72666a054e07">UnlockHereAwait</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a19e8738691fa0a4b13ab72666a054e07 inherit pro_methods_structyaclib_1_1detail_1_1MutexImpl"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a085e19266a1196eb4b3096afe44177b0 inherit pro_methods_structyaclib_1_1detail_1_1MutexImpl" id="r_a085e19266a1196eb4b3096afe44177b0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">auto</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structyaclib_1_1detail_1_1MutexImpl.html#a085e19266a1196eb4b3096afe44177b0">AwaitUnlock</a> (<a class="el" href="classyaclib_1_1detail_1_1BaseCore.html">BaseCore</a> &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">curr</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a085e19266a1196eb4b3096afe44177b0 inherit pro_methods_structyaclib_1_1detail_1_1MutexImpl"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afdf51e8dc0e2438512453d9891464347 inherit pro_methods_structyaclib_1_1detail_1_1MutexImpl" id="r_afdf51e8dc0e2438512453d9891464347"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">auto</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structyaclib_1_1detail_1_1MutexImpl.html#afdf51e8dc0e2438512453d9891464347">AwaitUnlockOn</a> (<a class="el" href="classyaclib_1_1detail_1_1BaseCore.html">BaseCore</a> &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">curr</a>, <a class="el" href="classyaclib_1_1IExecutor.html">IExecutor</a> &amp;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">executor</a>) <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:afdf51e8dc0e2438512453d9891464347 inherit pro_methods_structyaclib_1_1detail_1_1MutexImpl"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acf21216a9ddb9be58fc42eacedec3966 inherit pro_methods_structyaclib_1_1detail_1_1MutexImpl" id="r_acf21216a9ddb9be58fc42eacedec3966"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structyaclib_1_1detail_1_1MutexImpl.html#acf21216a9ddb9be58fc42eacedec3966">TryLock</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:acf21216a9ddb9be58fc42eacedec3966 inherit pro_methods_structyaclib_1_1detail_1_1MutexImpl"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2a71c810f5637af09bef0ed892acbbbb inherit pro_methods_structyaclib_1_1detail_1_1MutexImpl" id="r_a2a71c810f5637af09bef0ed892acbbbb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structyaclib_1_1detail_1_1MutexImpl.html#a2a71c810f5637af09bef0ed892acbbbb">UnlockHere</a> () <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">noexcept</a></td></tr>
+<tr class="separator:a2a71c810f5637af09bef0ed892acbbbb inherit pro_methods_structyaclib_1_1detail_1_1MutexImpl"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><div class="compoundTemplParams">template&lt;<a class="el" href="classbool.html">bool</a> Batching = true, <a class="el" href="classbool.html">bool</a> FIFO = false&gt;<br />
+class yaclib::Mutex&lt; Batching, FIFO &gt;</div><p><a class="el" href="classyaclib_1_1Mutex.html" title="Mutex for coroutines.">Mutex</a> for coroutines. </p>
+<dl class="section note"><dt>Note</dt><dd>It does not block execution thread, only coroutine </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="coro_2mutex_8hpp_source.html#l00196">196</a> of file <a class="el" href="coro_2mutex_8hpp_source.html">mutex.hpp</a>.</p>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
+<a id="a52e38098d58459d60212613c7361ec1a" name="a52e38098d58459d60212613c7361ec1a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a52e38098d58459d60212613c7361ec1a">&#9670;&#160;</a></span>Base</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="classbool.html">bool</a> Batching = true, <a class="el" href="classbool.html">bool</a> FIFO = false&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">using</a> <a class="el" href="classyaclib_1_1Mutex.html">yaclib::Mutex</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Batching</a>, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">FIFO</a> &gt;::Base =  <a class="el" href="structyaclib_1_1detail_1_1MutexImpl.html">detail::MutexImpl</a>&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">FIFO</a>, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Batching</a>&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="coro_2mutex_8hpp_source.html#l00198">198</a> of file <a class="el" href="coro_2mutex_8hpp_source.html">mutex.hpp</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="ab9621828978d361aa6a674dc838bb88d" name="ab9621828978d361aa6a674dc838bb88d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab9621828978d361aa6a674dc838bb88d">&#9670;&#160;</a></span>Cast()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="classbool.html">bool</a> Batching = true, <a class="el" href="classbool.html">bool</a> FIFO = false&gt; </div>
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">To</a> , <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">typename</a> From &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">static</a> <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">auto</a> &amp; <a class="el" href="classyaclib_1_1Mutex.html">yaclib::Mutex</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Batching</a>, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">FIFO</a> &gt;::Cast </td>
+          <td>(</td>
+          <td class="paramtype">From &amp;&#160;</td>
+          <td class="paramname"><em>from</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="coro_2mutex_8hpp_source.html#l00285">285</a> of file <a class="el" href="coro_2mutex_8hpp_source.html">mutex.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<a id="a72df683423d10072689093723baa0dee" name="a72df683423d10072689093723baa0dee"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a72df683423d10072689093723baa0dee">&#9670;&#160;</a></span>Guard()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="classbool.html">bool</a> Batching = true, <a class="el" href="classbool.html">bool</a> FIFO = false&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">auto</a> <a class="el" href="classyaclib_1_1Mutex.html">yaclib::Mutex</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Batching</a>, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">FIFO</a> &gt;::Guard </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Lock mutex and create <a class="el" href="classyaclib_1_1UniqueGuard.html">UniqueGuard</a> for it. </p>
+<dl class="section return"><dt>Returns</dt><dd>Awaitable, which await_resume returns the <a class="el" href="classyaclib_1_1UniqueGuard.html">UniqueGuard</a> </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="coro_2mutex_8hpp_source.html#l00215">215</a> of file <a class="el" href="coro_2mutex_8hpp_source.html">mutex.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a68dceeca00e7bc6960ea27d68c07e971" name="a68dceeca00e7bc6960ea27d68c07e971"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a68dceeca00e7bc6960ea27d68c07e971">&#9670;&#160;</a></span>GuardSticky()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="classbool.html">bool</a> Batching = true, <a class="el" href="classbool.html">bool</a> FIFO = false&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">auto</a> <a class="el" href="classyaclib_1_1Mutex.html">yaclib::Mutex</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Batching</a>, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">FIFO</a> &gt;::GuardSticky </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Lock mutex and create <a class="el" href="classyaclib_1_1StickyGuard.html">StickyGuard</a> for it. </p>
+<dl class="section return"><dt>Returns</dt><dd>Awaitable, which await_resume returns the <a class="el" href="classyaclib_1_1StickyGuard.html">StickyGuard</a> </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="coro_2mutex_8hpp_source.html#l00224">224</a> of file <a class="el" href="coro_2mutex_8hpp_source.html">mutex.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a66044ec2c4a1bd8e214b810010a5cfd0" name="a66044ec2c4a1bd8e214b810010a5cfd0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a66044ec2c4a1bd8e214b810010a5cfd0">&#9670;&#160;</a></span>Lock()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="classbool.html">bool</a> Batching = true, <a class="el" href="classbool.html">bool</a> FIFO = false&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">auto</a> <a class="el" href="classyaclib_1_1Mutex.html">yaclib::Mutex</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Batching</a>, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">FIFO</a> &gt;::Lock </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Lock mutex. </p>
+
+<p class="definition">Definition at line <a class="el" href="coro_2mutex_8hpp_source.html#l00237">237</a> of file <a class="el" href="coro_2mutex_8hpp_source.html">mutex.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a6a8a89adb339347d79407744b50be896" name="a6a8a89adb339347d79407744b50be896"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6a8a89adb339347d79407744b50be896">&#9670;&#160;</a></span>TryGuard()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="classbool.html">bool</a> Batching = true, <a class="el" href="classbool.html">bool</a> FIFO = false&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">auto</a> <a class="el" href="classyaclib_1_1Mutex.html">yaclib::Mutex</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Batching</a>, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">FIFO</a> &gt;::TryGuard </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Try to lock mutex and create <a class="el" href="classyaclib_1_1UniqueGuard.html">UniqueGuard</a> for it. </p>
+<dl class="section note"><dt>Note</dt><dd>If we couldn't lock mutex, then <a class="el" href="classyaclib_1_1detail_1_1Guard.html#a7116268f8cd9b4424424d3cd075ce25c">UniqueGuard::OwnsLock()</a> will be false </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Awaitable, which await_resume returns the <a class="el" href="classyaclib_1_1UniqueGuard.html">UniqueGuard</a> </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="coro_2mutex_8hpp_source.html#l00206">206</a> of file <a class="el" href="coro_2mutex_8hpp_source.html">mutex.hpp</a>.</p>
+
+</div>
+</div>
+<a id="acf21216a9ddb9be58fc42eacedec3966" name="acf21216a9ddb9be58fc42eacedec3966"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acf21216a9ddb9be58fc42eacedec3966">&#9670;&#160;</a></span>TryLock()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="classbool.html">bool</a> Batching = true, <a class="el" href="classbool.html">bool</a> FIFO = false&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classbool.html">bool</a> <a class="el" href="structyaclib_1_1detail_1_1MutexImpl.html">yaclib::detail::MutexImpl</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">FIFO</a>, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Batching</a> &gt;::TryLock </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Try to lock mutex return true if mutex was locked, false otherwise. </p>
+
+<p class="definition">Definition at line <a class="el" href="coro_2mutex_8hpp_source.html#l00097">97</a> of file <a class="el" href="coro_2mutex_8hpp_source.html">mutex.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a4e4886eccf4f3c4da4742e7079a0d999" name="a4e4886eccf4f3c4da4742e7079a0d999"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4e4886eccf4f3c4da4742e7079a0d999">&#9670;&#160;</a></span>Unlock()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="classbool.html">bool</a> Batching = true, <a class="el" href="classbool.html">bool</a> FIFO = false&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">auto</a> <a class="el" href="classyaclib_1_1Mutex.html">yaclib::Mutex</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Batching</a>, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">FIFO</a> &gt;::Unlock </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The best way to unlock mutex, if you interested in batched critical section. </p>
+
+<p class="definition">Definition at line <a class="el" href="coro_2mutex_8hpp_source.html#l00244">244</a> of file <a class="el" href="coro_2mutex_8hpp_source.html">mutex.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a2a71c810f5637af09bef0ed892acbbbb" name="a2a71c810f5637af09bef0ed892acbbbb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2a71c810f5637af09bef0ed892acbbbb">&#9670;&#160;</a></span>UnlockHere()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="classbool.html">bool</a> Batching = true, <a class="el" href="classbool.html">bool</a> FIFO = false&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">void</a> <a class="el" href="structyaclib_1_1detail_1_1MutexImpl.html">yaclib::detail::MutexImpl</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">FIFO</a>, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Batching</a> &gt;::UnlockHere </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The general way to unlock mutex, mainly for RAII. </p>
+
+<p class="definition">Definition at line <a class="el" href="coro_2mutex_8hpp_source.html#l00101">101</a> of file <a class="el" href="coro_2mutex_8hpp_source.html">mutex.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ad5535430d58b191adeae2674b16c206b" name="ad5535430d58b191adeae2674b16c206b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad5535430d58b191adeae2674b16c206b">&#9670;&#160;</a></span>UnlockOn()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="classbool.html">bool</a> Batching = true, <a class="el" href="classbool.html">bool</a> FIFO = false&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">auto</a> <a class="el" href="classyaclib_1_1Mutex.html">yaclib::Mutex</a>&lt; <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">Batching</a>, <a class="el" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">FIFO</a> &gt;::UnlockOn </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classyaclib_1_1IExecutor.html">IExecutor</a> &amp;&#160;</td>
+          <td class="paramname"><em>e</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>This method is an optimization for <a class="el" href="classyaclib_1_1Mutex.html#a4e4886eccf4f3c4da4742e7079a0d999" title="The best way to unlock mutex, if you interested in batched critical section.">Unlock()</a> and <a class="el" href="namespaceyaclib.html#a56dc2c5b95bbc3b8cd706654e0c49ba9" title="TODO(mkornaukhov03) Add doxygen docs.">On()</a> </p>
+<p>Use it instead of </p><div class="fragment"><div class="line">...</div>
+<div class="line">co_await mutex.Unlock();</div>
+<div class="line"><span class="keyword">co_await</span> <a class="code hl_function" href="namespaceyaclib.html#a56dc2c5b95bbc3b8cd706654e0c49ba9">On</a>(<a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">e</a>);</div>
+<div class="line">...</div>
+<div class="ttc" id="anamespaceyaclib_html_a56dc2c5b95bbc3b8cd706654e0c49ba9"><div class="ttname"><a href="namespaceyaclib.html#a56dc2c5b95bbc3b8cd706654e0c49ba9">yaclib::On</a></div><div class="ttdeci">YACLIB_INLINE detail::OnAwaiter On(IExecutor &amp;e) noexcept</div><div class="ttdoc">TODO(mkornaukhov03) Add doxygen docs.</div><div class="ttdef"><b>Definition</b> <a href="on_8hpp_source.html#l00011">on.hpp:11</a></div></div>
+<div class="ttc" id="anamespaceyaclib_html_ac918e7a0c384bcf611e0b5b4b2cd5504"><div class="ttname"><a href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">yaclib::MakeContract</a></div><div class="ttdeci">Contract&lt; V, E &gt; MakeContract()</div><div class="ttdoc">Creates related future and promise.</div><div class="ttdef"><b>Definition</b> <a href="contract_8hpp_source.html#l00025">contract.hpp:25</a></div></div>
+</div><!-- fragment --><p>Typical usage: </p><div class="fragment"><div class="line">...</div>
+<div class="line"><span class="comment">// auto&amp; executorBeforeCriticalSection = yaclib::kCurrent;</span></div>
+<div class="line">auto <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">guard</a> = <span class="keyword">co_await</span> mutex.StickyGuard();</div>
+<div class="line">...</div>
+<div class="line">co_await <a class="code hl_function" href="namespaceyaclib.html#ac918e7a0c384bcf611e0b5b4b2cd5504">guard</a>.UnlockOn();</div>
+<div class="line"><span class="comment">// auto&amp; executorAfterCriticalSection = yaclib::kCurrent;</span></div>
+<div class="line"><span class="comment">// assert(&amp;executorBeforeCriticalSection == &amp;executorAfterCriticalSection);</span></div>
+<div class="line">...</div>
+</div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">e</td><td>executor which will be used for code after unlock </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="coro_2mutex_8hpp_source.html#l00273">273</a> of file <a class="el" href="coro_2mutex_8hpp_source.html">mutex.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>.</p>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following file:<ul>
+<li>include/yaclib/coro/<a class="el" href="coro_2mutex_8hpp_source.html">mutex.hpp</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="namespaceyaclib.html">yaclib</a></li><li class="navelem"><a class="el" href="classyaclib_1_1Mutex.html">Mutex</a></li>
+    <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+  </ul>
+</div>
+</body>
+</html>
