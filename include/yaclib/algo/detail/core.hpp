@@ -225,7 +225,7 @@ class Core : public ResultCoreT<Type, Ret, E>, public FuncCore<Func> {
       caller->DecRef();
     }
     if constexpr (!Async) {
-      this->_func.storage.~Storage();
+      this->Destroy();
     }
     return this->template SetResult<SymmetricTransfer>();
   }
@@ -283,7 +283,7 @@ class Core : public ResultCoreT<Type, Ret, E>, public FuncCore<Func> {
         this->_self.unwrapping = 1;
       }
       this->_self.caller = core;
-      this->_func.storage.~Storage();
+      this->Destroy();
       if constexpr (is_task_v<decltype(async)>) {
         core->StoreCallback(*this);
         return Step<SymmetricTransfer>(*this, *MoveToCaller(core));
@@ -383,6 +383,33 @@ auto* MakeCore(Func&& f) {
   } else {
     return MakeUnique<Core>(std::forward<Func>(f)).Release();
   }
+}
+
+template <typename FromCorePtr, typename Func>
+bool TrySetCallback(FromCorePtr&& core, Func&& f) {
+  using Arg = typename remove_cvref_t<FromCorePtr>::Value::Value;
+  using E = typename remove_cvref_t<FromCorePtr>::Value::Error;
+
+  static constexpr bool Unique = std::is_same_v<UniqueCorePtr<Arg, E>&, FromCorePtr>;
+  static constexpr bool Shared = std::is_same_v<const SharedCorePtr<Arg, E>&, FromCorePtr>;
+  static_assert(Unique || Shared);
+
+  YACLIB_ASSERT(core);
+  static constexpr auto From = Unique ? CoreType::FromUnique : CoreType::FromShared;
+  auto* callback = MakeCore<CoreType::Detach | From, Arg, E>(std::forward<Func>(f));
+  callback->StoreCallback(MakeDrop());
+  callback->_executor = nullptr;
+
+  auto* caller = core.Get();
+  if (caller->SetCallback(*callback)) {
+    if constexpr (Unique) {
+      core.Release();
+    }
+    return true;
+  }
+  callback->Destroy();
+  callback->DecRef();
+  return false;
 }
 
 template <CoreType CoreT, bool On, typename FromCorePtr, typename Func>

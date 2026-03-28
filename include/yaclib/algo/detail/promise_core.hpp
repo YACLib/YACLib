@@ -34,7 +34,7 @@ class PromiseCore : public std::conditional_t<Shared, SharedCore<V, E>, UniqueCo
       // We need to move func with capture on stack, because promise can be Set before func return
       static_assert(std::is_nothrow_move_constructible_v<Storage>);
       auto func = std::move(this->_func.storage);
-      this->_func.storage.~Storage();
+      this->Destroy();
       std::forward<Invoke>(func)(std::move(promise));
     } catch (...) {
       if (promise.Valid()) {
@@ -47,7 +47,7 @@ class PromiseCore : public std::conditional_t<Shared, SharedCore<V, E>, UniqueCo
   }
 
   void Drop() noexcept final {
-    this->_func.storage.~Storage();
+    this->Destroy();
     this->Store(StopTag{});
     Loop(this, this->template SetResult<false>());
   }

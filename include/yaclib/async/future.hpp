@@ -161,6 +161,21 @@ class FutureBase {
   }
 
   /**
+   * Try to attach the final continuation func to *this and \ref Detach *this
+   *
+   * Returns false without calling \p f if *this is already ready (the callback
+   * cannot be set because the result is already stored). The caller is then
+   * responsible for consuming the result via \ref Touch.
+   *
+   * Returns true if the callback was successfully installed; \p f will be
+   * called inline when the result arrives.
+   */
+  template <typename Func>
+  [[nodiscard]] bool TryDetachInline(Func&& f) & {
+    return detail::TrySetCallback(_core, std::forward<Func>(f));
+  }
+
+  /**
    * Attach the final continuation func to *this and \ref Detach *this
    *
    * The func will be executed on the specified executor.

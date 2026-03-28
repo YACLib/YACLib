@@ -10,6 +10,11 @@ namespace yaclib::detail {
 
 template <typename Func>
 class FuncCore {
+ public:
+  YACLIB_INLINE void Destroy() noexcept {
+    _func.storage.~Storage();
+  }
+
  protected:
   using Storage = std::decay_t<Func>;
   using Invoke = std::conditional_t<std::is_function_v<std::remove_reference_t<Func>>, Storage, Func>;
