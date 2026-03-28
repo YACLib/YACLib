@@ -15,7 +15,7 @@ namespace yaclib::detail {
 template <typename V, typename E, bool Lazy, bool Shared>
 class PromiseType;
 
-struct Destroy final {
+struct DestroyAwaiter final {
   constexpr bool await_ready() const noexcept {
     return false;
   }
@@ -73,7 +73,7 @@ class PromiseType final : public PromiseTypeBase<V, E, Lazy, Shared> {
     }
   }
 
-  Destroy final_suspend() noexcept {
+  DestroyAwaiter final_suspend() noexcept {
     return {};
   }
 

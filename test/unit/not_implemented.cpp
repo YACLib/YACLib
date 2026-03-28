@@ -122,7 +122,7 @@ TEST(DefaultEvent, Reset) {
 
 TEST(CoroDummy, DestroyResume) {
 #if YACLIB_CORO != 0
-  yaclib::detail::Destroy d;
+  yaclib::detail::DestroyAwaiter d;
   d.await_resume();
 #else
   GTEST_SKIP();
