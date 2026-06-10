@@ -63,7 +63,11 @@ class [[nodiscard]] Result final {
   }
 
   Result(std::exception_ptr error) noexcept : _error{std::move(error)} {
+    // null exception_ptr would be indistinguishable from a value, treat it as stop
     YACLIB_ASSERT(_error != nullptr);
+    if (_error == nullptr) {
+      _error = StopPtr();
+    }
   }
 
   template <typename... Args>
@@ -198,7 +202,9 @@ extern template class Result<>;
 /**
  * Default result trait, describes how async abstractions create and inspect results
  *
- * A custom trait should provide the same interface, its container should be copyable iff V is copyable
+ * A custom trait should provide the same interface, its container should be copyable iff V is copyable.
+ * MakeResult<V>(StopTag) and MakeResult<V>(std::exception_ptr) must not throw: they are invoked
+ * inside noexcept cancellation and teardown paths, a throw there will std::terminate
  */
 struct ResultTrait {
   template <typename V>

@@ -190,13 +190,9 @@ TEST(MakeExceptionFuture, NonTrivial) {
   }
 }
 
-// StopError is gone: for the default trait the "error value" is yaclib::StopTag{}, stored as StopException
+// For the default trait Error == Stopped (single error channel), covered by MakeStoppedFuture;
+// a non-stop exception_ptr error is covered by MakeExceptionFuture
 TEST(MakeErrorFuture, Void) {
-  {
-    yaclib::Future<> f = yaclib::MakeFuture<void>(yaclib::StopTag{});
-    EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
-    EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::StopException);
-  }
   {
     yaclib::Future<void, ErrorCodeTrait> f =
       yaclib::MakeFuture<void, ErrorCodeTrait>(LikeErrorCode{std::make_error_code(std::errc::invalid_argument)});
@@ -209,11 +205,6 @@ TEST(MakeErrorFuture, Void) {
 
 TEST(MakeErrorFuture, Int) {
   {
-    yaclib::Future<int> f = yaclib::MakeFuture<int>(yaclib::StopTag{});
-    EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
-    EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::StopException);
-  }
-  {
     yaclib::Future<int, ErrorCodeTrait> f =
       yaclib::MakeFuture<int, ErrorCodeTrait>(LikeErrorCode{std::make_error_code(std::errc::invalid_argument)});
     EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
@@ -224,11 +215,6 @@ TEST(MakeErrorFuture, Int) {
 }
 
 TEST(MakeErrorFuture, NonTrivial) {
-  {
-    yaclib::Future<Kek> f = yaclib::MakeFuture<Kek>(yaclib::StopTag{});
-    EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
-    EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::StopException);
-  }
   {
     yaclib::Future<Kek, ErrorCodeTrait> f =
       yaclib::MakeFuture<Kek, ErrorCodeTrait>(LikeErrorCode{std::make_error_code(std::errc::invalid_argument)});

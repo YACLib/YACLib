@@ -24,6 +24,8 @@ class FutureBase {
   static_assert(Check<V>(), "V should be valid");
 
   using Result = typename T::template Result<V>;
+  static_assert(!std::is_same_v<V, typename T::Error>,
+                "V cannot be the same as the trait Error type, because callback dispatch would be ambiguous");
 
   FutureBase(const FutureBase&) = delete;
   FutureBase& operator=(const FutureBase&) = delete;

@@ -12,6 +12,9 @@ const std::exception_ptr& StopPtr() noexcept {
 }
 
 bool IsStop(const std::exception_ptr& error) noexcept {
+  if (error == nullptr) {
+    return false;
+  }
   if (error == StopPtr()) {
     return true;
   }

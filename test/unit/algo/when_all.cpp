@@ -17,12 +17,14 @@
 #include <chrono>
 #include <cstddef>
 #include <exception>
+#include <memory>
 #include <stdexcept>
 #include <system_error>
 #include <thread>
 #include <tuple>
 #include <type_traits>
 #include <utility>
+#include <variant>
 #include <vector>
 #include <yaclib_std/thread>
 
@@ -362,6 +364,180 @@ TEST(WhenAll, FirstFail) {
 #endif
   FirstFail();
   FirstFail<ErrorCodeTrait>();
+}
+
+/**
+ * Error type with an observably destructive move: moving steals the shared_ptr, leaving the source empty.
+ *
+ * Used to check that All<FirstFail>::Consume copies (not moves) the error from a live shared input core.
+ */
+struct DestructiveError {
+  DestructiveError() noexcept = default;
+
+  explicit DestructiveError(std::error_code error) : code{std::make_shared<std::error_code>(error)} {
+  }
+
+  DestructiveError(yaclib::StopTag /*tag*/)
+    : code{std::make_shared<std::error_code>(std::make_error_code(std::errc::operation_canceled))} {
+  }
+
+  DestructiveError(DestructiveError&&) noexcept = default;
+  DestructiveError(const DestructiveError&) noexcept = default;
+  DestructiveError& operator=(DestructiveError&&) noexcept = default;
+  DestructiveError& operator=(const DestructiveError&) noexcept = default;
+
+  std::shared_ptr<std::error_code> code;
+};
+
+/**
+ * Minimal result container like test::Expected, but with DestructiveError errors and Error()&& that really moves
+ */
+template <typename ValueT>
+class Destructive final {
+  using V = std::conditional_t<std::is_void_v<ValueT>, yaclib::Unit, ValueT>;
+  using Variant = std::variant<V, DestructiveError>;
+
+ public:
+  Destructive() : _result{std::in_place_index<1>, DestructiveError{yaclib::StopTag{}}} {
+  }
+
+  Destructive(yaclib::StopTag tag) : _result{std::in_place_index<1>, DestructiveError{tag}} {
+  }
+
+  Destructive(DestructiveError error) : _result{std::in_place_index<1>, std::move(error)} {
+  }
+
+  template <typename... Args>
+  explicit Destructive(std::in_place_t, Args&&... args) : _result{std::in_place_index<0>, std::forward<Args>(args)...} {
+  }
+
+  [[nodiscard]] explicit operator bool() const noexcept {
+    return _result.index() == 0;
+  }
+
+  [[nodiscard]] V&& Value() && noexcept {
+    return std::move(*std::get_if<0>(&_result));
+  }
+  [[nodiscard]] const V& Value() const& noexcept {
+    return *std::get_if<0>(&_result);
+  }
+
+  [[nodiscard]] DestructiveError&& Error() && noexcept {
+    return std::move(*std::get_if<1>(&_result));
+  }
+  [[nodiscard]] const DestructiveError& Error() const& noexcept {
+    return *std::get_if<1>(&_result);
+  }
+
+ private:
+  Variant _result;
+};
+
+/**
+ * Result trait that plugs \ref Destructive into yaclib, \see yaclib::ResultTrait for the contract
+ */
+struct DestructiveTrait {
+  template <typename V>
+  using Result = Destructive<V>;
+
+  using Error = DestructiveError;
+
+  template <typename R>
+  using Value = typename yaclib::detail::InstantiationType<Destructive, R>::Value;
+
+  template <typename V, typename... Args>
+  static Destructive<V> MakeResult(Args&&... args) {
+    static_assert(sizeof...(Args) > 0);
+    using Head = std::decay_t<yaclib::head_t<Args&&...>>;
+    if constexpr (sizeof...(Args) == 1 && std::is_same_v<Head, yaclib::Unit>) {
+      return Destructive<V>{std::in_place};
+    } else if constexpr (sizeof...(Args) == 1 && std::is_same_v<Head, std::exception_ptr>) {
+      return Destructive<V>{DestructiveError{std::make_error_code(std::errc::io_error)}};
+    } else if constexpr (std::is_same_v<Head, std::in_place_t> ||
+                         (sizeof...(Args) == 1 &&
+                          (std::is_same_v<Head, yaclib::StopTag> || std::is_same_v<Head, DestructiveError> ||
+                           std::is_same_v<Head, Destructive<V>>))) {
+      return Destructive<V>{std::forward<Args>(args)...};
+    } else {
+      return Destructive<V>{std::in_place, std::forward<Args>(args)...};
+    }
+  }
+
+  template <typename V>
+  static bool Ok(const Destructive<V>& r) noexcept {
+    return static_cast<bool>(r);
+  }
+
+  template <typename R>
+  static decltype(auto) MoveValue(R&& r) noexcept {
+    return std::forward<R>(r).Value();
+  }
+
+  template <typename R>
+  static decltype(auto) MoveError(R&& r) noexcept {
+    return std::forward<R>(r).Error();
+  }
+};
+
+// All<FirstFail>::Consume must copy (not move) the error from a live shared input core:
+// retained SharedFuture copies must still observe an intact error after the combinator consumed it
+
+TEST(WhenAll, FirstFailCopiesSharedError) {
+  auto [sf, sp] = yaclib::MakeSharedContract<int, DestructiveTrait>();
+  auto sf2 = sf;
+  auto [f2, p2] = yaclib::MakeContract<int, DestructiveTrait>();
+
+  auto all = yaclib::WhenAll<yaclib::FailPolicy::FirstFail>(std::move(sf), std::move(f2));
+
+  std::move(sp).Set(DestructiveError{std::make_error_code(std::errc::invalid_argument)});
+  std::move(p2).Set(1);
+
+  auto combined = std::move(all).Get();
+  EXPECT_FALSE(combined);
+  ASSERT_TRUE(combined.Error().code != nullptr);
+  EXPECT_EQ(*combined.Error().code, std::make_error_code(std::errc::invalid_argument));
+
+  const auto& retained = sf2.Get();
+  EXPECT_FALSE(retained);
+  ASSERT_TRUE(retained.Error().code != nullptr);
+  EXPECT_EQ(*retained.Error().code, std::make_error_code(std::errc::invalid_argument));
+}
+
+TEST(WhenAll, FirstFailCopiesSharedErrorDynamic) {
+  static constexpr std::size_t kCount = 3;
+
+  std::vector<yaclib::SharedFuture<int, DestructiveTrait>> futures;
+  std::vector<yaclib::SharedFuture<int, DestructiveTrait>> retained;
+  std::vector<yaclib::SharedPromise<int, DestructiveTrait>> promises;
+  for (std::size_t i = 0; i != kCount; ++i) {
+    auto [f, p] = yaclib::MakeSharedContract<int, DestructiveTrait>();
+    retained.push_back(f);
+    futures.push_back(std::move(f));
+    promises.push_back(std::move(p));
+  }
+
+  auto all = yaclib::WhenAll<yaclib::FailPolicy::FirstFail>(futures.begin(), futures.end());
+
+  std::move(promises[1]).Set(DestructiveError{std::make_error_code(std::errc::invalid_argument)});
+  std::move(promises[0]).Set(0);
+  std::move(promises[2]).Set(2);
+
+  auto combined = std::move(all).Get();
+  EXPECT_FALSE(combined);
+  ASSERT_TRUE(combined.Error().code != nullptr);
+  EXPECT_EQ(*combined.Error().code, std::make_error_code(std::errc::invalid_argument));
+
+  const auto& failed = retained[1].Get();
+  EXPECT_FALSE(failed);
+  ASSERT_TRUE(failed.Error().code != nullptr);
+  EXPECT_EQ(*failed.Error().code, std::make_error_code(std::errc::invalid_argument));
+
+  const auto& ok0 = retained[0].Get();
+  ASSERT_TRUE(ok0);
+  EXPECT_EQ(ok0.Value(), 0);
+  const auto& ok2 = retained[2].Get();
+  ASSERT_TRUE(ok2);
+  EXPECT_EQ(ok2.Value(), 2);
 }
 
 TEST(WhenAll, FailWithError) {

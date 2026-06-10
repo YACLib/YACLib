@@ -10,44 +10,65 @@
 namespace test {
 namespace {
 
-#if !defined(LAMBDA_SIZE) && defined(__has_cpp_attribute)
-#  if __has_cpp_attribute(no_unique_address)
-#    define LAMBDA_SIZE
-constexpr std::size_t kZeroCaptureLambdaSizeof = 0;
-#  endif
-#endif
+// Mirrors the Result storage idiom, so the expectation below holds on every compiler,
+// whether or not YACLIB_NO_UNIQUE_ADDRESS collapses the empty value
+union ProbeState {
+  YACLIB_NO_UNIQUE_ADDRESS yaclib::Unit stub;
 
-#if !defined(LAMBDA_SIZE) && defined(__has_attribute)
-#  if __has_attribute(no_unique_address)
-#    define LAMBDA_SIZE
-constexpr std::size_t kZeroCaptureLambdaSizeof = 0;
-#  endif
-#endif
+  ProbeState() noexcept : stub{} {
+  }
+  ~ProbeState() noexcept {
+  }
+};
 
-#ifndef LAMBDA_SIZE
-constexpr std::size_t kZeroCaptureLambdaSizeof = sizeof(void*);
-#endif
+struct Probe {
+  std::exception_ptr error;
+  YACLIB_NO_UNIQUE_ADDRESS ProbeState state;
+};
+
+// Mirrors Core's base layout (ResultCore with the result union + FuncCore with the functor
+// storage union), so the empty functor contribution matches what the real compiler produces
+struct ProbeResultCore {
+  void* stub[4];
+  union {
+    char result[16];
+  };
+};
+
+struct ProbeFuncCore {
+  YACLIB_NO_UNIQUE_ADDRESS ProbeState func;
+};
+
+struct ProbeCore : ProbeResultCore, ProbeFuncCore {};
+
+constexpr std::size_t kZeroCaptureLambdaSizeof = sizeof(ProbeCore) - sizeof(ProbeResultCore);
+
+constexpr std::size_t ExpectedResultSizeof(std::size_t size, std::size_t align) {
+  const auto a = align > alignof(std::exception_ptr) ? align : alignof(std::exception_ptr);
+  return (sizeof(std::exception_ptr) + size + a - 1) / a * a;
+}
 
 TEST(Result, VoidSizeof) {
   // Empty value is stored via YACLIB_NO_UNIQUE_ADDRESS, so where the attribute is supported
   // Result<void> is exactly one std::exception_ptr
-  static_assert(sizeof(yaclib::Result<>) ==
-                sizeof(std::exception_ptr) + (kZeroCaptureLambdaSizeof == 0 ? 0 : alignof(std::exception_ptr)));
+  static_assert(sizeof(yaclib::Result<>) == sizeof(Probe));
   std::cout << "sizeof(yaclib::Result<>): " << sizeof(yaclib::Result<>) << std::endl;
 }
 
 TEST(Result, IntSizeof) {
-  static_assert(sizeof(yaclib::Result<int>) == sizeof(std::exception_ptr) + alignof(std::exception_ptr));
+  static_assert(sizeof(yaclib::Result<int>) == ExpectedResultSizeof(sizeof(int), alignof(int)));
   std::cout << "sizeof(yaclib::Result<int>): " << sizeof(yaclib::Result<int>) << std::endl;
 }
 
 TEST(Result, StringViewSizeof) {
-  static_assert(sizeof(yaclib::Result<std::string_view>) == sizeof(std::string_view) + alignof(std::exception_ptr));
+  static_assert(sizeof(yaclib::Result<std::string_view>) ==
+                ExpectedResultSizeof(sizeof(std::string_view), alignof(std::string_view)));
   std::cout << "sizeof(yaclib::Result<std::string_view>): " << sizeof(yaclib::Result<std::string_view>) << std::endl;
 }
 
 TEST(Result, VectorSizeof) {
-  static_assert(sizeof(yaclib::Result<std::vector<int>>) == sizeof(std::vector<int>) + alignof(std::exception_ptr));
+  static_assert(sizeof(yaclib::Result<std::vector<int>>) ==
+                ExpectedResultSizeof(sizeof(std::vector<int>), alignof(std::vector<int>)));
   std::cout << "sizeof(yaclib::Result<std::vector<int>>): " << sizeof(yaclib::Result<std::vector<int>>) << std::endl;
 }
 

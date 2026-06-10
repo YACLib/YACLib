@@ -40,7 +40,12 @@ TEST(Result, DefaultIsStop) {
   yaclib::Result<int> result;
   EXPECT_FALSE(result);
   EXPECT_TRUE(yaclib::IsStop(std::as_const(result).Error()));
-  EXPECT_THROW(std::ignore = std::move(result).Ok(), yaclib::StopException);
+  try {
+    std::ignore = std::move(result).Ok();
+    FAIL();
+  } catch (const yaclib::StopException& e) {
+    EXPECT_STREQ(e.what(), "yaclib::StopException");
+  }
 }
 
 TEST(Result, StopTag) {
@@ -65,6 +70,10 @@ TEST(Result, InPlace) {
 
   yaclib::Result<NotDefaultConstructible> result2{std::in_place, 1};
   EXPECT_TRUE(result2);
+
+  yaclib::Result<NotDefaultConstructible> result3;
+  result3 = NotDefaultConstructible{5};
+  EXPECT_TRUE(result3);
 }
 
 TEST(Result, Exception) {
@@ -102,6 +111,16 @@ TEST(Result, CopyMoveTransitions) {
   result = yaclib::Result<std::string>{"other"};  // value -> value
   EXPECT_EQ(std::as_const(result).Value(), "other");
 
+  auto& self = result;  // self assignment in both states, reference to silence -Wself-assign
+  result = self;
+  EXPECT_EQ(std::as_const(result).Value(), "other");
+  result = std::move(self);
+  EXPECT_TRUE(result);
+  auto& error_self = error;
+  error = error_self;
+  EXPECT_FALSE(error);
+  EXPECT_TRUE(yaclib::IsStop(std::as_const(error).Error()));
+
   // moved-from error result still holds the error: _error is copied, not moved
   yaclib::Result<std::string> moved{std::move(error)};
   EXPECT_FALSE(moved);
@@ -132,6 +151,7 @@ TEST(Result, StopPtr) {
   // IsStop also recognizes a separately created StopException
   EXPECT_TRUE(yaclib::IsStop(std::make_exception_ptr(yaclib::StopException{})));
   EXPECT_FALSE(yaclib::IsStop(std::make_exception_ptr(std::runtime_error{""})));
+  EXPECT_FALSE(yaclib::IsStop(std::exception_ptr{}));
 }
 
 template <typename T>

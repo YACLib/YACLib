@@ -16,6 +16,8 @@ class SharedFutureBase {
 
  public:
   static_assert(Check<V>(), "V should be valid");
+  static_assert(!std::is_same_v<V, typename T::Error>,
+                "V cannot be the same as the trait Error type, because callback dispatch would be ambiguous");
   static_assert(std::is_copy_constructible_v<wrap_void_t<V>>, "Result should be copyable");
 
   using Result = typename T::template Result<V>;

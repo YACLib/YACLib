@@ -109,9 +109,9 @@ TEST(JustWorks, Value) {
 
 TEST(JustWorks, ErrorCode) {
   ErrorsCheck<double, false>(yaclib::StopTag{});
-  ErrorsCheck<double, false, ErrorCodeTrait>(LikeErrorCode{yaclib::StopTag{}});
+  ErrorsCheck<double, false, ErrorCodeTrait>(LikeErrorCode{std::make_error_code(std::errc::invalid_argument)});
   ErrorsCheck<double, true>(yaclib::StopTag{});
-  ErrorsCheck<double, true, ErrorCodeTrait>(LikeErrorCode{yaclib::StopTag{}});
+  ErrorsCheck<double, true, ErrorCodeTrait>(LikeErrorCode{std::make_error_code(std::errc::invalid_argument)});
 }
 
 TEST(JustWorks, Exception) {
@@ -179,9 +179,9 @@ TEST(VoidJustWorks, Simple) {
 
 TEST(VoidJustWorks, ErrorCode) {
   ErrorsCheck<void, false>(yaclib::StopTag{});
-  ErrorsCheck<double, false, ErrorCodeTrait>(LikeErrorCode{yaclib::StopTag{}});
+  ErrorsCheck<double, false, ErrorCodeTrait>(LikeErrorCode{std::make_error_code(std::errc::invalid_argument)});
   ErrorsCheck<void, true>(yaclib::StopTag{});
-  ErrorsCheck<double, true, ErrorCodeTrait>(LikeErrorCode{yaclib::StopTag{}});
+  ErrorsCheck<double, true, ErrorCodeTrait>(LikeErrorCode{std::make_error_code(std::errc::invalid_argument)});
 }
 
 TEST(VoidJustWorks, Exception) {
@@ -584,8 +584,8 @@ TYPED_TEST(Error, Simple2) {
   auto pipeline = yaclib::Run<T>(tp, first).Then(second).Then(third).Then(error_handler).Then(last);
   EXPECT_EQ(std::move(pipeline).Get().Value(), 53);
 
-  if constexpr (std::is_same_v<T, yaclib::DefaultTrait>) {
-    // For the default trait the recovery callback also fires on thrown exceptions
+  {
+    // The recovery callback also fires on thrown exceptions (converted to T::Error via the trait)
     auto first_throw = []() -> int {
       throw std::runtime_error{"first"};
     };
@@ -626,8 +626,8 @@ TYPED_TEST(Error, Shared) {
   auto pipeline_error_from_shared = yaclib::RunShared<T>(tp, first).Then(error_handler).Then(last);
   EXPECT_EQ(std::move(pipeline_error_from_shared).Get().Value(), 53);
 
-  if constexpr (std::is_same_v<T, yaclib::DefaultTrait>) {
-    // For the default trait the recovery callback also fires on thrown exceptions
+  {
+    // The recovery callback also fires on thrown exceptions (converted to T::Error via the trait)
     auto first_throw = []() -> int {
       throw std::runtime_error{"first"};
     };

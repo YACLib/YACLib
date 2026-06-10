@@ -29,6 +29,8 @@ class Task final {
   static_assert(Check<V>(), "V should be valid");
 
   using Result = typename T::template Result<V>;
+  static_assert(!std::is_same_v<V, typename T::Error>,
+                "V cannot be the same as the trait Error type, because callback dispatch would be ambiguous");
 
   Task(const Task&) = delete;
   Task& operator=(const Task&) = delete;

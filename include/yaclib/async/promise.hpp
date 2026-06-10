@@ -9,6 +9,8 @@ namespace yaclib {
 template <typename V, typename T>
 class Promise final {
   static_assert(Check<V>(), "V should be valid");
+  static_assert(!std::is_same_v<V, typename T::Error>,
+                "V cannot be the same as the trait Error type, because callback dispatch would be ambiguous");
 
  public:
   Promise(const Promise& other) = delete;

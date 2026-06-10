@@ -27,7 +27,13 @@ class SharedCore : public ResultCore<V, T> {
 #endif
 
   Result Retire() final {
-    auto result = (this->GetRef() == 1) ? std::move(this->Get()) : std::as_const(this->Get());
+    // Mixed value category conditional would always copy, so branch explicitly
+    auto result = [&]() -> Result {
+      if (this->GetRef() == 1) {
+        return std::move(this->Get());
+      }
+      return std::as_const(this->Get());
+    }();
     this->DecRef();
     return result;
   }

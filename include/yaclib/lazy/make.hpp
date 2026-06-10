@@ -11,10 +11,16 @@ class ReadyCore : public UniqueCore<V, T> {
  public:
   template <typename... Args>
   explicit ReadyCore(std::in_place_t, Args&&... args) {
-    if constexpr (sizeof...(Args) == 0) {
-      this->Store(Unit{});
-    } else {
-      this->Store(std::forward<Args>(args)...);
+    // If the value construction throws, the base would be unwound with no result stored,
+    // so convert the exception into the stored result instead
+    try {
+      if constexpr (sizeof...(Args) == 0) {
+        this->Store(Unit{});
+      } else {
+        this->Store(std::forward<Args>(args)...);
+      }
+    } catch (...) {
+      this->Store(std::current_exception());
     }
   }
 
