@@ -21,7 +21,7 @@ using namespace std::chrono_literals;
 
 static constexpr auto F = yaclib::FailPolicy::None;
 using V = void;
-using E = yaclib::StopError;
+using E = yaclib::DefaultTrait;
 
 TYPED_TEST(WhenSuite, UniqueStatic) {
   auto f1 = yaclib::MakeFuture<int>(kSetInt);

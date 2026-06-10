@@ -2,6 +2,6 @@
 
 namespace yaclib::detail {
 
-template class SharedCore<void, StopError>;
+template class SharedCore<void, DefaultTrait>;
 
 }  // namespace yaclib::detail

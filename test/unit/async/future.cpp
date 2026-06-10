@@ -40,26 +40,25 @@ namespace {
 
 using namespace std::chrono_literals;
 
-template <typename FutureType, bool Shared, typename E = yaclib::StopError, typename ErrorType>
+template <typename FutureType, bool Shared, typename Trait = yaclib::DefaultTrait, typename ErrorType>
 void ErrorsCheck(ErrorType expected) {
-  static_assert(std::is_same_v<ErrorType, std::exception_ptr> || std::is_same_v<ErrorType, yaclib::StopError> ||
+  static_assert(std::is_same_v<ErrorType, std::exception_ptr> || std::is_same_v<ErrorType, yaclib::StopTag> ||
                 std::is_same_v<ErrorType, LikeErrorCode>);
   auto [f, p] = [] {
     if constexpr (Shared) {
-      return yaclib::MakeSharedContract<FutureType, E>();
+      return yaclib::MakeSharedContract<FutureType, Trait>();
     } else {
-      return yaclib::MakeContract<FutureType, E>();
+      return yaclib::MakeContract<FutureType, Trait>();
     }
   }();
   EXPECT_FALSE(f.Ready());
   std::move(p).Set(expected);
   EXPECT_TRUE(f.Ready());
   auto result = std::move(f).Get();
-  if constexpr (std::is_same_v<ErrorType, std::exception_ptr>) {
-    EXPECT_EQ(result.State(), yaclib::ResultState::Exception);
-    EXPECT_EQ(std::move(result).Exception(), expected);
+  EXPECT_FALSE(static_cast<bool>(result));
+  if constexpr (std::is_same_v<ErrorType, yaclib::StopTag>) {
+    EXPECT_TRUE(yaclib::IsStop(std::as_const(result).Error()));
   } else {
-    EXPECT_EQ(result.State(), yaclib::ResultState::Error);
     EXPECT_EQ(std::move(result).Error(), expected);
   }
 }
@@ -79,7 +78,7 @@ void ValueCheck() {
   std::move(p).Set(Value{});
   EXPECT_TRUE(f.Ready());
   auto result = std::move(f).Get();
-  EXPECT_EQ(result.State(), yaclib::ResultState::Value);
+  EXPECT_TRUE(static_cast<bool>(result));
   EXPECT_EQ(std::move(result).Ok(), Value{});
 }
 
@@ -109,10 +108,10 @@ TEST(JustWorks, Value) {
 }
 
 TEST(JustWorks, ErrorCode) {
-  ErrorsCheck<double, false>(yaclib::StopError{yaclib::StopTag{}});
-  ErrorsCheck<double, false, LikeErrorCode>(LikeErrorCode{});
-  ErrorsCheck<double, true>(yaclib::StopError{yaclib::StopTag{}});
-  ErrorsCheck<double, true, LikeErrorCode>(LikeErrorCode{});
+  ErrorsCheck<double, false>(yaclib::StopTag{});
+  ErrorsCheck<double, false, ErrorCodeTrait>(LikeErrorCode{yaclib::StopTag{}});
+  ErrorsCheck<double, true>(yaclib::StopTag{});
+  ErrorsCheck<double, true, ErrorCodeTrait>(LikeErrorCode{yaclib::StopTag{}});
 }
 
 TEST(JustWorks, Exception) {
@@ -157,7 +156,7 @@ TYPED_TEST(AsyncSuite, JustWorks) {
                     return 1;
                   })
                   .Get();
-  EXPECT_THROW(std::ignore = std::move(result).Ok(), yaclib::ResultError<yaclib::StopError>);
+  EXPECT_THROW(std::ignore = std::move(result).Ok(), yaclib::StopException);
   tp.Stop();
   tp.Wait();
 }
@@ -179,10 +178,10 @@ TEST(VoidJustWorks, Simple) {
 }
 
 TEST(VoidJustWorks, ErrorCode) {
-  ErrorsCheck<void, false>(yaclib::StopError{yaclib::StopTag{}});
-  ErrorsCheck<double, false, LikeErrorCode>(LikeErrorCode{});
-  ErrorsCheck<void, true>(yaclib::StopError{yaclib::StopTag{}});
-  ErrorsCheck<double, true, LikeErrorCode>(LikeErrorCode{});
+  ErrorsCheck<void, false>(yaclib::StopTag{});
+  ErrorsCheck<double, false, ErrorCodeTrait>(LikeErrorCode{yaclib::StopTag{}});
+  ErrorsCheck<void, true>(yaclib::StopTag{});
+  ErrorsCheck<double, true, ErrorCodeTrait>(LikeErrorCode{yaclib::StopTag{}});
 }
 
 TEST(VoidJustWorks, Exception) {
@@ -239,7 +238,7 @@ TEST(JustWorks, Promise) {
   tp.Wait();
 }
 
-// TODO shared
+// TODO Shared
 TEST(Future, VoidParameter) {
   int called = 0;
   auto func = [&] {
@@ -405,7 +404,7 @@ TEST(Simple, Stop) {
         return 42;
       });
     }
-    EXPECT_THROW(std::ignore = std::move(g).Get().Ok(), yaclib::ResultError<yaclib::StopError>);
+    EXPECT_THROW(std::ignore = std::move(g).Get().Ok(), yaclib::StopException);
   }
   tp.SoftStop();
   tp.Wait();
@@ -528,9 +527,7 @@ TYPED_TEST(AsyncSuite, AsyncThen) {
 
 // TODO Shared
 TYPED_TEST(Error, Simple1) {
-  using TestType = typename TestFixture::Type;
-  static constexpr bool kIsError = !std::is_same_v<TestType, std::exception_ptr>;
-  using ErrorType = std::conditional_t<kIsError, TestType, yaclib::StopError>;
+  using T = typename TestFixture::Type;
 
   yaclib::FairThreadPool tp{4};
   // Pipeline stages:
@@ -545,7 +542,7 @@ TYPED_TEST(Error, Simple1) {
     std::cout << v << " + 1" << std::endl;
     return v + 1;
   };
-  auto error_handler = [](TestType) -> int {
+  auto error_handler = [](typename T::Error) -> int {
     return 42;
   };
   auto last = [&](int v) -> int {
@@ -553,7 +550,7 @@ TYPED_TEST(Error, Simple1) {
     return v + 11;
   };
 
-  auto f = yaclib::Run<ErrorType>(tp, first).Then(second).Then(third).Then(error_handler).Then(last);
+  auto f = yaclib::Run<T>(tp, first).Then(second).Then(third).Then(error_handler).Then(last);
   EXPECT_EQ(std::move(f).Get().Ok(), 14);
 
   tp.Stop();
@@ -562,19 +559,12 @@ TYPED_TEST(Error, Simple1) {
 
 // TODO Shared
 TYPED_TEST(Error, Simple2) {
-  using TestType = typename TestFixture::Type;
-  static constexpr bool kIsError = !std::is_same_v<TestType, std::exception_ptr>;
-  using ErrorType = std::conditional_t<kIsError, TestType, yaclib::StopError>;
+  using T = typename TestFixture::Type;
 
   yaclib::FairThreadPool tp{1};
   // Pipeline stages:
-  auto first = []() -> yaclib::Result<int, ErrorType> {
-    if constexpr (kIsError) {
-      return yaclib::StopTag{};
-    } else {
-      throw std::runtime_error{"first"};
-    }
-    return 0;
+  auto first = []() -> typename T::template Result<int> {
+    return yaclib::StopTag{};
   };
   auto second = [](int v) {
     std::cout << v << " x 2" << std::endl;
@@ -584,34 +574,36 @@ TYPED_TEST(Error, Simple2) {
     std::cout << v << " + 1" << std::endl;
     return v + 1;
   };
-  auto error_handler = [](TestType) -> int {
+  auto error_handler = [](typename T::Error) -> int {
     return 42;
   };
   auto last = [&](int v) {
     // EXPECT_EQ(&yaclib::CurrentThreadPool(), tp);
     return v + 11;
   };
-  auto pipeline = yaclib::Run<ErrorType>(tp, first).Then(second).Then(third).Then(error_handler).Then(last);
+  auto pipeline = yaclib::Run<T>(tp, first).Then(second).Then(third).Then(error_handler).Then(last);
   EXPECT_EQ(std::move(pipeline).Get().Value(), 53);
+
+  if constexpr (std::is_same_v<T, yaclib::DefaultTrait>) {
+    // For the default trait the recovery callback also fires on thrown exceptions
+    auto first_throw = []() -> int {
+      throw std::runtime_error{"first"};
+    };
+    auto pipeline2 = yaclib::Run<T>(tp, first_throw).Then(second).Then(third).Then(error_handler).Then(last);
+    EXPECT_EQ(std::move(pipeline2).Get().Value(), 53);
+  }
 
   tp.Stop();
   tp.Wait();
 }
 
 TYPED_TEST(Error, Shared) {
-  using TestType = typename TestFixture::Type;
-  static constexpr bool kIsError = !std::is_same_v<TestType, std::exception_ptr>;
-  using ErrorType = std::conditional_t<kIsError, TestType, yaclib::StopError>;
+  using T = typename TestFixture::Type;
 
   yaclib::FairThreadPool tp{1};
   // Pipeline stages:
-  auto first = []() -> yaclib::Result<int, ErrorType> {
-    if constexpr (kIsError) {
-      return yaclib::StopTag{};
-    } else {
-      throw std::runtime_error{"first"};
-    }
-    return 0;
+  auto first = []() -> typename T::template Result<int> {
+    return yaclib::StopTag{};
   };
   auto second = [](int v) {
     std::cout << v << " x 2" << std::endl;
@@ -621,18 +613,30 @@ TYPED_TEST(Error, Shared) {
     std::cout << v << " + 1" << std::endl;
     return v + 1;
   };
-  auto error_handler = [](TestType) -> int {
+  auto error_handler = [](typename T::Error) -> int {
     return 42;
   };
   auto last = [&](int v) {
     // EXPECT_EQ(&yaclib::CurrentThreadPool(), tp);
     return v + 11;
   };
-  auto pipeline = yaclib::RunShared<ErrorType>(tp, first).Then(second).Then(third).Then(error_handler).Then(last);
+  auto pipeline = yaclib::RunShared<T>(tp, first).Then(second).Then(third).Then(error_handler).Then(last);
   EXPECT_EQ(std::move(pipeline).Get().Value(), 53);
 
-  auto pipeline_error_from_shared = yaclib::RunShared<ErrorType>(tp, first).Then(error_handler).Then(last);
+  auto pipeline_error_from_shared = yaclib::RunShared<T>(tp, first).Then(error_handler).Then(last);
   EXPECT_EQ(std::move(pipeline_error_from_shared).Get().Value(), 53);
+
+  if constexpr (std::is_same_v<T, yaclib::DefaultTrait>) {
+    // For the default trait the recovery callback also fires on thrown exceptions
+    auto first_throw = []() -> int {
+      throw std::runtime_error{"first"};
+    };
+    auto pipeline_throw = yaclib::RunShared<T>(tp, first_throw).Then(second).Then(third).Then(error_handler).Then(last);
+    EXPECT_EQ(std::move(pipeline_throw).Get().Value(), 53);
+
+    auto pipeline_throw_from_shared = yaclib::RunShared<T>(tp, first_throw).Then(error_handler).Then(last);
+    EXPECT_EQ(std::move(pipeline_throw_from_shared).Get().Value(), 53);
+  }
 
   tp.Stop();
   tp.Wait();
@@ -694,7 +698,9 @@ TYPED_TEST(AsyncSuite, ExceptionCallbackReturningValue) {
                throw std::runtime_error{""};
              })
              .Then([](yaclib::Result<> result) {
-               EXPECT_EQ(result.State(), yaclib::ResultState::Exception);
+               // Error and Exception states are unified now, exception is any non-stop error
+               EXPECT_FALSE(static_cast<bool>(result));
+               EXPECT_FALSE(yaclib::IsStop(std::as_const(result).Error()));
                return 0;
              });
   EXPECT_EQ(std::move(f).Get().Ok(), 0);
@@ -712,7 +718,9 @@ TYPED_TEST(AsyncSuite, ExceptionCallbackReturningFuture) {
                throw std::runtime_error{""};
              })
              .Then([](yaclib::Result<> result) {
-               EXPECT_EQ(result.State(), yaclib::ResultState::Exception);
+               // Error and Exception states are unified now, exception is any non-stop error
+               EXPECT_FALSE(static_cast<bool>(result));
+               EXPECT_FALSE(yaclib::IsStop(std::as_const(result).Error()));
                return 0;
              });
   EXPECT_EQ(std::move(f).Get().Ok(), 0);
@@ -821,11 +829,11 @@ TYPED_TEST(AsyncSuite, ExecutorDrop2) {
          [&] {
            invoked_flags[0] = true;
          })
-    .Then([&](yaclib::StopError) {
+    .Then([&](std::exception_ptr) {
       invoked_flags[1] = true;
       return yaclib::MakeFuture();
     })
-    .Then([&](yaclib::StopError) {
+    .Then([&](std::exception_ptr) {
       invoked_flags[2] = true;
     })
     .Detach();
@@ -852,13 +860,7 @@ TYPED_TEST(AsyncSuite, InvokePromiseDrop) {
   auto f = INVOKE_V(int, yaclib::MakeInline(yaclib::StopTag{}), [](PROMISE_T(int) && p) {
     std::move(p).Set(1);
   });
-  try {
-    std::ignore = std::move(f).Get().Ok();
-  } catch (const yaclib::ResultError<yaclib::StopError>& e) {
-    EXPECT_EQ(e.Get(), yaclib::StopError{yaclib::StopTag{}});
-  } catch (...) {
-    FAIL();
-  }
+  EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::StopException);
 }
 
 TYPED_TEST(AsyncSuite, InvokePromiseSetAfterCall) {
@@ -906,13 +908,7 @@ TYPED_TEST(AsyncSuite, InvokePromiseException) {
     auto f = INVOKE_V(int, yaclib::MakeInline(), [](PROMISE_T(int)) {
       throw 1;
     });
-    try {
-      std::ignore = std::move(f).Get().Ok();
-    } catch (const yaclib::ResultError<yaclib::StopError>& e) {
-      EXPECT_EQ(e.Get(), yaclib::StopError{yaclib::StopTag{}});
-    } catch (...) {
-      FAIL();
-    }
+    EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::StopException);
   }
 }
 

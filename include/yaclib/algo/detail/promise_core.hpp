@@ -12,17 +12,17 @@
 
 namespace yaclib::detail {
 
-template <typename V, typename E, typename Func, bool Shared>
-class PromiseCore : public std::conditional_t<Shared, SharedCore<V, E>, UniqueCore<V, E>>, public FuncCore<Func> {
+template <typename V, typename T, typename Func, bool Shared>
+class PromiseCore : public std::conditional_t<Shared, SharedCore<V, T>, UniqueCore<V, T>>, public FuncCore<Func> {
   using F = FuncCore<Func>;
   using Invoke = typename F::Invoke;
   using Storage = typename F::Storage;
 
-  using CorePtrT = std::conditional_t<Shared, SharedCorePtr<V, E>, UniqueCorePtr<V, E>>;
-  using PromiseT = std::conditional_t<Shared, SharedPromise<V, E>, Promise<V, E>>;
+  using CorePtrT = std::conditional_t<Shared, SharedCorePtr<V, T>, UniqueCorePtr<V, T>>;
+  using PromiseT = std::conditional_t<Shared, SharedPromise<V, T>, Promise<V, T>>;
 
  public:
-  using Base = std::conditional_t<Shared, SharedCore<V, E>, UniqueCore<V, E>>;
+  using Base = std::conditional_t<Shared, SharedCore<V, T>, UniqueCore<V, T>>;
 
   explicit PromiseCore(Func&& f) : F{std::forward<Func>(f)} {
   }

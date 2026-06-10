@@ -18,7 +18,7 @@ namespace {
 
 using namespace std::chrono_literals;
 
-yaclib::Future<int, yaclib::StopError> test_co_ret42() {
+yaclib::Future<int> test_co_ret42() {
   co_return 42;
 }
 

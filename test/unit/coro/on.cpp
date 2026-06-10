@@ -177,7 +177,9 @@ TYPED_TEST(AsyncSuite, OnStopped) {
                         })
                         .ThenInline([] {
                         });
-  EXPECT_EQ(std::move(outer_future).Get().State(), yaclib::ResultState::Error);
+  const auto result = std::move(outer_future).Get();
+  EXPECT_FALSE(static_cast<bool>(result));
+  EXPECT_TRUE(yaclib::IsStop(result.Error()));
 
   EXPECT_TRUE(a);
   EXPECT_FALSE(b);

@@ -112,23 +112,24 @@ TEST(ThenInline, Simple) {
   EXPECT_EQ(std::move(g).Get().Ok(), 7);
 }
 
-template <typename TestType, bool Inline>
+template <typename Trait, bool Stop, bool Inline>
 void ErrorThenInline() {
-  static constexpr bool kIsError = !std::is_same_v<TestType, std::exception_ptr>;
-  using ErrorType = std::conditional_t<kIsError, TestType, yaclib::StopError>;
+  using ErrorType = typename Trait::Error;
+  using ResultInt = typename Trait::template Result<int>;
+  using ResultDouble = typename Trait::template Result<double>;
 
-  auto f = yaclib::MakeFuture<int, ErrorType>(32);
-  auto f_async = InlineThen<Inline>(std::move(f), [](TestType) {
-    return yaclib::MakeFuture<int, ErrorType>(42);
+  auto f = yaclib::MakeFuture<int, Trait>(32);
+  auto f_async = InlineThen<Inline>(std::move(f), [](ErrorType) {
+    return yaclib::MakeFuture<int, Trait>(42);
   });
-  f = InlineThen<Inline>(std::move(f_async), [](yaclib::Result<int, ErrorType>) {
+  f = InlineThen<Inline>(std::move(f_async), [](ResultInt) {
     return 2;
   });
   EXPECT_EQ(std::move(f).Get().Ok(), 2);
   auto make = [&] {
-    f = yaclib::MakeFuture<int, ErrorType>(32);
-    f = InlineThen<Inline>(std::move(f), [](int) -> yaclib::Result<int, ErrorType> {
-      if constexpr (kIsError) {
+    f = yaclib::MakeFuture<int, Trait>(32);
+    f = InlineThen<Inline>(std::move(f), [](int) -> ResultInt {
+      if constexpr (Stop) {
         return yaclib::StopTag{};
       } else {
         throw std::runtime_error{""};
@@ -138,24 +139,29 @@ void ErrorThenInline() {
   };
   make();
   auto f_async2 = InlineThen<Inline>(std::move(f), [](int) {
-    return yaclib::MakeFuture<double, ErrorType>(1.0);
+    return yaclib::MakeFuture<double, Trait>(1.0);
   });
-  f = InlineThen<Inline>(std::move(f_async2), [](yaclib::Result<double, ErrorType>) {
+  f = InlineThen<Inline>(std::move(f_async2), [](ResultDouble) {
     return 2;
   });
   EXPECT_EQ(std::move(f).Get().Ok(), 2);
 
   make();
-  f_async = InlineThen<Inline>(std::move(f), [](TestType) {
-    return yaclib::MakeFuture<int, ErrorType>(2);
+  f_async = InlineThen<Inline>(std::move(f), [](ErrorType) {
+    return yaclib::MakeFuture<int, Trait>(2);
   });
   EXPECT_EQ(std::move(f_async).Get().Ok(), 2);
 }
 
 TYPED_TEST(Error, AsyncThenInline) {
-  using TestType = typename TestFixture::Type;
-  ErrorThenInline<TestType, true>();
-  ErrorThenInline<TestType, false>();
+  using Trait = typename TestFixture::Type;
+  // Stop error route: callback returns yaclib::StopTag{}
+  ErrorThenInline<Trait, true, true>();
+  ErrorThenInline<Trait, true, false>();
+  // Exception route: callback throws, the error is stored via the trait
+  // (previously covered by the std::exception_ptr axis of the old error-typed suite)
+  ErrorThenInline<Trait, false, true>();
+  ErrorThenInline<Trait, false, false>();
 }
 
 template <bool Inline>

@@ -11,12 +11,12 @@ namespace yaclib {
 template <FailPolicy F = FailPolicy::LastFail, typename... Futures,
           typename = std::enable_if_t<(... && is_combinator_input_v<Futures>)>>
 YACLIB_INLINE auto WhenAny(Futures... futures) {
-  when::CheckSameError<Futures...>();
+  when::CheckSameTrait<Futures...>();
 
   using OutputValue = typename MaybeVariant<typename Unique<std::tuple<typename Futures::Core::Value...>>::Type>::Type;
-  using OutputError = typename head_t<Futures...>::Core::Error;
+  using OutputTrait = typename head_t<Futures...>::Core::Trait;
 
-  return when::When<when::Any, F, OutputValue, OutputError>(std::move(futures)...);
+  return when::When<when::Any, F, OutputValue, OutputTrait>(std::move(futures)...);
 }
 
 template <FailPolicy F = FailPolicy::LastFail, typename It, typename T = typename std::iterator_traits<It>::value_type>
@@ -24,12 +24,12 @@ YACLIB_INLINE auto WhenAny(It begin, std::size_t count) {
   if constexpr (is_future_base_v<T>) {
     if (count == 1) {
       using V = async_value_t<T>;
-      using E = async_error_t<T>;
-      return Future<V, E>{std::exchange(begin->GetCore(), nullptr)};
+      using Trait = async_trait_t<T>;
+      return Future<V, Trait>{std::exchange(begin->GetCore(), nullptr)};
     }
   }
 
-  return when::When<when::Any, F, typename T::Core::Value, typename T::Core::Error>(begin, count);
+  return when::When<when::Any, F, typename T::Core::Value, typename T::Core::Trait>(begin, count);
 }
 
 template <FailPolicy F = FailPolicy::LastFail, typename It, typename T = typename std::iterator_traits<It>::value_type>

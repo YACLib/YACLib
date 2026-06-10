@@ -7,9 +7,9 @@
 
 namespace yaclib {
 
-template <typename V, typename E>
-void Connect(FutureBase<V, E>&& f, Promise<V, E>&& p) {
-  static_assert(std::is_move_constructible_v<Result<V, E>>);
+template <typename V, typename T>
+void Connect(FutureBase<V, T>&& f, Promise<V, T>&& p) {
+  static_assert(std::is_move_constructible_v<wrap_void_t<V>>);
   YACLIB_ASSERT(f.Valid());
   YACLIB_ASSERT(p.Valid());
   YACLIB_ASSERT(f.GetCore() != p.GetCore());
@@ -21,8 +21,8 @@ void Connect(FutureBase<V, E>&& f, Promise<V, E>&& p) {
   }
 }
 
-template <typename V, typename E>
-void Connect(const SharedFutureBase<V, E>& f, Promise<V, E>&& p) {
+template <typename V, typename T>
+void Connect(const SharedFutureBase<V, T>& f, Promise<V, T>&& p) {
   YACLIB_ASSERT(f.Valid());
   YACLIB_ASSERT(p.Valid());
   if (f.GetCore()->SetCallback(*p.GetCore().Get())) {
@@ -32,8 +32,8 @@ void Connect(const SharedFutureBase<V, E>& f, Promise<V, E>&& p) {
   }
 }
 
-template <typename V, typename E>
-void Connect(FutureBase<V, E>&& f, SharedPromise<V, E>&& p) {
+template <typename V, typename T>
+void Connect(FutureBase<V, T>&& f, SharedPromise<V, T>&& p) {
   YACLIB_ASSERT(f.Valid());
   YACLIB_ASSERT(p.Valid());
   if (f.GetCore()->SetCallback(*p.GetCore().Get())) {
@@ -44,8 +44,8 @@ void Connect(FutureBase<V, E>&& f, SharedPromise<V, E>&& p) {
   }
 }
 
-template <typename V, typename E>
-void Connect(const SharedFutureBase<V, E>& f, SharedPromise<V, E>&& p) {
+template <typename V, typename T>
+void Connect(const SharedFutureBase<V, T>& f, SharedPromise<V, T>&& p) {
   YACLIB_ASSERT(f.Valid());
   YACLIB_ASSERT(p.Valid());
   YACLIB_ASSERT(f.GetCore() != p.GetCore());
@@ -56,16 +56,16 @@ void Connect(const SharedFutureBase<V, E>& f, SharedPromise<V, E>&& p) {
   }
 }
 
-template <typename V, typename E>
-void Connect(SharedPromise<V, E>& primary, Promise<V, E>&& subsumed) {
+template <typename V, typename T>
+void Connect(SharedPromise<V, T>& primary, Promise<V, T>&& subsumed) {
   YACLIB_ASSERT(primary.Valid());
   YACLIB_ASSERT(subsumed.Valid());
   auto subsumed_core = subsumed.GetCore().Release();
   std::ignore = primary.GetCore()->SetCallback(*subsumed_core);
 }
 
-template <typename V, typename E>
-void Connect(SharedPromise<V, E>& primary, SharedPromise<V, E>&& subsumed) {
+template <typename V, typename T>
+void Connect(SharedPromise<V, T>& primary, SharedPromise<V, T>&& subsumed) {
   YACLIB_ASSERT(primary.Valid());
   YACLIB_ASSERT(subsumed.Valid());
   auto subsumed_core = subsumed.GetCore().Release();

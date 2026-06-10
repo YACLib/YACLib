@@ -3,7 +3,9 @@
 #include <yaclib/util/result.hpp>
 
 #include <exception>
+#include <memory>
 #include <stdexcept>
+#include <string>
 #include <type_traits>
 #include <utility>
 
@@ -18,142 +20,156 @@ struct NotDefaultConstructible {
   }
 };
 
-TEST(Simple, Simple) {
+TEST(Result, Simple) {
   yaclib::Result<int> result;
-  EXPECT_EQ(result.State(), yaclib::ResultState::Empty);
+  EXPECT_FALSE(result);
   result = 5;
-  EXPECT_EQ(result.State(), yaclib::ResultState::Value);
+  EXPECT_TRUE(result);
   EXPECT_EQ(std::move(result).Ok(), 5);
   {
     yaclib::Result<int> result2 = std::move(result);
     yaclib::Result<int> result3 = result2;
     result = std::move(result2);
-    result = result3;
-  }
-  {
-    yaclib::StopTag tag;
-    yaclib::StopError error{tag};
-    yaclib::Result<int> result2 = tag;
-    yaclib::Result<int> result3 = error;
-    yaclib::Result<int> result4 = std::move(tag);
-    yaclib::Result<int> result5 = std::move(error);
-    result2 = result3;
-    result4 = std::move(result2);
+    EXPECT_TRUE(result);
+    EXPECT_TRUE(result3);
+    EXPECT_EQ(std::move(result3).Ok(), 5);
   }
 }
 
-TEST(Simple, NotDefaultConstructible) {
-  yaclib::Result<NotDefaultConstructible> result;
-  result = NotDefaultConstructible{5};
-}
-
-void TestState(yaclib::ResultState state) {
+TEST(Result, DefaultIsStop) {
   yaclib::Result<int> result;
-  EXPECT_EQ(result.State(), yaclib::ResultState::Empty);
-  switch (state) {
-    case yaclib::ResultState::Value: {
-      result = 1;
-    } break;
-    case yaclib::ResultState::Error: {
-      result = yaclib::StopTag{};
-    } break;
-    case yaclib::ResultState::Exception: {
-      result = std::make_exception_ptr(std::runtime_error{""});
-    } break;
-    case yaclib::ResultState::Empty: {
-    } break;
-  }
-  EXPECT_EQ(result.State(), state);
+  EXPECT_FALSE(result);
+  EXPECT_TRUE(yaclib::IsStop(std::as_const(result).Error()));
+  EXPECT_THROW(std::ignore = std::move(result).Ok(), yaclib::StopException);
 }
 
-TEST(State, Empty) {
-  TestState(yaclib::ResultState::Empty);
+TEST(Result, StopTag) {
+  yaclib::Result<int> result{yaclib::StopTag{}};
+  EXPECT_FALSE(result);
+  EXPECT_TRUE(yaclib::IsStop(std::as_const(result).Error()));
+  EXPECT_THROW(std::ignore = std::move(result).Ok(), yaclib::StopException);
 }
 
-TEST(State, Error) {
-  TestState(yaclib::ResultState::Error);
+TEST(Result, Value) {
+  yaclib::Result<std::string> result{"kek"};
+  EXPECT_TRUE(result);
+  EXPECT_EQ(std::as_const(result).Value(), "kek");
+  EXPECT_EQ(std::as_const(result).Ok(), "kek");
+  EXPECT_EQ(std::move(result).Value(), "kek");
 }
 
-TEST(State, Exception) {
-  TestState(yaclib::ResultState::Exception);
+TEST(Result, InPlace) {
+  yaclib::Result<std::string> result{std::in_place, 3, 'a'};
+  EXPECT_TRUE(result);
+  EXPECT_EQ(std::move(result).Ok(), "aaa");
+
+  yaclib::Result<NotDefaultConstructible> result2{std::in_place, 1};
+  EXPECT_TRUE(result2);
 }
 
-TEST(State, Value) {
-  TestState(yaclib::ResultState::Value);
+TEST(Result, Exception) {
+  yaclib::Result<int> result{std::make_exception_ptr(std::runtime_error{"kek"})};
+  EXPECT_FALSE(result);
+  EXPECT_FALSE(yaclib::IsStop(std::as_const(result).Error()));
+  EXPECT_THROW(std::ignore = std::move(result).Ok(), std::runtime_error);
 }
 
-template <typename Result>
-void TestOk(Result&& result, yaclib::ResultState state) {
-  EXPECT_EQ(result.State(), yaclib::ResultState::Empty);
-  switch (state) {
-    case yaclib::ResultState::Value: {
-      result = "1";
-      EXPECT_EQ(std::as_const(result).Ok(), "1");
-    } break;
-    case yaclib::ResultState::Error: {
-      result = yaclib::StopTag{};
-      try {
-        std::ignore = std::as_const(result).Ok();
-      } catch (const yaclib::ResultError<yaclib::StopError>& e) {
-        EXPECT_STREQ(e.what(), "yaclib::StopError");
-      } catch (const yaclib::ResultError<LikeErrorCode>& e) {
-        EXPECT_STREQ(e.what(), "generic");
-      }
-    } break;
-    case yaclib::ResultState::Exception: {
-      result = std::make_exception_ptr(std::runtime_error{""});
-      EXPECT_THROW(std::ignore = std::as_const(result).Ok(), std::runtime_error);
-    } break;
-    case yaclib::ResultState::Empty: {
-      try {
-        std::ignore = std::as_const(result).Ok();
-      } catch (const yaclib::ResultEmpty& e) {
-        EXPECT_STREQ(e.what(), "yaclib::ResultEmpty");
-      }
-    } break;
-  }
-  EXPECT_EQ(result.State(), state);
-  result = {};
+TEST(Result, AssignDispatch) {
+  yaclib::Result<int> result{5};
+  result = std::make_exception_ptr(std::runtime_error{""});
+  EXPECT_FALSE(result);
+  result = 7;
+  EXPECT_TRUE(result);
+  EXPECT_EQ(std::as_const(result).Value(), 7);
+  result = yaclib::StopTag{};
+  EXPECT_FALSE(result);
+  EXPECT_TRUE(yaclib::IsStop(std::as_const(result).Error()));
 }
 
-TEST(Ok, Value) {
-  yaclib::Result<std::string> r1;
-  TestOk(r1, yaclib::ResultState::Value);
-  TestOk(std::move(r1), yaclib::ResultState::Value);
+TEST(Result, CopyMoveTransitions) {
+  yaclib::Result<std::string> value{"value"};
+  yaclib::Result<std::string> error{yaclib::StopTag{}};
 
-  yaclib::Result<std::string, LikeErrorCode> r2;
-  TestOk(r2, yaclib::ResultState::Value);
-  TestOk(std::move(r2), yaclib::ResultState::Value);
+  yaclib::Result<std::string> result;
+  result = value;  // error -> value
+  EXPECT_TRUE(result);
+  EXPECT_EQ(std::as_const(result).Value(), "value");
+  result = error;  // value -> error
+  EXPECT_FALSE(result);
+  result = std::move(value);  // error -> value
+  EXPECT_TRUE(result);
+  EXPECT_EQ(std::as_const(result).Value(), "value");
+  result = yaclib::Result<std::string>{"other"};  // value -> value
+  EXPECT_EQ(std::as_const(result).Value(), "other");
+
+  // moved-from error result still holds the error: _error is copied, not moved
+  yaclib::Result<std::string> moved{std::move(error)};
+  EXPECT_FALSE(moved);
+  EXPECT_FALSE(error);
+  EXPECT_TRUE(yaclib::IsStop(std::as_const(error).Error()));
 }
 
-TEST(Ok, Error) {
-  yaclib::Result<std::string> r1;
-  TestOk(r1, yaclib::ResultState::Error);
-  TestOk(std::move(r1), yaclib::ResultState::Error);
-
-  yaclib::Result<std::string, LikeErrorCode> r2;
-  TestOk(r2, yaclib::ResultState::Error);
-  TestOk(std::move(r2), yaclib::ResultState::Error);
+TEST(Result, MoveOnly) {
+  yaclib::Result<std::unique_ptr<int>> result{std::make_unique<int>(5)};
+  EXPECT_TRUE(result);
+  auto moved = std::move(result);
+  EXPECT_EQ(*std::as_const(moved).Value(), 5);
+  auto ptr = std::move(moved).Ok();
+  EXPECT_EQ(*ptr, 5);
 }
 
-TEST(Ok, Exception) {
-  yaclib::Result<std::string> r1;
-  TestOk(r1, yaclib::ResultState::Exception);
-  TestOk(std::move(r1), yaclib::ResultState::Exception);
-
-  yaclib::Result<std::string, LikeErrorCode> r2;
-  TestOk(r2, yaclib::ResultState::Exception);
-  TestOk(std::move(r2), yaclib::ResultState::Exception);
+TEST(Result, Void) {
+  yaclib::Result<> result;
+  EXPECT_FALSE(result);
+  result = yaclib::Unit{};
+  EXPECT_TRUE(result);
+  std::ignore = std::move(result).Ok();
 }
 
-TEST(Ok, Empty) {
-  yaclib::Result<std::string> r1;
-  TestOk(r1, yaclib::ResultState::Empty);
-  TestOk(std::move(r1), yaclib::ResultState::Empty);
+TEST(Result, StopPtr) {
+  EXPECT_EQ(&yaclib::StopPtr(), &yaclib::StopPtr());
+  EXPECT_TRUE(yaclib::IsStop(yaclib::StopPtr()));
+  // IsStop also recognizes a separately created StopException
+  EXPECT_TRUE(yaclib::IsStop(std::make_exception_ptr(yaclib::StopException{})));
+  EXPECT_FALSE(yaclib::IsStop(std::make_exception_ptr(std::runtime_error{""})));
+}
 
-  yaclib::Result<std::string, LikeErrorCode> r2;
-  TestOk(r2, yaclib::ResultState::Empty);
-  TestOk(std::move(r2), yaclib::ResultState::Empty);
+template <typename T>
+void TestTrait() {
+  using R = typename T::template Result<int>;
+
+  auto value = T::template MakeResult<int>(5);
+  EXPECT_TRUE(T::Ok(value));
+  EXPECT_EQ(T::MoveValue(std::as_const(value)), 5);
+  EXPECT_EQ(T::MoveValue(std::move(value)), 5);
+
+  auto stop = T::template MakeResult<int>(yaclib::StopTag{});
+  EXPECT_FALSE(T::Ok(stop));
+  std::ignore = T::MoveError(std::as_const(stop));
+  std::ignore = T::MoveError(std::move(stop));
+
+  auto unit = T::template MakeResult<int>(yaclib::Unit{});
+  EXPECT_TRUE(T::Ok(unit));
+  EXPECT_EQ(T::MoveValue(std::move(unit)), 0);
+
+  auto error = T::template MakeResult<int>(std::make_exception_ptr(std::runtime_error{""}));
+  EXPECT_FALSE(T::Ok(error));
+
+  auto pass = T::template MakeResult<int>(R{1});
+  EXPECT_TRUE(T::Ok(pass));
+  EXPECT_EQ(T::MoveValue(std::move(pass)), 1);
+
+  auto in_place = T::template MakeResult<int>(std::in_place, 2);
+  EXPECT_TRUE(T::Ok(in_place));
+  EXPECT_EQ(T::MoveValue(std::move(in_place)), 2);
+}
+
+TEST(ResultTrait, Default) {
+  TestTrait<yaclib::DefaultTrait>();
+}
+
+TEST(ResultTrait, ErrorCode) {
+  TestTrait<ErrorCodeTrait>();
 }
 
 }  // namespace

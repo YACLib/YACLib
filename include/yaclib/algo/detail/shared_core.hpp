@@ -9,22 +9,24 @@ namespace yaclib::detail {
 inline constexpr std::size_t kSharedRefWithFuture = 4;
 inline constexpr std::size_t kSharedRefNoFuture = 3;
 
-template <typename V, typename E>
-class SharedCore : public ResultCore<V, E> {
-  using ResultCore<V, E>::ResultCore;
+template <typename V, typename T>
+class SharedCore : public ResultCore<V, T> {
+  using ResultCore<V, T>::ResultCore;
 
  public:
+  using Result = typename ResultCore<V, T>::Result;
+
   [[nodiscard]] InlineCore* Here(InlineCore& caller) noexcept override {
-    return ResultCore<V, E>::template Impl<false, true>(caller);
+    return ResultCore<V, T>::template Impl<false, true>(caller);
   }
 
 #if YACLIB_SYMMETRIC_TRANSFER != 0
   [[nodiscard]] yaclib_std::coroutine_handle<> Next(InlineCore& caller) noexcept override {
-    return ResultCore<V, E>::template Impl<true, true>(caller);
+    return ResultCore<V, T>::template Impl<true, true>(caller);
   }
 #endif
 
-  Result<V, E> Retire() final {
+  Result Retire() final {
     auto result = (this->GetRef() == 1) ? std::move(this->Get()) : std::as_const(this->Get());
     this->DecRef();
     return result;
@@ -49,9 +51,9 @@ class SharedCore : public ResultCore<V, E> {
   }
 };
 
-extern template class SharedCore<void, StopError>;
+extern template class SharedCore<void, DefaultTrait>;
 
-template <typename V, typename E>
-using SharedCorePtr = IntrusivePtr<SharedCore<V, E>>;
+template <typename V, typename T>
+using SharedCorePtr = IntrusivePtr<SharedCore<V, T>>;
 
 }  // namespace yaclib::detail

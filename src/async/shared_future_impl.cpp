@@ -2,7 +2,7 @@
 
 namespace yaclib {
 
-template class SharedFutureBase<void, StopError>;
+template class SharedFutureBase<void, DefaultTrait>;
 template class SharedFuture<>;
 template class SharedFutureOn<>;
 

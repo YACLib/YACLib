@@ -394,7 +394,7 @@ auto f = yaclib::Run(tp, [] {
   return y + 15;
 }).Then([](int z) {  // Will not run if we have any error
   return z * 2;
-}).Then([](std::exception_ptr e) {  // Recover from error codes
+}).Then([](std::exception_ptr e) {  // Recover from any error
   try {
     std::rethrow_exception(e);
   } catch (const std::runtime_error& e) {
@@ -405,24 +405,22 @@ auto f = yaclib::Run(tp, [] {
 int x = std::move(f).Get().Value();
 ```
 
+Note that cancellation is also delivered as an error (\ref yaclib::StopException), use `yaclib::IsStop(e)`
+to distinguish it from other exceptions inside a recovery callback.
+
 #### Error recovering
 
-```cpp
-yaclib::FairThreadPool tp{/*threads=*/4};
+Custom error types are supported with custom result traits: a trait plugs any result-like container
+(e.g. `std::expected`/`absl::StatusOr`-style with `std::error_code` errors) into all yaclib abstractions:
 
-auto f = yaclib::Run<std::error_code>(tp, [] {
-  if (random() % 2) {
-    return std::make_error_code(1);
-  }
+```cpp
+struct MyTrait { /* see yaclib::ResultTrait in <yaclib/util/result.hpp> for the interface */ };
+
+auto f = yaclib::Run<MyTrait>(tp, [] {
   return 42;
-}).Then([](int y) {
-  if (random() % 2) {
-    return std::make_error_code(2);
-  }
-  return y + 15;
 }).Then([](int z) {  // Will not run if we have any error
   return z * 2;
-}).Then([](std::error_code ec) {  // Recover from error codes
+}).Then([](std::error_code ec) {  // Recover from MyTrait's error type
   std::cout << ec.value() << std::endl;
   return 10;  // Some default value
 });

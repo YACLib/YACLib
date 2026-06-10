@@ -247,7 +247,7 @@ template <typename StrategyT, typename... Futures>
 auto CallWhen(Futures... futures) {
   static constexpr auto F = yaclib::FailPolicy::None;
   using V = void;
-  using E = yaclib::StopError;
+  using E = yaclib::DefaultTrait;
 
   if constexpr (std::is_same_v<StrategyT, NoneManagedTag>) {
     return yaclib::when::When<NoneManaged, F, V, E>(std::move(futures)...);
@@ -274,7 +274,7 @@ template <typename StrategyT, typename Iterator, typename Value = typename std::
 auto CallWhen(Iterator begin, Iterator end) {
   static constexpr auto F = yaclib::FailPolicy::None;
   using V = void;
-  using E = yaclib::StopError;
+  using E = yaclib::DefaultTrait;
 
   if constexpr (std::is_same_v<StrategyT, NoneManagedTag>) {
     return yaclib::when::When<NoneManaged, F, V, E>(begin, end);
@@ -301,7 +301,7 @@ template <typename StrategyT, typename Iterator, typename Value = typename std::
 auto CallWhen(Iterator begin, std::size_t count) {
   static constexpr auto F = yaclib::FailPolicy::None;
   using V = void;
-  using E = yaclib::StopError;
+  using E = yaclib::DefaultTrait;
 
   if constexpr (std::is_same_v<StrategyT, NoneManagedTag>) {
     return yaclib::when::When<NoneManaged, F, V, E>(begin, count);

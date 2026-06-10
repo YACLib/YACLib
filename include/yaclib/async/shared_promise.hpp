@@ -4,12 +4,10 @@
 
 namespace yaclib {
 
-template <typename V, typename E>
+template <typename V, typename T>
 class SharedPromise final {
   static_assert(Check<V>(), "V should be valid");
-  static_assert(Check<E>(), "E should be valid");
-  static_assert(!std::is_same_v<V, E>, "Future cannot be instantiated with same V and E, because it's ambiguous");
-  static_assert(std::is_copy_constructible_v<Result<V, E>>, "Result should be copyable");
+  static_assert(std::is_copy_constructible_v<wrap_void_t<V>>, "Result should be copyable");
 
  public:
   SharedPromise() noexcept = default;
@@ -29,7 +27,7 @@ class SharedPromise final {
     YACLIB_ASSERT(Valid());
 
     if constexpr (sizeof...(Args) == 0) {
-      _core->Store(std::in_place);
+      _core->Store(Unit{});
     } else {
       _core->Store(std::forward<Args>(args)...);
     }
@@ -48,15 +46,15 @@ class SharedPromise final {
   /**
    * Part of unsafe but internal API
    */
-  explicit SharedPromise(detail::SharedCorePtr<V, E> core) noexcept : _core(std::move(core)) {
+  explicit SharedPromise(detail::SharedCorePtr<V, T> core) noexcept : _core(std::move(core)) {
   }
 
-  [[nodiscard]] detail::SharedCorePtr<V, E>& GetCore() noexcept {
+  [[nodiscard]] detail::SharedCorePtr<V, T>& GetCore() noexcept {
     return _core;
   }
 
  private:
-  detail::SharedCorePtr<V, E> _core;
+  detail::SharedCorePtr<V, T> _core;
 };
 
 }  // namespace yaclib

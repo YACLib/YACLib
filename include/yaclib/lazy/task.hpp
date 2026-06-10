@@ -21,14 +21,14 @@ void Start(BaseCore* head) noexcept;
  * Provides a mechanism to schedule the some async operations
  * TODO(MBkkt) add description
  */
-template <typename V, typename E>
+template <typename V, typename T>
 class Task final {
   using CoreType = detail::CoreType;
 
  public:
   static_assert(Check<V>(), "V should be valid");
-  static_assert(Check<E>(), "E should be valid");
-  static_assert(!std::is_same_v<V, E>, "Task cannot be instantiated with same V and E, because it's ambiguous");
+
+  using Result = typename T::template Result<V>;
 
   Task(const Task&) = delete;
   Task& operator=(const Task&) = delete;
@@ -62,7 +62,7 @@ class Task final {
    * TODO(MBkkt) think about force On/Detach/ToFuture:
    *  It's able to set passed executor to previous nullptr/all/head/etc or replace
    */
-  Task<V, E> On(std::nullptr_t) && noexcept {
+  Task<V, T> On(std::nullptr_t) && noexcept {
     return {std::move(this->_core)};
   }
 
@@ -102,18 +102,18 @@ class Task final {
     detail::Start(core, e);
   }
 
-  Future<V, E> ToFuture() && noexcept {
+  Future<V, T> ToFuture() && noexcept {
     YACLIB_ASSERT(Valid());
     detail::Start(_core.Get());
     return {std::move(_core)};
   }
-  FutureOn<V, E> ToFuture(IExecutor& e) && noexcept {
+  FutureOn<V, T> ToFuture(IExecutor& e) && noexcept {
     YACLIB_ASSERT(Valid());
     detail::Start(_core.Get(), e);
     return {std::move(_core)};
   }
 
-  Result<V, E> Get() && noexcept {
+  Result Get() && noexcept {
     // TODO(MBkkt) make it better: we can remove concurrent atomic changes from here
     return std::move(*this).ToFuture().Get();
   }
@@ -121,11 +121,11 @@ class Task final {
   void Touch() & = delete;
   void Touch() const&& = delete;
 
-  const Result<V, E>& Touch() const& noexcept {
+  const Result& Touch() const& noexcept {
     YACLIB_ASSERT(Ready());
     return _core->Get();
   }
-  Result<V, E> Touch() && noexcept {
+  Result Touch() && noexcept {
     YACLIB_ASSERT(Ready());
     auto core = std::exchange(_core, nullptr);
     return std::move(core->Get());
@@ -136,14 +136,14 @@ class Task final {
    *
    * \return internal Core state ptr
    */
-  [[nodiscard]] detail::UniqueCorePtr<V, E>& GetCore() noexcept {
+  [[nodiscard]] detail::UniqueCorePtr<V, T>& GetCore() noexcept {
     return _core;
   }
-  Task(detail::UniqueCorePtr<V, E> core) noexcept : _core{std::move(core)} {
+  Task(detail::UniqueCorePtr<V, T> core) noexcept : _core{std::move(core)} {
   }
 
  private:
-  detail::UniqueCorePtr<V, E> _core;
+  detail::UniqueCorePtr<V, T> _core;
 };
 
 extern template class Task<>;

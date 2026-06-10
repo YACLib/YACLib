@@ -6,15 +6,16 @@
 #include <yaclib/util/type_traits.hpp>
 
 #include <atomic>
+#include <optional>
 
 namespace yaclib::when {
 
-template <FailPolicy F, typename OutputValue, typename OutputError, typename InputCore>
+template <FailPolicy F, typename OutputValue, typename Trait, typename InputCore>
 struct Any;
 
-template <typename OutputValue, typename OutputError, typename InputCore>
-struct Any<FailPolicy::None, OutputValue, OutputError, InputCore> {
-  using PromiseType = Promise<OutputValue, OutputError>;
+template <typename OutputValue, typename Trait, typename InputCore>
+struct Any<FailPolicy::None, OutputValue, Trait, InputCore> {
+  using PromiseType = Promise<OutputValue, Trait>;
 
   static constexpr ConsumePolicy kConsumePolicy = ConsumePolicy::Unordered;
   static constexpr CorePolicy kCorePolicy = CorePolicy::Managed;
@@ -22,15 +23,13 @@ struct Any<FailPolicy::None, OutputValue, OutputError, InputCore> {
   Any(std::size_t count, PromiseType p) : _p{std::move(p)} {
   }
 
-  template <typename Result>
-  void Consume(Result&& result) {
+  template <typename R>
+  void Consume(R&& result) {
     if (!_done.load(std::memory_order_relaxed) && !_done.exchange(true, std::memory_order_acq_rel)) {
-      if (result) {
-        std::move(_p).Set(std::forward<Result>(result).Value());
-      } else if (result.State() == ResultState::Error) {
-        std::move(_p).Set(std::forward<Result>(result).Error());
+      if (Trait::Ok(result)) {
+        std::move(_p).Set(Trait::MoveValue(std::forward<R>(result)));
       } else {
-        std::move(_p).Set(std::forward<Result>(result).Exception());
+        std::move(_p).Set(Trait::MoveError(std::forward<R>(result)));
       }
     }
   }
@@ -39,9 +38,9 @@ struct Any<FailPolicy::None, OutputValue, OutputError, InputCore> {
   PromiseType _p;
 };
 
-template <typename OutputValue, typename OutputError, typename InputCore>
-struct Any<FailPolicy::FirstFail, OutputValue, OutputError, InputCore> {
-  using PromiseType = Promise<OutputValue, OutputError>;
+template <typename OutputValue, typename Trait, typename InputCore>
+struct Any<FailPolicy::FirstFail, OutputValue, Trait, InputCore> {
+  using PromiseType = Promise<OutputValue, Trait>;
 
   static constexpr ConsumePolicy kConsumePolicy = ConsumePolicy::Unordered;
   static constexpr CorePolicy kCorePolicy = CorePolicy::Managed;
@@ -49,33 +48,26 @@ struct Any<FailPolicy::FirstFail, OutputValue, OutputError, InputCore> {
   Any(std::size_t count, PromiseType p) : _p{std::move(p)} {
   }
 
-  template <typename Result>
-  void Consume(Result&& result) {
-    if (result) {
+  template <typename R>
+  void Consume(R&& result) {
+    if (Trait::Ok(result)) {
       if (_state.load(std::memory_order_relaxed) != State::kValue &&
           _state.exchange(State::kValue, std::memory_order_acq_rel) != State::kValue) {
-        std::move(_p).Set(std::forward<Result>(result).Value());
+        std::move(_p).Set(Trait::MoveValue(std::forward<R>(result)));
       }
     } else {
       State expected = State::kEmpty;
       if (_state.load(std::memory_order_relaxed) == expected &&
           _state.compare_exchange_strong(expected, State::kError, std::memory_order_acq_rel)) {
-        if (result.State() == ResultState::Error) {
-          error = std::forward<Result>(result).Error();
-        } else {
-          error = std::forward<Result>(result).Exception();
-        }
+        _error.emplace(Trait::MoveError(std::forward<R>(result)));
       }
     }
   }
 
   ~Any() {
     if (_p.Valid()) {
-      if (error.State() == ResultState::Error) {
-        std::move(_p).Set(std::move(error).Error());
-      } else {
-        std::move(_p).Set(std::move(error).Exception());
-      }
+      YACLIB_ASSERT(_error.has_value());
+      std::move(_p).Set(std::move(*_error));
     }
   }
 
@@ -87,13 +79,13 @@ struct Any<FailPolicy::FirstFail, OutputValue, OutputError, InputCore> {
   };
 
   yaclib_std::atomic<State> _state = State::kEmpty;
-  Result<void, OutputError> error;
+  std::optional<typename Trait::Error> _error;
   PromiseType _p;
 };
 
-template <typename OutputValue, typename OutputError, typename InputCore>
-struct Any<FailPolicy::LastFail, OutputValue, OutputError, InputCore> {
-  using PromiseType = Promise<OutputValue, OutputError>;
+template <typename OutputValue, typename Trait, typename InputCore>
+struct Any<FailPolicy::LastFail, OutputValue, Trait, InputCore> {
+  using PromiseType = Promise<OutputValue, Trait>;
 
   static constexpr ConsumePolicy kConsumePolicy = ConsumePolicy::Unordered;
   static constexpr CorePolicy kCorePolicy = CorePolicy::Managed;
@@ -101,19 +93,15 @@ struct Any<FailPolicy::LastFail, OutputValue, OutputError, InputCore> {
   Any(std::size_t count, PromiseType p) : _state{2 * count}, _p{std::move(p)} {
   }
 
-  template <typename Result>
-  void Consume(Result&& result) {
+  template <typename R>
+  void Consume(R&& result) {
     if (!DoneImpl(_state.load(std::memory_order_acquire))) {
-      if (result) {
+      if (Trait::Ok(result)) {
         if (!DoneImpl(_state.exchange(1, std::memory_order_acq_rel))) {
-          std::move(_p).Set(std::forward<Result>(result).Value());
+          std::move(_p).Set(Trait::MoveValue(std::forward<R>(result)));
         }
       } else if (_state.fetch_sub(2, std::memory_order_acq_rel) == 2) {
-        if (result.State() == ResultState::Error) {
-          std::move(_p).Set(std::forward<Result>(result).Error());
-        } else {
-          std::move(_p).Set(std::forward<Result>(result).Exception());
-        }
+        std::move(_p).Set(Trait::MoveError(std::forward<R>(result)));
       }
     }
   }

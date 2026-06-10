@@ -2,7 +2,9 @@
 #include <yaclib/async/run.hpp>
 #include <yaclib/async/when_all.hpp>
 #include <yaclib/fwd.hpp>
+#include <yaclib/util/result.hpp>
 
+#include <stdexcept>
 #include <string_view>
 
 #include <gtest/gtest.h>
@@ -33,7 +35,9 @@ TEST(WhenAllTuple, FirstFailError) {
   });
 
   auto f = yaclib::WhenAll(std::move(f1), std::move(f2), std::move(f3), std::move(f4));
-  EXPECT_EQ(std::move(f).Get().Error(), yaclib::StopTag{});
+  const auto result = std::move(f).Get();
+  EXPECT_FALSE(result);
+  EXPECT_TRUE(yaclib::IsStop(result.Error()));
 }
 
 TEST(WhenAllTuple, FirstFailException) {
@@ -45,7 +49,11 @@ TEST(WhenAllTuple, FirstFailException) {
   });
 
   auto f = yaclib::WhenAll(std::move(f1), std::move(f2), std::move(f3), std::move(f4));
-  EXPECT_EQ(std::move(f).Get().State(), yaclib::ResultState::Exception);
+  // Exception and Error states are unified now: check error-ness and the concrete exception type
+  const auto result = std::move(f).Get();
+  EXPECT_FALSE(result);
+  EXPECT_FALSE(yaclib::IsStop(result.Error()));
+  EXPECT_THROW(std::rethrow_exception(result.Error()), std::runtime_error);
 }
 
 TEST(WhenAllTuple, None) {
@@ -62,8 +70,14 @@ TEST(WhenAllTuple, None) {
   auto result = std::move(f).Get().Value();
   EXPECT_EQ(std::move(std::get<0>(result)).Value(), kSetInt);
   EXPECT_EQ(std::move(std::get<1>(result)).Value(), kSetString);
-  EXPECT_EQ(std::move(std::get<2>(result)).Error(), yaclib::StopTag{});
-  EXPECT_EQ(std::move(std::get<3>(result)).State(), yaclib::ResultState::Exception);
+  const auto& r2 = std::get<2>(result);
+  EXPECT_FALSE(r2);
+  EXPECT_TRUE(yaclib::IsStop(r2.Error()));
+  // Exception and Error states are unified now: check error-ness and the concrete exception type
+  const auto& r3 = std::get<3>(result);
+  EXPECT_FALSE(r3);
+  EXPECT_FALSE(yaclib::IsStop(r3.Error()));
+  EXPECT_THROW(std::rethrow_exception(r3.Error()), std::runtime_error);
 }
 
 }  // namespace

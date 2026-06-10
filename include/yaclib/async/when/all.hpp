@@ -12,14 +12,14 @@
 
 namespace yaclib::when {
 
-template <FailPolicy F, typename OutputValue, typename OutputError, typename InputCore>
+template <FailPolicy F, typename OutputValue, typename Trait, typename InputCore>
 struct All {
   static_assert(F != FailPolicy::LastFail, "LastFail policy is not supported by All");
 };
 
-template <typename OutputValue, typename OutputError, typename InputCore>
-struct All<FailPolicy::None, OutputValue, OutputError, InputCore> {
-  using PromiseType = Promise<OutputValue, OutputError>;
+template <typename OutputValue, typename Trait, typename InputCore>
+struct All<FailPolicy::None, OutputValue, Trait, InputCore> {
+  using PromiseType = Promise<OutputValue, Trait>;
 
   static constexpr ConsumePolicy kConsumePolicy = ConsumePolicy::None;
   static constexpr CorePolicy kCorePolicy = CorePolicy::Owned;
@@ -46,9 +46,9 @@ struct All<FailPolicy::None, OutputValue, OutputError, InputCore> {
   PromiseType _p;
 };
 
-template <typename OutputValue, typename OutputError, typename InputCore>
-struct All<FailPolicy::FirstFail, OutputValue, OutputError, InputCore> {
-  using PromiseType = Promise<OutputValue, OutputError>;
+template <typename OutputValue, typename Trait, typename InputCore>
+struct All<FailPolicy::FirstFail, OutputValue, Trait, InputCore> {
+  using PromiseType = Promise<OutputValue, Trait>;
 
   static constexpr ConsumePolicy kConsumePolicy = ConsumePolicy::Unordered;
   static constexpr CorePolicy kCorePolicy = CorePolicy::Owned;
@@ -63,12 +63,8 @@ struct All<FailPolicy::FirstFail, OutputValue, OutputError, InputCore> {
 
   void Consume(InputCore& core) {
     auto& result = core.Get();
-    if (!result && !_done.load(std::memory_order_relaxed) && !_done.exchange(true, std::memory_order_acq_rel)) {
-      if (result.State() == ResultState::Exception) {
-        std::move(_p).Set(std::as_const(result).Exception());
-      } else {
-        std::move(_p).Set(std::as_const(result).Error());
-      }
+    if (!Trait::Ok(result) && !_done.load(std::memory_order_relaxed) && !_done.exchange(true, std::memory_order_acq_rel)) {
+      std::move(_p).Set(Trait::MoveError(std::move(result)));
     }
   }
 
@@ -77,7 +73,7 @@ struct All<FailPolicy::FirstFail, OutputValue, OutputError, InputCore> {
       OutputValue result;
       result.reserve(_cores.size());
       for (auto* core : _cores) {
-        result.push_back(core->Retire().Value());
+        result.push_back(Trait::MoveValue(core->Retire()));
       }
       std::move(_p).Set(std::move(result));
     } else {

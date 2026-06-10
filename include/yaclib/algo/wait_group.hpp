@@ -53,8 +53,8 @@ class WaitGroup final {
    * \tparam NeedAdd if true make implicit Add, if false you should make explicit Add before call Consume
    * \param futures to wait
    */
-  template <bool NeedAdd = true, typename... V, typename... E>
-  YACLIB_INLINE void Consume(FutureBase<V, E>&&... futures) noexcept {
+  template <bool NeedAdd = true, typename... V, typename... T>
+  YACLIB_INLINE void Consume(FutureBase<V, T>&&... futures) noexcept {
     InsertCore<true, NeedAdd>(UpCast<detail::BaseCore>(*futures.GetCore().Release())...);
   }
 
@@ -94,8 +94,8 @@ class WaitGroup final {
    * \tparam NeedAdd if true make implicit Add, if false you should make explicit Add before call Attach
    * \param futures to wait
    */
-  template <bool NeedAdd = true, typename... V, typename... E>
-  YACLIB_INLINE void Attach(FutureBase<V, E>&... futures) noexcept {
+  template <bool NeedAdd = true, typename... V, typename... T>
+  YACLIB_INLINE void Attach(FutureBase<V, T>&... futures) noexcept {
     InsertCore<false, NeedAdd>(UpCast<detail::BaseCore>(*futures.GetCore())...);
   }
 

@@ -1,210 +1,249 @@
 #pragma once
 
+#include <yaclib/config.hpp>
 #include <yaclib/fwd.hpp>
+#include <yaclib/log.hpp>
 #include <yaclib/util/type_traits.hpp>
 
 #include <exception>
+#include <new>
+#include <type_traits>
 #include <utility>
-#include <variant>
 
 namespace yaclib {
 
 /**
- * Result states \see Result
- * \enum Value, Exception, Error, Empty
+ * Exception that represents cancellation of an async operation, \see StopPtr
  */
-enum class [[nodiscard]] ResultState : unsigned char {
-  Value = 0,
-  Exception = 1,
-  Error = 2,
-  Empty = 3,
+struct StopException : std::exception {
+  const char* what() const noexcept override {
+    return "yaclib::StopException";
+  }
 };
 
 /**
- * Default error
+ * Cached std::exception_ptr with \ref StopException, copy is cheap and never allocates
  */
-struct [[nodiscard]] StopError final {
-  constexpr StopError(StopTag) noexcept {
-  }
-  constexpr StopError(StopError&&) noexcept = default;
-  constexpr StopError(const StopError&) noexcept = default;
-  constexpr StopError& operator=(StopError&&) noexcept = default;
-  constexpr StopError& operator=(const StopError&) noexcept = default;
-
-  static const char* What() noexcept {
-    return "yaclib::StopError";
-  }
-};
-
-YACLIB_DEFINE_VOID_COMPARE(StopError)
+[[nodiscard]] const std::exception_ptr& StopPtr() noexcept;
 
 /**
- * \class Exception for Error
- * \see Result
+ * Check if error represents cancellation, \see StopException
  */
-template <typename Error>
-class [[nodiscard]] ResultError final : public std::exception {
- public:
-  ResultError(ResultError&&) noexcept(std::is_nothrow_move_constructible_v<Error>) = default;
-  ResultError(const ResultError&) noexcept(std::is_nothrow_copy_constructible_v<Error>) = default;
-  ResultError& operator=(ResultError&&) noexcept(std::is_nothrow_move_assignable_v<Error>) = default;
-  ResultError& operator=(const ResultError&) noexcept(std::is_nothrow_copy_assignable_v<Error>) = default;
-
-  explicit ResultError(Error&& error) noexcept(std::is_nothrow_move_constructible_v<Error>) : _error{std::move(error)} {
-  }
-  explicit ResultError(const Error& error) noexcept(std::is_nothrow_copy_constructible_v<Error>) : _error{error} {
-  }
-
-  [[nodiscard]] Error& Get() & noexcept {
-    return _error;
-  }
-  [[nodiscard]] const Error& Get() const& noexcept {
-    return _error;
-  }
-
-  const char* what() const noexcept final {
-    return _error.What();
-  }
-
- private:
-  Error _error;
-};
-
-/**
- * \class Exception for Empty, invalid state
- * \see Result
- */
-struct ResultEmpty final : std::exception {
-  const char* what() const noexcept final {
-    return "yaclib::ResultEmpty";
-  }
-};
+[[nodiscard]] bool IsStop(const std::exception_ptr& error) noexcept;
 
 /**
  * Encapsulated return value from caller
  *
+ * Either a value of type V or a std::exception_ptr.
+ * Default constructed Result contains the stop error, \see StopPtr
+ *
  * \tparam ValueT type of value that stored in Result
- * \tparam E type of error that stored in Result
  */
-template <typename ValueT, typename E>
-class Result final {
+template <typename ValueT>
+class [[nodiscard]] Result final {
   static_assert(Check<ValueT>(), "V should be valid");
-  static_assert(Check<E>(), "E should be valid");
-  static_assert(!std::is_same_v<ValueT, E>, "Result cannot be instantiated with same V and E, because it's ambiguous");
-  static_assert(std::is_constructible_v<E, StopTag>, "Error should be constructable from StopTag");
+
   using V = std::conditional_t<std::is_void_v<ValueT>, Unit, ValueT>;
-  using Variant = std::variant<V, std::exception_ptr, E, std::monostate>;
+
+  union State {
+    YACLIB_NO_UNIQUE_ADDRESS Unit stub;
+    YACLIB_NO_UNIQUE_ADDRESS V value;
+
+    State() noexcept : stub{} {
+    }
+    ~State() noexcept {
+    }
+  };
 
  public:
-  Result(Result&& other) noexcept(std::is_nothrow_move_constructible_v<Variant>) = default;
-  Result(const Result& other) noexcept(std::is_nothrow_copy_constructible_v<Variant>) = default;
-  Result& operator=(Result&& other) noexcept(std::is_nothrow_move_assignable_v<Variant>) = default;
-  Result& operator=(const Result& other) noexcept(std::is_nothrow_copy_assignable_v<Variant>) = default;
+  Result() noexcept : _error{StopPtr()} {
+  }
 
-  template <typename... Args,
-            typename =
-              std::enable_if_t<(sizeof...(Args) > 1 || !std::is_same_v<std::decay_t<head_t<Args&&...>>, Result>), void>>
-  Result(Args&&... args) noexcept(std::is_nothrow_constructible_v<Variant, std::in_place_type_t<V>, Args&&...>)
-    : Result{std::in_place, std::forward<Args>(args)...} {
+  Result(StopTag) noexcept : _error{StopPtr()} {
+  }
+
+  Result(std::exception_ptr error) noexcept : _error{std::move(error)} {
+    YACLIB_ASSERT(_error != nullptr);
   }
 
   template <typename... Args>
-  Result(std::in_place_t,
-         Args&&... args) noexcept(std::is_nothrow_constructible_v<Variant, std::in_place_type_t<V>, Args&&...>)
-    : _result{std::in_place_type<V>, std::forward<Args>(args)...} {
+  explicit Result(std::in_place_t, Args&&... args) noexcept(std::is_nothrow_constructible_v<V, Args&&...>) {
+    ::new (&_value.value) V(std::forward<Args>(args)...);
   }
 
-  Result(std::exception_ptr exception) noexcept
-    : _result{std::in_place_type<std::exception_ptr>, std::move(exception)} {
+  template <typename... Args, typename = std::enable_if_t<
+                                (sizeof...(Args) > 1) ||
+                                !(std::is_same_v<std::decay_t<head_t<Args&&...>>, Result> ||
+                                  std::is_same_v<std::decay_t<head_t<Args&&...>>, std::exception_ptr> ||
+                                  std::is_same_v<std::decay_t<head_t<Args&&...>>, StopTag> ||
+                                  std::is_same_v<std::decay_t<head_t<Args&&...>>, std::in_place_t>)>>
+  Result(Args&&... args) noexcept(std::is_nothrow_constructible_v<V, Args&&...>)
+    : Result{std::in_place, std::forward<Args>(args)...} {
   }
 
-  Result(E error) noexcept : _result{std::in_place_type<E>, std::move(error)} {
+  // _error is copied, not moved: it's also the discriminant that controls the value lifetime
+  Result(const Result& other) noexcept(std::is_nothrow_copy_constructible_v<V>) : _error{other._error} {
+    if (!_error) {
+      ::new (&_value.value) V(other._value.value);
+    }
   }
 
-  Result(StopTag tag) noexcept : _result{std::in_place_type<E>, tag} {
+  Result(Result&& other) noexcept(std::is_nothrow_move_constructible_v<V>) : _error{other._error} {
+    if (!_error) {
+      ::new (&_value.value) V(std::move(other._value.value));
+    }
   }
 
-  Result() noexcept : _result{std::monostate{}} {
-  }
-
-  template <typename Arg, typename = std::enable_if_t<!is_result_v<std::decay_t<Arg>>, void>>
-  Result& operator=(Arg&& arg) noexcept(std::is_nothrow_assignable_v<Variant, Arg>) {
-    _result = std::forward<Arg>(arg);
+  Result& operator=(const Result& other) noexcept(std::is_nothrow_copy_constructible_v<V> &&
+                                                  std::is_nothrow_copy_assignable_v<V>) {
+    if (this != &other) {
+      if (!other._error) {
+        if (!_error) {
+          _value.value = other._value.value;
+        } else {
+          ::new (&_value.value) V(other._value.value);
+          _error = nullptr;
+        }
+      } else {
+        if (!_error) {
+          _value.value.~V();
+        }
+        _error = other._error;
+      }
+    }
     return *this;
   }
 
+  Result& operator=(Result&& other) noexcept(std::is_nothrow_move_constructible_v<V> &&
+                                             std::is_nothrow_move_assignable_v<V>) {
+    if (this != &other) {
+      if (!other._error) {
+        if (!_error) {
+          _value.value = std::move(other._value.value);
+        } else {
+          ::new (&_value.value) V(std::move(other._value.value));
+          _error = nullptr;
+        }
+      } else {
+        if (!_error) {
+          _value.value.~V();
+        }
+        _error = other._error;
+      }
+    }
+    return *this;
+  }
+
+  template <typename Arg, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Arg>, Result>>>
+  Result& operator=(Arg&& arg) {
+    *this = Result{std::forward<Arg>(arg)};
+    return *this;
+  }
+
+  ~Result() noexcept {
+    if (!_error) {
+      _value.value.~V();
+    }
+  }
+
   [[nodiscard]] explicit operator bool() const noexcept {
-    return State() == ResultState::Value;
+    return !_error;
   }
 
   void Ok() & = delete;
   void Ok() const&& = delete;
   void Value() & = delete;
   void Value() const&& = delete;
-  void Exception() & = delete;
-  void Exception() const&& = delete;
   void Error() & = delete;
   void Error() const&& = delete;
 
   [[nodiscard]] V&& Ok() && {
-    return Get(std::move(*this));
+    if (_error) {
+      std::rethrow_exception(_error);
+    }
+    return std::move(_value.value);
   }
   [[nodiscard]] const V& Ok() const& {
-    return Get(*this);
-  }
-
-  [[nodiscard]] ResultState State() const noexcept {
-    return ResultState{static_cast<unsigned char>(_result.index())};
+    if (_error) {
+      std::rethrow_exception(_error);
+    }
+    return _value.value;
   }
 
   [[nodiscard]] V&& Value() && noexcept {
-    return std::get<V>(std::move(_result));
+    YACLIB_ASSERT(!_error);
+    return std::move(_value.value);
   }
-
   [[nodiscard]] const V& Value() const& noexcept {
-    return std::get<V>(_result);
+    YACLIB_ASSERT(!_error);
+    return _value.value;
   }
 
-  [[nodiscard]] std::exception_ptr&& Exception() && noexcept {
-    return std::get<std::exception_ptr>(std::move(_result));
+  [[nodiscard]] const std::exception_ptr& Error() && noexcept {
+    YACLIB_ASSERT(_error);
+    return _error;
   }
-  [[nodiscard]] const std::exception_ptr& Exception() const& noexcept {
-    return std::get<std::exception_ptr>(_result);
-  }
-
-  [[nodiscard]] E&& Error() && noexcept {
-    return std::get<E>(std::move(_result));
-  }
-  [[nodiscard]] const E& Error() const& noexcept {
-    return std::get<E>(_result);
-  }
-
-  [[nodiscard]] Variant& Internal() {
-    return _result;
-  }
-
-  [[nodiscard]] const Variant& Internal() const {
-    return _result;
+  [[nodiscard]] const std::exception_ptr& Error() const& noexcept {
+    YACLIB_ASSERT(_error);
+    return _error;
   }
 
  private:
-  template <typename R>
-  static decltype(auto) Get(R&& r) {
-    switch (r.State()) {
-      case ResultState::Value:
-        return std::forward<R>(r).Value();
-      case ResultState::Exception:
-        std::rethrow_exception(std::forward<R>(r).Exception());
-      case ResultState::Error:
-        throw ResultError{std::forward<R>(r).Error()};
-      default:
-        throw ResultEmpty{};
-    }
-  }
-
-  Variant _result;
+  std::exception_ptr _error;
+  YACLIB_NO_UNIQUE_ADDRESS State _value;
 };
 
 extern template class Result<>;
+
+/**
+ * Default result trait, describes how async abstractions create and inspect results
+ *
+ * A custom trait should provide the same interface, its container should be copyable iff V is copyable
+ */
+struct ResultTrait {
+  template <typename V>
+  using Result = yaclib::Result<V>;
+
+  using Error = std::exception_ptr;
+
+  template <typename R>
+  using Value = typename detail::InstantiationType<yaclib::Result, R>::Value;
+
+  template <typename V, typename... Args>
+  YACLIB_INLINE static yaclib::Result<V> MakeResult(Args&&... args) {
+    static_assert(sizeof...(Args) > 0, "Use MakeResult<V>(Unit{}) to construct default value");
+    using Head = std::decay_t<head_t<Args&&...>>;
+    if constexpr (sizeof...(Args) == 1 && std::is_same_v<Head, Unit>) {
+      return yaclib::Result<V>{std::in_place};
+    } else if constexpr (std::is_same_v<Head, std::in_place_t> ||
+                         (sizeof...(Args) == 1 &&
+                          (std::is_same_v<Head, StopTag> || std::is_same_v<Head, std::exception_ptr> ||
+                           std::is_same_v<Head, yaclib::Result<V>>))) {
+      return yaclib::Result<V>{std::forward<Args>(args)...};
+    } else {
+      return yaclib::Result<V>{std::in_place, std::forward<Args>(args)...};
+    }
+  }
+
+  template <typename V>
+  YACLIB_INLINE static bool Ok(const yaclib::Result<V>& r) noexcept {
+    return static_cast<bool>(r);
+  }
+
+  template <typename R>
+  YACLIB_INLINE static decltype(auto) MoveValue(R&& r) noexcept {
+    return std::forward<R>(r).Value();
+  }
+
+  template <typename R>
+  YACLIB_INLINE static decltype(auto) MoveError(R&& r) noexcept {
+    return std::forward<R>(r).Error();
+  }
+};
+
+/**
+ * Trait used by default for all async abstractions, a separate struct so it can be forward declared
+ */
+struct DefaultTrait : ResultTrait {};
 
 }  // namespace yaclib

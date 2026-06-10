@@ -6,23 +6,25 @@
 
 namespace yaclib::detail {
 
-template <typename V, typename E>
-class UniqueCore : public ResultCore<V, E> {
-  using ResultCore<V, E>::ResultCore;
+template <typename V, typename T>
+class UniqueCore : public ResultCore<V, T> {
+  using ResultCore<V, T>::ResultCore;
 
  public:
+  using Result = typename ResultCore<V, T>::Result;
+
   [[nodiscard]] InlineCore* Here(InlineCore& caller) noexcept override {
-    return ResultCore<V, E>::template Impl<false, false>(caller);
+    return ResultCore<V, T>::template Impl<false, false>(caller);
   }
 
 #if YACLIB_SYMMETRIC_TRANSFER != 0
   [[nodiscard]] yaclib_std::coroutine_handle<> Next(InlineCore& caller) noexcept override {
-    return ResultCore<V, E>::template Impl<true, false>(caller);
+    return ResultCore<V, T>::template Impl<true, false>(caller);
   }
 #endif
 
-  Result<V, E> Retire() final {
-    if constexpr (std::is_move_constructible_v<Result<V, E>>) {
+  Result Retire() final {
+    if constexpr (std::is_move_constructible_v<wrap_void_t<V>>) {
       auto result = std::move(this->Get());
       this->DecRef();
       return result;
@@ -59,9 +61,9 @@ class UniqueCore : public ResultCore<V, E> {
   }
 };
 
-extern template class UniqueCore<void, StopError>;
+extern template class UniqueCore<void, DefaultTrait>;
 
-template <typename V, typename E>
-using UniqueCorePtr = IntrusivePtr<UniqueCore<V, E>>;
+template <typename V, typename T>
+using UniqueCorePtr = IntrusivePtr<UniqueCore<V, T>>;
 
 }  // namespace yaclib::detail

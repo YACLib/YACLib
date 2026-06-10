@@ -3,6 +3,9 @@
 #include <yaclib/async/run.hpp>
 #include <yaclib/fwd.hpp>
 #include <yaclib/util/fail_policy.hpp>
+#include <yaclib/util/result.hpp>
+
+#include <stdexcept>
 
 #include <gtest/gtest.h>
 
@@ -37,7 +40,9 @@ TEST(Join, ReturnError) {
   });
 
   auto f = yaclib::Join<yaclib::FailPolicy::FirstFail>(std::move(f1), std::move(f2), std::move(f3));
-  EXPECT_EQ(std::move(f).Get().Error(), yaclib::StopTag{});
+  const auto result = std::move(f).Get();
+  EXPECT_FALSE(result);
+  EXPECT_TRUE(yaclib::IsStop(result.Error()));
 }
 
 TEST(Join, ReturnException) {
@@ -48,7 +53,11 @@ TEST(Join, ReturnException) {
   });
 
   auto f = yaclib::Join<yaclib::FailPolicy::FirstFail>(std::move(f1), std::move(f2), std::move(f3));
-  EXPECT_EQ(std::move(f).Get().State(), yaclib::ResultState::Exception);
+  // Exception and Error states are unified now: check error-ness and the concrete exception type
+  const auto result = std::move(f).Get();
+  EXPECT_FALSE(result);
+  EXPECT_FALSE(yaclib::IsStop(result.Error()));
+  EXPECT_THROW(std::rethrow_exception(result.Error()), std::runtime_error);
 }
 
 TEST(Join, FirstFailNoError) {

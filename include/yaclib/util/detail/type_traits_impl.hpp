@@ -45,57 +45,67 @@ struct IsInstantiationOf<Instance, Instance<Args...>> final {
 };
 
 template <template <typename...> typename Instance, typename T>
-struct InstantiationTypes final {
+struct InstantiationType final {
   using Value = T;
-  using Error = T;
 };
 
-template <template <typename...> typename Instance, typename V, typename E>
-struct InstantiationTypes<Instance, Instance<V, E>> final {
+template <template <typename...> typename Instance, typename V>
+struct InstantiationType<Instance, Instance<V>> final {
   using Value = V;
-  using Error = E;
+};
+
+template <template <typename...> typename Instance, typename T>
+struct InstantiationTypes final {
+  using Value = T;
+  using Trait = T;
+};
+
+template <template <typename...> typename Instance, typename V, typename T>
+struct InstantiationTypes<Instance, Instance<V, T>> final {
+  using Value = V;
+  using Trait = T;
 };
 
 template <typename T>
 struct AsyncTypes final {
   using Value = T;
-  using Error = T;
+  using Trait = T;
 };
 
-template <typename V, typename E>
-struct AsyncTypes<FutureBase<V, E>> final {
+template <typename V, typename T>
+struct AsyncTypes<FutureBase<V, T>> final {
   using Value = V;
-  using Error = E;
+  using Trait = T;
 };
 
-template <typename V, typename E>
-struct AsyncTypes<Future<V, E>> final {
+template <typename V, typename T>
+struct AsyncTypes<Future<V, T>> final {
   using Value = V;
-  using Error = E;
+  using Trait = T;
 };
 
-template <typename V, typename E>
-struct AsyncTypes<FutureOn<V, E>> final {
+template <typename V, typename T>
+struct AsyncTypes<FutureOn<V, T>> final {
   using Value = V;
-  using Error = E;
+  using Trait = T;
 };
 
-template <typename V, typename E>
-struct AsyncTypes<SharedFutureBase<V, E>> final {
+template <typename V, typename T>
+struct AsyncTypes<SharedFutureBase<V, T>> final {
   using Value = V;
-  using Error = E;
+  using Trait = T;
 };
 
-template <typename V, typename E>
-struct AsyncTypes<SharedFuture<V, E>> final {
+template <typename V, typename T>
+struct AsyncTypes<SharedFuture<V, T>> final {
   using Value = V;
-  using Error = E;
+  using Trait = T;
 };
 
-template <typename V, typename E>
-struct AsyncTypes<SharedFutureOn<V, E>> final {
+template <typename V, typename T>
+struct AsyncTypes<SharedFutureOn<V, T>> final {
   using Value = V;
-  using Error = E;
+  using Trait = T;
 };
 
 }  // namespace yaclib::detail

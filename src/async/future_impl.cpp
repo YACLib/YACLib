@@ -2,7 +2,7 @@
 
 namespace yaclib {
 
-template class FutureBase<void, StopError>;
+template class FutureBase<void, DefaultTrait>;
 template class Future<>;
 template class FutureOn<>;
 

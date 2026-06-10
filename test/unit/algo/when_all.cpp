@@ -18,6 +18,7 @@
 #include <cstddef>
 #include <exception>
 #include <stdexcept>
+#include <system_error>
 #include <thread>
 #include <tuple>
 #include <type_traits>
@@ -43,26 +44,26 @@ enum FutureType {
   Mixed,
 };
 
-template <std::size_t Index, FutureType Type, typename V, typename E = yaclib::StopError>
+template <std::size_t Index, FutureType Type, typename V, typename T = yaclib::DefaultTrait>
 auto GetContract() {
   if constexpr (Type == Future || (Type == Mixed && Index % 2 == 0)) {
-    return yaclib::MakeContract<V, E>();
+    return yaclib::MakeContract<V, T>();
   } else {
-    return yaclib::MakeSharedContract<V, E>();
+    return yaclib::MakeSharedContract<V, T>();
   }
 }
 
-template <std::size_t Index, std::size_t Limit, FutureType Type, typename V, typename E = yaclib::StopError>
+template <std::size_t Index, std::size_t Limit, FutureType Type, typename V, typename T = yaclib::DefaultTrait>
 auto GetAsyncValue(yaclib::IExecutor& e) {
   if constexpr (Type == Future || (Type == Mixed && Index % 2 == 0)) {
-    return yaclib::Run(e, [] {
+    return yaclib::Run<T>(e, [] {
       yaclib_std::this_thread::sleep_for((Limit - Index) * 10ms);
       if constexpr (!std::is_void_v<V>) {
         return V{Index};
       }
     });
   } else {
-    return yaclib::RunShared(e, [] {
+    return yaclib::RunShared<T>(e, [] {
       yaclib_std::this_thread::sleep_for((Limit - Index) * 10ms);
       if constexpr (!std::is_void_v<V>) {
         return V{Index};
@@ -187,7 +188,7 @@ TYPED_TEST(WhenAllSuite, JustWorks) {
     }
     EXPECT_EQ(i, 3);
   } else if constexpr (is_void) {
-    EXPECT_EQ(std::move(all).Get().State(), yaclib::ResultState::Value);
+    EXPECT_TRUE(std::move(all).Get());
   } else {
     EXPECT_EQ(std::move(all).Get().Ok(), expected);
   }
@@ -220,9 +221,17 @@ TYPED_TEST(WhenAllSuite, AllFails) {
   } else {
     auto values = std::move(all).Touch().Value();
     EXPECT_EQ(values.size(), 3);
-    EXPECT_EQ(values[0].State(), yaclib::ResultState::Exception);
-    EXPECT_EQ(values[1].State(), yaclib::ResultState::Error);
-    EXPECT_EQ(values[2].State(), yaclib::ResultState::Error);
+    // Exception and Error states are unified now: check error-ness and use IsStop to distinguish cancellation
+    const auto& v0 = values[0];
+    EXPECT_FALSE(v0);
+    EXPECT_FALSE(yaclib::IsStop(v0.Error()));
+    EXPECT_THROW(std::rethrow_exception(v0.Error()), std::runtime_error);
+    const auto& v1 = values[1];
+    EXPECT_FALSE(v1);
+    EXPECT_TRUE(yaclib::IsStop(v1.Error()));
+    const auto& v2 = values[2];
+    EXPECT_FALSE(v2);
+    EXPECT_TRUE(yaclib::IsStop(v2.Error()));
   }
 }
 
@@ -280,25 +289,29 @@ TEST(Vector, EmptyInput) {
   EmptyInput<void>();
 }
 
-template <typename Error = yaclib::StopError>
+template <typename T = yaclib::DefaultTrait>
 void FirstFail() {
   yaclib::FairThreadPool tp;
-  std::vector<yaclib::FutureOn<void, Error>> ints;
+  std::vector<yaclib::FutureOn<void, T>> ints;
   std::size_t count = yaclib_std::thread::hardware_concurrency() * 4;
   ints.reserve(count * 2);
   for (int j = 0; j != 200; ++j) {
     for (std::size_t i = 0; i != count; ++i) {
-      ints.push_back(yaclib::Run<Error>(tp, [] {
+      ints.push_back(yaclib::Run<T>(tp, [] {
         std::this_thread::sleep_for(4ms);
       }));
     }
     for (std::size_t i = 0; i != count; ++i) {
-      ints.push_back(yaclib::Run<Error>(tp, [] {
+      ints.push_back(yaclib::Run<T>(tp, [] {
         std::this_thread::sleep_for(2ms);
-        return yaclib::Result<void, Error>{yaclib::StopTag{}};
+        return T::template MakeResult<void>(yaclib::StopTag{});
       }));
     }
-    EXPECT_THROW(std::ignore = WhenAll(ints.begin(), ints.end()).Get().Ok(), yaclib::ResultError<Error>);
+    if constexpr (std::is_same_v<T, yaclib::DefaultTrait>) {
+      EXPECT_THROW(std::ignore = WhenAll(ints.begin(), ints.end()).Get().Ok(), yaclib::StopException);
+    } else {
+      EXPECT_THROW(std::ignore = WhenAll(ints.begin(), ints.end()).Get().Ok(), std::system_error);
+    }
     ints.clear();
   }
   tp.Stop();
@@ -334,7 +347,7 @@ void TestBadTypes() {
   auto f1 = yaclib::MakeFuture<T>();
   auto f2 = yaclib::MakeFuture<T>();
   auto f_all = yaclib::WhenAll<yaclib::FailPolicy::None>(std::move(f1), std::move(f2)).Get();
-  EXPECT_EQ(f_all.State(), yaclib::ResultState::Value);
+  EXPECT_TRUE(f_all);
 }
 
 TEST(WhenAll, BadTypes) {
@@ -348,19 +361,21 @@ TEST(WhenAll, FirstFail) {
   GTEST_SKIP();  // Too long
 #endif
   FirstFail();
-  FirstFail<LikeErrorCode>();
+  FirstFail<ErrorCodeTrait>();
 }
 
 TEST(WhenAll, FailWithError) {
   auto f1 = yaclib::MakeFuture<void>(yaclib::StopTag{});
   auto f2 = yaclib::MakeFuture<void>(yaclib::Unit{});
-  auto all1 = yaclib::WhenAll(std::move(f1), std::move(f2)).Get();
-  EXPECT_EQ(std::move(all1).Error(), yaclib::StopTag{});
+  const auto all1 = yaclib::WhenAll(std::move(f1), std::move(f2)).Get();
+  EXPECT_FALSE(all1);
+  EXPECT_TRUE(yaclib::IsStop(all1.Error()));
 
   auto f3 = yaclib::MakeFuture<int>(yaclib::StopTag{});
   auto f4 = yaclib::MakeFuture<int>(3);
-  auto all2 = yaclib::WhenAll(std::move(f3), std::move(f4)).Get();
-  EXPECT_EQ(std::move(all2).Error(), yaclib::StopTag{});
+  const auto all2 = yaclib::WhenAll(std::move(f3), std::move(f4)).Get();
+  EXPECT_FALSE(all2);
+  EXPECT_TRUE(yaclib::IsStop(all2.Error()));
 }
 
 }  // namespace

@@ -106,7 +106,7 @@ void JustWork() {
 
 template <Result R, Container C, yaclib::FailPolicy P, typename V, bool UseDefault = false>
 void Fail() {
-  auto f1 = yaclib::StopError{yaclib::StopTag{}};
+  auto f1 = yaclib::StopTag{};
   auto f2 = std::make_exception_ptr(std::runtime_error{""});
   constexpr int kSize = 3;
   std::array<yaclib::Promise<V>, kSize> promises;
@@ -131,7 +131,7 @@ void Fail() {
   using ExceptionType =
     std::conditional_t<(P == yaclib::FailPolicy::LastFail && R == Result::Exception) ||
                          ((P == yaclib::FailPolicy::None || P == yaclib::FailPolicy::FirstFail) && R == Result::Error),
-                       yaclib::ResultError<yaclib::StopError>, std::runtime_error>;
+                       yaclib::StopException, std::runtime_error>;
   EXPECT_THROW(std::ignore = std::move(any).Get().Ok(), ExceptionType);
 }
 
@@ -148,8 +148,8 @@ void EmptyInput() {
   //  Return this code if we decide to return an empty ready future
   //  EXPECT_TRUE(any.Ready());
   //  auto result = std::move(any).Get();
-  //  EXPECT_EQ(result.State(), ResultState::Empty);
-  //  EXPECT_THROW(std::ignore = std::move(result).Ok(), ResultEmpty);
+  //  EXPECT_FALSE(static_cast<bool>(result));  // default-constructed Result is the stop error now
+  //  EXPECT_THROW(std::ignore = std::move(result).Ok(), yaclib::StopException);
 }
 
 template <Result R, Container C, yaclib::FailPolicy P, typename V>
@@ -449,7 +449,7 @@ TEST(WhenAny, DifferentTypesFail) {
   auto f1 = yaclib::MakeFuture<int>(yaclib::StopTag{});
   auto f2 = yaclib::MakeFuture<double>(yaclib::StopTag{});
   auto f = yaclib::WhenAny(std::move(f1), std::move(f2));
-  EXPECT_EQ(std::move(f).Get().Error(), yaclib::StopTag{});
+  EXPECT_TRUE(yaclib::IsStop(std::move(f).Get().Error()));
 }
 
 }  // namespace

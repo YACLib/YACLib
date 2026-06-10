@@ -27,16 +27,13 @@ template <typename T>
 inline constexpr bool is_result_v = detail::IsInstantiationOf<Result, T>::Value;  // NOLINT
 
 template <typename T>
-using result_value_t = typename detail::InstantiationTypes<Result, T>::Value;  // NOLINT
-
-template <typename T>
-using result_error_t = typename detail::InstantiationTypes<Result, T>::Error;  // NOLINT
+using result_value_t = typename detail::InstantiationType<Result, T>::Value;  // NOLINT
 
 template <typename T>
 using task_value_t = typename detail::InstantiationTypes<Task, T>::Value;  // NOLINT
 
 template <typename T>
-using task_error_t = typename detail::InstantiationTypes<Task, T>::Error;  // NOLINT
+using task_trait_t = typename detail::InstantiationTypes<Task, T>::Trait;  // NOLINT
 
 template <typename T>
 inline constexpr bool is_future_base_v = detail::IsInstantiationOf<FutureBase, T>::Value ||  // NOLINT
@@ -70,7 +67,7 @@ template <typename T>
 using async_value_t = typename detail::AsyncTypes<T>::Value;  // NOLINT
 
 template <typename T>
-using async_error_t = typename detail::AsyncTypes<T>::Error;  // NOLINT
+using async_trait_t = typename detail::AsyncTypes<T>::Trait;  // NOLINT
 
 template <bool Condition, typename T>
 decltype(auto) move_if(T&& arg) noexcept {  // NOLINT

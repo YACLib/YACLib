@@ -2,6 +2,6 @@
 
 namespace yaclib::detail {
 
-template class UniqueCore<void, StopError>;
+template class UniqueCore<void, DefaultTrait>;
 
 }  // namespace yaclib::detail

@@ -17,8 +17,8 @@ auto InlineThen(Future&& future, Func&& f) {
   }
 }
 
-template <bool Inline, typename V, typename E, typename Func>
-void InlineDetach(yaclib::Future<V, E>&& future, Func&& f) {
+template <bool Inline, typename V, typename T, typename Func>
+void InlineDetach(yaclib::Future<V, T>&& future, Func&& f) {
   if constexpr (Inline) {
     std::move(future).DetachInline(std::forward<Func>(f));
   } else {

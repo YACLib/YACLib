@@ -38,7 +38,7 @@ TEST(MakeReadyFuture, Void) {
     EXPECT_EQ(std::move(f).Get().Ok(), yaclib::Unit{});
   }
   {
-    yaclib::Future<void, LikeErrorCode> f = yaclib::MakeFuture<void, LikeErrorCode>();
+    yaclib::Future<void, ErrorCodeTrait> f = yaclib::MakeFuture<void, ErrorCodeTrait>();
     EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
     EXPECT_EQ(std::move(f).Get().Ok(), yaclib::Unit{});
   }
@@ -48,7 +48,7 @@ TEST(MakeReadyFuture, Void) {
     EXPECT_EQ(std::move(f).Get().Ok(), yaclib::Unit{});
   }
   {
-    yaclib::Future<void, LikeErrorCode> f = yaclib::MakeFuture<yaclib::Unit, LikeErrorCode>();
+    yaclib::Future<void, ErrorCodeTrait> f = yaclib::MakeFuture<yaclib::Unit, ErrorCodeTrait>();
     EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
     EXPECT_EQ(std::move(f).Get().Ok(), yaclib::Unit{});
   }
@@ -66,7 +66,7 @@ TEST(MakeReadyFuture, Default) {
     EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
   }
   {
-    yaclib::Future<Default, LikeErrorCode> f = yaclib::MakeFuture<Default, LikeErrorCode>();
+    yaclib::Future<Default, ErrorCodeTrait> f = yaclib::MakeFuture<Default, ErrorCodeTrait>();
     EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
   }
 }
@@ -107,7 +107,7 @@ TEST(MakeReadyFuture, Int) {
     EXPECT_EQ(std::move(f).Get().Ok(), 1);
   }
   {
-    yaclib::Future<int, LikeErrorCode> f = yaclib::MakeFuture<int, LikeErrorCode>(1);
+    yaclib::Future<int, ErrorCodeTrait> f = yaclib::MakeFuture<int, ErrorCodeTrait>(1);
     EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
     EXPECT_EQ(std::move(f).Get().Ok(), 1);
   }
@@ -121,7 +121,7 @@ TEST(MakeReadyFuture, Args1) {
     EXPECT_EQ(std::move(f).Get().Ok(), kek);
   }
   {
-    yaclib::Future<Kek, LikeErrorCode> f = yaclib::MakeFuture<Kek, LikeErrorCode>(1);
+    yaclib::Future<Kek, ErrorCodeTrait> f = yaclib::MakeFuture<Kek, ErrorCodeTrait>(1);
     EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
     EXPECT_EQ(std::move(f).Get().Ok(), kek);
   }
@@ -135,7 +135,7 @@ TEST(MakeReadyFuture, Args2) {
     EXPECT_EQ(std::move(f).Get().Ok(), kek);
   }
   {
-    yaclib::Future<Kek, LikeErrorCode> f = yaclib::MakeFuture<Kek, LikeErrorCode>(2, "rara");
+    yaclib::Future<Kek, ErrorCodeTrait> f = yaclib::MakeFuture<Kek, ErrorCodeTrait>(2, "rara");
     EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
     EXPECT_EQ(std::move(f).Get().Ok(), kek);
   }
@@ -148,10 +148,13 @@ TEST(MakeExceptionFuture, Void) {
     EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), std::runtime_error);
   }
   {
-    yaclib::Future<void, LikeErrorCode> f =
-      yaclib::MakeFuture<void, LikeErrorCode>(std::make_exception_ptr(std::runtime_error{""}));
+    // ErrorCodeTrait converts std::exception_ptr to LikeErrorCode, so Ok() throws std::system_error
+    yaclib::Future<void, ErrorCodeTrait> f =
+      yaclib::MakeFuture<void, ErrorCodeTrait>(std::make_exception_ptr(std::runtime_error{""}));
     EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
-    EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), std::runtime_error);
+    auto result = std::move(f).Get();
+    EXPECT_EQ(result.Error(), std::make_error_code(std::errc::io_error));
+    EXPECT_THROW(std::ignore = std::move(result).Ok(), std::system_error);
   }
 }
 
@@ -162,10 +165,12 @@ TEST(MakeExceptionFuture, Int) {
     EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), std::runtime_error);
   }
   {
-    yaclib::Future<int, LikeErrorCode> f =
-      yaclib::MakeFuture<int, LikeErrorCode>(std::make_exception_ptr(std::runtime_error{""}));
+    yaclib::Future<int, ErrorCodeTrait> f =
+      yaclib::MakeFuture<int, ErrorCodeTrait>(std::make_exception_ptr(std::runtime_error{""}));
     EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
-    EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), std::runtime_error);
+    auto result = std::move(f).Get();
+    EXPECT_EQ(result.Error(), std::make_error_code(std::errc::io_error));
+    EXPECT_THROW(std::ignore = std::move(result).Ok(), std::system_error);
   }
 }
 
@@ -176,49 +181,61 @@ TEST(MakeExceptionFuture, NonTrivial) {
     EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), std::runtime_error);
   }
   {
-    yaclib::Future<Kek, LikeErrorCode> f =
-      yaclib::MakeFuture<Kek, LikeErrorCode>(std::make_exception_ptr(std::runtime_error{""}));
+    yaclib::Future<Kek, ErrorCodeTrait> f =
+      yaclib::MakeFuture<Kek, ErrorCodeTrait>(std::make_exception_ptr(std::runtime_error{""}));
     EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
-    EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), std::runtime_error);
+    auto result = std::move(f).Get();
+    EXPECT_EQ(result.Error(), std::make_error_code(std::errc::io_error));
+    EXPECT_THROW(std::ignore = std::move(result).Ok(), std::system_error);
   }
 }
 
+// StopError is gone: for the default trait the "error value" is yaclib::StopTag{}, stored as StopException
 TEST(MakeErrorFuture, Void) {
   {
-    yaclib::Future<> f = yaclib::MakeFuture<void>(yaclib::StopError{yaclib::StopTag{}});
+    yaclib::Future<> f = yaclib::MakeFuture<void>(yaclib::StopTag{});
     EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
-    EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::ResultError<yaclib::StopError>);
+    EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::StopException);
   }
   {
-    yaclib::Future<void, LikeErrorCode> f = yaclib::MakeFuture<void, LikeErrorCode>(LikeErrorCode{});
+    yaclib::Future<void, ErrorCodeTrait> f =
+      yaclib::MakeFuture<void, ErrorCodeTrait>(LikeErrorCode{std::make_error_code(std::errc::invalid_argument)});
     EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
-    EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::ResultError<LikeErrorCode>);
+    auto result = std::move(f).Get();
+    EXPECT_EQ(result.Error(), std::make_error_code(std::errc::invalid_argument));
+    EXPECT_THROW(std::ignore = std::move(result).Ok(), std::system_error);
   }
 }
 
 TEST(MakeErrorFuture, Int) {
   {
-    yaclib::Future<int> f = yaclib::MakeFuture<int>(yaclib::StopError{yaclib::StopTag{}});
+    yaclib::Future<int> f = yaclib::MakeFuture<int>(yaclib::StopTag{});
     EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
-    EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::ResultError<yaclib::StopError>);
+    EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::StopException);
   }
   {
-    yaclib::Future<int, LikeErrorCode> f = yaclib::MakeFuture<int, LikeErrorCode>(LikeErrorCode{});
+    yaclib::Future<int, ErrorCodeTrait> f =
+      yaclib::MakeFuture<int, ErrorCodeTrait>(LikeErrorCode{std::make_error_code(std::errc::invalid_argument)});
     EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
-    EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::ResultError<LikeErrorCode>);
+    auto result = std::move(f).Get();
+    EXPECT_EQ(result.Error(), std::make_error_code(std::errc::invalid_argument));
+    EXPECT_THROW(std::ignore = std::move(result).Ok(), std::system_error);
   }
 }
 
 TEST(MakeErrorFuture, NonTrivial) {
   {
-    yaclib::Future<Kek> f = yaclib::MakeFuture<Kek>(yaclib::StopError{yaclib::StopTag{}});
+    yaclib::Future<Kek> f = yaclib::MakeFuture<Kek>(yaclib::StopTag{});
     EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
-    EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::ResultError<yaclib::StopError>);
+    EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::StopException);
   }
   {
-    yaclib::Future<Kek, LikeErrorCode> f = yaclib::MakeFuture<Kek, LikeErrorCode>(LikeErrorCode{});
+    yaclib::Future<Kek, ErrorCodeTrait> f =
+      yaclib::MakeFuture<Kek, ErrorCodeTrait>(LikeErrorCode{std::make_error_code(std::errc::invalid_argument)});
     EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
-    EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::ResultError<LikeErrorCode>);
+    auto result = std::move(f).Get();
+    EXPECT_EQ(result.Error(), std::make_error_code(std::errc::invalid_argument));
+    EXPECT_THROW(std::ignore = std::move(result).Ok(), std::system_error);
   }
 }
 
@@ -226,12 +243,14 @@ TEST(MakeStoppedFuture, Void) {
   {
     yaclib::Future<> f = yaclib::MakeFuture<void>(yaclib::StopTag{});
     EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
-    EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::ResultError<yaclib::StopError>);
+    EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::StopException);
   }
   {
-    yaclib::Future<void, LikeErrorCode> f = yaclib::MakeFuture<void, LikeErrorCode>(yaclib::StopTag{});
+    yaclib::Future<void, ErrorCodeTrait> f = yaclib::MakeFuture<void, ErrorCodeTrait>(yaclib::StopTag{});
     EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
-    EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::ResultError<LikeErrorCode>);
+    auto result = std::move(f).Get();
+    EXPECT_EQ(result.Error(), LikeErrorCode{yaclib::StopTag{}});
+    EXPECT_THROW(std::ignore = std::move(result).Ok(), std::system_error);
   }
 }
 
@@ -239,12 +258,14 @@ TEST(MakeStoppedFuture, Int) {
   {
     yaclib::Future<int> f = yaclib::MakeFuture<int>(yaclib::StopTag{});
     EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
-    EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::ResultError<yaclib::StopError>);
+    EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::StopException);
   }
   {
-    yaclib::Future<int, LikeErrorCode> f = yaclib::MakeFuture<int, LikeErrorCode>(yaclib::StopTag{});
+    yaclib::Future<int, ErrorCodeTrait> f = yaclib::MakeFuture<int, ErrorCodeTrait>(yaclib::StopTag{});
     EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
-    EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::ResultError<LikeErrorCode>);
+    auto result = std::move(f).Get();
+    EXPECT_EQ(result.Error(), LikeErrorCode{yaclib::StopTag{}});
+    EXPECT_THROW(std::ignore = std::move(result).Ok(), std::system_error);
   }
 }
 
@@ -252,12 +273,14 @@ TEST(MakeStoppedFuture, NonTrivial) {
   {
     yaclib::Future<Kek> f = yaclib::MakeFuture<Kek>(yaclib::StopTag{});
     EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
-    EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::ResultError<yaclib::StopError>);
+    EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::StopException);
   }
   {
-    yaclib::Future<Kek, LikeErrorCode> f = yaclib::MakeFuture<Kek, LikeErrorCode>(yaclib::StopTag{});
+    yaclib::Future<Kek, ErrorCodeTrait> f = yaclib::MakeFuture<Kek, ErrorCodeTrait>(yaclib::StopTag{});
     EXPECT_EQ(f.GetCore()->_executor, &yaclib::MakeInline());
-    EXPECT_THROW(std::ignore = std::move(f).Get().Ok(), yaclib::ResultError<LikeErrorCode>);
+    auto result = std::move(f).Get();
+    EXPECT_EQ(result.Error(), LikeErrorCode{yaclib::StopTag{}});
+    EXPECT_THROW(std::ignore = std::move(result).Ok(), std::system_error);
   }
 }
 

@@ -22,14 +22,14 @@ struct AsyncSuite : testing::Test {
   static constexpr bool kIsTask = yaclib::is_task_v<T>;
   static constexpr bool kIsSharedFuture = yaclib::is_shared_future_base_v<T>;
 
-  template <typename V = void, typename E = yaclib::StopError>
-  using FutureT = std::conditional_t<kIsSharedFuture, yaclib::SharedFuture<V, E>, yaclib::Future<V, E>>;
+  template <typename V = void, typename T2 = yaclib::DefaultTrait>
+  using FutureT = std::conditional_t<kIsSharedFuture, yaclib::SharedFuture<V, T2>, yaclib::Future<V, T2>>;
 
-  template <typename V = void, typename E = yaclib::StopError>
-  using FutureOnT = std::conditional_t<kIsSharedFuture, yaclib::SharedFutureOn<V, E>, yaclib::FutureOn<V, E>>;
+  template <typename V = void, typename T2 = yaclib::DefaultTrait>
+  using FutureOnT = std::conditional_t<kIsSharedFuture, yaclib::SharedFutureOn<V, T2>, yaclib::FutureOn<V, T2>>;
 
-  template <typename V = void, typename E = yaclib::StopError>
-  using AsyncT = std::conditional_t<kIsTask, yaclib::Task<V, E>, FutureT<V, E>>;
+  template <typename V = void, typename T2 = yaclib::DefaultTrait>
+  using AsyncT = std::conditional_t<kIsTask, yaclib::Task<V, T2>, FutureT<V, T2>>;
 
   using Type = T;
 };
@@ -59,11 +59,11 @@ struct FutureSuite : testing::Test {
   static constexpr bool kIsFuture = yaclib::is_future_base_v<T>;
   static constexpr bool kIsSharedFuture = yaclib::is_shared_future_base_v<T>;
 
-  template <typename V = void, typename E = yaclib::StopError>
-  using FutureT = std::conditional_t<kIsFuture, yaclib::Future<V, E>, yaclib::SharedFuture<V, E>>;
+  template <typename V = void, typename T2 = yaclib::DefaultTrait>
+  using FutureT = std::conditional_t<kIsFuture, yaclib::Future<V, T2>, yaclib::SharedFuture<V, T2>>;
 
-  template <typename V = void, typename E = yaclib::StopError>
-  using FutureOnT = std::conditional_t<kIsFuture, yaclib::FutureOn<V, E>, yaclib::SharedFutureOn<V, E>>;
+  template <typename V = void, typename T2 = yaclib::DefaultTrait>
+  using FutureOnT = std::conditional_t<kIsFuture, yaclib::FutureOn<V, T2>, yaclib::SharedFutureOn<V, T2>>;
 };
 
 struct FutureTypeNames {

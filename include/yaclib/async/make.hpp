@@ -16,23 +16,24 @@ namespace yaclib {
  * Function for create Ready Future
  *
  * \tparam V if not default value, it's type of Future value
- * \tparam E type of Future error, by default its
+ * \tparam T trait of the Future, by default \ref DefaultTrait
  * \tparam Args if single, and V default, then used as type of Future value
  * \param args for fulfill Future
  * \return Ready Future
  */
-template <typename V = Unit, typename E = StopError, typename... Args>
+template <typename V = Unit, typename T = DefaultTrait, typename... Args>
 /*Future*/ auto MakeFuture(Args&&... args) {
   if constexpr (sizeof...(Args) == 0) {
-    using T = std::conditional_t<std::is_same_v<V, Unit>, void, V>;
-    return Future{detail::UniqueCorePtr<T, E>{MakeUnique<detail::UniqueCore<T, E>>(std::in_place)}};
+    using Value = std::conditional_t<std::is_same_v<V, Unit>, void, V>;
+    return Future{detail::UniqueCorePtr<Value, T>{MakeUnique<detail::UniqueCore<Value, T>>(std::in_place)}};
   } else if constexpr (std::is_same_v<V, Unit>) {
-    using T0 = std::decay_t<head_t<Args&&...>>;
-    using T = std::conditional_t<std::is_same_v<T0, Unit>, void, T0>;
-    return Future{
-      detail::UniqueCorePtr<T, E>{MakeUnique<detail::UniqueCore<T, E>>(std::in_place, std::forward<Args>(args)...)}};
+    using Head = std::decay_t<head_t<Args&&...>>;
+    using Value = std::conditional_t<std::is_same_v<Head, Unit>, void, Head>;
+    return Future{detail::UniqueCorePtr<Value, T>{
+      MakeUnique<detail::UniqueCore<Value, T>>(std::in_place, std::forward<Args>(args)...)}};
   } else {
-    return Future{detail::UniqueCorePtr<V, E>{MakeUnique<detail::UniqueCore<V, E>>(std::forward<Args>(args)...)}};
+    return Future{
+      detail::UniqueCorePtr<V, T>{MakeUnique<detail::UniqueCore<V, T>>(std::in_place, std::forward<Args>(args)...)}};
   }
 }
 

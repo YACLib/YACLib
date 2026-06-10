@@ -13,39 +13,39 @@ namespace yaclib {
 
 template <typename Core, FailPolicy F>
 using ContainerElem = std::conditional_t<F == FailPolicy::FirstFail, wrap_void_t<typename Core::Value>,
-                                         Result<typename Core::Value, typename Core::Error>>;
+                                         typename Core::Trait::template Result<typename Core::Value>>;
 
 template <FailPolicy F = FailPolicy::FirstFail, typename... Futures,
           typename = std::enable_if_t<(... && is_combinator_input_v<Futures>)>>
 YACLIB_INLINE auto WhenAll(Futures... futures) {
-  when::CheckSameError<Futures...>();
+  when::CheckSameTrait<Futures...>();
 
   using Head = typename head_t<Futures...>::Core;
   using Value = typename Head::Value;
-  using OutputError = typename Head::Error;
+  using OutputTrait = typename Head::Trait;
 
   if constexpr ((... && std::is_same_v<Value, typename Futures::Core::Value>)) {
     if constexpr (std::is_same_v<Value, void> && F != FailPolicy::None) {
-      return when::When<when::Join, F, void, OutputError>(std::move(futures)...);
+      return when::When<when::Join, F, void, OutputTrait>(std::move(futures)...);
     } else {
       using OutputValue = std::vector<ContainerElem<Head, F>>;
-      return when::When<when::All, F, OutputValue, OutputError>(std::move(futures)...);
+      return when::When<when::All, F, OutputValue, OutputTrait>(std::move(futures)...);
     }
   } else {
     using OutputValue = std::tuple<ContainerElem<typename Futures::Core, F>...>;
-    return when::When<when::AllTuple, F, OutputValue, OutputError>(std::move(futures)...);
+    return when::When<when::AllTuple, F, OutputValue, OutputTrait>(std::move(futures)...);
   }
 }
 
 template <FailPolicy F = FailPolicy::FirstFail, typename It, typename T = typename std::iterator_traits<It>::value_type>
 YACLIB_INLINE auto WhenAll(It begin, std::size_t count) {
-  using OutputError = typename T::Core::Error;
+  using OutputTrait = typename T::Core::Trait;
 
   if constexpr (std::is_same_v<typename T::Core::Value, void> && F != FailPolicy::None) {
-    return when::When<when::Join, F, void, OutputError>(begin, count);
+    return when::When<when::Join, F, void, OutputTrait>(begin, count);
   } else {
     using OutputValue = std::vector<ContainerElem<typename T::Core, F>>;
-    return when::When<when::All, F, OutputValue, OutputError>(begin, count);
+    return when::When<when::All, F, OutputValue, OutputTrait>(begin, count);
   }
 }
 

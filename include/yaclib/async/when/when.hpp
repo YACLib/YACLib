@@ -17,11 +17,11 @@
 namespace yaclib::when {
 
 template <typename... Futures>
-YACLIB_INLINE void CheckSameError() {
+YACLIB_INLINE void CheckSameTrait() {
   static_assert(sizeof...(Futures) > 0);
-  using Error = typename head_t<Futures...>::Core::Error;
-  static_assert((... && std::is_same_v<Error, typename Futures::Core::Error>),
-                "All futures need to have the same error type");
+  using Trait = typename head_t<Futures...>::Core::Trait;
+  static_assert((... && std::is_same_v<Trait, typename Futures::Core::Trait>),
+                "All futures need to have the same trait");
 }
 
 template <typename T>
@@ -314,24 +314,24 @@ struct DynamicCombinator : IRef {
 };
 
 template <template <FailPolicy, typename...> typename Strategy, FailPolicy F, typename OutputValue,
-          typename OutputError, typename... Futures>
+          typename OutputTrait, typename... Futures>
 auto When(Futures... futures) {
   if constexpr (sizeof...(Futures) == 0) {
-    return Future<OutputValue, OutputError>{nullptr};
+    return Future<OutputValue, OutputTrait>{nullptr};
   } else {
-    auto [f, p] = MakeContract<OutputValue, OutputError>();
+    auto [f, p] = MakeContract<OutputValue, OutputTrait>();
 
     using Head = typename head_t<Futures...>::Core;
     using Value = typename Head::Value;
-    using Error = typename Head::Error;
+    using Trait = typename Head::Trait;
 
     using InputCore =
       std::conditional_t<(... && std::is_same_v<Head, typename Futures::Core>), Head,
                          std::conditional_t<(... && (std::is_same_v<Value, typename Futures::Core::Value> &&
-                                                     std::is_same_v<Error, typename Futures::Core::Error>)),
-                                            detail::ResultCore<Value, Error>, detail::InlineCore>>;
+                                                     std::is_same_v<Trait, typename Futures::Core::Trait>)),
+                                            detail::ResultCore<Value, Trait>, detail::InlineCore>>;
 
-    using S = Strategy<F, OutputValue, OutputError, InputCore>;
+    using S = Strategy<F, OutputValue, OutputTrait, InputCore>;
 
     using FinalCombinator =
       std::conditional_t<CoreSignature<typename Futures::Core...>::kTotalCount == 1 && !kIsOrdered<S::kConsumePolicy>,
@@ -345,16 +345,16 @@ auto When(Futures... futures) {
 }
 
 template <template <FailPolicy, typename...> typename Strategy, FailPolicy F, typename OutputValue,
-          typename OutputError, typename Iterator, typename Value = typename std::iterator_traits<Iterator>::value_type>
+          typename OutputTrait, typename Iterator, typename Value = typename std::iterator_traits<Iterator>::value_type>
 auto When(Iterator begin, std::size_t count) {
   if (count == 0) {
-    return Future<OutputValue, OutputError>{nullptr};
+    return Future<OutputValue, OutputTrait>{nullptr};
   }
 
-  auto [f, p] = MakeContract<OutputValue, OutputError>();
+  auto [f, p] = MakeContract<OutputValue, OutputTrait>();
 
   using Core = typename Value::Core;
-  using S = Strategy<F, OutputValue, OutputError, Core>;
+  using S = Strategy<F, OutputValue, OutputTrait, Core>;
 
   static_assert(S::kConsumePolicy != ConsumePolicy::Static);
 

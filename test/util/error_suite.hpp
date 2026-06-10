@@ -22,18 +22,16 @@ class ErrorNames {
   static std::string GetName(int i) {
     switch (i) {
       case 0:
-        return "std::exception_ptr";
+        return "yaclib::DefaultTrait";
       case 1:
-        return "yaclib::StopError";
-      case 2:
-        return "std::error_code";
+        return "test::ErrorCodeTrait";
       default:
         return "unknown";
     }
   }
 };
 
-using ErrorTypes = testing::Types<std::exception_ptr, yaclib::StopError, LikeErrorCode>;
+using ErrorTypes = testing::Types<yaclib::DefaultTrait, ErrorCodeTrait>;
 
 TYPED_TEST_SUITE(Error, ErrorTypes, ErrorNames);
 

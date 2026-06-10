@@ -372,7 +372,7 @@ TEST(AwaitGroup, AwaitOn) {
     ++count;
     co_return{};
   };
-  EXPECT_THROW(std::ignore = coro().Get().Ok(), yaclib::ResultError<yaclib::StopError>);
+  EXPECT_THROW(std::ignore = coro().Get().Ok(), yaclib::StopException);
   EXPECT_EQ(count, 2);
 }
 

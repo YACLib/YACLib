@@ -7,32 +7,32 @@
 
 namespace yaclib {
 
-template <typename V, typename E>
-Future<V, E> Share(const SharedFutureBase<V, E>& future) {
-  auto [f, p] = MakeContract<V, E>();
+template <typename V, typename T>
+Future<V, T> Share(const SharedFutureBase<V, T>& future) {
+  auto [f, p] = MakeContract<V, T>();
   Connect(future, std::move(p));
   return std::move(f);
 }
 
-template <typename V, typename E>
-FutureOn<V, E> Share(const SharedFutureBase<V, E>& future, IExecutor& executor) {
-  auto [f, p] = MakeContractOn<V, E>(executor);
+template <typename V, typename T>
+FutureOn<V, T> Share(const SharedFutureBase<V, T>& future, IExecutor& executor) {
+  auto [f, p] = MakeContractOn<V, T>(executor);
   Connect(future, std::move(p));
   return std::move(f);
 }
 
-template <typename V, typename E>
-Future<V, E> Share(SharedPromise<V, E>& promise) {
+template <typename V, typename T>
+Future<V, T> Share(SharedPromise<V, T>& promise) {
   YACLIB_ASSERT(promise.Valid());
-  auto [f, p] = MakeContract<V, E>();
+  auto [f, p] = MakeContract<V, T>();
   Connect(promise, std::move(p));
   return std::move(f);
 }
 
-template <typename V, typename E>
-FutureOn<V, E> Share(SharedPromise<V, E>& promise, IExecutor& executor) {
+template <typename V, typename T>
+FutureOn<V, T> Share(SharedPromise<V, T>& promise, IExecutor& executor) {
   YACLIB_ASSERT(promise.Valid());
-  auto [f, p] = MakeContractOn<V, E>(executor);
+  auto [f, p] = MakeContractOn<V, T>(executor);
   Connect(promise, std::move(p));
   return std::move(f);
 }

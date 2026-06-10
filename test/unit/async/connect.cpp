@@ -16,12 +16,12 @@ namespace {
 constexpr int kSetInt = 5;
 constexpr std::string_view kSetString = "aaa-aaa-aaa-aaa-aaa-aaa-aaa-aaa-aaa-aaa-aaa";
 
-template <typename V, typename E, bool Shared>
+template <typename V, typename T, bool Shared>
 auto GetContract() {
   if constexpr (Shared) {
-    return yaclib::MakeSharedContract<V, E>();
+    return yaclib::MakeSharedContract<V, T>();
   } else {
-    return yaclib::MakeContract<V, E>();
+    return yaclib::MakeContract<V, T>();
   }
 }
 
@@ -43,10 +43,10 @@ auto doGet(Future& f) {
   }
 }
 
-template <bool LShared, bool RShared, typename V = void, typename E = yaclib::StopError, typename Expected>
+template <bool LShared, bool RShared, typename V = void, typename T = yaclib::DefaultTrait, typename Expected>
 void FuturePromiseConnectSet(Expected expected) {
-  auto [f1, p1] = GetContract<V, E, LShared>();
-  auto [f2, p2] = GetContract<V, E, RShared>();
+  auto [f1, p1] = GetContract<V, T, LShared>();
+  auto [f2, p2] = GetContract<V, T, RShared>();
   doConnect(f1, p2);
   std::move(p1).Set(expected);
   ASSERT_EQ(doGet(f2), expected);
@@ -67,10 +67,10 @@ TEST(Connect, ConnectSet) {
   FuturePromiseConnectSet<true, true, std::string>(kSetString);
 }
 
-template <bool LShared, bool RShared, typename V = void, typename E = yaclib::StopError, typename Expected>
+template <bool LShared, bool RShared, typename V = void, typename T = yaclib::DefaultTrait, typename Expected>
 void FuturePromiseSetConnect(Expected expected) {
-  auto [f1, p1] = GetContract<V, E, LShared>();
-  auto [f2, p2] = GetContract<V, E, RShared>();
+  auto [f1, p1] = GetContract<V, T, LShared>();
+  auto [f2, p2] = GetContract<V, T, RShared>();
   std::move(p1).Set(expected);
   doConnect(f1, p2);
   ASSERT_EQ(doGet(f2), expected);
