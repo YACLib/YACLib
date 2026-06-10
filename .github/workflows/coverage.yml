@@ -98,7 +98,10 @@ jobs:
               fi
 
               cd $dir
-              lcov --rc branch_coverage=1 --rc geninfo_unexecuted_blocks=1 --gcov-tool "$gcov_tool" -d . -c -o lcov.info
+              # YACLIB_ASSERT lines are excluded: asserts are compiled out in this build (no YACLIB_LOG),
+              # gcov only reports codegen artifacts for them
+              lcov --rc branch_coverage=1 --rc geninfo_unexecuted_blocks=1 --rc lcov_excl_line='YACLIB_ASSERT'        \
+                --gcov-tool "$gcov_tool" -d . -c -o lcov.info
               # TODO(myannyax) remove '-r lcov.info "*/fault/*"'
               lcov --rc branch_coverage=1                                                                         \
                 -r lcov.info "/usr/*"                                                                                  \
