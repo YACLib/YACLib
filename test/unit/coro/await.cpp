@@ -92,11 +92,12 @@ TEST(SharedFuture, TwoCoroutinesAwaitOneShared) {
   // Both coroutines must suspend: with a not Empty readiness check the second one
   // would treat the first one's attached callback as a ready result
   auto [sf, sp] = yaclib::MakeSharedContract<int>();
-  auto coro = [&sf]() -> yaclib::Future<int> {
-    co_return co_await sf;
+  // By value parameter: old clang cannot capture a structured binding in a lambda
+  auto coro = [](yaclib::SharedFuture<int> shared) -> yaclib::Future<int> {
+    co_return co_await shared;
   };
-  auto f1 = coro();
-  auto f2 = coro();
+  auto f1 = coro(sf);
+  auto f2 = coro(sf);
   EXPECT_FALSE(f1.Ready());
   EXPECT_FALSE(f2.Ready());
   std::move(sp).Set(21);
@@ -112,13 +113,13 @@ TEST(SharedFuture, TwoCoroutinesInheritCallerExecutor) {
                  return yaclib_std::this_thread::get_id();
                }).Get();
   auto [sf, sp] = yaclib::MakeSharedContractOn<int>(tp);
-  auto coro = [&sf]() -> yaclib::Future<yaclib_std::thread::id> {
-    std::ignore = co_await sf;
+  auto coro = [](yaclib::SharedFuture<int> shared) -> yaclib::Future<yaclib_std::thread::id> {
+    std::ignore = co_await shared;
     co_await yaclib::kYield;  // reschedules on the coroutine's executor
     co_return yaclib_std::this_thread::get_id();
   };
-  auto f1 = coro();
-  auto f2 = coro();
+  auto f1 = coro(sf);
+  auto f2 = coro(sf);
   std::move(sp).Set(21);
   EXPECT_EQ(std::move(f1).Get().Value(), std::as_const(tp_id).Value());
   EXPECT_EQ(std::move(f2).Get().Value(), std::as_const(tp_id).Value());
