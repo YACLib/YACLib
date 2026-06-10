@@ -7,9 +7,12 @@
 
 namespace yaclib::detail {
 
+// E defaults to IExecutor (the type-erased path); when E is a concrete final
+// executor the Submit call below devirtualizes.
+template <typename E = IExecutor>
 class [[nodiscard]] OnAwaiter final {
  public:
-  YACLIB_INLINE explicit OnAwaiter(IExecutor& e) noexcept : _executor{e} {
+  YACLIB_INLINE explicit OnAwaiter(E& e) noexcept : _executor{e} {
   }
 
   constexpr bool await_ready() const noexcept {
@@ -27,7 +30,7 @@ class [[nodiscard]] OnAwaiter final {
   }
 
  private:
-  IExecutor& _executor;
+  E& _executor;
 };
 
 }  // namespace yaclib::detail

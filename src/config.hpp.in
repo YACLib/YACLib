@@ -86,6 +86,26 @@
 #  endif
 #endif
 
+// Clang coroutine Heap Allocation Elision (HALO) hints. The two are symmetric:
+// the type attribute marks a coroutine return type (Future/Task) as elidable,
+// and the argument attribute propagates the safe-elide context through a
+// pass-through function (e.g. operator co_await(Future&&)) so that
+// `co_await coro()` actually elides the callee frame. Both are needed together.
+#if defined(__clang__) && defined(__has_cpp_attribute)
+#  if __has_cpp_attribute(clang::coro_await_elidable)
+#    define YACLIB_CORO_AWAIT_ELIDABLE [[clang::coro_await_elidable]]
+#  endif
+#  if __has_cpp_attribute(clang::coro_await_elidable_argument)
+#    define YACLIB_CORO_AWAIT_ELIDABLE_ARGUMENT [[clang::coro_await_elidable_argument]]
+#  endif
+#endif
+#if !defined(YACLIB_CORO_AWAIT_ELIDABLE)
+#  define YACLIB_CORO_AWAIT_ELIDABLE
+#endif
+#if !defined(YACLIB_CORO_AWAIT_ELIDABLE_ARGUMENT)
+#  define YACLIB_CORO_AWAIT_ELIDABLE_ARGUMENT
+#endif
+
 #if defined(__has_include)
 #  define YACLIB_HAS_INCLUDE(include) __has_include(include)
 #else

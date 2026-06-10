@@ -22,7 +22,7 @@ void Start(BaseCore* head) noexcept;
  * TODO(MBkkt) add description
  */
 template <typename V, typename E>
-class Task final {
+class YACLIB_CORO_AWAIT_ELIDABLE Task final {
   using CoreType = detail::CoreType;
 
  public:

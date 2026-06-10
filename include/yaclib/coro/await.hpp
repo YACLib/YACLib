@@ -37,7 +37,7 @@ YACLIB_INLINE auto Await(Iterator begin, Iterator end) noexcept {
 }
 
 template <typename V, typename E>
-YACLIB_INLINE auto operator co_await(FutureBase<V, E>&& future) noexcept {
+YACLIB_INLINE auto operator co_await(YACLIB_CORO_AWAIT_ELIDABLE_ARGUMENT FutureBase<V, E>&& future) noexcept {
   YACLIB_ASSERT(future.Valid());
   return detail::AwaitSingleAwaiter<false, V, E>{std::move(future.GetCore())};
 }
@@ -49,7 +49,7 @@ YACLIB_INLINE auto operator co_await(const SharedFutureBase<V, E>& future) noexc
 }
 
 template <typename V, typename E>
-YACLIB_INLINE auto operator co_await(Task<V, E>&& task) noexcept {
+YACLIB_INLINE auto operator co_await(YACLIB_CORO_AWAIT_ELIDABLE_ARGUMENT Task<V, E>&& task) noexcept {
   YACLIB_ASSERT(task.Valid());
   return detail::TransferSingleAwaiter{std::move(task.GetCore())};
 }

@@ -223,7 +223,7 @@ extern template class FutureBase<void, StopError>;
  * Use the \ref Promise to fulfill the \ref Future.
  */
 template <typename V, typename E>
-class Future final : public FutureBase<V, E> {
+class YACLIB_CORO_AWAIT_ELIDABLE Future final : public FutureBase<V, E> {
   using CoreType = detail::CoreType;
   using Base = FutureBase<V, E>;
 
@@ -257,7 +257,7 @@ extern template class Future<>;
  * Use the \ref Promise to fulfill the \ref Future.
  */
 template <typename V, typename E>
-class FutureOn final : public FutureBase<V, E> {
+class YACLIB_CORO_AWAIT_ELIDABLE FutureOn final : public FutureBase<V, E> {
   using CoreType = detail::CoreType;
   using Base = FutureBase<V, E>;
 
