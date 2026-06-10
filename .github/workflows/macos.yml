@@ -19,14 +19,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ 14, 15 ]  # 13 runners are retired
+        os: [ 15 ]  # 13 runners are retired, 14 works same as 15
         build_type: [ Debug, RelWithDebInfo ]
         isPR:
           - ${{ github.event_name == 'pull_request' }}
         exclude:
-          - isPR: true
-            os: 13
-            build_type: RelWithDebInfo
           - isPR: true
             os: 15
             build_type: RelWithDebInfo
