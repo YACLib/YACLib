@@ -113,7 +113,7 @@ TEST(SharedFuture, TwoCoroutinesInheritCallerExecutor) {
                  return yaclib_std::this_thread::get_id();
                }).Get();
   auto [sf, sp] = yaclib::MakeSharedContractOn<int>(tp);
-  auto coro = [](yaclib::SharedFuture<int> shared) -> yaclib::Future<yaclib_std::thread::id> {
+  auto coro = [](yaclib::SharedFutureOn<int> shared) -> yaclib::Future<yaclib_std::thread::id> {
     std::ignore = co_await shared;
     co_await yaclib::kYield;  // reschedules on the coroutine's executor
     co_return yaclib_std::this_thread::get_id();
