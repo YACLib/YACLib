@@ -13,7 +13,7 @@ namespace {
 // Mirrors the Result storage idiom, so the expectation below holds on every compiler,
 // whether or not YACLIB_NO_UNIQUE_ADDRESS collapses the empty value
 union ProbeState {
-  YACLIB_NO_UNIQUE_ADDRESS yaclib::Unit stub;
+  YACLIB_RESULT_EMPTY_VALUE yaclib::Unit stub;
 
   ProbeState() noexcept : stub{} {
   }
@@ -23,7 +23,7 @@ union ProbeState {
 
 struct Probe {
   std::exception_ptr error;
-  YACLIB_NO_UNIQUE_ADDRESS ProbeState state;
+  YACLIB_RESULT_EMPTY_VALUE ProbeState state;
 };
 
 // Mirrors Core's base layout (ResultCore with the result union + FuncCore with the functor

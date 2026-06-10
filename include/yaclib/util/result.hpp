@@ -12,6 +12,15 @@
 
 namespace yaclib {
 
+// [[msvc::no_unique_address]] on the all empty union below miscompiles with MSVC
+// (runtime SEH in every Result<void> path, VS2022), so the empty value optimization
+// is disabled there and sizeof(Result<void>) stays sizeof(exception_ptr) + 8
+#if defined(_MSC_VER) && !defined(__clang__)
+#  define YACLIB_RESULT_EMPTY_VALUE
+#else
+#  define YACLIB_RESULT_EMPTY_VALUE YACLIB_NO_UNIQUE_ADDRESS
+#endif
+
 /**
  * Exception that represents cancellation of an async operation, \see StopPtr
  */
@@ -46,8 +55,8 @@ class [[nodiscard]] Result final {
   using V = std::conditional_t<std::is_void_v<ValueT>, Unit, ValueT>;
 
   union State {
-    YACLIB_NO_UNIQUE_ADDRESS Unit stub;
-    YACLIB_NO_UNIQUE_ADDRESS V value;
+    YACLIB_RESULT_EMPTY_VALUE Unit stub;
+    YACLIB_RESULT_EMPTY_VALUE V value;
 
     State() noexcept : stub{} {
     }
@@ -194,7 +203,7 @@ class [[nodiscard]] Result final {
 
  private:
   std::exception_ptr _error;
-  YACLIB_NO_UNIQUE_ADDRESS State _value;
+  YACLIB_RESULT_EMPTY_VALUE State _value;
 };
 
 extern template class Result<>;

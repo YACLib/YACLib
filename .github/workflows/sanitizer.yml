@@ -22,7 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-24.04, ubuntu-24.04-arm, windows-2025 ]  # TODO(mbkkt) macos-15 some strange failure, probably because of issues with symmetric transfer
+        os: [ ubuntu-24.04, ubuntu-24.04-arm, windows-2022 ]  # TODO(mbkkt) macos-15 some strange failure, probably because of issues with symmetric transfer
         flags: [ WARN, UBSAN, ASAN, TSAN, LSAN ]
         build_type: [ Debug, RelWithDebInfo ]
         isPR:
@@ -64,10 +64,10 @@ jobs:
             build_type: RelWithDebInfo
 
           #  Doesn't build with ClanCL ASAN. Random crash on start before main() with MSVC ASAN. THANKS TO THE BEST OS.
-          - os: windows-2025
+          - os: windows-2022
             flags: ASAN
             build_type: Debug
-          - os: windows-2025
+          - os: windows-2022
             flags: ASAN
             build_type: RelWithDebInfo
           # Best OS doesn't support unnecessary things like UBSAN, LSAN, TSAN.
@@ -75,22 +75,22 @@ jobs:
           # I also have a conspiracy theory that Windows is just an unnecessary abstraction over Linux.
           # See how well WSL works. Or how quickly they made the analog of io_uring.
           # And who cares if the virtual machine falls? I think this explains everything.
-          - os: windows-2025
+          - os: windows-2022
             flags: UBSAN
             build_type: Debug
-          - os: windows-2025
+          - os: windows-2022
             flags: UBSAN
             build_type: RelWithDebInfo
-          - os: windows-2025
+          - os: windows-2022
             flags: LSAN
             build_type: Debug
-          - os: windows-2025
+          - os: windows-2022
             flags: LSAN
             build_type: RelWithDebInfo
-          - os: windows-2025
+          - os: windows-2022
             flags: TSAN
             build_type: Debug
-          - os: windows-2025
+          - os: windows-2022
             flags: TSAN
             build_type: RelWithDebInfo
 
@@ -130,7 +130,7 @@ jobs:
           brew install ninja llvm@19 gcc@14
 
       - name: Configure CMake Posix
-        if: ${{ matrix.os != 'windows-2025' }}
+        if: ${{ matrix.os != 'windows-2022' }}
         run: |
           flags=${{ matrix.flags }}
           build_type=${{ matrix.build_type }}
@@ -214,7 +214,7 @@ jobs:
                 cmake -S . -B $dir                                                                                     \
                   -DCMAKE_BUILD_TYPE=$build_type                                                                       \
                   -DYACLIB_CXX_STANDARD=23                                                                             \
-                  -DYACLIB_TEST=SINGLE                                                                                 \
+                  -DYACLIB_TEST=SINGLE -DYACLIB_EXT_TEST=OFF                                                                                 \
                   -DYACLIB_FLAGS="CORO;$flags"                                                                         \
                   -DCMAKE_CXX_COMPILER=${cxx_compilers[$i]}                                                            \
                   -G"Ninja"                                                                                            \
@@ -229,7 +229,7 @@ jobs:
           done
 
       - name: Configure CMake Windows
-        if: ${{ matrix.os == 'windows-2025' }}
+        if: ${{ matrix.os == 'windows-2022' }}
         shell: bash
         run: |
           flags=${{ matrix.flags }}
@@ -259,7 +259,7 @@ jobs:
 
               cmake -S . -B $dir                                                                                       \
                 -DYACLIB_CXX_STANDARD=${cxx_standard}                                                                  \
-                -DYACLIB_TEST=SINGLE                                                                                   \
+                -DYACLIB_TEST=SINGLE -DYACLIB_EXT_TEST=OFF                                                                                   \
                 -DYACLIB_FLAGS="$coroutine_option;$flags"                                                              \
                 -DYACLIB_FAULT=$yaclib_fault                                                                           \
                 -DYACLIB_LOG="DEBUG"                                                                                   \

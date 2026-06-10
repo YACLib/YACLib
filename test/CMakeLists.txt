@@ -149,27 +149,61 @@ endif ()
 add_executable(yaclib_log_test test.cpp unit/log.cpp)
 yaclib_add_test(yaclib_log_test)
 
-# yaclib_ext tests: integrations that require specific libraries or standards
-
-if (cxx_std_23 IN_LIST CMAKE_CXX_COMPILE_FEATURES)
-  add_executable(yaclib_ext_std_test test.cpp ext/std/expected.cpp)
-  yaclib_add_test(yaclib_ext_std_test)
-  set_target_properties(yaclib_ext_std_test PROPERTIES CXX_STANDARD 23)
+# yaclib_ext tests: integrations that require specific libraries or standards.
+# YACLIB_EXT_TEST=OFF skips them (e.g. sanitizer/coverage jobs that target yaclib itself)
+if (NOT DEFINED YACLIB_EXT_TEST)
+  set(YACLIB_EXT_TEST AUTO)
 endif ()
 
-find_package(absl QUIET)
-if (NOT absl_FOUND)
-  include(FetchContent)
-  FetchContent_Declare(abseil
-    GIT_REPOSITORY https://github.com/abseil/abseil-cpp.git
-    GIT_TAG master
-    )
-  set(ABSL_PROPAGATE_CXX_STD ON CACHE BOOL "" FORCE)
-  set(ABSL_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
-  FetchContent_MakeAvailable(abseil)
+if (NOT YACLIB_EXT_TEST STREQUAL "OFF")
+  # Real compile probe: the cxx_std_23 feature flag is not enough, old clang with new
+  # libstdc++ advertises it but cannot parse the C++23 headers
+  if (cxx_std_23 IN_LIST CMAKE_CXX_COMPILE_FEATURES)
+    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/probe_expected.cpp
+      "#include <expected>\n#include <ranges>\n#include <vector>\n"
+      "int main() {\n"
+      "  std::vector<int> v{1};\n"
+      "  for (auto x : v | std::views::transform([](int y) { return y; })) { (void)x; }\n"
+      "  return std::expected<int, int>{0}.value();\n"
+      "}\n")
+    try_compile(YACLIB_HAS_STD_EXPECTED
+      ${CMAKE_CURRENT_BINARY_DIR}/probe_expected
+      ${CMAKE_CURRENT_BINARY_DIR}/probe_expected.cpp
+      CXX_STANDARD 23 CXX_STANDARD_REQUIRED ON)
+  endif ()
+  if (YACLIB_HAS_STD_EXPECTED)
+    add_executable(yaclib_ext_std_test test.cpp ext/std/expected.cpp)
+    yaclib_add_test(yaclib_ext_std_test)
+    set_target_properties(yaclib_ext_std_test PROPERTIES CXX_STANDARD 23)
+  else ()
+    message(STATUS "yaclib_ext_std_test skipped: no usable std::expected")
+  endif ()
+
+  # abseil master compiler floor is above yaclib's
+  set(YACLIB_EXT_ABSL TRUE)
+  if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 10)
+    set(YACLIB_EXT_ABSL FALSE)
+  elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 14)
+    set(YACLIB_EXT_ABSL FALSE)
+  endif ()
+  if (YACLIB_EXT_ABSL)
+    find_package(absl QUIET)
+    if (NOT absl_FOUND)
+      include(FetchContent)
+      FetchContent_Declare(abseil
+        GIT_REPOSITORY https://github.com/abseil/abseil-cpp.git
+        GIT_TAG master
+        )
+      set(ABSL_PROPAGATE_CXX_STD ON CACHE BOOL "" FORCE)
+      set(ABSL_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
+      FetchContent_MakeAvailable(abseil)
+    endif ()
+    add_executable(yaclib_ext_absl_test test.cpp ext/absl/status_or.cpp)
+    yaclib_add_test(yaclib_ext_absl_test)
+    target_link_libraries(yaclib_ext_absl_test PRIVATE absl::status absl::statusor)
+  else ()
+    message(STATUS "yaclib_ext_absl_test skipped: compiler below abseil floor")
+  endif ()
 endif ()
-add_executable(yaclib_ext_absl_test test.cpp ext/absl/status_or.cpp)
-yaclib_add_test(yaclib_ext_absl_test)
-target_link_libraries(yaclib_ext_absl_test PRIVATE absl::status absl::statusor)
 
 set(YACLIB_DEFINITIONS OLD_YACLIB_DEFINITIONS)
