@@ -63,7 +63,8 @@ struct All<FailPolicy::FirstFail, OutputValue, Trait, InputCore> {
 
   void Consume(InputCore& core) {
     auto& result = core.Get();
-    if (!Trait::Ok(result) && !_done.load(std::memory_order_relaxed) && !_done.exchange(true, std::memory_order_acq_rel)) {
+    if (!Trait::Ok(result) && !_done.load(std::memory_order_relaxed) &&
+        !_done.exchange(true, std::memory_order_acq_rel)) {
       std::move(_p).Set(Trait::MoveError(std::move(result)));
     }
   }

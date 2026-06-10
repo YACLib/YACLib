@@ -45,7 +45,8 @@ struct Join<FailPolicy::FirstFail, void, Trait, InputCore> {
 
   template <typename R>
   void Consume(R&& result) {
-    if (!Trait::Ok(result) && !_done.load(std::memory_order_relaxed) && !_done.exchange(true, std::memory_order_acq_rel)) {
+    if (!Trait::Ok(result) && !_done.load(std::memory_order_relaxed) &&
+        !_done.exchange(true, std::memory_order_acq_rel)) {
       std::move(_p).Set(Trait::MoveError(std::forward<R>(result)));
     }
   }

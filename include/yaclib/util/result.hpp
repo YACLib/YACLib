@@ -71,12 +71,12 @@ class [[nodiscard]] Result final {
     ::new (&_value.value) V(std::forward<Args>(args)...);
   }
 
-  template <typename... Args, typename = std::enable_if_t<
-                                (sizeof...(Args) > 1) ||
-                                !(std::is_same_v<std::decay_t<head_t<Args&&...>>, Result> ||
-                                  std::is_same_v<std::decay_t<head_t<Args&&...>>, std::exception_ptr> ||
-                                  std::is_same_v<std::decay_t<head_t<Args&&...>>, StopTag> ||
-                                  std::is_same_v<std::decay_t<head_t<Args&&...>>, std::in_place_t>)>>
+  template <typename... Args,
+            typename = std::enable_if_t<(sizeof...(Args) > 1) ||
+                                        !(std::is_same_v<std::decay_t<head_t<Args&&...>>, Result> ||
+                                          std::is_same_v<std::decay_t<head_t<Args&&...>>, std::exception_ptr> ||
+                                          std::is_same_v<std::decay_t<head_t<Args&&...>>, StopTag> ||
+                                          std::is_same_v<std::decay_t<head_t<Args&&...>>, std::in_place_t>)>>
   Result(Args&&... args) noexcept(std::is_nothrow_constructible_v<V, Args&&...>)
     : Result{std::in_place, std::forward<Args>(args)...} {
   }

@@ -256,8 +256,7 @@ class Core : public ResultCoreT<Type, Ret, T>, public FuncCore<Func> {
        *     return 1;
        *   });
        */
-      static_assert(is_invocable_v<Invoke, typename T::Error>,
-                    "Recovery callback should be invocable with T::Error");
+      static_assert(is_invocable_v<Invoke, typename T::Error>, "Recovery callback should be invocable with T::Error");
       if (T::Ok(r)) {
         return Done<SymmetricTransfer>(std::forward<R>(r));
       } else {
