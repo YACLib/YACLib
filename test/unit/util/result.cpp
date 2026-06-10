@@ -111,9 +111,13 @@ TEST(Result, CopyMoveTransitions) {
   result = yaclib::Result<std::string>{"other"};  // value -> value
   EXPECT_EQ(std::as_const(result).Value(), "other");
 
+  const yaclib::Result<std::string> another{"another"};
+  result = another;  // value -> value copy
+  EXPECT_EQ(std::as_const(result).Value(), "another");
+
   auto& self = result;  // self assignment in both states, reference to silence -Wself-assign
   result = self;
-  EXPECT_EQ(std::as_const(result).Value(), "other");
+  EXPECT_EQ(std::as_const(result).Value(), "another");
   result = std::move(self);
   EXPECT_TRUE(result);
   auto& error_self = error;
@@ -144,6 +148,16 @@ TEST(Result, Void) {
   EXPECT_TRUE(result);
   std::ignore = std::move(result).Ok();
 }
+
+#ifndef YACLIB_LOG_DEBUG
+TEST(Result, NullExceptionPtrIsStop) {
+  // Precondition violation: with asserts enabled YACLIB_ASSERT reports it,
+  // without asserts the null error degrades to the stop error instead of breaking the value lifetime
+  yaclib::Result<int> result{std::exception_ptr{}};
+  EXPECT_FALSE(result);
+  EXPECT_TRUE(yaclib::IsStop(std::as_const(result).Error()));
+}
+#endif
 
 TEST(Result, StopPtr) {
   EXPECT_EQ(&yaclib::StopPtr(), &yaclib::StopPtr());

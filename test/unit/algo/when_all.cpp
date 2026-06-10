@@ -554,5 +554,19 @@ TEST(WhenAll, FailWithError) {
   EXPECT_TRUE(yaclib::IsStop(all2.Error()));
 }
 
+TEST(WhenAll, NoneRetiresLiveSharedCore) {
+  auto [sf, sp] = yaclib::MakeSharedContract<int>();
+  auto retained = sf;
+  auto all = yaclib::WhenAll<yaclib::FailPolicy::None>(std::move(sf));
+  std::move(sp).Set(5);
+  auto result = std::move(all).Get();
+  ASSERT_TRUE(result);
+  const auto& items = std::as_const(result).Value();
+  ASSERT_EQ(items.size(), 1);
+  EXPECT_EQ(std::as_const(items[0]).Value(), 5);
+  // The combinator retired the shared core while this copy was still alive, so it copied the value
+  EXPECT_EQ(retained.Get().Value(), 5);
+}
+
 }  // namespace
 }  // namespace test
