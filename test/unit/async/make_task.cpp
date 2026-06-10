@@ -270,5 +270,22 @@ TEST(MakeStoppedTask, NonTrivial) {
   }
 }
 
+TEST(MakeTask, ThrowingConstruction) {
+  struct ThrowOnCopy {
+    ThrowOnCopy() = default;
+    ThrowOnCopy(const ThrowOnCopy&) {
+      throw std::runtime_error{"copy"};
+    }
+    ThrowOnCopy(ThrowOnCopy&&) = default;
+    std::string owner{"owner"};
+  };
+  ThrowOnCopy value;
+  // The throwing copy must become the stored error, not unwind through the core
+  auto task = yaclib::MakeTask<ThrowOnCopy>(value);
+  auto result = std::move(task).Get();
+  EXPECT_FALSE(result);
+  EXPECT_THROW(std::rethrow_exception(std::as_const(result).Error()), std::runtime_error);
+}
+
 }  // namespace
 }  // namespace test

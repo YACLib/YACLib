@@ -9,10 +9,12 @@ namespace detail {
 template <typename V, typename T>
 class ReadyCore : public UniqueCore<V, T> {
  public:
+  using Result = typename UniqueCore<V, T>::Result;
+
   template <typename... Args>
   explicit ReadyCore(std::in_place_t, Args&&... args) {
-    // If the value construction throws, the base would be unwound with no result stored,
-    // so convert the exception into the stored result instead
+    // Body level try is required: in a constructor function try block the handler runs
+    // after the base is already destroyed and always rethrows at the end
     try {
       if constexpr (sizeof...(Args) == 0) {
         this->Store(Unit{});
@@ -29,7 +31,7 @@ class ReadyCore : public UniqueCore<V, T> {
   }
 
   void Drop() noexcept final {
-    std::destroy_at(std::addressof(this->_result));
+    this->_result.~Result();
     this->Store(StopTag{});
     Call();
   }

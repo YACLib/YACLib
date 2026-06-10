@@ -27,13 +27,11 @@ class SharedCore : public ResultCore<V, T> {
 #endif
 
   Result Retire() final {
-    // Mixed value category conditional would always copy, so branch explicitly
-    auto result = [&]() -> Result {
-      if (this->GetRef() == 1) {
-        return std::move(this->Get());
-      }
-      return std::as_const(this->Get());
-    }();
+    // Higher refcount can be alive SharedFutures or transient refs of this core's
+    // callback dispatch, both forbid the move
+    // Both arms construct a prvalue: with glvalue arms of mixed value category
+    // the conditional would yield a const lvalue and the move arm would copy
+    auto result = (this->GetRef() == 1) ? Result{std::move(this->Get())} : Result{std::as_const(this->Get())};
     this->DecRef();
     return result;
   }

@@ -65,7 +65,7 @@ struct All<FailPolicy::FirstFail, OutputValue, Trait, InputCore> {
     auto& result = core.Get();
     if (!Trait::Ok(result) && !_done.load(std::memory_order_relaxed) &&
         !_done.exchange(true, std::memory_order_acq_rel)) {
-      // Copy, not move: the input core can be a SharedCore that other holders still read
+      // The input can be a SharedCore whose result alive SharedFutures still read, so copy
       std::move(_p).Set(Trait::GetError(std::as_const(result)));
     }
   }

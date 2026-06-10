@@ -554,6 +554,39 @@ TEST(WhenAll, FailWithError) {
   EXPECT_TRUE(yaclib::IsStop(all2.Error()));
 }
 
+TEST(WhenAll, NoneRetireMovesFinishedSharedCores) {
+  struct Counting {
+    explicit Counting(int* c) : copies{c} {
+    }
+    Counting(const Counting& other) : copies{other.copies} {
+      ++*copies;
+    }
+    Counting(Counting&& other) noexcept = default;
+    Counting& operator=(const Counting& other) {
+      copies = other.copies;
+      ++*copies;
+      return *this;
+    }
+    Counting& operator=(Counting&&) noexcept = default;
+
+    int* copies;
+  };
+  int first = 0;
+  int last = 0;
+  auto [sf1, sp1] = yaclib::MakeSharedContract<Counting>();
+  auto [sf2, sp2] = yaclib::MakeSharedContract<Counting>();
+  auto all = yaclib::WhenAll<yaclib::FailPolicy::None>(std::move(sf1), std::move(sf2));
+  std::move(sp1).Set(Counting{&first});
+  std::move(sp2).Set(Counting{&last});
+  auto result = std::move(all).Get();
+  ASSERT_TRUE(result);
+  // Retire moves from a core whose delivery already finished
+  EXPECT_EQ(first, 0);
+  // The input that triggers the combinator destruction is retired inside its own
+  // delivery, where the core still holds the last callback refs, so it's copied
+  EXPECT_EQ(last, 1);
+}
+
 TEST(WhenAll, NoneRetiresLiveSharedCore) {
   auto [sf, sp] = yaclib::MakeSharedContract<int>();
   auto retained = sf;

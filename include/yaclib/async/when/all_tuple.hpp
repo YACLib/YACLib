@@ -56,7 +56,7 @@ struct AllTuple<FailPolicy::FirstFail, OutputValue, Trait, InputCore> {
     } else if (!_done.load(std::memory_order_relaxed) && !_done.exchange(true, std::memory_order_acq_rel)) {
       std::move(_p).Set(Trait::GetError(std::forward<R>(result)));
     }
-    // Errors that lost the race are intentionally dropped, the promise is already set
+    // An error that lost the _done race is dropped, the promise is already set
   }
 
   ~AllTuple() {

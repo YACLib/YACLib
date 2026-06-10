@@ -56,6 +56,18 @@ TEST(WhenAllTuple, FirstFailException) {
   EXPECT_THROW(std::rethrow_exception(result.Error()), std::runtime_error);
 }
 
+TEST(WhenAllTuple, FirstFailTwoErrors) {
+  // Both inputs fail: the loser error must be dropped, previously it was accessed as a value
+  auto [f1, p1] = yaclib::MakeContract<int>();
+  auto [f2, p2] = yaclib::MakeContract<std::string>();
+  auto all = yaclib::WhenAll<yaclib::FailPolicy::FirstFail>(std::move(f1), std::move(f2));
+  std::move(p1).Set(std::make_exception_ptr(std::runtime_error{"first"}));
+  std::move(p2).Set(yaclib::StopTag{});
+  auto result = std::move(all).Get();
+  EXPECT_FALSE(result);
+  EXPECT_THROW(std::rethrow_exception(std::as_const(result).Error()), std::runtime_error);
+}
+
 TEST(WhenAllTuple, None) {
   auto f1 = yaclib::MakeFuture<int>(kSetInt);
   auto f2 = yaclib::MakeFuture<std::string>(kSetString);
