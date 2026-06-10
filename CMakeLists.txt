@@ -32,6 +32,7 @@ if (YACLIB_INSTALL)
   include(GNUInstallDirs)
   install(DIRECTORY ${YACLIB_SOURCE_DIR}/include/yaclib TYPE INCLUDE)
   install(DIRECTORY ${YACLIB_SOURCE_DIR}/include/yaclib_std TYPE INCLUDE)
+  install(DIRECTORY ${YACLIB_SOURCE_DIR}/include/yaclib_ext TYPE INCLUDE)
   install(DIRECTORY ${YACLIB_BINARY_DIR}/include/yaclib TYPE INCLUDE)
 endif()
 

@@ -149,4 +149,27 @@ endif ()
 add_executable(yaclib_log_test test.cpp unit/log.cpp)
 yaclib_add_test(yaclib_log_test)
 
+# yaclib_ext tests: integrations that require specific libraries or standards
+
+if (cxx_std_23 IN_LIST CMAKE_CXX_COMPILE_FEATURES)
+  add_executable(yaclib_ext_std_test test.cpp ext/std/expected.cpp)
+  yaclib_add_test(yaclib_ext_std_test)
+  set_target_properties(yaclib_ext_std_test PROPERTIES CXX_STANDARD 23)
+endif ()
+
+find_package(absl QUIET)
+if (NOT absl_FOUND)
+  include(FetchContent)
+  FetchContent_Declare(abseil
+    GIT_REPOSITORY https://github.com/abseil/abseil-cpp.git
+    GIT_TAG master
+    )
+  set(ABSL_PROPAGATE_CXX_STD ON CACHE BOOL "" FORCE)
+  set(ABSL_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
+  FetchContent_MakeAvailable(abseil)
+endif ()
+add_executable(yaclib_ext_absl_test test.cpp ext/absl/status_or.cpp)
+yaclib_add_test(yaclib_ext_absl_test)
+target_link_libraries(yaclib_ext_absl_test PRIVATE absl::status absl::statusor)
+
 set(YACLIB_DEFINITIONS OLD_YACLIB_DEFINITIONS)

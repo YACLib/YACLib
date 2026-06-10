@@ -245,6 +245,15 @@ struct ResultTrait {
   YACLIB_INLINE static decltype(auto) GetError(R&& r) noexcept {
     return std::forward<R>(r).Error();
   }
+
+  template <typename R>
+  YACLIB_INLINE static decltype(auto) Get(R&& r) {
+    return std::forward<R>(r).Ok();
+  }
+
+  YACLIB_INLINE static bool IsStop(const std::exception_ptr& error) noexcept {
+    return yaclib::IsStop(error);
+  }
 };
 
 /**

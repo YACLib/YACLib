@@ -152,6 +152,15 @@ struct ErrorCodeTrait {
   static decltype(auto) GetError(R&& r) noexcept {
     return std::forward<R>(r).Error();
   }
+
+  template <typename R>
+  static decltype(auto) Get(R&& r) {
+    return std::forward<R>(r).Ok();
+  }
+
+  static bool IsStop(const LikeErrorCode& error) noexcept {
+    return error == LikeErrorCode{yaclib::StopTag{}};
+  }
 };
 
 }  // namespace test

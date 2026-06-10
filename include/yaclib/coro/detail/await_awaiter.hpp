@@ -60,7 +60,7 @@ struct [[nodiscard]] TransferSingleAwaiter final {
   }
 
   auto await_resume() {
-    return std::move(_result->Get()).Ok();
+    return T::Get(std::move(_result->Get()));
   }
 
  private:
@@ -217,7 +217,7 @@ class [[nodiscard]] AwaitSingleAwaiter<false, V, T> final {
   }
 
   auto await_resume() {
-    return std::move(_result->Get()).Ok();
+    return T::Get(std::move(_result->Get()));
   }
 
  private:
@@ -242,7 +242,7 @@ class [[nodiscard]] AwaitSingleAwaiter<true, V, T> final {
   }
 
   auto await_resume() const {
-    return std::as_const(_result->Get()).Ok();
+    return T::Get(std::as_const(_result->Get()));
   }
 
  private:
