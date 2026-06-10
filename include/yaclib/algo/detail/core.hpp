@@ -114,6 +114,7 @@ class Core : public ResultCoreT<Type, Ret, T>, public FuncCore<Func> {
   using Invoke = typename F::Invoke;
 
   static_assert(!(IsDetach(Type) && kAsync != AsyncType::None), "Detach cannot be Async, should be void");
+  static_assert(!(IsDetach(Type) && kAsync != AsyncType::None), "Detach cannot be Async, should be void");
 
  public:
   using Base = ResultCoreT<Type, Ret, T>;
@@ -164,11 +165,6 @@ class Core : public ResultCoreT<Type, Ret, T>, public FuncCore<Func> {
       YACLIB_ASSERT(this->_self.caller == nullptr);
       this->_self.caller = &caller;
       DownCast<BaseCore>(caller).TransferExecutorTo<IsFromShared(Type)>(*this);
-      if constexpr (IsFromShared(Type) && (IsCall(Type) || kAsync != AsyncType::None)) {
-        // The callback can outlive all SharedFutures
-        // We assume ownership here and release it in Done()
-        caller.IncRef();
-      }
       if constexpr (IsCall(Type)) {
         this->_executor->Submit(*this);
         return Noop<SymmetricTransfer>();
@@ -213,16 +209,10 @@ class Core : public ResultCoreT<Type, Ret, T>, public FuncCore<Func> {
     auto* caller = this->_self.caller;
     this->Store(std::forward<R>(value));
 
-    // We decrease the reference count in the following cases:
-    // If !Async (We are now not called by the async result of our callback), then:
-    //   !Type & Run : We are not the first callback in the chain so there is a previous core AND:
-    //     Type & FromUnique : The previous core is a UniqueCore, we always have ownership
-    //     OR we have might have a SharedCore as the previous core and in that case:
-    //       Type & Call : Our callback can outlive the previous core OR
-    //       kAsync != AsyncType::None: Async operation of our callback can outlive the previous core
-    //       - So in the last two cases, we assume ownership of the SharedCore beforehand and release it here
-    // If Async, then we always have ownership of the async result of our callback
-    if constexpr ((!IsRun(Type) && (IsFromUnique(Type) || IsCall(Type) || kAsync != AsyncType::None)) || Async) {
+    // We always own one reference on the previous core: transferred from the future
+    // for FromUnique, granted at attach for FromShared, and if Async we own the
+    // async result core of our callback, so release it here
+    if constexpr (!IsRun(Type) || Async) {
       caller->DecRef();
     }
     if constexpr (!Async) {
@@ -394,6 +384,9 @@ auto SetCallback(FromCorePtr&& core, IExecutor* executor, Func&& f) {
     if constexpr (Unique) {
       return core.Release();
     } else {
+      // Grant the callback its reference on the core, it is released when
+      // the callback is done reading, in both attached and immediate paths
+      core->IncRef();
       return core.Get();
     }
   }();

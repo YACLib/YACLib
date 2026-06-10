@@ -55,20 +55,19 @@ template <bool SymmetricTransfer, bool Shared>
   YACLIB_ASSERT(expected != kResult);
   if constexpr (Shared) {
     auto* head = reinterpret_cast<InlineCore*>(expected);
+    // Producer's own reference. Every callback that reads this core owns one
+    // reference (granted at attach, released by the callback when it is done),
+    // signal only callbacks (wait/await events) read nothing and own nothing.
+    // The walk itself never touches the core after the last callback, which
+    // may release the last reference
+    DecRef();
     if (head) {
       while (auto* next = head->next) {
         Loop(this, head);
         head = static_cast<InlineCore*>(next);
       }
-      DecRef();
-      // If the refcount here is 2, the callback is the last one for
-      // this core (no Shared futures left), so the value may be moved
       Loop(this, head);
-    } else {
-      DecRef();
     }
-    DecRef();
-    DecRef();
     return Noop<SymmetricTransfer>();
   } else {
     if (expected != kEmpty) {
