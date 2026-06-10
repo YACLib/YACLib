@@ -52,9 +52,9 @@ struct AllTuple<FailPolicy::FirstFail, OutputValue, Trait, InputCore> {
   template <std::size_t Index, typename R>
   void Consume(R&& result) {
     if (Trait::Ok(result)) {
-      std::get<Index>(_tuple) = Trait::MoveValue(std::forward<R>(result));
+      std::get<Index>(_tuple) = Trait::GetValue(std::forward<R>(result));
     } else if (!_done.load(std::memory_order_relaxed) && !_done.exchange(true, std::memory_order_acq_rel)) {
-      std::move(_p).Set(Trait::MoveError(std::forward<R>(result)));
+      std::move(_p).Set(Trait::GetError(std::forward<R>(result)));
     }
     // Errors that lost the race are intentionally dropped, the promise is already set
   }

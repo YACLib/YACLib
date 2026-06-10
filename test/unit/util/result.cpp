@@ -160,28 +160,28 @@ void TestTrait() {
 
   auto value = T::template MakeResult<int>(5);
   EXPECT_TRUE(T::Ok(value));
-  EXPECT_EQ(T::MoveValue(std::as_const(value)), 5);
-  EXPECT_EQ(T::MoveValue(std::move(value)), 5);
+  EXPECT_EQ(T::GetValue(std::as_const(value)), 5);
+  EXPECT_EQ(T::GetValue(std::move(value)), 5);
 
   auto stop = T::template MakeResult<int>(yaclib::StopTag{});
   EXPECT_FALSE(T::Ok(stop));
-  std::ignore = T::MoveError(std::as_const(stop));
-  std::ignore = T::MoveError(std::move(stop));
+  std::ignore = T::GetError(std::as_const(stop));
+  std::ignore = T::GetError(std::move(stop));
 
   auto unit = T::template MakeResult<int>(yaclib::Unit{});
   EXPECT_TRUE(T::Ok(unit));
-  EXPECT_EQ(T::MoveValue(std::move(unit)), 0);
+  EXPECT_EQ(T::GetValue(std::move(unit)), 0);
 
   auto error = T::template MakeResult<int>(std::make_exception_ptr(std::runtime_error{""}));
   EXPECT_FALSE(T::Ok(error));
 
   auto pass = T::template MakeResult<int>(R{1});
   EXPECT_TRUE(T::Ok(pass));
-  EXPECT_EQ(T::MoveValue(std::move(pass)), 1);
+  EXPECT_EQ(T::GetValue(std::move(pass)), 1);
 
   auto in_place = T::template MakeResult<int>(std::in_place, 2);
   EXPECT_TRUE(T::Ok(in_place));
-  EXPECT_EQ(T::MoveValue(std::move(in_place)), 2);
+  EXPECT_EQ(T::GetValue(std::move(in_place)), 2);
 }
 
 TEST(ResultTrait, Default) {

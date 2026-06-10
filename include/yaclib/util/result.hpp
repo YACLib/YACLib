@@ -237,12 +237,12 @@ struct ResultTrait {
   }
 
   template <typename R>
-  YACLIB_INLINE static decltype(auto) MoveValue(R&& r) noexcept {
+  YACLIB_INLINE static decltype(auto) GetValue(R&& r) noexcept {
     return std::forward<R>(r).Value();
   }
 
   template <typename R>
-  YACLIB_INLINE static decltype(auto) MoveError(R&& r) noexcept {
+  YACLIB_INLINE static decltype(auto) GetError(R&& r) noexcept {
     return std::forward<R>(r).Error();
   }
 };

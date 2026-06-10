@@ -27,9 +27,9 @@ struct Any<FailPolicy::None, OutputValue, Trait, InputCore> {
   void Consume(R&& result) {
     if (!_done.load(std::memory_order_relaxed) && !_done.exchange(true, std::memory_order_acq_rel)) {
       if (Trait::Ok(result)) {
-        std::move(_p).Set(Trait::MoveValue(std::forward<R>(result)));
+        std::move(_p).Set(Trait::GetValue(std::forward<R>(result)));
       } else {
-        std::move(_p).Set(Trait::MoveError(std::forward<R>(result)));
+        std::move(_p).Set(Trait::GetError(std::forward<R>(result)));
       }
     }
   }
@@ -53,13 +53,13 @@ struct Any<FailPolicy::FirstFail, OutputValue, Trait, InputCore> {
     if (Trait::Ok(result)) {
       if (_state.load(std::memory_order_relaxed) != State::kValue &&
           _state.exchange(State::kValue, std::memory_order_acq_rel) != State::kValue) {
-        std::move(_p).Set(Trait::MoveValue(std::forward<R>(result)));
+        std::move(_p).Set(Trait::GetValue(std::forward<R>(result)));
       }
     } else {
       State expected = State::kEmpty;
       if (_state.load(std::memory_order_relaxed) == expected &&
           _state.compare_exchange_strong(expected, State::kError, std::memory_order_acq_rel)) {
-        _error.emplace(Trait::MoveError(std::forward<R>(result)));
+        _error.emplace(Trait::GetError(std::forward<R>(result)));
       }
     }
   }
@@ -98,10 +98,10 @@ struct Any<FailPolicy::LastFail, OutputValue, Trait, InputCore> {
     if (!DoneImpl(_state.load(std::memory_order_acquire))) {
       if (Trait::Ok(result)) {
         if (!DoneImpl(_state.exchange(1, std::memory_order_acq_rel))) {
-          std::move(_p).Set(Trait::MoveValue(std::forward<R>(result)));
+          std::move(_p).Set(Trait::GetValue(std::forward<R>(result)));
         }
       } else if (_state.fetch_sub(2, std::memory_order_acq_rel) == 2) {
-        std::move(_p).Set(Trait::MoveError(std::forward<R>(result)));
+        std::move(_p).Set(Trait::GetError(std::forward<R>(result)));
       }
     }
   }

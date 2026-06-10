@@ -235,9 +235,9 @@ class Core : public ResultCoreT<Type, Ret, T>, public FuncCore<Func> {
   [[nodiscard]] YACLIB_INLINE auto CallResolveState(R&& r) {
     if constexpr (is_invocable_v<Invoke, Arg> || (std::is_void_v<Arg> && is_invocable_v<Invoke, Unit>)) {
       if (T::Ok(r)) {
-        return CallResolveAsync<SymmetricTransfer>(T::MoveValue(std::forward<R>(r)));
+        return CallResolveAsync<SymmetricTransfer>(T::GetValue(std::forward<R>(r)));
       } else {
-        return Done<SymmetricTransfer>(T::MoveError(std::forward<R>(r)));
+        return Done<SymmetricTransfer>(T::GetError(std::forward<R>(r)));
       }
     } else {
       /**
@@ -260,7 +260,7 @@ class Core : public ResultCoreT<Type, Ret, T>, public FuncCore<Func> {
       if (T::Ok(r)) {
         return Done<SymmetricTransfer>(std::forward<R>(r));
       } else {
-        return CallResolveAsync<SymmetricTransfer>(T::MoveError(std::forward<R>(r)));
+        return CallResolveAsync<SymmetricTransfer>(T::GetError(std::forward<R>(r)));
       }
     }
   }

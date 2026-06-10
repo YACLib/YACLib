@@ -469,12 +469,12 @@ struct DestructiveTrait {
   }
 
   template <typename R>
-  static decltype(auto) MoveValue(R&& r) noexcept {
+  static decltype(auto) GetValue(R&& r) noexcept {
     return std::forward<R>(r).Value();
   }
 
   template <typename R>
-  static decltype(auto) MoveError(R&& r) noexcept {
+  static decltype(auto) GetError(R&& r) noexcept {
     return std::forward<R>(r).Error();
   }
 };
