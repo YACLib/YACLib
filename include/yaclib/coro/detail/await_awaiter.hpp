@@ -73,7 +73,7 @@ struct AwaitAwaiterBase {
   }
 
   YACLIB_INLINE bool await_ready() const noexcept {
-    return !_core->Empty();
+    return _core->Ready();
   }
 
   constexpr void await_resume() const noexcept {
@@ -208,7 +208,7 @@ class [[nodiscard]] AwaitSingleAwaiter<false, V, T> final {
   }
 
   YACLIB_INLINE bool await_ready() const noexcept {
-    return !_result->Empty();
+    return _result->Ready();
   }
 
   template <typename Promise>
@@ -233,7 +233,7 @@ class [[nodiscard]] AwaitSingleAwaiter<true, V, T> final {
   }
 
   YACLIB_INLINE bool await_ready() const noexcept {
-    return !_result->Empty();
+    return _result->Ready();
   }
 
   template <typename Promise>

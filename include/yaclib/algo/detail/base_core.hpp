@@ -29,6 +29,12 @@ class BaseCore : public InlineCore {
     return callback == kEmpty;
   }
 
+  // Not Empty() is the wrong readiness check for shared cores:
+  // the callback word also holds the attached callback list
+  bool Ready() const noexcept {
+    return _callback.load(std::memory_order_acquire) == kResult;
+  }
+
   template <bool Shared>
   void TransferExecutorTo(BaseCore& callback) noexcept {
     if (!callback._executor) {

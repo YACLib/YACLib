@@ -12,6 +12,7 @@
 #include <yaclib/coro/await.hpp>
 #include <yaclib/coro/await_on.hpp>
 #include <yaclib/coro/on.hpp>
+#include <yaclib/coro/yield.hpp>
 #include <yaclib/exe/manual.hpp>
 #include <yaclib/lazy/make.hpp>
 #include <yaclib/runtime/fair_thread_pool.hpp>
@@ -86,6 +87,44 @@ TYPED_TEST(AsyncSuite, JustWorksCoAwait) {
 }
 
 constexpr std::string_view kSetString = "aaa-aaa-aaa-aaa-aaa-aaa-aaa-aaa-aaa-aaa-aaa";
+
+TEST(SharedFuture, TwoCoroutinesAwaitOneShared) {
+  // Both coroutines must suspend: with a not Empty readiness check the second one
+  // would treat the first one's attached callback as a ready result
+  auto [sf, sp] = yaclib::MakeSharedContract<int>();
+  auto coro = [&sf]() -> yaclib::Future<int> {
+    co_return co_await sf;
+  };
+  auto f1 = coro();
+  auto f2 = coro();
+  EXPECT_FALSE(f1.Ready());
+  EXPECT_FALSE(f2.Ready());
+  std::move(sp).Set(21);
+  EXPECT_EQ(std::move(f1).Get().Value(), 21);
+  EXPECT_EQ(std::move(f2).Get().Value(), 21);
+}
+
+TEST(SharedFuture, TwoCoroutinesInheritCallerExecutor) {
+  // Every awaiting coroutine copies the shared caller's executor,
+  // moving would leave the wrong executor for all but the first one
+  yaclib::FairThreadPool tp{1};
+  auto tp_id = yaclib::Run(tp, [] {
+                 return yaclib_std::this_thread::get_id();
+               }).Get();
+  auto [sf, sp] = yaclib::MakeSharedContractOn<int>(tp);
+  auto coro = [&sf]() -> yaclib::Future<yaclib_std::thread::id> {
+    std::ignore = co_await sf;
+    co_await yaclib::kYield;  // reschedules on the coroutine's executor
+    co_return yaclib_std::this_thread::get_id();
+  };
+  auto f1 = coro();
+  auto f2 = coro();
+  std::move(sp).Set(21);
+  EXPECT_EQ(std::move(f1).Get().Value(), std::as_const(tp_id).Value());
+  EXPECT_EQ(std::move(f2).Get().Value(), std::as_const(tp_id).Value());
+  tp.Stop();
+  tp.Wait();
+}
 
 TEST(SharedFuture, JustWorksCoAwaitShared) {
   yaclib::FairThreadPool tp;

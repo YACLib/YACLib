@@ -23,7 +23,7 @@ template <typename V = void, typename T = DefaultTrait>
 }
 
 template <typename V = void, typename T = DefaultTrait>
-[[nodiscard]] SharedContract<V, T> MakeSharedContractOn(IExecutor& e) {
+[[nodiscard]] SharedContractOn<V, T> MakeSharedContractOn(IExecutor& e) {
   auto core = MakeShared<detail::SharedCore<V, T>>(detail::kSharedRefWithFuture);
   e.IncRef();
   core->_executor.Reset(NoRefTag{}, &e);

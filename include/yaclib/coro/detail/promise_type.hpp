@@ -122,7 +122,9 @@ class PromiseType final : public PromiseTypeBase<V, T, Lazy, Shared> {
   }
 
   YACLIB_INLINE void Impl(InlineCore& caller) noexcept {
-    this->_executor = std::move(DownCast<BaseCore>(caller)._executor);
+    // Copy, not move: a shared caller resumes every awaiting coroutine,
+    // moving would leave the wrong executor for all but the first one
+    this->_executor = DownCast<BaseCore>(caller)._executor;
     YACLIB_ASSERT(this->_executor != nullptr);
   }
   [[nodiscard]] InlineCore* Here(InlineCore& caller) noexcept final {
