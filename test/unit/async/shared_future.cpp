@@ -1,5 +1,6 @@
 #include <yaclib/async/contract.hpp>
 #include <yaclib/async/future.hpp>
+#include <yaclib/async/make.hpp>
 #include <yaclib/async/promise.hpp>
 #include <yaclib/async/run.hpp>
 #include <yaclib/async/share.hpp>
@@ -578,6 +579,49 @@ TEST(SharedFuture, MultipleWaitDynamic) {
 
   tp.SoftStop();
   tp.Wait();
+}
+
+TEST(SharedFuture, ThenUnwrapping) {
+  // FromShared + Async: the continuation returns a Future, the grant is released
+  // when the caller is swapped for the async result core
+  auto [sf, sp] = yaclib::MakeSharedContract<int>();
+  auto retained = sf;
+  auto f = sf.ThenInline([](int x) {
+    return yaclib::MakeFuture<int>(x + 1);
+  });
+  std::move(sp).Set(41);
+  EXPECT_EQ(std::move(f).Get().Value(), 42);
+  EXPECT_EQ(retained.Get().Value(), 41);
+}
+
+TEST(SharedFuture, Subscribe) {
+  auto [sf, sp] = yaclib::MakeSharedContract<int>();
+  int attached = 0;
+  int immediate = 0;
+  // Attached path: the grant is consumed when the callback runs in the dispatch walk
+  sf.SubscribeInline([&](int x) {
+    attached = x;
+  });
+  std::move(sp).Set(5);
+  // Immediate path: the result is already set, the grant accompanies the callback into Step
+  sf.SubscribeInline([&](int x) {
+    immediate = x;
+  });
+  EXPECT_EQ(attached, 5);
+  EXPECT_EQ(immediate, 5);
+  EXPECT_EQ(sf.Get().Value(), 5);
+}
+
+TEST(SharedFuture, DroppedCallbackReleasesCore) {
+  auto [sf, sp] = yaclib::MakeSharedContract<int>();
+  yaclib::FairThreadPool tp{1};
+  tp.HardStop();
+  tp.Wait();
+  // The executor drops the submitted callback, Core::Drop must still release the grant
+  sf.Subscribe(tp, [](int) {
+  });
+  std::move(sp).Set(5);
+  EXPECT_EQ(sf.Get().Value(), 5);
 }
 
 }  // namespace

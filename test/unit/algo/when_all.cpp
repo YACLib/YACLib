@@ -580,11 +580,11 @@ TEST(WhenAll, NoneRetireMovesFinishedSharedCores) {
   std::move(sp2).Set(Counting{&last});
   auto result = std::move(all).Get();
   ASSERT_TRUE(result);
-  // Retire moves from a core whose delivery already finished
+  // The combinator strategy is the sole owner at Retire time for every input,
+  // including the one whose delivery triggered the combinator destruction:
+  // callbacks own their references and the core holds none on itself
   EXPECT_EQ(first, 0);
-  // The input that triggers the combinator destruction is retired inside its own
-  // delivery, where the core still holds the last callback refs, so it's copied
-  EXPECT_EQ(last, 1);
+  EXPECT_EQ(last, 0);
 }
 
 TEST(WhenAll, NoneRetiresLiveSharedCore) {

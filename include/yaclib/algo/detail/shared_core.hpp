@@ -4,10 +4,11 @@
 
 namespace yaclib::detail {
 
-// 3 refs for the promise (1 for the promise itself and 2 for the last callback)
-// 1 ref for the future
-inline constexpr std::size_t kSharedRefWithFuture = 4;
-inline constexpr std::size_t kSharedRefNoFuture = 3;
+// 1 ref for the promise, 1 ref for the future.
+// Every attached callback additionally owns 1 ref, granted at attach,
+// released by the callback when it is done reading the core
+inline constexpr std::size_t kSharedRefWithFuture = 2;
+inline constexpr std::size_t kSharedRefNoFuture = 1;
 
 template <typename V, typename T>
 class SharedCore : public ResultCore<V, T> {

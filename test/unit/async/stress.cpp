@@ -1,6 +1,7 @@
 #include <yaclib/algo/wait_group.hpp>
 #include <yaclib/async/contract.hpp>
 #include <yaclib/async/future.hpp>
+#include <yaclib/async/shared_contract.hpp>
 #include <yaclib/exe/executor.hpp>
 #include <yaclib/exe/inline.hpp>
 #include <yaclib/runtime/fair_thread_pool.hpp>
@@ -9,6 +10,7 @@
 #include <array>
 #include <cstdint>
 #include <iostream>
+#include <string>
 #include <thread>
 #include <type_traits>
 #include <utility>
@@ -166,6 +168,25 @@ TEST_F(StressTest, Then) {
   });
   tp.Stop();
   tp.Wait();
+}
+
+TEST(SharedFutureStress, ConcurrentSoleReaderMove) {
+  // The ==1 move decisions in Get()/ResultCore::Impl race the producer dispatch
+  // and a concurrently released second handle, the value must stay intact
+  for (std::size_t i = 0; i != 1000; ++i) {
+    auto [sf, sp] = yaclib::MakeSharedContract<std::string>();
+    auto copy = sf;
+    yaclib_std::thread producer{[p = std::move(sp)]() mutable {
+      std::move(p).Set(std::string(64, 'x'));
+    }};
+    yaclib_std::thread releaser{[c = std::move(copy)]() mutable {
+      std::move(c).Detach();
+    }};
+    auto result = std::move(sf).Get();
+    EXPECT_EQ(std::as_const(result).Value(), std::string(64, 'x'));
+    producer.join();
+    releaser.join();
+  }
 }
 
 }  // namespace

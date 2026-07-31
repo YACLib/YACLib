@@ -30,7 +30,7 @@ class SharedFutureBase {
 
   [[nodiscard]] bool Ready() const noexcept {
     YACLIB_ASSERT(Valid());
-    return !_core->Empty();
+    return _core->Ready();
   }
 
   [[nodiscard]] Result Get() && noexcept {
