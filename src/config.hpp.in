@@ -153,3 +153,12 @@
 #else
 #  define YACLIB_NO_UNIQUE_ADDRESS
 #endif
+
+#if YACLIB_HAS_ATTRIBUTE(clang::trivial_abi)
+// attribute available for clang 7 and gcc's trunk since
+// https://github.com/gcc-mirror/gcc/commit/1e89650aff94c20007f74949018f5d5150ea9ba7
+// for purpuse of portability gcc uses the same [[clang::trivial_abi]] attribute name
+#  define YACLIB_TRIVIAL_ABI [[clang::trivial_abi]]
+#else
+#  define YACLIB_TRIVIAL_ABI
+#endif

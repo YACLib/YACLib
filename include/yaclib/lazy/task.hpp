@@ -3,6 +3,7 @@
 #include <yaclib/algo/detail/promise_core.hpp>
 #include <yaclib/algo/detail/result_core.hpp>
 #include <yaclib/async/future.hpp>
+#include <yaclib/config.hpp>
 #include <yaclib/exe/executor.hpp>
 #include <yaclib/exe/inline.hpp>
 #include <yaclib/fwd.hpp>
@@ -22,7 +23,7 @@ void Start(BaseCore* head) noexcept;
  * TODO(MBkkt) add description
  */
 template <typename V, typename T>
-class Task final {
+class YACLIB_TRIVIAL_ABI Task final {
   using CoreType = detail::CoreType;
 
  public:
