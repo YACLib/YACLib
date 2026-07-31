@@ -1,5 +1,6 @@
 #pragma once
 
+#include <yaclib/config.hpp>
 #include <yaclib/util/ref.hpp>
 
 #include <type_traits>
@@ -14,7 +15,7 @@ struct NoRefTag final {};
  * https://www.boost.org/doc/libs/1_77_0/libs/smart_ptr/doc/html/smart_ptr.html#intrusive_ptr
  */
 template <typename T>
-class IntrusivePtr final {
+class YACLIB_TRIVIAL_ABI IntrusivePtr final {
   static_assert(std::is_base_of_v<IRef, T>, "T must be derived class of IRef");
 
  public:

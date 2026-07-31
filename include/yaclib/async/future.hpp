@@ -3,6 +3,7 @@
 #include <yaclib/algo/detail/core.hpp>
 #include <yaclib/algo/detail/unique_core.hpp>
 #include <yaclib/async/wait.hpp>
+#include <yaclib/config.hpp>
 #include <yaclib/exe/executor.hpp>
 #include <yaclib/fwd.hpp>
 #include <yaclib/util/helper.hpp>
@@ -17,7 +18,7 @@ namespace yaclib {
  * Use the \ref Promise to fulfill the \ref Future.
  */
 template <typename V, typename T>
-class FutureBase {
+class YACLIB_TRIVIAL_ABI FutureBase {
   using CoreType = detail::CoreType;
 
  public:
@@ -210,7 +211,7 @@ extern template class FutureBase<void, DefaultTrait>;
  * Use the \ref Promise to fulfill the \ref Future.
  */
 template <typename V, typename T>
-class Future final : public FutureBase<V, T> {
+class YACLIB_TRIVIAL_ABI Future final : public FutureBase<V, T> {
   using CoreType = detail::CoreType;
   using Base = FutureBase<V, T>;
 
@@ -244,7 +245,7 @@ extern template class Future<>;
  * Use the \ref Promise to fulfill the \ref Future.
  */
 template <typename V, typename T>
-class FutureOn final : public FutureBase<V, T> {
+class YACLIB_TRIVIAL_ABI FutureOn final : public FutureBase<V, T> {
   using CoreType = detail::CoreType;
   using Base = FutureBase<V, T>;
 

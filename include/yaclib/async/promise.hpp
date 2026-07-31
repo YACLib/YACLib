@@ -1,13 +1,14 @@
 #pragma once
 
 #include <yaclib/algo/detail/unique_core.hpp>
+#include <yaclib/config.hpp>
 #include <yaclib/fwd.hpp>
 #include <yaclib/util/type_traits.hpp>
 
 namespace yaclib {
 
 template <typename V, typename T>
-class Promise final {
+class YACLIB_TRIVIAL_ABI Promise final {
   static_assert(Check<V>(), "V should be valid");
   static_assert(!std::is_same_v<V, typename T::Error>,
                 "V cannot be the same as the trait Error type, because callback dispatch would be ambiguous");
