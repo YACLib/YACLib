@@ -2,6 +2,7 @@
 
 #include <yaclib/fwd.hpp>
 
+#include <iterator>
 #include <type_traits>
 
 namespace yaclib::detail {
@@ -106,6 +107,70 @@ template <typename V, typename T>
 struct AsyncTypes<SharedFutureOn<V, T>> final {
   using Value = V;
   using Trait = T;
+};
+
+template <typename It, typename Tag, typename = std::void_t<>>
+struct HasIteratorCategory {
+  static constexpr bool Value = false;
+};
+
+template <typename It, typename Tag>
+struct HasIteratorCategory<It, Tag, std::void_t<typename std::iterator_traits<It>::iterator_category>> final {
+  static constexpr bool Value = std::is_base_of_v<Tag, typename std::iterator_traits<It>::iterator_category>;
+};
+
+template <typename It, typename = std::void_t<>>
+struct IsInputIterator {
+  static constexpr bool Value = false;
+};
+
+template <typename It>
+struct IsInputIterator<It, std::void_t<decltype(*std::declval<const It&>()), decltype(++std::declval<It&>())>> final {
+  static constexpr bool Value = HasIteratorCategory<It, std::input_iterator_tag>::Value;
+};
+
+template <typename Sentinel, typename It, typename = std::void_t<>>
+struct IsSentinelFor {
+  static constexpr bool Value = false;
+};
+
+template <typename Sentinel, typename It>
+struct IsSentinelFor<Sentinel, It,
+                     std::void_t<decltype(std::declval<const It&>() == std::declval<const Sentinel&>())>> {
+  static constexpr bool Value = true;
+};
+
+template <typename It, typename Sentinel>
+struct IsInputRangePair {
+  static constexpr bool Value = IsInputIterator<It>::Value && IsSentinelFor<Sentinel, It>::Value;
+};
+
+template <typename Range>
+using RangeIterator = std::decay_t<decltype(std::begin(std::declval<Range&>()))>;
+
+template <typename Range>
+using RangeSentinel = std::decay_t<decltype(std::end(std::declval<Range&>()))>;
+
+template <typename Range, typename = std::void_t<>>
+struct IsInputRange {
+  static constexpr bool Value = false;
+};
+
+template <typename Range>
+struct IsInputRange<Range, std::void_t<RangeIterator<Range>, RangeSentinel<Range>>> {
+  static constexpr bool Value = IsInputRangePair<RangeIterator<Range>, RangeSentinel<Range>>::Value;
+};
+
+template <typename It, typename Sentinel, typename = std::void_t<>>
+struct HasConstantTimeDistance {
+  static constexpr bool Value = false;
+};
+
+template <typename It, typename Sentinel>
+struct HasConstantTimeDistance<It, Sentinel,
+                               std::void_t<decltype(std::declval<const Sentinel&>() - std::declval<const It&>()),
+                                           decltype(std::declval<const It&>() - std::declval<const Sentinel&>())>> {
+  static constexpr bool Value = true;
 };
 
 }  // namespace yaclib::detail

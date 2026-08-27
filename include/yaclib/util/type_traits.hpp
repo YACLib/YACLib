@@ -242,4 +242,19 @@ constexpr bool Check() noexcept {
   return true;
 }
 
+template <typename It>
+inline constexpr bool is_input_iterator_v = detail::IsInputIterator<It>::Value;
+
+template <typename Sentinel, typename It>
+inline constexpr bool is_sentinel_for_v = detail::IsSentinelFor<Sentinel, It>::Value;
+
+template <typename It, typename Sentinel>
+inline constexpr bool is_input_range_pair_v = detail::IsInputRangePair<It, Sentinel>::Value;
+
+template <typename Range>
+inline constexpr bool is_input_range_v = detail::IsInputRange<Range>::Value;
+
+template <typename It, typename Sentinel>
+inline constexpr bool has_constant_time_distance_v = detail::HasConstantTimeDistance<It, Sentinel>::Value;
+
 }  // namespace yaclib

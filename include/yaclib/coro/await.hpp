@@ -24,16 +24,29 @@ YACLIB_INLINE auto Await(Waited&... waited) noexcept {
   return AwaitInline(waited...);
 }
 
-template <typename Iterator, typename Value = typename std::iterator_traits<Iterator>::value_type,
-          typename = std::enable_if_t<is_waitable_v<Value>>>
-YACLIB_INLINE auto Await(Iterator begin, std::size_t count) noexcept {
+template <typename It, typename = std::enable_if_t<is_input_iterator_v<It> &&
+                                                   is_waitable_v<typename std::iterator_traits<It>::value_type>>>
+YACLIB_INLINE auto Await(It begin, std::size_t count) noexcept {
   return AwaitInline(begin, count);
 }
 
-template <typename Iterator,
-          typename = std::enable_if_t<is_waitable_v<typename std::iterator_traits<Iterator>::value_type>>>
-YACLIB_INLINE auto Await(Iterator begin, Iterator end) noexcept {
-  return AwaitInline(begin, end);
+template <typename It, typename Sentinel,
+          typename = std::enable_if_t<is_input_range_pair_v<It, Sentinel> &&
+                                      is_waitable_v<typename std::iterator_traits<It>::value_type>>>
+YACLIB_INLINE auto Await(It begin, Sentinel end) noexcept {
+  static_assert(
+    has_constant_time_distance_v<It, Sentinel>,
+    "Use Await(begin, std::distance(begin, end)) instead");  // We don't use std::distance because we want to alert
+                                                             // the user to the fact that it can be expensive.
+
+  return Await(begin, static_cast<std::size_t>(end - begin));
+}
+
+template <typename Range, typename = std::enable_if_t<
+                            is_input_range_v<Range> &&
+                            is_waitable_v<typename std::iterator_traits<detail::RangeIterator<Range>>::value_type>>>
+YACLIB_INLINE auto Await(Range&& range) noexcept {
+  return Await(std::begin(range), std::end(range));
 }
 
 template <typename V, typename T>
