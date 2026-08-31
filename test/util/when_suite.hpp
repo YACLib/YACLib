@@ -270,8 +270,9 @@ auto CallWhen(Futures... futures) {
   }
 }
 
-template <typename StrategyT, typename Iterator, typename Value = typename std::iterator_traits<Iterator>::value_type>
-auto CallWhen(Iterator begin, Iterator end) {
+template <typename StrategyT, typename It, typename Sentinel,
+          typename = std::enable_if_t<yaclib::is_input_range_pair_v<It, Sentinel>>>
+auto CallWhen(It begin, Sentinel end) {
   static constexpr auto F = yaclib::FailPolicy::None;
   using V = void;
   using E = yaclib::DefaultTrait;
@@ -297,8 +298,8 @@ auto CallWhen(Iterator begin, Iterator end) {
   }
 }
 
-template <typename StrategyT, typename Iterator, typename Value = typename std::iterator_traits<Iterator>::value_type>
-auto CallWhen(Iterator begin, std::size_t count) {
+template <typename StrategyT, typename It>
+auto CallWhen(It begin, std::size_t count) {
   static constexpr auto F = yaclib::FailPolicy::None;
   using V = void;
   using E = yaclib::DefaultTrait;

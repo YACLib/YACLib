@@ -67,9 +67,28 @@ class WaitGroup final {
    * \param begin iterator to futures to Add
    * \param end iterator to futures to Add
    */
-  template <bool NeedAdd = true, typename It>
-  YACLIB_INLINE std::enable_if_t<!is_future_base_v<It>, void> Consume(It begin, It end) noexcept {
-    InsertIt<true, NeedAdd>(begin, static_cast<std::size_t>(end - begin));
+  template <bool NeedAdd = true, typename It, typename Sentinel,
+            typename = std::enable_if_t<is_input_range_pair_v<It, Sentinel>>>
+  YACLIB_INLINE void Consume(It begin, Sentinel end) noexcept {
+    static_assert(
+      has_constant_time_distance_v<It, Sentinel>,
+      "Use Consume(begin, std::distance(begin, end)) instead");  // We don't use std::distance because we want to alert
+                                                                 // the user to the fact that it can be expensive.
+
+    Consume<NeedAdd>(begin, static_cast<std::size_t>(end - begin));
+  }
+
+  /**
+   * Consume \ref Future by WaitGroup with auto Done
+   *
+   * Also \see Add
+   *
+   * \tparam NeedAdd if true make implicit Add, if false you should make explicit Add before call Consume
+   * \param range of futures to Add
+   */
+  template <bool NeedAdd = true, typename Range, typename = std::enable_if_t<is_input_range_v<Range>>>
+  YACLIB_INLINE void Consume(Range&& range) noexcept {
+    Consume<NeedAdd>(std::begin(range), std::end(range));
   }
 
   /**
@@ -79,9 +98,9 @@ class WaitGroup final {
    *
    * \tparam NeedAdd if true make implicit Add, if false you should make explicit Add before call Consume
    * \param begin iterator to futures to Add
-   * \param count count of futures to Add
+   * \param count of futures to Add
    */
-  template <bool NeedAdd = true, typename It>
+  template <bool NeedAdd = true, typename It, typename = std::enable_if_t<is_input_iterator_v<It>>>
   YACLIB_INLINE void Consume(It begin, std::size_t count) noexcept {
     InsertIt<true, NeedAdd>(begin, count);
   }
@@ -108,9 +127,28 @@ class WaitGroup final {
    * \param begin iterator to futures to Add
    * \param end iterator to futures to Add
    */
-  template <bool NeedAdd = true, typename It>
-  YACLIB_INLINE std::enable_if_t<!is_future_base_v<It>, void> Attach(It begin, It end) noexcept {
-    InsertIt<false, NeedAdd>(begin, static_cast<std::size_t>(end - begin));
+  template <bool NeedAdd = true, typename It, typename Sentinel,
+            typename = std::enable_if_t<is_input_range_pair_v<It, Sentinel>>>
+  YACLIB_INLINE void Attach(It begin, Sentinel end) noexcept {
+    static_assert(
+      has_constant_time_distance_v<It, Sentinel>,
+      "Use Attach(begin, std::distance(begin, end)) instead");  // We don't use std::distance because we want to alert
+                                                                // the user to the fact that it can be expensive.
+
+    Attach<NeedAdd>(begin, static_cast<std::size_t>(end - begin));
+  }
+
+  /**
+   * Attach \ref Future to WaitGroup with auto Done
+   *
+   * Also \see Add
+   *
+   * \tparam NeedAdd if true make implicit Add, if false you should make explicit Add before call Attach
+   * \param range of futures to Add
+   */
+  template <bool NeedAdd = true, typename Range, typename = std::enable_if_t<is_input_range_v<Range>>>
+  YACLIB_INLINE void Attach(Range&& range) noexcept {
+    Attach<NeedAdd>(std::begin(range), std::end(range));
   }
 
   /**
@@ -120,9 +158,9 @@ class WaitGroup final {
    *
    * \tparam NeedAdd if true make implicit Add, if false you should make explicit Add before call Attach
    * \param begin iterator to futures to Add
-   * \param count count of futures to Add
+   * \param count of futures to Add
    */
-  template <bool NeedAdd = true, typename It>
+  template <bool NeedAdd = true, typename It, typename = std::enable_if_t<is_input_iterator_v<It>>>
   YACLIB_INLINE void Attach(It begin, std::size_t count) noexcept {
     InsertIt<false, NeedAdd>(begin, count);
   }
