@@ -1,0 +1,9 @@
+<map id="yaclib::detail::LockStickyAwaiter&lt; M &gt;" name="yaclib::detail::LockStickyAwaiter&lt; M &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,169,168,210"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="27,80,71,106"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="59,120,67,144,78,168,73,170,62,146,53,122"/>
+<area shape="rect" id="Node000003" href="$classyaclib_1_1IExecutor.html" title=" " alt="" coords="96,80,210,106"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="138,120,103,170,98,167,134,117"/>
+<area shape="rect" id="Node000004" href="$classyaclib_1_1IRef.html" title="Reference counting interface." alt="" coords="111,5,195,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="156,46,156,80,151,80,151,46"/>
+</map>

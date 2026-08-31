@@ -1,0 +1,5 @@
+var searchData=
+[
+  ['valid_0',['valid',['../classyaclib_1_1FutureBase.html#aa0a86b661a00435eea29571bd6ec4519',1,'yaclib::FutureBase::Valid()'],['../classyaclib_1_1Promise.html#aece29e4fc04fc2208821bc97ad0ff1c2',1,'yaclib::Promise::Valid()'],['../classyaclib_1_1SharedFutureBase.html#a85b93bb12d6a164a3e763b3d61eae9e3',1,'yaclib::SharedFutureBase::Valid()'],['../classyaclib_1_1SharedPromise.html#a5cb19e6a8ac041f83051bcdfd8f71e31',1,'yaclib::SharedPromise::Valid()'],['../classyaclib_1_1Task.html#a9290822e4bd335c71b3e26ca3eee6e4e',1,'yaclib::Task::Valid()']]],
+  ['value_1',['value',['../classyaclib_1_1Result.html#a814ee9861a018692dbebb4666647077f',1,'yaclib::Result::Value() &amp;=delete'],['../classyaclib_1_1Result.html#a61141d31f2941a88dbe02c95d6d76745',1,'yaclib::Result::Value() const &amp;&amp;=delete'],['../classyaclib_1_1Result.html#a7c9c1591381094861cff91a9a6c55a6f',1,'yaclib::Result::Value() &amp;&amp;noexcept'],['../classyaclib_1_1Result.html#a970eb02990b5bf453099b66e29ba6e5c',1,'yaclib::Result::Value() const &amp;noexcept']]]
+];

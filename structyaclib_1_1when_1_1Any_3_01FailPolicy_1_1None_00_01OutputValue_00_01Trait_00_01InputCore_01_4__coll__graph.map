@@ -1,0 +1,15 @@
+<map id="yaclib::when::Any&lt; FailPolicy::None, OutputValue, Trait, InputCore &gt;" name="yaclib::when::Any&lt; FailPolicy::None, OutputValue, Trait, InputCore &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="681,79,881,135"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="350,5,521,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="536,43,658,70,682,76,680,81,656,75,535,48"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="347,70,524,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="540,88,681,97,680,103,539,93"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="382,120,489,145"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="503,126,657,117,680,115,681,120,657,122,504,132"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="52,120,113,145"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="128,130,382,130,382,135,128,135"/>
+<area shape="rect" id="Node000006" href="$classyaclib_1_1Promise.html" title=" " alt="" coords="338,169,533,210"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="547,169,656,145,698,133,699,138,658,150,549,174"/>
+<area shape="rect" id="Node000007" href="$classyaclib_1_1Promise.html" title=" " alt="" coords="5,177,160,203"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="175,187,337,187,337,192,175,192"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="include/yaclib/algo/one_shot_event.hpp" name="include/yaclib/algo/one_shot_event.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="105,5,246,46"/>
+<area shape="rect" id="Node000002" href="$wait__group_8hpp.html" title=" " alt="" coords="21,94,148,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="146,59,107,95,103,92,142,55"/>
+<area shape="rect" id="Node000004" href="$one__shot__event_8cpp.html" title=" " alt="" coords="172,102,360,127"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="209,55,255,99,252,103,205,59"/>
+<area shape="rect" id="Node000003" href="$wait__group_8cpp.html" title=" " alt="" coords="5,183,164,208"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="87,150,87,182,82,182,82,150"/>
+</map>

@@ -1,0 +1,34 @@
+<map id="include/yaclib/util/helper.hpp" name="include/yaclib/util/helper.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="189,5,309,46"/>
+<area shape="rect" id="Node000002" href="$atomic__counter_8hpp.html" title=" " alt="" coords="245,94,384,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="266,45,293,80,288,83,262,48"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="397,271,461,297"/>
+<area shape="poly" id="edge18_Node000001_Node000005" title=" " alt="" coords="189,37,156,44,121,56,87,73,58,96,30,127,12,158,9,174,9,190,15,205,26,221,50,239,86,252,132,263,184,270,292,279,382,281,382,286,291,284,183,276,131,268,85,258,47,243,22,225,10,208,4,191,3,173,7,157,25,124,54,92,84,69,119,51,154,39,188,32"/>
+<area shape="rect" id="Node000008" href="$unique__counter_8hpp.html" title=" " alt="" coords="69,94,206,135"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="225,49,176,87,173,82,222,44"/>
+<area shape="rect" id="Node000009" href="$intrusive__ptr_8hpp.html" title=" " alt="" coords="602,94,731,135"/>
+<area shape="poly" id="edge9_Node000001_Node000009" title=" " alt="" coords="310,37,588,94,587,99,309,42"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="467,190,583,216"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="363,133,483,181,481,186,361,138"/>
+<area shape="rect" id="Node000004" href="$default__deleter_8hpp.html" title=" " alt="" coords="35,183,170,223"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="267,138,166,179,164,174,265,133"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="353,133,381,154,406,181,423,219,430,255,425,256,418,220,402,184,378,158,350,137"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="194,190,246,216"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="295,137,246,182,242,178,291,133"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="269,190,392,216"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="321,135,328,175,323,176,316,136"/>
+<area shape="poly" id="edge8_Node000008_Node000004" title=" " alt="" coords="132,136,118,169,113,167,127,134"/>
+<area shape="poly" id="edge10_Node000009_Node000003" title=" " alt="" coords="636,137,559,184,556,180,633,133"/>
+<area shape="rect" id="Node000010" href="$ref_8hpp.html" title=" " alt="" coords="607,190,726,216"/>
+<area shape="poly" id="edge11_Node000009_Node000010" title=" " alt="" coords="669,135,669,175,664,175,664,135"/>
+<area shape="rect" id="Node000013" title=" " alt="" coords="750,190,831,216"/>
+<area shape="poly" id="edge15_Node000009_Node000013" title=" " alt="" coords="696,133,763,179,760,183,693,137"/>
+<area shape="rect" id="Node000014" href="$intrusive__ptr__impl_8hpp.html" title=" " alt="" coords="855,183,1006,223"/>
+<area shape="poly" id="edge16_Node000009_Node000014" title=" " alt="" coords="727,133,857,175,855,180,726,138"/>
+<area shape="poly" id="edge14_Node000010_Node000005" title=" " alt="" coords="631,219,477,270,476,265,629,214"/>
+<area shape="rect" id="Node000011" href="$log_8hpp.html" title=" " alt="" coords="749,271,848,297"/>
+<area shape="poly" id="edge12_Node000010_Node000011" title=" " alt="" coords="688,214,767,261,764,265,685,219"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="755,345,842,371"/>
+<area shape="poly" id="edge13_Node000011_Node000012" title=" " alt="" coords="801,297,801,329,796,329,796,297"/>
+<area shape="poly" id="edge17_Node000014_Node000011" title=" " alt="" coords="899,226,833,265,830,261,896,222"/>
+</map>

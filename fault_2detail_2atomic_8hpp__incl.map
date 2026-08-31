@@ -1,0 +1,14 @@
+<map id="include/yaclib/fault/detail/atomic.hpp" name="include/yaclib/fault/detail/atomic.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="153,5,281,46"/>
+<area shape="rect" id="Node000002" href="$atomic__wait_8hpp.html" title=" " alt="" coords="60,94,179,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="197,49,154,86,151,82,193,45"/>
+<area shape="rect" id="Node000004" href="$inject_8hpp.html" title=" " alt="" coords="146,183,288,208"/>
+<area shape="poly" id="edge5_Node000001_Node000004" title=" " alt="" coords="220,46,220,167,214,167,214,46"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="255,102,336,127"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="237,45,276,88,272,92,233,48"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,183,122,208"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="108,137,83,171,79,168,103,134"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="145,133,192,171,188,175,142,137"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="187,256,247,282"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="220,209,220,241,214,241,214,209"/>
+</map>

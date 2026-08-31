@@ -1,0 +1,7 @@
+<map id="include/yaclib/fault/detail/fiber/atomic_wait.hpp" name="include/yaclib/fault/detail/fiber/atomic_wait.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="98,5,227,61"/>
+<area shape="rect" id="Node000002" href="$fault_2detail_2fiber_2atomic_8hpp.html" title=" " alt="" coords="5,117,157,157"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="133,75,98,118,94,115,129,72"/>
+<area shape="rect" id="Node000003" href="$fault_2detail_2fiber_2atomic__flag_8hpp.html" title=" " alt="" coords="181,109,309,165"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="196,72,225,107,221,110,192,75"/>
+</map>

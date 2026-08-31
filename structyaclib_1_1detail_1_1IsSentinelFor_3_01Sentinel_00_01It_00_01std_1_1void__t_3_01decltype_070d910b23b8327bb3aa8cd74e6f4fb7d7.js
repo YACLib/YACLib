@@ -1,0 +1,4 @@
+var structyaclib_1_1detail_1_1IsSentinelFor_3_01Sentinel_00_01It_00_01std_1_1void__t_3_01decltype_070d910b23b8327bb3aa8cd74e6f4fb7d7 =
+[
+    [ "Value", "structyaclib_1_1detail_1_1IsSentinelFor_3_01Sentinel_00_01It_00_01std_1_1void__t_3_01decltype_070d910b23b8327bb3aa8cd74e6f4fb7d7.html#a0f6032ffb331c159d497694ad70c2946", null ]
+];

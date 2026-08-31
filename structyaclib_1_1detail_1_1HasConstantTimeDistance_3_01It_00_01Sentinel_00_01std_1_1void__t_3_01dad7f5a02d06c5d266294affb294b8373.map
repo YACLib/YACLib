@@ -1,0 +1,5 @@
+<map id="yaclib::detail::HasConstantTimeDistance&lt; It, Sentinel, std::void_t&lt; decltype(std::declval&lt; const Sentinel &amp; &gt;() &#45; std::declval&lt; const It &amp; &gt;()), decltype(std::declval&lt; const It &amp; &gt;() &#45; std::declval&lt; const Sentinel &amp; &gt;())&gt; &gt;" name="yaclib::detail::HasConstantTimeDistance&lt; It, Sentinel, std::void_t&lt; decltype(std::declval&lt; const Sentinel &amp; &gt;() &#45; std::declval&lt; const It &amp; &gt;()), decltype(std::declval&lt; const It &amp; &gt;() &#45; std::declval&lt; const Sentinel &amp; &gt;())&gt; &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,94,187,225"/>
+<area shape="rect" id="Node000002" href="$classbool.html" title=" " alt="" coords="73,5,119,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="99,46,99,93,93,93,93,46"/>
+</map>

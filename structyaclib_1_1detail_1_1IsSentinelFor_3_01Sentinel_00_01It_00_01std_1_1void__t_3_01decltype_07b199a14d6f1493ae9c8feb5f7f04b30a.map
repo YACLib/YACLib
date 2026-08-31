@@ -1,0 +1,5 @@
+<map id="yaclib::detail::IsSentinelFor&lt; Sentinel, It, std::void_t&lt; decltype(std::declval&lt; const It &amp; &gt;()==std::declval&lt; const Sentinel &amp; &gt;())&gt; &gt;" name="yaclib::detail::IsSentinelFor&lt; Sentinel, It, std::void_t&lt; decltype(std::declval&lt; const It &amp; &gt;()==std::declval&lt; const Sentinel &amp; &gt;())&gt; &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,94,193,195"/>
+<area shape="rect" id="Node000002" href="$classbool.html" title=" " alt="" coords="76,5,122,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="102,47,102,94,96,94,96,47"/>
+</map>

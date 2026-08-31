@@ -1,0 +1,9 @@
+<map id="yaclib::detail::MultiEvent&lt; Event, Counter, Callbacks &gt;" name="yaclib::detail::MultiEvent&lt; Event, Counter, Callbacks &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="317,55,509,96"/>
+<area shape="rect" id="Node000002" href="$classCounter.html" title=" " alt="" coords="17,5,206,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="198,32,317,55,316,60,197,37"/>
+<area shape="rect" id="Node000003" href="$classCallbacks.html" title=" " alt="" coords="5,55,218,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="233,73,316,73,316,78,233,78"/>
+<area shape="rect" id="Node000004" href="$classbool.html" title=" " alt="" coords="89,120,134,146"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="149,123,316,91,317,96,150,128"/>
+</map>

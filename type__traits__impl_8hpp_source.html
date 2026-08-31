@@ -1,0 +1,431 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.9.8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<!-- BEGIN opengraph metadata -->
+<meta property="og:title" content="Doxygen Awesome" />
+<meta property="og:image" content="https://repository-images.githubusercontent.com/348492097/4f16df80-88fb-11eb-9d31-4015ff22c452" />
+<meta property="og:description" content="Custom CSS theme for doxygen html-documentation with lots of customization parameters." />
+<meta property="og:url" content="https://jothepro.github.io/doxygen-awesome-css/" />
+<!-- END opengraph metadata -->
+<!-- BEGIN twitter metadata -->
+<meta name="twitter:image:src" content="https://repository-images.githubusercontent.com/348492097/4f16df80-88fb-11eb-9d31-4015ff22c452" />
+<meta name="twitter:title" content="Doxygen Awesome" />
+<meta name="twitter:description" content="Custom CSS theme for doxygen html-documentation with lots of customization parameters." />
+<!-- END twitter metadata -->
+<title>YACLib: include/yaclib/util/detail/type_traits_impl.hpp Source File</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link rel="icon" type="image/svg+xml" href="logo.drawio.svg"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+<script type="text/javascript" src="doxygen-awesome-fragment-copy-button.js"></script>
+<script type="text/javascript" src="doxygen-awesome-paragraph-link.js"></script>
+<script type="text/javascript" src="toggle-alternative-theme.js"></script>
+<script type="text/javascript">
+    DoxygenAwesomeFragmentCopyButton.init()
+    DoxygenAwesomeDarkModeToggle.init()
+    DoxygenAwesomeParagraphLink.init()
+</script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="custom.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only-darkmode-toggle.css" rel="stylesheet" type="text/css"/>
+<link href="custom-alternative.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<!-- https://tholman.com/github-corners/ -->
+<a href="https://github.com/YACLib/YACLib" class="github-corner" title="View source on GitHub" target="_blank">
+    <svg viewBox="0 0 250 250" width="40" height="40" style="position: absolute; top: 0; border: 0; right: 0; z-index: 99;" aria-hidden="true">
+    <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
+   <div id="projectname">YACLib
+   </div>
+   <div id="projectbrief">C++ library for concurrent tasks execution</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Search');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function() { init_codefold(0); });
+/* @license-end */
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('type__traits__impl_8hpp_source.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">type_traits_impl.hpp</div></div>
+</div><!--header-->
+<div class="contents">
+<a href="type__traits__impl_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span> </div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &lt;<a class="code" href="fwd_8hpp.html">yaclib/fwd.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span> </div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &lt;iterator&gt;</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &lt;type_traits&gt;</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespaceyaclib_1_1detail.html">yaclib::detail</a> {</div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span>...&gt;</div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1Head.html">   11</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structyaclib_1_1detail_1_1Head.html">Head</a>;</div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span> </div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span>... <a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">Args</a>&gt;</div>
+<div class="foldopen" id="foldopen00014" data-start="{" data-end="};">
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1Head_3_01T_00_01Args_8_8_8_01_4.html">   14</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structyaclib_1_1detail_1_1Head.html">Head</a>&lt;T, <a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">Args</a>...&gt; <a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">final</a> {</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1Head_3_01T_00_01Args_8_8_8_01_4.html#ad76b66746674a2f90b648ea6c9cc8b75">   15</a></span>  <span class="keyword">using </span><a class="code hl_typedef" href="structyaclib_1_1detail_1_1Head_3_01T_00_01Args_8_8_8_01_4.html#ad76b66746674a2f90b648ea6c9cc8b75">Type</a> = T;</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>};</div>
+</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> <a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">Func</a>, <span class="keyword">typename</span>... <a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">Args</a>&gt;</div>
+<div class="foldopen" id="foldopen00019" data-start="{" data-end="};">
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1IsInvocable.html">   19</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structyaclib_1_1detail_1_1IsInvocable.html">IsInvocable</a> <a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">final</a> {</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1IsInvocable.html#ac5490fc260364912fc057c941906fa3a">   20</a></span>  <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> <a class="code hl_variable" href="structyaclib_1_1detail_1_1IsInvocable.html#ac5490fc260364912fc057c941906fa3a">Value</a> = std::is_invocable_v&lt;<a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">Func</a>, <a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">Args</a>...&gt;;</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>};</div>
+</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span> </div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Func&gt;</div>
+<div class="foldopen" id="foldopen00024" data-start="{" data-end="};">
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1IsInvocable_3_01Func_00_01void_01_4.html">   24</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structyaclib_1_1detail_1_1IsInvocable.html">IsInvocable</a>&lt;<a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">Func</a>, <a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">void</a>&gt; <a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">final</a> {</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1IsInvocable_3_01Func_00_01void_01_4.html#af6b72a431bb3bafb81ef601f774652b0">   25</a></span>  <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> <a class="code hl_variable" href="structyaclib_1_1detail_1_1IsInvocable.html#ac5490fc260364912fc057c941906fa3a">Value</a> = std::is_invocable_v&lt;Func&gt;;</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>};</div>
+</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span> </div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> <a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">Func</a>, <span class="keyword">typename</span>... <a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">Args</a>&gt;</div>
+<div class="foldopen" id="foldopen00029" data-start="{" data-end="};">
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1Invoke.html">   29</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structyaclib_1_1detail_1_1Invoke.html">Invoke</a> <a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">final</a> {</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1Invoke.html#a9257328002ca0842bbd42560f9ff61e5">   30</a></span>  <span class="keyword">using </span><a class="code hl_typedef" href="structyaclib_1_1detail_1_1Invoke.html#a9257328002ca0842bbd42560f9ff61e5">Type</a> = std::invoke_result_t&lt;<a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">Func</a>, <a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">Args</a>...&gt;;</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>};</div>
+</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span> </div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Func&gt;</div>
+<div class="foldopen" id="foldopen00034" data-start="{" data-end="};">
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1Invoke_3_01Func_00_01void_01_4.html">   34</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structyaclib_1_1detail_1_1Invoke.html">Invoke</a>&lt;<a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">Func</a>, <a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">void</a>&gt; <a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">final</a> {</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1Invoke_3_01Func_00_01void_01_4.html#a3cd441fa2fa4083d88ad04940d5eb09c">   35</a></span>  <span class="keyword">using </span><a class="code hl_typedef" href="structyaclib_1_1detail_1_1Invoke_3_01Func_00_01void_01_4.html#a3cd441fa2fa4083d88ad04940d5eb09c">Type</a> = std::invoke_result_t&lt;Func&gt;;</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>};</div>
+</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span> </div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span><span class="keyword">template</span> &lt;<span class="keyword">template</span> &lt;<span class="keyword">typename</span>...&gt; <span class="keyword">typename</span> <a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">Instance</a>, <span class="keyword">typename</span>...&gt;</div>
+<div class="foldopen" id="foldopen00039" data-start="{" data-end="};">
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1IsInstantiationOf.html">   39</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structyaclib_1_1detail_1_1IsInstantiationOf.html">IsInstantiationOf</a> <span class="keyword">final</span> {</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1IsInstantiationOf.html#a1153c9c1364a7d5c86d60e3734c4b42a">   40</a></span>  <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> Value = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>};</div>
+</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span> </div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span><span class="keyword">template</span> &lt;<span class="keyword">template</span> &lt;<span class="keyword">typename</span>...&gt; <span class="keyword">typename</span> <a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">Instance</a>, <span class="keyword">typename</span>... <a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">Args</a>&gt;</div>
+<div class="foldopen" id="foldopen00044" data-start="{" data-end="};">
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1IsInstantiationOf_3_01Instance_00_01Instance_3_01Args_8_8_8_01_4_01_4.html">   44</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structyaclib_1_1detail_1_1IsInstantiationOf.html">IsInstantiationOf</a>&lt;<a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">Instance</a>, <a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">Instance</a>&lt;<a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">Args</a>...&gt;&gt; <a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">final</a> {</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1IsInstantiationOf_3_01Instance_00_01Instance_3_01Args_8_8_8_01_4_01_4.html#a26b13d27c20d96e019480c8ec816c73e">   45</a></span>  <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> <a class="code hl_variable" href="structyaclib_1_1detail_1_1IsInstantiationOf.html#a1153c9c1364a7d5c86d60e3734c4b42a">Value</a> = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>};</div>
+</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span> </div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span><span class="keyword">template</span> &lt;<span class="keyword">template</span> &lt;<span class="keyword">typename</span>...&gt; <span class="keyword">typename</span> <a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">Instance</a>, <span class="keyword">typename</span> T&gt;</div>
+<div class="foldopen" id="foldopen00049" data-start="{" data-end="};">
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1InstantiationType.html">   49</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structyaclib_1_1detail_1_1InstantiationType.html">InstantiationType</a> <a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">final</a> {</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1InstantiationType.html#ae9bcf142e3eb4bbb25c549ca6595775f">   50</a></span>  <span class="keyword">using </span><a class="code hl_typedef" href="structyaclib_1_1detail_1_1InstantiationType.html#ae9bcf142e3eb4bbb25c549ca6595775f">Value</a> = T;</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>};</div>
+</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span> </div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span><span class="keyword">template</span> &lt;<span class="keyword">template</span> &lt;<span class="keyword">typename</span>...&gt; <span class="keyword">typename</span> <a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">Instance</a>, <span class="keyword">typename</span> V&gt;</div>
+<div class="foldopen" id="foldopen00054" data-start="{" data-end="};">
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1InstantiationType_3_01Instance_00_01Instance_3_01V_01_4_01_4.html">   54</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structyaclib_1_1detail_1_1InstantiationType.html">InstantiationType</a>&lt;<a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">Instance</a>, <a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">Instance</a>&lt;V&gt;&gt; <a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">final</a> {</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1InstantiationType_3_01Instance_00_01Instance_3_01V_01_4_01_4.html#af061907c55b66161746773ea6c322d5b">   55</a></span>  <span class="keyword">using </span><a class="code hl_typedef" href="structyaclib_1_1detail_1_1InstantiationType_3_01Instance_00_01Instance_3_01V_01_4_01_4.html#af061907c55b66161746773ea6c322d5b">Value</a> = V;</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>};</div>
+</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span> </div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span><span class="keyword">template</span> &lt;<span class="keyword">template</span> &lt;<span class="keyword">typename</span>...&gt; <span class="keyword">typename</span> <a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">Instance</a>, <span class="keyword">typename</span> T&gt;</div>
+<div class="foldopen" id="foldopen00059" data-start="{" data-end="};">
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1InstantiationTypes.html">   59</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structyaclib_1_1detail_1_1InstantiationTypes.html">InstantiationTypes</a> <a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">final</a> {</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1InstantiationTypes.html#ad68658a1a421f91813941dba3d877244">   60</a></span>  <span class="keyword">using </span><a class="code hl_typedef" href="structyaclib_1_1detail_1_1InstantiationTypes.html#ad68658a1a421f91813941dba3d877244">Value</a> = T;</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1InstantiationTypes.html#a122d30780e747cf6a37bdc1a7a757c22">   61</a></span>  <span class="keyword">using </span><a class="code hl_typedef" href="structyaclib_1_1detail_1_1InstantiationTypes.html#a122d30780e747cf6a37bdc1a7a757c22">Trait</a> = T;</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>};</div>
+</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span> </div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span><span class="keyword">template</span> &lt;<span class="keyword">template</span> &lt;<span class="keyword">typename</span>...&gt; <span class="keyword">typename</span> <a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">Instance</a>, <span class="keyword">typename</span> V, <span class="keyword">typename</span> T&gt;</div>
+<div class="foldopen" id="foldopen00065" data-start="{" data-end="};">
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1InstantiationTypes_3_01Instance_00_01Instance_3_01V_00_01T_01_4_01_4.html">   65</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structyaclib_1_1detail_1_1InstantiationTypes.html">InstantiationTypes</a>&lt;<a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">Instance</a>, <a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">Instance</a>&lt;V, T&gt;&gt; <a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">final</a> {</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1InstantiationTypes_3_01Instance_00_01Instance_3_01V_00_01T_01_4_01_4.html#aa247a28321c7e25a4a6252449f590688">   66</a></span>  <span class="keyword">using </span><a class="code hl_typedef" href="structyaclib_1_1detail_1_1InstantiationTypes_3_01Instance_00_01Instance_3_01V_00_01T_01_4_01_4.html#aa247a28321c7e25a4a6252449f590688">Value</a> = V;</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1InstantiationTypes_3_01Instance_00_01Instance_3_01V_00_01T_01_4_01_4.html#aacea861ca96f625738553703f14f2ce5">   67</a></span>  <span class="keyword">using </span><a class="code hl_typedef" href="structyaclib_1_1detail_1_1InstantiationTypes_3_01Instance_00_01Instance_3_01V_00_01T_01_4_01_4.html#aacea861ca96f625738553703f14f2ce5">Trait</a> = T;</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>};</div>
+</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span> </div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
+<div class="foldopen" id="foldopen00071" data-start="{" data-end="};">
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1AsyncTypes.html">   71</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structyaclib_1_1detail_1_1AsyncTypes.html">AsyncTypes</a> <a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">final</a> {</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1AsyncTypes.html#a07aeccc73cc2445dba4bf0cb6c81282a">   72</a></span>  <span class="keyword">using </span><a class="code hl_typedef" href="structyaclib_1_1detail_1_1AsyncTypes.html#a07aeccc73cc2445dba4bf0cb6c81282a">Value</a> = T;</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1AsyncTypes.html#a2f4fd12e7f498275d30de16c08c07dde">   73</a></span>  <span class="keyword">using </span><a class="code hl_typedef" href="structyaclib_1_1detail_1_1AsyncTypes.html#a2f4fd12e7f498275d30de16c08c07dde">Trait</a> = T;</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>};</div>
+</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span> </div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> V, <span class="keyword">typename</span> T&gt;</div>
+<div class="foldopen" id="foldopen00077" data-start="{" data-end="};">
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1AsyncTypes_3_01FutureBase_3_01V_00_01T_01_4_01_4.html">   77</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structyaclib_1_1detail_1_1AsyncTypes.html">AsyncTypes</a>&lt;<a class="code hl_class" href="classyaclib_1_1FutureBase.html">FutureBase</a>&lt;V, T&gt;&gt; <a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">final</a> {</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1AsyncTypes_3_01FutureBase_3_01V_00_01T_01_4_01_4.html#aba336982ee59b41b6373ded538bce3a8">   78</a></span>  <span class="keyword">using </span><a class="code hl_typedef" href="structyaclib_1_1detail_1_1AsyncTypes_3_01FutureBase_3_01V_00_01T_01_4_01_4.html#aba336982ee59b41b6373ded538bce3a8">Value</a> = V;</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1AsyncTypes_3_01FutureBase_3_01V_00_01T_01_4_01_4.html#a06cf8cebfd68ccd5fbde65313c4c1df2">   79</a></span>  <span class="keyword">using </span><a class="code hl_typedef" href="structyaclib_1_1detail_1_1AsyncTypes_3_01FutureBase_3_01V_00_01T_01_4_01_4.html#a06cf8cebfd68ccd5fbde65313c4c1df2">Trait</a> = T;</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>};</div>
+</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span> </div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> V, <span class="keyword">typename</span> T&gt;</div>
+<div class="foldopen" id="foldopen00083" data-start="{" data-end="};">
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1AsyncTypes_3_01Future_3_01V_00_01T_01_4_01_4.html">   83</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structyaclib_1_1detail_1_1AsyncTypes.html">AsyncTypes</a>&lt;<a class="code hl_class" href="classyaclib_1_1Future.html">Future</a>&lt;V, T&gt;&gt; <a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">final</a> {</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1AsyncTypes_3_01Future_3_01V_00_01T_01_4_01_4.html#a0379a34cdcd1c3280d6b6d39c0e446bd">   84</a></span>  <span class="keyword">using </span><a class="code hl_typedef" href="structyaclib_1_1detail_1_1AsyncTypes_3_01Future_3_01V_00_01T_01_4_01_4.html#a0379a34cdcd1c3280d6b6d39c0e446bd">Value</a> = V;</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1AsyncTypes_3_01Future_3_01V_00_01T_01_4_01_4.html#aa222529b7e73835a2b64f8360fcc859f">   85</a></span>  <span class="keyword">using </span><a class="code hl_typedef" href="structyaclib_1_1detail_1_1AsyncTypes_3_01Future_3_01V_00_01T_01_4_01_4.html#aa222529b7e73835a2b64f8360fcc859f">Trait</a> = T;</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>};</div>
+</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span> </div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> V, <span class="keyword">typename</span> T&gt;</div>
+<div class="foldopen" id="foldopen00089" data-start="{" data-end="};">
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1AsyncTypes_3_01FutureOn_3_01V_00_01T_01_4_01_4.html">   89</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structyaclib_1_1detail_1_1AsyncTypes.html">AsyncTypes</a>&lt;<a class="code hl_class" href="classyaclib_1_1FutureOn.html">FutureOn</a>&lt;V, T&gt;&gt; <a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">final</a> {</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1AsyncTypes_3_01FutureOn_3_01V_00_01T_01_4_01_4.html#a8b17f5dab283b8d115e2b9fae8622fe9">   90</a></span>  <span class="keyword">using </span><a class="code hl_typedef" href="structyaclib_1_1detail_1_1AsyncTypes_3_01FutureOn_3_01V_00_01T_01_4_01_4.html#a8b17f5dab283b8d115e2b9fae8622fe9">Value</a> = V;</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1AsyncTypes_3_01FutureOn_3_01V_00_01T_01_4_01_4.html#ab7df871cd8298557f72234a17b6cb7ec">   91</a></span>  <span class="keyword">using </span><a class="code hl_typedef" href="structyaclib_1_1detail_1_1AsyncTypes_3_01FutureOn_3_01V_00_01T_01_4_01_4.html#ab7df871cd8298557f72234a17b6cb7ec">Trait</a> = T;</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>};</div>
+</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span> </div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> V, <span class="keyword">typename</span> T&gt;</div>
+<div class="foldopen" id="foldopen00095" data-start="{" data-end="};">
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1AsyncTypes_3_01SharedFutureBase_3_01V_00_01T_01_4_01_4.html">   95</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structyaclib_1_1detail_1_1AsyncTypes.html">AsyncTypes</a>&lt;<a class="code hl_class" href="classyaclib_1_1SharedFutureBase.html">SharedFutureBase</a>&lt;V, T&gt;&gt; <a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">final</a> {</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1AsyncTypes_3_01SharedFutureBase_3_01V_00_01T_01_4_01_4.html#abd44da038df304a51440600c4375ba93">   96</a></span>  <span class="keyword">using </span><a class="code hl_typedef" href="structyaclib_1_1detail_1_1AsyncTypes_3_01SharedFutureBase_3_01V_00_01T_01_4_01_4.html#abd44da038df304a51440600c4375ba93">Value</a> = V;</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1AsyncTypes_3_01SharedFutureBase_3_01V_00_01T_01_4_01_4.html#a624b535aab7ab08bea28e42c25abb480">   97</a></span>  <span class="keyword">using </span><a class="code hl_typedef" href="structyaclib_1_1detail_1_1AsyncTypes_3_01SharedFutureBase_3_01V_00_01T_01_4_01_4.html#a624b535aab7ab08bea28e42c25abb480">Trait</a> = T;</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>};</div>
+</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span> </div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> V, <span class="keyword">typename</span> T&gt;</div>
+<div class="foldopen" id="foldopen00101" data-start="{" data-end="};">
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1AsyncTypes_3_01SharedFuture_3_01V_00_01T_01_4_01_4.html">  101</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structyaclib_1_1detail_1_1AsyncTypes.html">AsyncTypes</a>&lt;<a class="code hl_class" href="classyaclib_1_1SharedFuture.html">SharedFuture</a>&lt;V, T&gt;&gt; <a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">final</a> {</div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1AsyncTypes_3_01SharedFuture_3_01V_00_01T_01_4_01_4.html#a4fa191e93e621aafe6de4d4a6fbbec35">  102</a></span>  <span class="keyword">using </span><a class="code hl_typedef" href="structyaclib_1_1detail_1_1AsyncTypes_3_01SharedFuture_3_01V_00_01T_01_4_01_4.html#a4fa191e93e621aafe6de4d4a6fbbec35">Value</a> = V;</div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1AsyncTypes_3_01SharedFuture_3_01V_00_01T_01_4_01_4.html#ac90c5e530be453c645c06cf2766608b3">  103</a></span>  <span class="keyword">using </span><a class="code hl_typedef" href="structyaclib_1_1detail_1_1AsyncTypes_3_01SharedFuture_3_01V_00_01T_01_4_01_4.html#ac90c5e530be453c645c06cf2766608b3">Trait</a> = T;</div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>};</div>
+</div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span> </div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> V, <span class="keyword">typename</span> T&gt;</div>
+<div class="foldopen" id="foldopen00107" data-start="{" data-end="};">
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1AsyncTypes_3_01SharedFutureOn_3_01V_00_01T_01_4_01_4.html">  107</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structyaclib_1_1detail_1_1AsyncTypes.html">AsyncTypes</a>&lt;<a class="code hl_class" href="classyaclib_1_1SharedFutureOn.html">SharedFutureOn</a>&lt;V, T&gt;&gt; <a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">final</a> {</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1AsyncTypes_3_01SharedFutureOn_3_01V_00_01T_01_4_01_4.html#a49e92f783f3806da995148e8a54529f4">  108</a></span>  <span class="keyword">using </span><a class="code hl_typedef" href="structyaclib_1_1detail_1_1AsyncTypes_3_01SharedFutureOn_3_01V_00_01T_01_4_01_4.html#a49e92f783f3806da995148e8a54529f4">Value</a> = V;</div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1AsyncTypes_3_01SharedFutureOn_3_01V_00_01T_01_4_01_4.html#a96e95b1bd4e385cac2c49bf35aefdcfc">  109</a></span>  <span class="keyword">using </span><a class="code hl_typedef" href="structyaclib_1_1detail_1_1AsyncTypes_3_01SharedFutureOn_3_01V_00_01T_01_4_01_4.html#a96e95b1bd4e385cac2c49bf35aefdcfc">Trait</a> = T;</div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>};</div>
+</div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span> </div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> It, <span class="keyword">typename</span> Tag, <span class="keyword">typename</span> = std::<span class="keywordtype">void</span>_t&lt;&gt;&gt;</div>
+<div class="foldopen" id="foldopen00113" data-start="{" data-end="};">
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1HasIteratorCategory.html">  113</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structyaclib_1_1detail_1_1HasIteratorCategory.html">HasIteratorCategory</a> {</div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1HasIteratorCategory.html#a113895bd41f431c7a7a6d9129b4c4078">  114</a></span>  <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> <a class="code hl_variable" href="structyaclib_1_1detail_1_1HasIteratorCategory.html#a113895bd41f431c7a7a6d9129b4c4078">Value</a> = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>};</div>
+</div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span> </div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> It, <span class="keyword">typename</span> Tag&gt;</div>
+<div class="foldopen" id="foldopen00118" data-start="{" data-end="};">
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1HasIteratorCategory_3_01It_00_01Tag_00_01std_1_1void__t_3_01typename_0883969a6f294383da0b243abcba8d123.html">  118</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structyaclib_1_1detail_1_1HasIteratorCategory.html">HasIteratorCategory</a>&lt;It, <a class="code hl_function" href="namespaceyaclib_1_1detail.html#a2d44bdd8a476b54828d40bfa87c3350e">Tag</a>, std::<a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">void_t</a>&lt;typename std::iterator_traits&lt;It&gt;::iterator_category&gt;&gt; <a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">final</a> {</div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1HasIteratorCategory_3_01It_00_01Tag_00_01std_1_1void__t_3_01typename_0883969a6f294383da0b243abcba8d123.html#a46facb8f53eba5d27e8c4a7e4b456527">  119</a></span>  <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> <a class="code hl_variable" href="structyaclib_1_1detail_1_1HasIteratorCategory.html#a113895bd41f431c7a7a6d9129b4c4078">Value</a> = std::is_base_of_v&lt;Tag, typename std::iterator_traits&lt;It&gt;::iterator_category&gt;;</div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>};</div>
+</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span> </div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> It, <span class="keyword">typename</span> = std::<span class="keywordtype">void</span>_t&lt;&gt;&gt;</div>
+<div class="foldopen" id="foldopen00123" data-start="{" data-end="};">
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1IsInputIterator.html">  123</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structyaclib_1_1detail_1_1IsInputIterator.html">IsInputIterator</a> {</div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1IsInputIterator.html#af6a9e7de1707d9ad269df712a1a935a7">  124</a></span>  <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> <a class="code hl_variable" href="structyaclib_1_1detail_1_1IsInputIterator.html#af6a9e7de1707d9ad269df712a1a935a7">Value</a> = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>};</div>
+</div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span> </div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> It&gt;</div>
+<div class="foldopen" id="foldopen00128" data-start="{" data-end="};">
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1IsInputIterator_3_01It_00_01std_1_1void__t_3_01decltype_07_5std_1_1dec75dd5bceab3732527b9421bf00c86fc1.html">  128</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structyaclib_1_1detail_1_1IsInputIterator.html">IsInputIterator</a>&lt;It, std::<a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">void_t</a>&lt;decltype(*std::declval&lt;const It&amp;&gt;()), decltype(++std::declval&lt;It&amp;&gt;())&gt;&gt; <a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">final</a> {</div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1IsInputIterator_3_01It_00_01std_1_1void__t_3_01decltype_07_5std_1_1dec75dd5bceab3732527b9421bf00c86fc1.html#a4f749800978d3aad9dde00192c001db6">  129</a></span>  <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> <a class="code hl_variable" href="structyaclib_1_1detail_1_1IsInputIterator.html#af6a9e7de1707d9ad269df712a1a935a7">Value</a> = <a class="code hl_struct" href="structyaclib_1_1detail_1_1HasIteratorCategory.html">HasIteratorCategory&lt;It, std::input_iterator_tag&gt;::Value</a>;</div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>};</div>
+</div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span> </div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Sentinel, <span class="keyword">typename</span> It, <span class="keyword">typename</span> = std::<span class="keywordtype">void</span>_t&lt;&gt;&gt;</div>
+<div class="foldopen" id="foldopen00133" data-start="{" data-end="};">
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1IsSentinelFor.html">  133</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structyaclib_1_1detail_1_1IsSentinelFor.html">IsSentinelFor</a> {</div>
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1IsSentinelFor.html#a1c0365c005f1055ebc8bbddfa9891331">  134</a></span>  <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> <a class="code hl_variable" href="structyaclib_1_1detail_1_1IsSentinelFor.html#a1c0365c005f1055ebc8bbddfa9891331">Value</a> = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>};</div>
+</div>
+<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span> </div>
+<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Sentinel, <span class="keyword">typename</span> It&gt;</div>
+<div class="foldopen" id="foldopen00138" data-start="{" data-end="};">
+<div class="line"><a id="l00138" name="l00138"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1IsSentinelFor_3_01Sentinel_00_01It_00_01std_1_1void__t_3_01decltype_070d910b23b8327bb3aa8cd74e6f4fb7d7.html">  138</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structyaclib_1_1detail_1_1IsSentinelFor.html">IsSentinelFor</a>&lt;<a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">Sentinel</a>, It,</div>
+<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span>                     std::<a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">void_t</a>&lt;decltype(std::declval&lt;const It&amp;&gt;() == std::declval&lt;const Sentinel&amp;&gt;())&gt;&gt; {</div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1IsSentinelFor_3_01Sentinel_00_01It_00_01std_1_1void__t_3_01decltype_070d910b23b8327bb3aa8cd74e6f4fb7d7.html#a0f6032ffb331c159d497694ad70c2946">  140</a></span>  <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> <a class="code hl_variable" href="structyaclib_1_1detail_1_1IsSentinelFor.html#a1c0365c005f1055ebc8bbddfa9891331">Value</a> = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span>};</div>
+</div>
+<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span> </div>
+<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> It, <span class="keyword">typename</span> Sentinel&gt;</div>
+<div class="foldopen" id="foldopen00144" data-start="{" data-end="};">
+<div class="line"><a id="l00144" name="l00144"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1IsInputRangePair.html">  144</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structyaclib_1_1detail_1_1IsInputRangePair.html">IsInputRangePair</a> {</div>
+<div class="line"><a id="l00145" name="l00145"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1IsInputRangePair.html#ab8e8c7eca3acc868d83fa19a1262ce95">  145</a></span>  <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> <a class="code hl_variable" href="structyaclib_1_1detail_1_1IsInputRangePair.html#ab8e8c7eca3acc868d83fa19a1262ce95">Value</a> = <a class="code hl_struct" href="structyaclib_1_1detail_1_1IsInputIterator.html">IsInputIterator&lt;It&gt;::Value</a> &amp;&amp; <a class="code hl_struct" href="structyaclib_1_1detail_1_1IsSentinelFor.html">IsSentinelFor&lt;Sentinel, It&gt;::Value</a>;</div>
+<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span>};</div>
+</div>
+<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span> </div>
+<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Range&gt;</div>
+<div class="line"><a id="l00149" name="l00149"></a><span class="lineno"><a class="line" href="namespaceyaclib_1_1detail.html#ab778a303c0c18875d37a0ff8979f2128">  149</a></span><span class="keyword">using </span><a class="code hl_typedef" href="namespaceyaclib_1_1detail.html#ab778a303c0c18875d37a0ff8979f2128">RangeIterator</a> = std::decay_t&lt;decltype(std::begin(std::declval&lt;Range&amp;&gt;()))&gt;;</div>
+<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span> </div>
+<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Range&gt;</div>
+<div class="line"><a id="l00152" name="l00152"></a><span class="lineno"><a class="line" href="namespaceyaclib_1_1detail.html#acd3eef3210785212ac53eccb7d7d7a01">  152</a></span><span class="keyword">using </span><a class="code hl_typedef" href="namespaceyaclib_1_1detail.html#acd3eef3210785212ac53eccb7d7d7a01">RangeSentinel</a> = std::decay_t&lt;decltype(std::end(std::declval&lt;Range&amp;&gt;()))&gt;;</div>
+<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span> </div>
+<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Range, <span class="keyword">typename</span> = std::<span class="keywordtype">void</span>_t&lt;&gt;&gt;</div>
+<div class="foldopen" id="foldopen00155" data-start="{" data-end="};">
+<div class="line"><a id="l00155" name="l00155"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1IsInputRange.html">  155</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structyaclib_1_1detail_1_1IsInputRange.html">IsInputRange</a> {</div>
+<div class="line"><a id="l00156" name="l00156"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1IsInputRange.html#a62d2e7828a34a3a535cea2ff649c73e4">  156</a></span>  <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> <a class="code hl_variable" href="structyaclib_1_1detail_1_1IsInputRange.html#a62d2e7828a34a3a535cea2ff649c73e4">Value</a> = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>};</div>
+</div>
+<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span> </div>
+<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Range&gt;</div>
+<div class="foldopen" id="foldopen00160" data-start="{" data-end="};">
+<div class="line"><a id="l00160" name="l00160"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1IsInputRange_3_01Range_00_01std_1_1void__t_3_01RangeIterator_3_01Rangeca03f864bbe3aa012b5e88585d92560a.html">  160</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structyaclib_1_1detail_1_1IsInputRange.html">IsInputRange</a>&lt;<a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">Range</a>, std::<a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">void_t</a>&lt;RangeIterator&lt;Range&gt;, RangeSentinel&lt;Range&gt;&gt;&gt; {</div>
+<div class="line"><a id="l00161" name="l00161"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1IsInputRange_3_01Range_00_01std_1_1void__t_3_01RangeIterator_3_01Rangeca03f864bbe3aa012b5e88585d92560a.html#a3d39b8f21772600a4349e1d9e2912290">  161</a></span>  <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> <a class="code hl_variable" href="structyaclib_1_1detail_1_1IsInputRange.html#a62d2e7828a34a3a535cea2ff649c73e4">Value</a> = <a class="code hl_struct" href="structyaclib_1_1detail_1_1IsInputRangePair.html">IsInputRangePair&lt;RangeIterator&lt;Range&gt;</a>, <a class="code hl_typedef" href="namespaceyaclib_1_1detail.html#acd3eef3210785212ac53eccb7d7d7a01">RangeSentinel&lt;Range&gt;</a>&gt;<a class="code hl_variable" href="structyaclib_1_1detail_1_1IsInputRange.html#a62d2e7828a34a3a535cea2ff649c73e4">::Value</a>;</div>
+<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>};</div>
+</div>
+<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span> </div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> It, <span class="keyword">typename</span> Sentinel, <span class="keyword">typename</span> = std::<span class="keywordtype">void</span>_t&lt;&gt;&gt;</div>
+<div class="foldopen" id="foldopen00165" data-start="{" data-end="};">
+<div class="line"><a id="l00165" name="l00165"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1HasConstantTimeDistance.html">  165</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structyaclib_1_1detail_1_1HasConstantTimeDistance.html">HasConstantTimeDistance</a> {</div>
+<div class="line"><a id="l00166" name="l00166"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1HasConstantTimeDistance.html#a5f51d472be06d904b747567a813c9e72">  166</a></span>  <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> <a class="code hl_variable" href="structyaclib_1_1detail_1_1HasConstantTimeDistance.html#a5f51d472be06d904b747567a813c9e72">Value</a> = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>};</div>
+</div>
+<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span> </div>
+<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> It, <span class="keyword">typename</span> Sentinel&gt;</div>
+<div class="foldopen" id="foldopen00170" data-start="{" data-end="};">
+<div class="line"><a id="l00170" name="l00170"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1HasConstantTimeDistance_3_01It_00_01Sentinel_00_01std_1_1void__t_3_01d28cb8aba34adfdab112483c96d33a93d.html">  170</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structyaclib_1_1detail_1_1HasConstantTimeDistance.html">HasConstantTimeDistance</a>&lt;It, <a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">Sentinel</a>,</div>
+<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span>                               std::<a class="code hl_function" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">void_t</a>&lt;decltype(std::declval&lt;const Sentinel&amp;&gt;() - std::declval&lt;const It&amp;&gt;()),</div>
+<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>                                           decltype(std::declval&lt;const It&amp;&gt;() - std::declval&lt;const Sentinel&amp;&gt;())&gt;&gt; {</div>
+<div class="line"><a id="l00173" name="l00173"></a><span class="lineno"><a class="line" href="structyaclib_1_1detail_1_1HasConstantTimeDistance_3_01It_00_01Sentinel_00_01std_1_1void__t_3_01d28cb8aba34adfdab112483c96d33a93d.html#ad58007b159c6dac475997280bfad9eac">  173</a></span>  <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> <a class="code hl_variable" href="structyaclib_1_1detail_1_1HasConstantTimeDistance.html#a5f51d472be06d904b747567a813c9e72">Value</a> = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span>};</div>
+</div>
+<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span> </div>
+<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span>}  <span class="comment">// namespace yaclib::detail</span></div>
+<div class="ttc" id="aclassyaclib_1_1FutureBase_html"><div class="ttname"><a href="classyaclib_1_1FutureBase.html">yaclib::FutureBase</a></div><div class="ttdoc">Provides a mechanism to access the result of async operations.</div><div class="ttdef"><b>Definition</b> <a href="async_2future_8hpp_source.html#l00021">future.hpp:21</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1FutureOn_html"><div class="ttname"><a href="classyaclib_1_1FutureOn.html">yaclib::FutureOn</a></div><div class="ttdoc">Provides a mechanism to access the result of async operations.</div><div class="ttdef"><b>Definition</b> <a href="async_2future_8hpp_source.html#l00248">future.hpp:248</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1Future_html"><div class="ttname"><a href="classyaclib_1_1Future.html">yaclib::Future</a></div><div class="ttdoc">Provides a mechanism to access the result of async operations.</div><div class="ttdef"><b>Definition</b> <a href="async_2future_8hpp_source.html#l00214">future.hpp:214</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1SharedFutureBase_html"><div class="ttname"><a href="classyaclib_1_1SharedFutureBase.html">yaclib::SharedFutureBase</a></div><div class="ttdef"><b>Definition</b> <a href="async_2shared__future_8hpp_source.html#l00014">shared_future.hpp:14</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1SharedFutureOn_html"><div class="ttname"><a href="classyaclib_1_1SharedFutureOn.html">yaclib::SharedFutureOn</a></div><div class="ttdef"><b>Definition</b> <a href="async_2shared__future_8hpp_source.html#l00143">shared_future.hpp:143</a></div></div>
+<div class="ttc" id="aclassyaclib_1_1SharedFuture_html"><div class="ttname"><a href="classyaclib_1_1SharedFuture.html">yaclib::SharedFuture</a></div><div class="ttdef"><b>Definition</b> <a href="async_2shared__future_8hpp_source.html#l00123">shared_future.hpp:123</a></div></div>
+<div class="ttc" id="afwd_8hpp_html"><div class="ttname"><a href="fwd_8hpp.html">fwd.hpp</a></div></div>
+<div class="ttc" id="anamespaceyaclib_1_1detail_html"><div class="ttname"><a href="namespaceyaclib_1_1detail.html">yaclib::detail</a></div><div class="ttdef"><b>Definition</b> <a href="base__core_8hpp_source.html#l00015">base_core.hpp:15</a></div></div>
+<div class="ttc" id="anamespaceyaclib_1_1detail_html_a2d44bdd8a476b54828d40bfa87c3350e"><div class="ttname"><a href="namespaceyaclib_1_1detail.html#a2d44bdd8a476b54828d40bfa87c3350e">yaclib::detail::Tag</a></div><div class="ttdeci">constexpr char Tag() noexcept</div><div class="ttdef"><b>Definition</b> <a href="core_8hpp_source.html#l00312">core.hpp:312</a></div></div>
+<div class="ttc" id="anamespaceyaclib_1_1detail_html_ab778a303c0c18875d37a0ff8979f2128"><div class="ttname"><a href="namespaceyaclib_1_1detail.html#ab778a303c0c18875d37a0ff8979f2128">yaclib::detail::RangeIterator</a></div><div class="ttdeci">std::decay_t&lt; decltype(std::begin(std::declval&lt; Range &amp; &gt;()))&gt; RangeIterator</div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00149">type_traits_impl.hpp:149</a></div></div>
+<div class="ttc" id="anamespaceyaclib_1_1detail_html_acd3eef3210785212ac53eccb7d7d7a01"><div class="ttname"><a href="namespaceyaclib_1_1detail.html#acd3eef3210785212ac53eccb7d7d7a01">yaclib::detail::RangeSentinel</a></div><div class="ttdeci">std::decay_t&lt; decltype(std::end(std::declval&lt; Range &amp; &gt;()))&gt; RangeSentinel</div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00152">type_traits_impl.hpp:152</a></div></div>
+<div class="ttc" id="anamespaceyaclib_html_a00c2be097d083519b327295f4f271568"><div class="ttname"><a href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">yaclib::MakeContract</a></div><div class="ttdeci">Contract&lt; V, T &gt; MakeContract()</div><div class="ttdoc">Creates related future and promise.</div><div class="ttdef"><b>Definition</b> <a href="contract_8hpp_source.html#l00025">contract.hpp:25</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1AsyncTypes_3_01FutureBase_3_01V_00_01T_01_4_01_4_html_a06cf8cebfd68ccd5fbde65313c4c1df2"><div class="ttname"><a href="structyaclib_1_1detail_1_1AsyncTypes_3_01FutureBase_3_01V_00_01T_01_4_01_4.html#a06cf8cebfd68ccd5fbde65313c4c1df2">yaclib::detail::AsyncTypes&lt; FutureBase&lt; V, T &gt; &gt;::Trait</a></div><div class="ttdeci">T Trait</div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00079">type_traits_impl.hpp:79</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1AsyncTypes_3_01FutureBase_3_01V_00_01T_01_4_01_4_html_aba336982ee59b41b6373ded538bce3a8"><div class="ttname"><a href="structyaclib_1_1detail_1_1AsyncTypes_3_01FutureBase_3_01V_00_01T_01_4_01_4.html#aba336982ee59b41b6373ded538bce3a8">yaclib::detail::AsyncTypes&lt; FutureBase&lt; V, T &gt; &gt;::Value</a></div><div class="ttdeci">V Value</div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00078">type_traits_impl.hpp:78</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1AsyncTypes_3_01FutureOn_3_01V_00_01T_01_4_01_4_html_a8b17f5dab283b8d115e2b9fae8622fe9"><div class="ttname"><a href="structyaclib_1_1detail_1_1AsyncTypes_3_01FutureOn_3_01V_00_01T_01_4_01_4.html#a8b17f5dab283b8d115e2b9fae8622fe9">yaclib::detail::AsyncTypes&lt; FutureOn&lt; V, T &gt; &gt;::Value</a></div><div class="ttdeci">V Value</div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00090">type_traits_impl.hpp:90</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1AsyncTypes_3_01FutureOn_3_01V_00_01T_01_4_01_4_html_ab7df871cd8298557f72234a17b6cb7ec"><div class="ttname"><a href="structyaclib_1_1detail_1_1AsyncTypes_3_01FutureOn_3_01V_00_01T_01_4_01_4.html#ab7df871cd8298557f72234a17b6cb7ec">yaclib::detail::AsyncTypes&lt; FutureOn&lt; V, T &gt; &gt;::Trait</a></div><div class="ttdeci">T Trait</div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00091">type_traits_impl.hpp:91</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1AsyncTypes_3_01Future_3_01V_00_01T_01_4_01_4_html_a0379a34cdcd1c3280d6b6d39c0e446bd"><div class="ttname"><a href="structyaclib_1_1detail_1_1AsyncTypes_3_01Future_3_01V_00_01T_01_4_01_4.html#a0379a34cdcd1c3280d6b6d39c0e446bd">yaclib::detail::AsyncTypes&lt; Future&lt; V, T &gt; &gt;::Value</a></div><div class="ttdeci">V Value</div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00084">type_traits_impl.hpp:84</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1AsyncTypes_3_01Future_3_01V_00_01T_01_4_01_4_html_aa222529b7e73835a2b64f8360fcc859f"><div class="ttname"><a href="structyaclib_1_1detail_1_1AsyncTypes_3_01Future_3_01V_00_01T_01_4_01_4.html#aa222529b7e73835a2b64f8360fcc859f">yaclib::detail::AsyncTypes&lt; Future&lt; V, T &gt; &gt;::Trait</a></div><div class="ttdeci">T Trait</div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00085">type_traits_impl.hpp:85</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1AsyncTypes_3_01SharedFutureBase_3_01V_00_01T_01_4_01_4_html_a624b535aab7ab08bea28e42c25abb480"><div class="ttname"><a href="structyaclib_1_1detail_1_1AsyncTypes_3_01SharedFutureBase_3_01V_00_01T_01_4_01_4.html#a624b535aab7ab08bea28e42c25abb480">yaclib::detail::AsyncTypes&lt; SharedFutureBase&lt; V, T &gt; &gt;::Trait</a></div><div class="ttdeci">T Trait</div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00097">type_traits_impl.hpp:97</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1AsyncTypes_3_01SharedFutureBase_3_01V_00_01T_01_4_01_4_html_abd44da038df304a51440600c4375ba93"><div class="ttname"><a href="structyaclib_1_1detail_1_1AsyncTypes_3_01SharedFutureBase_3_01V_00_01T_01_4_01_4.html#abd44da038df304a51440600c4375ba93">yaclib::detail::AsyncTypes&lt; SharedFutureBase&lt; V, T &gt; &gt;::Value</a></div><div class="ttdeci">V Value</div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00096">type_traits_impl.hpp:96</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1AsyncTypes_3_01SharedFutureOn_3_01V_00_01T_01_4_01_4_html_a49e92f783f3806da995148e8a54529f4"><div class="ttname"><a href="structyaclib_1_1detail_1_1AsyncTypes_3_01SharedFutureOn_3_01V_00_01T_01_4_01_4.html#a49e92f783f3806da995148e8a54529f4">yaclib::detail::AsyncTypes&lt; SharedFutureOn&lt; V, T &gt; &gt;::Value</a></div><div class="ttdeci">V Value</div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00108">type_traits_impl.hpp:108</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1AsyncTypes_3_01SharedFutureOn_3_01V_00_01T_01_4_01_4_html_a96e95b1bd4e385cac2c49bf35aefdcfc"><div class="ttname"><a href="structyaclib_1_1detail_1_1AsyncTypes_3_01SharedFutureOn_3_01V_00_01T_01_4_01_4.html#a96e95b1bd4e385cac2c49bf35aefdcfc">yaclib::detail::AsyncTypes&lt; SharedFutureOn&lt; V, T &gt; &gt;::Trait</a></div><div class="ttdeci">T Trait</div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00109">type_traits_impl.hpp:109</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1AsyncTypes_3_01SharedFuture_3_01V_00_01T_01_4_01_4_html_a4fa191e93e621aafe6de4d4a6fbbec35"><div class="ttname"><a href="structyaclib_1_1detail_1_1AsyncTypes_3_01SharedFuture_3_01V_00_01T_01_4_01_4.html#a4fa191e93e621aafe6de4d4a6fbbec35">yaclib::detail::AsyncTypes&lt; SharedFuture&lt; V, T &gt; &gt;::Value</a></div><div class="ttdeci">V Value</div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00102">type_traits_impl.hpp:102</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1AsyncTypes_3_01SharedFuture_3_01V_00_01T_01_4_01_4_html_ac90c5e530be453c645c06cf2766608b3"><div class="ttname"><a href="structyaclib_1_1detail_1_1AsyncTypes_3_01SharedFuture_3_01V_00_01T_01_4_01_4.html#ac90c5e530be453c645c06cf2766608b3">yaclib::detail::AsyncTypes&lt; SharedFuture&lt; V, T &gt; &gt;::Trait</a></div><div class="ttdeci">T Trait</div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00103">type_traits_impl.hpp:103</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1AsyncTypes_html"><div class="ttname"><a href="structyaclib_1_1detail_1_1AsyncTypes.html">yaclib::detail::AsyncTypes</a></div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00071">type_traits_impl.hpp:71</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1AsyncTypes_html_a07aeccc73cc2445dba4bf0cb6c81282a"><div class="ttname"><a href="structyaclib_1_1detail_1_1AsyncTypes.html#a07aeccc73cc2445dba4bf0cb6c81282a">yaclib::detail::AsyncTypes::Value</a></div><div class="ttdeci">T Value</div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00072">type_traits_impl.hpp:72</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1AsyncTypes_html_a2f4fd12e7f498275d30de16c08c07dde"><div class="ttname"><a href="structyaclib_1_1detail_1_1AsyncTypes.html#a2f4fd12e7f498275d30de16c08c07dde">yaclib::detail::AsyncTypes::Trait</a></div><div class="ttdeci">T Trait</div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00073">type_traits_impl.hpp:73</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1HasConstantTimeDistance_html"><div class="ttname"><a href="structyaclib_1_1detail_1_1HasConstantTimeDistance.html">yaclib::detail::HasConstantTimeDistance</a></div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00165">type_traits_impl.hpp:165</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1HasConstantTimeDistance_html_a5f51d472be06d904b747567a813c9e72"><div class="ttname"><a href="structyaclib_1_1detail_1_1HasConstantTimeDistance.html#a5f51d472be06d904b747567a813c9e72">yaclib::detail::HasConstantTimeDistance::Value</a></div><div class="ttdeci">static constexpr bool Value</div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00166">type_traits_impl.hpp:166</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1HasIteratorCategory_html"><div class="ttname"><a href="structyaclib_1_1detail_1_1HasIteratorCategory.html">yaclib::detail::HasIteratorCategory</a></div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00113">type_traits_impl.hpp:113</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1HasIteratorCategory_html_a113895bd41f431c7a7a6d9129b4c4078"><div class="ttname"><a href="structyaclib_1_1detail_1_1HasIteratorCategory.html#a113895bd41f431c7a7a6d9129b4c4078">yaclib::detail::HasIteratorCategory::Value</a></div><div class="ttdeci">static constexpr bool Value</div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00114">type_traits_impl.hpp:114</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1Head_3_01T_00_01Args_8_8_8_01_4_html_ad76b66746674a2f90b648ea6c9cc8b75"><div class="ttname"><a href="structyaclib_1_1detail_1_1Head_3_01T_00_01Args_8_8_8_01_4.html#ad76b66746674a2f90b648ea6c9cc8b75">yaclib::detail::Head&lt; T, Args... &gt;::Type</a></div><div class="ttdeci">T Type</div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00015">type_traits_impl.hpp:15</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1Head_html"><div class="ttname"><a href="structyaclib_1_1detail_1_1Head.html">yaclib::detail::Head</a></div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00011">type_traits_impl.hpp:11</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1InstantiationType_3_01Instance_00_01Instance_3_01V_01_4_01_4_html_af061907c55b66161746773ea6c322d5b"><div class="ttname"><a href="structyaclib_1_1detail_1_1InstantiationType_3_01Instance_00_01Instance_3_01V_01_4_01_4.html#af061907c55b66161746773ea6c322d5b">yaclib::detail::InstantiationType&lt; Instance, Instance&lt; V &gt; &gt;::Value</a></div><div class="ttdeci">V Value</div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00055">type_traits_impl.hpp:55</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1InstantiationType_html"><div class="ttname"><a href="structyaclib_1_1detail_1_1InstantiationType.html">yaclib::detail::InstantiationType</a></div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00049">type_traits_impl.hpp:49</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1InstantiationType_html_ae9bcf142e3eb4bbb25c549ca6595775f"><div class="ttname"><a href="structyaclib_1_1detail_1_1InstantiationType.html#ae9bcf142e3eb4bbb25c549ca6595775f">yaclib::detail::InstantiationType::Value</a></div><div class="ttdeci">T Value</div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00050">type_traits_impl.hpp:50</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1InstantiationTypes_3_01Instance_00_01Instance_3_01V_00_01T_01_4_01_4_html_aa247a28321c7e25a4a6252449f590688"><div class="ttname"><a href="structyaclib_1_1detail_1_1InstantiationTypes_3_01Instance_00_01Instance_3_01V_00_01T_01_4_01_4.html#aa247a28321c7e25a4a6252449f590688">yaclib::detail::InstantiationTypes&lt; Instance, Instance&lt; V, T &gt; &gt;::Value</a></div><div class="ttdeci">V Value</div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00066">type_traits_impl.hpp:66</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1InstantiationTypes_3_01Instance_00_01Instance_3_01V_00_01T_01_4_01_4_html_aacea861ca96f625738553703f14f2ce5"><div class="ttname"><a href="structyaclib_1_1detail_1_1InstantiationTypes_3_01Instance_00_01Instance_3_01V_00_01T_01_4_01_4.html#aacea861ca96f625738553703f14f2ce5">yaclib::detail::InstantiationTypes&lt; Instance, Instance&lt; V, T &gt; &gt;::Trait</a></div><div class="ttdeci">T Trait</div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00067">type_traits_impl.hpp:67</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1InstantiationTypes_html"><div class="ttname"><a href="structyaclib_1_1detail_1_1InstantiationTypes.html">yaclib::detail::InstantiationTypes</a></div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00059">type_traits_impl.hpp:59</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1InstantiationTypes_html_a122d30780e747cf6a37bdc1a7a757c22"><div class="ttname"><a href="structyaclib_1_1detail_1_1InstantiationTypes.html#a122d30780e747cf6a37bdc1a7a757c22">yaclib::detail::InstantiationTypes::Trait</a></div><div class="ttdeci">T Trait</div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00061">type_traits_impl.hpp:61</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1InstantiationTypes_html_ad68658a1a421f91813941dba3d877244"><div class="ttname"><a href="structyaclib_1_1detail_1_1InstantiationTypes.html#ad68658a1a421f91813941dba3d877244">yaclib::detail::InstantiationTypes::Value</a></div><div class="ttdeci">T Value</div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00060">type_traits_impl.hpp:60</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1Invoke_3_01Func_00_01void_01_4_html_a3cd441fa2fa4083d88ad04940d5eb09c"><div class="ttname"><a href="structyaclib_1_1detail_1_1Invoke_3_01Func_00_01void_01_4.html#a3cd441fa2fa4083d88ad04940d5eb09c">yaclib::detail::Invoke&lt; Func, void &gt;::Type</a></div><div class="ttdeci">std::invoke_result_t&lt; Func &gt; Type</div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00035">type_traits_impl.hpp:35</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1Invoke_html"><div class="ttname"><a href="structyaclib_1_1detail_1_1Invoke.html">yaclib::detail::Invoke</a></div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00029">type_traits_impl.hpp:29</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1Invoke_html_a9257328002ca0842bbd42560f9ff61e5"><div class="ttname"><a href="structyaclib_1_1detail_1_1Invoke.html#a9257328002ca0842bbd42560f9ff61e5">yaclib::detail::Invoke::Type</a></div><div class="ttdeci">std::invoke_result_t&lt; Func, Args... &gt; Type</div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00030">type_traits_impl.hpp:30</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1IsInputIterator_html"><div class="ttname"><a href="structyaclib_1_1detail_1_1IsInputIterator.html">yaclib::detail::IsInputIterator</a></div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00123">type_traits_impl.hpp:123</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1IsInputIterator_html_af6a9e7de1707d9ad269df712a1a935a7"><div class="ttname"><a href="structyaclib_1_1detail_1_1IsInputIterator.html#af6a9e7de1707d9ad269df712a1a935a7">yaclib::detail::IsInputIterator::Value</a></div><div class="ttdeci">static constexpr bool Value</div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00124">type_traits_impl.hpp:124</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1IsInputRangePair_html"><div class="ttname"><a href="structyaclib_1_1detail_1_1IsInputRangePair.html">yaclib::detail::IsInputRangePair</a></div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00144">type_traits_impl.hpp:144</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1IsInputRangePair_html_ab8e8c7eca3acc868d83fa19a1262ce95"><div class="ttname"><a href="structyaclib_1_1detail_1_1IsInputRangePair.html#ab8e8c7eca3acc868d83fa19a1262ce95">yaclib::detail::IsInputRangePair::Value</a></div><div class="ttdeci">static constexpr bool Value</div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00145">type_traits_impl.hpp:145</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1IsInputRange_html"><div class="ttname"><a href="structyaclib_1_1detail_1_1IsInputRange.html">yaclib::detail::IsInputRange</a></div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00155">type_traits_impl.hpp:155</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1IsInputRange_html_a62d2e7828a34a3a535cea2ff649c73e4"><div class="ttname"><a href="structyaclib_1_1detail_1_1IsInputRange.html#a62d2e7828a34a3a535cea2ff649c73e4">yaclib::detail::IsInputRange::Value</a></div><div class="ttdeci">static constexpr bool Value</div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00156">type_traits_impl.hpp:156</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1IsInstantiationOf_html"><div class="ttname"><a href="structyaclib_1_1detail_1_1IsInstantiationOf.html">yaclib::detail::IsInstantiationOf</a></div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00039">type_traits_impl.hpp:39</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1IsInstantiationOf_html_a1153c9c1364a7d5c86d60e3734c4b42a"><div class="ttname"><a href="structyaclib_1_1detail_1_1IsInstantiationOf.html#a1153c9c1364a7d5c86d60e3734c4b42a">yaclib::detail::IsInstantiationOf::Value</a></div><div class="ttdeci">static constexpr bool Value</div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00040">type_traits_impl.hpp:40</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1IsInvocable_html"><div class="ttname"><a href="structyaclib_1_1detail_1_1IsInvocable.html">yaclib::detail::IsInvocable</a></div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00019">type_traits_impl.hpp:19</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1IsInvocable_html_ac5490fc260364912fc057c941906fa3a"><div class="ttname"><a href="structyaclib_1_1detail_1_1IsInvocable.html#ac5490fc260364912fc057c941906fa3a">yaclib::detail::IsInvocable::Value</a></div><div class="ttdeci">static constexpr bool Value</div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00020">type_traits_impl.hpp:20</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1IsSentinelFor_html"><div class="ttname"><a href="structyaclib_1_1detail_1_1IsSentinelFor.html">yaclib::detail::IsSentinelFor</a></div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00133">type_traits_impl.hpp:133</a></div></div>
+<div class="ttc" id="astructyaclib_1_1detail_1_1IsSentinelFor_html_a1c0365c005f1055ebc8bbddfa9891331"><div class="ttname"><a href="structyaclib_1_1detail_1_1IsSentinelFor.html#a1c0365c005f1055ebc8bbddfa9891331">yaclib::detail::IsSentinelFor::Value</a></div><div class="ttdeci">static constexpr bool Value</div><div class="ttdef"><b>Definition</b> <a href="type__traits__impl_8hpp_source.html#l00134">type_traits_impl.hpp:134</a></div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_5202e9473254619c80971b7f5a23629e.html">yaclib</a></li><li class="navelem"><a class="el" href="dir_9463e03d191b6d61661112ff0fb64dc7.html">util</a></li><li class="navelem"><a class="el" href="dir_dea61625d6631c6773a5e42e2ea0544a.html">detail</a></li><li class="navelem"><a class="el" href="type__traits__impl_8hpp.html">type_traits_impl.hpp</a></li>
+    <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+  </ul>
+</div>
+</body>
+</html>

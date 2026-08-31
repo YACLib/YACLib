@@ -1,0 +1,4 @@
+var structyaclib_1_1detail_1_1HasConstantTimeDistance_3_01It_00_01Sentinel_00_01std_1_1void__t_3_01d28cb8aba34adfdab112483c96d33a93d =
+[
+    [ "Value", "structyaclib_1_1detail_1_1HasConstantTimeDistance_3_01It_00_01Sentinel_00_01std_1_1void__t_3_01d28cb8aba34adfdab112483c96d33a93d.html#ad58007b159c6dac475997280bfad9eac", null ]
+];

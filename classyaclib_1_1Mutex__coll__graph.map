@@ -1,0 +1,5 @@
+<map id="yaclib::Mutex&lt; Batching, FIFO &gt;" name="yaclib::Mutex&lt; Batching, FIFO &gt;">
+<area shape="rect" id="Node000001" title="Mutex for coroutines." alt="" coords="5,94,167,135"/>
+<area shape="rect" id="Node000002" href="$structyaclib_1_1detail_1_1MutexImpl.html" title=" " alt="" coords="7,5,165,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="89,62,89,94,83,94,83,62"/>
+</map>

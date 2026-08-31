@@ -1,0 +1,14 @@
+<map id="yaclib::detail::Atomic&lt; Impl, U * &gt;" name="yaclib::detail::Atomic&lt; Impl, U * &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="40,403,178,444"/>
+<area shape="rect" id="Node000002" href="$classyaclib_1_1detail_1_1AtomicBase.html" title=" " alt="" coords="25,313,193,354"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="112,370,112,403,106,403,106,370"/>
+<area shape="rect" id="Node000003" href="$classyaclib_1_1detail_1_1AtomicWait.html" title=" " alt="" coords="5,145,170,186"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="95,201,109,312,104,313,89,202"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="80,5,127,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="103,47,92,145,87,145,98,46"/>
+<area shape="rect" id="Node000006" href="$classyaclib_1_1detail_1_1AtomicWait.html" title=" " alt="" coords="125,80,290,121"/>
+<area shape="poly" id="edge6_Node000006_Node000004" title=" " alt="" coords="133,39,184,78,181,82,129,43"/>
+<area shape="rect" id="Node000005" href="$classyaclib_1_1detail_1_1AtomicBase.html" title=" " alt="" coords="125,210,293,250"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="181,264,130,315,126,311,177,260"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="211,136,211,209,206,209,205,137"/>
+</map>

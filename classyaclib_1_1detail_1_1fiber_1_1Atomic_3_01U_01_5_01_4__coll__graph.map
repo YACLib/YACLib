@@ -1,0 +1,17 @@
+<map id="yaclib::detail::fiber::Atomic&lt; U * &gt;" name="yaclib::detail::fiber::Atomic&lt; U * &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="105,378,226,418"/>
+<area shape="rect" id="Node000002" href="$classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html" title=" " alt="" coords="96,288,235,328"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="168,344,168,377,163,377,163,344"/>
+<area shape="rect" id="Node000003" href="$classyaclib_1_1detail_1_1fiber_1_1AtomicWait.html" title=" " alt="" coords="59,94,184,135"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="132,149,163,287,158,288,127,150"/>
+<area shape="rect" id="Node000004" href="$classbool.html" title=" " alt="" coords="61,5,107,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="47,32,16,48,9,57,12,69,33,88,60,101,58,106,30,93,7,71,4,57,12,44,45,27"/>
+<area shape="rect" id="Node000007" href="$classyaclib_1_1detail_1_1fiber_1_1AtomicWait.html" title=" " alt="" coords="207,94,332,135"/>
+<area shape="poly" id="edge7_Node000007_Node000004" title=" " alt="" coords="113,38,161,68,214,91,212,96,159,72,111,42"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="326,5,365,31"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="323,44,281,72,185,99,183,94,279,68,320,39"/>
+<area shape="poly" id="edge8_Node000007_Node000005" title=" " alt="" coords="358,46,358,59,354,71,343,85,329,96,326,91,339,81,350,69,353,58,352,46"/>
+<area shape="rect" id="Node000006" href="$classyaclib_1_1detail_1_1fiber_1_1AtomicBase.html" title=" " alt="" coords="193,184,322,225"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="231,238,185,289,181,285,227,235"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="267,151,263,184,257,183,262,150"/>
+</map>

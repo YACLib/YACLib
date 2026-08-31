@@ -1,0 +1,981 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.9.8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<!-- BEGIN opengraph metadata -->
+<meta property="og:title" content="Doxygen Awesome" />
+<meta property="og:image" content="https://repository-images.githubusercontent.com/348492097/4f16df80-88fb-11eb-9d31-4015ff22c452" />
+<meta property="og:description" content="Custom CSS theme for doxygen html-documentation with lots of customization parameters." />
+<meta property="og:url" content="https://jothepro.github.io/doxygen-awesome-css/" />
+<!-- END opengraph metadata -->
+<!-- BEGIN twitter metadata -->
+<meta name="twitter:image:src" content="https://repository-images.githubusercontent.com/348492097/4f16df80-88fb-11eb-9d31-4015ff22c452" />
+<meta name="twitter:title" content="Doxygen Awesome" />
+<meta name="twitter:description" content="Custom CSS theme for doxygen html-documentation with lots of customization parameters." />
+<!-- END twitter metadata -->
+<title>YACLib: yaclib::Task&lt; V, T &gt; Class Template Reference</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link rel="icon" type="image/svg+xml" href="logo.drawio.svg"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+<script type="text/javascript" src="doxygen-awesome-fragment-copy-button.js"></script>
+<script type="text/javascript" src="doxygen-awesome-paragraph-link.js"></script>
+<script type="text/javascript" src="toggle-alternative-theme.js"></script>
+<script type="text/javascript">
+    DoxygenAwesomeFragmentCopyButton.init()
+    DoxygenAwesomeDarkModeToggle.init()
+    DoxygenAwesomeParagraphLink.init()
+</script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="custom.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only-darkmode-toggle.css" rel="stylesheet" type="text/css"/>
+<link href="custom-alternative.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<!-- https://tholman.com/github-corners/ -->
+<a href="https://github.com/YACLib/YACLib" class="github-corner" title="View source on GitHub" target="_blank">
+    <svg viewBox="0 0 250 250" width="40" height="40" style="position: absolute; top: 0; border: 0; right: 0; z-index: 99;" aria-hidden="true">
+    <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
+   <div id="projectname">YACLib
+   </div>
+   <div id="projectbrief">C++ library for concurrent tasks execution</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Search');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('classyaclib_1_1Task.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="classyaclib_1_1Task-members.html">List of all members</a>  </div>
+  <div class="headertitle"><div class="title">yaclib::Task&lt; V, T &gt; Class Template Reference</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>Provides a mechanism to schedule the some async operations TODO(MBkkt) add description.  
+ <a href="classyaclib_1_1Task.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="lazy_2task_8hpp_source.html">task.hpp</a>&gt;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-types" name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:a9629f6f9c9c5dbe94537a54c33194e6a" id="r_a9629f6f9c9c5dbe94537a54c33194e6a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">using</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1Task.html#a9629f6f9c9c5dbe94537a54c33194e6a">Result</a> = <a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> T::template <a class="el" href="classyaclib_1_1Task.html#a9629f6f9c9c5dbe94537a54c33194e6a">Result</a>&lt; V &gt;</td></tr>
+<tr class="separator:a9629f6f9c9c5dbe94537a54c33194e6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:ab8826a33953efeefdf31ed945a5a8c47" id="r_ab8826a33953efeefdf31ed945a5a8c47"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1Task.html#ab8826a33953efeefdf31ed945a5a8c47">Task</a> (<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">const</a> <a class="el" href="classyaclib_1_1Task.html">Task</a> &amp;)=<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">delete</a></td></tr>
+<tr class="separator:ab8826a33953efeefdf31ed945a5a8c47"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a056097ec8035d0daf5ec7f71965cabfe" id="r_a056097ec8035d0daf5ec7f71965cabfe"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classyaclib_1_1Task.html">Task</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1Task.html#a056097ec8035d0daf5ec7f71965cabfe">operator=</a> (<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">const</a> <a class="el" href="classyaclib_1_1Task.html">Task</a> &amp;)=<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">delete</a></td></tr>
+<tr class="separator:a056097ec8035d0daf5ec7f71965cabfe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9bcdc30e4b6ccc48b942b39aeb55c8b2" id="r_a9bcdc30e4b6ccc48b942b39aeb55c8b2"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1Task.html#a9bcdc30e4b6ccc48b942b39aeb55c8b2">Task</a> (<a class="el" href="classyaclib_1_1Task.html">Task</a> &amp;&amp;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">other</a>) <a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">noexcept</a>=<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">default</a></td></tr>
+<tr class="separator:a9bcdc30e4b6ccc48b942b39aeb55c8b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a43bb29d712be63edd2e7f22a8eb6db3b" id="r_a43bb29d712be63edd2e7f22a8eb6db3b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classyaclib_1_1Task.html">Task</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1Task.html#a43bb29d712be63edd2e7f22a8eb6db3b">operator=</a> (<a class="el" href="classyaclib_1_1Task.html">Task</a> &amp;&amp;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">other</a>) <a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">noexcept</a>=<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">default</a></td></tr>
+<tr class="separator:a43bb29d712be63edd2e7f22a8eb6db3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a45a647f03b9f2d69964dd364a1e8b854" id="r_a45a647f03b9f2d69964dd364a1e8b854"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1Task.html#a45a647f03b9f2d69964dd364a1e8b854">Task</a> () <a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">noexcept</a>=<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">default</a></td></tr>
+<tr class="separator:a45a647f03b9f2d69964dd364a1e8b854"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a630e201bcc135dd8ccd9ddda61ba9961" id="r_a630e201bcc135dd8ccd9ddda61ba9961"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1Task.html#a630e201bcc135dd8ccd9ddda61ba9961">~Task</a> () <a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">noexcept</a></td></tr>
+<tr class="separator:a630e201bcc135dd8ccd9ddda61ba9961"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9290822e4bd335c71b3e26ca3eee6e4e" id="r_a9290822e4bd335c71b3e26ca3eee6e4e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1Task.html#a9290822e4bd335c71b3e26ca3eee6e4e">Valid</a> () <a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">const</a> &amp;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">noexcept</a></td></tr>
+<tr class="separator:a9290822e4bd335c71b3e26ca3eee6e4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a532780c92f4d4a8f93f17e8c70cdad23" id="r_a532780c92f4d4a8f93f17e8c70cdad23"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1Task.html#a532780c92f4d4a8f93f17e8c70cdad23">Ready</a> () <a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">const</a> &amp;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">noexcept</a></td></tr>
+<tr class="memdesc:a532780c92f4d4a8f93f17e8c70cdad23"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check that <a class="el" href="classyaclib_1_1Result.html">Result</a> that corresponds to this <a class="el" href="classyaclib_1_1Task.html">Task</a> is computed.  <br /></td></tr>
+<tr class="separator:a532780c92f4d4a8f93f17e8c70cdad23"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab5bd0e06659ed7b6ab6d317bebb01e7f" id="r_ab5bd0e06659ed7b6ab6d317bebb01e7f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classyaclib_1_1Task.html">Task</a>&lt; V, T &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1Task.html#ab5bd0e06659ed7b6ab6d317bebb01e7f">On</a> (std::nullptr_t) &amp;&amp;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">noexcept</a></td></tr>
+<tr class="memdesc:ab5bd0e06659ed7b6ab6d317bebb01e7f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Do nothing, just for compatibility with <a class="el" href="classyaclib_1_1FutureOn.html" title="Provides a mechanism to access the result of async operations.">FutureOn</a> TODO(MBkkt) think about force On/Detach/ToFuture: It's able to set passed executor to previous nullptr/all/head/etc or replace.  <br /></td></tr>
+<tr class="separator:ab5bd0e06659ed7b6ab6d317bebb01e7f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5150e0e90b09a04572d88ed508fcd176" id="r_a5150e0e90b09a04572d88ed508fcd176"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> <a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">Func</a> &gt; </td></tr>
+<tr class="memitem:a5150e0e90b09a04572d88ed508fcd176"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">auto</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classyaclib_1_1Task.html#a5150e0e90b09a04572d88ed508fcd176">Then</a> (<a class="el" href="classyaclib_1_1IExecutor.html">IExecutor</a> &amp;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">e</a>, <a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">Func</a> &amp;&amp;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">f</a>) &amp;&amp;</td></tr>
+<tr class="separator:a5150e0e90b09a04572d88ed508fcd176"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac6f1b50e65d68fdb92a21be4af2a3f8d" id="r_ac6f1b50e65d68fdb92a21be4af2a3f8d"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> <a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">Func</a> &gt; </td></tr>
+<tr class="memitem:ac6f1b50e65d68fdb92a21be4af2a3f8d"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">auto</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classyaclib_1_1Task.html#ac6f1b50e65d68fdb92a21be4af2a3f8d">ThenInline</a> (<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">Func</a> &amp;&amp;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">f</a>) &amp;&amp;</td></tr>
+<tr class="separator:ac6f1b50e65d68fdb92a21be4af2a3f8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a267ee1bfd5903bfd8b2ecff479d19c04" id="r_a267ee1bfd5903bfd8b2ecff479d19c04"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> <a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">Func</a> &gt; </td></tr>
+<tr class="memitem:a267ee1bfd5903bfd8b2ecff479d19c04"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">auto</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classyaclib_1_1Task.html#a267ee1bfd5903bfd8b2ecff479d19c04">Then</a> (<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">Func</a> &amp;&amp;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">f</a>) &amp;&amp;</td></tr>
+<tr class="separator:a267ee1bfd5903bfd8b2ecff479d19c04"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa4db0f9293f6e00a8fdbfd088c7da153" id="r_aa4db0f9293f6e00a8fdbfd088c7da153"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1Task.html#aa4db0f9293f6e00a8fdbfd088c7da153">Cancel</a> () &amp;&amp;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">noexcept</a></td></tr>
+<tr class="separator:aa4db0f9293f6e00a8fdbfd088c7da153"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeffe6b908bd0b61b4ee6d15d5aab0f55" id="r_aeffe6b908bd0b61b4ee6d15d5aab0f55"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1Task.html#aeffe6b908bd0b61b4ee6d15d5aab0f55">Detach</a> () &amp;&amp;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">noexcept</a></td></tr>
+<tr class="separator:aeffe6b908bd0b61b4ee6d15d5aab0f55"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a404b61ff933b6ff2b2f2ade834dc2001" id="r_a404b61ff933b6ff2b2f2ade834dc2001"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1Task.html#a404b61ff933b6ff2b2f2ade834dc2001">Detach</a> (<a class="el" href="classyaclib_1_1IExecutor.html">IExecutor</a> &amp;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">e</a>) &amp;&amp;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">noexcept</a></td></tr>
+<tr class="separator:a404b61ff933b6ff2b2f2ade834dc2001"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a251e6d1093b726c43e4f23cb9dcab4c7" id="r_a251e6d1093b726c43e4f23cb9dcab4c7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classyaclib_1_1Future.html">Future</a>&lt; V, T &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1Task.html#a251e6d1093b726c43e4f23cb9dcab4c7">ToFuture</a> () &amp;&amp;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">noexcept</a></td></tr>
+<tr class="separator:a251e6d1093b726c43e4f23cb9dcab4c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad27d1b2b00e7ca131dda63a9f144c940" id="r_ad27d1b2b00e7ca131dda63a9f144c940"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classyaclib_1_1FutureOn.html">FutureOn</a>&lt; V, T &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1Task.html#ad27d1b2b00e7ca131dda63a9f144c940">ToFuture</a> (<a class="el" href="classyaclib_1_1IExecutor.html">IExecutor</a> &amp;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">e</a>) &amp;&amp;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">noexcept</a></td></tr>
+<tr class="separator:ad27d1b2b00e7ca131dda63a9f144c940"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7bc56580f8245c2d75863ba66cfaeead" id="r_a7bc56580f8245c2d75863ba66cfaeead"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classyaclib_1_1Task.html#a9629f6f9c9c5dbe94537a54c33194e6a">Result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1Task.html#a7bc56580f8245c2d75863ba66cfaeead">Get</a> () &amp;&amp;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">noexcept</a></td></tr>
+<tr class="separator:a7bc56580f8245c2d75863ba66cfaeead"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2d32adaaa85da7e9f22008644397cdf4" id="r_a2d32adaaa85da7e9f22008644397cdf4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1Task.html#a2d32adaaa85da7e9f22008644397cdf4">Touch</a> () &amp;=<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">delete</a></td></tr>
+<tr class="separator:a2d32adaaa85da7e9f22008644397cdf4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a64864686f9a05be43675ee9444499333" id="r_a64864686f9a05be43675ee9444499333"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1Task.html#a64864686f9a05be43675ee9444499333">Touch</a> () <a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">const</a> &amp;&amp;=<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">delete</a></td></tr>
+<tr class="separator:a64864686f9a05be43675ee9444499333"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a28774561c22d2f780808a7e7466ab33c" id="r_a28774561c22d2f780808a7e7466ab33c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">const</a> <a class="el" href="classyaclib_1_1Task.html#a9629f6f9c9c5dbe94537a54c33194e6a">Result</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1Task.html#a28774561c22d2f780808a7e7466ab33c">Touch</a> () <a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">const</a> &amp;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">noexcept</a></td></tr>
+<tr class="separator:a28774561c22d2f780808a7e7466ab33c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae232008ae20a0a4752aca0c0fcc270fd" id="r_ae232008ae20a0a4752aca0c0fcc270fd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classyaclib_1_1Task.html#a9629f6f9c9c5dbe94537a54c33194e6a">Result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1Task.html#ae232008ae20a0a4752aca0c0fcc270fd">Touch</a> () &amp;&amp;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">noexcept</a></td></tr>
+<tr class="separator:ae232008ae20a0a4752aca0c0fcc270fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1a0700725c2d1bb78a00c32d9b3bdd03" id="r_a1a0700725c2d1bb78a00c32d9b3bdd03"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceyaclib_1_1detail.html#a7809142672bcb940084f513fea38acb6">detail::UniqueCorePtr</a>&lt; V, T &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1Task.html#a1a0700725c2d1bb78a00c32d9b3bdd03">GetCore</a> () <a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">noexcept</a></td></tr>
+<tr class="memdesc:a1a0700725c2d1bb78a00c32d9b3bdd03"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method that get internal Core state.  <br /></td></tr>
+<tr class="separator:a1a0700725c2d1bb78a00c32d9b3bdd03"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a765b79b83d26dde535c5c921f8588ef4" id="r_a765b79b83d26dde535c5c921f8588ef4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classyaclib_1_1Task.html#a765b79b83d26dde535c5c921f8588ef4">Task</a> (<a class="el" href="namespaceyaclib_1_1detail.html#a7809142672bcb940084f513fea38acb6">detail::UniqueCorePtr</a>&lt; V, T &gt; core) <a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">noexcept</a></td></tr>
+<tr class="separator:a765b79b83d26dde535c5c921f8588ef4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><div class="compoundTemplParams">template&lt;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> V, <a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> T&gt;<br />
+class yaclib::Task&lt; V, T &gt;</div><p>Provides a mechanism to schedule the some async operations TODO(MBkkt) add description. </p>
+
+<p class="definition">Definition at line <a class="el" href="lazy_2task_8hpp_source.html#l00026">26</a> of file <a class="el" href="lazy_2task_8hpp_source.html">task.hpp</a>.</p>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
+<a id="a9629f6f9c9c5dbe94537a54c33194e6a" name="a9629f6f9c9c5dbe94537a54c33194e6a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9629f6f9c9c5dbe94537a54c33194e6a">&#9670;&#160;</a></span>Result</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> V , <a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">using</a> <a class="el" href="classyaclib_1_1Task.html">yaclib::Task</a>&lt; V, T &gt;::Result =  <a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> T::template <a class="el" href="classyaclib_1_1Task.html#a9629f6f9c9c5dbe94537a54c33194e6a">Result</a>&lt;V&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="lazy_2task_8hpp_source.html#l00032">32</a> of file <a class="el" href="lazy_2task_8hpp_source.html">task.hpp</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="ab8826a33953efeefdf31ed945a5a8c47" name="ab8826a33953efeefdf31ed945a5a8c47"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab8826a33953efeefdf31ed945a5a8c47">&#9670;&#160;</a></span>Task() <span class="overload">[1/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> V , <a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classyaclib_1_1Task.html">yaclib::Task</a>&lt; V, T &gt;::Task </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">const</a> <a class="el" href="classyaclib_1_1Task.html">Task</a>&lt; V, T &gt; &amp;&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">delete</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9bcdc30e4b6ccc48b942b39aeb55c8b2" name="a9bcdc30e4b6ccc48b942b39aeb55c8b2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9bcdc30e4b6ccc48b942b39aeb55c8b2">&#9670;&#160;</a></span>Task() <span class="overload">[2/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> V , <a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classyaclib_1_1Task.html">yaclib::Task</a>&lt; V, T &gt;::Task </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classyaclib_1_1Task.html">Task</a>&lt; V, T &gt; &amp;&amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">default</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a45a647f03b9f2d69964dd364a1e8b854" name="a45a647f03b9f2d69964dd364a1e8b854"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a45a647f03b9f2d69964dd364a1e8b854">&#9670;&#160;</a></span>Task() <span class="overload">[3/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> V , <a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classyaclib_1_1Task.html">yaclib::Task</a>&lt; V, T &gt;::Task </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">default</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a630e201bcc135dd8ccd9ddda61ba9961" name="a630e201bcc135dd8ccd9ddda61ba9961"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a630e201bcc135dd8ccd9ddda61ba9961">&#9670;&#160;</a></span>~Task()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> V , <a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classyaclib_1_1Task.html">yaclib::Task</a>&lt; V, T &gt;::~<a class="el" href="classyaclib_1_1Task.html">Task</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="lazy_2task_8hpp_source.html#l00043">43</a> of file <a class="el" href="lazy_2task_8hpp_source.html">task.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="lazy_2task_8hpp_source.html#l00091">yaclib::Task&lt; V, T &gt;::Cancel()</a>.</p>
+
+</div>
+</div>
+<a id="a765b79b83d26dde535c5c921f8588ef4" name="a765b79b83d26dde535c5c921f8588ef4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a765b79b83d26dde535c5c921f8588ef4">&#9670;&#160;</a></span>Task() <span class="overload">[4/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> V , <a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classyaclib_1_1Task.html">yaclib::Task</a>&lt; V, T &gt;::Task </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib_1_1detail.html#a7809142672bcb940084f513fea38acb6">detail::UniqueCorePtr</a>&lt; V, T &gt;&#160;</td>
+          <td class="paramname"><em>core</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="lazy_2task_8hpp_source.html#l00145">145</a> of file <a class="el" href="lazy_2task_8hpp_source.html">task.hpp</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="aa4db0f9293f6e00a8fdbfd088c7da153" name="aa4db0f9293f6e00a8fdbfd088c7da153"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa4db0f9293f6e00a8fdbfd088c7da153">&#9670;&#160;</a></span>Cancel()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> V , <a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">void</a> <a class="el" href="classyaclib_1_1Task.html">yaclib::Task</a>&lt; V, T &gt;::Cancel </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> &amp;&amp;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="lazy_2task_8hpp_source.html#l00091">91</a> of file <a class="el" href="lazy_2task_8hpp_source.html">task.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>, and <a class="el" href="inline_8cpp_source.html#l00034">yaclib::MakeInline()</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="lazy_2task_8hpp_source.html#l00043">yaclib::Task&lt; V, T &gt;::~Task()</a>.</p>
+
+</div>
+</div>
+<a id="aeffe6b908bd0b61b4ee6d15d5aab0f55" name="aeffe6b908bd0b61b4ee6d15d5aab0f55"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeffe6b908bd0b61b4ee6d15d5aab0f55">&#9670;&#160;</a></span>Detach() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> V , <a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">void</a> <a class="el" href="classyaclib_1_1Task.html">yaclib::Task</a>&lt; V, T &gt;::Detach </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> &amp;&amp;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="lazy_2task_8hpp_source.html#l00095">95</a> of file <a class="el" href="lazy_2task_8hpp_source.html">task.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="drop__core_8cpp_source.html#l00027">yaclib::detail::MakeDrop()</a>, <a class="el" href="task__impl_8cpp_source.html#l00006">yaclib::detail::Start()</a>, and <a class="el" href="log_8hpp_source.html#l00085">YACLIB_ASSERT</a>.</p>
+
+</div>
+</div>
+<a id="a404b61ff933b6ff2b2f2ade834dc2001" name="a404b61ff933b6ff2b2f2ade834dc2001"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a404b61ff933b6ff2b2f2ade834dc2001">&#9670;&#160;</a></span>Detach() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> V , <a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">void</a> <a class="el" href="classyaclib_1_1Task.html">yaclib::Task</a>&lt; V, T &gt;::Detach </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classyaclib_1_1IExecutor.html">IExecutor</a> &amp;&#160;</td>
+          <td class="paramname"><em>e</em></td><td>)</td>
+          <td> &amp;&amp;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="lazy_2task_8hpp_source.html#l00101">101</a> of file <a class="el" href="lazy_2task_8hpp_source.html">task.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>, <a class="el" href="drop__core_8cpp_source.html#l00027">yaclib::detail::MakeDrop()</a>, <a class="el" href="task__impl_8cpp_source.html#l00006">yaclib::detail::Start()</a>, and <a class="el" href="log_8hpp_source.html#l00085">YACLIB_ASSERT</a>.</p>
+
+</div>
+</div>
+<a id="a7bc56580f8245c2d75863ba66cfaeead" name="a7bc56580f8245c2d75863ba66cfaeead"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7bc56580f8245c2d75863ba66cfaeead">&#9670;&#160;</a></span>Get()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> V , <a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classyaclib_1_1Task.html#a9629f6f9c9c5dbe94537a54c33194e6a">Result</a> <a class="el" href="classyaclib_1_1Task.html">yaclib::Task</a>&lt; V, T &gt;::Get </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> &amp;&amp;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="lazy_2task_8hpp_source.html#l00119">119</a> of file <a class="el" href="lazy_2task_8hpp_source.html">task.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a1a0700725c2d1bb78a00c32d9b3bdd03" name="a1a0700725c2d1bb78a00c32d9b3bdd03"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1a0700725c2d1bb78a00c32d9b3bdd03">&#9670;&#160;</a></span>GetCore()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> V , <a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib_1_1detail.html#a7809142672bcb940084f513fea38acb6">detail::UniqueCorePtr</a>&lt; V, T &gt; &amp; <a class="el" href="classyaclib_1_1Task.html">yaclib::Task</a>&lt; V, T &gt;::GetCore </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Method that get internal Core state. </p>
+<dl class="section return"><dt>Returns</dt><dd>internal Core state ptr </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="lazy_2task_8hpp_source.html#l00142">142</a> of file <a class="el" href="lazy_2task_8hpp_source.html">task.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ab5bd0e06659ed7b6ab6d317bebb01e7f" name="ab5bd0e06659ed7b6ab6d317bebb01e7f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab5bd0e06659ed7b6ab6d317bebb01e7f">&#9670;&#160;</a></span>On()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> V , <a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classyaclib_1_1Task.html">Task</a>&lt; V, T &gt; <a class="el" href="classyaclib_1_1Task.html">yaclib::Task</a>&lt; V, T &gt;::On </td>
+          <td>(</td>
+          <td class="paramtype">std::nullptr_t&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td> &amp;&amp;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Do nothing, just for compatibility with <a class="el" href="classyaclib_1_1FutureOn.html" title="Provides a mechanism to access the result of async operations.">FutureOn</a> TODO(MBkkt) think about force On/Detach/ToFuture: It's able to set passed executor to previous nullptr/all/head/etc or replace. </p>
+
+<p class="definition">Definition at line <a class="el" href="lazy_2task_8hpp_source.html#l00068">68</a> of file <a class="el" href="lazy_2task_8hpp_source.html">task.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a056097ec8035d0daf5ec7f71965cabfe" name="a056097ec8035d0daf5ec7f71965cabfe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a056097ec8035d0daf5ec7f71965cabfe">&#9670;&#160;</a></span>operator=() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> V , <a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classyaclib_1_1Task.html">Task</a> &amp; <a class="el" href="classyaclib_1_1Task.html">yaclib::Task</a>&lt; V, T &gt;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">::operator</a>= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">const</a> <a class="el" href="classyaclib_1_1Task.html">Task</a>&lt; V, T &gt; &amp;&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">delete</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a43bb29d712be63edd2e7f22a8eb6db3b" name="a43bb29d712be63edd2e7f22a8eb6db3b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a43bb29d712be63edd2e7f22a8eb6db3b">&#9670;&#160;</a></span>operator=() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> V , <a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classyaclib_1_1Task.html">Task</a> &amp; <a class="el" href="classyaclib_1_1Task.html">yaclib::Task</a>&lt; V, T &gt;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">::operator</a>= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classyaclib_1_1Task.html">Task</a>&lt; V, T &gt; &amp;&amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">default</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a532780c92f4d4a8f93f17e8c70cdad23" name="a532780c92f4d4a8f93f17e8c70cdad23"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a532780c92f4d4a8f93f17e8c70cdad23">&#9670;&#160;</a></span>Ready()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> V , <a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classbool.html">bool</a> <a class="el" href="classyaclib_1_1Task.html">yaclib::Task</a>&lt; V, T &gt;::Ready </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const &amp;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Check that <a class="el" href="classyaclib_1_1Result.html">Result</a> that corresponds to this <a class="el" href="classyaclib_1_1Task.html">Task</a> is computed. </p>
+<dl class="section return"><dt>Returns</dt><dd>false if the <a class="el" href="classyaclib_1_1Result.html">Result</a> of this <a class="el" href="classyaclib_1_1Task.html">Task</a> is not computed yet, otherwise true </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="lazy_2task_8hpp_source.html#l00058">58</a> of file <a class="el" href="lazy_2task_8hpp_source.html">task.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="log_8hpp_source.html#l00085">YACLIB_ASSERT</a>.</p>
+
+</div>
+</div>
+<a id="a267ee1bfd5903bfd8b2ecff479d19c04" name="a267ee1bfd5903bfd8b2ecff479d19c04"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a267ee1bfd5903bfd8b2ecff479d19c04">&#9670;&#160;</a></span>Then() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> V , <a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> T &gt; </div>
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> <a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">Func</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">auto</a> <a class="el" href="classyaclib_1_1Task.html">yaclib::Task</a>&lt; V, T &gt;::Then </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">Func</a> &amp;&amp;&#160;</td>
+          <td class="paramname"><em>f</em></td><td>)</td>
+          <td> &amp;&amp;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="lazy_2task_8hpp_source.html#l00085">85</a> of file <a class="el" href="lazy_2task_8hpp_source.html">task.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>, and <a class="el" href="log_8hpp_source.html#l00085">YACLIB_ASSERT</a>.</p>
+
+</div>
+</div>
+<a id="a5150e0e90b09a04572d88ed508fcd176" name="a5150e0e90b09a04572d88ed508fcd176"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5150e0e90b09a04572d88ed508fcd176">&#9670;&#160;</a></span>Then() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> V , <a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> T &gt; </div>
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> <a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">Func</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">auto</a> <a class="el" href="classyaclib_1_1Task.html">yaclib::Task</a>&lt; V, T &gt;::Then </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classyaclib_1_1IExecutor.html">IExecutor</a> &amp;&#160;</td>
+          <td class="paramname"><em>e</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">Func</a> &amp;&amp;&#160;</td>
+          <td class="paramname"><em>f</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> &amp;&amp;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="lazy_2task_8hpp_source.html#l00073">73</a> of file <a class="el" href="lazy_2task_8hpp_source.html">task.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>, and <a class="el" href="log_8hpp_source.html#l00085">YACLIB_ASSERT</a>.</p>
+
+</div>
+</div>
+<a id="ac6f1b50e65d68fdb92a21be4af2a3f8d" name="ac6f1b50e65d68fdb92a21be4af2a3f8d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac6f1b50e65d68fdb92a21be4af2a3f8d">&#9670;&#160;</a></span>ThenInline()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> V , <a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> T &gt; </div>
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> <a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">Func</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">auto</a> <a class="el" href="classyaclib_1_1Task.html">yaclib::Task</a>&lt; V, T &gt;::ThenInline </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">Func</a> &amp;&amp;&#160;</td>
+          <td class="paramname"><em>f</em></td><td>)</td>
+          <td> &amp;&amp;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="lazy_2task_8hpp_source.html#l00079">79</a> of file <a class="el" href="lazy_2task_8hpp_source.html">task.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>, and <a class="el" href="log_8hpp_source.html#l00085">YACLIB_ASSERT</a>.</p>
+
+</div>
+</div>
+<a id="a251e6d1093b726c43e4f23cb9dcab4c7" name="a251e6d1093b726c43e4f23cb9dcab4c7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a251e6d1093b726c43e4f23cb9dcab4c7">&#9670;&#160;</a></span>ToFuture() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> V , <a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classyaclib_1_1Future.html">Future</a>&lt; V, T &gt; <a class="el" href="classyaclib_1_1Task.html">yaclib::Task</a>&lt; V, T &gt;::ToFuture </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> &amp;&amp;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="lazy_2task_8hpp_source.html#l00108">108</a> of file <a class="el" href="lazy_2task_8hpp_source.html">task.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="task__impl_8cpp_source.html#l00006">yaclib::detail::Start()</a>, and <a class="el" href="log_8hpp_source.html#l00085">YACLIB_ASSERT</a>.</p>
+
+</div>
+</div>
+<a id="ad27d1b2b00e7ca131dda63a9f144c940" name="ad27d1b2b00e7ca131dda63a9f144c940"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad27d1b2b00e7ca131dda63a9f144c940">&#9670;&#160;</a></span>ToFuture() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> V , <a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classyaclib_1_1FutureOn.html">FutureOn</a>&lt; V, T &gt; <a class="el" href="classyaclib_1_1Task.html">yaclib::Task</a>&lt; V, T &gt;::ToFuture </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classyaclib_1_1IExecutor.html">IExecutor</a> &amp;&#160;</td>
+          <td class="paramname"><em>e</em></td><td>)</td>
+          <td> &amp;&amp;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="lazy_2task_8hpp_source.html#l00113">113</a> of file <a class="el" href="lazy_2task_8hpp_source.html">task.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="contract_8hpp_source.html#l00025">yaclib::MakeContract()</a>, <a class="el" href="task__impl_8cpp_source.html#l00006">yaclib::detail::Start()</a>, and <a class="el" href="log_8hpp_source.html#l00085">YACLIB_ASSERT</a>.</p>
+
+</div>
+</div>
+<a id="ae232008ae20a0a4752aca0c0fcc270fd" name="ae232008ae20a0a4752aca0c0fcc270fd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae232008ae20a0a4752aca0c0fcc270fd">&#9670;&#160;</a></span>Touch() <span class="overload">[1/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> V , <a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classyaclib_1_1Task.html#a9629f6f9c9c5dbe94537a54c33194e6a">Result</a> <a class="el" href="classyaclib_1_1Task.html">yaclib::Task</a>&lt; V, T &gt;::Touch </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> &amp;&amp;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="lazy_2task_8hpp_source.html#l00131">131</a> of file <a class="el" href="lazy_2task_8hpp_source.html">task.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="log_8hpp_source.html#l00085">YACLIB_ASSERT</a>.</p>
+
+</div>
+</div>
+<a id="a2d32adaaa85da7e9f22008644397cdf4" name="a2d32adaaa85da7e9f22008644397cdf4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2d32adaaa85da7e9f22008644397cdf4">&#9670;&#160;</a></span>Touch() <span class="overload">[2/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> V , <a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">void</a> <a class="el" href="classyaclib_1_1Task.html">yaclib::Task</a>&lt; V, T &gt;::Touch </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> &amp;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">delete</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a64864686f9a05be43675ee9444499333" name="a64864686f9a05be43675ee9444499333"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a64864686f9a05be43675ee9444499333">&#9670;&#160;</a></span>Touch() <span class="overload">[3/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> V , <a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">void</a> <a class="el" href="classyaclib_1_1Task.html">yaclib::Task</a>&lt; V, T &gt;::Touch </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const &amp;&amp;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">delete</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a28774561c22d2f780808a7e7466ab33c" name="a28774561c22d2f780808a7e7466ab33c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a28774561c22d2f780808a7e7466ab33c">&#9670;&#160;</a></span>Touch() <span class="overload">[4/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> V , <a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">const</a> <a class="el" href="classyaclib_1_1Task.html#a9629f6f9c9c5dbe94537a54c33194e6a">Result</a> &amp; <a class="el" href="classyaclib_1_1Task.html">yaclib::Task</a>&lt; V, T &gt;::Touch </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const &amp;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="lazy_2task_8hpp_source.html#l00127">127</a> of file <a class="el" href="lazy_2task_8hpp_source.html">task.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="log_8hpp_source.html#l00085">YACLIB_ASSERT</a>.</p>
+
+</div>
+</div>
+<a id="a9290822e4bd335c71b3e26ca3eee6e4e" name="a9290822e4bd335c71b3e26ca3eee6e4e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9290822e4bd335c71b3e26ca3eee6e4e">&#9670;&#160;</a></span>Valid()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> V , <a class="el" href="namespaceyaclib.html#a00c2be097d083519b327295f4f271568">typename</a> T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classbool.html">bool</a> <a class="el" href="classyaclib_1_1Task.html">yaclib::Task</a>&lt; V, T &gt;::Valid </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const &amp;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="lazy_2task_8hpp_source.html#l00049">49</a> of file <a class="el" href="lazy_2task_8hpp_source.html">task.hpp</a>.</p>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following files:<ul>
+<li>include/yaclib/<a class="el" href="fwd_8hpp_source.html">fwd.hpp</a></li>
+<li>include/yaclib/lazy/<a class="el" href="lazy_2task_8hpp_source.html">task.hpp</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="namespaceyaclib.html">yaclib</a></li><li class="navelem"><a class="el" href="classyaclib_1_1Task.html">Task</a></li>
+    <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+  </ul>
+</div>
+</body>
+</html>

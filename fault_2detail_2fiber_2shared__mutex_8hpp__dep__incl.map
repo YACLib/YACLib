@@ -1,0 +1,7 @@
+<map id="include/yaclib/fault/detail/fiber/shared_mutex.hpp" name="include/yaclib/fault/detail/fiber/shared_mutex.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="84,5,212,61"/>
+<area shape="rect" id="Node000002" href="$fault_2detail_2fiber_2shared__timed__mutex_8hpp.html" title=" " alt="" coords="5,109,134,165"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="120,75,93,110,89,107,116,72"/>
+<area shape="rect" id="Node000003" href="$shared__mutex_8cpp.html" title=" " alt="" coords="157,117,297,157"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="181,72,214,115,210,118,176,75"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="yaclib::detail::fiber::DefaultAllocator" name="yaclib::detail::fiber::DefaultAllocator">
+<area shape="rect" id="Node000001" title="Allocator used by default." alt="" coords="5,94,127,135"/>
+<area shape="rect" id="Node000002" href="$classyaclib_1_1detail_1_1fiber_1_1IStackAllocator.html" title="Passed to coroutine/fiber constructor, specifies the way in which memory for Stack is Allocated and R..." alt="" coords="5,5,127,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="69,62,69,94,63,94,63,62"/>
+</map>

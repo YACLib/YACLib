@@ -1,0 +1,21 @@
+<map id="yaclib::detail::AwaitOnAwaiter&lt; Handle &gt;" name="yaclib::detail::AwaitOnAwaiter&lt; Handle &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="1190,30,1381,71"/>
+<area shape="rect" id="Node000002" href="$classyaclib_1_1detail_1_1AwaitOnEvent.html" title=" " alt="" coords="960,30,1141,71"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1156,48,1190,48,1190,53,1156,53"/>
+<area shape="rect" id="Node000003" href="$classyaclib_1_1detail_1_1InlineCore.html" title=" " alt="" coords="461,68,616,94"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="632,79,679,80,769,82,859,80,959,66,960,71,860,85,769,87,679,85,632,85"/>
+<area shape="rect" id="Node000009" href="$classyaclib_1_1detail_1_1AwaitOnEvent.html" title=" " alt="" coords="679,30,859,71"/>
+<area shape="poly" id="edge9_Node000009_Node000003" title=" " alt="" coords="631,66,678,60,679,65,631,71"/>
+<area shape="rect" id="Node000004" href="$classyaclib_1_1Job.html" title="Callable that can be executed in an IExecutor." alt="" coords="317,68,398,94"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="414,78,460,78,460,84,414,84"/>
+<area shape="rect" id="Node000005" href="$classyaclib_1_1IFunc.html" title="Callable interface." alt="" coords="157,35,250,60"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="266,58,317,70,316,75,265,63"/>
+<area shape="rect" id="Node000006" href="$classyaclib_1_1IRef.html" title="Reference counting interface." alt="" coords="5,35,90,60"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="105,45,156,45,156,50,105,50"/>
+<area shape="rect" id="Node000007" href="$structyaclib_1_1detail_1_1Node.html" title="Node class, used in intrusive data structure." alt="" coords="139,84,267,110"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="283,86,316,82,316,88,283,91"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="447,5,630,31"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="645,13,654,13,757,11,860,16,937,28,960,32,959,37,936,33,859,21,757,16,654,18,645,18"/>
+<area shape="poly" id="edge10_Node000009_Node000008" title=" " alt="" coords="645,30,679,35,678,40,645,36"/>
+<area shape="poly" id="edge8_Node000002_Node000009" title=" " alt="" coords="875,48,960,48,960,53,875,53"/>
+</map>

@@ -1,0 +1,4 @@
+var structyaclib__std_1_1coroutine__traits_3_01yaclib_1_1SharedFuture_3_01V_00_01T_01_4_00_01Args_8_8_8_01_4 =
+[
+    [ "promise_type", "structyaclib__std_1_1coroutine__traits_3_01yaclib_1_1SharedFuture_3_01V_00_01T_01_4_00_01Args_8_8_8_01_4.html#aa20dc5480618f0d1e90e8e14fda3015d", null ]
+];

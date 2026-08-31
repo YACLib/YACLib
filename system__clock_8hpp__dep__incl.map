@@ -1,0 +1,43 @@
+<map id="include/yaclib/fault/detail/fiber/system_clock.hpp" name="include/yaclib/fault/detail/fiber/system_clock.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="1035,5,1165,61"/>
+<area shape="rect" id="Node000002" href="$queue_8hpp.html" title=" " alt="" coords="942,109,1089,150"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1067,74,1035,111,1031,107,1063,71"/>
+<area shape="rect" id="Node000020" href="$system__clock_8cpp.html" title=" " alt="" coords="1114,109,1256,150"/>
+<area shape="poly" id="edge21_Node000001_Node000020" title=" " alt="" coords="1136,71,1169,107,1165,111,1132,74"/>
+<area shape="rect" id="Node000003" href="$fiber_2atomic__wait_8hpp.html" title=" " alt="" coords="181,198,309,253"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="927,144,310,219,309,214,926,139"/>
+<area shape="rect" id="Node000006" href="$fault_2detail_2fiber_2mutex_8hpp.html" title=" " alt="" coords="581,205,728,246"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="928,156,729,208,728,202,926,151"/>
+<area shape="rect" id="Node000009" href="$fault_2detail_2fiber_2timed__mutex_8hpp.html" title=" " alt="" coords="681,309,868,350"/>
+<area shape="poly" id="edge19_Node000002_Node000009" title=" " alt="" coords="982,162,800,310,797,306,978,158"/>
+<area shape="rect" id="Node000011" href="$fault_2detail_2fiber_2recursive__mutex_8hpp.html" title=" " alt="" coords="1000,198,1141,253"/>
+<area shape="poly" id="edge10_Node000002_Node000011" title=" " alt="" coords="1037,162,1057,196,1052,198,1032,165"/>
+<area shape="rect" id="Node000012" href="$fault_2detail_2fiber_2recursive__timed__mutex_8hpp.html" title=" " alt="" coords="892,301,1033,357"/>
+<area shape="poly" id="edge13_Node000002_Node000012" title=" " alt="" coords="1003,165,990,198,977,253,969,301,963,301,972,252,985,197,998,163"/>
+<area shape="rect" id="Node000014" href="$fault_2detail_2fiber_2shared__mutex_8hpp.html" title=" " alt="" coords="1200,198,1328,253"/>
+<area shape="poly" id="edge14_Node000002_Node000014" title=" " alt="" coords="1083,153,1200,197,1198,202,1081,158"/>
+<area shape="rect" id="Node000017" href="$fault_2detail_2fiber_2thread_8hpp.html" title=" " alt="" coords="1352,205,1501,246"/>
+<area shape="poly" id="edge17_Node000002_Node000017" title=" " alt="" coords="1105,147,1225,170,1340,195,1366,202,1364,207,1339,200,1224,175,1104,153"/>
+<area shape="rect" id="Node000019" href="$queue_8cpp.html" title=" " alt="" coords="1524,213,1683,238"/>
+<area shape="poly" id="edge20_Node000002_Node000019" title=" " alt="" coords="1105,147,1221,162,1311,169,1401,177,1514,195,1568,209,1567,215,1512,200,1400,182,1311,174,1220,167,1104,153"/>
+<area shape="rect" id="Node000004" href="$fault_2detail_2fiber_2atomic_8hpp.html" title=" " alt="" coords="5,309,157,350"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="190,264,114,311,111,306,187,260"/>
+<area shape="rect" id="Node000005" href="$fault_2detail_2fiber_2atomic__flag_8hpp.html" title=" " alt="" coords="181,301,309,357"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="248,269,248,301,242,301,242,269"/>
+<area shape="rect" id="Node000007" href="$fault_2detail_2fiber_2condition__variable_8hpp.html" title=" " alt="" coords="334,301,474,357"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="593,254,472,303,470,298,591,250"/>
+<area shape="poly" id="edge8_Node000006_Node000009" title=" " alt="" coords="690,254,753,306,750,310,687,258"/>
+<area shape="rect" id="Node000010" href="$mutex_8cpp.html" title=" " alt="" coords="497,316,657,342"/>
+<area shape="poly" id="edge9_Node000006_Node000010" title=" " alt="" coords="632,260,588,318,584,314,628,257"/>
+<area shape="rect" id="Node000008" href="$fiber_2condition__variable_8cpp.html" title=" " alt="" coords="328,405,480,446"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="406,373,406,405,401,405,401,373"/>
+<area shape="poly" id="edge11_Node000011_Node000012" title=" " alt="" coords="1032,266,993,303,990,299,1029,262"/>
+<area shape="rect" id="Node000013" href="$recursive__mutex_8cpp.html" title=" " alt="" coords="1058,309,1211,350"/>
+<area shape="poly" id="edge12_Node000011_Node000013" title=" " alt="" coords="1098,265,1124,307,1120,310,1093,268"/>
+<area shape="rect" id="Node000015" href="$fault_2detail_2fiber_2shared__timed__mutex_8hpp.html" title=" " alt="" coords="1236,301,1364,357"/>
+<area shape="poly" id="edge15_Node000014_Node000015" title=" " alt="" coords="1281,267,1293,300,1287,302,1276,269"/>
+<area shape="rect" id="Node000016" href="$shared__mutex_8cpp.html" title=" " alt="" coords="1387,309,1527,350"/>
+<area shape="poly" id="edge16_Node000014_Node000016" title=" " alt="" coords="1330,259,1421,306,1419,311,1328,263"/>
+<area shape="rect" id="Node000018" href="$thread_8cpp.html" title=" " alt="" coords="1550,316,1711,342"/>
+<area shape="poly" id="edge18_Node000017_Node000018" title=" " alt="" coords="1480,250,1607,313,1605,318,1478,255"/>
+</map>

@@ -1,0 +1,13 @@
+<map id="include/yaclib/util/detail/safe_call.hpp" name="include/yaclib/util/detail/safe_call.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="213,5,349,46"/>
+<area shape="rect" id="Node000002" href="$unique__job_8hpp.html" title=" " alt="" coords="121,94,268,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="253,59,216,95,212,92,249,55"/>
+<area shape="rect" id="Node000006" href="$shared__func_8hpp.html" title=" " alt="" coords="291,94,447,135"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="314,55,351,92,347,95,310,59"/>
+<area shape="rect" id="Node000003" href="$submit_8hpp.html" title=" " alt="" coords="133,183,256,223"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="197,150,197,182,192,182,192,150"/>
+<area shape="rect" id="Node000004" href="$test_2example_2exe_2strand_8cpp.html" title=" " alt="" coords="5,279,189,305"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="163,236,112,281,109,277,159,232"/>
+<area shape="rect" id="Node000005" href="$thread__pool_8cpp.html" title=" " alt="" coords="213,271,373,312"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="230,232,272,269,269,273,226,236"/>
+</map>

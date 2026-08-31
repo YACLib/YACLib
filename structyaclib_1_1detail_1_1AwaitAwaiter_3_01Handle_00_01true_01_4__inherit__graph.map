@@ -1,0 +1,15 @@
+<map id="yaclib::detail::AwaitAwaiter&lt; Handle, true &gt;" name="yaclib::detail::AwaitAwaiter&lt; Handle, true &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="100,315,274,356"/>
+<area shape="rect" id="Node000002" href="$structyaclib_1_1detail_1_1AwaitAwaiterBase.html" title=" " alt="" coords="5,226,180,267"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="127,276,168,313,164,317,123,280"/>
+<area shape="rect" id="Node000003" href="$classyaclib_1_1detail_1_1InlineCore.html" title=" " alt="" coords="204,234,360,260"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="259,272,210,317,207,313,256,268"/>
+<area shape="rect" id="Node000004" href="$classyaclib_1_1Job.html" title="Callable that can be executed in an IExecutor." alt="" coords="241,153,323,178"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="285,194,285,233,279,233,279,194"/>
+<area shape="rect" id="Node000005" href="$classyaclib_1_1IFunc.html" title="Callable interface." alt="" coords="169,79,262,105"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="238,114,273,150,269,154,235,118"/>
+<area shape="rect" id="Node000006" href="$classyaclib_1_1IRef.html" title="Reference counting interface." alt="" coords="173,5,257,31"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="218,46,218,79,213,79,213,46"/>
+<area shape="rect" id="Node000007" href="$structyaclib_1_1detail_1_1Node.html" title="Node class, used in intrusive data structure." alt="" coords="286,79,414,105"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="330,118,295,154,291,150,326,114"/>
+</map>

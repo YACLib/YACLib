@@ -1,0 +1,17 @@
+<map id="yaclib::detail::GuardState" name="yaclib::detail::GuardState">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,58,169,84"/>
+<area shape="rect" id="Node000002" href="$classyaclib_1_1detail_1_1Guard.html" title=" " alt="" coords="469,5,602,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="149,51,218,36,284,28,351,23,469,21,469,27,352,29,285,33,218,42,150,56"/>
+<area shape="rect" id="Node000004" href="$classyaclib_1_1detail_1_1Guard.html" title=" " alt="" coords="469,100,602,141"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="149,86,218,100,352,114,469,118,469,123,352,119,218,106,148,91"/>
+<area shape="rect" id="Node000007" href="$classyaclib_1_1detail_1_1Guard.html" title=" " alt="" coords="218,51,350,91"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="184,68,217,68,217,74,184,74"/>
+<area shape="rect" id="Node000003" href="$classyaclib_1_1SharedGuard.html" title=" " alt="" coords="651,13,820,39"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="617,23,651,23,651,28,617,28"/>
+<area shape="rect" id="Node000005" href="$classyaclib_1_1StickyGuard.html" title=" " alt="" coords="654,125,818,151"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="618,125,653,128,653,133,617,130"/>
+<area shape="rect" id="Node000006" href="$classyaclib_1_1UniqueGuard.html" title=" " alt="" coords="651,76,820,101"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="617,105,651,99,652,104,618,110"/>
+<area shape="poly" id="edge7_Node000007_Node000002" title=" " alt="" coords="365,54,445,39,468,35,469,40,446,45,366,59"/>
+<area shape="poly" id="edge8_Node000007_Node000004" title=" " alt="" coords="366,84,469,105,468,110,365,90"/>
+</map>

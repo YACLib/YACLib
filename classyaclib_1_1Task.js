@@ -1,0 +1,28 @@
+var classyaclib_1_1Task =
+[
+    [ "Result", "classyaclib_1_1Task.html#a9629f6f9c9c5dbe94537a54c33194e6a", null ],
+    [ "Task", "classyaclib_1_1Task.html#ab8826a33953efeefdf31ed945a5a8c47", null ],
+    [ "Task", "classyaclib_1_1Task.html#a9bcdc30e4b6ccc48b942b39aeb55c8b2", null ],
+    [ "Task", "classyaclib_1_1Task.html#a45a647f03b9f2d69964dd364a1e8b854", null ],
+    [ "~Task", "classyaclib_1_1Task.html#a630e201bcc135dd8ccd9ddda61ba9961", null ],
+    [ "Task", "classyaclib_1_1Task.html#a765b79b83d26dde535c5c921f8588ef4", null ],
+    [ "Cancel", "classyaclib_1_1Task.html#aa4db0f9293f6e00a8fdbfd088c7da153", null ],
+    [ "Detach", "classyaclib_1_1Task.html#aeffe6b908bd0b61b4ee6d15d5aab0f55", null ],
+    [ "Detach", "classyaclib_1_1Task.html#a404b61ff933b6ff2b2f2ade834dc2001", null ],
+    [ "Get", "classyaclib_1_1Task.html#a7bc56580f8245c2d75863ba66cfaeead", null ],
+    [ "GetCore", "classyaclib_1_1Task.html#a1a0700725c2d1bb78a00c32d9b3bdd03", null ],
+    [ "On", "classyaclib_1_1Task.html#ab5bd0e06659ed7b6ab6d317bebb01e7f", null ],
+    [ "operator=", "classyaclib_1_1Task.html#a056097ec8035d0daf5ec7f71965cabfe", null ],
+    [ "operator=", "classyaclib_1_1Task.html#a43bb29d712be63edd2e7f22a8eb6db3b", null ],
+    [ "Ready", "classyaclib_1_1Task.html#a532780c92f4d4a8f93f17e8c70cdad23", null ],
+    [ "Then", "classyaclib_1_1Task.html#a267ee1bfd5903bfd8b2ecff479d19c04", null ],
+    [ "Then", "classyaclib_1_1Task.html#a5150e0e90b09a04572d88ed508fcd176", null ],
+    [ "ThenInline", "classyaclib_1_1Task.html#ac6f1b50e65d68fdb92a21be4af2a3f8d", null ],
+    [ "ToFuture", "classyaclib_1_1Task.html#a251e6d1093b726c43e4f23cb9dcab4c7", null ],
+    [ "ToFuture", "classyaclib_1_1Task.html#ad27d1b2b00e7ca131dda63a9f144c940", null ],
+    [ "Touch", "classyaclib_1_1Task.html#ae232008ae20a0a4752aca0c0fcc270fd", null ],
+    [ "Touch", "classyaclib_1_1Task.html#a2d32adaaa85da7e9f22008644397cdf4", null ],
+    [ "Touch", "classyaclib_1_1Task.html#a64864686f9a05be43675ee9444499333", null ],
+    [ "Touch", "classyaclib_1_1Task.html#a28774561c22d2f780808a7e7466ab33c", null ],
+    [ "Valid", "classyaclib_1_1Task.html#a9290822e4bd335c71b3e26ca3eee6e4e", null ]
+];
