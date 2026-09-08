@@ -43,33 +43,40 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # TODO(MBkkt) https://github.com/msys2/setup-msys2?
-      # TODO(MBkkt) Run tests with MinGW
-      # - name: Set up MinGW x86
-      #   if: ${{ matrix.arch == 'Win32' }}
-      #   uses: egor-tensin/setup-mingw@v2
-      #   with:
-      #     platform: x86
-      #
-      # - name: Set up MinGW x64
-      #   if: ${{ matrix.arch == 'x64' }}
-      #   uses: egor-tensin/setup-mingw@v2
-      #   with:
-      #     platform: x64
+      - name: Set up MinGW x86
+        if: ${{ matrix.arch == 'Win32' }}
+        uses: msys2/setup-msys2@v2 
+        with:
+          msystem: mingw32
+          install: mingw-w64-i686-cmake mingw-w64-i686-ninja mingw-w64-i686-gcc
+      
+      - name: Set up MinGW x64
+        if: ${{ matrix.arch == 'x64' }}
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: mingw64
+          install: mingw-w64-x86_64-cmake mingw-w64-x86_64-ninja mingw-w64-x86_64-gcc
 
       - name: Configure CMake
-        shell: bash
+        shell: bash 
         run: |
-          msvc="17 2022"
+          os=${{ matrix.os }}
+          if [[ "$os" == "2022" ]]; then
+            msvc="17 2022"
+          else
+            msvc="18 2026"
+          fi
+
           arch=${{ matrix.arch }}
           if [[ "$arch" == "Win32" ]]; then
             slowdown=5
           else
             slowdown=1
           fi
-          names=(MSVC ClangCL)  # TODO(MBkkt) MinGW
-          generators=("Visual Studio $msvc" "Visual Studio $msvc" "MinGW Makefiles")
-          options=("-A $arch" "-A $arch -T ClangCL" "-DCMAKE_BUILD_TYPE=${{ matrix.build_type }}")
+
+          names=(MSVC ClangCL)
+          generators=("Visual Studio $msvc" "Visual Studio $msvc")
+          options=("-A $arch" "-A $arch -T ClangCL")
 
           for (( i=0; i<${#names[*]}; i+=1 )); do
             if [[ "${names[$i]}" == "MSVC" ]]; then
@@ -90,20 +97,67 @@ jobs:
               -DYACLIB_DEFINITIONS="YACLIB_CI_SLOWDOWN=$slowdown"
           done
 
+      - name: Configure CMake MinGW
+        shell: msys2 {0}
+        run: |
+          arch=${{ matrix.arch }}
+          if [[ "$arch" == "Win32" ]]; then
+            slowdown=5
+          else
+            slowdown=1
+          fi
+
+          dir="build_MinGW"
+          echo $dir
+
+          cmake -S . -B $dir                                                                                           \
+              -DYACLIB_CXX_STANDARD=17                                                                                 \
+              -DYACLIB_TEST=SINGLE                                                                                     \
+              -DYACLIB_LOG="DEBUG"                                                                                     \
+              -G Ninja                                                                                                 \
+              -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}                                                              \
+              -DYACLIB_DEFINITIONS="YACLIB_CI_SLOWDOWN=$slowdown"
+
       - name: Build
         shell: bash
         run: |
           for dir in build*/; do
+            if [[ "$dir" == "build_MinGW/" ]]; then
+              continue
+            fi
+
             echo $dir
             cmake --build $dir --config ${{ matrix.build_type }} --parallel
             echo
           done
 
+      - name: Build MinGW
+        shell: msys2 {0}
+        run: | 
+            dir="build_MinGW/"
+
+            echo $dir
+            cmake --build $dir --config ${{ matrix.build_type }} --parallel
+            echo
+
       - name: Test
         shell: bash
         run: |
           for dir in build*/; do
+            if [[ "$dir" == "build_MinGW/" ]]; then
+              continue
+            fi
+
             cd $dir
             ctest --output-on-failure -C ${{ matrix.build_type }} -V
             cd ..
           done
+
+      - name: Test MinGW
+        shell: msys2 {0}
+        run: | 
+          dir="build_MinGW/"
+
+          cd $dir
+          ctest --output-on-failure -C ${{ matrix.build_type }} -V
+          cd ..

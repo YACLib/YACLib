@@ -112,7 +112,7 @@ jobs:
           compiler=${{ matrix.compiler }}
           clang_version=${compiler:6}
           sudo apt update
-          sudo apt install clang-${clang_version} libc++-${clang_version}-dev libc++abi-${clang_version}-dev       \
+          sudo apt install clang-${clang_version} libc++-${clang_version}-dev libc++abi-${clang_version}-dev           \
                            gcc-${gcc_version} g++-${gcc_version} libstdc++-${gcc_version}-dev
 
           sudo update-alternatives                                                                                     \
@@ -202,7 +202,7 @@ jobs:
                 -DCMAKE_CXX_COMPILER="$compiler"                                                                       \
                 -G"Ninja"                                                                                              \
                 -DYACLIB_LINK_OPTIONS="$link_option"                                                                   \
-                -DYACLIB_LOG="DEBUG"                                                                             \
+                -DYACLIB_LOG="DEBUG"                                                                                   \
                 -DYACLIB_COMPILE_OPTIONS="$compile_option"
             done
           done

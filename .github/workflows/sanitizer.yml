@@ -104,8 +104,8 @@ jobs:
         if: ${{ matrix.os == 'ubuntu-24.04' || matrix.os == 'ubuntu-24.04-arm' }}
         run: |
           sudo apt update
-          sudo apt install ninja-build googletest                                                                  \
-                           gcc-14 g++-14 libstdc++-14-dev                                                          \
+          sudo apt install ninja-build googletest                                                                      \
+                           gcc-14 g++-14 libstdc++-14-dev                                                              \
                            clang-18 lld-18 libc++-18-dev libc++abi-18-dev libclang-common-18-dev
           # We use lld because it faster than ld and gold and don't have strange issues like mold
           sudo ln -sf /usr/bin/lld-18 /usr/local/bin/ld
@@ -214,7 +214,7 @@ jobs:
                 cmake -S . -B $dir                                                                                     \
                   -DCMAKE_BUILD_TYPE=$build_type                                                                       \
                   -DYACLIB_CXX_STANDARD=23                                                                             \
-                  -DYACLIB_TEST=SINGLE -DYACLIB_EXT_TEST=OFF                                                                                 \
+                  -DYACLIB_TEST=SINGLE -DYACLIB_EXT_TEST=OFF                                                           \
                   -DYACLIB_FLAGS="CORO;$flags"                                                                         \
                   -DCMAKE_CXX_COMPILER=${cxx_compilers[$i]}                                                            \
                   -G"Ninja"                                                                                            \
@@ -259,7 +259,7 @@ jobs:
 
               cmake -S . -B $dir                                                                                       \
                 -DYACLIB_CXX_STANDARD=${cxx_standard}                                                                  \
-                -DYACLIB_TEST=SINGLE -DYACLIB_EXT_TEST=OFF                                                                                   \
+                -DYACLIB_TEST=SINGLE -DYACLIB_EXT_TEST=OFF                                                             \
                 -DYACLIB_FLAGS="$coroutine_option;$flags"                                                              \
                 -DYACLIB_FAULT=$yaclib_fault                                                                           \
                 -DYACLIB_LOG="DEBUG"                                                                                   \
