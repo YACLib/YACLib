@@ -61,6 +61,7 @@ set(YACLIB_UNIT_SOURCES
   unit/algo/wait
   unit/algo/when_any
   unit/algo/wait_group
+  unit/algo/ranges
   unit/runtime/fair_thread_pool
   unit/async/shared_future
   unit/async/stress
@@ -79,6 +80,7 @@ if (YACLIB_CORO_NEED)
     unit/coro/future_coro_traits
     unit/coro/stress
     unit/coro/on
+    unit/coro/ranges
     )
 endif ()
 

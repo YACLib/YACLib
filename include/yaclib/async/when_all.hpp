@@ -37,8 +37,9 @@ YACLIB_INLINE auto WhenAll(Futures... futures) {
   }
 }
 
-template <FailPolicy F = FailPolicy::FirstFail, typename It, typename T = typename std::iterator_traits<It>::value_type>
+template <FailPolicy F = FailPolicy::FirstFail, typename It, typename = std::enable_if_t<is_input_iterator_v<It>>>
 YACLIB_INLINE auto WhenAll(It begin, std::size_t count) {
+  using T = typename std::iterator_traits<It>::value_type;
   using OutputTrait = typename T::Core::Trait;
 
   if constexpr (std::is_same_v<typename T::Core::Value, void> && F != FailPolicy::None) {
@@ -49,11 +50,20 @@ YACLIB_INLINE auto WhenAll(It begin, std::size_t count) {
   }
 }
 
-template <FailPolicy F = FailPolicy::FirstFail, typename It, typename T = typename std::iterator_traits<It>::value_type>
-YACLIB_INLINE auto WhenAll(It begin, It end) {
-  // We don't use std::distance because we want to alert the user to the fact that it can be expensive.
-  // Maybe the user has the size of the range, otherwise it is suggested to call WhenAny(begin, distance(begin, end))
+template <FailPolicy F = FailPolicy::FirstFail, typename It, typename Sentinel,
+          typename = std::enable_if_t<is_input_range_pair_v<It, Sentinel>>>
+YACLIB_INLINE auto WhenAll(It begin, Sentinel end) {
+  static_assert(
+    has_constant_time_distance_v<It, Sentinel>,
+    "Use WhenAll(begin, std::distance(begin, end)) instead");  // We don't use std::distance because we want to alert
+                                                               // the user to the fact that it can be expensive.
+
   return WhenAll<F>(begin, static_cast<std::size_t>(end - begin));
+}
+
+template <FailPolicy F = FailPolicy::FirstFail, typename Range, typename = std::enable_if_t<is_input_range_v<Range>>>
+YACLIB_INLINE auto WhenAll(Range&& range) {
+  return WhenAll<F>(std::begin(range), std::end(range));
 }
 
 }  // namespace yaclib

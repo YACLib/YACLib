@@ -6,6 +6,8 @@
 #include <yaclib/util/fail_policy.hpp>
 #include <yaclib/util/type_traits.hpp>
 
+#include <algorithm>
+
 namespace yaclib {
 
 template <FailPolicy F = FailPolicy::LastFail, typename... Futures,
@@ -19,8 +21,10 @@ YACLIB_INLINE auto WhenAny(Futures... futures) {
   return when::When<when::Any, F, OutputValue, OutputTrait>(std::move(futures)...);
 }
 
-template <FailPolicy F = FailPolicy::LastFail, typename It, typename T = typename std::iterator_traits<It>::value_type>
+template <FailPolicy F = FailPolicy::LastFail, typename It, typename = std::enable_if_t<is_input_iterator_v<It>>>
 YACLIB_INLINE auto WhenAny(It begin, std::size_t count) {
+  using T = typename std::iterator_traits<It>::value_type;
+
   if constexpr (is_future_base_v<T>) {
     if (count == 1) {
       using V = async_value_t<T>;
@@ -32,11 +36,20 @@ YACLIB_INLINE auto WhenAny(It begin, std::size_t count) {
   return when::When<when::Any, F, typename T::Core::Value, typename T::Core::Trait>(begin, count);
 }
 
-template <FailPolicy F = FailPolicy::LastFail, typename It, typename T = typename std::iterator_traits<It>::value_type>
-YACLIB_INLINE auto WhenAny(It begin, It end) {
-  // We don't use std::distance because we want to alert the user to the fact that it can be expensive.
-  // Maybe the user has the size of the range, otherwise it is suggested to call WhenAny(begin, distance(begin, end))
+template <FailPolicy F = FailPolicy::LastFail, typename It, typename Sentinel,
+          typename = std::enable_if_t<is_input_range_pair_v<It, Sentinel>>>
+YACLIB_INLINE auto WhenAny(It begin, Sentinel end) {
+  static_assert(
+    has_constant_time_distance_v<It, Sentinel>,
+    "Use WhenAny(begin, std::distance(begin, end)) instead");  // We don't use std::distance because we want to alert
+                                                               // the user to the fact that it can be expensive.
+
   return WhenAny<F>(begin, static_cast<std::size_t>(end - begin));
+}
+
+template <FailPolicy F = FailPolicy::LastFail, typename Range, typename = std::enable_if_t<is_input_range_v<Range>>>
+YACLIB_INLINE auto WhenAny(Range&& range) {
+  return WhenAny<F>(std::begin(range), std::end(range));
 }
 
 }  // namespace yaclib
