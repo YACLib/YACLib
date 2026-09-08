@@ -180,12 +180,14 @@ if (NOT YACLIB_EXT_TEST STREQUAL "OFF")
   endif ()
 
   # abseil master compiler floor is above yaclib's
+  # abseil doesn't support mingw compilers at all
   set(YACLIB_EXT_ABSL TRUE)
-  if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 10)
+  if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 10 OR WIN32))
     set(YACLIB_EXT_ABSL FALSE)
   elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 14)
     set(YACLIB_EXT_ABSL FALSE)
   endif ()
+  
   if (YACLIB_EXT_ABSL)
     find_package(absl QUIET)
     if (NOT absl_FOUND)
@@ -202,7 +204,7 @@ if (NOT YACLIB_EXT_TEST STREQUAL "OFF")
     yaclib_add_test(yaclib_ext_absl_test)
     target_link_libraries(yaclib_ext_absl_test PRIVATE absl::status absl::statusor)
   else ()
-    message(STATUS "yaclib_ext_absl_test skipped: compiler below abseil floor")
+    message(STATUS "yaclib_ext_absl_test skipped: compiler below abseil floor or unsupported")
   endif ()
 endif ()
 
